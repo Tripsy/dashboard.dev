@@ -1,10 +1,10 @@
 import { cookies, headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { Configuration } from '@/config/settings.config';
-import type { ResponseFetch } from '@/helpers/api.helper';
+import type { ApiResponseFetch } from '@/types/api.type';
 
 type NextResponseLanguage = NextResponse<
-	ResponseFetch<{
+	ApiResponseFetch<{
 		language: string;
 	}>
 >;

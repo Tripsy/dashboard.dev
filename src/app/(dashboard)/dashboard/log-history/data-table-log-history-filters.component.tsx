@@ -35,7 +35,7 @@ const sources = Object.values(LogHistorySource).map((v) => ({
 }));
 
 export const DataTableLogHistoryFilters = (): React.JSX.Element => {
-	const { stateDefault, modelStore } = useDataTable<'log_history'>();
+	const { stateDefault, dataTableStore } = useDataTable<'log_history'>();
 
 	const translationsKeys = useMemo(
 		() =>
@@ -52,9 +52,12 @@ export const DataTableLogHistoryFilters = (): React.JSX.Element => {
 
 	const { translations } = useTranslation(translationsKeys);
 
-	const filters = useStore(modelStore, (state) => state.tableState.filters);
+	const filters = useStore(
+		dataTableStore,
+		(state) => state.tableState.filters,
+	);
 	const updateTableState = useStore(
-		modelStore,
+		dataTableStore,
 		(state) => state.updateTableState,
 	);
 

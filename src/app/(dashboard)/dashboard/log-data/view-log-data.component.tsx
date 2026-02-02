@@ -6,8 +6,8 @@ import { parseJson } from '@/helpers/string.helper';
 import { useTranslation } from '@/hooks';
 
 export function ViewLogData() {
-	const { modelStore } = useDataTable<'log_data'>();
-	const actionEntry = useStore(modelStore, (state) => state.actionEntry);
+	const { dataTableStore } = useDataTable<'log_data'>();
+	const actionEntry = useStore(dataTableStore, (state) => state.actionEntry);
 
 	const translationsKeys = useMemo(
 		() =>

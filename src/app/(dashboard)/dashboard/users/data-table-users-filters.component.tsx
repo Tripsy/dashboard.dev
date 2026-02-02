@@ -27,7 +27,7 @@ const roles = Object.values(UserRoleEnum).map((v) => ({
 }));
 
 export const DataTableUsersFilters = (): React.JSX.Element => {
-	const { stateDefault, modelStore } = useDataTable<'users'>();
+	const { stateDefault, dataTableStore } = useDataTable<'users'>();
 
 	const translationsKeys = useMemo(
 		() =>
@@ -42,9 +42,12 @@ export const DataTableUsersFilters = (): React.JSX.Element => {
 
 	const { translations } = useTranslation(translationsKeys);
 
-	const filters = useStore(modelStore, (state) => state.tableState.filters);
+	const filters = useStore(
+		dataTableStore,
+		(state) => state.tableState.filters,
+	);
 	const updateTableState = useStore(
-		modelStore,
+		dataTableStore,
 		(state) => state.updateTableState,
 	);
 

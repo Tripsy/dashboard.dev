@@ -21,7 +21,7 @@ const statuses = Object.values(MailQueueStatusEnum).map((v) => ({
 }));
 
 export const DataTableMailQueueFilters = (): React.JSX.Element => {
-	const { stateDefault, modelStore } = useDataTable<'mail_queue'>();
+	const { stateDefault, dataTableStore } = useDataTable<'mail_queue'>();
 
 	const translationsKeys = useMemo(
 		() =>
@@ -37,9 +37,12 @@ export const DataTableMailQueueFilters = (): React.JSX.Element => {
 
 	const { translations } = useTranslation(translationsKeys);
 
-	const filters = useStore(modelStore, (state) => state.tableState.filters);
+	const filters = useStore(
+		dataTableStore,
+		(state) => state.tableState.filters,
+	);
 	const updateTableState = useStore(
-		modelStore,
+		dataTableStore,
 		(state) => state.updateTableState,
 	);
 

@@ -31,11 +31,8 @@ import {
 } from '@/hooks';
 import { useAuth } from '@/providers/auth.provider';
 import { useToast } from '@/providers/toast.provider';
-import {
-	type AuthTokenListType,
-	type AuthTokenType,
-	removeTokenAccount,
-} from '@/services/account.service';
+import { removeTokenAccount } from '@/services/account.service';
+import type { AuthTokenListType, AuthTokenType } from '@/types/auth.type';
 
 export default function Login() {
 	const { showToast } = useToast();

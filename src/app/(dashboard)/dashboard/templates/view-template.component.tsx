@@ -7,8 +7,8 @@ import { TemplateDetails } from '@/app/(dashboard)/dashboard/templates/template-
 import { useTranslation } from '@/hooks';
 
 export function ViewTemplate() {
-	const { modelStore } = useDataTable<'templates'>();
-	const actionEntry = useStore(modelStore, (state) => state.actionEntry);
+	const { dataTableStore } = useDataTable<'templates'>();
+	const actionEntry = useStore(dataTableStore, (state) => state.actionEntry);
 
 	const translationsKeys = useMemo(
 		() => ['dashboard.text.no_entry_selected'] as const,

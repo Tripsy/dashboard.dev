@@ -12,10 +12,8 @@ import { capitalizeFirstLetter } from '@/helpers/string.helper';
 import { useTranslation } from '@/hooks';
 import { useAuth } from '@/providers/auth.provider';
 import { useToast } from '@/providers/toast.provider';
-import {
-	type AuthTokenListType,
-	getSessions,
-} from '@/services/account.service';
+import { getSessions } from '@/services/account.service';
+import type { AuthTokenListType } from '@/types/auth.type';
 
 export default function AccountMe() {
 	const { auth, authStatus } = useAuth();

@@ -4,19 +4,16 @@ import type {
 	FindFunctionResponseType,
 	FindFunctionType,
 } from '@/config/data-source';
-import {
-	ApiRequest,
-	getResponseData,
-	type ResponseFetch,
-} from '@/helpers/api.helper';
+import { ApiRequest, getResponseData } from '@/helpers/api.helper';
 import { buildQueryString } from '@/helpers/string.helper';
+import type { ApiResponseFetch } from '@/types/api.type';
 
 export const findLogHistory: FindFunctionType<'log_history'> = async (
 	params: FindFunctionParamsType,
 ) => {
 	const query = buildQueryString(params);
 
-	const response: ResponseFetch<FindFunctionResponseType<'log_history'>> =
+	const response: ApiResponseFetch<FindFunctionResponseType<'log_history'>> =
 		await new ApiRequest().doFetch(`/log-history?${query}`);
 
 	return getResponseData<FindFunctionResponseType<'log_history'>>(response);

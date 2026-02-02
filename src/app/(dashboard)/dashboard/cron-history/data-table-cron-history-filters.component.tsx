@@ -21,7 +21,7 @@ const statuses = Object.values(CronHistoryStatusEnum).map((v) => ({
 }));
 
 export const DataTableCronHistoryFilters = (): React.JSX.Element => {
-	const { stateDefault, modelStore } = useDataTable<'cron_history'>();
+	const { stateDefault, dataTableStore } = useDataTable<'cron_history'>();
 
 	const translationsKeys = useMemo(
 		() =>
@@ -35,9 +35,12 @@ export const DataTableCronHistoryFilters = (): React.JSX.Element => {
 
 	const { translations } = useTranslation(translationsKeys);
 
-	const filters = useStore(modelStore, (state) => state.tableState.filters);
+	const filters = useStore(
+		dataTableStore,
+		(state) => state.tableState.filters,
+	);
 	const updateTableState = useStore(
-		modelStore,
+		dataTableStore,
 		(state) => state.updateTableState,
 	);
 

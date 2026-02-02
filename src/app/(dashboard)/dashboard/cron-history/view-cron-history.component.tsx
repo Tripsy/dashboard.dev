@@ -7,8 +7,8 @@ import { parseJson } from '@/helpers/string.helper';
 import { useTranslation } from '@/hooks';
 
 export function ViewCronHistory() {
-	const { modelStore } = useDataTable<'cron_history'>();
-	const actionEntry = useStore(modelStore, (state) => state.actionEntry);
+	const { dataTableStore } = useDataTable<'cron_history'>();
+	const actionEntry = useStore(dataTableStore, (state) => state.actionEntry);
 
 	const translationsKeys = useMemo(
 		() =>

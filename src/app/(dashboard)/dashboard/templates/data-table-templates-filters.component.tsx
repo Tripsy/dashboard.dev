@@ -27,7 +27,7 @@ const types = Object.values(TemplateTypeEnum).map((v) => ({
 }));
 
 export const DataTableTemplatesFilters = (): React.JSX.Element => {
-	const { stateDefault, modelStore } = useDataTable<'templates'>();
+	const { stateDefault, dataTableStore } = useDataTable<'templates'>();
 
 	const translationsKeys = useMemo(
 		() =>
@@ -41,9 +41,12 @@ export const DataTableTemplatesFilters = (): React.JSX.Element => {
 
 	const { translations } = useTranslation(translationsKeys);
 
-	const filters = useStore(modelStore, (state) => state.tableState.filters);
+	const filters = useStore(
+		dataTableStore,
+		(state) => state.tableState.filters,
+	);
 	const updateTableState = useStore(
-		modelStore,
+		dataTableStore,
 		(state) => state.updateTableState,
 	);
 

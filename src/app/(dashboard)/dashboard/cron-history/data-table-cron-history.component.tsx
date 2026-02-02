@@ -5,13 +5,13 @@ import { DataTableActions } from '@/app/(dashboard)/_components/data-table-actio
 import DataTableList from '@/app/(dashboard)/_components/data-table-list.component';
 import { DataTableModal } from '@/app/(dashboard)/_components/data-table-modal.component';
 import { DataTableProvider } from '@/app/(dashboard)/_providers/data-table-provider';
-import { createModelStore } from '@/app/(dashboard)/_stores/model.store';
+import { createDataTableStore } from '@/app/(dashboard)/_stores/model.store';
 import { DataTableCronHistoryFilters } from '@/app/(dashboard)/dashboard/cron-history/data-table-cron-history-filters.component';
 import { ViewCronHistory } from '@/app/(dashboard)/dashboard/cron-history/view-cron-history.component';
 import { Loading } from '@/components/loading.component';
 import { useMounted, useTranslation } from '@/hooks';
 
-const modelStore = createModelStore('cron_history');
+const dataTableStore = createDataTableStore('cron_history');
 
 export const DataTableCronHistory = (): JSX.Element => {
 	const translationsKeys = useMemo(() => ['app.text.loading'] as const, []);
@@ -27,7 +27,7 @@ export const DataTableCronHistory = (): JSX.Element => {
 		<DataTableProvider
 			dataSource="cron_history"
 			selectionMode="multiple"
-			modelStore={modelStore}
+			dataTableStore={dataTableStore}
 		>
 			<div className="standard-box p-4 shadow-md">
 				<DataTableCronHistoryFilters />

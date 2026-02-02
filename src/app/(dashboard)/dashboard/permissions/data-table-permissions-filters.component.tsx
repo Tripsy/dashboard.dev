@@ -13,7 +13,7 @@ import { createFilterHandlers } from '@/helpers/data-table.helper';
 import { useSearchFilter, useTranslation } from '@/hooks';
 
 export const DataTablePermissionsFilters = (): React.JSX.Element => {
-	const { stateDefault, modelStore } = useDataTable<'permissions'>();
+	const { stateDefault, dataTableStore } = useDataTable<'permissions'>();
 
 	const translationsKeys = useMemo(
 		() => ['permissions.form_filters.label_global'] as const,
@@ -22,9 +22,12 @@ export const DataTablePermissionsFilters = (): React.JSX.Element => {
 
 	const { translations } = useTranslation(translationsKeys);
 
-	const filters = useStore(modelStore, (state) => state.tableState.filters);
+	const filters = useStore(
+		dataTableStore,
+		(state) => state.tableState.filters,
+	);
 	const updateTableState = useStore(
-		modelStore,
+		dataTableStore,
 		(state) => state.updateTableState,
 	);
 

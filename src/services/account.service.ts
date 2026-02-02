@@ -8,11 +8,13 @@ import type { PasswordRecoverChangeFormFieldsType } from '@/app/(public)/account
 import type { PasswordUpdateFormFieldsType } from '@/app/(public)/account/password-update/password-update.definition';
 import type { RegisterFormFieldsType } from '@/app/(public)/account/register/register.definition';
 import type { UserModel } from '@/entities/user.model';
-import { ApiRequest, type ResponseFetch } from '@/helpers/api.helper';
+import { ApiRequest } from '@/helpers/api.helper';
+import type { ApiResponseFetch } from '@/types/api.type';
+import type { AuthTokenListType } from '@/types/auth.type';
 
 export async function registerAccount(
 	params: RegisterFormFieldsType,
-): Promise<ResponseFetch<UserModel>> {
+): Promise<ApiResponseFetch<UserModel>> {
 	return await new ApiRequest().doFetch('/account/register', {
 		method: 'POST',
 		body: JSON.stringify(params),
@@ -22,7 +24,7 @@ export async function registerAccount(
 export async function loginAccount(
 	params: LoginFormFieldsType,
 ): Promise<
-	ResponseFetch<{ token: string } | { authValidTokens: AuthTokenListType }>
+	ApiResponseFetch<{ token: string } | { authValidTokens: AuthTokenListType }>
 > {
 	return await new ApiRequest().doFetch('/account/login', {
 		method: 'POST',
@@ -32,7 +34,7 @@ export async function loginAccount(
 
 export async function removeTokenAccount(
 	token: string,
-): Promise<ResponseFetch<null>> {
+): Promise<ApiResponseFetch<null>> {
 	return await new ApiRequest().doFetch('/account/token', {
 		method: 'DELETE',
 		body: JSON.stringify({
@@ -41,7 +43,7 @@ export async function removeTokenAccount(
 	});
 }
 
-export async function logoutAccount(): Promise<ResponseFetch<null>> {
+export async function logoutAccount(): Promise<ApiResponseFetch<null>> {
 	return await new ApiRequest().doFetch('/account/logout', {
 		method: 'DELETE',
 	});
@@ -49,7 +51,7 @@ export async function logoutAccount(): Promise<ResponseFetch<null>> {
 
 export async function passwordRecoverAccount(
 	params: PasswordRecoverFormFieldsType,
-): Promise<ResponseFetch<null>> {
+): Promise<ApiResponseFetch<null>> {
 	return await new ApiRequest().doFetch('/account/password-recover', {
 		method: 'POST',
 		body: JSON.stringify(params),
@@ -59,7 +61,7 @@ export async function passwordRecoverAccount(
 export async function passwordRecoverChangeAccount(
 	token: string,
 	params: PasswordRecoverChangeFormFieldsType,
-): Promise<ResponseFetch<null>> {
+): Promise<ApiResponseFetch<null>> {
 	return await new ApiRequest().doFetch(
 		`/account/password-recover-change/${token}`,
 		{
@@ -71,25 +73,16 @@ export async function passwordRecoverChangeAccount(
 
 export async function emailConfirmSendAccount(
 	params: EmailConfirmSendFormFieldsType,
-): Promise<ResponseFetch<null>> {
+): Promise<ApiResponseFetch<null>> {
 	return await new ApiRequest().doFetch('/account/email-confirm-send', {
 		method: 'POST',
 		body: JSON.stringify(params),
 	});
 }
 
-export type AuthTokenType = {
-	ident: string;
-	label: string;
-	used_at: Date;
-	used_now: boolean; // true - if is a match for the current session
-};
-
-export type AuthTokenListType = AuthTokenType[];
-
 export async function getSessions(): Promise<AuthTokenListType | []> {
 	try {
-		const fetchResponse: ResponseFetch<AuthTokenListType> =
+		const fetchResponse: ApiResponseFetch<AuthTokenListType> =
 			await new ApiRequest().doFetch('/account/me/sessions', {
 				method: 'GET',
 			});
@@ -106,7 +99,7 @@ export async function getSessions(): Promise<AuthTokenListType | []> {
 
 export async function editAccount(
 	params: AccountEditFormFieldsType,
-): Promise<ResponseFetch<null>> {
+): Promise<ApiResponseFetch<null>> {
 	return await new ApiRequest().doFetch('/account/me/edit', {
 		method: 'POST',
 		body: JSON.stringify(params),
@@ -115,7 +108,7 @@ export async function editAccount(
 
 export async function passwordUpdateAccount(
 	params: PasswordUpdateFormFieldsType,
-): Promise<ResponseFetch<{ token: string }>> {
+): Promise<ApiResponseFetch<{ token: string }>> {
 	return await new ApiRequest().doFetch('/account/password-update', {
 		method: 'POST',
 		body: JSON.stringify(params),
@@ -124,7 +117,7 @@ export async function passwordUpdateAccount(
 
 export async function emailUpdateAccount(
 	params: EmailUpdateFormFieldsType,
-): Promise<ResponseFetch<null>> {
+): Promise<ApiResponseFetch<null>> {
 	return await new ApiRequest().doFetch('/account/email-update', {
 		method: 'POST',
 		body: JSON.stringify(params),
@@ -133,7 +126,7 @@ export async function emailUpdateAccount(
 
 export async function deleteAccount(
 	params: AccountDeleteFormFieldsType,
-): Promise<ResponseFetch<{ token: string }>> {
+): Promise<ApiResponseFetch<{ token: string }>> {
 	return await new ApiRequest().doFetch('/account/me/delete', {
 		method: 'DELETE',
 		body: JSON.stringify(params),

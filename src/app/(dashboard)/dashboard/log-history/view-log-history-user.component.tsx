@@ -11,8 +11,8 @@ import { getUser } from '@/services/users.service';
 export function ViewLogHistoryUser() {
 	const { showToast } = useToast();
 
-	const { modelStore } = useDataTable<'log_history'>();
-	const actionEntry = useStore(modelStore, (state) => state.actionEntry);
+	const { dataTableStore } = useDataTable<'log_history'>();
+	const actionEntry = useStore(dataTableStore, (state) => state.actionEntry);
 
 	const translationsKeys = useMemo(
 		() =>

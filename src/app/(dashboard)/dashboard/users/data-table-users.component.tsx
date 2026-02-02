@@ -5,7 +5,7 @@ import { DataTableActions } from '@/app/(dashboard)/_components/data-table-actio
 import DataTableList from '@/app/(dashboard)/_components/data-table-list.component';
 import { DataTableModal } from '@/app/(dashboard)/_components/data-table-modal.component';
 import { DataTableProvider } from '@/app/(dashboard)/_providers/data-table-provider';
-import { createModelStore } from '@/app/(dashboard)/_stores/model.store';
+import { createDataTableStore } from '@/app/(dashboard)/_stores/model.store';
 import { DataTableUsersFilters } from '@/app/(dashboard)/dashboard/users/data-table-users-filters.component';
 import { FormManageUser } from '@/app/(dashboard)/dashboard/users/form-manage-user.component';
 import { SetupPermissionsUser } from '@/app/(dashboard)/dashboard/users/setup-permissions-user.component';
@@ -13,7 +13,7 @@ import { ViewUser } from '@/app/(dashboard)/dashboard/users/view-user.component'
 import { Loading } from '@/components/loading.component';
 import { useMounted, useTranslation } from '@/hooks';
 
-const modelStore = createModelStore('users');
+const dataTableStore = createDataTableStore('users');
 
 export const DataTableUsers = (): JSX.Element => {
 	const translationsKeys = useMemo(() => ['app.text.loading'] as const, []);
@@ -29,7 +29,7 @@ export const DataTableUsers = (): JSX.Element => {
 		<DataTableProvider
 			dataSource="users"
 			selectionMode="checkbox"
-			modelStore={modelStore}
+			dataTableStore={dataTableStore}
 		>
 			<div className="standard-box p-4 shadow-md">
 				<DataTableUsersFilters />

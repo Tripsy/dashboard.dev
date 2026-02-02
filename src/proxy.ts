@@ -7,13 +7,10 @@ import {
 	hasPermission,
 	prepareAuthModel,
 } from '@/entities/auth.model';
-import {
-	ApiRequest,
-	getResponseData,
-	type ResponseFetch,
-} from '@/helpers/api.helper';
+import { ApiRequest, getResponseData } from '@/helpers/api.helper';
 import { getTrackedCookie } from '@/helpers/session.helper';
 import { apiHeaders } from '@/helpers/system.helper';
+import type { ApiResponseFetch } from '@/types/api.type';
 
 class MiddlewareContext {
 	req: NextRequest;
@@ -242,15 +239,16 @@ class MiddlewareContext {
  */
 async function fetchAuthModel(token: string): Promise<AuthModel> {
 	try {
-		const fetchResponse: ResponseFetch<AuthModel> = await new ApiRequest()
-			.setRequestMode('remote-api')
-			.doFetch('/account/me', {
-				method: 'GET',
-				headers: {
-					Authorization: `Bearer ${token}`,
-					...(await apiHeaders()),
-				},
-			});
+		const fetchResponse: ApiResponseFetch<AuthModel> =
+			await new ApiRequest()
+				.setRequestMode('remote-api')
+				.doFetch('/account/me', {
+					method: 'GET',
+					headers: {
+						Authorization: `Bearer ${token}`,
+						...(await apiHeaders()),
+					},
+				});
 
 		if (fetchResponse?.success) {
 			const responseData = getResponseData(fetchResponse);

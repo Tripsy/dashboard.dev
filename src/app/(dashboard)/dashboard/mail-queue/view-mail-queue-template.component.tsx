@@ -11,8 +11,8 @@ import { getTemplate } from '@/services/templates.service';
 export function ViewMailQueueTemplate() {
 	const { showToast } = useToast();
 
-	const { modelStore } = useDataTable<'mail_queue'>();
-	const actionEntry = useStore(modelStore, (state) => state.actionEntry);
+	const { dataTableStore } = useDataTable<'mail_queue'>();
+	const actionEntry = useStore(dataTableStore, (state) => state.actionEntry);
 
 	const translationsKeys = useMemo(
 		() =>

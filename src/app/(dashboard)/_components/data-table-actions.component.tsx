@@ -29,19 +29,19 @@ type ActionKey = 'create' | 'update' | 'delete' | string;
 export function DataTableActions() {
 	const [error, setError] = useState<string | null>(null);
 
-	const { dataSource, selectionMode, modelStore } = useDataTable();
+	const { dataSource, selectionMode, dataTableStore } = useDataTable();
 	const { auth } = useAuth();
 	const { showToast } = useToast();
 
-	const openCreate = useStore(modelStore, (state) => state.openCreate);
-	const openUpdate = useStore(modelStore, (state) => state.openUpdate);
-	const openAction = useStore(modelStore, (state) => state.openAction);
+	const openCreate = useStore(dataTableStore, (state) => state.openCreate);
+	const openUpdate = useStore(dataTableStore, (state) => state.openUpdate);
+	const openAction = useStore(dataTableStore, (state) => state.openAction);
 	const setActionEntry = useStore(
-		modelStore,
+		dataTableStore,
 		(state) => state.setActionEntry,
 	);
 	const selectedEntries = useStore(
-		modelStore,
+		dataTableStore,
 		(state) => state.selectedEntries,
 	);
 

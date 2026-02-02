@@ -33,14 +33,14 @@ export function FormManage<K extends keyof DataSourceType>({
 }: {
 	children: React.ReactNode;
 }) {
-	const { dataSource, modelStore } = useDataTable<K>();
+	const { dataSource, dataTableStore } = useDataTable<K>();
 	const { showToast } = useToast();
 
-	const actionName = useStore(modelStore, (state) => state.actionName);
-	const actionEntry = useStore(modelStore, (state) => state.actionEntry);
-	const closeOut = useStore(modelStore, (state) => state.closeOut);
+	const actionName = useStore(dataTableStore, (state) => state.actionName);
+	const actionEntry = useStore(dataTableStore, (state) => state.actionEntry);
+	const closeOut = useStore(dataTableStore, (state) => state.closeOut);
 	const refreshTableState = useStore(
-		modelStore,
+		dataTableStore,
 		(state) => state.refreshTableState,
 	);
 

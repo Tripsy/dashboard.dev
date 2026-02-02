@@ -4,21 +4,18 @@ import { translate } from '@/config/lang';
 import { Configuration } from '@/config/settings.config';
 import { type AuthModel, prepareAuthModel } from '@/entities/auth.model';
 import { ApiError } from '@/exceptions/api.error';
-import {
-	ApiRequest,
-	getResponseData,
-	type ResponseFetch,
-} from '@/helpers/api.helper';
+import { ApiRequest, getResponseData } from '@/helpers/api.helper';
 import {
 	deleteCookie,
 	getTrackedCookie,
 	setupTrackedCookie,
 } from '@/helpers/session.helper';
 import { apiHeaders } from '@/helpers/system.helper';
+import type { ApiResponseFetch } from '@/types/api.type';
 
 export async function createAuth(
 	sessionToken: string,
-): Promise<ResponseFetch<null>> {
+): Promise<ApiResponseFetch<null>> {
 	if (!sessionToken) {
 		return {
 			message: 'No token provided',
@@ -44,7 +41,7 @@ export async function createAuth(
 	};
 }
 
-export async function getAuth(): Promise<ResponseFetch<AuthModel>> {
+export async function getAuth(): Promise<ApiResponseFetch<AuthModel>> {
 	try {
 		const sessionToken = await getTrackedCookie(
 			Configuration.get('user.sessionToken') as string,
@@ -58,7 +55,7 @@ export async function getAuth(): Promise<ResponseFetch<AuthModel>> {
 			};
 		}
 
-		const fetchResponse: ResponseFetch<AuthModel> | undefined =
+		const fetchResponse: ApiResponseFetch<AuthModel> | undefined =
 			await new ApiRequest()
 				.setRequestMode('remote-api')
 				.doFetch('/account/me', {
@@ -115,7 +112,7 @@ export async function getAuth(): Promise<ResponseFetch<AuthModel>> {
 	}
 }
 
-export async function clearAuth(): Promise<ResponseFetch<null>> {
+export async function clearAuth(): Promise<ApiResponseFetch<null>> {
 	await deleteCookie(Configuration.get('user.sessionToken') as string);
 
 	return {

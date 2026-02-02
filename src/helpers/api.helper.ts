@@ -1,6 +1,7 @@
 import Routes from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
 import { ApiError } from '@/exceptions/api.error';
+import type { ApiRequestMode, ApiResponseFetch } from '@/types/api.type';
 
 export function getRemoteApiUrl(path: string): string {
 	path = path.replace(/^\//, ''); // Remove the first ` / ` if exist
@@ -8,19 +9,11 @@ export function getRemoteApiUrl(path: string): string {
 	return `${Configuration.get('remoteApi.url')}/${path}`;
 }
 
-export type ResponseFetch<T> =
-	| {
-			data?: T;
-			message: string;
-			success: boolean;
-	  }
-	| undefined;
-
-export function getResponseData<T>(response: ResponseFetch<T>): T | undefined {
+export function getResponseData<T>(
+	response: ApiResponseFetch<T>,
+): T | undefined {
 	return response?.data as T;
 }
-
-export type RequestMode = 'same-site' | 'use-proxy' | 'remote-api' | 'custom';
 
 export class ApiRequest {
 	static readonly ABORT_TIMEOUT: number = 10000; // 10s
@@ -32,9 +25,9 @@ export class ApiRequest {
 		},
 	};
 
-	private requestMode: RequestMode = 'use-proxy';
+	private requestMode: ApiRequestMode = 'use-proxy';
 
-	public setRequestMode(mode: RequestMode): this {
+	public setRequestMode(mode: ApiRequestMode): this {
 		this.requestMode = mode;
 
 		return this;
@@ -118,7 +111,7 @@ export class ApiRequest {
 	public async doFetch<T>(
 		path: string,
 		requestInit: RequestInit = {},
-	): Promise<ResponseFetch<T>> {
+	): Promise<ApiResponseFetch<T>> {
 		const controller = new AbortController();
 		const timeout = setTimeout(
 			() => controller.abort(),
@@ -144,7 +137,7 @@ export class ApiRequest {
 				return undefined;
 			}
 
-			const jsonResponse: ResponseFetch<T> =
+			const jsonResponse: ApiResponseFetch<T> =
 				await this.handleJsonResponse(res);
 
 			if (!res.ok) {

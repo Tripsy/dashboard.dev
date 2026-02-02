@@ -4,19 +4,16 @@ import type {
 	FindFunctionResponseType,
 	FindFunctionType,
 } from '@/config/data-source';
-import {
-	ApiRequest,
-	getResponseData,
-	type ResponseFetch,
-} from '@/helpers/api.helper';
+import { ApiRequest, getResponseData } from '@/helpers/api.helper';
 import { buildQueryString } from '@/helpers/string.helper';
+import type { ApiResponseFetch } from '@/types/api.type';
 
 export const findCronHistory: FindFunctionType<'cron_history'> = async (
 	params: FindFunctionParamsType,
 ) => {
 	const query = buildQueryString(params);
 
-	const response: ResponseFetch<FindFunctionResponseType<'cron_history'>> =
+	const response: ApiResponseFetch<FindFunctionResponseType<'cron_history'>> =
 		await new ApiRequest().doFetch(`/cron-history?${query}`);
 
 	return getResponseData<FindFunctionResponseType<'cron_history'>>(response);

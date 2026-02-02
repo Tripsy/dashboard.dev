@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import { v4 as uuid } from 'uuid';
 import { Configuration } from '@/config/settings.config';
-import type { ResponseFetch } from '@/helpers/api.helper';
 import { getTrackedCookie } from '@/helpers/session.helper';
+import type { ApiResponseFetch } from '@/types/api.type';
 
 type NextResponseCsrf = NextResponse<
-	ResponseFetch<{
+	ApiResponseFetch<{
 		csrfToken: string;
 	}>
 >;

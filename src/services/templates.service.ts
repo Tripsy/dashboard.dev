@@ -8,19 +8,16 @@ import type {
 	FindFunctionType,
 	UpdateFunctionType,
 } from '@/config/data-source';
-import {
-	ApiRequest,
-	getResponseData,
-	type ResponseFetch,
-} from '@/helpers/api.helper';
+import { ApiRequest, getResponseData } from '@/helpers/api.helper';
 import { buildQueryString } from '@/helpers/string.helper';
+import type { ApiResponseFetch } from '@/types/api.type';
 
 export const findTemplates: FindFunctionType<'templates'> = async (
 	params: FindFunctionParamsType,
 ) => {
 	const query = buildQueryString(params);
 
-	const response: ResponseFetch<FindFunctionResponseType<'templates'>> =
+	const response: ApiResponseFetch<FindFunctionResponseType<'templates'>> =
 		await new ApiRequest().doFetch(`/templates?${query}`);
 
 	return getResponseData<FindFunctionResponseType<'templates'>>(response);
@@ -55,7 +52,7 @@ export const deleteTemplate: DeleteFunctionType = async (ids: number[]) => {
 
 export const restoreTemplate = async (
 	ids: number[],
-): Promise<ResponseFetch<null>> => {
+): Promise<ApiResponseFetch<null>> => {
 	const id = ids[0];
 
 	return await new ApiRequest().doFetch(`/templates/${id}/restore`, {
@@ -64,7 +61,7 @@ export const restoreTemplate = async (
 };
 
 export const getTemplate = async (id: number) => {
-	const response: ResponseFetch<DataSourceModel<'templates'>> =
+	const response: ApiResponseFetch<DataSourceModel<'templates'>> =
 		await new ApiRequest().doFetch(`/templates/${id}`);
 
 	return getResponseData(response);

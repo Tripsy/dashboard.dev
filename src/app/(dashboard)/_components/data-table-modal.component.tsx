@@ -29,13 +29,13 @@ export function DataTableModal<K extends keyof DataSourceType>({
 	modalClass?: ModalClassMap;
 	defaultModalClass?: string;
 }) {
-	const { dataSource, modelStore } = useDataTable();
+	const { dataSource, dataTableStore } = useDataTable();
 	const { showToast } = useToast();
 
-	const isOpen = useStore(modelStore, (state) => state.isOpen);
-	const actionName = useStore(modelStore, (state) => state.actionName);
-	const actionEntry = useStore(modelStore, (state) => state.actionEntry);
-	const closeOut = useStore(modelStore, (state) => state.closeOut);
+	const isOpen = useStore(dataTableStore, (state) => state.isOpen);
+	const actionName = useStore(dataTableStore, (state) => state.actionName);
+	const actionEntry = useStore(dataTableStore, (state) => state.actionEntry);
+	const closeOut = useStore(dataTableStore, (state) => state.closeOut);
 	const actions = getDataSourceConfig(dataSource, 'actions');
 
 	if (!actions) {

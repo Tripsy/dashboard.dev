@@ -7,19 +7,16 @@ import type {
 	FindFunctionType,
 	UpdateFunctionType,
 } from '@/config/data-source';
-import {
-	ApiRequest,
-	getResponseData,
-	type ResponseFetch,
-} from '@/helpers/api.helper';
+import { ApiRequest, getResponseData } from '@/helpers/api.helper';
 import { buildQueryString } from '@/helpers/string.helper';
+import type { ApiResponseFetch } from '@/types/api.type';
 
 export const findPermissions: FindFunctionType<'permissions'> = async (
 	params: FindFunctionParamsType,
 ) => {
 	const query = buildQueryString(params);
 
-	const response: ResponseFetch<FindFunctionResponseType<'permissions'>> =
+	const response: ApiResponseFetch<FindFunctionResponseType<'permissions'>> =
 		await new ApiRequest().doFetch(`/permissions?${query}`);
 
 	return getResponseData<FindFunctionResponseType<'permissions'>>(response);
@@ -54,7 +51,7 @@ export const deletePermissions: DeleteFunctionType = async (ids: number[]) => {
 
 export const restorePermissions = async (
 	ids: number[],
-): Promise<ResponseFetch<null>> => {
+): Promise<ApiResponseFetch<null>> => {
 	const id = ids[0];
 
 	return await new ApiRequest().doFetch(`/permissions/${id}/restore`, {

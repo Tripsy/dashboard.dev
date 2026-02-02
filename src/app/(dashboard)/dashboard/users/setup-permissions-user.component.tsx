@@ -31,8 +31,8 @@ export function SetupPermissionsUser() {
 
 	const { showToast } = useToast();
 
-	const { modelStore } = useDataTable<'users'>();
-	const actionEntry = useStore(modelStore, (state) => state.actionEntry);
+	const { dataTableStore } = useDataTable<'users'>();
+	const actionEntry = useStore(dataTableStore, (state) => state.actionEntry);
 
 	const user_id = actionEntry?.id;
 

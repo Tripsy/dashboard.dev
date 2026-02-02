@@ -38,24 +38,24 @@ function displayActionEntries<K extends keyof DataSourceType>(
 }
 
 export function ActionManage() {
-	const { dataSource, modelStore } = useDataTable();
+	const { dataSource, dataTableStore } = useDataTable();
 	const { showToast } = useToast();
 
-	const isOpen = useStore(modelStore, (state) => state.isOpen);
+	const isOpen = useStore(dataTableStore, (state) => state.isOpen);
 	const actionName = useStore(
-		modelStore,
+		dataTableStore,
 		(state) => state.actionName,
 	) as string;
-	const actionEntry = useStore(modelStore, (state) => state.actionEntry);
-	const closeOut = useStore(modelStore, (state) => state.closeOut);
-	const isLoading = useStore(modelStore, (state) => state.isLoading);
-	const setLoading = useStore(modelStore, (state) => state.setLoading);
+	const actionEntry = useStore(dataTableStore, (state) => state.actionEntry);
+	const closeOut = useStore(dataTableStore, (state) => state.closeOut);
+	const isLoading = useStore(dataTableStore, (state) => state.isLoading);
+	const setLoading = useStore(dataTableStore, (state) => state.setLoading);
 	const refreshTableState = useStore(
-		modelStore,
+		dataTableStore,
 		(state) => state.refreshTableState,
 	);
 	const selectedEntries = useStore(
-		modelStore,
+		dataTableStore,
 		(state) => state.selectedEntries,
 	);
 

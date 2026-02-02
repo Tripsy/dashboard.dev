@@ -5,13 +5,13 @@ import { DataTableActions } from '@/app/(dashboard)/_components/data-table-actio
 import DataTableList from '@/app/(dashboard)/_components/data-table-list.component';
 import { DataTableModal } from '@/app/(dashboard)/_components/data-table-modal.component';
 import { DataTableProvider } from '@/app/(dashboard)/_providers/data-table-provider';
-import { createModelStore } from '@/app/(dashboard)/_stores/model.store';
+import { createDataTableStore } from '@/app/(dashboard)/_stores/model.store';
 import { DataTablePermissionsFilters } from '@/app/(dashboard)/dashboard/permissions/data-table-permissions-filters.component';
 import { FormManagePermission } from '@/app/(dashboard)/dashboard/permissions/form-manage-permission.component';
 import { Loading } from '@/components/loading.component';
 import { useMounted, useTranslation } from '@/hooks';
 
-const modelStore = createModelStore('permissions');
+const dataTableStore = createDataTableStore('permissions');
 
 export const DataTablePermissions = (): JSX.Element => {
 	const translationsKeys = useMemo(() => ['app.text.loading'] as const, []);
@@ -27,7 +27,7 @@ export const DataTablePermissions = (): JSX.Element => {
 		<DataTableProvider
 			dataSource="permissions"
 			selectionMode="checkbox"
-			modelStore={modelStore}
+			dataTableStore={dataTableStore}
 		>
 			<div className="standard-box p-4 shadow-md">
 				<DataTablePermissionsFilters />

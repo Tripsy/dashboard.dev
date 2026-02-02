@@ -59,28 +59,28 @@ const CurrentPageReport = (options: PaginatorCurrentPageReportOptions) => {
 export default function DataTableList<K extends keyof DataSourceType>(
 	props: DataTablePropsType,
 ) {
-	const { dataSource, dataStorageKey, selectionMode, modelStore } =
+	const { dataSource, dataStorageKey, selectionMode, dataTableStore } =
 		useDataTable<K>();
 
-	const tableState = useStore(modelStore, (state) => state.tableState);
+	const tableState = useStore(dataTableStore, (state) => state.tableState);
 	const updateTableState = useStore(
-		modelStore,
+		dataTableStore,
 		(state) => state.updateTableState,
 	);
 	const selectedEntries = useStore(
-		modelStore,
+		dataTableStore,
 		(state) => state.selectedEntries,
 	);
 	const setSelectedEntries = useStore(
-		modelStore,
+		dataTableStore,
 		(state) => state.setSelectedEntries,
 	);
 	const clearSelectedEntries = useStore(
-		modelStore,
+		dataTableStore,
 		(state) => state.clearSelectedEntries,
 	);
-	const isLoading = useStore(modelStore, (state) => state.isLoading);
-	const setLoading = useStore(modelStore, (state) => state.setLoading);
+	const isLoading = useStore(dataTableStore, (state) => state.isLoading);
+	const setLoading = useStore(dataTableStore, (state) => state.setLoading);
 
 	const [data, setData] = useState<DataSourceModel<K>[]>([]);
 	const [totalRecords, setTotalRecords] = useState(0);

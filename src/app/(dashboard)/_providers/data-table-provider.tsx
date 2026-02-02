@@ -8,7 +8,7 @@ import {
 	useRef,
 } from 'react';
 import { useStore } from 'zustand/react';
-import type { ModelStoreType } from '@/app/(dashboard)/_stores/model.store';
+import type { DataTableStoreType } from '@/app/(dashboard)/_stores/model.store';
 import {
 	type DataSourceModel,
 	type DataSourceTableFilter,
@@ -24,7 +24,7 @@ type DataTableContextType<K extends keyof DataSourceType> = {
 	dataStorageKey: string;
 	selectionMode: DataTableSelectionModeType;
 	stateDefault: DataTableStateType<DataSourceTableFilter<K>>;
-	modelStore: ModelStoreType<K>;
+	dataTableStore: DataTableStoreType<K>;
 };
 
 const DataTableContext = createContext<
@@ -34,12 +34,12 @@ const DataTableContext = createContext<
 function DataTableProvider<K extends keyof DataSourceType>({
 	dataSource,
 	selectionMode,
-	modelStore,
+	dataTableStore,
 	children,
 }: {
 	dataSource: K;
 	selectionMode: DataTableSelectionModeType;
-	modelStore: ModelStoreType<K>;
+	dataTableStore: DataTableStoreType<K>;
 	children: ReactNode;
 }) {
 	const dataStorageKey = useMemo(
@@ -49,7 +49,7 @@ function DataTableProvider<K extends keyof DataSourceType>({
 	const stateDefault = getDataSourceConfig(dataSource, 'dataTableState');
 
 	const selectedEntries = useStore(
-		modelStore,
+		dataTableStore,
 		(state) => state.selectedEntries,
 	);
 
@@ -89,7 +89,7 @@ function DataTableProvider<K extends keyof DataSourceType>({
 				dataStorageKey,
 				selectionMode,
 				stateDefault,
-				modelStore,
+				dataTableStore,
 			}}
 		>
 			{children}

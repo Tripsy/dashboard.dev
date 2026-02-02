@@ -5,11 +5,11 @@ import {
 	type PasswordRecoverStateType,
 } from '@/app/(public)/account/password-recover/password-recover.definition';
 import { translate } from '@/config/lang';
-import { cfg } from '@/config/settings';
-import { ApiError } from '@/lib/exceptions/api.error';
-import { accumulateZodErrors } from '@/lib/helpers/form';
-import { isValidCsrfToken } from '@/lib/helpers/session';
-import { passwordRecoverAccount } from '@/lib/services/account.service';
+import { Configuration } from '@/config/settings.config';
+import { ApiError } from '@/exceptions/api.error';
+import { accumulateZodErrors } from '@/helpers/form.helper';
+import { isValidCsrfToken } from '@/helpers/session.helper';
+import { passwordRecoverAccount } from '@/services/account.service';
 
 export function passwordRecoverFormValues(
 	formData: FormData,
@@ -38,7 +38,9 @@ export async function passwordRecoverAction(
 	};
 
 	// Check CSRF token
-	const csrfToken = formData.get(cfg('csrf.inputName') as string) as string;
+	const csrfToken = formData.get(
+		Configuration.get('csrf.inputName') as string,
+	) as string;
 
 	if (!(await isValidCsrfToken(csrfToken))) {
 		return {

@@ -2,19 +2,19 @@
 
 import { useMemo } from 'react';
 import { useStore } from 'zustand/react';
-import { Loading } from '@/app/_components/loading.component';
-import { useTranslation } from '@/app/_hooks';
-import { useToast } from '@/app/_providers/toast.provider';
 import { DataTableActionButton } from '@/app/(dashboard)/_components/data-table-action-button.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
+import { Loading } from '@/components/loading.component';
 import {
 	type DataSourceModel,
 	type DataSourceType,
 	getDataSourceConfig,
 } from '@/config/data-source';
-import { ApiError } from '@/lib/exceptions/api.error';
-import ValueError from '@/lib/exceptions/value.error';
-import { replaceVars } from '@/lib/helpers/string';
+import { ApiError } from '@/exceptions/api.error';
+import ValueError from '@/exceptions/value.error';
+import { replaceVars } from '@/helpers/string.helper';
+import { useTranslation } from '@/hooks';
+import { useToast } from '@/providers/toast.provider';
 
 function displayActionEntries<K extends keyof DataSourceType>(
 	dataSource: K,

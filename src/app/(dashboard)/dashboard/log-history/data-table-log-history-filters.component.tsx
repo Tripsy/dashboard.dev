@@ -3,7 +3,6 @@
 import type React from 'react';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useStore } from 'zustand/react';
-import { useSearchFilter, useTranslation } from '@/app/_hooks';
 import {
 	FormFiltersDateRange,
 	FormFiltersReset,
@@ -15,9 +14,10 @@ import {
 	LogHistoryActions,
 	LogHistoryEntities,
 	LogHistorySource,
-} from '@/lib/entities/log-history.model';
-import { createFilterHandlers } from '@/lib/helpers/data-table';
-import { capitalizeFirstLetter, toTitleCase } from '@/lib/helpers/string';
+} from '@/entities/log-history.model';
+import { createFilterHandlers } from '@/helpers/data-table.helper';
+import { capitalizeFirstLetter, toTitleCase } from '@/helpers/string.helper';
+import { useSearchFilter, useTranslation } from '@/hooks';
 
 const entities = LogHistoryEntities.map((v) => ({
 	label: toTitleCase(v),

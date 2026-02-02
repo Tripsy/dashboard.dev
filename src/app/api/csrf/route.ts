@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { v4 as uuid } from 'uuid';
-import { cfg } from '@/config/settings';
-import type { ResponseFetch } from '@/lib/helpers/api';
-import { getTrackedCookie } from '@/lib/helpers/session';
+import { Configuration } from '@/config/settings.config';
+import type { ResponseFetch } from '@/helpers/api.helper';
+import { getTrackedCookie } from '@/helpers/session.helper';
 
 type NextResponseCsrf = NextResponse<
 	ResponseFetch<{
@@ -11,7 +11,7 @@ type NextResponseCsrf = NextResponse<
 >;
 
 export async function GET(): Promise<NextResponseCsrf> {
-	const cookieName = cfg('csrf.cookieName') as string;
+	const cookieName = Configuration.get('csrf.cookieName') as string;
 
 	const csrfToken = await getTrackedCookie(cookieName);
 
@@ -43,11 +43,11 @@ export async function GET(): Promise<NextResponseCsrf> {
 	);
 
 	if (csrfToken.action === 'set') {
-		const cookieMaxAge = cfg('csrf.cookieMaxAge') as number;
+		const cookieMaxAge = Configuration.get('csrf.cookieMaxAge') as number;
 
 		response.cookies.set(cookieName, csrfToken.value, {
 			httpOnly: true,
-			secure: cfg('app.environment') === 'production',
+			secure: Configuration.isEnvironment('production'),
 			path: '/',
 			sameSite: 'lax',
 			maxAge: cookieMaxAge,
@@ -60,7 +60,7 @@ export async function GET(): Promise<NextResponseCsrf> {
 			String(cookieExpireValue),
 			{
 				httpOnly: true,
-				secure: cfg('app.environment') === 'production',
+				secure: Configuration.isEnvironment('production'),
 				path: '/',
 				sameSite: 'lax',
 				maxAge: cookieMaxAge,

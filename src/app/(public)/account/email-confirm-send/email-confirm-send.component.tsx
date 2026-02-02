@@ -2,15 +2,6 @@
 
 import Link from 'next/link';
 import { useActionState } from 'react';
-import { FormCsrf } from '@/app/_components/form/form-csrf';
-import {
-	FormComponentEmail,
-	FormComponentSubmit,
-} from '@/app/_components/form/form-element.component';
-import { FormError } from '@/app/_components/form/form-error.component';
-import { FormPart } from '@/app/_components/form/form-part.component';
-import { Icons } from '@/app/_components/icon.component';
-import { useElementIds, useFormValidation, useFormValues } from '@/app/_hooks';
 import {
 	emailConfirmSendAction,
 	emailConfirmSendValidate,
@@ -19,8 +10,17 @@ import {
 	type EmailConfirmSendFormFieldsType,
 	EmailConfirmSendState,
 } from '@/app/(public)/account/email-confirm-send/email-confirm-send.definition';
-import Routes from '@/config/routes';
-import { cfg } from '@/config/settings';
+import { FormCsrf } from '@/components/form/form-csrf';
+import {
+	FormComponentEmail,
+	FormComponentSubmit,
+} from '@/components/form/form-element.component';
+import { FormError } from '@/components/form/form-error.component';
+import { FormPart } from '@/components/form/form-part.component';
+import { Icons } from '@/components/icon.component';
+import RoutesSetup from '@/config/routes.setup';
+import { Configuration } from '@/config/settings.config';
+import { useElementIds, useFormValidation, useFormValues } from '@/hooks';
 
 export default function EmailConfirmSend() {
 	const [state, action, pending] = useActionState(
@@ -75,7 +75,7 @@ export default function EmailConfirmSend() {
 					<span className="text-sm text-gray-500 dark:text-base-content">
 						Meanwhile you can go back to{' '}
 						<Link
-							href={Routes.get('home')}
+							href={RoutesSetup.get('home')}
 							className="link link-info link-hover text-sm"
 						>
 							home page
@@ -92,7 +92,9 @@ export default function EmailConfirmSend() {
 			onSubmit={() => setSubmitted(true)}
 			className="form-section"
 		>
-			<FormCsrf inputName={cfg('csrf.inputName') as string} />
+			<FormCsrf
+				inputName={Configuration.get('csrf.inputName') as string}
+			/>
 
 			<h1 className="text-center">Email Confirmation Send</h1>
 
@@ -134,7 +136,7 @@ export default function EmailConfirmSend() {
 						Not registered yet?{' '}
 					</span>
 					<Link
-						href={Routes.get('register')}
+						href={RoutesSetup.get('register')}
 						className="link link-info link-hover text-sm"
 					>
 						Create an account

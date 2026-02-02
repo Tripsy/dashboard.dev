@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { translateBatch } from '@/config/lang';
-import { cfg } from '@/config/settings';
-import type { FormSituationType } from '@/lib/types';
+import { Configuration } from '@/config/settings.config';
+import type { FormSituationType } from '@/types';
 
 export type PasswordUpdateFormFieldsType = {
 	password_current: string;
@@ -35,7 +35,7 @@ const translations = await translateBatch([
 	{
 		key: 'account_password_update.validation.password_new_min',
 		vars: {
-			min: cfg('user.passwordMinLength') as string,
+			min: Configuration.get('user.passwordMinLength') as string,
 		},
 	},
 	'account_password_update.validation.password_new_condition_capital_letter',
@@ -69,7 +69,7 @@ export const PasswordUpdateSchema = z
 					],
 			})
 			.trim()
-			.min(cfg('user.passwordMinLength') as number, {
+			.min(Configuration.get('user.passwordMinLength') as number, {
 				message:
 					translations[
 						'account_password_update.validation.password_new_min'

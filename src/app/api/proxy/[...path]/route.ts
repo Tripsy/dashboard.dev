@@ -1,15 +1,19 @@
 'use server';
 
 import { type NextRequest, NextResponse } from 'next/server';
-import { cfg } from '@/config/settings';
-import { getRemoteApiUrl } from '@/lib/helpers/api';
-import { getCookie } from '@/lib/helpers/session';
-import { apiHeaders } from '@/lib/helpers/system';
+import { Configuration } from '@/config/settings.config';
+import { getRemoteApiUrl } from '@/helpers/api.helper';
+import { getCookie } from '@/helpers/session.helper';
+import { apiHeaders } from '@/helpers/system.helper';
 
 async function handler(request: NextRequest, path: string[]) {
-	const token = await getCookie(cfg('user.sessionToken') as string);
+	const token = await getCookie(
+		Configuration.get('user.sessionToken') as string,
+	);
 	const baseUrl = getRemoteApiUrl(path.join('/'));
 	const url = `${baseUrl}${request.nextUrl.search || ''}`;
+
+	console.log(url);
 
 	const headers = {
 		'Content-Type': 'application/json',

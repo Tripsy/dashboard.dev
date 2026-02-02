@@ -1,7 +1,7 @@
 import { cookies, headers } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { cfg, isSupportedLanguage } from '@/config/settings';
-import type { ResponseFetch } from '@/lib/helpers/api';
+import { Configuration } from '@/config/settings.config';
+import type { ResponseFetch } from '@/helpers/api.helper';
 
 type NextResponseLanguage = NextResponse<
 	ResponseFetch<{
@@ -17,13 +17,13 @@ export async function GET(): Promise<NextResponseLanguage> {
 		headerList.get('x-language') ||
 		headerList.get('accept-language')?.split(',')[0]?.split('-')[0];
 	const fromCookie = cookieStore.get('preferred-language')?.value;
-	const fallback = cfg('app.language') as string;
+	const fallback = Configuration.get('app.language') as string;
 
 	const language = fromHeader || fromCookie || fallback;
 
-	const languageSelected = isSupportedLanguage(language)
+	const languageSelected = Configuration.isSupportedLanguage(language)
 		? language
-		: (cfg('app.language') as string);
+		: (Configuration.get('app.language') as string);
 
 	return NextResponse.json(
 		{

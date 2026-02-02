@@ -1,12 +1,9 @@
 import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
 import type { DataTableColumnType } from '@/config/data-source';
 import { translateBatch } from '@/config/lang';
-import type { MailQueueModel } from '@/lib/entities/mail-queue.model';
-import { formatDate } from '@/lib/helpers/date';
-import {
-	deleteMailQueue,
-	findMailQueue,
-} from '@/lib/services/mail-queue.service';
+import type { MailQueueModel } from '@/entities/mail-queue.model';
+import { formatDate } from '@/helpers/date.helper';
+import { deleteMailQueue, findMailQueue } from '@/services/mail-queue.service';
 
 const translations = await translateBatch([
 	'mail_queue.data_table.column_id',

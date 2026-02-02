@@ -5,15 +5,15 @@ import {
 	type LoginStateType,
 } from '@/app/(public)/account/login/login.definition';
 import { translate } from '@/config/lang';
-import { cfg } from '@/config/settings';
-import { ApiError } from '@/lib/exceptions/api.error';
-import { accumulateZodErrors } from '@/lib/helpers/form';
-import { isValidCsrfToken } from '@/lib/helpers/session';
+import { Configuration } from '@/config/settings.config';
+import { ApiError } from '@/exceptions/api.error';
+import { accumulateZodErrors } from '@/helpers/form.helper';
+import { isValidCsrfToken } from '@/helpers/session.helper';
 import {
 	type AuthTokenListType,
 	loginAccount,
-} from '@/lib/services/account.service';
-import { createAuth } from '@/lib/services/auth.service';
+} from '@/services/account.service';
+import { createAuth } from '@/services/auth.service';
 
 export function loginFormValues(formData: FormData): LoginFormFieldsType {
 	return {
@@ -41,7 +41,9 @@ export async function loginAction(
 	};
 
 	// Check CSRF token
-	const csrfToken = formData.get(cfg('csrf.inputName') as string) as string;
+	const csrfToken = formData.get(
+		Configuration.get('csrf.inputName') as string,
+	) as string;
 
 	if (!(await isValidCsrfToken(csrfToken))) {
 		return {

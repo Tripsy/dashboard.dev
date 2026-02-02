@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import type { ValidationReturnType } from '@/app/_hooks';
 import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
 import type { DataTableColumnType, FormStateType } from '@/config/data-source';
 import { translateBatch } from '@/config/lang';
@@ -10,17 +9,18 @@ import {
 	TemplateLayoutPageEnum,
 	type TemplateModel,
 	TemplateTypeEnum,
-} from '@/lib/entities/template.model';
-import { LanguageEnum } from '@/lib/entities/user.model';
-import { safeHtml } from '@/lib/helpers/form';
-import { parseJson } from '@/lib/helpers/string';
+} from '@/entities/template.model';
+import { LanguageEnum } from '@/entities/user.model';
+import { safeHtml } from '@/helpers/form.helper';
+import { parseJson } from '@/helpers/string.helper';
+import type { ValidationReturnType } from '@/hooks';
 import {
 	createTemplate,
 	deleteTemplate,
 	findTemplates,
 	restoreTemplate,
 	updateTemplate,
-} from '@/lib/services/templates.service';
+} from '@/services/templates.service';
 
 const translations = await translateBatch([
 	'templates.validation.label_invalid',

@@ -6,14 +6,14 @@ import type {
 	FormStateType,
 } from '@/config/data-source';
 import { translateBatch } from '@/config/lang';
-import { cfg } from '@/config/settings';
+import { Configuration } from '@/config/settings.config';
 import {
 	LanguageEnum,
 	type UserModel,
 	UserOperatorTypeEnum,
 	UserRoleEnum,
 	UserStatusEnum,
-} from '@/lib/entities/user.model';
+} from '@/entities/user.model';
 import {
 	createUser,
 	deleteUser,
@@ -22,14 +22,14 @@ import {
 	findUsers,
 	restoreUser,
 	updateUser,
-} from '@/lib/services/users.service';
+} from '@/services/users.service';
 
 const translations = await translateBatch([
 	'users.validation.name_invalid',
 	{
 		key: 'users.validation.name_min',
 		vars: {
-			min: cfg('user.nameMinLength') as string,
+			min: Configuration.get('user.nameMinLength') as string,
 		},
 	},
 	'users.validation.email_invalid',
@@ -38,13 +38,13 @@ const translations = await translateBatch([
 	{
 		key: 'users.validation.password_invalid',
 		vars: {
-			min: cfg('user.passwordMinLength') as string,
+			min: Configuration.get('user.passwordMinLength') as string,
 		},
 	},
 	{
 		key: 'users.validation.password_min',
 		vars: {
-			min: cfg('user.passwordMinLength') as string,
+			min: Configuration.get('user.passwordMinLength') as string,
 		},
 	},
 	'users.validation.password_condition_capital_letter',
@@ -65,7 +65,7 @@ const ValidateSchemaBaseUsers = z.object({
 	name: z
 		.string({ message: translations['users.validation.name_invalid'] })
 		.trim()
-		.min(cfg('user.nameMinLength') as number, {
+		.min(Configuration.get('user.nameMinLength') as number, {
 			message: translations['users.validation.name_min'],
 		}),
 	email: z.email({
@@ -88,7 +88,7 @@ const ValidateSchemaCreateUsers = ValidateSchemaBaseUsers.extend({
 	password: z
 		.string({ message: translations['users.validation.password_invalid'] })
 		.trim()
-		.min(cfg('user.passwordMinLength') as number, {
+		.min(Configuration.get('user.passwordMinLength') as number, {
 			message: translations['users.validation.password_min'],
 		})
 		.refine((value) => /[A-Z]/.test(value), {
@@ -143,7 +143,7 @@ const ValidateSchemaUpdateUsers = ValidateSchemaBaseUsers.extend({
 				message: translations['users.validation.password_invalid'],
 			})
 			.trim()
-			.min(cfg('user.passwordMinLength') as number, {
+			.min(Configuration.get('user.passwordMinLength') as number, {
 				message: translations['users.validation.password_min'],
 			})
 			.refine((value) => /[A-Z]/.test(value), {

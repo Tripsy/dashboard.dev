@@ -5,11 +5,11 @@ import {
 	type EmailUpdateStateType,
 } from '@/app/(public)/account/email-update/email-update.definition';
 import { translate } from '@/config/lang';
-import { cfg } from '@/config/settings';
-import { ApiError } from '@/lib/exceptions/api.error';
-import { accumulateZodErrors } from '@/lib/helpers/form';
-import { isValidCsrfToken } from '@/lib/helpers/session';
-import { emailUpdateAccount } from '@/lib/services/account.service';
+import { Configuration } from '@/config/settings.config';
+import { ApiError } from '@/exceptions/api.error';
+import { accumulateZodErrors } from '@/helpers/form.helper';
+import { isValidCsrfToken } from '@/helpers/session.helper';
+import { emailUpdateAccount } from '@/services/account.service';
 
 export function emailUpdateFormValues(
 	formData: FormData,
@@ -38,7 +38,9 @@ export async function emailUpdateAction(
 	};
 
 	// Check CSRF token
-	const csrfToken = formData.get(cfg('csrf.inputName') as string) as string;
+	const csrfToken = formData.get(
+		Configuration.get('csrf.inputName') as string,
+	) as string;
 
 	if (!(await isValidCsrfToken(csrfToken))) {
 		return {

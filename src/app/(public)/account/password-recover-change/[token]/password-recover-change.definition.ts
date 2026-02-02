@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { translateBatch } from '@/config/lang';
-import { cfg } from '@/config/settings';
-import type { FormSituationType } from '@/lib/types';
+import { Configuration } from '@/config/settings.config';
+import type { FormSituationType } from '@/types';
 
 export type PasswordRecoverChangeFormFieldsType = {
 	password: string;
@@ -38,7 +38,7 @@ const translations = await translateBatch([
 	{
 		key: 'password_recover_change.validation.password_min',
 		vars: {
-			min: cfg('user.passwordMinLength') as string,
+			min: Configuration.get('user.passwordMinLength') as string,
 		},
 	},
 	'password_recover_change.validation.password_condition_capital_letter',
@@ -58,7 +58,7 @@ export const PasswordRecoverChangeSchema = z
 					],
 			})
 			.trim()
-			.min(cfg('user.passwordMinLength') as number, {
+			.min(Configuration.get('user.passwordMinLength') as number, {
 				message:
 					translations[
 						'password_recover_change.validation.password_min'

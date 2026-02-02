@@ -1,6 +1,4 @@
 import type React from 'react';
-import type { ValidationReturnType } from '@/app/_hooks';
-
 // Data source imports
 import {
 	DataSourceConfigCronHistory,
@@ -30,8 +28,9 @@ import {
 	DataSourceConfigUsers,
 	type DataSourceUsersType,
 } from '@/app/(dashboard)/dashboard/users/users.definition';
-import type { ResponseFetch } from '@/lib/helpers/api';
-import type { FormSituationType } from '@/lib/types';
+import type { ResponseFetch } from '@/helpers/api.helper';
+import type { ValidationReturnType } from '@/hooks';
+import type { FormSituationType } from '@/types';
 
 // ============================================================================
 // Core Types

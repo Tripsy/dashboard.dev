@@ -1,10 +1,10 @@
 import { headers } from 'next/headers';
 import type React from 'react';
-import { AuthProvider } from '@/app/_providers/auth.provider';
-import { PrimeProvider } from '@/app/_providers/prime.provider';
-import { ThemeProvider } from '@/app/_providers/theme.provider';
-import { ToastProvider } from '@/app/_providers/toast.provider';
-import type { AuthModel } from '@/lib/entities/auth.model';
+import type { AuthModel } from '@/entities/auth.model';
+import { AuthProvider } from '@/providers/auth.provider';
+import { PrimeProvider } from '@/providers/prime.provider';
+import { ThemeProvider } from '@/providers/theme.provider';
+import { ToastProvider } from '@/providers/toast.provider';
 
 export async function Providers({ children }: { children: React.ReactNode }) {
 	const headersList = await headers();

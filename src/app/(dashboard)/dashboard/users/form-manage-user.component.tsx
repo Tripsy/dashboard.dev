@@ -5,15 +5,18 @@ import {
 	FormComponentPassword,
 	FormComponentRadio,
 	FormComponentSelect,
-} from '@/app/_components/form/form-element.component';
-import { useElementIds, useTranslation } from '@/app/_hooks';
+} from '@/components/form/form-element.component';
 import type { FormManageType } from '@/config/data-source';
 import {
 	LanguageEnum,
 	UserOperatorTypeEnum,
 	UserRoleEnum,
-} from '@/lib/entities/user.model';
-import { capitalizeFirstLetter, formatEnumLabel } from '@/lib/helpers/string';
+} from '@/entities/user.model';
+import {
+	capitalizeFirstLetter,
+	formatEnumLabel,
+} from '@/helpers/string.helper';
+import { useElementIds, useTranslation } from '@/hooks';
 
 const roles = Object.values(UserRoleEnum).map((v) => ({
 	label: capitalizeFirstLetter(v),

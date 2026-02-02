@@ -3,10 +3,10 @@ import type {
 	LogoutState,
 } from '@/app/(public)/account/logout/logout.definition';
 import { translate } from '@/config/lang';
-import { ApiError } from '@/lib/exceptions/api.error';
-import type { ResponseFetch } from '@/lib/helpers/api';
-import { logoutAccount } from '@/lib/services/account.service';
-import { clearAuth } from '@/lib/services/auth.service';
+import { ApiError } from '@/exceptions/api.error';
+import type { ResponseFetch } from '@/helpers/api.helper';
+import { logoutAccount } from '@/services/account.service';
+import { clearAuth } from '@/services/auth.service';
 
 export async function logoutAction(): Promise<LogoutState> {
 	try {

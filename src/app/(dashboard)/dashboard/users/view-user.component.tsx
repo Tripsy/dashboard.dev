@@ -2,9 +2,9 @@
 
 import { useMemo } from 'react';
 import { useStore } from 'zustand/react';
-import { useTranslation } from '@/app/_hooks';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import { UserDetails } from '@/app/(dashboard)/dashboard/users/user-details.component';
+import { useTranslation } from '@/hooks';
 
 export function ViewUser() {
 	const { modelStore } = useDataTable<'users'>();

@@ -3,23 +3,6 @@
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useActionState, useEffect, useMemo, useState } from 'react';
-import { FormCsrf } from '@/app/_components/form/form-csrf';
-import {
-	FormComponentEmail,
-	FormComponentPassword,
-	FormComponentSubmit,
-} from '@/app/_components/form/form-element.component';
-import { FormError } from '@/app/_components/form/form-error.component';
-import { FormPart } from '@/app/_components/form/form-part.component';
-import { Icons } from '@/app/_components/icon.component';
-import {
-	useElementIds,
-	useFormValidation,
-	useFormValues,
-	useTranslation,
-} from '@/app/_hooks';
-import { useAuth } from '@/app/_providers/auth.provider';
-import { useToast } from '@/app/_providers/toast.provider';
 import {
 	loginAction,
 	loginValidate,
@@ -28,14 +11,31 @@ import {
 	type LoginFormFieldsType,
 	LoginState,
 } from '@/app/(public)/account/login/login.definition';
-import Routes, { isExcludedRoute } from '@/config/routes';
-import { cfg } from '@/config/settings';
-import { formatDate } from '@/lib/helpers/date';
+import { FormCsrf } from '@/components/form/form-csrf';
+import {
+	FormComponentEmail,
+	FormComponentPassword,
+	FormComponentSubmit,
+} from '@/components/form/form-element.component';
+import { FormError } from '@/components/form/form-error.component';
+import { FormPart } from '@/components/form/form-part.component';
+import { Icons } from '@/components/icon.component';
+import RoutesSetup, { isExcludedRoute } from '@/config/routes.setup';
+import { Configuration } from '@/config/settings.config';
+import { formatDate } from '@/helpers/date.helper';
+import {
+	useElementIds,
+	useFormValidation,
+	useFormValues,
+	useTranslation,
+} from '@/hooks';
+import { useAuth } from '@/providers/auth.provider';
+import { useToast } from '@/providers/toast.provider';
 import {
 	type AuthTokenListType,
 	type AuthTokenType,
 	removeTokenAccount,
-} from '@/lib/services/account.service';
+} from '@/services/account.service';
 
 export default function Login() {
 	const { showToast } = useToast();
@@ -70,11 +70,11 @@ export default function Login() {
 	const { translations } = useTranslation(translationsKeys);
 
 	const handleChange = (
-		name: string,
+		name: keyof LoginFormFieldsType,
 		value: string | boolean | number | Date,
 	) => {
 		setFormValues((prev) => ({ ...prev, [name]: value }));
-		markFieldAsTouched(name as keyof LoginFormFieldsType);
+		markFieldAsTouched(name);
 	};
 
 	useEffect(() => {
@@ -86,7 +86,7 @@ export default function Login() {
 			// Get the original destination from query params
 			const fromParam = searchParams.get('from');
 
-			let redirectUrl = Routes.get('home');
+			let redirectUrl = RoutesSetup.get('home');
 
 			if (fromParam) {
 				const decodedFrom = decodeURIComponent(fromParam);
@@ -134,7 +134,7 @@ export default function Login() {
 						instructions, you can resend the{' '}
 					</span>
 					<Link
-						href={Routes.get('email-confirm-send')}
+						href={RoutesSetup.get('email-confirm-send')}
 						className="link link-info link-hover text-sm"
 					>
 						confirmation email
@@ -150,7 +150,9 @@ export default function Login() {
 			onSubmit={() => setSubmitted(true)}
 			className="form-section"
 		>
-			<FormCsrf inputName={cfg('csrf.inputName') as string} />
+			<FormCsrf
+				inputName={Configuration.get('csrf.inputName') as string}
+			/>
 
 			<h1 className="text-center">Sign In</h1>
 
@@ -230,7 +232,7 @@ export default function Login() {
 							Not registered yet?{' '}
 						</span>
 						<Link
-							href={Routes.get('register')}
+							href={RoutesSetup.get('register')}
 							className="link link-info link-hover text-sm"
 						>
 							Create an account
@@ -241,7 +243,7 @@ export default function Login() {
 							Forgot your password?{' '}
 						</span>
 						<Link
-							href={Routes.get('password-recover')}
+							href={RoutesSetup.get('password-recover')}
 							className="link link-info link-hover text-sm"
 						>
 							Reset it here

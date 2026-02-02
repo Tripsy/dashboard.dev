@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 import { useStore } from 'zustand/react';
-import { useTranslation } from '@/app/_hooks';
 import { DisplayStatus } from '@/app/(dashboard)/_components/data-table-value';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
-import { formatDate } from '@/lib/helpers/date';
+import { formatDate } from '@/helpers/date.helper';
+import { useTranslation } from '@/hooks';
 
 export function ViewMailQueue() {
 	const { modelStore } = useDataTable<'mail_queue'>();

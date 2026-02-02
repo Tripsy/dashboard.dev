@@ -1,14 +1,14 @@
 import type { Metadata } from 'next';
-import ProtectedRoute from '@/app/_components/protected-route.component';
 import Me from '@/app/(public)/account/me/account-me.component';
+import ProtectedRoute from '@/components/protected-route.component';
 import { translate } from '@/config/lang';
-import { RouteAuth } from '@/config/routes';
-import { cfg } from '@/config/settings';
+import { RouteAuth } from '@/config/routes.setup';
+import { Configuration } from '@/config/settings.config';
 
 export async function generateMetadata(): Promise<Metadata> {
 	return {
 		title: await translate('account_me.meta.title', {
-			app_name: cfg('app.name') as string,
+			app_name: Configuration.get('app.name') as string,
 		}),
 	};
 }

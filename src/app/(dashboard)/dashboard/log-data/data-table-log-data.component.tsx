@@ -1,8 +1,6 @@
 'use client';
 
 import { type JSX, useMemo } from 'react';
-import { Loading } from '@/app/_components/loading.component';
-import { useMounted, useTranslation } from '@/app/_hooks';
 import { DataTableActions } from '@/app/(dashboard)/_components/data-table-actions.component';
 import DataTableList from '@/app/(dashboard)/_components/data-table-list.component';
 import { DataTableModal } from '@/app/(dashboard)/_components/data-table-modal.component';
@@ -10,6 +8,8 @@ import { DataTableProvider } from '@/app/(dashboard)/_providers/data-table-provi
 import { createModelStore } from '@/app/(dashboard)/_stores/model.store';
 import { DataTableLogDataFilters } from '@/app/(dashboard)/dashboard/log-data/data-table-log-data-filters.component';
 import { ViewLogData } from '@/app/(dashboard)/dashboard/log-data/view-log-data.component';
+import { Loading } from '@/components/loading.component';
+import { useMounted, useTranslation } from '@/hooks';
 
 const modelStore = createModelStore('log_data');
 

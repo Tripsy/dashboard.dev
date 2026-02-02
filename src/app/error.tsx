@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { Notice } from '@/app/_components/notice.component';
+import { Notice } from '@/components/notice.component';
 
 export default function ErrorBoundary({
 	error,

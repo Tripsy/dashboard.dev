@@ -5,14 +5,14 @@ import type {
 	FormStateType,
 } from '@/config/data-source';
 import { translateBatch } from '@/config/lang';
-import type { PermissionModel } from '@/lib/entities/permission.model';
+import type { PermissionModel } from '@/entities/permission.model';
 import {
 	createPermissions,
 	deletePermissions,
 	findPermissions,
 	restorePermissions,
 	updatePermissions,
-} from '@/lib/services/permissions.service';
+} from '@/services/permissions.service';
 
 const translations = await translateBatch([
 	'permissions.validation.entity_invalid',

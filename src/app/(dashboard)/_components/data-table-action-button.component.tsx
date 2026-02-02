@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
-import { getActionIcon, Icons } from '@/app/_components/icon.component';
-import { useTranslation } from '@/app/_hooks';
+import { getActionIcon, Icons } from '@/components/icon.component';
 import type { DataSourceType } from '@/config/data-source';
+import { useTranslation } from '@/hooks';
 
 export function DataTableActionButton({
 	dataSource,

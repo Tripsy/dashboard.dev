@@ -2,15 +2,15 @@
 
 import clsx from 'clsx';
 import { type JSX, useMemo } from 'react';
-import { Icons } from '@/app/_components/icon.component';
-import { useTranslation } from '@/app/_hooks';
+import { Icons } from '@/components/icon.component';
 import type {
 	DataSourceModel,
 	DataSourceType,
 	DataTableColumnType,
 } from '@/config/data-source';
-import { formatDate } from '@/lib/helpers/date';
-import { capitalizeFirstLetter } from '@/lib/helpers/string';
+import { formatDate } from '@/helpers/date.helper';
+import { capitalizeFirstLetter } from '@/helpers/string.helper';
+import { useTranslation } from '@/hooks';
 
 export const statusList = {
 	active: {

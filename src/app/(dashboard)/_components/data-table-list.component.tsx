@@ -11,7 +11,6 @@ import type { PaginatorCurrentPageReportOptions } from 'primereact/paginator';
 import type React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useStore } from 'zustand/react';
-import { useTranslation } from '@/app/_hooks';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import {
 	type DataSourceModel,
@@ -19,8 +18,9 @@ import {
 	type DataTablePropsType,
 	getDataSourceConfig,
 } from '@/config/data-source';
-import { toDateInstanceCustom } from '@/lib/helpers/date';
-import { replaceVars } from '@/lib/helpers/string';
+import { toDateInstanceCustom } from '@/helpers/date.helper';
+import { replaceVars } from '@/helpers/string.helper';
+import { useTranslation } from '@/hooks';
 
 type SelectionChangeEvent<T> = {
 	originalEvent: React.SyntheticEvent;

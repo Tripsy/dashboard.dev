@@ -4,13 +4,13 @@ import type {
 	TemplateContentPageType,
 	TemplateLayoutPageEnum,
 	TemplateModel,
-} from '@/lib/entities/template.model';
+} from '@/entities/template.model';
 import {
 	ApiRequest,
 	getResponseData,
 	type ResponseFetch,
-} from '@/lib/helpers/api';
-import { formatDate } from '@/lib/helpers/date';
+} from '@/helpers/api.helper';
+import { formatDate } from '@/helpers/date.helper';
 
 interface Props {
 	params: Promise<{

@@ -3,7 +3,6 @@
 import type React from 'react';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useStore } from 'zustand/react';
-import { useSearchFilter, useTranslation } from '@/app/_hooks';
 import {
 	FormFiltersDateRange,
 	FormFiltersReset,
@@ -12,9 +11,10 @@ import {
 	FormFiltersShowDeleted,
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
-import { UserRoleEnum, UserStatusEnum } from '@/lib/entities/user.model';
-import { createFilterHandlers } from '@/lib/helpers/data-table';
-import { capitalizeFirstLetter } from '@/lib/helpers/string';
+import { UserRoleEnum, UserStatusEnum } from '@/entities/user.model';
+import { createFilterHandlers } from '@/helpers/data-table.helper';
+import { capitalizeFirstLetter } from '@/helpers/string.helper';
+import { useSearchFilter, useTranslation } from '@/hooks';
 
 const statuses = Object.values(UserStatusEnum).map((v) => ({
 	label: capitalizeFirstLetter(v),

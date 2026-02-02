@@ -1,8 +1,8 @@
 import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
 import type { DataTableColumnType } from '@/config/data-source';
 import { translateBatch } from '@/config/lang';
-import type { LogDataModel } from '@/lib/entities/log-data.model';
-import { deleteLogData, findLogData } from '@/lib/services/log-data.service';
+import type { LogDataModel } from '@/entities/log-data.model';
+import { deleteLogData, findLogData } from '@/services/log-data.service';
 
 const translations = await translateBatch([
 	'log_data.data_table.column_id',

@@ -7,7 +7,7 @@ import {
 	useLayoutEffect,
 	useState,
 } from 'react';
-import { isLargeScreen } from '@/lib/helpers/window';
+import { isLargeScreen } from '@/helpers/window.helper';
 
 type Status = 'open' | 'closed';
 

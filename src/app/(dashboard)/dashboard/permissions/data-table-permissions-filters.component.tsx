@@ -3,14 +3,14 @@
 import type React from 'react';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useStore } from 'zustand/react';
-import { useSearchFilter, useTranslation } from '@/app/_hooks';
 import {
 	FormFiltersReset,
 	FormFiltersSearch,
 	FormFiltersShowDeleted,
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
-import { createFilterHandlers } from '@/lib/helpers/data-table';
+import { createFilterHandlers } from '@/helpers/data-table.helper';
+import { useSearchFilter, useTranslation } from '@/hooks';
 
 export const DataTablePermissionsFilters = (): React.JSX.Element => {
 	const { stateDefault, modelStore } = useDataTable<'permissions'>();

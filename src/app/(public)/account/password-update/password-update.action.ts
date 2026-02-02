@@ -5,12 +5,12 @@ import {
 	type PasswordUpdateStateType,
 } from '@/app/(public)/account/password-update/password-update.definition';
 import { translate } from '@/config/lang';
-import { cfg } from '@/config/settings';
-import { ApiError } from '@/lib/exceptions/api.error';
-import { accumulateZodErrors } from '@/lib/helpers/form';
-import { isValidCsrfToken } from '@/lib/helpers/session';
-import { passwordUpdateAccount } from '@/lib/services/account.service';
-import { createAuth } from '@/lib/services/auth.service';
+import { Configuration } from '@/config/settings.config';
+import { ApiError } from '@/exceptions/api.error';
+import { accumulateZodErrors } from '@/helpers/form.helper';
+import { isValidCsrfToken } from '@/helpers/session.helper';
+import { passwordUpdateAccount } from '@/services/account.service';
+import { createAuth } from '@/services/auth.service';
 
 export function passwordUpdateFormValues(
 	formData: FormData,
@@ -41,7 +41,9 @@ export async function passwordUpdateAction(
 	};
 
 	// Check CSRF token
-	const csrfToken = formData.get(cfg('csrf.inputName') as string) as string;
+	const csrfToken = formData.get(
+		Configuration.get('csrf.inputName') as string,
+	) as string;
 
 	if (!(await isValidCsrfToken(csrfToken))) {
 		return {

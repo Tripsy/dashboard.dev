@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { translateBatch } from '@/config/lang';
-import { cfg } from '@/config/settings';
-import { LanguageEnum } from '@/lib/entities/user.model';
-import type { FormSituationType } from '@/lib/types';
+import { Configuration } from '@/config/settings.config';
+import { LanguageEnum } from '@/entities/user.model';
+import type { FormSituationType } from '@/types';
 
 export type RegisterFormFieldsType = {
 	name: string;
@@ -44,7 +44,7 @@ const translations = await translateBatch([
 	{
 		key: 'register.validation.name_min',
 		vars: {
-			min: cfg('user.nameMinLength') as string,
+			min: Configuration.get('user.nameMinLength') as string,
 		},
 	},
 	'register.validation.email_invalid',
@@ -52,7 +52,7 @@ const translations = await translateBatch([
 	{
 		key: 'register.validation.password_min',
 		vars: {
-			min: cfg('user.passwordMinLength') as string,
+			min: Configuration.get('user.passwordMinLength') as string,
 		},
 	},
 	'register.validation.password_condition_capital_letter',
@@ -71,7 +71,7 @@ export const RegisterSchema = z
 				message: translations['register.validation.name_invalid'],
 			})
 			.trim()
-			.min(cfg('user.nameMinLength') as number, {
+			.min(Configuration.get('user.nameMinLength') as number, {
 				message: translations['register.validation.name_min'],
 			}),
 		email: z.email({
@@ -82,7 +82,7 @@ export const RegisterSchema = z
 				message: translations['register.validation.password_invalid'],
 			})
 			.trim()
-			.min(cfg('user.passwordMinLength') as number, {
+			.min(Configuration.get('user.passwordMinLength') as number, {
 				message: translations['register.validation.password_min'],
 			})
 			.refine((value) => /[A-Z]/.test(value), {

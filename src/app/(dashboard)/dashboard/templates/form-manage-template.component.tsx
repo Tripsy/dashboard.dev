@@ -7,19 +7,19 @@ import {
 	FormComponentInput,
 	FormComponentSelect,
 	FormElement,
-} from '@/app/_components/form/form-element.component';
-import { FormElementError } from '@/app/_components/form/form-element-error.component';
-import { FormPart } from '@/app/_components/form/form-part.component';
-import { Icons } from '@/app/_components/icon.component';
-import { useElementIds, useTranslation } from '@/app/_hooks';
+} from '@/components/form/form-element.component';
+import { FormElementError } from '@/components/form/form-element-error.component';
+import { FormPart } from '@/components/form/form-part.component';
+import { Icons } from '@/components/icon.component';
 import type { FormManageType } from '@/config/data-source';
 import {
 	TemplateLayoutEmailEnum,
 	TemplateTypeEnum,
-} from '@/lib/entities/template.model';
-import { LanguageEnum } from '@/lib/entities/user.model';
-import { getNestedError } from '@/lib/helpers/form';
-import { capitalizeFirstLetter, toKebabCase } from '@/lib/helpers/string';
+} from '@/entities/template.model';
+import { LanguageEnum } from '@/entities/user.model';
+import { getNestedError } from '@/helpers/form.helper';
+import { capitalizeFirstLetter, toKebabCase } from '@/helpers/string.helper';
+import { useElementIds, useTranslation } from '@/hooks';
 
 const languages = Object.values(LanguageEnum).map((v) => ({
 	label: capitalizeFirstLetter(v),

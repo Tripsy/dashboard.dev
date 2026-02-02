@@ -3,17 +3,6 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useActionState, useEffect } from 'react';
-import { FormCsrf } from '@/app/_components/form/form-csrf';
-import {
-	FormComponentEmail,
-	FormComponentSubmit,
-} from '@/app/_components/form/form-element.component';
-import { FormError } from '@/app/_components/form/form-error.component';
-import { FormPart } from '@/app/_components/form/form-part.component';
-import { Icons } from '@/app/_components/icon.component';
-import { Loading } from '@/app/_components/loading.component';
-import { useElementIds, useFormValidation, useFormValues } from '@/app/_hooks';
-import { useAuth } from '@/app/_providers/auth.provider';
 import {
 	emailUpdateAction,
 	emailUpdateValidate,
@@ -22,8 +11,19 @@ import {
 	type EmailUpdateFormFieldsType,
 	EmailUpdateState,
 } from '@/app/(public)/account/email-update/email-update.definition';
-import Routes from '@/config/routes';
-import { cfg } from '@/config/settings';
+import { FormCsrf } from '@/components/form/form-csrf';
+import {
+	FormComponentEmail,
+	FormComponentSubmit,
+} from '@/components/form/form-element.component';
+import { FormError } from '@/components/form/form-error.component';
+import { FormPart } from '@/components/form/form-part.component';
+import { Icons } from '@/components/icon.component';
+import { Loading } from '@/components/loading.component';
+import RoutesSetup from '@/config/routes.setup';
+import { Configuration } from '@/config/settings.config';
+import { useElementIds, useFormValidation, useFormValues } from '@/hooks';
+import { useAuth } from '@/providers/auth.provider';
 
 export default function EmailUpdate() {
 	const { auth, authStatus } = useAuth();
@@ -56,7 +56,7 @@ export default function EmailUpdate() {
 	// Refresh auth & redirect to `/account/me`
 	useEffect(() => {
 		if (state?.situation === 'success' && router) {
-			router.replace(`${Routes.get('account-me')}?from=emailUpdate`);
+			router.replace(`${RoutesSetup.get('account-me')}?from=emailUpdate`);
 		}
 	}, [state?.situation, router]);
 
@@ -74,7 +74,7 @@ export default function EmailUpdate() {
 					<Icons.Status.Error className="text-error mr-1" />
 					Please{' '}
 					<Link
-						href={Routes.get('login')}
+						href={RoutesSetup.get('login')}
 						title="Sign in"
 						className="link link-info link-hover"
 					>
@@ -105,7 +105,9 @@ export default function EmailUpdate() {
 			onSubmit={() => setSubmitted(true)}
 			className="form-section"
 		>
-			<FormCsrf inputName={cfg('csrf.inputName') as string} />
+			<FormCsrf
+				inputName={Configuration.get('csrf.inputName') as string}
+			/>
 
 			<h1 className="text-center">My Account - Email update</h1>
 
@@ -129,7 +131,7 @@ export default function EmailUpdate() {
 
 			<div className="flex justify-end gap-2">
 				<a
-					href={Routes.get('account-me')}
+					href={RoutesSetup.get('account-me')}
 					className="btn btn-action-cancel"
 					title="Cancel & Go back to my account"
 				>

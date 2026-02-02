@@ -1,4 +1,3 @@
-import type { ValidationReturnType } from '@/app/_hooks';
 import {
 	type CreateFunctionType,
 	type DataSourceFormValues,
@@ -8,9 +7,10 @@ import {
 	type UpdateFunctionType,
 } from '@/config/data-source';
 import { translate } from '@/config/lang';
-import { ApiError } from '@/lib/exceptions/api.error';
-import ValueError from '@/lib/exceptions/value.error';
-import { accumulateZodErrors } from '@/lib/helpers/form';
+import { ApiError } from '@/exceptions/api.error';
+import ValueError from '@/exceptions/value.error';
+import { accumulateZodErrors } from '@/helpers/form.helper';
+import type { ValidationReturnType } from '@/hooks';
 
 export function getFormValues<K extends keyof DataSourceType>(
 	dataSource: K,

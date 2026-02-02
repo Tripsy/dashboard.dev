@@ -2,11 +2,11 @@
 
 import Link from 'next/link';
 import { useMemo } from 'react';
-import { Icons } from '@/app/_components/icon.component';
-import { useTranslation } from '@/app/_hooks';
-import { useAuth } from '@/app/_providers/auth.provider';
-import Routes from '@/config/routes';
-import { UserRoleEnum } from '@/lib/entities/user.model';
+import { Icons } from '@/components/icon.component';
+import RoutesSetup from '@/config/routes.setup';
+import { UserRoleEnum } from '@/entities/user.model';
+import { useTranslation } from '@/hooks';
+import { useAuth } from '@/providers/auth.provider';
 
 export function UserMenu() {
 	const { auth, authStatus } = useAuth();
@@ -44,7 +44,7 @@ export function UserMenu() {
 				<ul className="dropdown-content menu bg-base-100 rounded-box z-1 w-36 p-2 shadow-sm">
 					<li>
 						<Link
-							href={Routes.get('login')}
+							href={RoutesSetup.get('login')}
 							title={
 								translations['users.text.menu_link_login_title']
 							}
@@ -54,7 +54,7 @@ export function UserMenu() {
 					</li>
 					<li>
 						<Link
-							href={Routes.get('register')}
+							href={RoutesSetup.get('register')}
 							title={
 								translations[
 									'users.text.menu_link_register_title'
@@ -74,7 +74,7 @@ export function UserMenu() {
 				<ul className="dropdown-content menu bg-base-100 rounded-box z-1 w-36 p-2 shadow-sm">
 					<li>
 						<Link
-							href={Routes.get('account-me')}
+							href={RoutesSetup.get('account-me')}
 							title={
 								translations[
 									'users.text.menu_link_account_me_title'
@@ -94,7 +94,7 @@ export function UserMenu() {
 						) && (
 							<li>
 								<Link
-									href={Routes.get('dashboard')}
+									href={RoutesSetup.get('dashboard')}
 									title={
 										translations[
 											'users.text.menu_link_dashboard_title'
@@ -111,7 +111,7 @@ export function UserMenu() {
 						)}
 					<li>
 						<Link
-							href={Routes.get('logout')}
+							href={RoutesSetup.get('logout')}
 							prefetch={false}
 							title={
 								translations[

@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { translateBatch } from '@/config/lang';
-import { cfg } from '@/config/settings';
-import { LanguageEnum } from '@/lib/entities/user.model';
-import type { FormSituationType } from '@/lib/types';
+import { Configuration } from '@/config/settings.config';
+import { LanguageEnum } from '@/entities/user.model';
+import type { FormSituationType } from '@/types';
 
 export type AccountEditFormFieldsType = {
 	name: string;
@@ -33,7 +33,7 @@ const translations = await translateBatch([
 	{
 		key: 'account_edit.validation.name_min',
 		vars: {
-			min: cfg('user.nameMinLength') as string,
+			min: Configuration.get('user.nameMinLength') as string,
 		},
 	},
 	'account_edit.validation.language_invalid',
@@ -45,7 +45,7 @@ export const AccountEditSchema = z.object({
 			message: translations['account_edit.validation.name_invalid'],
 		})
 		.trim()
-		.min(cfg('user.nameMinLength') as number, {
+		.min(Configuration.get('user.nameMinLength') as number, {
 			message: translations['account_edit.validation.name_min'],
 		}),
 	language: z.enum(LanguageEnum, {

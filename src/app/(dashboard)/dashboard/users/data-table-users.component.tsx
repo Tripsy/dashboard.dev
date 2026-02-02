@@ -1,8 +1,6 @@
 'use client';
 
 import { type JSX, useMemo } from 'react';
-import { Loading } from '@/app/_components/loading.component';
-import { useMounted, useTranslation } from '@/app/_hooks';
 import { DataTableActions } from '@/app/(dashboard)/_components/data-table-actions.component';
 import DataTableList from '@/app/(dashboard)/_components/data-table-list.component';
 import { DataTableModal } from '@/app/(dashboard)/_components/data-table-modal.component';
@@ -12,6 +10,8 @@ import { DataTableUsersFilters } from '@/app/(dashboard)/dashboard/users/data-ta
 import { FormManageUser } from '@/app/(dashboard)/dashboard/users/form-manage-user.component';
 import { SetupPermissionsUser } from '@/app/(dashboard)/dashboard/users/setup-permissions-user.component';
 import { ViewUser } from '@/app/(dashboard)/dashboard/users/view-user.component';
+import { Loading } from '@/components/loading.component';
+import { useMounted, useTranslation } from '@/hooks';
 
 const modelStore = createModelStore('users');
 

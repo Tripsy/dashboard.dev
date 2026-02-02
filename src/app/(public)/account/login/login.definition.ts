@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { translateBatch } from '@/config/lang';
-import type { AuthTokenListType } from '@/lib/services/account.service';
-import type { FormSituationType } from '@/lib/types';
+import type { AuthTokenListType } from '@/services/account.service';
+import type { FormSituationType } from '@/types';
 
 export type LoginFormFieldsType = {
 	email: string;

@@ -1,19 +1,19 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import Routes, { RouteAuth, type RouteMatch } from '@/config/routes';
-import { cfg, isSupportedLanguage } from '@/config/settings';
+import RoutesSetup, { RouteAuth, type RouteMatch } from '@/config/routes.setup';
+import { Configuration } from '@/config/settings.config';
 import {
 	type AuthModel,
 	hasPermission,
 	prepareAuthModel,
-} from '@/lib/entities/auth.model';
+} from '@/entities/auth.model';
 import {
 	ApiRequest,
 	getResponseData,
 	type ResponseFetch,
-} from '@/lib/helpers/api';
-import { getTrackedCookie } from '@/lib/helpers/session';
-import { apiHeaders } from '@/lib/helpers/system';
+} from '@/helpers/api.helper';
+import { getTrackedCookie } from '@/helpers/session.helper';
+import { apiHeaders } from '@/helpers/system.helper';
 
 class MiddlewareContext {
 	req: NextRequest;
@@ -47,7 +47,7 @@ class MiddlewareContext {
 		const destinationPath = currentUrl.pathname + currentUrl.search;
 
 		// Create the login URL
-		const loginUrl = new URL(Routes.get('login'), this.req.url);
+		const loginUrl = new URL(RoutesSetup.get('login'), this.req.url);
 
 		// Set from query parameter as `destinationPath`
 		loginUrl.searchParams.set('from', encodeURIComponent(destinationPath));
@@ -57,7 +57,7 @@ class MiddlewareContext {
 
 	redirectToError(r: string) {
 		const redirectUrl = new URL(
-			Routes.get('status', { type: 'error' }),
+			RoutesSetup.get('status', { type: 'error' }),
 			this.req.url,
 		);
 
@@ -81,11 +81,11 @@ class MiddlewareContext {
 		// Determine language with priority: query > cookie > header
 		const language = queryLang || cookieLang || headerLang;
 
-		if (language && isSupportedLanguage(language)) {
+		if (language && Configuration.isSupportedLanguage(language)) {
 			if (language !== cookieLang) {
 				this.res.cookies.set('preferred-language', language, {
 					httpOnly: true,
-					secure: cfg('app.environment') === 'production',
+					secure: Configuration.isEnvironment('production'),
 					path: '/',
 					sameSite: 'lax',
 					maxAge: 60 * 60 * 24 * 365,
@@ -100,7 +100,9 @@ class MiddlewareContext {
 		const origin = this.req.headers.get('origin');
 		const referer = this.req.headers.get('referer');
 
-		const allowedOrigins = cfg('security.allowedOrigins') as string[];
+		const allowedOrigins = Configuration.get(
+			'security.allowedOrigins',
+		) as string[];
 
 		// Probably a same-origin browser request — allow it
 		if (!origin && !referer) {
@@ -128,14 +130,16 @@ class MiddlewareContext {
 	}
 
 	destroySession() {
-		this.res.cookies.delete(cfg('user.sessionToken') as string);
+		this.res.cookies.delete(
+			Configuration.get('user.sessionToken') as string,
+		);
 	}
 
 	async handleAuth(
 		routeMatch: RouteMatch | undefined,
 	): Promise<NextResponse> {
 		const sessionToken = await getTrackedCookie(
-			cfg('user.sessionToken') as string,
+			Configuration.get('user.sessionToken') as string,
 		);
 
 		const { auth: routeAuth, permission: routePermission } =
@@ -196,12 +200,14 @@ class MiddlewareContext {
 		this.res.headers.set('x-auth-data', JSON.stringify(authModel));
 
 		if (sessionToken.action === 'set' && sessionToken.value) {
-			const cookieName = cfg('user.sessionToken') as string;
-			const cookieMaxAge = cfg('user.sessionMaxAge') as number;
+			const cookieName = Configuration.get('user.sessionToken') as string;
+			const cookieMaxAge = Configuration.get(
+				'user.sessionMaxAge',
+			) as number;
 
 			this.res.cookies.set(cookieName, sessionToken.value, {
 				httpOnly: true,
-				secure: cfg('app.environment') === 'production',
+				secure: Configuration.isEnvironment('production'),
 				path: '/',
 				sameSite: 'lax',
 				maxAge: cookieMaxAge,
@@ -214,7 +220,7 @@ class MiddlewareContext {
 				String(cookieExpireValue),
 				{
 					httpOnly: true,
-					secure: cfg('app.environment') === 'production',
+					secure: Configuration.isEnvironment('production'),
 					path: '/',
 					sameSite: 'lax',
 					maxAge: cookieMaxAge,
@@ -225,38 +231,6 @@ class MiddlewareContext {
 		return this.success();
 	}
 }
-
-// /**
-//  * This won't work because of the use of Redis in the middleware
-//  *
-//  * https://www.davidtran.dev/blogs/nextjs-middleware-full-nodejs-access
-//  * https://nextjs.org/blog/next-15-2#nodejs-middleware-experimental
-//  *
-//  * @param req
-//  */
-// async function rateLimit(req: NextRequest) {
-//     const redis = getRedisClient();
-//     const clientIp = getClientIp(req) || 'xxx.xxx.xxx.xxx';
-//
-//     const key = `rate-limit:${clientIp}`;
-//     const current = await redis.incr(key);
-//
-//     if (current === 1) {
-//         await redis.expire(key, cfg('middleware.rate_limit_window'));
-//     }
-//
-//     if (current > cfg('middleware.max_requests')) {
-//         const ttl = await redis.ttl(key);
-//
-//         return {
-//             isAllowed: false, retryAfter: ttl
-//         };
-//     }
-//
-//     return {
-//         isAllowed: true
-//     };
-// }
 
 /**
  * Fetches auth model
@@ -313,7 +287,7 @@ export async function proxy(req: NextRequest) {
 	}
 
 	const pathname = req.nextUrl.pathname;
-	const routeMatch = Routes.match(pathname);
+	const routeMatch = RoutesSetup.match(pathname);
 
 	if (!routeMatch) {
 		return ctx.success();

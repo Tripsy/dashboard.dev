@@ -2,9 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useStore } from 'zustand/react';
-import { useTranslation } from '@/app/_hooks';
-import { useAuth } from '@/app/_providers/auth.provider';
-import { useToast } from '@/app/_providers/toast.provider';
 import { DataTableActionButton } from '@/app/(dashboard)/_components/data-table-action-button.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import {
@@ -12,7 +9,10 @@ import {
 	type DataSourceType,
 	getDataSourceConfig,
 } from '@/config/data-source';
-import { hasPermission } from '@/lib/entities/auth.model';
+import { hasPermission } from '@/entities/auth.model';
+import { useTranslation } from '@/hooks';
+import { useAuth } from '@/providers/auth.provider';
+import { useToast } from '@/providers/toast.provider';
 
 export const handleReset = (source: string) => {
 	const event = new CustomEvent('filterReset', {

@@ -4,11 +4,11 @@ import {
 	type AccountEditStateType,
 } from '@/app/(public)/account/edit/account-edit.definition';
 import { translate } from '@/config/lang';
-import { cfg } from '@/config/settings';
-import { LanguageEnum } from '@/lib/entities/user.model';
-import { accumulateZodErrors } from '@/lib/helpers/form';
-import { isValidCsrfToken } from '@/lib/helpers/session';
-import { editAccount } from '@/lib/services/account.service';
+import { Configuration } from '@/config/settings.config';
+import { LanguageEnum } from '@/entities/user.model';
+import { accumulateZodErrors } from '@/helpers/form.helper';
+import { isValidCsrfToken } from '@/helpers/session.helper';
+import { editAccount } from '@/services/account.service';
 
 export function accountEditFormValues(
 	formData: FormData,
@@ -43,7 +43,9 @@ export async function accountEditAction(
 	};
 
 	// Check CSRF token
-	const csrfToken = formData.get(cfg('csrf.inputName') as string) as string;
+	const csrfToken = formData.get(
+		Configuration.get('csrf.inputName') as string,
+	) as string;
 
 	if (!(await isValidCsrfToken(csrfToken))) {
 		return {

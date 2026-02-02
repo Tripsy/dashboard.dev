@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { translateBatch } from '@/config/lang';
-import type { FormSituationType } from '@/lib/types';
+import type { FormSituationType } from '@/types';
 
 export type EmailUpdateFormFieldsType = {
 	email_new: string;

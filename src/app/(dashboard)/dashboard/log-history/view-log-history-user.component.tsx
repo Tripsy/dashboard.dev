@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useStore } from 'zustand/react';
-import { Loading } from '@/app/_components/loading.component';
-import { useTranslation } from '@/app/_hooks';
-import { useToast } from '@/app/_providers/toast.provider';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import { UserDetails } from '@/app/(dashboard)/dashboard/users/user-details.component';
-import type { UserModel } from '@/lib/entities/user.model';
-import { getUser } from '@/lib/services/users.service';
+import { Loading } from '@/components/loading.component';
+import type { UserModel } from '@/entities/user.model';
+import { useTranslation } from '@/hooks';
+import { useToast } from '@/providers/toast.provider';
+import { getUser } from '@/services/users.service';
 
 export function ViewLogHistoryUser() {
 	const { showToast } = useToast();

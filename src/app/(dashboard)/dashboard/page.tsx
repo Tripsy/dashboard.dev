@@ -2,12 +2,12 @@ import type { Metadata } from 'next';
 import NavBreadcrumbSetter from '@/app/(dashboard)/_components/nav-breadcrumb.setter';
 import type { BreadcrumbType } from '@/app/(dashboard)/_providers/breadcrumb.provider';
 import { translate } from '@/config/lang';
-import { cfg } from '@/config/settings';
+import { Configuration } from '@/config/settings.config';
 
 export async function generateMetadata(): Promise<Metadata> {
 	return {
 		title: await translate('dashboard.meta.title', {
-			app_name: cfg('app.name') as string,
+			app_name: Configuration.get('app.name') as string,
 		}),
 	};
 }

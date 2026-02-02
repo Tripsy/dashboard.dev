@@ -1,11 +1,11 @@
 import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
 import type { DataTableColumnType } from '@/config/data-source';
 import { translateBatch } from '@/config/lang';
-import type { CronHistoryModel } from '@/lib/entities/cron-history.model';
+import type { CronHistoryModel } from '@/entities/cron-history.model';
 import {
 	deleteCronHistory,
 	findCronHistory,
-} from '@/lib/services/cron-history.service';
+} from '@/services/cron-history.service';
 
 const translations = await translateBatch([
 	'cron_history.data_table.column_id',

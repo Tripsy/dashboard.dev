@@ -1,12 +1,12 @@
 import { useMemo } from 'react';
-import { FormComponentAutoComplete } from '@/app/_components/form/form-element.component';
-import { useElementIds, useTranslation } from '@/app/_hooks';
-import { useAutocomplete } from '@/app/_hooks/use-autocomplete';
+import { FormComponentAutoComplete } from '@/components/form/form-element.component';
 import type { FormManageType } from '@/config/data-source';
 import {
 	PermissionEntitiesSuggestions,
 	PermissionOperationSuggestions,
-} from '@/lib/entities/permission.model';
+} from '@/entities/permission.model';
+import { useElementIds, useTranslation } from '@/hooks';
+import { useAutocomplete } from '@/hooks/use-autocomplete';
 
 export function FormManagePermission({
 	formValues,

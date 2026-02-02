@@ -10,14 +10,12 @@ import {
 	useMemo,
 } from 'react';
 import { useStore } from 'zustand/react';
-import { FormError } from '@/app/_components/form/form-error.component';
-import { FormPart } from '@/app/_components/form/form-part.component';
-import { getActionIcon, Icons } from '@/app/_components/icon.component';
-import { useFormValidation, useFormValues, useTranslation } from '@/app/_hooks';
-import { useToast } from '@/app/_providers/toast.provider';
 import { formAction } from '@/app/(dashboard)/_actions';
 import { handleReset } from '@/app/(dashboard)/_components/data-table-actions.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
+import { FormError } from '@/components/form/form-error.component';
+import { FormPart } from '@/components/form/form-part.component';
+import { getActionIcon, Icons } from '@/components/icon.component';
 import {
 	type DataSourceFormValues,
 	type DataSourceType,
@@ -25,8 +23,10 @@ import {
 	type FormStateType,
 	getDataSourceConfig,
 } from '@/config/data-source';
-import ValueError from '@/lib/exceptions/value.error';
-import { setObjectValue } from '@/lib/helpers/objects.helper';
+import ValueError from '@/exceptions/value.error';
+import { setObjectValue } from '@/helpers/objects.helper';
+import { useFormValidation, useFormValues, useTranslation } from '@/hooks';
+import { useToast } from '@/providers/toast.provider';
 
 export function FormManage<K extends keyof DataSourceType>({
 	children,

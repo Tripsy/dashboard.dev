@@ -3,17 +3,6 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useActionState, useEffect } from 'react';
-import { FormCsrf } from '@/app/_components/form/form-csrf';
-import {
-	FormComponentName,
-	FormComponentRadio,
-	FormComponentSubmit,
-} from '@/app/_components/form/form-element.component';
-import { FormError } from '@/app/_components/form/form-error.component';
-import { Icons } from '@/app/_components/icon.component';
-import { Loading } from '@/app/_components/loading.component';
-import { useElementIds, useFormValidation, useFormValues } from '@/app/_hooks';
-import { useAuth } from '@/app/_providers/auth.provider';
 import {
 	accountEditAction,
 	accountEditValidate,
@@ -22,10 +11,21 @@ import {
 	type AccountEditFormFieldsType,
 	AccountEditState,
 } from '@/app/(public)/account/edit/account-edit.definition';
-import Routes from '@/config/routes';
-import { cfg } from '@/config/settings';
-import { LanguageEnum } from '@/lib/entities/user.model';
-import { capitalizeFirstLetter } from '@/lib/helpers/string';
+import { FormCsrf } from '@/components/form/form-csrf';
+import {
+	FormComponentName,
+	FormComponentRadio,
+	FormComponentSubmit,
+} from '@/components/form/form-element.component';
+import { FormError } from '@/components/form/form-error.component';
+import { Icons } from '@/components/icon.component';
+import { Loading } from '@/components/loading.component';
+import RoutesSetup from '@/config/routes.setup';
+import { Configuration } from '@/config/settings.config';
+import { LanguageEnum } from '@/entities/user.model';
+import { capitalizeFirstLetter } from '@/helpers/string.helper';
+import { useElementIds, useFormValidation, useFormValues } from '@/hooks';
+import { useAuth } from '@/providers/auth.provider';
 
 const languages = Object.values(LanguageEnum).map((language) => ({
 	label: capitalizeFirstLetter(language),
@@ -76,7 +76,7 @@ export default function AccountEdit() {
 				await refreshAuth();
 			})();
 
-			router.replace(`${Routes.get('account-me')}?from=edit`);
+			router.replace(`${RoutesSetup.get('account-me')}?from=edit`);
 		}
 	}, [state?.situation, router, refreshAuth]);
 
@@ -94,7 +94,7 @@ export default function AccountEdit() {
 					<Icons.Status.Error className="text-error mr-1" />
 					Please{' '}
 					<Link
-						href={Routes.get('login')}
+						href={RoutesSetup.get('login')}
 						title="Sign in"
 						className="link link-info link-hover"
 					>
@@ -125,7 +125,9 @@ export default function AccountEdit() {
 			onSubmit={() => setSubmitted(true)}
 			className="form-section"
 		>
-			<FormCsrf inputName={cfg('csrf.inputName') as string} />
+			<FormCsrf
+				inputName={Configuration.get('csrf.inputName') as string}
+			/>
 			<h1 className="text-center">My Account - Edit</h1>
 			<FormComponentName
 				labelText="Name"
@@ -148,7 +150,7 @@ export default function AccountEdit() {
 
 			<div className="flex justify-end gap-2">
 				<a
-					href={Routes.get('account-me')}
+					href={RoutesSetup.get('account-me')}
 					className="btn btn-action-cancel"
 					title="Cancel & Go back to my account"
 				>

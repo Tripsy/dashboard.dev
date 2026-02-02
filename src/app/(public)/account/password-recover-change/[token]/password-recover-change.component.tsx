@@ -3,15 +3,6 @@
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useActionState, useState } from 'react';
-import { FormCsrf } from '@/app/_components/form/form-csrf';
-import {
-	FormComponentPassword,
-	FormComponentSubmit,
-} from '@/app/_components/form/form-element.component';
-import { FormError } from '@/app/_components/form/form-error.component';
-import { FormPart } from '@/app/_components/form/form-part.component';
-import { Icons } from '@/app/_components/icon.component';
-import { useElementIds, useFormValidation, useFormValues } from '@/app/_hooks';
 import {
 	passwordRecoverChangeAction,
 	passwordRecoverChangeValidate,
@@ -20,8 +11,17 @@ import {
 	type PasswordRecoverChangeFormFieldsType,
 	PasswordRecoverChangeState,
 } from '@/app/(public)/account/password-recover-change/[token]/password-recover-change.definition';
-import Routes from '@/config/routes';
-import { cfg } from '@/config/settings';
+import { FormCsrf } from '@/components/form/form-csrf';
+import {
+	FormComponentPassword,
+	FormComponentSubmit,
+} from '@/components/form/form-element.component';
+import { FormError } from '@/components/form/form-error.component';
+import { FormPart } from '@/components/form/form-part.component';
+import { Icons } from '@/components/icon.component';
+import RoutesSetup from '@/config/routes.setup';
+import { Configuration } from '@/config/settings.config';
+import { useElementIds, useFormValidation, useFormValues } from '@/hooks';
 
 export default function PasswordRecoverChange() {
 	const params = useParams<{ token: string }>();
@@ -84,7 +84,7 @@ export default function PasswordRecoverChange() {
 					<span className="text-sm text-gray-500 dark:text-base-content">
 						You can now go to the{' '}
 						<Link
-							href={Routes.get('login')}
+							href={RoutesSetup.get('login')}
 							className="link link-info link-hover text-sm"
 						>
 							login page
@@ -102,7 +102,9 @@ export default function PasswordRecoverChange() {
 			onSubmit={() => setSubmitted(true)}
 			className="form-section"
 		>
-			<FormCsrf inputName={cfg('csrf.inputName') as string} />
+			<FormCsrf
+				inputName={Configuration.get('csrf.inputName') as string}
+			/>
 
 			<h1 className="text-center">Recover Password</h1>
 

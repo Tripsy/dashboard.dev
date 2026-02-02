@@ -13,11 +13,11 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
 import React, { useLayoutEffect, useMemo, useState } from 'react';
-import { AwesomeIcon } from '@/app/_components/icon.component';
-import { useDebouncedEffect, useTranslation } from '@/app/_hooks';
-import { useAuth } from '@/app/_providers/auth.provider';
-import Routes from '@/config/routes';
-import { hasPermission } from '@/lib/entities/auth.model';
+import { AwesomeIcon } from '@/components/icon.component';
+import RoutesSetup from '@/config/routes.setup';
+import { hasPermission } from '@/entities/auth.model';
+import { useDebouncedEffect, useTranslation } from '@/hooks';
+import { useAuth } from '@/providers/auth.provider';
 
 type SideMenuGroupProps = {
 	groupKey: string;
@@ -144,7 +144,7 @@ export function SideMenu() {
 				title: translations['dashboard.labels.settings'],
 				items: [
 					{
-						href: Routes.get('template'),
+						href: RoutesSetup.get('template'),
 						label: translations['dashboard.labels.templates'],
 						icon: faFileLines,
 						permission: hasPermission(auth, 'template.find'),
@@ -156,25 +156,25 @@ export function SideMenu() {
 				title: translations['dashboard.labels.logs'],
 				items: [
 					{
-						href: Routes.get('log-data'),
+						href: RoutesSetup.get('log-data'),
 						label: translations['dashboard.labels.log_data'],
 						icon: faDatabase,
 						permission: hasPermission(auth, 'log_data.find'),
 					},
 					{
-						href: Routes.get('log-history'),
+						href: RoutesSetup.get('log-history'),
 						label: translations['dashboard.labels.log_history'],
 						icon: faFileWaveform,
 						permission: hasPermission(auth, 'log_history.find'),
 					},
 					{
-						href: Routes.get('cron-history'),
+						href: RoutesSetup.get('cron-history'),
 						label: translations['dashboard.labels.cron_history'],
 						icon: faFileContract,
 						permission: hasPermission(auth, 'cron_history.find'),
 					},
 					{
-						href: Routes.get('mail-queue'),
+						href: RoutesSetup.get('mail-queue'),
 						label: translations['dashboard.labels.mail_queue'],
 						icon: faEnvelopesBulk,
 						permission: hasPermission(auth, 'mail_queue.find'),
@@ -187,13 +187,13 @@ export function SideMenu() {
 				defaultOpen: true,
 				items: [
 					{
-						href: Routes.get('user'),
+						href: RoutesSetup.get('user'),
 						label: translations['dashboard.labels.users'],
 						icon: faUserGroup,
 						permission: hasPermission(auth, 'user.find'),
 					},
 					{
-						href: Routes.get('permission'),
+						href: RoutesSetup.get('permission'),
 						label: translations['dashboard.labels.permissions'],
 						icon: faUserLock,
 						permission: hasPermission(auth, 'permission.find'),

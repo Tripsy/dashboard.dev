@@ -1,7 +1,7 @@
-import { cfg, isSupportedLanguage } from '@/config/settings';
-import { ApiRequest } from '@/lib/helpers/api';
-import { getObjectValue } from '@/lib/helpers/objects.helper';
-import { replaceVars } from '@/lib/helpers/string';
+import { Configuration } from '@/config/settings.config';
+import { ApiRequest } from '@/helpers/api.helper';
+import { getObjectValue } from '@/helpers/objects.helper';
+import { replaceVars } from '@/helpers/string.helper';
 
 type TranslationValue = string | { [key: string]: TranslationValue };
 type TranslationResource = Record<string, TranslationValue>;
@@ -20,11 +20,14 @@ async function fetchLanguage() {
 				method: 'GET',
 			});
 
-		return result?.data?.language || (cfg('app.language') as string);
+		return (
+			result?.data?.language ||
+			(Configuration.get('app.language') as string)
+		);
 	} catch (error) {
 		console.error('Failed to fetch language:', error);
 
-		return cfg('app.language') as string;
+		return Configuration.get('app.language') as string;
 	}
 }
 
@@ -41,15 +44,18 @@ export async function getLanguage(): Promise<string> {
 		languageSelected = languageSelected.toLowerCase();
 	}
 
-	if (languageSelected && isSupportedLanguage(languageSelected)) {
+	if (
+		languageSelected &&
+		Configuration.isSupportedLanguage(languageSelected)
+	) {
 		return languageSelected;
 	}
 
-	return cfg('app.language') as string;
+	return Configuration.get('app.language') as string;
 }
 
 export function setLanguage(lang: string) {
-	if (isSupportedLanguage(lang)) {
+	if (Configuration.isSupportedLanguage(lang)) {
 		languageSelected = lang;
 	}
 }

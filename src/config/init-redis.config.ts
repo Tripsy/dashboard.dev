@@ -1,14 +1,14 @@
 import Redis from 'ioredis';
-import { cfg } from '@/config/settings';
+import { Configuration } from '@/config/settings.config';
 
 let redisInstance: Redis | null = null;
 
 export const getRedisClient = (): Redis => {
 	if (!redisInstance) {
 		redisInstance = new Redis({
-			host: cfg('redis.host') as string,
-			port: cfg('redis.port') as number,
-			password: cfg('redis.password') as string,
+			host: Configuration.get('redis.host') as string,
+			port: Configuration.get('redis.port') as number,
+			password: Configuration.get('redis.password') as string,
 		});
 
 		redisInstance.on('error', (error) => {

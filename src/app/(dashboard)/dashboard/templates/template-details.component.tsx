@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
-import { useTranslation } from '@/app/_hooks';
-import type { TemplateModel } from '@/lib/entities/template.model';
-import { formatDate } from '@/lib/helpers/date';
-import { capitalizeFirstLetter, parseJson } from '@/lib/helpers/string';
+import type { TemplateModel } from '@/entities/template.model';
+import { formatDate } from '@/helpers/date.helper';
+import { capitalizeFirstLetter, parseJson } from '@/helpers/string.helper';
+import { useTranslation } from '@/hooks';
 
 export function TemplateDetails({
 	entry,

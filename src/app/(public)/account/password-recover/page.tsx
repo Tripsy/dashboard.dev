@@ -1,14 +1,14 @@
 import type { Metadata } from 'next';
-import ProtectedRoute from '@/app/_components/protected-route.component';
 import PasswordRecover from '@/app/(public)/account/password-recover/password-recover.component';
+import ProtectedRoute from '@/components/protected-route.component';
 import { translate } from '@/config/lang';
-import { RouteAuth } from '@/config/routes';
-import { cfg } from '@/config/settings';
+import { RouteAuth } from '@/config/routes.setup';
+import { Configuration } from '@/config/settings.config';
 
 export async function generateMetadata(): Promise<Metadata> {
 	return {
 		title: await translate('password_recover.meta.title', {
-			app_name: cfg('app.name') as string,
+			app_name: Configuration.get('app.name') as string,
 		}),
 		robots: 'noindex, nofollow',
 	};

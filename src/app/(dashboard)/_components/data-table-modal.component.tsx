@@ -4,13 +4,13 @@ import clsx from 'clsx';
 import type React from 'react';
 import { useEffect, useMemo } from 'react';
 import { useStore } from 'zustand/react';
-import { getActionIcon, Icons } from '@/app/_components/icon.component';
-import { useTranslation } from '@/app/_hooks';
-import { useToast } from '@/app/_providers/toast.provider';
 import { ActionManage } from '@/app/(dashboard)/_components/action-manage.component';
 import { FormManage } from '@/app/(dashboard)/_components/form-manage.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
+import { getActionIcon, Icons } from '@/components/icon.component';
 import { type DataSourceType, getDataSourceConfig } from '@/config/data-source';
+import { useTranslation } from '@/hooks';
+import { useToast } from '@/providers/toast.provider';
 
 type ModalsMap = {
 	[key: string]: React.ReactNode;

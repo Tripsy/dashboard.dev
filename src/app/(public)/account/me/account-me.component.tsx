@@ -3,19 +3,19 @@
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
-import { Icons } from '@/app/_components/icon.component';
-import { Loading } from '@/app/_components/loading.component';
-import { useTranslation } from '@/app/_hooks';
-import { useAuth } from '@/app/_providers/auth.provider';
-import { useToast } from '@/app/_providers/toast.provider';
 import { AuthTokenList } from '@/app/(public)/account/login/login.component';
-import Routes from '@/config/routes';
-import { formatDate } from '@/lib/helpers/date';
-import { capitalizeFirstLetter } from '@/lib/helpers/string';
+import { Icons } from '@/components/icon.component';
+import { Loading } from '@/components/loading.component';
+import RoutesSetup from '@/config/routes.setup';
+import { formatDate } from '@/helpers/date.helper';
+import { capitalizeFirstLetter } from '@/helpers/string.helper';
+import { useTranslation } from '@/hooks';
+import { useAuth } from '@/providers/auth.provider';
+import { useToast } from '@/providers/toast.provider';
 import {
 	type AuthTokenListType,
 	getSessions,
-} from '@/lib/services/account.service';
+} from '@/services/account.service';
 
 export default function AccountMe() {
 	const { auth, authStatus } = useAuth();
@@ -80,7 +80,7 @@ export default function AccountMe() {
 					break;
 			}
 
-			const newUrl = Routes.get('account-me');
+			const newUrl = RoutesSetup.get('account-me');
 			router.replace(newUrl, { scroll: false });
 		}
 	}, [
@@ -103,7 +103,7 @@ export default function AccountMe() {
 					<Icons.Status.Error className="text-error mr-1" />
 					Please{' '}
 					<Link
-						href={Routes.get('login')}
+						href={RoutesSetup.get('login')}
 						title="Sign in"
 						className="link link-info link-hover"
 					>
@@ -122,7 +122,7 @@ export default function AccountMe() {
 			<div className="flex justify-between items-center">
 				<h1 className="text-center">My Account</h1>
 				<Link
-					href={Routes.get('account-edit')}
+					href={RoutesSetup.get('account-edit')}
 					prefetch={false}
 					title="Edit my account"
 					className="btn btn-success btn-sm"
@@ -168,7 +168,7 @@ export default function AccountMe() {
 									</span>
 									// <a
 									// 	className="badge badge-warning badge-sm mt-1"
-									// 	href={Routes.get('email-confirm-send')}
+									// 	href={RoutesSetup.get('email-confirm-send')}
 									// 	title="Re-send email verification"
 									// >
 									// 	<Icons.Status.Warning />
@@ -177,7 +177,7 @@ export default function AccountMe() {
 								)}
 							</div>
 							<Link
-								href={Routes.get('email-update')}
+								href={RoutesSetup.get('email-update')}
 								className="btn btn-outline btn-sm"
 								title="Update email address"
 							>
@@ -235,7 +235,7 @@ export default function AccountMe() {
 								</p>
 							</div>
 							<Link
-								href={Routes.get('password-update')}
+								href={RoutesSetup.get('password-update')}
 								className="btn btn-outline btn-sm"
 								title="Update password"
 							>
@@ -248,7 +248,7 @@ export default function AccountMe() {
 					{/* Quick Actions */}
 					<div className="card-actions justify-end mt-6">
 						<Link
-							href={Routes.get('account-delete')}
+							href={RoutesSetup.get('account-delete')}
 							className="btn btn-error btn-sm"
 						>
 							<Icons.Action.Delete />

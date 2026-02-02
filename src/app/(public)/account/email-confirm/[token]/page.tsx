@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Icons } from '@/app/_components/icon.component';
+import { Icons } from '@/components/icon.component';
 import { translate } from '@/config/lang';
-import Routes from '@/config/routes';
-import { cfg } from '@/config/settings';
-import { ApiError } from '@/lib/exceptions/api.error';
-import { ApiRequest, type ResponseFetch } from '@/lib/helpers/api';
+import RoutesSetup from '@/config/routes.setup';
+import { Configuration } from '@/config/settings.config';
+import { ApiError } from '@/exceptions/api.error';
+import { ApiRequest, type ResponseFetch } from '@/helpers/api.helper';
 
 interface Props {
 	params: Promise<{
@@ -16,7 +16,7 @@ interface Props {
 export async function generateMetadata(): Promise<Metadata> {
 	return {
 		title: await translate('email_confirm.meta.title', {
-			app_name: cfg('app.name') as string,
+			app_name: Configuration.get('app.name') as string,
 		}),
 		robots: 'noindex, nofollow',
 	};
@@ -79,14 +79,14 @@ export default async function Page(props: Props) {
 						<span className="text-sm text-gray-500 dark:text-base-content">
 							What's next? Check{' '}
 							<Link
-								href={Routes.get('account-me')}
+								href={RoutesSetup.get('account-me')}
 								className="link link-info link-hover text-sm"
 							>
 								your account
 							</Link>{' '}
 							or navigate to{' '}
 							<Link
-								href={Routes.get('home')}
+								href={RoutesSetup.get('home')}
 								className="link link-info link-hover text-sm"
 							>
 								home page
@@ -98,14 +98,14 @@ export default async function Page(props: Props) {
 						<span className="text-sm text-gray-500 dark:text-base-content">
 							What now? You can register for a{' '}
 							<Link
-								href={Routes.get('register')}
+								href={RoutesSetup.get('register')}
 								className="link link-info link-hover text-sm"
 							>
 								new account
 							</Link>{' '}
 							or request{' '}
 							<Link
-								href={Routes.get('email-confirm-send')}
+								href={RoutesSetup.get('email-confirm-send')}
 								className="link link-info link-hover text-sm"
 							>
 								another confirmation link

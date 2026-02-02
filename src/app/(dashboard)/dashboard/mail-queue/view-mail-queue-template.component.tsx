@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useStore } from 'zustand/react';
-import { Loading } from '@/app/_components/loading.component';
-import { useTranslation } from '@/app/_hooks';
-import { useToast } from '@/app/_providers/toast.provider';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import { TemplateDetails } from '@/app/(dashboard)/dashboard/templates/template-details.component';
-import type { TemplateModel } from '@/lib/entities/template.model';
-import { getTemplate } from '@/lib/services/templates.service';
+import { Loading } from '@/components/loading.component';
+import type { TemplateModel } from '@/entities/template.model';
+import { useTranslation } from '@/hooks';
+import { useToast } from '@/providers/toast.provider';
+import { getTemplate } from '@/services/templates.service';
 
 export function ViewMailQueueTemplate() {
 	const { showToast } = useToast();

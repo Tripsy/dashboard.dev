@@ -3,17 +3,17 @@
 import { Checkbox } from 'primereact/checkbox';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useStore } from 'zustand/react';
-import { Loading } from '@/app/_components/loading.component';
-import { useTranslation } from '@/app/_hooks';
-import { useToast } from '@/app/_providers/toast.provider';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
-import type { PermissionModel } from '@/lib/entities/permission.model';
-import { findPermissions } from '@/lib/services/permissions.service';
+import { Loading } from '@/components/loading.component';
+import type { PermissionModel } from '@/entities/permission.model';
+import { useTranslation } from '@/hooks';
+import { useToast } from '@/providers/toast.provider';
+import { findPermissions } from '@/services/permissions.service';
 import {
 	createUserPermissions,
 	deleteUserPermission,
 	getUserPermissions,
-} from '@/lib/services/users.service';
+} from '@/services/users.service';
 
 export function SetupPermissionsUser() {
 	const translationsKeys = useMemo(

@@ -1,8 +1,8 @@
 'use client';
 
 import type React from 'react';
-import { Icons } from '@/app/_components/icon.component';
 import { useSideMenu } from '@/app/(dashboard)/_providers/side-menu.provider';
+import { Icons } from '@/components/icon.component';
 
 export function SideMenuToggle() {
 	const { status, toggleStatus } = useSideMenu();

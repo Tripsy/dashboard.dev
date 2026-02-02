@@ -3,20 +3,6 @@
 import clsx from 'clsx';
 import Link from 'next/link';
 import React, { useActionState, useState } from 'react';
-import { FormCsrf } from '@/app/_components/form/form-csrf';
-import {
-	FormComponentEmail,
-	FormComponentName,
-	FormComponentPassword,
-	FormComponentRadio,
-	FormComponentSubmit,
-	FormElement,
-} from '@/app/_components/form/form-element.component';
-import { FormElementError as RawFormElementError } from '@/app/_components/form/form-element-error.component';
-import { FormError } from '@/app/_components/form/form-error.component';
-import { FormPart } from '@/app/_components/form/form-part.component';
-import { Icons } from '@/app/_components/icon.component';
-import { useElementIds, useFormValidation, useFormValues } from '@/app/_hooks';
 import {
 	registerAction,
 	registerValidate,
@@ -25,10 +11,24 @@ import {
 	type RegisterFormFieldsType,
 	RegisterState,
 } from '@/app/(public)/account/register/register.definition';
-import Routes from '@/config/routes';
-import { cfg } from '@/config/settings';
-import { LanguageEnum } from '@/lib/entities/user.model';
-import { capitalizeFirstLetter } from '@/lib/helpers/string';
+import { FormCsrf } from '@/components/form/form-csrf';
+import {
+	FormComponentEmail,
+	FormComponentName,
+	FormComponentPassword,
+	FormComponentRadio,
+	FormComponentSubmit,
+	FormElement,
+} from '@/components/form/form-element.component';
+import { FormElementError as RawFormElementError } from '@/components/form/form-element-error.component';
+import { FormError } from '@/components/form/form-error.component';
+import { FormPart } from '@/components/form/form-part.component';
+import { Icons } from '@/components/icon.component';
+import RoutesSetup from '@/config/routes.setup';
+import { Configuration } from '@/config/settings.config';
+import { LanguageEnum } from '@/entities/user.model';
+import { capitalizeFirstLetter } from '@/helpers/string.helper';
+import { useElementIds, useFormValidation, useFormValues } from '@/hooks';
 
 const FormElementError = React.memo(RawFormElementError);
 
@@ -99,7 +99,7 @@ export default function Register() {
 						instructions, you can resend the{' '}
 					</span>
 					<Link
-						href={Routes.get('email-confirm-send')}
+						href={RoutesSetup.get('email-confirm-send')}
 						className="link link-info link-hover text-sm"
 					>
 						confirmation email
@@ -132,7 +132,7 @@ export default function Register() {
 					<span className="text-sm text-gray-500 dark:text-base-content">
 						Meanwhile you can go back to{' '}
 						<Link
-							href={Routes.get('home')}
+							href={RoutesSetup.get('home')}
 							className="link link-info link-hover text-sm"
 						>
 							home page
@@ -149,7 +149,9 @@ export default function Register() {
 			onSubmit={() => setSubmitted(true)}
 			className="form-section"
 		>
-			<FormCsrf inputName={cfg('csrf.inputName') as string} />
+			<FormCsrf
+				inputName={Configuration.get('csrf.inputName') as string}
+			/>
 			<h1 className="text-center">Create Account</h1>
 			<FormPart className="text-sm text-center md:max-w-xs">
 				<>
@@ -232,7 +234,7 @@ export default function Register() {
 								I agree with&nbsp;
 							</span>
 							<Link
-								href={Routes.get('page', {
+								href={RoutesSetup.get('page', {
 									label: 'terms-and-conditions',
 								})}
 								className="link link-info link-hover text-sm"
@@ -266,7 +268,7 @@ export default function Register() {
 						Already registered?{' '}
 					</span>
 					<Link
-						href={Routes.get('login')}
+						href={RoutesSetup.get('login')}
 						className="link link-info link-hover text-sm"
 					>
 						Sign in here

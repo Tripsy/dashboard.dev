@@ -1,10 +1,13 @@
 import { useMemo } from 'react';
-import { useTranslation } from '@/app/_hooks';
 import { DisplayStatus } from '@/app/(dashboard)/_components/data-table-value';
-import type { UserModel } from '@/lib/entities/user.model';
-import { UserRoleEnum } from '@/lib/entities/user.model';
-import { formatDate } from '@/lib/helpers/date';
-import { capitalizeFirstLetter, formatEnumLabel } from '@/lib/helpers/string';
+import type { UserModel } from '@/entities/user.model';
+import { UserRoleEnum } from '@/entities/user.model';
+import { formatDate } from '@/helpers/date.helper';
+import {
+	capitalizeFirstLetter,
+	formatEnumLabel,
+} from '@/helpers/string.helper';
+import { useTranslation } from '@/hooks';
 
 export function UserDetails({ entry }: { entry: UserModel | undefined }) {
 	const translationsKeys = useMemo(

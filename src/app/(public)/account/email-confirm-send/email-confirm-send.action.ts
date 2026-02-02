@@ -5,11 +5,11 @@ import {
 	type EmailConfirmSendStateType,
 } from '@/app/(public)/account/email-confirm-send/email-confirm-send.definition';
 import { translate } from '@/config/lang';
-import { cfg } from '@/config/settings';
-import { ApiError } from '@/lib/exceptions/api.error';
-import { accumulateZodErrors } from '@/lib/helpers/form';
-import { isValidCsrfToken } from '@/lib/helpers/session';
-import { emailConfirmSendAccount } from '@/lib/services/account.service';
+import { Configuration } from '@/config/settings.config';
+import { ApiError } from '@/exceptions/api.error';
+import { accumulateZodErrors } from '@/helpers/form.helper';
+import { isValidCsrfToken } from '@/helpers/session.helper';
+import { emailConfirmSendAccount } from '@/services/account.service';
 
 export function emailConfirmSendFormValues(
 	formData: FormData,
@@ -40,7 +40,9 @@ export async function emailConfirmSendAction(
 	};
 
 	// Check CSRF token
-	const csrfToken = formData.get(cfg('csrf.inputName') as string) as string;
+	const csrfToken = formData.get(
+		Configuration.get('csrf.inputName') as string,
+	) as string;
 
 	if (!(await isValidCsrfToken(csrfToken))) {
 		return {

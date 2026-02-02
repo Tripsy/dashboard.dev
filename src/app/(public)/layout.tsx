@@ -1,9 +1,9 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { Footer } from '@/app/_components/layout-default.component';
-import { ToggleTheme } from '@/app/_components/toggle-theme';
 import { UserMenu } from '@/app/(dashboard)/_components/user-menu.component';
-import Routes from '@/config/routes';
+import { Footer } from '@/components/layout-default.component';
+import { ToggleTheme } from '@/components/toggle-theme';
+import RoutesSetup from '@/config/routes.setup';
 
 function Header() {
 	return (
@@ -11,7 +11,7 @@ function Header() {
 			<div className="header-section justify-between">
 				<div className="h-full flex items-center ">
 					<Link
-						href={Routes.get('home')}
+						href={RoutesSetup.get('home')}
 						className="flex items-end hover:link-info"
 					>
 						<span className="text-lg font-bold">

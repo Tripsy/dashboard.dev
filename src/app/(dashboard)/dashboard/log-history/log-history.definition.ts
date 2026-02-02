@@ -1,12 +1,12 @@
 import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
 import type { DataTableColumnType } from '@/config/data-source';
 import { translateBatch } from '@/config/lang';
-import type { LogHistoryModel } from '@/lib/entities/log-history.model';
-import { toTitleCase } from '@/lib/helpers/string';
+import type { LogHistoryModel } from '@/entities/log-history.model';
+import { toTitleCase } from '@/helpers/string.helper';
 import {
 	deleteLogHistory,
 	findLogHistory,
-} from '@/lib/services/log-history.service';
+} from '@/services/log-history.service';
 
 const translations = await translateBatch([
 	'log_history.data_table.column_id',

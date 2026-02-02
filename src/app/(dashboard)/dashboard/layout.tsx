@@ -1,15 +1,15 @@
 import Link from 'next/link';
 import type { JSX } from 'react';
-import { Footer } from '@/app/_components/layout-default.component';
-import ProtectedRoute from '@/app/_components/protected-route.component';
-import { ToggleTheme } from '@/app/_components/toggle-theme';
 import { NavBreadcrumb } from '@/app/(dashboard)/_components/nav-breadcrumb.component';
 import { SideMenu } from '@/app/(dashboard)/_components/side-menu.component';
 import SideMenuSetter from '@/app/(dashboard)/_components/side-menu.setter';
 import { SideMenuToggle } from '@/app/(dashboard)/_components/side-menu-toggle.component';
 import { UserMenu } from '@/app/(dashboard)/_components/user-menu.component';
 import { DashboardProvider } from '@/app/(dashboard)/_providers/dashboard.provider';
-import Routes, { RouteAuth } from '@/config/routes';
+import { Footer } from '@/components/layout-default.component';
+import ProtectedRoute from '@/components/protected-route.component';
+import { ToggleTheme } from '@/components/toggle-theme';
+import RoutesSetup, { RouteAuth } from '@/config/routes.setup';
 
 function Header() {
 	return (
@@ -18,7 +18,7 @@ function Header() {
 				<div className="h-full flex items-center">
 					<SideMenuToggle />
 					<Link
-						href={Routes.get('home')}
+						href={RoutesSetup.get('home')}
 						className="flex items-end hover:link-info"
 					>
 						<span className="text-lg font-bold">

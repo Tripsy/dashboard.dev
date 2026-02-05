@@ -4,7 +4,6 @@ import { useMemo } from 'react';
 import { useStore } from 'zustand/react';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import { TemplateDetails } from '@/app/(dashboard)/dashboard/templates/template-details.component';
-import { useTranslation } from '@/hooks';
 
 export function ViewTemplate() {
 	const { dataTableStore } = useDataTable<'templates'>();

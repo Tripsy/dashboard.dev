@@ -24,7 +24,9 @@ import RoutesSetup from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
 import { LanguageEnum } from '@/entities/user.model';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
-import { useElementIds, useFormValidation, useFormValues } from '@/hooks';
+import { useElementIds } from '@/hooks/use-element-ids.hook';
+import { useFormValidation } from '@/hooks/use-form-validation.hook';
+import { useFormValues } from '@/hooks/use-form-values.hook';
 import { useAuth } from '@/providers/auth.provider';
 
 const languages = Object.values(LanguageEnum).map((language) => ({

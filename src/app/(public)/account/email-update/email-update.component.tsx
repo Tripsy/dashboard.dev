@@ -22,7 +22,9 @@ import { Icons } from '@/components/icon.component';
 import { Loading } from '@/components/loading.component';
 import RoutesSetup from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
-import { useElementIds, useFormValidation, useFormValues } from '@/hooks';
+import { useElementIds } from '@/hooks/use-element-ids.hook';
+import { useFormValidation } from '@/hooks/use-form-validation.hook';
+import { useFormValues } from '@/hooks/use-form-values.hook';
 import { useAuth } from '@/providers/auth.provider';
 
 export default function EmailUpdate() {

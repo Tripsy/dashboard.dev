@@ -13,22 +13,18 @@ import {
 } from '@/components/form/form-element.component';
 import { FormPart } from '@/components/form/form-part.component';
 import { Icons } from '@/components/icon.component';
-import type {
-	DataSourceTableFilter,
-	DataSourceType,
-} from '@/config/data-source';
 import type { MatchModeType } from '@/helpers/data-table.helper';
 import { getValidDate, toDateInstance } from '@/helpers/date.helper';
-import { useElementIds, type useSearchFilter, useTranslation } from '@/hooks';
+import { useElementIds } from '@/hooks/use-element-ids.hook';
+import type { useSearchFilter } from '@/hooks/use-search-filter.hook';
+import { useTranslation } from '@/hooks/use-translation.hook';
 
-type HandleSelectChangeType<K extends keyof DataSourceType> = <
-	F extends keyof DataSourceTableFilter<K>,
->(
-	field: F,
+type HandleSelectChangeType<Filters> = (
+	field: keyof Filters,
 	value: string,
 ) => void;
 
-export function FormFiltersSelect<K extends keyof DataSourceType>({
+export function FormFiltersSelect<Filters>({
 	labelText,
 	fieldName,
 	fieldValue,
@@ -39,7 +35,7 @@ export function FormFiltersSelect<K extends keyof DataSourceType>({
 	fieldName: string;
 	fieldValue: string | number | null;
 	selectOptions: OptionsType;
-	handleSelectChange: HandleSelectChangeType<K>;
+	handleSelectChange: HandleSelectChangeType<Filters>;
 }) {
 	const elementKey = `search-${fieldName}`;
 	const elementIds = useElementIds([elementKey]);
@@ -64,10 +60,7 @@ export function FormFiltersSelect<K extends keyof DataSourceType>({
 					value={fieldValue}
 					options={selectOptions}
 					onChange={(e) =>
-						handleSelectChange(
-							fieldName as keyof DataSourceTableFilter<K>,
-							e.value,
-						)
+						handleSelectChange(fieldName as keyof Filters, e.value)
 					}
 					placeholder={
 						translations[
@@ -118,21 +111,19 @@ export function FormFiltersSearch({
 	);
 }
 
-type HandleDateChangeType<K extends keyof DataSourceType> = <
-	F extends keyof DataSourceTableFilter<K>,
->(
-	field: F,
+type HandleDateChangeType<Filters> = (
+	field: keyof Filters,
 	value: Nullable<Date>,
 	matchMode: MatchModeType,
 ) => void;
 
-export function FormFiltersDateRange<K extends keyof DataSourceType>(props: {
+export function FormFiltersDateRange<Filters>(props: {
 	labelText: string;
 	startDateField: string;
 	startDateValue: string;
 	endDateField: string;
 	endDateValue: string;
-	handleDateChange: HandleDateChangeType<K>;
+	handleDateChange: HandleDateChangeType<Filters>;
 }) {
 	const {
 		labelText,
@@ -171,7 +162,7 @@ export function FormFiltersDateRange<K extends keyof DataSourceType>(props: {
 						value={toDateInstance(startDateValue)}
 						onChange={(e) =>
 							handleDateChange(
-								startDateField as keyof DataSourceTableFilter<K>,
+								startDateField as keyof Filters,
 								e.value,
 								'dateAfter',
 							)
@@ -190,7 +181,7 @@ export function FormFiltersDateRange<K extends keyof DataSourceType>(props: {
 						value={toDateInstance(endDateValue)}
 						onChange={(e) =>
 							handleDateChange(
-								endDateField as keyof DataSourceTableFilter<K>,
+								endDateField as keyof Filters,
 								e.value,
 								'dateBefore',
 							)
@@ -207,15 +198,12 @@ export function FormFiltersDateRange<K extends keyof DataSourceType>(props: {
 	);
 }
 
-export function FormFiltersShowDeleted<K extends keyof DataSourceType>({
+export function FormFiltersShowDeleted<Filters>({
 	is_deleted = false,
 	handleCheckboxChange,
 }: {
 	is_deleted: boolean;
-	handleCheckboxChange: (
-		name: keyof DataSourceTableFilter<K>,
-		value: boolean,
-	) => void;
+	handleCheckboxChange: (name: keyof Filters, value: boolean) => void;
 }) {
 	const elementIds = useElementIds(['searchIsDeleted']);
 
@@ -236,7 +224,7 @@ export function FormFiltersShowDeleted<K extends keyof DataSourceType>({
 						checked={is_deleted}
 						onChange={(e) =>
 							handleCheckboxChange(
-								'is_deleted' as keyof DataSourceTableFilter<K>,
+								'is_deleted' as keyof Filters,
 								e.checked ?? false,
 							)
 						}

@@ -19,7 +19,6 @@ import {
 import { LanguageEnum } from '@/entities/user.model';
 import { getNestedError } from '@/helpers/form.helper';
 import { capitalizeFirstLetter, toKebabCase } from '@/helpers/string.helper';
-import { useElementIds, useTranslation } from '@/hooks';
 
 const languages = Object.values(LanguageEnum).map((v) => ({
 	label: capitalizeFirstLetter(v),

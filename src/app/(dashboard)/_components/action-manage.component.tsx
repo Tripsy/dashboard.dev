@@ -6,39 +6,42 @@ import { DataTableActionButton } from '@/app/(dashboard)/_components/data-table-
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import { Loading } from '@/components/loading.component';
 import {
-	type DataSourceModel,
-	type DataSourceType,
+	type BaseEntityType,
+	type DataSourceKey,
+	type DisplayActionEntriesFunctionType,
 	getDataSourceConfig,
 } from '@/config/data-source';
 import { ApiError } from '@/exceptions/api.error';
 import ValueError from '@/exceptions/value.error';
 import { replaceVars } from '@/helpers/string.helper';
-import { useTranslation } from '@/hooks';
+import { useTranslation } from '@/hooks/use-translation.hook';
 import { useToast } from '@/providers/toast.provider';
 
-function displayActionEntries<K extends keyof DataSourceType>(
+function displayActionEntries<K extends DataSourceKey, Entity>(
 	dataSource: K,
-	entries: DataSourceModel<K>[],
+	entries: Entity[],
 ) {
 	const functions = getDataSourceConfig(dataSource, 'functions');
 
-	if (!functions) {
-		throw new ValueError(`'functions' are not defined for ${dataSource}`);
-	}
-
-	const displayActionEntries = functions.displayActionEntries;
-
-	if (!displayActionEntries) {
+	if (
+		!('displayActionEntries' in functions) ||
+		typeof functions.displayActionEntries !== 'function'
+	) {
 		throw new ValueError(
 			`'displayActionEntries' function is not defined for ${dataSource}`,
 		);
 	}
 
-	return displayActionEntries(entries);
+	return (
+		functions.displayActionEntries as DisplayActionEntriesFunctionType<Entity>
+	)(entries);
 }
 
-export function ActionManage() {
-	const { dataSource, dataTableStore } = useDataTable();
+export function ActionManage<
+	K extends DataSourceKey,
+	Entity extends BaseEntityType,
+>() {
+	const { dataSource, dataTableStore } = useDataTable<K, Entity>();
 	const { showToast } = useToast();
 
 	const isOpen = useStore(dataTableStore, (state) => state.isOpen);
@@ -120,10 +123,12 @@ export function ActionManage() {
 		setLoading(true);
 
 		try {
-			// When allowedEntries is 'single', actionEntry is used, otherwise selectedEntries is used to map through entries
-			const ids = (
+			// When allowedEntries is 'single', actionEntry is used; otherwise selectedEntries is used to map through entries
+			const ids: number[] = (
 				actionProps.allowedEntries === 'single'
-					? [actionEntry as DataSourceModel<typeof dataSource>]
+					? actionEntry
+						? [actionEntry]
+						: []
 					: selectedEntries
 			).map((entry) => entry.id);
 
@@ -136,7 +141,7 @@ export function ActionManage() {
 				summary: fetchResponse?.success ? 'Success' : 'Error',
 				detail: fetchResponse?.message || translations['error.form'],
 			});
-		} catch (error: unknown) {
+		} catch (error) {
 			showToast({
 				severity: 'error',
 				summary: 'Error',
@@ -154,7 +159,7 @@ export function ActionManage() {
 	const actionContentEntries = displayActionEntries(
 		dataSource,
 		actionProps.allowedEntries === 'single'
-			? [actionEntry as DataSourceModel<typeof dataSource>]
+			? [actionEntry]
 			: selectedEntries,
 	);
 

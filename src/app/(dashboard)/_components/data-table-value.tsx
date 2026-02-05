@@ -3,14 +3,33 @@
 import clsx from 'clsx';
 import { type JSX, useMemo } from 'react';
 import { Icons } from '@/components/icon.component';
-import type {
-	DataSourceModel,
-	DataSourceType,
-	DataTableColumnType,
-} from '@/config/data-source';
 import { formatDate } from '@/helpers/date.helper';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
-import { useTranslation } from '@/hooks';
+import { useTranslation } from '@/hooks/use-translation.hook';
+
+export type DataTableColumnType<Entity> = {
+	field: string;
+	header: string;
+	sortable?: boolean;
+	body?: (
+		entry: Entity,
+		column: DataTableColumnType<Entity>,
+	) => React.JSX.Element | string;
+	style?: React.CSSProperties;
+};
+
+type DataTableValueOptionsType<Entity> = {
+	customValue?: string;
+	capitalize?: boolean;
+	markDeleted?: boolean;
+	isStatus?: boolean;
+	displayDate?: boolean;
+	source?: string;
+	action?: {
+		name: null | string | ((entry: Entity) => string | null);
+		source: string;
+	};
+};
 
 export const statusList = {
 	active: {
@@ -77,14 +96,14 @@ export const DisplayStatus = ({ status }: { status: string }) => {
 	);
 };
 
-export const DisplayAction = <K extends keyof DataSourceType>({
+export const DisplayAction = <Entity extends Record<string, unknown>>({
 	value,
 	action,
 	entry,
 }: {
 	value: string | JSX.Element;
-	action: NonNullable<DataTableValueOptionsType<K>['action']>;
-	entry: DataSourceModel<K>;
+	action: NonNullable<DataTableValueOptionsType<Entity>['action']>;
+	entry: Entity;
 }) => {
 	const actionName =
 		typeof action.name === 'function' ? action.name(entry) : action.name;
@@ -126,23 +145,10 @@ export const DisplayAction = <K extends keyof DataSourceType>({
 	);
 };
 
-export type DataTableValueOptionsType<K extends keyof DataSourceType> = {
-	customValue?: string;
-	capitalize?: boolean;
-	markDeleted?: boolean;
-	isStatus?: boolean;
-	displayDate?: boolean;
-	source?: string;
-	action?: {
-		name: null | string | ((entry: DataSourceModel<K>) => string | null);
-		source: string;
-	};
-};
-
-export const DataTableValue = <K extends keyof DataSourceType>(
-	entry: DataSourceModel<K> & Record<string, unknown>,
-	column: DataTableColumnType<DataSourceModel<K>>,
-	options: DataTableValueOptionsType<K>,
+export const DataTableValue = <Entity extends Record<string, unknown>>(
+	entry: Entity,
+	column: DataTableColumnType<Entity>,
+	options: DataTableValueOptionsType<Entity>,
 ) => {
 	let outputValue: string | JSX.Element;
 

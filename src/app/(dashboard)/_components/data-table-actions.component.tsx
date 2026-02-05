@@ -4,13 +4,9 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useStore } from 'zustand/react';
 import { DataTableActionButton } from '@/app/(dashboard)/_components/data-table-action-button.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
-import {
-	type DataSourceModel,
-	type DataSourceType,
-	getDataSourceConfig,
-} from '@/config/data-source';
+import { type DataSourceKey, getDataSourceConfig } from '@/config/data-source';
 import { hasPermission } from '@/entities/auth.model';
-import { useTranslation } from '@/hooks';
+import { useTranslation } from '@/hooks/use-translation.hook';
 import { useAuth } from '@/providers/auth.provider';
 import { useToast } from '@/providers/toast.provider';
 
@@ -26,10 +22,13 @@ export const handleReset = (source: string) => {
 
 type ActionKey = 'create' | 'update' | 'delete' | string;
 
-export function DataTableActions() {
+export function DataTableActions<K extends DataSourceKey, Entity>() {
 	const [error, setError] = useState<string | null>(null);
 
-	const { dataSource, selectionMode, dataTableStore } = useDataTable();
+	const { dataSource, selectionMode, dataTableStore } = useDataTable<
+		K,
+		Entity
+	>();
 	const { auth } = useAuth();
 	const { showToast } = useToast();
 
@@ -62,11 +61,11 @@ export function DataTableActions() {
 	const { translations } = useTranslation(translationsKeys);
 
 	const allowAction = useCallback(
-		<K extends keyof DataSourceType>(
-			entries: DataSourceModel<K>[],
+		(
+			entries: Entity[],
 			permission: string,
 			allowedEntries: 'free' | 'single' | 'multiple',
-			customEntryCheck?: (entry: DataSourceModel<K>) => boolean,
+			customEntryCheck?: (entry: Entity) => boolean,
 		) => {
 			if (allowedEntries === 'single') {
 				if (entries.length !== 1) {
@@ -88,12 +87,12 @@ export function DataTableActions() {
 	);
 
 	const handleClick = useCallback(
-		<K extends keyof DataSourceType>(
-			entries: DataSourceModel<K>[],
+		(
+			entries: Entity[],
 			actionName: ActionKey,
 			permission: string,
 			allowedEntries: 'free' | 'single' | 'multiple',
-			customEntryCheck?: (entry: DataSourceModel<K>) => boolean,
+			customEntryCheck?: (entry: Entity) => boolean,
 		) => {
 			if (
 				!allowAction(
@@ -188,11 +187,11 @@ export function DataTableActions() {
 	};
 
 	useEffect(() => {
-		const handleUseDataTableAction = <K extends keyof DataSourceType>(
+		const handleUseDataTableAction = (
 			event: CustomEvent<{
 				source: string;
 				actionName: string;
-				entry: DataSourceModel<K>;
+				entry: Entity;
 			}>,
 		) => {
 			const actionName = event.detail.actionName;
@@ -207,7 +206,7 @@ export function DataTableActions() {
 			}
 
 			const customCheck = actionProps.customEntryCheck as
-				| ((entry: unknown) => boolean)
+				| ((entry: Entity) => boolean)
 				| undefined;
 
 			handleClick(
@@ -225,7 +224,7 @@ export function DataTableActions() {
 			handleUseDataTableAction as EventListener,
 		);
 
-		// Cleanup on unmount
+		// Cleanup on unmounting
 		return () => {
 			window.removeEventListener(
 				'useDataTableAction',

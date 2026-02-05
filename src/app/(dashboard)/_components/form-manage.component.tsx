@@ -17,23 +17,29 @@ import { FormError } from '@/components/form/form-error.component';
 import { FormPart } from '@/components/form/form-part.component';
 import { getActionIcon, Icons } from '@/components/icon.component';
 import {
-	type DataSourceFormValues,
-	type DataSourceType,
+	type DataSourceKey,
 	type FormManageType,
 	type FormStateType,
+	type FormStateValuesType,
 	getDataSourceConfig,
+	type ValidateSyncFormStateFunctionType,
 } from '@/config/data-source';
 import ValueError from '@/exceptions/value.error';
 import { setObjectValue } from '@/helpers/objects.helper';
-import { useFormValidation, useFormValues, useTranslation } from '@/hooks';
+import {
+	useFormValidation,
+	type ValidateFormFunctionType,
+} from '@/hooks/use-form-validation.hook';
+import { useFormValues } from '@/hooks/use-form-values.hook';
+import { useTranslation } from '@/hooks/use-translation.hook';
 import { useToast } from '@/providers/toast.provider';
 
-export function FormManage<K extends keyof DataSourceType>({
-	children,
-}: {
-	children: React.ReactNode;
-}) {
-	const { dataSource, dataTableStore } = useDataTable<K>();
+export function FormManage<
+	K extends DataSourceKey,
+	Entity,
+	FormValues extends FormStateValuesType,
+>({ children }: { children: React.ReactNode }) {
+	const { dataSource, dataTableStore } = useDataTable<K, Entity>();
 	const { showToast } = useToast();
 
 	const actionName = useStore(dataTableStore, (state) => state.actionName);
@@ -48,72 +54,70 @@ export function FormManage<K extends keyof DataSourceType>({
 		throw new Error('actionName appears to be null');
 	}
 
-	const functions = getDataSourceConfig(dataSource, 'functions');
+	const formState = getDataSourceConfig<K, Entity, FormValues, 'formState'>(
+		dataSource,
+		'formState',
+	);
 
-	// Determine syncFormState function
-	if (!('syncFormState' in functions)) {
-		throw new ValueError(
-			`'syncFormState' function is not defined for ${dataSource}`,
-		);
-	}
-
-	const syncFormStateFunction = functions.syncFormState;
-
-	// Fighting with Typescript & Eslint
-	if (!syncFormStateFunction) {
-		throw new ValueError(
-			`'syncFormState' function is not defined for ${dataSource}`,
-		);
-	}
-
-	// Determine initial form state
-	const formState = getDataSourceConfig(dataSource, 'formState');
-
-	// Fighting with Typescript & Eslint
 	if (!formState) {
 		throw new ValueError(`'formState' is not defined for ${dataSource}`);
 	}
 
+	const functions = getDataSourceConfig(dataSource, 'functions');
+
+	if (
+		!('syncFormState' in functions) ||
+		typeof functions.syncFormState !== 'function'
+	) {
+		throw new ValueError(
+			`'syncFormState' function is not defined for ${dataSource}`,
+		);
+	}
+
+	if (
+		!('validateForm' in functions) ||
+		typeof functions.validateForm !== 'function'
+	) {
+		throw new ValueError(
+			`'validateForm' function is not defined for ${dataSource}`,
+		);
+	}
+
 	const initState =
-		actionName === 'update' && actionEntry && syncFormStateFunction
-			? syncFormStateFunction(formState, actionEntry)
+		actionName === 'update' && actionEntry
+			? (
+					functions.syncFormState as ValidateSyncFormStateFunctionType<
+						K,
+						Entity,
+						FormValues
+					>
+				)(formState, actionEntry)
 			: formState;
 
-	const [state, action, pending] = useActionState<FormStateType<K>, FormData>(
-		async (state: FormStateType<K>, formData: FormData) =>
-			formAction<K>(state, formData),
-		initState as Awaited<FormStateType<K>>,
+	const [state, action, pending] = useActionState<
+		FormStateType<K, Entity, FormValues>,
+		FormData
+	>(
+		async (
+			state: FormStateType<K, Entity, FormValues>,
+			formData: FormData,
+		) => formAction(state, formData),
+		initState as Awaited<FormStateType<K, Entity, FormValues>>,
 	);
 
-	const [formValues, setFormValues] = useFormValues<DataSourceFormValues<K>>(
-		state.values,
-	);
-
-	// Determine validateForm function
-	if (!('validateForm' in functions)) {
-		throw new ValueError(
-			`'validateForm' function is not defined for ${dataSource}`,
-		);
-	}
-
-	const validateFormFunction = functions.validateForm;
-
-	// Fighting with Typescript & Eslint
-	if (!validateFormFunction) {
-		throw new ValueError(
-			`'validateForm' function is not defined for ${dataSource}`,
-		);
-	}
+	const [formValues, setFormValues] = useFormValues<FormValues>(state.values);
 
 	const validate = useCallback(
-		(values: DataSourceFormValues<K>) => {
-			return validateFormFunction(values, state.id);
+		(values: FormValues) => {
+			return (
+				functions.validateForm as ValidateFormFunctionType<FormValues>
+			)(values, state.id);
 		},
-		[state.id, validateFormFunction],
+		[state.id, functions.validateForm],
 	);
 
 	const { errors, submitted, setSubmitted, markFieldAsTouched } =
-		useFormValidation<DataSourceFormValues<K>>({
+		useFormValidation<FormValues>({
 			formValues,
 			validate,
 			debounceDelay: 800,
@@ -136,7 +140,7 @@ export function FormManage<K extends keyof DataSourceType>({
 			return newValues;
 		});
 
-		markFieldAsTouched(name as keyof DataSourceFormValues<K>);
+		markFieldAsTouched(name as keyof FormValues);
 	};
 
 	const actionLabelKey = `${dataSource}.action.${actionName}.label`;
@@ -195,7 +199,7 @@ export function FormManage<K extends keyof DataSourceType>({
 				errors,
 				handleChange,
 				pending,
-			} as FormManageType<K>)
+			} as FormManageType<FormValues>)
 		: children;
 
 	return (

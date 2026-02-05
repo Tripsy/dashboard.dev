@@ -41,7 +41,7 @@ export const DataTablePermissionsFilters = (): React.JSX.Element => {
 	);
 
 	const handlers = useMemo(
-		() => createFilterHandlers<'permissions'>(updateFilters),
+		() => createFilterHandlers(updateFilters),
 		[updateFilters],
 	);
 	const { handleInputChange, handleCheckboxChange } = handlers;

@@ -1,27 +1,26 @@
 import type {
 	CreateFunctionType,
-	DataSourceModel,
-	DataSourceType,
 	DeleteFunctionType,
 	FindFunctionParamsType,
 	FindFunctionResponseType,
 	FindFunctionType,
 	UpdateFunctionType,
 } from '@/config/data-source';
+import type { UserModel } from '@/entities/user.model';
 import type { UserPermissionModel } from '@/entities/user-permission.model';
 import { ApiRequest, getResponseData } from '@/helpers/api.helper';
 import { buildQueryString } from '@/helpers/string.helper';
 import type { ApiResponseFetch } from '@/types/api.type';
 
-export const findUsers: FindFunctionType<'users'> = async (
+export const findUsers: FindFunctionType<UserModel> = async (
 	params: FindFunctionParamsType,
 ) => {
 	const query = buildQueryString(params);
 
-	const response: ApiResponseFetch<FindFunctionResponseType<'users'>> =
+	const response: ApiResponseFetch<FindFunctionResponseType<UserModel>> =
 		await new ApiRequest().doFetch(`/users?${query}`);
 
-	return getResponseData<FindFunctionResponseType<'users'>>(response);
+	return getResponseData<FindFunctionResponseType<UserModel>>(response);
 };
 
 export const createUser: CreateFunctionType<'users'> = async (

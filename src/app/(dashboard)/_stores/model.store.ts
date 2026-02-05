@@ -3,45 +3,17 @@ import { create, type StateCreator } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import {
-	type DataSourceModel,
-	type DataSourceTableFilter,
-	type DataSourceType,
+	type DataSourceKey,
+	type DataTableFiltersType,
 	type DataTableStateType,
 	getDataSourceConfig,
 } from '@/config/data-source';
 
-export interface DataTableSelectionSlice<K extends keyof DataSourceType> {
-	selectedEntries: DataSourceModel<K>[];
-	setSelectedEntries: (entries: DataSourceModel<K>[]) => void;
-	clearSelectedEntries: () => void;
-}
-
-export const createDataTableSelectionSlice =
-	<K extends keyof DataSourceType>(): StateCreator<
-		DataTableStore<K>,
-		[['zustand/immer', never]],
-		[],
-		DataTableSelectionSlice<K>
-	> =>
-	(set) => ({
-		selectedEntries: [],
-
-		setSelectedEntries: (entries) =>
-			set((state: Draft<DataTableSelectionSlice<K>>) => {
-				state.selectedEntries = entries as Draft<DataSourceModel<K>>[];
-			}),
-
-		clearSelectedEntries: () =>
-			set((state: Draft<DataTableSelectionSlice<K>>) => {
-				state.selectedEntries = [];
-			}),
-	});
-
-export interface DataTableModalSlice<K extends keyof DataSourceType> {
+export interface DataTableModalSlice<Entity> {
 	isOpen: boolean;
 	actionName: string | null;
-	actionEntry: DataSourceModel<K> | null;
-	setActionEntry: (entry: DataSourceModel<K>) => void;
+	actionEntry: Entity | null;
+	setActionEntry: (entry: Entity) => void;
 	openCreate: () => void;
 	openUpdate: () => void;
 	openAction: (name: string) => void;
@@ -49,11 +21,11 @@ export interface DataTableModalSlice<K extends keyof DataSourceType> {
 }
 
 export const createDataTableModalSlice =
-	<K extends keyof DataSourceType>(): StateCreator<
-		DataTableStore<K>,
+	<Entity>(): StateCreator<
+		DataTableStore<Entity>,
 		[['zustand/immer', never]],
 		[],
-		DataTableModalSlice<K>
+		DataTableModalSlice<Entity>
 	> =>
 	(set) => ({
 		isOpen: false,
@@ -61,93 +33,121 @@ export const createDataTableModalSlice =
 		actionEntry: null,
 
 		openCreate: () =>
-			set((state: Draft<DataTableModalSlice<K>>) => {
+			set((state: Draft<DataTableModalSlice<Entity>>) => {
 				state.isOpen = true;
 				state.actionName = 'create';
 			}),
 
 		openUpdate: () =>
-			set((state: Draft<DataTableModalSlice<K>>) => {
+			set((state: Draft<DataTableModalSlice<Entity>>) => {
 				state.isOpen = true;
 				state.actionName = 'update';
 			}),
 
 		openAction: (name: string) =>
-			set((state: Draft<DataTableModalSlice<K>>) => {
+			set((state: Draft<DataTableModalSlice<Entity>>) => {
 				state.isOpen = true;
 				state.actionName = name;
 			}),
 
 		setActionEntry: (entry) =>
-			set((state: Draft<DataTableModalSlice<K>>) => {
-				state.actionEntry = entry as Draft<DataSourceModel<K>>;
+			set((state: Draft<DataTableModalSlice<Entity>>) => {
+				state.actionEntry = entry as Draft<Entity>;
 			}),
 
 		closeOut: () =>
-			set((state: Draft<DataTableModalSlice<K>>) => {
+			set((state: Draft<DataTableModalSlice<Entity>>) => {
 				state.isOpen = false;
 				state.actionName = null;
 				state.actionEntry = null;
 			}),
 	});
 
-export interface DataTableSlice<K extends keyof DataSourceType> {
-	tableState: DataTableStateType<DataSourceTableFilter<K>>;
-	updateTableState: (
-		newState: Partial<DataTableStateType<DataSourceTableFilter<K>>>,
-	) => void;
+export interface DataTableSlice {
+	tableState: DataTableStateType;
+	updateTableState: (newState: Partial<DataTableStateType>) => void;
 	refreshTableState: () => void;
 }
 
 export const createDataTableSlice =
-	<K extends keyof DataSourceType>(
+	<K extends DataSourceKey, Entity>(
 		dataSource: K,
 	): StateCreator<
-		DataTableStore<K>,
+		DataTableStore<Entity>,
 		[['zustand/immer', never]],
 		[],
-		DataTableSlice<K>
+		DataTableSlice
 	> =>
 	(set) => ({
 		tableState: getDataSourceConfig(dataSource, 'dataTableState'),
 
 		updateTableState: (newState) =>
-			set((state: Draft<DataTableSlice<K>>) => {
+			set((state: Draft<DataTableSlice>) => {
 				state.tableState = {
 					...state.tableState,
 					...newState,
 					filters:
-						(newState.filters as Draft<DataSourceTableFilter<K>>) ||
+						(newState.filters as Draft<DataTableFiltersType>) ||
 						state.tableState.filters,
 				};
 			}),
 
 		refreshTableState: () => {
-			set((state: Draft<DataTableSlice<K>>) => {
+			set((state: Draft<DataTableSlice>) => {
 				state.tableState.reloadTrigger =
 					(state.tableState.reloadTrigger || 0) + 1;
 			});
 		},
 	});
 
-export type DataTableStore<K extends keyof DataSourceType> =
-	DataTableModalSlice<K> &
-		DataTableSlice<K> &
-		DataTableSelectionSlice<K> & {
-			isLoading: boolean;
-			setLoading: (loading: boolean) => void;
-		};
+export interface DataTableSelectionSlice<Entity> {
+	selectedEntries: Entity[];
+	setSelectedEntries: (entries: Entity[]) => void;
+	clearSelectedEntries: () => void;
+}
 
-export const createDataTableStore = <K extends keyof DataSourceType>(
+export const createDataTableSelectionSlice =
+	<Entity>(): StateCreator<
+		DataTableStore<Entity>,
+		[['zustand/immer', never]],
+		[],
+		DataTableSelectionSlice<Entity>
+	> =>
+	(set) => ({
+		selectedEntries: [],
+
+		setSelectedEntries: (entries) =>
+			set((state: Draft<DataTableSelectionSlice<Entity>>) => {
+				state.selectedEntries = entries as Draft<Entity>[];
+			}),
+
+		clearSelectedEntries: () =>
+			set((state: Draft<DataTableSelectionSlice<Entity>>) => {
+				state.selectedEntries = [];
+			}),
+	});
+
+export type DataTableStore<Entity> = DataTableModalSlice<Entity> &
+	DataTableSlice &
+	DataTableSelectionSlice<Entity> & {
+		isLoading: boolean;
+		setLoading: (loading: boolean) => void;
+	};
+
+export const createDataTableStore = <K extends DataSourceKey, Entity>(
 	dataSource: K,
 ) =>
-	create<DataTableStore<K>>()(
+	create<DataTableStore<Entity>>()(
 		devtools(
 			persist(
 				immer((set, get, store) => ({
-					...createDataTableModalSlice<K>()(set, get, store),
-					...createDataTableSlice<K>(dataSource)(set, get, store),
-					...createDataTableSelectionSlice<K>()(set, get, store),
+					...createDataTableModalSlice<Entity>()(set, get, store),
+					...createDataTableSlice<K, Entity>(dataSource)(
+						set,
+						get,
+						store,
+					),
+					...createDataTableSelectionSlice<Entity>()(set, get, store),
 					isLoading: false,
 					setLoading: (loading: boolean) => {
 						set((state) => {
@@ -166,6 +166,6 @@ export const createDataTableStore = <K extends keyof DataSourceType>(
 		),
 	);
 
-export type DataTableStoreType<K extends keyof DataSourceType> = ReturnType<
-	typeof createDataTableStore<K>
+export type DataTableStoreType<K extends DataSourceKey, Entity> = ReturnType<
+	typeof createDataTableStore<K, Entity>
 >;

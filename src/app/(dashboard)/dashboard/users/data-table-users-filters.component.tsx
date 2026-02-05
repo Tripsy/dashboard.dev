@@ -11,7 +11,12 @@ import {
 	FormFiltersShowDeleted,
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
-import { UserRoleEnum, UserStatusEnum } from '@/entities/user.model';
+import type { dataTableStateFiltersUsers } from '@/app/(dashboard)/dashboard/users/users.definition';
+import {
+	type UserModel,
+	UserRoleEnum,
+	UserStatusEnum,
+} from '@/entities/user.model';
 import { createFilterHandlers } from '@/helpers/data-table.helper';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
 import { useSearchFilter, useTranslation } from '@/hooks';
@@ -27,7 +32,7 @@ const roles = Object.values(UserRoleEnum).map((v) => ({
 }));
 
 export const DataTableUsersFilters = (): React.JSX.Element => {
-	const { stateDefault, dataTableStore } = useDataTable<'users'>();
+	const { stateDefault, dataTableStore } = useDataTable<'users', UserModel>();
 
 	const translationsKeys = useMemo(
 		() =>
@@ -45,7 +50,7 @@ export const DataTableUsersFilters = (): React.JSX.Element => {
 	const filters = useStore(
 		dataTableStore,
 		(state) => state.tableState.filters,
-	);
+	) as typeof dataTableStateFiltersUsers;
 	const updateTableState = useStore(
 		dataTableStore,
 		(state) => state.updateTableState,

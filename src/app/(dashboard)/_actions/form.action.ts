@@ -1,76 +1,75 @@
 import {
 	type CreateFunctionType,
-	type DataSourceFormValues,
-	type DataSourceType,
+	type DataSourceKey,
 	type FormStateType,
+	type FormStateValuesType,
 	getDataSourceConfig,
 	type UpdateFunctionType,
+	type ValidateGetFormValuesFunctionType,
 } from '@/config/data-source';
 import { translate } from '@/config/lang';
 import { ApiError } from '@/exceptions/api.error';
 import ValueError from '@/exceptions/value.error';
 import { accumulateZodErrors } from '@/helpers/form.helper';
-import type { ValidationReturnType } from '@/hooks';
+import type {
+	ValidateFormFunctionType,
+	ValidationReturnType,
+} from '@/hooks/use-form-validation.hook';
 
-export function getFormValues<K extends keyof DataSourceType>(
+export function getFormValues<K extends DataSourceKey, FormValues>(
 	dataSource: K,
 	formData: FormData,
-): DataSourceFormValues<K> {
+): FormValues {
 	const functions = getDataSourceConfig(dataSource, 'functions');
 
-	if (!('getFormValues' in functions)) {
+	if (
+		!('getFormValues' in functions) ||
+		typeof functions.getFormValues !== 'function'
+	) {
 		throw new ValueError(
 			`'getFormValues' function is not defined for ${dataSource}`,
 		);
 	}
 
-	const getFormValuesFunction = functions.getFormValues;
-
-	// Fighting with TypeScript & Eslint
-	if (!getFormValuesFunction) {
-		throw new ValueError(
-			`'getFormValues' function is not defined for ${dataSource}`,
-		);
-	}
-
-	return getFormValuesFunction(formData) as DataSourceFormValues<K>;
+	return (
+		functions.getFormValues as ValidateGetFormValuesFunctionType<FormValues>
+	)(formData);
 }
 
-export function handleValidate<K extends keyof DataSourceType>(
+export function handleValidate<K extends DataSourceKey, FormValues>(
 	dataSource: K,
-	values: DataSourceFormValues<K>,
+	values: FormValues,
 	id?: number,
-): ValidationReturnType<DataSourceFormValues<K>> {
+): ValidationReturnType<FormValues> {
 	const functions = getDataSourceConfig(dataSource, 'functions');
 
-	if (!('validateForm' in functions)) {
+	if (
+		!('validateForm' in functions) ||
+		typeof functions.validateForm !== 'function'
+	) {
 		throw new ValueError(
 			`'validateForm' function is not defined for ${dataSource}`,
 		);
 	}
 
-	const validateFormFunction = functions.validateForm;
-
-	// Fighting with TypeScript & Eslint
-	if (!validateFormFunction) {
-		throw new ValueError(
-			`'validateForm' function is not defined for ${dataSource}`,
-		);
-	}
-
-	return validateFormFunction(values, id);
+	return (functions.validateForm as ValidateFormFunctionType<FormValues>)(
+		values,
+		id,
+	);
 }
 
-export async function formAction<K extends keyof DataSourceType>(
-	state: FormStateType<K>,
-	formData: FormData,
-): Promise<FormStateType<K>> {
-	async function executeFetch(data: FormStateType<K>['values'], id?: number) {
+export async function formAction<
+	K extends DataSourceKey,
+	Entity,
+	FormValues extends FormStateValuesType,
+	FormState extends FormStateType<K, Entity, FormValues>,
+>(state: FormState, formData: FormData): Promise<FormState> {
+	async function executeFetch(data: FormValues, id?: number) {
 		const actions = getDataSourceConfig(state.dataSource, 'actions');
 
 		if (id) {
 			const updateFunction = actions?.update?.function as
-				| UpdateFunctionType<K>
+				| UpdateFunctionType<Entity, FormValues>
 				| undefined;
 
 			// Not all the entities have an `update` function
@@ -84,7 +83,7 @@ export async function formAction<K extends keyof DataSourceType>(
 		}
 
 		const createFunction = actions?.create?.function as
-			| CreateFunctionType<K>
+			| CreateFunctionType<Entity, FormValues>
 			| undefined;
 
 		// Not all the entities have a `create` function
@@ -98,7 +97,7 @@ export async function formAction<K extends keyof DataSourceType>(
 	}
 
 	try {
-		const values = getFormValues(state.dataSource, formData);
+		const values = getFormValues<K, FormValues>(state.dataSource, formData);
 		const validated = handleValidate(state.dataSource, values, state.id);
 
 		if (!validated) {
@@ -115,9 +114,7 @@ export async function formAction<K extends keyof DataSourceType>(
 		};
 
 		if (!validated.success) {
-			const errors = accumulateZodErrors<DataSourceFormValues<K>>(
-				validated.error,
-			);
+			const errors = accumulateZodErrors<FormValues>(validated.error);
 
 			return {
 				...result,
@@ -136,9 +133,7 @@ export async function formAction<K extends keyof DataSourceType>(
 			situation: fetchResponse?.success ? 'success' : 'error',
 			resultData: fetchResponse?.data,
 		};
-	} catch (error: unknown) {
-		console.error(error);
-
+	} catch (error) {
 		const message =
 			error instanceof ValueError || error instanceof ApiError
 				? error.message

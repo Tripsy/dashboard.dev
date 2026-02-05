@@ -36,7 +36,7 @@ export const DataTableTemplates = (): JSX.Element => {
 				<DataTableList dataKey="id" scrollHeight="400px" />
 			</div>
 
-			<DataTableModal<'templates'>
+			<DataTableModal
 				modals={{
 					// @ts-expect-error FormManageTemplate props are injected at runtime via FormManage
 					create: <FormManageTemplate />,

@@ -37,7 +37,7 @@ export const DataTableUsers = (): JSX.Element => {
 				<DataTableList dataKey="id" scrollHeight="400px" />
 			</div>
 
-			<DataTableModal<'users'>
+			<DataTableModal
 				modals={{
 					// @ts-expect-error FormManageUser props are injected at runtime via FormManage
 					create: <FormManageUser />,

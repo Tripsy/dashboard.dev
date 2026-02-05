@@ -9,7 +9,7 @@ import { Loading } from '@/components/loading.component';
 import RoutesSetup from '@/config/routes.setup';
 import { formatDate } from '@/helpers/date.helper';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
-import { useTranslation } from '@/hooks';
+import { useTranslation } from '@/hooks/use-translation.hook';
 import { useAuth } from '@/providers/auth.provider';
 import { useToast } from '@/providers/toast.provider';
 import { getSessions } from '@/services/account.service';

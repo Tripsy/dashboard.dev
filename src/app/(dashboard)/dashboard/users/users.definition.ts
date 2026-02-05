@@ -1,9 +1,12 @@
 import { z } from 'zod';
-import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
-import type {
-	DataSourceType,
-	DataTableColumnType,
-	FormStateType,
+import {
+	type DataTableColumnType,
+	DataTableValue,
+} from '@/app/(dashboard)/_components/data-table-value';
+import {
+	type DataTableFiltersType,
+	type FormStateType,
+	registerDataSource,
 } from '@/config/data-source';
 import { translateBatch } from '@/config/lang';
 import { Configuration } from '@/config/settings.config';
@@ -208,9 +211,7 @@ const ValidateSchemaUpdateUsers = ValidateSchemaBaseUsers.extend({
 		}
 	});
 
-function getFormValuesUsers(
-	formData: FormData,
-): DataSourceType['users']['formValues'] {
+function getFormValuesUsers(formData: FormData): FormStateValuesUsersType {
 	const language = formData.get('language');
 	const validLanguages = Object.values(LanguageEnum);
 
@@ -239,80 +240,32 @@ function getFormValuesUsers(
 	};
 }
 
-const DataTableColumnsUsers: DataTableColumnType<UserModel>[] = [
-	{
-		field: 'id',
-		header: translations['users.data_table.column_id'],
-		sortable: true,
-		body: (entry, column) =>
-			DataTableValue<'users'>(entry, column, {
-				markDeleted: true,
-				action: {
-					name: 'view',
-					source: 'users',
-				},
-			}),
-	},
-	{
-		field: 'name',
-		header: translations['users.data_table.column_name'],
-		sortable: true,
-	},
-	{
-		field: 'email',
-		header: translations['users.data_table.column_email'],
-	},
-	{
-		field: 'role',
-		header: translations['users.data_table.column_role'],
-		body: (entry, column) =>
-			DataTableValue<'users'>(entry, column, {
-				capitalize: true,
-				action: {
-					name: (entry: UserModel) => {
-						return entry.role === UserRoleEnum.OPERATOR
-							? 'permissions'
-							: null;
-					},
-					source: 'users',
-				},
-			}),
-	},
-	{
-		field: 'status',
-		header: translations['users.data_table.column_status'],
-		body: (entry, column) =>
-			DataTableValue<'users'>(entry, column, {
-				isStatus: true,
-				markDeleted: true,
-				action: {
-					name: (entry: UserModel) => {
-						return entry.deleted_at
-							? 'restore'
-							: entry.status === UserStatusEnum.ACTIVE
-								? 'disable'
-								: 'enable';
-					},
-					source: 'users',
-				},
-			}),
-		style: {
-			minWidth: '8rem',
-			maxWidth: '8rem',
-		},
-	},
-	{
-		field: 'created_at',
-		header: translations['users.data_table.column_created_at'],
-		sortable: true,
-		body: (entry, column) =>
-			DataTableValue<'users'>(entry, column, {
-				displayDate: true,
-			}),
-	},
-];
+// export type DataSourceUsersType = {
+// 	tableFilter: typeof DataTableUsersFilters;
+// 	model: UserModel;
+// 	formState: FormStateType<'users'>;
+// 	formValues: {
+// 		name: string;
+// 		email: string;
+// 		password?: string;
+// 		password_confirm?: string;
+// 		language: LanguageEnum;
+// 		role: UserRoleEnum;
+// 		operator_type: UserOperatorTypeEnum | null;
+// 	};
+// };
 
-const DataTableUsersFilters = {
+export type FormStateValuesUsersType = {
+	name: string;
+	email: string;
+	password?: string;
+	password_confirm?: string;
+	language: LanguageEnum;
+	role: UserRoleEnum;
+	operator_type: UserOperatorTypeEnum | null;
+};
+
+export const dataTableStateFiltersUsers: DataTableFiltersType = {
 	global: { value: null, matchMode: 'contains' },
 	role: { value: null, matchMode: 'equals' },
 	status: { value: null, matchMode: 'equals' },
@@ -321,31 +274,87 @@ const DataTableUsersFilters = {
 	is_deleted: { value: null, matchMode: 'equals' },
 };
 
-export type DataSourceUsersType = {
-	tableFilter: typeof DataTableUsersFilters;
-	model: UserModel;
-	formState: FormStateType<'users'>;
-	formValues: {
-		name: string;
-		email: string;
-		password?: string;
-		password_confirm?: string;
-		language: LanguageEnum;
-		role: UserRoleEnum;
-		operator_type: UserOperatorTypeEnum | null;
-	};
-};
-
-export const DataSourceConfigUsers = {
+const dataSourceConfigUsers = {
 	dataTableState: {
 		reloadTrigger: 0,
 		first: 0,
 		rows: 10,
 		sortField: 'id',
 		sortOrder: -1 as const,
-		filters: DataTableUsersFilters,
+		filters: dataTableStateFiltersUsers,
 	},
-	dataTableColumns: DataTableColumnsUsers,
+	dataTableColumns: [
+		{
+			field: 'id',
+			header: translations['users.data_table.column_id'],
+			sortable: true,
+			body: (entry: UserModel, column: DataTableColumnType<UserModel>) =>
+				DataTableValue(entry, column, {
+					markDeleted: true,
+					action: {
+						name: 'view',
+						source: 'users',
+					},
+				}),
+		},
+		{
+			field: 'name',
+			header: translations['users.data_table.column_name'],
+			sortable: true,
+		},
+		{
+			field: 'email',
+			header: translations['users.data_table.column_email'],
+		},
+		{
+			field: 'role',
+			header: translations['users.data_table.column_role'],
+			body: (entry: UserModel, column: DataTableColumnType<UserModel>) =>
+				DataTableValue(entry, column, {
+					capitalize: true,
+					action: {
+						name: (entry: UserModel) => {
+							return entry.role === UserRoleEnum.OPERATOR
+								? 'permissions'
+								: null;
+						},
+						source: 'users',
+					},
+				}),
+		},
+		{
+			field: 'status',
+			header: translations['users.data_table.column_status'],
+			body: (entry: UserModel, column: DataTableColumnType<UserModel>) =>
+				DataTableValue(entry, column, {
+					isStatus: true,
+					markDeleted: true,
+					action: {
+						name: (entry: UserModel) => {
+							return entry.deleted_at
+								? 'restore'
+								: entry.status === UserStatusEnum.ACTIVE
+									? 'disable'
+									: 'enable';
+						},
+						source: 'users',
+					},
+				}),
+			style: {
+				minWidth: '8rem',
+				maxWidth: '8rem',
+			},
+		},
+		{
+			field: 'created_at',
+			header: translations['users.data_table.column_created_at'],
+			sortable: true,
+			body: (entry: UserModel, column: DataTableColumnType<UserModel>) =>
+				DataTableValue(entry, column, {
+					displayDate: true,
+				}),
+		},
+	],
 	formState: {
 		dataSource: 'users' as const,
 		id: undefined,
@@ -367,10 +376,7 @@ export const DataSourceConfigUsers = {
 		// onRowSelect: (entry: UserModel) => console.log('selected', entry),
 		// onRowUnselect: (entry: UserModel) => console.log('unselected', entry),
 		getFormValues: getFormValuesUsers,
-		validateForm: (
-			values: DataSourceType['users']['formValues'],
-			id?: number,
-		) => {
+		validateForm: (values: FormStateValuesUsersType, id?: number) => {
 			if (id) {
 				return ValidateSchemaUpdateUsers.safeParse(values);
 			}
@@ -378,9 +384,9 @@ export const DataSourceConfigUsers = {
 			return ValidateSchemaCreateUsers.safeParse(values);
 		},
 		syncFormState: (
-			state: FormStateType<'users'>,
+			state: FormStateType<'users', UserModel, FormStateValuesUsersType>,
 			model: UserModel,
-		): FormStateType<'users'> => {
+		): FormStateType<'users', UserModel, FormStateValuesUsersType> => {
 			return {
 				...state,
 				id: model.id,
@@ -493,3 +499,5 @@ export const DataSourceConfigUsers = {
 		},
 	},
 };
+
+registerDataSource('users', dataSourceConfigUsers);

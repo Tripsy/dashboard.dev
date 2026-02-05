@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import type { FormStateValuesUsersType } from '@/app/(dashboard)/dashboard/users/users.definition';
 import {
 	FormComponentEmail,
 	FormComponentName,
@@ -39,7 +40,7 @@ export function FormManageUser({
 	errors,
 	handleChange,
 	pending,
-}: FormManageType<'users'>) {
+}: FormManageType<FormStateValuesUsersType>) {
 	const translationsKeys = useMemo(
 		() =>
 			[

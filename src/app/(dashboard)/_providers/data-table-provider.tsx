@@ -10,28 +10,26 @@ import {
 import { useStore } from 'zustand/react';
 import type { DataTableStoreType } from '@/app/(dashboard)/_stores/model.store';
 import {
-	type DataSourceModel,
-	type DataSourceTableFilter,
-	type DataSourceType,
+	type DataSourceKey,
 	type DataTableSelectionModeType,
 	type DataTableStateType,
 	getDataSourceConfig,
 } from '@/config/data-source';
-import { useDebouncedEffect } from '@/hooks';
+import { useDebouncedEffect } from '@/hooks/use-debounced-effect.hook';
 
-type DataTableContextType<K extends keyof DataSourceType> = {
+type DataTableContextType<K extends DataSourceKey, Entity> = {
 	dataSource: K;
 	dataStorageKey: string;
 	selectionMode: DataTableSelectionModeType;
-	stateDefault: DataTableStateType<DataSourceTableFilter<K>>;
-	dataTableStore: DataTableStoreType<K>;
+	stateDefault: DataTableStateType;
+	dataTableStore: DataTableStoreType<K, Entity>;
 };
 
 const DataTableContext = createContext<
-	DataTableContextType<keyof DataSourceType> | undefined
+	DataTableContextType<any, any> | undefined
 >(undefined);
 
-function DataTableProvider<K extends keyof DataSourceType>({
+function DataTableProvider<K extends DataSourceKey, Entity>({
 	dataSource,
 	selectionMode,
 	dataTableStore,
@@ -39,7 +37,7 @@ function DataTableProvider<K extends keyof DataSourceType>({
 }: {
 	dataSource: K;
 	selectionMode: DataTableSelectionModeType;
-	dataTableStore: DataTableStoreType<K>;
+	dataTableStore: DataTableStoreType<K, Entity>;
 	children: ReactNode;
 }) {
 	const dataStorageKey = useMemo(
@@ -53,7 +51,7 @@ function DataTableProvider<K extends keyof DataSourceType>({
 		(state) => state.selectedEntries,
 	);
 
-	const prevSelectedEntriesRef = useRef<DataSourceModel<K>[]>([]);
+	const prevSelectedEntriesRef = useRef<Entity[]>([]);
 
 	useDebouncedEffect(
 		() => {
@@ -97,16 +95,14 @@ function DataTableProvider<K extends keyof DataSourceType>({
 	);
 }
 
-function useDataTable<K extends keyof DataSourceType>() {
-	const context = useContext(DataTableContext) as
-		| DataTableContextType<K>
-		| undefined;
+function useDataTable<K extends DataSourceKey, Entity>() {
+	const context = useContext(DataTableContext);
 
 	if (!context) {
 		throw new Error('useDataTable must be used within a DataTableProvider');
 	}
 
-	return context;
+	return context as DataTableContextType<K, Entity>;
 }
 
 export { DataTableProvider, useDataTable };

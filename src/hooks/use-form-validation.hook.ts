@@ -4,34 +4,39 @@ import type { ZodSafeParseError, ZodSafeParseSuccess } from 'zod';
 import { accumulateZodErrors } from '@/helpers/form.helper';
 import { useDebouncedEffect } from '@/hooks/use-debounced-effect.hook';
 
-export type ValidationReturnType<K> =
-	| ZodSafeParseSuccess<K>
-	| ZodSafeParseError<K>;
+export type ValidationReturnType<FormValues> =
+	| ZodSafeParseSuccess<FormValues>
+	| ZodSafeParseError<FormValues>;
 
-interface UseFormValidationProps<K> {
-	formValues: K;
-	validate: (values: K) => ValidationReturnType<K>;
+type UseFormValidationProps<FormValues> = {
+	formValues: FormValues;
+	validate: (values: FormValues) => ValidationReturnType<FormValues>;
 	debounceDelay?: number;
-}
+};
 
-export function useFormValidation<T>({
+export type ValidateFormFunctionType<FormValues> = (
+	values: FormValues,
+	id?: number,
+) => ValidationReturnType<FormValues>;
+
+export function useFormValidation<FormValues>({
 	formValues,
 	validate,
 	debounceDelay = 800,
-}: UseFormValidationProps<T>) {
-	const [errors, setErrors] = useState<Partial<Record<keyof T, string[]>>>(
-		{},
-	);
+}: UseFormValidationProps<FormValues>) {
+	const [errors, setErrors] = useState<
+		Partial<Record<keyof FormValues, string[]>>
+	>({});
 	const [touchedFields, setTouchedFields] = useState<
-		Partial<Record<keyof T, boolean>>
+		Partial<Record<keyof FormValues, boolean>>
 	>({});
 	const [submitted, setSubmitted] = useState(false);
 
-	const prevValuesRef = useRef<T>(formValues);
+	const prevValuesRef = useRef<FormValues>(formValues);
 	const prevTouchedRef = useRef(touchedFields);
 	const prevSubmittedRef = useRef(submitted);
 
-	const markFieldAsTouched = useCallback((field: keyof T) => {
+	const markFieldAsTouched = useCallback((field: keyof FormValues) => {
 		setTouchedFields((prev) =>
 			prev[field] ? prev : { ...prev, [field]: true },
 		);
@@ -71,14 +76,14 @@ export function useFormValidation<T>({
 				? formValues
 				: Object.keys(touchedFields).reduce(
 						(acc, key) => {
-							if (touchedFields[key as keyof T]) {
-								acc[key as keyof T] =
-									formValues[key as keyof T];
+							if (touchedFields[key as keyof FormValues]) {
+								acc[key as keyof FormValues] =
+									formValues[key as keyof FormValues];
 							}
 
 							return acc;
 						},
-						{} as Partial<T>,
+						{} as Partial<FormValues>,
 					);
 
 			if (Object.keys(fieldsToValidate).length === 0) {
@@ -90,7 +95,9 @@ export function useFormValidation<T>({
 			if (validated.success) {
 				setErrors({});
 			} else {
-				const fieldErrors = accumulateZodErrors<T>(validated.error);
+				const fieldErrors = accumulateZodErrors<FormValues>(
+					validated.error,
+				);
 
 				if (submitted) {
 					// Show ALL errors when submitted
@@ -104,7 +111,7 @@ export function useFormValidation<T>({
 
 						// Update errors for all currently touched fields
 						Object.keys(touchedFields).forEach((key) => {
-							const fieldName = key as keyof T;
+							const fieldName = key as keyof FormValues;
 
 							if (touchedFields[fieldName]) {
 								// If this touched field has a validation error, add it

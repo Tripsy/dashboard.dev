@@ -211,7 +211,17 @@ const ValidateSchemaUpdateUsers = ValidateSchemaBaseUsers.extend({
 		}
 	});
 
-function getFormValuesUsers(formData: FormData): FormStateValuesUsersType {
+export type FormValuesUsersType = {
+	name: string;
+	email: string;
+	password?: string;
+	password_confirm?: string;
+	language: LanguageEnum;
+	role: UserRoleEnum;
+	operator_type: UserOperatorTypeEnum | null;
+};
+
+function getFormValuesUsers(formData: FormData): FormValuesUsersType {
 	const language = formData.get('language');
 	const validLanguages = Object.values(LanguageEnum);
 
@@ -240,38 +250,22 @@ function getFormValuesUsers(formData: FormData): FormStateValuesUsersType {
 	};
 }
 
-// export type DataSourceUsersType = {
-// 	tableFilter: typeof DataTableUsersFilters;
-// 	model: UserModel;
-// 	formState: FormStateType<'users'>;
-// 	formValues: {
-// 		name: string;
-// 		email: string;
-// 		password?: string;
-// 		password_confirm?: string;
-// 		language: LanguageEnum;
-// 		role: UserRoleEnum;
-// 		operator_type: UserOperatorTypeEnum | null;
-// 	};
-// };
-
-export type FormStateValuesUsersType = {
-	name: string;
-	email: string;
-	password?: string;
-	password_confirm?: string;
-	language: LanguageEnum;
-	role: UserRoleEnum;
-	operator_type: UserOperatorTypeEnum | null;
+export type DataTableStateFiltersUsersType = DataTableFiltersType & {
+	global: { value: string | null; matchMode: 'contains' };
+	role: { value: UserRoleEnum | null; matchMode: 'equals' };
+	status: { value: UserStatusEnum | null; matchMode: 'equals' };
+	create_date_start: { value: string | null; matchMode: 'equals' };
+	create_date_end: { value: string | null; matchMode: 'equals' };
+	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
-export const dataTableStateFiltersUsers: DataTableFiltersType = {
+export const dataTableStateFiltersUsers: DataTableStateFiltersUsersType = {
 	global: { value: null, matchMode: 'contains' },
 	role: { value: null, matchMode: 'equals' },
 	status: { value: null, matchMode: 'equals' },
 	create_date_start: { value: null, matchMode: 'equals' },
 	create_date_end: { value: null, matchMode: 'equals' },
-	is_deleted: { value: null, matchMode: 'equals' },
+	is_deleted: { value: false, matchMode: 'equals' },
 };
 
 const dataSourceConfigUsers = {
@@ -376,7 +370,7 @@ const dataSourceConfigUsers = {
 		// onRowSelect: (entry: UserModel) => console.log('selected', entry),
 		// onRowUnselect: (entry: UserModel) => console.log('unselected', entry),
 		getFormValues: getFormValuesUsers,
-		validateForm: (values: FormStateValuesUsersType, id?: number) => {
+		validateForm: (values: FormValuesUsersType, id?: number) => {
 			if (id) {
 				return ValidateSchemaUpdateUsers.safeParse(values);
 			}
@@ -384,9 +378,9 @@ const dataSourceConfigUsers = {
 			return ValidateSchemaCreateUsers.safeParse(values);
 		},
 		syncFormState: (
-			state: FormStateType<'users', UserModel, FormStateValuesUsersType>,
+			state: FormStateType<'users', UserModel, FormValuesUsersType>,
 			model: UserModel,
-		): FormStateType<'users', UserModel, FormStateValuesUsersType> => {
+		): FormStateType<'users', UserModel, FormValuesUsersType> => {
 			return {
 				...state,
 				id: model.id,

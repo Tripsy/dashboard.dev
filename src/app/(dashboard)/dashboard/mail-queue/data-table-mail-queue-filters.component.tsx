@@ -13,7 +13,6 @@ import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import { MailQueueStatusEnum } from '@/entities/mail-queue.model';
 import { createFilterHandlers } from '@/helpers/data-table.helper';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
-import { useSearchFilter, useTranslation } from '@/hooks';
 
 const statuses = Object.values(MailQueueStatusEnum).map((v) => ({
 	label: capitalizeFirstLetter(v),

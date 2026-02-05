@@ -10,7 +10,6 @@ import {
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import { createFilterHandlers } from '@/helpers/data-table.helper';
-import { useSearchFilter, useTranslation } from '@/hooks';
 
 export const DataTablePermissionsFilters = (): React.JSX.Element => {
 	const { stateDefault, dataTableStore } = useDataTable<'permissions'>();

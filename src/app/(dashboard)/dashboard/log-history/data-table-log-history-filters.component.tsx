@@ -17,7 +17,6 @@ import {
 } from '@/entities/log-history.model';
 import { createFilterHandlers } from '@/helpers/data-table.helper';
 import { capitalizeFirstLetter, toTitleCase } from '@/helpers/string.helper';
-import { useSearchFilter, useTranslation } from '@/hooks';
 
 const entities = LogHistoryEntities.map((v) => ({
 	label: toTitleCase(v),

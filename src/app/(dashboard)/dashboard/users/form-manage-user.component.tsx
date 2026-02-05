@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import type { FormStateValuesUsersType } from '@/app/(dashboard)/dashboard/users/users.definition';
+import type { FormValuesUsersType } from '@/app/(dashboard)/dashboard/users/users.definition';
 import {
 	FormComponentEmail,
 	FormComponentName,
@@ -17,7 +17,8 @@ import {
 	capitalizeFirstLetter,
 	formatEnumLabel,
 } from '@/helpers/string.helper';
-import { useElementIds, useTranslation } from '@/hooks';
+import { useElementIds } from '@/hooks/use-element-ids.hook';
+import { useTranslation } from '@/hooks/use-translation.hook';
 
 const roles = Object.values(UserRoleEnum).map((v) => ({
 	label: capitalizeFirstLetter(v),
@@ -40,7 +41,7 @@ export function FormManageUser({
 	errors,
 	handleChange,
 	pending,
-}: FormManageType<FormStateValuesUsersType>) {
+}: FormManageType<FormValuesUsersType>) {
 	const translationsKeys = useMemo(
 		() =>
 			[
@@ -62,7 +63,7 @@ export function FormManageUser({
 
 	const prevRoleRef = useRef(formValues.role);
 
-	// Clear operator_type when role changes away from OPERATOR
+	// Clear operator_type when a role changes away from OPERATOR
 	useEffect(() => {
 		const prevRole = prevRoleRef.current;
 		const currentRole = formValues.role;

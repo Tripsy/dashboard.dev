@@ -10,7 +10,6 @@ import { DataTableMailQueueFilters } from '@/app/(dashboard)/dashboard/mail-queu
 import { ViewMailQueue } from '@/app/(dashboard)/dashboard/mail-queue/view-mail-queue.component';
 import { ViewMailQueueTemplate } from '@/app/(dashboard)/dashboard/mail-queue/view-mail-queue-template.component';
 import { Loading } from '@/components/loading.component';
-import { useMounted, useTranslation } from '@/hooks';
 
 const dataTableStore = createDataTableStore('mail_queue');
 

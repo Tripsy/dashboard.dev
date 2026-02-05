@@ -7,7 +7,7 @@ import {
 	capitalizeFirstLetter,
 	formatEnumLabel,
 } from '@/helpers/string.helper';
-import { useTranslation } from '@/hooks';
+import { useTranslation } from '@/hooks/use-translation.hook';
 
 export function UserDetails({ entry }: { entry: UserModel | undefined }) {
 	const translationsKeys = useMemo(

@@ -6,7 +6,8 @@ import { useStore } from 'zustand/react';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import { Loading } from '@/components/loading.component';
 import type { PermissionModel } from '@/entities/permission.model';
-import { useTranslation } from '@/hooks';
+import type { UserModel } from '@/entities/user.model';
+import { useTranslation } from '@/hooks/use-translation.hook';
 import { useToast } from '@/providers/toast.provider';
 import { findPermissions } from '@/services/permissions.service';
 import {
@@ -31,7 +32,7 @@ export function SetupPermissionsUser() {
 
 	const { showToast } = useToast();
 
-	const { dataTableStore } = useDataTable();
+	const { dataTableStore } = useDataTable<'users', UserModel>();
 	const actionEntry = useStore(dataTableStore, (state) => state.actionEntry);
 
 	const user_id = actionEntry?.id;

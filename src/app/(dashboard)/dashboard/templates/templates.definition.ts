@@ -13,7 +13,6 @@ import {
 import { LanguageEnum } from '@/entities/user.model';
 import { safeHtml } from '@/helpers/form.helper';
 import { parseJson } from '@/helpers/string.helper';
-import type { ValidationReturnType } from '@/hooks';
 import {
 	createTemplate,
 	deleteTemplate,

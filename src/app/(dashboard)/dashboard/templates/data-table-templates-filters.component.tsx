@@ -14,7 +14,6 @@ import { TemplateTypeEnum } from '@/entities/template.model';
 import { LanguageEnum } from '@/entities/user.model';
 import { createFilterHandlers } from '@/helpers/data-table.helper';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
-import { useSearchFilter, useTranslation } from '@/hooks';
 
 const languages = Object.values(LanguageEnum).map((language) => ({
 	label: capitalizeFirstLetter(language),

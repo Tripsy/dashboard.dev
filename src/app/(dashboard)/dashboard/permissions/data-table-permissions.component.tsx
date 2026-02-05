@@ -9,7 +9,6 @@ import { createDataTableStore } from '@/app/(dashboard)/_stores/model.store';
 import { DataTablePermissionsFilters } from '@/app/(dashboard)/dashboard/permissions/data-table-permissions-filters.component';
 import { FormManagePermission } from '@/app/(dashboard)/dashboard/permissions/form-manage-permission.component';
 import { Loading } from '@/components/loading.component';
-import { useMounted, useTranslation } from '@/hooks';
 
 const dataTableStore = createDataTableStore('permissions');
 

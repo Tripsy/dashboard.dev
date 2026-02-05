@@ -9,7 +9,6 @@ import { createDataTableStore } from '@/app/(dashboard)/_stores/model.store';
 import { DataTableLogDataFilters } from '@/app/(dashboard)/dashboard/log-data/data-table-log-data-filters.component';
 import { ViewLogData } from '@/app/(dashboard)/dashboard/log-data/view-log-data.component';
 import { Loading } from '@/components/loading.component';
-import { useMounted, useTranslation } from '@/hooks';
 
 const dataTableStore = createDataTableStore('log_data');
 

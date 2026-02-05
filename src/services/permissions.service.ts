@@ -7,19 +7,21 @@ import type {
 	FindFunctionType,
 	UpdateFunctionType,
 } from '@/config/data-source';
+import type { PermissionModel } from '@/entities/permission.model';
 import { ApiRequest, getResponseData } from '@/helpers/api.helper';
 import { buildQueryString } from '@/helpers/string.helper';
 import type { ApiResponseFetch } from '@/types/api.type';
 
-export const findPermissions: FindFunctionType<'permissions'> = async (
+export const findPermissions: FindFunctionType<PermissionModel> = async (
 	params: FindFunctionParamsType,
 ) => {
 	const query = buildQueryString(params);
 
-	const response: ApiResponseFetch<FindFunctionResponseType<'permissions'>> =
-		await new ApiRequest().doFetch(`/permissions?${query}`);
+	const response: ApiResponseFetch<
+		FindFunctionResponseType<PermissionModel>
+	> = await new ApiRequest().doFetch(`/permissions?${query}`);
 
-	return getResponseData<FindFunctionResponseType<'permissions'>>(response);
+	return getResponseData(response);
 };
 
 export const createPermissions: CreateFunctionType<'permissions'> = async (

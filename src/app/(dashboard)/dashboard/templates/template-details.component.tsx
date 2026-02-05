@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import type { TemplateModel } from '@/entities/template.model';
 import { formatDate } from '@/helpers/date.helper';
 import { capitalizeFirstLetter, parseJson } from '@/helpers/string.helper';
-import { useTranslation } from '@/hooks';
+import { useTranslation } from '@/hooks/use-translation.hook';
 
 export function TemplateDetails({
 	entry,

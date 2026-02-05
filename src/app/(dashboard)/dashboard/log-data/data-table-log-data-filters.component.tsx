@@ -13,7 +13,6 @@ import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import { LogCategoryEnum, LogLevelEnum } from '@/entities/log-data.model';
 import { createFilterHandlers } from '@/helpers/data-table.helper';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
-import { useSearchFilter, useTranslation } from '@/hooks';
 
 const logLevels = Object.values(LogLevelEnum).map((v) => ({
 	label: capitalizeFirstLetter(v),

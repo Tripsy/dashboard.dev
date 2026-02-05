@@ -9,7 +9,6 @@ import { createDataTableStore } from '@/app/(dashboard)/_stores/model.store';
 import { DataTableCronHistoryFilters } from '@/app/(dashboard)/dashboard/cron-history/data-table-cron-history-filters.component';
 import { ViewCronHistory } from '@/app/(dashboard)/dashboard/cron-history/view-cron-history.component';
 import { Loading } from '@/components/loading.component';
-import { useMounted, useTranslation } from '@/hooks';
 
 const dataTableStore = createDataTableStore('cron_history');
 

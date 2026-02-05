@@ -14,17 +14,13 @@ export type DataTableEntryRecordType = Record<string, unknown>;
 
 export type DataTableSelectionModeType = 'checkbox' | 'multiple' | null;
 
+type DataTableBaseFilterType = {
+	value: string | number | boolean | Date | null;
+	matchMode?: 'contains' | 'equals' | 'startsWith' | 'endsWith' | 'gt' | 'lt';
+};
+
 export type DataTableFiltersType = {
-	[key: string]: {
-		value: string | number | boolean | Date | null;
-		matchMode?:
-			| 'contains'
-			| 'equals'
-			| 'startsWith'
-			| 'endsWith'
-			| 'gt'
-			| 'lt';
-	};
+	[key: string]: DataTableBaseFilterType;
 };
 
 export type DataTableStateType = {

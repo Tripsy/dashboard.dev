@@ -1,3 +1,4 @@
+import type { FormValuesUsersType } from '@/app/(dashboard)/dashboard/users/users.definition';
 import type {
 	CreateFunctionType,
 	DeleteFunctionType,
@@ -23,19 +24,20 @@ export const findUsers: FindFunctionType<UserModel> = async (
 	return getResponseData<FindFunctionResponseType<UserModel>>(response);
 };
 
-export const createUser: CreateFunctionType<'users'> = async (
-	params: DataSourceType['users']['formValues'],
-) => {
+export const createUser: CreateFunctionType<
+	UserModel,
+	FormValuesUsersType
+> = async (params: FormValuesUsersType) => {
 	return await new ApiRequest().doFetch('/users', {
 		method: 'POST',
 		body: JSON.stringify(params),
 	});
 };
 
-export const updateUser: UpdateFunctionType<'users'> = async (
-	params: DataSourceType['users']['formValues'],
-	id: number,
-) => {
+export const updateUser: UpdateFunctionType<
+	UserModel,
+	FormValuesUsersType
+> = async (params: FormValuesUsersType, id: number) => {
 	return await new ApiRequest().doFetch(`/users/${id}`, {
 		method: 'PUT',
 		body: JSON.stringify(params),
@@ -81,7 +83,7 @@ export const restoreUser = async (
 };
 
 export const getUser = async (id: number) => {
-	const response: ApiResponseFetch<DataSourceModel<'users'>> =
+	const response: ApiResponseFetch<UserModel> =
 		await new ApiRequest().doFetch(`/users/${id}`);
 
 	return getResponseData(response);

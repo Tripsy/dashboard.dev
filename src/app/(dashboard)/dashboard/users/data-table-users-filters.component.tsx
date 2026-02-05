@@ -11,7 +11,10 @@ import {
 	FormFiltersShowDeleted,
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
-import type { dataTableStateFiltersUsers } from '@/app/(dashboard)/dashboard/users/users.definition';
+import type {
+	DataTableStateFiltersUsersType,
+	dataTableStateFiltersUsers,
+} from '@/app/(dashboard)/dashboard/users/users.definition';
 import {
 	type UserModel,
 	UserRoleEnum,
@@ -19,7 +22,8 @@ import {
 } from '@/entities/user.model';
 import { createFilterHandlers } from '@/helpers/data-table.helper';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
-import { useSearchFilter, useTranslation } from '@/hooks';
+import { useSearchFilter } from '@/hooks/use-search-filter.hook';
+import { useTranslation } from '@/hooks/use-translation.hook';
 
 const statuses = Object.values(UserStatusEnum).map((v) => ({
 	label: capitalizeFirstLetter(v),
@@ -51,6 +55,7 @@ export const DataTableUsersFilters = (): React.JSX.Element => {
 		dataTableStore,
 		(state) => state.tableState.filters,
 	) as typeof dataTableStateFiltersUsers;
+
 	const updateTableState = useStore(
 		dataTableStore,
 		(state) => state.updateTableState,
@@ -66,7 +71,8 @@ export const DataTableUsersFilters = (): React.JSX.Element => {
 	);
 
 	const handlers = useMemo(
-		() => createFilterHandlers<'users'>(updateFilters),
+		() =>
+			createFilterHandlers<DataTableStateFiltersUsersType>(updateFilters),
 		[updateFilters],
 	);
 

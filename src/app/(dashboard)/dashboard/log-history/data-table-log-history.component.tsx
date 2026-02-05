@@ -10,7 +10,6 @@ import { DataTableLogHistoryFilters } from '@/app/(dashboard)/dashboard/log-hist
 import { ViewLogHistory } from '@/app/(dashboard)/dashboard/log-history/view-log-history.component';
 import { ViewLogHistoryUser } from '@/app/(dashboard)/dashboard/log-history/view-log-history-user.component';
 import { Loading } from '@/components/loading.component';
-import { useMounted, useTranslation } from '@/hooks';
 
 const dataTableStore = createDataTableStore('log_history');
 

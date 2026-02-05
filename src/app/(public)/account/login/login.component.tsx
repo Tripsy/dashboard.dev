@@ -23,12 +23,10 @@ import { Icons } from '@/components/icon.component';
 import RoutesSetup, { isExcludedRoute } from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
 import { formatDate } from '@/helpers/date.helper';
-import {
-	useElementIds,
-	useFormValidation,
-	useFormValues,
-	useTranslation,
-} from '@/hooks';
+import { useElementIds } from '@/hooks/use-element-ids.hook';
+import { useFormValidation } from '@/hooks/use-form-validation.hook';
+import { useFormValues } from '@/hooks/use-form-values.hook';
+import { useTranslation } from '@/hooks/use-translation.hook';
 import { useAuth } from '@/providers/auth.provider';
 import { useToast } from '@/providers/toast.provider';
 import { removeTokenAccount } from '@/services/account.service';

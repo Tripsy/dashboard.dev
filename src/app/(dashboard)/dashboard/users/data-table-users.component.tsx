@@ -11,7 +11,8 @@ import { FormManageUser } from '@/app/(dashboard)/dashboard/users/form-manage-us
 import { SetupPermissionsUser } from '@/app/(dashboard)/dashboard/users/setup-permissions-user.component';
 import { ViewUser } from '@/app/(dashboard)/dashboard/users/view-user.component';
 import { Loading } from '@/components/loading.component';
-import { useMounted, useTranslation } from '@/hooks';
+import { useMounted } from '@/hooks/use-mounted.hook';
+import { useTranslation } from '@/hooks/use-translation.hook';
 
 const dataTableStore = createDataTableStore('users');
 

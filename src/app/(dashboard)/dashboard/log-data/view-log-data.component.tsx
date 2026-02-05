@@ -3,7 +3,6 @@ import { useStore } from 'zustand/react';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import { formatDate } from '@/helpers/date.helper';
 import { parseJson } from '@/helpers/string.helper';
-import { useTranslation } from '@/hooks';
 
 export function ViewLogData() {
 	const { dataTableStore } = useDataTable<'log_data'>();

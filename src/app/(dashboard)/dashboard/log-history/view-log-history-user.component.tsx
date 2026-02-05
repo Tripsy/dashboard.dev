@@ -4,7 +4,6 @@ import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import { UserDetails } from '@/app/(dashboard)/dashboard/users/user-details.component';
 import { Loading } from '@/components/loading.component';
 import type { UserModel } from '@/entities/user.model';
-import { useTranslation } from '@/hooks';
 import { useToast } from '@/providers/toast.provider';
 import { getUser } from '@/services/users.service';
 

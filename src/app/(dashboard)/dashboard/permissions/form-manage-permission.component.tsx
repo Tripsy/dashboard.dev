@@ -5,7 +5,6 @@ import {
 	PermissionEntitiesSuggestions,
 	PermissionOperationSuggestions,
 } from '@/entities/permission.model';
-import { useElementIds, useTranslation } from '@/hooks';
 import { useAutocomplete } from '@/hooks/use-autocomplete';
 
 export function FormManagePermission({

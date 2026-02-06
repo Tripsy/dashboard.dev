@@ -4,11 +4,12 @@ import { useMemo } from 'react';
 import { useStore } from 'zustand/react';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import { UserDetails } from '@/app/(dashboard)/dashboard/users/user-details.component';
-import { useTranslation } from '@/hooks';
+import { useTranslation } from '@/hooks/use-translation.hook';
+import type { UserModel } from '@/models/user.model';
 
 export function ViewUser() {
-	const { modelStore } = useDataTable<'users'>();
-	const actionEntry = useStore(modelStore, (state) => state.actionEntry);
+	const { dataTableStore } = useDataTable<'users', UserModel>();
+	const actionEntry = useStore(dataTableStore, (state) => state.actionEntry);
 
 	const translationsKeys = useMemo(
 		() => ['dashboard.text.no_entry_selected'] as const,

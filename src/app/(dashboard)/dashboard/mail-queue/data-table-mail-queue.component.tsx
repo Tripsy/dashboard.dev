@@ -5,14 +5,15 @@ import { DataTableActions } from '@/app/(dashboard)/_components/data-table-actio
 import DataTableList from '@/app/(dashboard)/_components/data-table-list.component';
 import { DataTableModal } from '@/app/(dashboard)/_components/data-table-modal.component';
 import { DataTableProvider } from '@/app/(dashboard)/_providers/data-table-provider';
-import { createModelStore } from '@/app/(dashboard)/_stores/model.store';
+import { createDataTableStore } from '@/app/(dashboard)/_stores/model.store';
 import { DataTableMailQueueFilters } from '@/app/(dashboard)/dashboard/mail-queue/data-table-mail-queue-filters.component';
 import { ViewMailQueue } from '@/app/(dashboard)/dashboard/mail-queue/view-mail-queue.component';
 import { ViewMailQueueTemplate } from '@/app/(dashboard)/dashboard/mail-queue/view-mail-queue-template.component';
 import { Loading } from '@/components/loading.component';
-import { useMounted, useTranslation } from '@/hooks';
+import { useMounted } from '@/hooks/use-mounted.hook';
+import { useTranslation } from '@/hooks/use-translation.hook';
 
-const modelStore = createModelStore('mail_queue');
+const dataTableStore = createDataTableStore('mail-queue');
 
 export const DataTableMailQueue = (): JSX.Element => {
 	const translationsKeys = useMemo(() => ['app.text.loading'] as const, []);
@@ -26,9 +27,9 @@ export const DataTableMailQueue = (): JSX.Element => {
 
 	return (
 		<DataTableProvider
-			dataSource="mail_queue"
+			dataSource="mail-queue"
 			selectionMode="multiple"
-			modelStore={modelStore}
+			dataTableStore={dataTableStore}
 		>
 			<div className="standard-box p-4 shadow-md">
 				<DataTableMailQueueFilters />
@@ -36,7 +37,7 @@ export const DataTableMailQueue = (): JSX.Element => {
 				<DataTableList dataKey="id" scrollHeight="400px" />
 			</div>
 
-			<DataTableModal<'mail_queue'>
+			<DataTableModal
 				modals={{
 					view: <ViewMailQueue />,
 					viewTemplate: <ViewMailQueueTemplate />,

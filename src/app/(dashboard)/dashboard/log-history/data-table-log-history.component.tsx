@@ -5,14 +5,15 @@ import { DataTableActions } from '@/app/(dashboard)/_components/data-table-actio
 import DataTableList from '@/app/(dashboard)/_components/data-table-list.component';
 import { DataTableModal } from '@/app/(dashboard)/_components/data-table-modal.component';
 import { DataTableProvider } from '@/app/(dashboard)/_providers/data-table-provider';
-import { createModelStore } from '@/app/(dashboard)/_stores/model.store';
+import { createDataTableStore } from '@/app/(dashboard)/_stores/model.store';
 import { DataTableLogHistoryFilters } from '@/app/(dashboard)/dashboard/log-history/data-table-log-history-filters.component';
 import { ViewLogHistory } from '@/app/(dashboard)/dashboard/log-history/view-log-history.component';
 import { ViewLogHistoryUser } from '@/app/(dashboard)/dashboard/log-history/view-log-history-user.component';
 import { Loading } from '@/components/loading.component';
-import { useMounted, useTranslation } from '@/hooks';
+import { useMounted } from '@/hooks/use-mounted.hook';
+import { useTranslation } from '@/hooks/use-translation.hook';
 
-const modelStore = createModelStore('log_history');
+const dataTableStore = createDataTableStore('log-history');
 
 export const DataTableLogHistory = (): JSX.Element => {
 	const translationsKeys = useMemo(() => ['app.text.loading'] as const, []);
@@ -26,9 +27,9 @@ export const DataTableLogHistory = (): JSX.Element => {
 
 	return (
 		<DataTableProvider
-			dataSource="log_history"
+			dataSource="log-history"
 			selectionMode="multiple"
-			modelStore={modelStore}
+			dataTableStore={dataTableStore}
 		>
 			<div className="standard-box p-4 shadow-md">
 				<DataTableLogHistoryFilters />
@@ -36,7 +37,7 @@ export const DataTableLogHistory = (): JSX.Element => {
 				<DataTableList dataKey="id" scrollHeight="400px" />
 			</div>
 
-			<DataTableModal<'log_history'>
+			<DataTableModal
 				modals={{
 					view: <ViewLogHistory />,
 					viewUser: <ViewLogHistoryUser />,

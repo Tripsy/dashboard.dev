@@ -4,11 +4,12 @@ import { DisplayStatus } from '@/app/(dashboard)/_components/data-table-value';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import { formatDate } from '@/helpers/date.helper';
 import { parseJson } from '@/helpers/string.helper';
-import { useTranslation } from '@/hooks';
+import { useTranslation } from '@/hooks/use-translation.hook';
+import type { CronHistoryModel } from '@/models/cron-history.model';
 
 export function ViewCronHistory() {
-	const { modelStore } = useDataTable<'cron_history'>();
-	const actionEntry = useStore(modelStore, (state) => state.actionEntry);
+	const { dataTableStore } = useDataTable<'cron-history', CronHistoryModel>();
+	const actionEntry = useStore(dataTableStore, (state) => state.actionEntry);
 
 	const translationsKeys = useMemo(
 		() =>

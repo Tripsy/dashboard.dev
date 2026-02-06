@@ -1,7 +1,7 @@
 import './globals.css';
 import type { ReactNode } from 'react';
 import { Providers } from '@/app/providers';
-import { getLanguage } from '@/config/lang';
+import { getLanguage } from '@/config/translate.setup';
 
 export default async function RootLayout({
 	children,

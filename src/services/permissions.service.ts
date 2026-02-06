@@ -1,43 +1,45 @@
 import type {
 	CreateFunctionType,
-	DataSourceType,
 	DeleteFunctionType,
 	FindFunctionParamsType,
 	FindFunctionResponseType,
 	FindFunctionType,
 	UpdateFunctionType,
-} from '@/config/data-source';
-import {
-	ApiRequest,
-	getResponseData,
-	type ResponseFetch,
-} from '@/helpers/api.helper';
+} from '@/config/data-source.config';
+import { ApiRequest, getResponseData } from '@/helpers/api.helper';
 import { buildQueryString } from '@/helpers/string.helper';
+import type {
+	PermissionFormValuesType,
+	PermissionModel,
+} from '@/models/permission.model';
+import type { ApiResponseFetch } from '@/types/api.type';
 
-export const findPermissions: FindFunctionType<'permissions'> = async (
+export const findPermissions: FindFunctionType<PermissionModel> = async (
 	params: FindFunctionParamsType,
 ) => {
 	const query = buildQueryString(params);
 
-	const response: ResponseFetch<FindFunctionResponseType<'permissions'>> =
-		await new ApiRequest().doFetch(`/permissions?${query}`);
+	const response: ApiResponseFetch<
+		FindFunctionResponseType<PermissionModel>
+	> = await new ApiRequest().doFetch(`/permissions?${query}`);
 
-	return getResponseData<FindFunctionResponseType<'permissions'>>(response);
+	return getResponseData(response);
 };
 
-export const createPermissions: CreateFunctionType<'permissions'> = async (
-	params: DataSourceType['permissions']['formValues'],
-) => {
+export const createPermissions: CreateFunctionType<
+	PermissionModel,
+	PermissionFormValuesType
+> = async (params: PermissionFormValuesType) => {
 	return await new ApiRequest().doFetch('/permissions', {
 		method: 'POST',
 		body: JSON.stringify(params),
 	});
 };
 
-export const updatePermissions: UpdateFunctionType<'permissions'> = async (
-	params: DataSourceType['permissions']['formValues'],
-	id: number,
-) => {
+export const updatePermissions: UpdateFunctionType<
+	PermissionModel,
+	PermissionFormValuesType
+> = async (params: PermissionFormValuesType, id: number) => {
 	return await new ApiRequest().doFetch(`/permissions/${id}`, {
 		method: 'PUT',
 		body: JSON.stringify(params),
@@ -54,7 +56,7 @@ export const deletePermissions: DeleteFunctionType = async (ids: number[]) => {
 
 export const restorePermissions = async (
 	ids: number[],
-): Promise<ResponseFetch<null>> => {
+): Promise<ApiResponseFetch<null>> => {
 	const id = ids[0];
 
 	return await new ApiRequest().doFetch(`/permissions/${id}/restore`, {

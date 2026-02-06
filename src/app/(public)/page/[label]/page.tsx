@@ -1,16 +1,13 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { ApiRequest, getResponseData } from '@/helpers/api.helper';
+import { formatDate } from '@/helpers/date.helper';
 import type {
 	TemplateContentPageType,
 	TemplateLayoutPageEnum,
 	TemplateModel,
-} from '@/entities/template.model';
-import {
-	ApiRequest,
-	getResponseData,
-	type ResponseFetch,
-} from '@/helpers/api.helper';
-import { formatDate } from '@/helpers/date.helper';
+} from '@/models/template.model';
+import type { ApiResponseFetch } from '@/types/api.type';
 
 interface Props {
 	params: Promise<{
@@ -25,7 +22,7 @@ async function getPageData(label: string): Promise<{
 	updated_at: string | Date;
 } | null> {
 	try {
-		const fetchResponse: ResponseFetch<TemplateModel> | undefined =
+		const fetchResponse: ApiResponseFetch<TemplateModel> | undefined =
 			await new ApiRequest()
 				.setRequestMode('remote-api')
 				.doFetch(`/templates/${label}/page`, {

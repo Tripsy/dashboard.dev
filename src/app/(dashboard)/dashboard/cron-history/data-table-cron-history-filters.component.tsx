@@ -10,10 +10,15 @@ import {
 	FormFiltersSelect,
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
-import { CronHistoryStatusEnum } from '@/entities/cron-history.model';
+import type { CronHistoryDataTableFiltersType } from '@/app/(dashboard)/dashboard/cron-history/cron-history.definition';
 import { createFilterHandlers } from '@/helpers/data-table.helper';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
-import { useSearchFilter, useTranslation } from '@/hooks';
+import { useSearchFilter } from '@/hooks/use-search-filter.hook';
+import { useTranslation } from '@/hooks/use-translation.hook';
+import {
+	type CronHistoryModel,
+	CronHistoryStatusEnum,
+} from '@/models/cron-history.model';
 
 const statuses = Object.values(CronHistoryStatusEnum).map((v) => ({
 	label: capitalizeFirstLetter(v),
@@ -21,7 +26,10 @@ const statuses = Object.values(CronHistoryStatusEnum).map((v) => ({
 }));
 
 export const DataTableCronHistoryFilters = (): React.JSX.Element => {
-	const { stateDefault, modelStore } = useDataTable<'cron_history'>();
+	const { stateDefault, dataTableStore } = useDataTable<
+		'cron-history',
+		CronHistoryModel
+	>();
 
 	const translationsKeys = useMemo(
 		() =>
@@ -35,9 +43,13 @@ export const DataTableCronHistoryFilters = (): React.JSX.Element => {
 
 	const { translations } = useTranslation(translationsKeys);
 
-	const filters = useStore(modelStore, (state) => state.tableState.filters);
+	const filters = useStore(
+		dataTableStore,
+		(state) => state.tableState.filters,
+	) as CronHistoryDataTableFiltersType;
+
 	const updateTableState = useStore(
-		modelStore,
+		dataTableStore,
 		(state) => state.updateTableState,
 	);
 
@@ -51,7 +63,7 @@ export const DataTableCronHistoryFilters = (): React.JSX.Element => {
 	);
 
 	const handlers = useMemo(
-		() => createFilterHandlers<'cron_history'>(updateFilters),
+		() => createFilterHandlers(updateFilters),
 		[updateFilters],
 	);
 

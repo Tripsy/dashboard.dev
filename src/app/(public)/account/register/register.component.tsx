@@ -26,9 +26,11 @@ import { FormPart } from '@/components/form/form-part.component';
 import { Icons } from '@/components/icon.component';
 import RoutesSetup from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
-import { LanguageEnum } from '@/entities/user.model';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
-import { useElementIds, useFormValidation, useFormValues } from '@/hooks';
+import { useElementIds } from '@/hooks/use-element-ids.hook';
+import { useFormValidation } from '@/hooks/use-form-validation.hook';
+import { useFormValues } from '@/hooks/use-form-values.hook';
+import { LanguageEnum } from '@/models/user.model';
 
 const FormElementError = React.memo(RawFormElementError);
 
@@ -48,7 +50,7 @@ export default function Register() {
 		state.values,
 	);
 
-	const { errors, submitted, setSubmitted, markFieldAsTouched } =
+	const { errors, submitted, markSubmit, markFieldAsTouched } =
 		useFormValidation({
 			formValues: formValues,
 			validate: registerValidate,
@@ -144,11 +146,7 @@ export default function Register() {
 	}
 
 	return (
-		<form
-			action={action}
-			onSubmit={() => setSubmitted(true)}
-			className="form-section"
-		>
+		<form action={action} onSubmit={markSubmit} className="form-section">
 			<FormCsrf
 				inputName={Configuration.get('csrf.inputName') as string}
 			/>

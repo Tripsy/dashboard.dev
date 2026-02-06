@@ -8,38 +8,37 @@ import {
 	useRef,
 } from 'react';
 import { useStore } from 'zustand/react';
-import type { ModelStoreType } from '@/app/(dashboard)/_stores/model.store';
+import type { DataTableStoreType } from '@/app/(dashboard)/_stores/model.store';
 import {
-	type DataSourceModel,
-	type DataSourceTableFilter,
-	type DataSourceType,
+	type DataSourceKey,
 	type DataTableSelectionModeType,
 	type DataTableStateType,
 	getDataSourceConfig,
-} from '@/config/data-source';
-import { useDebouncedEffect } from '@/hooks';
+} from '@/config/data-source.config';
+import { useDebouncedEffect } from '@/hooks/use-debounced-effect.hook';
 
-type DataTableContextType<K extends keyof DataSourceType> = {
+type DataTableContextType<K extends DataSourceKey, Model> = {
 	dataSource: K;
 	dataStorageKey: string;
 	selectionMode: DataTableSelectionModeType;
-	stateDefault: DataTableStateType<DataSourceTableFilter<K>>;
-	modelStore: ModelStoreType<K>;
+	stateDefault: DataTableStateType;
+	dataTableStore: DataTableStoreType<K, Model>;
 };
 
 const DataTableContext = createContext<
-	DataTableContextType<keyof DataSourceType> | undefined
+	// biome-ignore lint/suspicious/noExplicitAny: Context is initialized without concrete generics; actual types are provided by the DataTable provider.
+	DataTableContextType<any, any> | undefined
 >(undefined);
 
-function DataTableProvider<K extends keyof DataSourceType>({
+function DataTableProvider<K extends DataSourceKey, Model>({
 	dataSource,
 	selectionMode,
-	modelStore,
+	dataTableStore,
 	children,
 }: {
 	dataSource: K;
 	selectionMode: DataTableSelectionModeType;
-	modelStore: ModelStoreType<K>;
+	dataTableStore: DataTableStoreType<K, Model>;
 	children: ReactNode;
 }) {
 	const dataStorageKey = useMemo(
@@ -49,11 +48,11 @@ function DataTableProvider<K extends keyof DataSourceType>({
 	const stateDefault = getDataSourceConfig(dataSource, 'dataTableState');
 
 	const selectedEntries = useStore(
-		modelStore,
+		dataTableStore,
 		(state) => state.selectedEntries,
 	);
 
-	const prevSelectedEntriesRef = useRef<DataSourceModel<K>[]>([]);
+	const prevSelectedEntriesRef = useRef<Model[]>([]);
 
 	useDebouncedEffect(
 		() => {
@@ -89,7 +88,7 @@ function DataTableProvider<K extends keyof DataSourceType>({
 				dataStorageKey,
 				selectionMode,
 				stateDefault,
-				modelStore,
+				dataTableStore,
 			}}
 		>
 			{children}
@@ -97,16 +96,14 @@ function DataTableProvider<K extends keyof DataSourceType>({
 	);
 }
 
-function useDataTable<K extends keyof DataSourceType>() {
-	const context = useContext(DataTableContext) as
-		| DataTableContextType<K>
-		| undefined;
+function useDataTable<K extends DataSourceKey, Model>() {
+	const context = useContext(DataTableContext);
 
 	if (!context) {
 		throw new Error('useDataTable must be used within a DataTableProvider');
 	}
 
-	return context;
+	return context as DataTableContextType<K, Model>;
 }
 
 export { DataTableProvider, useDataTable };

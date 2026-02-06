@@ -11,10 +11,16 @@ import {
 	FormFiltersShowDeleted,
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
-import { UserRoleEnum, UserStatusEnum } from '@/entities/user.model';
+import type { UsersDataTableFiltersType } from '@/app/(dashboard)/dashboard/users/users.definition';
 import { createFilterHandlers } from '@/helpers/data-table.helper';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
-import { useSearchFilter, useTranslation } from '@/hooks';
+import { useSearchFilter } from '@/hooks/use-search-filter.hook';
+import { useTranslation } from '@/hooks/use-translation.hook';
+import {
+	type UserModel,
+	UserRoleEnum,
+	UserStatusEnum,
+} from '@/models/user.model';
 
 const statuses = Object.values(UserStatusEnum).map((v) => ({
 	label: capitalizeFirstLetter(v),
@@ -27,7 +33,7 @@ const roles = Object.values(UserRoleEnum).map((v) => ({
 }));
 
 export const DataTableUsersFilters = (): React.JSX.Element => {
-	const { stateDefault, modelStore } = useDataTable<'users'>();
+	const { stateDefault, dataTableStore } = useDataTable<'users', UserModel>();
 
 	const translationsKeys = useMemo(
 		() =>
@@ -42,9 +48,13 @@ export const DataTableUsersFilters = (): React.JSX.Element => {
 
 	const { translations } = useTranslation(translationsKeys);
 
-	const filters = useStore(modelStore, (state) => state.tableState.filters);
+	const filters = useStore(
+		dataTableStore,
+		(state) => state.tableState.filters,
+	) as UsersDataTableFiltersType;
+
 	const updateTableState = useStore(
-		modelStore,
+		dataTableStore,
 		(state) => state.updateTableState,
 	);
 
@@ -58,7 +68,7 @@ export const DataTableUsersFilters = (): React.JSX.Element => {
 	);
 
 	const handlers = useMemo(
-		() => createFilterHandlers<'users'>(updateFilters),
+		() => createFilterHandlers(updateFilters),
 		[updateFilters],
 	);
 

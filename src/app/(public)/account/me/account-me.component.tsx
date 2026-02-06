@@ -9,13 +9,11 @@ import { Loading } from '@/components/loading.component';
 import RoutesSetup from '@/config/routes.setup';
 import { formatDate } from '@/helpers/date.helper';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
-import { useTranslation } from '@/hooks';
+import { useTranslation } from '@/hooks/use-translation.hook';
 import { useAuth } from '@/providers/auth.provider';
 import { useToast } from '@/providers/toast.provider';
-import {
-	type AuthTokenListType,
-	getSessions,
-} from '@/services/account.service';
+import { getSessions } from '@/services/account.service';
+import type { AuthTokenListType } from '@/types/auth.type';
 
 export default function AccountMe() {
 	const { auth, authStatus } = useAuth();
@@ -83,13 +81,7 @@ export default function AccountMe() {
 			const newUrl = RoutesSetup.get('account-me');
 			router.replace(newUrl, { scroll: false });
 		}
-	}, [
-		searchParams.get,
-		showToast,
-		isTranslationLoading,
-		translations,
-		router,
-	]);
+	}, [searchParams, showToast, isTranslationLoading, translations, router]);
 
 	if (authStatus === 'loading') {
 		return <Loading text="Loading..." />;

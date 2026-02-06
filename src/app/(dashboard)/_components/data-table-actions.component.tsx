@@ -5,12 +5,11 @@ import { useStore } from 'zustand/react';
 import { DataTableActionButton } from '@/app/(dashboard)/_components/data-table-action-button.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import {
-	type DataSourceModel,
-	type DataSourceType,
+	type DataSourceKey,
 	getDataSourceConfig,
-} from '@/config/data-source';
-import { hasPermission } from '@/entities/auth.model';
-import { useTranslation } from '@/hooks';
+} from '@/config/data-source.config';
+import { useTranslation } from '@/hooks/use-translation.hook';
+import { hasPermission } from '@/models/auth.model';
 import { useAuth } from '@/providers/auth.provider';
 import { useToast } from '@/providers/toast.provider';
 
@@ -26,22 +25,25 @@ export const handleReset = (source: string) => {
 
 type ActionKey = 'create' | 'update' | 'delete' | string;
 
-export function DataTableActions() {
+export function DataTableActions<K extends DataSourceKey, Model>() {
 	const [error, setError] = useState<string | null>(null);
 
-	const { dataSource, selectionMode, modelStore } = useDataTable();
+	const { dataSource, selectionMode, dataTableStore } = useDataTable<
+		K,
+		Model
+	>();
 	const { auth } = useAuth();
 	const { showToast } = useToast();
 
-	const openCreate = useStore(modelStore, (state) => state.openCreate);
-	const openUpdate = useStore(modelStore, (state) => state.openUpdate);
-	const openAction = useStore(modelStore, (state) => state.openAction);
+	const openCreate = useStore(dataTableStore, (state) => state.openCreate);
+	const openUpdate = useStore(dataTableStore, (state) => state.openUpdate);
+	const openAction = useStore(dataTableStore, (state) => state.openAction);
 	const setActionEntry = useStore(
-		modelStore,
+		dataTableStore,
 		(state) => state.setActionEntry,
 	);
 	const selectedEntries = useStore(
-		modelStore,
+		dataTableStore,
 		(state) => state.selectedEntries,
 	);
 
@@ -62,11 +64,11 @@ export function DataTableActions() {
 	const { translations } = useTranslation(translationsKeys);
 
 	const allowAction = useCallback(
-		<K extends keyof DataSourceType>(
-			entries: DataSourceModel<K>[],
+		(
+			entries: Model[],
 			permission: string,
 			allowedEntries: 'free' | 'single' | 'multiple',
-			customEntryCheck?: (entry: DataSourceModel<K>) => boolean,
+			customEntryCheck?: (entry: Model) => boolean,
 		) => {
 			if (allowedEntries === 'single') {
 				if (entries.length !== 1) {
@@ -88,12 +90,12 @@ export function DataTableActions() {
 	);
 
 	const handleClick = useCallback(
-		<K extends keyof DataSourceType>(
-			entries: DataSourceModel<K>[],
+		(
+			entries: Model[],
 			actionName: ActionKey,
 			permission: string,
 			allowedEntries: 'free' | 'single' | 'multiple',
-			customEntryCheck?: (entry: DataSourceModel<K>) => boolean,
+			customEntryCheck?: (entry: Model) => boolean,
 		) => {
 			if (
 				!allowAction(
@@ -188,11 +190,11 @@ export function DataTableActions() {
 	};
 
 	useEffect(() => {
-		const handleUseDataTableAction = <K extends keyof DataSourceType>(
+		const handleUseDataTableAction = (
 			event: CustomEvent<{
 				source: string;
 				actionName: string;
-				entry: DataSourceModel<K>;
+				entry: Model;
 			}>,
 		) => {
 			const actionName = event.detail.actionName;
@@ -207,7 +209,7 @@ export function DataTableActions() {
 			}
 
 			const customCheck = actionProps.customEntryCheck as
-				| ((entry: unknown) => boolean)
+				| ((entry: Model) => boolean)
 				| undefined;
 
 			handleClick(
@@ -225,7 +227,7 @@ export function DataTableActions() {
 			handleUseDataTableAction as EventListener,
 		);
 
-		// Cleanup on unmount
+		// Cleanup on unmounting
 		return () => {
 			window.removeEventListener(
 				'useDataTableAction',

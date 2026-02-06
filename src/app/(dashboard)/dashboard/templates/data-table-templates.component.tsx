@@ -5,14 +5,15 @@ import { DataTableActions } from '@/app/(dashboard)/_components/data-table-actio
 import DataTableList from '@/app/(dashboard)/_components/data-table-list.component';
 import { DataTableModal } from '@/app/(dashboard)/_components/data-table-modal.component';
 import { DataTableProvider } from '@/app/(dashboard)/_providers/data-table-provider';
-import { createModelStore } from '@/app/(dashboard)/_stores/model.store';
+import { createDataTableStore } from '@/app/(dashboard)/_stores/model.store';
 import { DataTableTemplatesFilters } from '@/app/(dashboard)/dashboard/templates/data-table-templates-filters.component';
 import { FormManageTemplate } from '@/app/(dashboard)/dashboard/templates/form-manage-template.component';
 import { ViewTemplate } from '@/app/(dashboard)/dashboard/templates/view-template.component';
 import { Loading } from '@/components/loading.component';
-import { useMounted, useTranslation } from '@/hooks';
+import { useMounted } from '@/hooks/use-mounted.hook';
+import { useTranslation } from '@/hooks/use-translation.hook';
 
-const modelStore = createModelStore('templates');
+const dataTableStore = createDataTableStore('templates');
 
 export const DataTableTemplates = (): JSX.Element => {
 	const translationsKeys = useMemo(() => ['app.text.loading'] as const, []);
@@ -28,7 +29,7 @@ export const DataTableTemplates = (): JSX.Element => {
 		<DataTableProvider
 			dataSource="templates"
 			selectionMode="checkbox"
-			modelStore={modelStore}
+			dataTableStore={dataTableStore}
 		>
 			<div className="standard-box p-4 shadow-md">
 				<DataTableTemplatesFilters />
@@ -36,7 +37,7 @@ export const DataTableTemplates = (): JSX.Element => {
 				<DataTableList dataKey="id" scrollHeight="400px" />
 			</div>
 
-			<DataTableModal<'templates'>
+			<DataTableModal
 				modals={{
 					// @ts-expect-error FormManageTemplate props are injected at runtime via FormManage
 					create: <FormManageTemplate />,

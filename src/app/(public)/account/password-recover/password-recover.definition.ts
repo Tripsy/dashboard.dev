@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { translateBatch } from '@/config/lang';
+import { translateBatch } from '@/config/translate.setup';
 import type { FormSituationType } from '@/types';
 
 export type PasswordRecoverFormFieldsType = {

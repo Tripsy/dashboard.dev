@@ -3,11 +3,12 @@ import { useStore } from 'zustand/react';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import { formatDate } from '@/helpers/date.helper';
 import { parseJson } from '@/helpers/string.helper';
-import { useTranslation } from '@/hooks';
+import { useTranslation } from '@/hooks/use-translation.hook';
+import type { LogHistoryModel } from '@/models/log-history.model';
 
 export function ViewLogHistory() {
-	const { modelStore } = useDataTable<'log_history'>();
-	const actionEntry = useStore(modelStore, (state) => state.actionEntry);
+	const { dataTableStore } = useDataTable<'log-history', LogHistoryModel>();
+	const actionEntry = useStore(dataTableStore, (state) => state.actionEntry);
 
 	const translationsKeys = useMemo(
 		() =>

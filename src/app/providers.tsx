@@ -1,6 +1,6 @@
 import { headers } from 'next/headers';
 import type React from 'react';
-import type { AuthModel } from '@/entities/auth.model';
+import type { AuthModel } from '@/models/auth.model';
 import { AuthProvider } from '@/providers/auth.provider';
 import { PrimeProvider } from '@/providers/prime.provider';
 import { ThemeProvider } from '@/providers/theme.provider';

@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { translateBatch } from '@/config/lang';
 import { Configuration } from '@/config/settings.config';
-import { LanguageEnum } from '@/entities/user.model';
+import { translateBatch } from '@/config/translate.setup';
+import { LanguageEnum } from '@/models/user.model';
 import type { FormSituationType } from '@/types';
 
 export type AccountEditFormFieldsType = {

@@ -10,14 +10,17 @@ import {
 	FormFiltersSelect,
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
+import type { LogHistoryDataTableFiltersType } from '@/app/(dashboard)/dashboard/log-history/log-history.definition';
+import { createFilterHandlers } from '@/helpers/data-table.helper';
+import { capitalizeFirstLetter, toTitleCase } from '@/helpers/string.helper';
+import { useSearchFilter } from '@/hooks/use-search-filter.hook';
+import { useTranslation } from '@/hooks/use-translation.hook';
 import {
 	LogHistoryActions,
 	LogHistoryEntities,
+	type LogHistoryModel,
 	LogHistorySource,
-} from '@/entities/log-history.model';
-import { createFilterHandlers } from '@/helpers/data-table.helper';
-import { capitalizeFirstLetter, toTitleCase } from '@/helpers/string.helper';
-import { useSearchFilter, useTranslation } from '@/hooks';
+} from '@/models/log-history.model';
 
 const entities = LogHistoryEntities.map((v) => ({
 	label: toTitleCase(v),
@@ -35,7 +38,10 @@ const sources = Object.values(LogHistorySource).map((v) => ({
 }));
 
 export const DataTableLogHistoryFilters = (): React.JSX.Element => {
-	const { stateDefault, modelStore } = useDataTable<'log_history'>();
+	const { stateDefault, dataTableStore } = useDataTable<
+		'log-history',
+		LogHistoryModel
+	>();
 
 	const translationsKeys = useMemo(
 		() =>
@@ -52,9 +58,13 @@ export const DataTableLogHistoryFilters = (): React.JSX.Element => {
 
 	const { translations } = useTranslation(translationsKeys);
 
-	const filters = useStore(modelStore, (state) => state.tableState.filters);
+	const filters = useStore(
+		dataTableStore,
+		(state) => state.tableState.filters,
+	) as LogHistoryDataTableFiltersType;
+
 	const updateTableState = useStore(
-		modelStore,
+		dataTableStore,
 		(state) => state.updateTableState,
 	);
 
@@ -68,7 +78,7 @@ export const DataTableLogHistoryFilters = (): React.JSX.Element => {
 	);
 
 	const handlers = useMemo(
-		() => createFilterHandlers<'log_history'>(updateFilters),
+		() => createFilterHandlers(updateFilters),
 		[updateFilters],
 	);
 

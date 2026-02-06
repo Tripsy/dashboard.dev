@@ -2,18 +2,15 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import RoutesSetup, { RouteAuth, type RouteMatch } from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
+import { ApiRequest, getResponseData } from '@/helpers/api.helper';
+import { getTrackedCookie } from '@/helpers/session.helper';
+import { apiHeaders } from '@/helpers/system.helper';
 import {
 	type AuthModel,
 	hasPermission,
 	prepareAuthModel,
-} from '@/entities/auth.model';
-import {
-	ApiRequest,
-	getResponseData,
-	type ResponseFetch,
-} from '@/helpers/api.helper';
-import { getTrackedCookie } from '@/helpers/session.helper';
-import { apiHeaders } from '@/helpers/system.helper';
+} from '@/models/auth.model';
+import type { ApiResponseFetch } from '@/types/api.type';
 
 class MiddlewareContext {
 	req: NextRequest;
@@ -242,15 +239,16 @@ class MiddlewareContext {
  */
 async function fetchAuthModel(token: string): Promise<AuthModel> {
 	try {
-		const fetchResponse: ResponseFetch<AuthModel> = await new ApiRequest()
-			.setRequestMode('remote-api')
-			.doFetch('/account/me', {
-				method: 'GET',
-				headers: {
-					Authorization: `Bearer ${token}`,
-					...(await apiHeaders()),
-				},
-			});
+		const fetchResponse: ApiResponseFetch<AuthModel> =
+			await new ApiRequest()
+				.setRequestMode('remote-api')
+				.doFetch('/account/me', {
+					method: 'GET',
+					headers: {
+						Authorization: `Bearer ${token}`,
+						...(await apiHeaders()),
+					},
+				});
 
 		if (fetchResponse?.success) {
 			const responseData = getResponseData(fetchResponse);
@@ -292,22 +290,6 @@ export async function proxy(req: NextRequest) {
 	if (!routeMatch) {
 		return ctx.success();
 	}
-
-	// // Rate limit
-	// const {isAllowed, retryAfter} = await rateLimit(req);
-	//
-	// if (!isAllowed) {
-	//     return new NextResponse(
-	//         JSON.stringify({error: 'Too many requests. Please try again later.'}),
-	//         {
-	//             status: 429,
-	//             headers: {
-	//                 'Content-Type': 'application/json',
-	//                 'Retry-After': String(retryAfter),
-	//             },
-	//         }
-	//     );
-	// }
 
 	// Skip auth check for proxy routes - they will fail at remote API if is the case
 	if (!['proxy'].includes(routeMatch.name)) {

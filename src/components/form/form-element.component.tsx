@@ -11,7 +11,7 @@ import React, { type JSX, useMemo } from 'react';
 import { FormElementError } from '@/components/form/form-element-error.component';
 import { FormPart } from '@/components/form/form-part.component';
 import { Icons } from '@/components/icon.component';
-import { useTranslation } from '@/hooks';
+import { useTranslation } from '@/hooks/use-translation.hook';
 
 export const FormElement = ({
 	children,

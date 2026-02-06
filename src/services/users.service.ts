@@ -1,45 +1,42 @@
 import type {
 	CreateFunctionType,
-	DataSourceModel,
-	DataSourceType,
 	DeleteFunctionType,
 	FindFunctionParamsType,
 	FindFunctionResponseType,
 	FindFunctionType,
 	UpdateFunctionType,
-} from '@/config/data-source';
-import type { UserPermissionModel } from '@/entities/user-permission.model';
-import {
-	ApiRequest,
-	getResponseData,
-	type ResponseFetch,
-} from '@/helpers/api.helper';
+} from '@/config/data-source.config';
+import { ApiRequest, getResponseData } from '@/helpers/api.helper';
 import { buildQueryString } from '@/helpers/string.helper';
+import type { UserFormValuesType, UserModel } from '@/models/user.model';
+import type { UserPermissionModel } from '@/models/user-permission.model';
+import type { ApiResponseFetch } from '@/types/api.type';
 
-export const findUsers: FindFunctionType<'users'> = async (
+export const findUsers: FindFunctionType<UserModel> = async (
 	params: FindFunctionParamsType,
 ) => {
 	const query = buildQueryString(params);
 
-	const response: ResponseFetch<FindFunctionResponseType<'users'>> =
+	const response: ApiResponseFetch<FindFunctionResponseType<UserModel>> =
 		await new ApiRequest().doFetch(`/users?${query}`);
 
-	return getResponseData<FindFunctionResponseType<'users'>>(response);
+	return getResponseData<FindFunctionResponseType<UserModel>>(response);
 };
 
-export const createUser: CreateFunctionType<'users'> = async (
-	params: DataSourceType['users']['formValues'],
-) => {
+export const createUser: CreateFunctionType<
+	UserModel,
+	UserFormValuesType
+> = async (params: UserFormValuesType) => {
 	return await new ApiRequest().doFetch('/users', {
 		method: 'POST',
 		body: JSON.stringify(params),
 	});
 };
 
-export const updateUser: UpdateFunctionType<'users'> = async (
-	params: DataSourceType['users']['formValues'],
-	id: number,
-) => {
+export const updateUser: UpdateFunctionType<
+	UserModel,
+	UserFormValuesType
+> = async (params: UserFormValuesType, id: number) => {
 	return await new ApiRequest().doFetch(`/users/${id}`, {
 		method: 'PUT',
 		body: JSON.stringify(params),
@@ -56,7 +53,7 @@ export const deleteUser: DeleteFunctionType = async (ids: number[]) => {
 
 export const enableUser = async (
 	ids: number[],
-): Promise<ResponseFetch<null>> => {
+): Promise<ApiResponseFetch<null>> => {
 	const id = ids[0];
 
 	return await new ApiRequest().doFetch(`/users/${id}/status/active`, {
@@ -66,7 +63,7 @@ export const enableUser = async (
 
 export const disableUser = async (
 	ids: number[],
-): Promise<ResponseFetch<null>> => {
+): Promise<ApiResponseFetch<null>> => {
 	const id = ids[0];
 
 	return await new ApiRequest().doFetch(`/users/${id}/status/inactive`, {
@@ -76,7 +73,7 @@ export const disableUser = async (
 
 export const restoreUser = async (
 	ids: number[],
-): Promise<ResponseFetch<null>> => {
+): Promise<ApiResponseFetch<null>> => {
 	const id = ids[0];
 
 	return await new ApiRequest().doFetch(`/users/${id}/restore`, {
@@ -85,7 +82,7 @@ export const restoreUser = async (
 };
 
 export const getUser = async (id: number) => {
-	const response: ResponseFetch<DataSourceModel<'users'>> =
+	const response: ApiResponseFetch<UserModel> =
 		await new ApiRequest().doFetch(`/users/${id}`);
 
 	return getResponseData(response);
@@ -106,7 +103,7 @@ export const getUserPermissions = async (
 ) => {
 	const query = buildQueryString(params);
 
-	const response: ResponseFetch<GetUserPermissionsType> =
+	const response: ApiResponseFetch<GetUserPermissionsType> =
 		await new ApiRequest().doFetch(
 			`/users/${user_id}/permissions?${query}`,
 		);
@@ -117,7 +114,7 @@ export const getUserPermissions = async (
 export const createUserPermissions = async (
 	user_id: number,
 	permission_ids: number[],
-): Promise<ResponseFetch<{ permission_id: number; message: string }[]>> => {
+): Promise<ApiResponseFetch<{ permission_id: number; message: string }[]>> => {
 	return await new ApiRequest().doFetch(`/users/${user_id}/permissions`, {
 		method: 'POST',
 		body: JSON.stringify({
@@ -130,7 +127,7 @@ export const createUserPermissions = async (
 export const deleteUserPermission = async (
 	user_id: number,
 	permission_id: number,
-): Promise<ResponseFetch<null>> => {
+): Promise<ApiResponseFetch<null>> => {
 	return await new ApiRequest().doFetch(
 		`/users/${user_id}/permissions/${permission_id}`,
 		{

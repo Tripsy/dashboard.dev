@@ -1,6 +1,6 @@
 import type React from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useDebouncedEffect } from '@/hooks/index';
+import { useDebouncedEffect } from './use-debounced-effect.hook';
 
 interface UseSearchFilterOptions {
 	initialValue?: string;

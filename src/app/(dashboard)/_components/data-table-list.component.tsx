@@ -6,6 +6,7 @@ import {
 	type DataTableFilterMeta,
 	type DataTablePageEvent,
 	type DataTableSortEvent,
+	type DataTableValue,
 } from 'primereact/datatable';
 import type { PaginatorCurrentPageReportOptions } from 'primereact/paginator';
 import type React from 'react';
@@ -13,14 +14,12 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useStore } from 'zustand/react';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import {
-	type DataSourceModel,
-	type DataSourceType,
-	type DataTablePropsType,
+	type FindFunctionResponseType,
 	getDataSourceConfig,
-} from '@/config/data-source';
+} from '@/config/data-source.config';
 import { toDateInstanceCustom } from '@/helpers/date.helper';
 import { replaceVars } from '@/helpers/string.helper';
-import { useTranslation } from '@/hooks';
+import { useTranslation } from '@/hooks/use-translation.hook';
 
 type SelectionChangeEvent<T> = {
 	originalEvent: React.SyntheticEvent;
@@ -56,33 +55,34 @@ const CurrentPageReport = (options: PaginatorCurrentPageReportOptions) => {
 	);
 };
 
-export default function DataTableList<K extends keyof DataSourceType>(
-	props: DataTablePropsType,
-) {
-	const { dataSource, dataStorageKey, selectionMode, modelStore } =
-		useDataTable<K>();
+export default function DataTableList<Model extends DataTableValue>(props: {
+	dataKey: string;
+	scrollHeight?: string;
+}) {
+	const { dataSource, dataStorageKey, selectionMode, dataTableStore } =
+		useDataTable();
 
-	const tableState = useStore(modelStore, (state) => state.tableState);
+	const tableState = useStore(dataTableStore, (state) => state.tableState);
 	const updateTableState = useStore(
-		modelStore,
+		dataTableStore,
 		(state) => state.updateTableState,
 	);
 	const selectedEntries = useStore(
-		modelStore,
+		dataTableStore,
 		(state) => state.selectedEntries,
-	);
+	) as Model[];
 	const setSelectedEntries = useStore(
-		modelStore,
+		dataTableStore,
 		(state) => state.setSelectedEntries,
 	);
 	const clearSelectedEntries = useStore(
-		modelStore,
+		dataTableStore,
 		(state) => state.clearSelectedEntries,
 	);
-	const isLoading = useStore(modelStore, (state) => state.isLoading);
-	const setLoading = useStore(modelStore, (state) => state.setLoading);
+	const isLoading = useStore(dataTableStore, (state) => state.isLoading);
+	const setLoading = useStore(dataTableStore, (state) => state.setLoading);
 
-	const [data, setData] = useState<DataSourceModel<K>[]>([]);
+	const [data, setData] = useState<Model[]>([]);
 	const [totalRecords, setTotalRecords] = useState(0);
 
 	const translationsKeys = useMemo(
@@ -186,7 +186,7 @@ export default function DataTableList<K extends keyof DataSourceType>(
 						);
 					}
 
-					const data = await findFunction({
+					const data = (await findFunction({
 						order_by: tableState.sortField,
 						direction: tableState.sortOrder === 1 ? 'ASC' : 'DESC',
 						limit: tableState.rows,
@@ -197,7 +197,7 @@ export default function DataTableList<K extends keyof DataSourceType>(
 									) + 1
 								: 1,
 						filter: findFunctionFilter,
-					});
+					})) as FindFunctionResponseType<Model>;
 
 					if (signal?.aborted) {
 						return;
@@ -269,7 +269,7 @@ export default function DataTableList<K extends keyof DataSourceType>(
 	);
 
 	const onSelectionChange = useCallback(
-		(event: SelectionChangeEvent<DataSourceModel<K>>) => {
+		(event: SelectionChangeEvent<Model>) => {
 			setSelectedEntries(event.value);
 		},
 		[setSelectedEntries],

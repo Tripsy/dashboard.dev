@@ -5,13 +5,14 @@ import { DataTableActions } from '@/app/(dashboard)/_components/data-table-actio
 import DataTableList from '@/app/(dashboard)/_components/data-table-list.component';
 import { DataTableModal } from '@/app/(dashboard)/_components/data-table-modal.component';
 import { DataTableProvider } from '@/app/(dashboard)/_providers/data-table-provider';
-import { createModelStore } from '@/app/(dashboard)/_stores/model.store';
+import { createDataTableStore } from '@/app/(dashboard)/_stores/model.store';
 import { DataTableLogDataFilters } from '@/app/(dashboard)/dashboard/log-data/data-table-log-data-filters.component';
 import { ViewLogData } from '@/app/(dashboard)/dashboard/log-data/view-log-data.component';
 import { Loading } from '@/components/loading.component';
-import { useMounted, useTranslation } from '@/hooks';
+import { useMounted } from '@/hooks/use-mounted.hook';
+import { useTranslation } from '@/hooks/use-translation.hook';
 
-const modelStore = createModelStore('log_data');
+const dataTableStore = createDataTableStore('log-data');
 
 export const DataTableLogData = (): JSX.Element => {
 	const translationsKeys = useMemo(() => ['app.text.loading'] as const, []);
@@ -25,9 +26,9 @@ export const DataTableLogData = (): JSX.Element => {
 
 	return (
 		<DataTableProvider
-			dataSource="log_data"
+			dataSource="log-data"
 			selectionMode="multiple"
-			modelStore={modelStore}
+			dataTableStore={dataTableStore}
 		>
 			<div className="standard-box p-4 shadow-md">
 				<DataTableLogDataFilters />
@@ -35,7 +36,7 @@ export const DataTableLogData = (): JSX.Element => {
 				<DataTableList dataKey="id" scrollHeight="400px" />
 			</div>
 
-			<DataTableModal<'log_data'>
+			<DataTableModal
 				modals={{
 					view: <ViewLogData />,
 				}}

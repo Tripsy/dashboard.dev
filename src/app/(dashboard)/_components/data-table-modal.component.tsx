@@ -8,8 +8,12 @@ import { ActionManage } from '@/app/(dashboard)/_components/action-manage.compon
 import { FormManage } from '@/app/(dashboard)/_components/form-manage.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import { getActionIcon, Icons } from '@/components/icon.component';
-import { type DataSourceType, getDataSourceConfig } from '@/config/data-source';
-import { useTranslation } from '@/hooks';
+import {
+	type BaseModelType,
+	type DataSourceKey,
+	getDataSourceConfig,
+} from '@/config/data-source.config';
+import { useTranslation } from '@/hooks/use-translation.hook';
 import { useToast } from '@/providers/toast.provider';
 
 type ModalsMap = {
@@ -20,7 +24,10 @@ type ModalClassMap = {
 	[key: string]: string; // ex: "max-w-4xl bg-base-100/90"
 };
 
-export function DataTableModal<K extends keyof DataSourceType>({
+export function DataTableModal<
+	K extends DataSourceKey,
+	Model extends BaseModelType,
+>({
 	modals,
 	modalClass,
 	defaultModalClass = 'bg-base-100 rounded-lg w-full max-w-lg relative max-h-[80vh] flex flex-col mx-4',
@@ -29,13 +36,13 @@ export function DataTableModal<K extends keyof DataSourceType>({
 	modalClass?: ModalClassMap;
 	defaultModalClass?: string;
 }) {
-	const { dataSource, modelStore } = useDataTable();
+	const { dataSource, dataTableStore } = useDataTable<K, Model>();
 	const { showToast } = useToast();
 
-	const isOpen = useStore(modelStore, (state) => state.isOpen);
-	const actionName = useStore(modelStore, (state) => state.actionName);
-	const actionEntry = useStore(modelStore, (state) => state.actionEntry);
-	const closeOut = useStore(modelStore, (state) => state.closeOut);
+	const isOpen = useStore(dataTableStore, (state) => state.isOpen);
+	const actionName = useStore(dataTableStore, (state) => state.actionName);
+	const actionEntry = useStore(dataTableStore, (state) => state.actionEntry);
+	const closeOut = useStore(dataTableStore, (state) => state.closeOut);
 	const actions = getDataSourceConfig(dataSource, 'actions');
 
 	if (!actions) {
@@ -117,7 +124,7 @@ export function DataTableModal<K extends keyof DataSourceType>({
 				<div className="bg-base-200 flex-1 overflow-y-auto p-4">
 					{actionMode === 'other' && ModalComponent}
 					{actionMode === 'form' && (
-						<FormManage<K>
+						<FormManage
 							key={
 								'form-' +
 								(actionEntry?.id

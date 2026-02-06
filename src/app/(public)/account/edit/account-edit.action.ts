@@ -3,11 +3,11 @@ import {
 	AccountEditSchema,
 	type AccountEditStateType,
 } from '@/app/(public)/account/edit/account-edit.definition';
-import { translate } from '@/config/lang';
 import { Configuration } from '@/config/settings.config';
-import { LanguageEnum } from '@/entities/user.model';
+import { translate } from '@/config/translate.setup';
 import { accumulateZodErrors } from '@/helpers/form.helper';
 import { isValidCsrfToken } from '@/helpers/session.helper';
+import { LanguageEnum } from '@/models/user.model';
 import { editAccount } from '@/services/account.service';
 
 export function accountEditFormValues(

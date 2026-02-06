@@ -3,23 +3,22 @@ import type {
 	FindFunctionParamsType,
 	FindFunctionResponseType,
 	FindFunctionType,
-} from '@/config/data-source';
-import {
-	ApiRequest,
-	getResponseData,
-	type ResponseFetch,
-} from '@/helpers/api.helper';
+} from '@/config/data-source.config';
+import { ApiRequest, getResponseData } from '@/helpers/api.helper';
 import { buildQueryString } from '@/helpers/string.helper';
+import type { CronHistoryModel } from '@/models/cron-history.model';
+import type { ApiResponseFetch } from '@/types/api.type';
 
-export const findCronHistory: FindFunctionType<'cron_history'> = async (
+export const findCronHistory: FindFunctionType<CronHistoryModel> = async (
 	params: FindFunctionParamsType,
 ) => {
 	const query = buildQueryString(params);
 
-	const response: ResponseFetch<FindFunctionResponseType<'cron_history'>> =
-		await new ApiRequest().doFetch(`/cron-history?${query}`);
+	const response: ApiResponseFetch<
+		FindFunctionResponseType<CronHistoryModel>
+	> = await new ApiRequest().doFetch(`/cron-history?${query}`);
 
-	return getResponseData<FindFunctionResponseType<'cron_history'>>(response);
+	return getResponseData(response);
 };
 
 export const deleteCronHistory: DeleteFunctionType = async (ids: number[]) => {

@@ -22,7 +22,9 @@ import { Icons } from '@/components/icon.component';
 import { Loading } from '@/components/loading.component';
 import RoutesSetup from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
-import { useElementIds, useFormValidation, useFormValues } from '@/hooks';
+import { useElementIds } from '@/hooks/use-element-ids.hook';
+import { useFormValidation } from '@/hooks/use-form-validation.hook';
+import { useFormValues } from '@/hooks/use-form-values.hook';
 import { useAuth } from '@/providers/auth.provider';
 
 export default function EmailUpdate() {
@@ -36,7 +38,7 @@ export default function EmailUpdate() {
 	const [formValues, setFormValues] =
 		useFormValues<EmailUpdateFormFieldsType>(state.values);
 
-	const { errors, submitted, setSubmitted, markFieldAsTouched } =
+	const { errors, submitted, markSubmit, markFieldAsTouched } =
 		useFormValidation({
 			formValues: formValues,
 			validate: emailUpdateValidate,
@@ -100,11 +102,7 @@ export default function EmailUpdate() {
 	}
 
 	return (
-		<form
-			action={action}
-			onSubmit={() => setSubmitted(true)}
-			className="form-section"
-		>
+		<form action={action} onSubmit={markSubmit} className="form-section">
 			<FormCsrf
 				inputName={Configuration.get('csrf.inputName') as string}
 			/>

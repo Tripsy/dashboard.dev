@@ -3,7 +3,7 @@
 import { useParams, useSearchParams } from 'next/navigation';
 import { useMemo } from 'react';
 import { Notice } from '@/components/notice.component';
-import { useTranslation } from '@/hooks';
+import { useTranslation } from '@/hooks/use-translation.hook';
 
 type ParamsType = 'error' | 'warning' | 'info' | 'success';
 

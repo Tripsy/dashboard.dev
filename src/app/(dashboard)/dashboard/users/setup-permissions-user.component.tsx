@@ -5,8 +5,9 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useStore } from 'zustand/react';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import { Loading } from '@/components/loading.component';
-import type { PermissionModel } from '@/entities/permission.model';
-import { useTranslation } from '@/hooks';
+import { useTranslation } from '@/hooks/use-translation.hook';
+import type { PermissionModel } from '@/models/permission.model';
+import type { UserModel } from '@/models/user.model';
 import { useToast } from '@/providers/toast.provider';
 import { findPermissions } from '@/services/permissions.service';
 import {
@@ -31,8 +32,8 @@ export function SetupPermissionsUser() {
 
 	const { showToast } = useToast();
 
-	const { modelStore } = useDataTable<'users'>();
-	const actionEntry = useStore(modelStore, (state) => state.actionEntry);
+	const { dataTableStore } = useDataTable<'users', UserModel>();
+	const actionEntry = useStore(dataTableStore, (state) => state.actionEntry);
 
 	const user_id = actionEntry?.id;
 

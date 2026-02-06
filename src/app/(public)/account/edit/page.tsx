@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import AccountEdit from '@/app/(public)/account/edit/account-edit.component';
 import ProtectedRoute from '@/components/protected-route.component';
-import { translate } from '@/config/lang';
 import { RouteAuth } from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
+import { translate } from '@/config/translate.setup';
 
 export async function generateMetadata(): Promise<Metadata> {
 	return {

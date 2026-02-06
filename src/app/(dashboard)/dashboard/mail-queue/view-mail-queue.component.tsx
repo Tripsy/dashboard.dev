@@ -3,11 +3,12 @@ import { useStore } from 'zustand/react';
 import { DisplayStatus } from '@/app/(dashboard)/_components/data-table-value';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import { formatDate } from '@/helpers/date.helper';
-import { useTranslation } from '@/hooks';
+import { useTranslation } from '@/hooks/use-translation.hook';
+import type { MailQueueModel } from '@/models/mail-queue.model';
 
 export function ViewMailQueue() {
-	const { modelStore } = useDataTable<'mail_queue'>();
-	const actionEntry = useStore(modelStore, (state) => state.actionEntry);
+	const { dataTableStore } = useDataTable<'mail-queue', MailQueueModel>();
+	const actionEntry = useStore(dataTableStore, (state) => state.actionEntry);
 
 	const translationsKeys = useMemo(
 		() =>

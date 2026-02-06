@@ -4,8 +4,8 @@ import Link from 'next/link';
 import { useMemo } from 'react';
 import { Icons } from '@/components/icon.component';
 import RoutesSetup from '@/config/routes.setup';
-import { UserRoleEnum } from '@/entities/user.model';
-import { useTranslation } from '@/hooks';
+import { useTranslation } from '@/hooks/use-translation.hook';
+import { UserRoleEnum } from '@/models/user.model';
 import { useAuth } from '@/providers/auth.provider';
 
 export function UserMenu() {

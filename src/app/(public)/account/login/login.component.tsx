@@ -23,19 +23,14 @@ import { Icons } from '@/components/icon.component';
 import RoutesSetup, { isExcludedRoute } from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
 import { formatDate } from '@/helpers/date.helper';
-import {
-	useElementIds,
-	useFormValidation,
-	useFormValues,
-	useTranslation,
-} from '@/hooks';
+import { useElementIds } from '@/hooks/use-element-ids.hook';
+import { useFormValidation } from '@/hooks/use-form-validation.hook';
+import { useFormValues } from '@/hooks/use-form-values.hook';
+import { useTranslation } from '@/hooks/use-translation.hook';
 import { useAuth } from '@/providers/auth.provider';
 import { useToast } from '@/providers/toast.provider';
-import {
-	type AuthTokenListType,
-	type AuthTokenType,
-	removeTokenAccount,
-} from '@/services/account.service';
+import { removeTokenAccount } from '@/services/account.service';
+import type { AuthTokenListType, AuthTokenType } from '@/types/auth.type';
 
 export default function Login() {
 	const { showToast } = useToast();
@@ -51,7 +46,7 @@ export default function Login() {
 		state.values,
 	);
 
-	const { errors, submitted, setSubmitted, markFieldAsTouched } =
+	const { errors, submitted, markSubmit, markFieldAsTouched } =
 		useFormValidation({
 			formValues: formValues,
 			validate: loginValidate,
@@ -103,7 +98,7 @@ export default function Login() {
 
 			router.replace(redirectUrl);
 		}
-	}, [state?.situation, router, refreshAuth, searchParams.get]);
+	}, [state?.situation, router, refreshAuth, searchParams]);
 
 	const elementIds = useElementIds(['email', 'password']);
 
@@ -145,11 +140,7 @@ export default function Login() {
 	}
 
 	return (
-		<form
-			action={action}
-			onSubmit={() => setSubmitted(true)}
-			className="form-section"
-		>
+		<form action={action} onSubmit={markSubmit} className="form-section">
 			<FormCsrf
 				inputName={Configuration.get('csrf.inputName') as string}
 			/>

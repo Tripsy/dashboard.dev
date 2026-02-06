@@ -9,11 +9,17 @@ import {
 	FormFiltersShowDeleted,
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
+import type { PermissionDataTableFiltersType } from '@/app/(dashboard)/dashboard/permissions/permissions.definition';
 import { createFilterHandlers } from '@/helpers/data-table.helper';
-import { useSearchFilter, useTranslation } from '@/hooks';
+import { useSearchFilter } from '@/hooks/use-search-filter.hook';
+import { useTranslation } from '@/hooks/use-translation.hook';
+import type { PermissionModel } from '@/models/permission.model';
 
 export const DataTablePermissionsFilters = (): React.JSX.Element => {
-	const { stateDefault, modelStore } = useDataTable<'permissions'>();
+	const { stateDefault, dataTableStore } = useDataTable<
+		'permissions',
+		PermissionModel
+	>();
 
 	const translationsKeys = useMemo(
 		() => ['permissions.form_filters.label_global'] as const,
@@ -22,9 +28,13 @@ export const DataTablePermissionsFilters = (): React.JSX.Element => {
 
 	const { translations } = useTranslation(translationsKeys);
 
-	const filters = useStore(modelStore, (state) => state.tableState.filters);
+	const filters = useStore(
+		dataTableStore,
+		(state) => state.tableState.filters,
+	) as PermissionDataTableFiltersType;
+
 	const updateTableState = useStore(
-		modelStore,
+		dataTableStore,
 		(state) => state.updateTableState,
 	);
 
@@ -38,7 +48,7 @@ export const DataTablePermissionsFilters = (): React.JSX.Element => {
 	);
 
 	const handlers = useMemo(
-		() => createFilterHandlers<'permissions'>(updateFilters),
+		() => createFilterHandlers(updateFilters),
 		[updateFilters],
 	);
 	const { handleInputChange, handleCheckboxChange } = handlers;

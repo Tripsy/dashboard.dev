@@ -1,16 +1,16 @@
 import { useMemo } from 'react';
 import { getActionIcon, Icons } from '@/components/icon.component';
-import type { DataSourceType } from '@/config/data-source';
-import { useTranslation } from '@/hooks';
+import type { DataSourceKey } from '@/config/data-source.config';
+import { useTranslation } from '@/hooks/use-translation.hook';
 
-export function DataTableActionButton({
+export function DataTableActionButton<K extends DataSourceKey>({
 	dataSource,
 	actionName,
 	className,
 	handleClick,
 	disabled = false,
 }: {
-	dataSource: keyof DataSourceType;
+	dataSource: K;
 	actionName: string;
 	className?: string;
 	handleClick: () => void;

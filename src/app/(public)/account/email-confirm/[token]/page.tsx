@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Icons } from '@/components/icon.component';
-import { translate } from '@/config/lang';
 import RoutesSetup from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
+import { translate } from '@/config/translate.setup';
 import { ApiError } from '@/exceptions/api.error';
-import { ApiRequest, type ResponseFetch } from '@/helpers/api.helper';
+import { ApiRequest } from '@/helpers/api.helper';
+import type { ApiResponseFetch } from '@/types/api.type';
 
 interface Props {
 	params: Promise<{
@@ -32,7 +33,7 @@ export default async function Page(props: Props) {
 	let success = false;
 
 	try {
-		const fetchResponse: ResponseFetch<null> | undefined =
+		const fetchResponse: ApiResponseFetch<null> | undefined =
 			await new ApiRequest()
 				.setRequestMode('remote-api')
 				.doFetch(`/account/email-confirm/${token}`, {

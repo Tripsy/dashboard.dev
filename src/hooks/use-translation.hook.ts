@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { translate } from '@/config/lang';
+import { translate } from '@/config/translate.setup';
 
 export function useTranslation<const T extends readonly string[]>(keys: T) {
 	type TranslationMap = Record<T[number], string>;

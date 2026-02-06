@@ -6,8 +6,8 @@ import { useEffect, useMemo } from 'react';
 import { Loading } from '@/components/loading.component';
 import { Notice } from '@/components/notice.component';
 import RoutesSetup, { RouteAuth } from '@/config/routes.setup';
-import { hasPermission } from '@/entities/auth.model';
-import { useTranslation } from '@/hooks';
+import { useTranslation } from '@/hooks/use-translation.hook';
+import { hasPermission } from '@/models/auth.model';
 import { useAuth } from '@/providers/auth.provider';
 
 type ProtectedRouteProps = {
@@ -40,7 +40,7 @@ export default function ProtectedRoute({
 	const router = useRouter();
 	const pathname = usePathname();
 
-	// Redirect to login page if not authenticated and route is protected or authenticated
+	// Redirect to the login page if not authenticated and route is protected or authenticated
 	useEffect(() => {
 		if (
 			[RouteAuth.AUTHENTICATED, RouteAuth.PROTECTED].includes(

@@ -6,17 +6,19 @@ import {
 	FormComponentRadio,
 	FormComponentSelect,
 } from '@/components/form/form-element.component';
-import type { FormManageType } from '@/config/data-source';
-import {
-	LanguageEnum,
-	UserOperatorTypeEnum,
-	UserRoleEnum,
-} from '@/entities/user.model';
+import type { FormManageType } from '@/config/data-source.config';
 import {
 	capitalizeFirstLetter,
 	formatEnumLabel,
 } from '@/helpers/string.helper';
-import { useElementIds, useTranslation } from '@/hooks';
+import { useElementIds } from '@/hooks/use-element-ids.hook';
+import { useTranslation } from '@/hooks/use-translation.hook';
+import {
+	LanguageEnum,
+	type UserFormValuesType,
+	UserOperatorTypeEnum,
+	UserRoleEnum,
+} from '@/models/user.model';
 
 const roles = Object.values(UserRoleEnum).map((v) => ({
 	label: capitalizeFirstLetter(v),
@@ -39,7 +41,7 @@ export function FormManageUser({
 	errors,
 	handleChange,
 	pending,
-}: FormManageType<'users'>) {
+}: FormManageType<UserFormValuesType>) {
 	const translationsKeys = useMemo(
 		() =>
 			[
@@ -61,7 +63,7 @@ export function FormManageUser({
 
 	const prevRoleRef = useRef(formValues.role);
 
-	// Clear operator_type when role changes away from OPERATOR
+	// Clear operator_type when a role changes away from OPERATOR
 	useEffect(() => {
 		const prevRole = prevRoleRef.current;
 		const currentRole = formValues.role;

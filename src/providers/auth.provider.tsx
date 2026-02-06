@@ -9,8 +9,8 @@ import {
 	useMemo,
 	useState,
 } from 'react';
-import type { AuthModel } from '@/entities/auth.model';
 import { ApiError } from '@/exceptions/api.error';
+import type { AuthModel } from '@/models/auth.model';
 import { getAuth } from '@/services/auth.service';
 
 type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated' | 'error';

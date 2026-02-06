@@ -1,43 +1,40 @@
 import type { Nullable } from 'primereact/ts-helpers';
-import type {
-	DataSourceTableFilter,
-	DataSourceType,
-} from '@/config/data-source';
+import type { DataTableFiltersType } from '@/config/data-source.config';
 import { formatDate } from '@/helpers/date.helper';
 
 export type MatchModeType = 'contains' | 'equals' | 'dateAfter' | 'dateBefore';
 
-export function createFilterHandlers<K extends keyof DataSourceType>(
-	update: <T extends keyof DataSourceTableFilter<K>>(
-		newFilters: Pick<DataSourceTableFilter<K>, T>,
+export function createFilterHandlers<TableFilters extends DataTableFiltersType>(
+	update: <T extends keyof TableFilters>(
+		newFilters: Pick<TableFilters, T>,
 	) => void,
 ) {
 	return {
-		handleInputChange: <F extends keyof DataSourceTableFilter<K>>(
+		handleInputChange: <F extends keyof TableFilters>(
 			field: F,
 			value: string,
 		) =>
 			update({
-				[field]: { value, matchMode: 'contains' as MatchModeType },
-			} as Pick<DataSourceTableFilter<K>, F>),
+				[field]: { value, matchMode: 'contains' as const },
+			} as Pick<TableFilters, F>),
 
-		handleSelectChange: <F extends keyof DataSourceTableFilter<K>>(
+		handleSelectChange: <F extends keyof TableFilters>(
 			field: F,
 			value: string | number,
 		) =>
 			update({
-				[field]: { value, matchMode: 'equals' as MatchModeType },
-			} as Pick<DataSourceTableFilter<K>, F>),
+				[field]: { value, matchMode: 'equals' as const },
+			} as Pick<TableFilters, F>),
 
-		handleCheckboxChange: <F extends keyof DataSourceTableFilter<K>>(
+		handleCheckboxChange: <F extends keyof TableFilters>(
 			field: F,
 			value: boolean,
 		) =>
 			update({
-				[field]: { value, matchMode: 'equals' },
-			} as Pick<DataSourceTableFilter<K>, F>),
+				[field]: { value, matchMode: 'equals' as const },
+			} as Pick<TableFilters, F>),
 
-		handleDateChange: <F extends keyof DataSourceTableFilter<K>>(
+		handleDateChange: <F extends keyof TableFilters>(
 			field: F,
 			value: Nullable<Date>,
 			matchMode: MatchModeType,
@@ -47,6 +44,6 @@ export function createFilterHandlers<K extends keyof DataSourceType>(
 					value: formatDate(value, 'default'),
 					matchMode: matchMode,
 				},
-			} as Pick<DataSourceTableFilter<K>, F>),
+			} as Pick<TableFilters, F>),
 	};
 }

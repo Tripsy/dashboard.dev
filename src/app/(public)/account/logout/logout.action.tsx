@@ -2,15 +2,15 @@ import type {
 	LogoutSituation,
 	LogoutState,
 } from '@/app/(public)/account/logout/logout.definition';
-import { translate } from '@/config/lang';
+import { translate } from '@/config/translate.setup';
 import { ApiError } from '@/exceptions/api.error';
-import type { ResponseFetch } from '@/helpers/api.helper';
 import { logoutAccount } from '@/services/account.service';
 import { clearAuth } from '@/services/auth.service';
+import type { ApiResponseFetch } from '@/types/api.type';
 
 export async function logoutAction(): Promise<LogoutState> {
 	try {
-		const fetchResponse: ResponseFetch<null> = await logoutAccount();
+		const fetchResponse: ApiResponseFetch<null> = await logoutAccount();
 
 		if (fetchResponse?.success) {
 			const authResponse = await clearAuth();

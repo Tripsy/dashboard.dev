@@ -10,10 +10,15 @@ import {
 	FormFiltersSelect,
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
-import { MailQueueStatusEnum } from '@/entities/mail-queue.model';
+import type { MailQueueDataTableFiltersType } from '@/app/(dashboard)/dashboard/mail-queue/mail-queue.definition';
 import { createFilterHandlers } from '@/helpers/data-table.helper';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
-import { useSearchFilter, useTranslation } from '@/hooks';
+import { useSearchFilter } from '@/hooks/use-search-filter.hook';
+import { useTranslation } from '@/hooks/use-translation.hook';
+import {
+	type MailQueueModel,
+	MailQueueStatusEnum,
+} from '@/models/mail-queue.model';
 
 const statuses = Object.values(MailQueueStatusEnum).map((v) => ({
 	label: capitalizeFirstLetter(v),
@@ -21,7 +26,10 @@ const statuses = Object.values(MailQueueStatusEnum).map((v) => ({
 }));
 
 export const DataTableMailQueueFilters = (): React.JSX.Element => {
-	const { stateDefault, modelStore } = useDataTable<'mail_queue'>();
+	const { stateDefault, dataTableStore } = useDataTable<
+		'mail-queue',
+		MailQueueModel
+	>();
 
 	const translationsKeys = useMemo(
 		() =>
@@ -37,9 +45,13 @@ export const DataTableMailQueueFilters = (): React.JSX.Element => {
 
 	const { translations } = useTranslation(translationsKeys);
 
-	const filters = useStore(modelStore, (state) => state.tableState.filters);
+	const filters = useStore(
+		dataTableStore,
+		(state) => state.tableState.filters,
+	) as MailQueueDataTableFiltersType;
+
 	const updateTableState = useStore(
-		modelStore,
+		dataTableStore,
 		(state) => state.updateTableState,
 	);
 
@@ -53,7 +65,7 @@ export const DataTableMailQueueFilters = (): React.JSX.Element => {
 	);
 
 	const handlers = useMemo(
-		() => createFilterHandlers<'mail_queue'>(updateFilters),
+		() => createFilterHandlers(updateFilters),
 		[updateFilters],
 	);
 

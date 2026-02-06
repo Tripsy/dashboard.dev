@@ -5,13 +5,14 @@ import { DataTableActions } from '@/app/(dashboard)/_components/data-table-actio
 import DataTableList from '@/app/(dashboard)/_components/data-table-list.component';
 import { DataTableModal } from '@/app/(dashboard)/_components/data-table-modal.component';
 import { DataTableProvider } from '@/app/(dashboard)/_providers/data-table-provider';
-import { createModelStore } from '@/app/(dashboard)/_stores/model.store';
+import { createDataTableStore } from '@/app/(dashboard)/_stores/model.store';
 import { DataTableCronHistoryFilters } from '@/app/(dashboard)/dashboard/cron-history/data-table-cron-history-filters.component';
 import { ViewCronHistory } from '@/app/(dashboard)/dashboard/cron-history/view-cron-history.component';
 import { Loading } from '@/components/loading.component';
-import { useMounted, useTranslation } from '@/hooks';
+import { useMounted } from '@/hooks/use-mounted.hook';
+import { useTranslation } from '@/hooks/use-translation.hook';
 
-const modelStore = createModelStore('cron_history');
+const dataTableStore = createDataTableStore('cron-history');
 
 export const DataTableCronHistory = (): JSX.Element => {
 	const translationsKeys = useMemo(() => ['app.text.loading'] as const, []);
@@ -25,9 +26,9 @@ export const DataTableCronHistory = (): JSX.Element => {
 
 	return (
 		<DataTableProvider
-			dataSource="cron_history"
+			dataSource="cron-history"
 			selectionMode="multiple"
-			modelStore={modelStore}
+			dataTableStore={dataTableStore}
 		>
 			<div className="standard-box p-4 shadow-md">
 				<DataTableCronHistoryFilters />
@@ -35,7 +36,7 @@ export const DataTableCronHistory = (): JSX.Element => {
 				<DataTableList dataKey="id" scrollHeight="400px" />
 			</div>
 
-			<DataTableModal<'cron_history'>
+			<DataTableModal
 				modals={{
 					view: <ViewCronHistory />,
 				}}

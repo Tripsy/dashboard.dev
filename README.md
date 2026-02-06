@@ -182,6 +182,11 @@ $ pnpm run madge
 
 # Dependencies
 
+- [next](https://nextjs.org/)
+- [react](https://reactjs.org/)
+- [zustand](https://zustand.docs.pmnd.rs/)
+- [primereact](https://primereact.org/)
+- [immer](https://immerjs.github.io/immer/)
 - [zod](https://zod.dev) — TypeScript-first schema validation with static type inference
 - [ioredis](https://github.com/luin/ioredis) — Robust Redis client for Node.js
 - [dayjs](https://day.js.org/) — Parses, validates, manipulates, and displays dates and times
@@ -189,6 +194,7 @@ $ pnpm run madge
 Dev only:
 
 - [typescript](https://www.typescriptlang.org/)
+- [tailwindcss](https://tailwindcss.com/)
 - [madge](https://github.com/pahen/madge) — Helps finding circular dependencies
 
 # RESOURCES

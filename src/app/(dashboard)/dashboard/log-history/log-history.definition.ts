@@ -2,10 +2,7 @@ import {
 	type DataTableColumnType,
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
-import {
-	type DataTableFiltersType,
-	registerDataSource,
-} from '@/config/data-source.config';
+import type { DataTableFiltersType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import { toTitleCase } from '@/helpers/string.helper';
 import type {
@@ -47,7 +44,7 @@ const logHistoryDataTableFilters: LogHistoryDataTableFiltersType = {
 	recorded_at_end: { value: null, matchMode: 'equals' },
 };
 
-const dataSourceConfigLogHistory = {
+export const dataSourceConfigLogHistory = {
 	dataTableState: {
 		reloadTrigger: 0,
 		first: 0,
@@ -165,5 +162,3 @@ const dataSourceConfigLogHistory = {
 		},
 	},
 };
-
-registerDataSource('log-history', dataSourceConfigLogHistory);

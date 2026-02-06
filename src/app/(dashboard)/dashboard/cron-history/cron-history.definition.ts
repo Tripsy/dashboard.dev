@@ -2,10 +2,7 @@ import {
 	type DataTableColumnType,
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
-import {
-	type DataTableFiltersType,
-	registerDataSource,
-} from '@/config/data-source.config';
+import type { DataTableFiltersType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import type {
 	CronHistoryModel,
@@ -38,7 +35,7 @@ export const cronHistoryDataTableFilters: CronHistoryDataTableFiltersType = {
 	start_date_end: { value: null, matchMode: 'equals' },
 };
 
-const dataSourceConfigCronHistory = {
+export const dataSourceConfigCronHistory = {
 	dataTableState: {
 		reloadTrigger: 0,
 		first: 0,
@@ -129,5 +126,3 @@ const dataSourceConfigCronHistory = {
 		},
 	},
 };
-
-registerDataSource('cron-history', dataSourceConfigCronHistory);

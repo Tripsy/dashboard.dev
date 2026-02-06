@@ -3,10 +3,9 @@ import {
 	type DataTableColumnType,
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
-import {
-	type DataTableFiltersType,
-	type FormStateType,
-	registerDataSource,
+import type {
+	DataTableFiltersType,
+	FormStateType,
 } from '@/config/data-source.config';
 import { Configuration } from '@/config/settings.config';
 import { translateBatch } from '@/config/translate.setup';
@@ -259,7 +258,7 @@ export const usersDataTableFilters: UsersDataTableFiltersType = {
 	is_deleted: { value: false, matchMode: 'equals' },
 };
 
-const dataSourceConfigUsers = {
+export const dataSourceConfigUsers = {
 	dataTableState: {
 		reloadTrigger: 0,
 		first: 0,
@@ -484,5 +483,3 @@ const dataSourceConfigUsers = {
 		},
 	},
 };
-
-registerDataSource('users', dataSourceConfigUsers);

@@ -8,6 +8,9 @@ import {
 	type DataTableStateType,
 	getDataSourceConfig,
 } from '@/config/data-source.config';
+import { registerDashboardDataSource } from '@/config/data-source.dashboard.register';
+
+registerDashboardDataSource();
 
 export interface DataTableModalSlice<Model> {
 	isOpen: boolean;
@@ -52,14 +55,16 @@ export const createDataTableModalSlice =
 
 		setActionEntry: (entry) =>
 			set((state: Draft<DataTableModalSlice<Model>>) => {
-				state.actionEntry = entry as Draft<Model>;
+				// biome-ignore lint/suspicious/noExplicitAny: This cast is safe because Immer handles drafting at runtime.
+				state.actionEntry = entry as any;
 			}),
 
 		closeOut: () =>
 			set((state: Draft<DataTableModalSlice<Model>>) => {
 				state.isOpen = false;
 				state.actionName = null;
-				state.actionEntry = null;
+				// biome-ignore lint/suspicious/noExplicitAny: This cast is safe because Immer handles drafting at runtime.
+				state.actionEntry = null as any;
 			}),
 	});
 
@@ -100,54 +105,54 @@ export const createDataTableSlice =
 		},
 	});
 
-export interface DataTableSelectionSlice<Entity> {
-	selectedEntries: Entity[];
-	setSelectedEntries: (entries: Entity[]) => void;
+export interface DataTableSelectionSlice<Model> {
+	selectedEntries: Model[];
+	setSelectedEntries: (entries: Model[]) => void;
 	clearSelectedEntries: () => void;
 }
 
 export const createDataTableSelectionSlice =
-	<Entity>(): StateCreator<
-		DataTableStore<Entity>,
+	<Model>(): StateCreator<
+		DataTableStore<Model>,
 		[['zustand/immer', never]],
 		[],
-		DataTableSelectionSlice<Entity>
+		DataTableSelectionSlice<Model>
 	> =>
 	(set) => ({
 		selectedEntries: [],
 
 		setSelectedEntries: (entries) =>
-			set((state: Draft<DataTableSelectionSlice<Entity>>) => {
-				state.selectedEntries = entries as Draft<Entity>[];
+			set((state: Draft<DataTableSelectionSlice<Model>>) => {
+				state.selectedEntries = entries as Draft<Model>[];
 			}),
 
 		clearSelectedEntries: () =>
-			set((state: Draft<DataTableSelectionSlice<Entity>>) => {
+			set((state: Draft<DataTableSelectionSlice<Model>>) => {
 				state.selectedEntries = [];
 			}),
 	});
 
-export type DataTableStore<Entity> = DataTableModalSlice<Entity> &
+export type DataTableStore<Model> = DataTableModalSlice<Model> &
 	DataTableSlice &
-	DataTableSelectionSlice<Entity> & {
+	DataTableSelectionSlice<Model> & {
 		isLoading: boolean;
 		setLoading: (loading: boolean) => void;
 	};
 
-export const createDataTableStore = <K extends DataSourceKey, Entity>(
+export const createDataTableStore = <K extends DataSourceKey, Model>(
 	dataSource: K,
 ) =>
-	create<DataTableStore<Entity>>()(
+	create<DataTableStore<Model>>()(
 		devtools(
 			persist(
 				immer((set, get, store) => ({
-					...createDataTableModalSlice<Entity>()(set, get, store),
-					...createDataTableSlice<K, Entity>(dataSource)(
+					...createDataTableModalSlice<Model>()(set, get, store),
+					...createDataTableSlice<K, Model>(dataSource)(
 						set,
 						get,
 						store,
 					),
-					...createDataTableSelectionSlice<Entity>()(set, get, store),
+					...createDataTableSelectionSlice<Model>()(set, get, store),
 					isLoading: false,
 					setLoading: (loading: boolean) => {
 						set((state) => {
@@ -166,6 +171,6 @@ export const createDataTableStore = <K extends DataSourceKey, Entity>(
 		),
 	);
 
-export type DataTableStoreType<K extends DataSourceKey, Entity> = ReturnType<
-	typeof createDataTableStore<K, Entity>
+export type DataTableStoreType<K extends DataSourceKey, Model> = ReturnType<
+	typeof createDataTableStore<K, Model>
 >;

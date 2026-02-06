@@ -208,6 +208,10 @@ export function registerDataSource<
 	Entity,
 	FormValues extends FormStateValuesType = EmptyFormValues,
 >(key: K, config: DataSourceConfigType<K, Entity, FormValues>) {
+	if (hasDataSourceConfig(key)) {
+		return;
+	}
+
 	dataSourceConfig[key] = config;
 }
 
@@ -224,4 +228,8 @@ export function getDataSourceConfig<
 	}
 
 	return config[prop];
+}
+
+export function hasDataSourceConfig<K extends DataSourceKey>(key: K): boolean {
+	return !!dataSourceConfig[key];
 }

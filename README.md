@@ -141,27 +141,30 @@ $ pnpm run madge
 
 1. Create `lib/entities/cars.model.ts` from `lib/entities/users.model.ts`
 2. Duplicate `src/(dashboard)/dashboard/users` > `src/(dashboard)/dashboard/cars` & rename files
-    1. page.tsx
-    2. cars.definition.ts
-    3. data-table-cars.component.tsx
-    4. form-manage-cars.component.tsx
-    5. data-table-cars-filters.component.tsx
-3. Update data-source.config.ts
-    - export type DataSourceType = {
-    - export const DataSourceConfig: {
-4. Add `cars.json` to `src/locales/[language]` & update src/locales/en/index.ts
-5. Update `RoutesSetup.group('dashboard')` in `src/config/routes.setup.ts`
-6. Create `lib/services/cars.service.ts` from `lib/services/users.service.ts`
-7. Update `src/app/(dashboard)/_components/side-menu.component.tsx`
-8. Update PermissionEntitiesSuggestions & LogHistoryEntities
+    - page.tsx
+    - cars.definition.ts
+    - data-table-cars.component.tsx
+    - form-manage-cars.component.tsx
+    - data-table-cars-filters.component.tsx
+3. Update `src/config/data-source.config.ts`
+    - export type DataSourceKey
+4. Update `src/config/data-source.dashboard.register.ts`
+    - add `registerDataSource('cars', dataSourceConfigCars)`
+5. Add `cars.json` to `src/locales/[language]` & update src/locales/en/index.ts
+6. Update `RoutesSetup.group('dashboard')` in `src/config/routes.setup.ts`
+7. Create `src/services/cars.service.ts` from `src/services/users.service.ts`
+8. Update `src/app/(dashboard)/_components/side-menu.component.tsx`
+9. Update `src/models/permission.model.ts`
+    - PermissionEntitiesSuggestions
+10. Update `src/models/log-history.model.ts`
+     - LogHistoryEntities
 
 # TODO
 
-1. review package.json > update Dependencies
-2. inspire from wellatwork components
-3. use AI to create a clean dashboard
-4. Review How to section 
-5. Recreate docker image
+1. inspire from wellatwork components
+2. use AI to create a clean dashboard
+3. Review How to section 
+4. Recreate docker image
 
 # Bugs & Issues & Ideas
 

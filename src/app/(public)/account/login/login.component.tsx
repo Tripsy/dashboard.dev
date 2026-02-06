@@ -98,7 +98,7 @@ export default function Login() {
 
 			router.replace(redirectUrl);
 		}
-	}, [state?.situation, router, refreshAuth, searchParams.get]);
+	}, [state?.situation, router, refreshAuth, searchParams]);
 
 	const elementIds = useElementIds(['email', 'password']);
 

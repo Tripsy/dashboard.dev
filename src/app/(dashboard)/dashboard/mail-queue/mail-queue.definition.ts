@@ -2,10 +2,7 @@ import {
 	type DataTableColumnType,
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
-import {
-	type DataTableFiltersType,
-	registerDataSource,
-} from '@/config/data-source.config';
+import type { DataTableFiltersType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import { formatDate } from '@/helpers/date.helper';
 import type {
@@ -40,7 +37,7 @@ const mailQueueDataTableFilters: MailQueueDataTableFiltersType = {
 	sent_date_end: { value: null, matchMode: 'equals' },
 };
 
-const dataSourceConfigMailQueue = {
+export const dataSourceConfigMailQueue = {
 	dataTableState: {
 		reloadTrigger: 0,
 		first: 0,
@@ -155,5 +152,3 @@ const dataSourceConfigMailQueue = {
 		},
 	},
 };
-
-registerDataSource('mail-queue', dataSourceConfigMailQueue);

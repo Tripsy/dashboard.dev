@@ -3,10 +3,9 @@ import {
 	type DataTableColumnType,
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
-import {
-	type DataTableFiltersType,
-	type FormStateType,
-	registerDataSource,
+import type {
+	DataTableFiltersType,
+	FormStateType,
 } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import { safeHtml } from '@/helpers/form.helper';
@@ -174,7 +173,7 @@ export const templatesDataTableFilters: TemplateDataTableFiltersType = {
 	is_deleted: { value: false, matchMode: 'equals' },
 };
 
-const dataSourceConfigTemplates = {
+export const dataSourceConfigTemplates = {
 	dataTableState: {
 		reloadTrigger: 0,
 		first: 0,
@@ -342,5 +341,3 @@ const dataSourceConfigTemplates = {
 		},
 	},
 };
-
-registerDataSource('templates', dataSourceConfigTemplates);

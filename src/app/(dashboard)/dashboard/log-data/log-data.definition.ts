@@ -2,10 +2,7 @@ import {
 	type DataTableColumnType,
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
-import {
-	type DataTableFiltersType,
-	registerDataSource,
-} from '@/config/data-source.config';
+import type { DataTableFiltersType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import type {
 	LogCategoryEnum,
@@ -38,7 +35,7 @@ export const logDataDataTableFilters: LogDataDataTableFiltersType = {
 	create_date_end: { value: null, matchMode: 'equals' },
 };
 
-const dataSourceConfigLogData = {
+export const dataSourceConfigLogData = {
 	dataTableState: {
 		reloadTrigger: 0,
 		first: 0,
@@ -133,5 +130,3 @@ const dataSourceConfigLogData = {
 		},
 	},
 };
-
-registerDataSource('log-data', dataSourceConfigLogData);

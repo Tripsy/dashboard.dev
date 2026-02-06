@@ -1,8 +1,7 @@
 import { z } from 'zod';
-import {
-	type DataTableFiltersType,
-	type FormStateType,
-	registerDataSource,
+import type {
+	DataTableFiltersType,
+	FormStateType,
 } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import type {
@@ -51,7 +50,7 @@ export const permissionDataTableFilters: PermissionDataTableFiltersType = {
 	is_deleted: { value: false, matchMode: 'equals' },
 };
 
-const dataSourceConfigPermissions = {
+export const dataSourceConfigPermissions = {
 	dataTableState: {
 		reloadTrigger: 0,
 		first: 0,
@@ -168,5 +167,3 @@ const dataSourceConfigPermissions = {
 		},
 	},
 };
-
-registerDataSource('permissions', dataSourceConfigPermissions);

@@ -81,13 +81,7 @@ export default function AccountMe() {
 			const newUrl = RoutesSetup.get('account-me');
 			router.replace(newUrl, { scroll: false });
 		}
-	}, [
-		searchParams.get,
-		showToast,
-		isTranslationLoading,
-		translations,
-		router,
-	]);
+	}, [searchParams, showToast, isTranslationLoading, translations, router]);
 
 	if (authStatus === 'loading') {
 		return <Loading text="Loading..." />;

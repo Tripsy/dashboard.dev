@@ -1,11 +1,14 @@
 import { z } from 'zod';
-import type {
-	DataSourceType,
-	DataTableColumnType,
-	FormStateType,
+import {
+	type DataTableFiltersType,
+	type FormStateType,
+	registerDataSource,
 } from '@/config/data-source';
 import { translateBatch } from '@/config/lang';
-import type { PermissionModel } from '@/entities/permission.model';
+import type {
+	PermissionFormValuesType,
+	PermissionModel,
+} from '@/models/permission.model';
 import {
 	createPermissions,
 	deletePermissions,
@@ -31,49 +34,49 @@ const ValidateSchemaBasePermissions = z.object({
 	}),
 });
 
-const DataTableColumnsPermissions: DataTableColumnType<PermissionModel>[] = [
-	{
-		field: 'id',
-		header: translations['permissions.data_table.column_id'],
-		sortable: true,
-	},
-	{
-		field: 'entity',
-		header: translations['permissions.data_table.column_entity'],
-		sortable: true,
-	},
-	{
-		field: 'operation',
-		header: translations['permissions.data_table.column_operation'],
-		sortable: true,
-	},
-];
-
-const DataTablePermissionsFilters = {
-	global: { value: null, matchMode: 'contains' },
-	is_deleted: { value: null, matchMode: 'equals' },
-};
-
-export type DataSourcePermissionsType = {
-	tableFilter: typeof DataTablePermissionsFilters;
-	model: PermissionModel;
-	formState: FormStateType<'permissions'>;
-	formValues: {
-		entity: string;
-		operation: string;
+function getFormValuesPermission(formData: FormData): PermissionFormValuesType {
+	return {
+		entity: formData.get('entity') as string,
+		operation: formData.get('operation') as string,
 	};
+}
+
+export type PermissionDataTableFiltersType = DataTableFiltersType & {
+	global: { value: string | null; matchMode: 'contains' };
+	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
-export const DataSourceConfigPermissions = {
+export const permissionDataTableFilters: PermissionDataTableFiltersType = {
+	global: { value: null, matchMode: 'contains' },
+	is_deleted: { value: false, matchMode: 'equals' },
+};
+
+const dataSourceConfigPermissions = {
 	dataTableState: {
 		reloadTrigger: 0,
 		first: 0,
 		rows: 10,
 		sortField: 'id',
 		sortOrder: -1 as const,
-		filters: DataTablePermissionsFilters,
+		filters: permissionDataTableFilters,
 	},
-	dataTableColumns: DataTableColumnsPermissions,
+	dataTableColumns: [
+		{
+			field: 'id',
+			header: translations['permissions.data_table.column_id'],
+			sortable: true,
+		},
+		{
+			field: 'entity',
+			header: translations['permissions.data_table.column_entity'],
+			sortable: true,
+		},
+		{
+			field: 'operation',
+			header: translations['permissions.data_table.column_operation'],
+			sortable: true,
+		},
+	],
 	formState: {
 		dataSource: 'permissions' as const,
 		id: undefined,
@@ -87,21 +90,22 @@ export const DataSourceConfigPermissions = {
 	},
 	functions: {
 		find: findPermissions,
-		getFormValues: (
-			formData: FormData,
-		): DataSourceType['permissions']['formValues'] => {
-			return {
-				entity: formData.get('entity') as string,
-				operation: formData.get('operation') as string,
-			};
-		},
-		validateForm: (values: DataSourceType['permissions']['formValues']) => {
+		getFormValues: getFormValuesPermission,
+		validateForm: (values: PermissionFormValuesType) => {
 			return ValidateSchemaBasePermissions.safeParse(values);
 		},
 		syncFormState: (
-			state: FormStateType<'permissions'>,
+			state: FormStateType<
+				'permissions',
+				PermissionModel,
+				PermissionFormValuesType
+			>,
 			model: PermissionModel,
-		): FormStateType<'permissions'> => {
+		): FormStateType<
+			'permissions',
+			PermissionModel,
+			PermissionFormValuesType
+		> => {
 			return {
 				...state,
 				id: model.id,
@@ -164,3 +168,5 @@ export const DataSourceConfigPermissions = {
 		},
 	},
 };
+
+registerDataSource('permissions', dataSourceConfigPermissions);

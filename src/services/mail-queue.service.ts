@@ -6,17 +6,18 @@ import type {
 } from '@/config/data-source';
 import { ApiRequest, getResponseData } from '@/helpers/api.helper';
 import { buildQueryString } from '@/helpers/string.helper';
+import type { MailQueueModel } from '@/models/mail-queue.model';
 import type { ApiResponseFetch } from '@/types/api.type';
 
-export const findMailQueue: FindFunctionType<'mail_queue'> = async (
+export const findMailQueue: FindFunctionType<MailQueueModel> = async (
 	params: FindFunctionParamsType,
 ) => {
 	const query = buildQueryString(params);
 
-	const response: ApiResponseFetch<FindFunctionResponseType<'mail_queue'>> =
+	const response: ApiResponseFetch<FindFunctionResponseType<MailQueueModel>> =
 		await new ApiRequest().doFetch(`/mail-queue?${query}`);
 
-	return getResponseData<FindFunctionResponseType<'mail_queue'>>(response);
+	return getResponseData(response);
 };
 
 export const deleteMailQueue: DeleteFunctionType = async (ids: number[]) => {

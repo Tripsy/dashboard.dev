@@ -9,11 +9,11 @@ import {
 	getDataSourceConfig,
 } from '@/config/data-source';
 
-export interface DataTableModalSlice<Entity> {
+export interface DataTableModalSlice<Model> {
 	isOpen: boolean;
 	actionName: string | null;
-	actionEntry: Entity | null;
-	setActionEntry: (entry: Entity) => void;
+	actionEntry: Model | null;
+	setActionEntry: (entry: Model) => void;
 	openCreate: () => void;
 	openUpdate: () => void;
 	openAction: (name: string) => void;
@@ -21,11 +21,11 @@ export interface DataTableModalSlice<Entity> {
 }
 
 export const createDataTableModalSlice =
-	<Entity>(): StateCreator<
-		DataTableStore<Entity>,
+	<Model>(): StateCreator<
+		DataTableStore<Model>,
 		[['zustand/immer', never]],
 		[],
-		DataTableModalSlice<Entity>
+		DataTableModalSlice<Model>
 	> =>
 	(set) => ({
 		isOpen: false,
@@ -33,30 +33,30 @@ export const createDataTableModalSlice =
 		actionEntry: null,
 
 		openCreate: () =>
-			set((state: Draft<DataTableModalSlice<Entity>>) => {
+			set((state: Draft<DataTableModalSlice<Model>>) => {
 				state.isOpen = true;
 				state.actionName = 'create';
 			}),
 
 		openUpdate: () =>
-			set((state: Draft<DataTableModalSlice<Entity>>) => {
+			set((state: Draft<DataTableModalSlice<Model>>) => {
 				state.isOpen = true;
 				state.actionName = 'update';
 			}),
 
 		openAction: (name: string) =>
-			set((state: Draft<DataTableModalSlice<Entity>>) => {
+			set((state: Draft<DataTableModalSlice<Model>>) => {
 				state.isOpen = true;
 				state.actionName = name;
 			}),
 
 		setActionEntry: (entry) =>
-			set((state: Draft<DataTableModalSlice<Entity>>) => {
-				state.actionEntry = entry as Draft<Entity>;
+			set((state: Draft<DataTableModalSlice<Model>>) => {
+				state.actionEntry = entry as Draft<Model>;
 			}),
 
 		closeOut: () =>
-			set((state: Draft<DataTableModalSlice<Entity>>) => {
+			set((state: Draft<DataTableModalSlice<Model>>) => {
 				state.isOpen = false;
 				state.actionName = null;
 				state.actionEntry = null;
@@ -70,10 +70,10 @@ export interface DataTableSlice {
 }
 
 export const createDataTableSlice =
-	<K extends DataSourceKey, Entity>(
+	<K extends DataSourceKey, Model>(
 		dataSource: K,
 	): StateCreator<
-		DataTableStore<Entity>,
+		DataTableStore<Model>,
 		[['zustand/immer', never]],
 		[],
 		DataTableSlice

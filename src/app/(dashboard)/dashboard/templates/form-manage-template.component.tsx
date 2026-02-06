@@ -12,13 +12,16 @@ import { FormElementError } from '@/components/form/form-element-error.component
 import { FormPart } from '@/components/form/form-part.component';
 import { Icons } from '@/components/icon.component';
 import type { FormManageType } from '@/config/data-source';
-import {
-	TemplateLayoutEmailEnum,
-	TemplateTypeEnum,
-} from '@/entities/template.model';
-import { LanguageEnum } from '@/entities/user.model';
 import { getNestedError } from '@/helpers/form.helper';
 import { capitalizeFirstLetter, toKebabCase } from '@/helpers/string.helper';
+import { useElementIds } from '@/hooks/use-element-ids.hook';
+import { useTranslation } from '@/hooks/use-translation.hook';
+import {
+	type TemplateFormValuesType,
+	TemplateLayoutEmailEnum,
+	TemplateTypeEnum,
+} from '@/models/template.model';
+import { LanguageEnum } from '@/models/user.model';
 
 const languages = Object.values(LanguageEnum).map((v) => ({
 	label: capitalizeFirstLetter(v),
@@ -40,7 +43,7 @@ export function FormManageTemplate({
 	errors,
 	handleChange,
 	pending,
-}: FormManageType<'templates'>) {
+}: FormManageType<TemplateFormValuesType>) {
 	const translationsKeys = useMemo(
 		() =>
 			[

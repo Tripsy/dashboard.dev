@@ -1,15 +1,17 @@
 import type {
 	CreateFunctionType,
-	DataSourceType,
 	DeleteFunctionType,
 	FindFunctionParamsType,
 	FindFunctionResponseType,
 	FindFunctionType,
 	UpdateFunctionType,
 } from '@/config/data-source';
-import type { PermissionModel } from '@/entities/permission.model';
 import { ApiRequest, getResponseData } from '@/helpers/api.helper';
 import { buildQueryString } from '@/helpers/string.helper';
+import type {
+	PermissionFormValuesType,
+	PermissionModel,
+} from '@/models/permission.model';
 import type { ApiResponseFetch } from '@/types/api.type';
 
 export const findPermissions: FindFunctionType<PermissionModel> = async (
@@ -24,19 +26,20 @@ export const findPermissions: FindFunctionType<PermissionModel> = async (
 	return getResponseData(response);
 };
 
-export const createPermissions: CreateFunctionType<'permissions'> = async (
-	params: DataSourceType['permissions']['formValues'],
-) => {
+export const createPermissions: CreateFunctionType<
+	PermissionModel,
+	PermissionFormValuesType
+> = async (params: PermissionFormValuesType) => {
 	return await new ApiRequest().doFetch('/permissions', {
 		method: 'POST',
 		body: JSON.stringify(params),
 	});
 };
 
-export const updatePermissions: UpdateFunctionType<'permissions'> = async (
-	params: DataSourceType['permissions']['formValues'],
-	id: number,
-) => {
+export const updatePermissions: UpdateFunctionType<
+	PermissionModel,
+	PermissionFormValuesType
+> = async (params: PermissionFormValuesType, id: number) => {
 	return await new ApiRequest().doFetch(`/permissions/${id}`, {
 		method: 'PUT',
 		body: JSON.stringify(params),

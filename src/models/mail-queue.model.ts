@@ -1,5 +1,5 @@
-import type { TemplateContentEmailType } from '@/entities/template.model';
-import type { LanguageEnum } from '@/entities/user.model';
+import type { TemplateContentEmailType } from '@/models/template.model';
+import type { LanguageEnum } from '@/models/user.model';
 
 export enum MailQueueStatusEnum {
 	PENDING = 'pending',

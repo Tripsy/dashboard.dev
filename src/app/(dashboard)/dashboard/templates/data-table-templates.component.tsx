@@ -10,6 +10,8 @@ import { DataTableTemplatesFilters } from '@/app/(dashboard)/dashboard/templates
 import { FormManageTemplate } from '@/app/(dashboard)/dashboard/templates/form-manage-template.component';
 import { ViewTemplate } from '@/app/(dashboard)/dashboard/templates/view-template.component';
 import { Loading } from '@/components/loading.component';
+import { useMounted } from '@/hooks/use-mounted.hook';
+import { useTranslation } from '@/hooks/use-translation.hook';
 
 const dataTableStore = createDataTableStore('templates');
 

@@ -6,17 +6,19 @@ import type {
 } from '@/config/data-source';
 import { ApiRequest, getResponseData } from '@/helpers/api.helper';
 import { buildQueryString } from '@/helpers/string.helper';
+import type { LogHistoryModel } from '@/models/log-history.model';
 import type { ApiResponseFetch } from '@/types/api.type';
 
-export const findLogHistory: FindFunctionType<'log_history'> = async (
+export const findLogHistory: FindFunctionType<LogHistoryModel> = async (
 	params: FindFunctionParamsType,
 ) => {
 	const query = buildQueryString(params);
 
-	const response: ApiResponseFetch<FindFunctionResponseType<'log_history'>> =
-		await new ApiRequest().doFetch(`/log-history?${query}`);
+	const response: ApiResponseFetch<
+		FindFunctionResponseType<LogHistoryModel>
+	> = await new ApiRequest().doFetch(`/log-history?${query}`);
 
-	return getResponseData<FindFunctionResponseType<'log_history'>>(response);
+	return getResponseData(response);
 };
 
 export const deleteLogHistory: DeleteFunctionType = async (ids: number[]) => {

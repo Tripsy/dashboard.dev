@@ -10,9 +10,16 @@ import {
 	FormFiltersSelect,
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
-import { LogCategoryEnum, LogLevelEnum } from '@/entities/log-data.model';
+import type { LogDataDataTableFiltersType } from '@/app/(dashboard)/dashboard/log-data/log-data.definition';
 import { createFilterHandlers } from '@/helpers/data-table.helper';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
+import { useSearchFilter } from '@/hooks/use-search-filter.hook';
+import { useTranslation } from '@/hooks/use-translation.hook';
+import {
+	LogCategoryEnum,
+	type LogDataModel,
+	LogLevelEnum,
+} from '@/models/log-data.model';
 
 const logLevels = Object.values(LogLevelEnum).map((v) => ({
 	label: capitalizeFirstLetter(v),
@@ -25,7 +32,10 @@ const logCategories = Object.values(LogCategoryEnum).map((v) => ({
 }));
 
 export const DataTableLogDataFilters = (): React.JSX.Element => {
-	const { stateDefault, dataTableStore } = useDataTable<'log_data'>();
+	const { stateDefault, dataTableStore } = useDataTable<
+		'log_data',
+		LogDataModel
+	>();
 
 	const translationsKeys = useMemo(
 		() =>
@@ -43,7 +53,8 @@ export const DataTableLogDataFilters = (): React.JSX.Element => {
 	const filters = useStore(
 		dataTableStore,
 		(state) => state.tableState.filters,
-	);
+	) as LogDataDataTableFiltersType;
+
 	const updateTableState = useStore(
 		dataTableStore,
 		(state) => state.updateTableState,
@@ -59,7 +70,7 @@ export const DataTableLogDataFilters = (): React.JSX.Element => {
 	);
 
 	const handlers = useMemo(
-		() => createFilterHandlers<'log_data'>(updateFilters),
+		() => createFilterHandlers(updateFilters),
 		[updateFilters],
 	);
 

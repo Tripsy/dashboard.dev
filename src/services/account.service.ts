@@ -7,8 +7,8 @@ import type { PasswordRecoverFormFieldsType } from '@/app/(public)/account/passw
 import type { PasswordRecoverChangeFormFieldsType } from '@/app/(public)/account/password-recover-change/[token]/password-recover-change.definition';
 import type { PasswordUpdateFormFieldsType } from '@/app/(public)/account/password-update/password-update.definition';
 import type { RegisterFormFieldsType } from '@/app/(public)/account/register/register.definition';
-import type { UserModel } from '@/entities/user.model';
 import { ApiRequest } from '@/helpers/api.helper';
+import type { UserModel } from '@/models/user.model';
 import type { ApiResponseFetch } from '@/types/api.type';
 import type { AuthTokenListType } from '@/types/auth.type';
 

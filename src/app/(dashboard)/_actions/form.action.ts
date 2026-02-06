@@ -60,19 +60,19 @@ export function handleValidate<K extends DataSourceKey, FormValues>(
 
 export async function formAction<
 	K extends DataSourceKey,
-	Entity,
+	Model,
 	FormValues extends FormStateValuesType,
-	FormState extends FormStateType<K, Entity, FormValues>,
+	FormState extends FormStateType<K, Model, FormValues>,
 >(state: FormState, formData: FormData): Promise<FormState> {
 	async function executeFetch(data: FormValues, id?: number) {
 		const actions = getDataSourceConfig(state.dataSource, 'actions');
 
 		if (id) {
 			const updateFunction = actions?.update?.function as
-				| UpdateFunctionType<Entity, FormValues>
+				| UpdateFunctionType<Model, FormValues>
 				| undefined;
 
-			// Not all the entities have an `update` function
+			// Not all the models have an `update` function
 			if (!updateFunction) {
 				throw new ValueError(
 					`'update' function is not defined for ${state.dataSource}`,
@@ -83,10 +83,10 @@ export async function formAction<
 		}
 
 		const createFunction = actions?.create?.function as
-			| CreateFunctionType<Entity, FormValues>
+			| CreateFunctionType<Model, FormValues>
 			| undefined;
 
-		// Not all the entities have a `create` function
+		// Not all the models have a `create` function
 		if (!createFunction) {
 			throw new ValueError(
 				`'create' function is not defined for ${state.dataSource}`,

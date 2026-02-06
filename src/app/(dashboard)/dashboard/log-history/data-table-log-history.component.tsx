@@ -10,6 +10,8 @@ import { DataTableLogHistoryFilters } from '@/app/(dashboard)/dashboard/log-hist
 import { ViewLogHistory } from '@/app/(dashboard)/dashboard/log-history/view-log-history.component';
 import { ViewLogHistoryUser } from '@/app/(dashboard)/dashboard/log-history/view-log-history-user.component';
 import { Loading } from '@/components/loading.component';
+import { useMounted } from '@/hooks/use-mounted.hook';
+import { useTranslation } from '@/hooks/use-translation.hook';
 
 const dataTableStore = createDataTableStore('log_history');
 
@@ -35,7 +37,7 @@ export const DataTableLogHistory = (): JSX.Element => {
 				<DataTableList dataKey="id" scrollHeight="400px" />
 			</div>
 
-			<DataTableModal<'log_history'>
+			<DataTableModal
 				modals={{
 					view: <ViewLogHistory />,
 					viewUser: <ViewLogHistoryUser />,

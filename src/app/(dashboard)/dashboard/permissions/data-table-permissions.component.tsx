@@ -9,6 +9,8 @@ import { createDataTableStore } from '@/app/(dashboard)/_stores/model.store';
 import { DataTablePermissionsFilters } from '@/app/(dashboard)/dashboard/permissions/data-table-permissions-filters.component';
 import { FormManagePermission } from '@/app/(dashboard)/dashboard/permissions/form-manage-permission.component';
 import { Loading } from '@/components/loading.component';
+import { useMounted } from '@/hooks/use-mounted.hook';
+import { useTranslation } from '@/hooks/use-translation.hook';
 
 const dataTableStore = createDataTableStore('permissions');
 
@@ -34,7 +36,7 @@ export const DataTablePermissions = (): JSX.Element => {
 				<DataTableList dataKey="id" scrollHeight="400px" />
 			</div>
 
-			<DataTableModal<'permissions'>
+			<DataTableModal
 				modals={{
 					// @ts-expect-error FormManagePermission props are injected at runtime via FormManage
 					create: <FormManagePermission />,

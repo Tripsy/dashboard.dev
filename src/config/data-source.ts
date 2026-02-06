@@ -6,7 +6,7 @@ import type { ApiResponseFetch } from '@/types/api.type';
 const dataSourceConfig: Record<string, any> = {};
 export type DataSourceKey = keyof typeof dataSourceConfig;
 
-export type BaseEntityType = {
+export type BaseModelType = {
 	id: number;
 };
 
@@ -37,7 +37,7 @@ type EmptyFormValues = Record<never, never>;
 
 export type FormStateType<
 	K extends DataSourceKey,
-	Entity,
+	Model,
 	FormValues extends FormStateValuesType,
 > = {
 	dataSource: K;
@@ -46,7 +46,7 @@ export type FormStateType<
 	errors: Partial<Record<keyof FormValues, string[]>>;
 	message: string | null;
 	situation: FormSituationType;
-	resultData?: Partial<Entity>;
+	resultData?: Partial<Model>;
 };
 
 // ============================================================================
@@ -61,8 +61,8 @@ export type FindFunctionParamsType = {
 	filter?: string;
 };
 
-export type FindFunctionResponseType<Entity> = {
-	entries: Entity[];
+export type FindFunctionResponseType<Model> = {
+	entries: Model[];
 	pagination: {
 		page: number;
 		limit: number;
@@ -70,22 +70,19 @@ export type FindFunctionResponseType<Entity> = {
 	};
 };
 
-export type FindFunctionType<Entity> = (
+export type FindFunctionType<Model> = (
 	params: FindFunctionParamsType,
-) => Promise<FindFunctionResponseType<Entity> | undefined>;
+) => Promise<FindFunctionResponseType<Model> | undefined>;
 
 export type CreateFunctionType<
-	Entity,
+	Model,
 	FormValues extends FormStateValuesType,
-> = (data: FormValues) => Promise<ApiResponseFetch<Partial<Entity>>>;
+> = (data: FormValues) => Promise<ApiResponseFetch<Partial<Model>>>;
 
 export type UpdateFunctionType<
-	Entity,
+	Model,
 	FormValues extends FormStateValuesType,
-> = (
-	data: FormValues,
-	id: number,
-) => Promise<ApiResponseFetch<Partial<Entity>>>;
+> = (data: FormValues, id: number) => Promise<ApiResponseFetch<Partial<Model>>>;
 
 export type DeleteFunctionType = (
 	ids: number[],
@@ -100,12 +97,12 @@ type DataTableActionMode = 'form' | 'action' | 'other';
 type DataTableEntryRequirement = 'free' | 'single' | 'multiple';
 type DataTableActionPosition = 'left' | 'right' | 'hidden';
 
-export type DataTableActionConfigType<Entity, Function> = {
+export type DataTableActionConfigType<Model, Function> = {
 	type?: DataTableActionType;
 	mode: DataTableActionMode;
 	permission: string;
 	allowedEntries: DataTableEntryRequirement;
-	customEntryCheck?: (entry: Entity) => boolean;
+	customEntryCheck?: (entry: Model) => boolean;
 	position: DataTableActionPosition;
 	function?: Function;
 	button?: {
@@ -114,20 +111,20 @@ export type DataTableActionConfigType<Entity, Function> = {
 };
 
 export type DataTableActionsType<
-	Entity,
+	Model,
 	FormValues extends FormStateValuesType,
 > = {
-	[key: string]: DataTableActionConfigType<Entity, unknown>;
+	[key: string]: DataTableActionConfigType<Model, unknown>;
 } & {
 	create?: DataTableActionConfigType<
-		Entity,
-		CreateFunctionType<Entity, FormValues>
+		Model,
+		CreateFunctionType<Model, FormValues>
 	>;
 	update?: DataTableActionConfigType<
-		Entity,
-		UpdateFunctionType<Entity, FormValues>
+		Model,
+		UpdateFunctionType<Model, FormValues>
 	>;
-	delete?: DataTableActionConfigType<Entity, DeleteFunctionType>;
+	delete?: DataTableActionConfigType<Model, DeleteFunctionType>;
 };
 
 // ============================================================================

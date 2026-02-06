@@ -6,7 +6,7 @@ import { DataTableActionButton } from '@/app/(dashboard)/_components/data-table-
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import { Loading } from '@/components/loading.component';
 import {
-	type BaseEntityType,
+	type BaseModelType,
 	type DataSourceKey,
 	type DisplayActionEntriesFunctionType,
 	getDataSourceConfig,
@@ -17,9 +17,9 @@ import { replaceVars } from '@/helpers/string.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { useToast } from '@/providers/toast.provider';
 
-function displayActionEntries<K extends DataSourceKey, Entity>(
+function displayActionEntries<K extends DataSourceKey, Model>(
 	dataSource: K,
-	entries: Entity[],
+	entries: Model[],
 ) {
 	const functions = getDataSourceConfig(dataSource, 'functions');
 
@@ -33,15 +33,15 @@ function displayActionEntries<K extends DataSourceKey, Entity>(
 	}
 
 	return (
-		functions.displayActionEntries as DisplayActionEntriesFunctionType<Entity>
+		functions.displayActionEntries as DisplayActionEntriesFunctionType<Model>
 	)(entries);
 }
 
 export function ActionManage<
 	K extends DataSourceKey,
-	Entity extends BaseEntityType,
+	Model extends BaseModelType,
 >() {
-	const { dataSource, dataTableStore } = useDataTable<K, Entity>();
+	const { dataSource, dataTableStore } = useDataTable<K, Model>();
 	const { showToast } = useToast();
 
 	const isOpen = useStore(dataTableStore, (state) => state.isOpen);

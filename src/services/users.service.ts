@@ -1,4 +1,3 @@
-import type { FormValuesUsersType } from '@/app/(dashboard)/dashboard/users/users.definition';
 import type {
 	CreateFunctionType,
 	DeleteFunctionType,
@@ -7,10 +6,10 @@ import type {
 	FindFunctionType,
 	UpdateFunctionType,
 } from '@/config/data-source';
-import type { UserModel } from '@/entities/user.model';
-import type { UserPermissionModel } from '@/entities/user-permission.model';
 import { ApiRequest, getResponseData } from '@/helpers/api.helper';
 import { buildQueryString } from '@/helpers/string.helper';
+import type { UserFormValuesType, UserModel } from '@/models/user.model';
+import type { UserPermissionModel } from '@/models/user-permission.model';
 import type { ApiResponseFetch } from '@/types/api.type';
 
 export const findUsers: FindFunctionType<UserModel> = async (
@@ -26,8 +25,8 @@ export const findUsers: FindFunctionType<UserModel> = async (
 
 export const createUser: CreateFunctionType<
 	UserModel,
-	FormValuesUsersType
-> = async (params: FormValuesUsersType) => {
+	UserFormValuesType
+> = async (params: UserFormValuesType) => {
 	return await new ApiRequest().doFetch('/users', {
 		method: 'POST',
 		body: JSON.stringify(params),
@@ -36,8 +35,8 @@ export const createUser: CreateFunctionType<
 
 export const updateUser: UpdateFunctionType<
 	UserModel,
-	FormValuesUsersType
-> = async (params: FormValuesUsersType, id: number) => {
+	UserFormValuesType
+> = async (params: UserFormValuesType, id: number) => {
 	return await new ApiRequest().doFetch(`/users/${id}`, {
 		method: 'PUT',
 		body: JSON.stringify(params),

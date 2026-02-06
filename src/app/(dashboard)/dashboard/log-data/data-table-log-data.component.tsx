@@ -9,6 +9,8 @@ import { createDataTableStore } from '@/app/(dashboard)/_stores/model.store';
 import { DataTableLogDataFilters } from '@/app/(dashboard)/dashboard/log-data/data-table-log-data-filters.component';
 import { ViewLogData } from '@/app/(dashboard)/dashboard/log-data/view-log-data.component';
 import { Loading } from '@/components/loading.component';
+import { useMounted } from '@/hooks/use-mounted.hook';
+import { useTranslation } from '@/hooks/use-translation.hook';
 
 const dataTableStore = createDataTableStore('log_data');
 
@@ -34,7 +36,7 @@ export const DataTableLogData = (): JSX.Element => {
 				<DataTableList dataKey="id" scrollHeight="400px" />
 			</div>
 
-			<DataTableModal<'log_data'>
+			<DataTableModal
 				modals={{
 					view: <ViewLogData />,
 				}}

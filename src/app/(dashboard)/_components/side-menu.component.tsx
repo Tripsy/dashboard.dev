@@ -15,9 +15,9 @@ import Link from 'next/link';
 import React, { useLayoutEffect, useMemo, useState } from 'react';
 import { AwesomeIcon } from '@/components/icon.component';
 import RoutesSetup from '@/config/routes.setup';
-import { hasPermission } from '@/entities/auth.model';
 import { useDebouncedEffect } from '@/hooks/use-debounced-effect.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
+import { hasPermission } from '@/models/auth.model';
 import { useAuth } from '@/providers/auth.provider';
 
 type SideMenuGroupProps = {

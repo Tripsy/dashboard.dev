@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { ApiRequest, getResponseData } from '@/helpers/api.helper';
+import { formatDate } from '@/helpers/date.helper';
 import type {
 	TemplateContentPageType,
 	TemplateLayoutPageEnum,
 	TemplateModel,
-} from '@/entities/template.model';
-import { ApiRequest, getResponseData } from '@/helpers/api.helper';
-import { formatDate } from '@/helpers/date.helper';
+} from '@/models/template.model';
 import type { ApiResponseFetch } from '@/types/api.type';
 
 interface Props {

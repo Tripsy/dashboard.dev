@@ -9,7 +9,7 @@ import { FormManage } from '@/app/(dashboard)/_components/form-manage.component'
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import { getActionIcon, Icons } from '@/components/icon.component';
 import {
-	type BaseEntityType,
+	type BaseModelType,
 	type DataSourceKey,
 	getDataSourceConfig,
 } from '@/config/data-source';
@@ -26,7 +26,7 @@ type ModalClassMap = {
 
 export function DataTableModal<
 	K extends DataSourceKey,
-	Entity extends BaseEntityType,
+	Model extends BaseModelType,
 >({
 	modals,
 	modalClass,
@@ -36,7 +36,7 @@ export function DataTableModal<
 	modalClass?: ModalClassMap;
 	defaultModalClass?: string;
 }) {
-	const { dataSource, dataTableStore } = useDataTable<K, Entity>();
+	const { dataSource, dataTableStore } = useDataTable<K, Model>();
 	const { showToast } = useToast();
 
 	const isOpen = useStore(dataTableStore, (state) => state.isOpen);

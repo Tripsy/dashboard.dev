@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import type { FormValuesUsersType } from '@/app/(dashboard)/dashboard/users/users.definition';
 import {
 	FormComponentEmail,
 	FormComponentName,
@@ -9,16 +8,17 @@ import {
 } from '@/components/form/form-element.component';
 import type { FormManageType } from '@/config/data-source';
 import {
-	LanguageEnum,
-	UserOperatorTypeEnum,
-	UserRoleEnum,
-} from '@/entities/user.model';
-import {
 	capitalizeFirstLetter,
 	formatEnumLabel,
 } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
+import {
+	LanguageEnum,
+	type UserFormValuesType,
+	UserOperatorTypeEnum,
+	UserRoleEnum,
+} from '@/models/user.model';
 
 const roles = Object.values(UserRoleEnum).map((v) => ({
 	label: capitalizeFirstLetter(v),
@@ -41,7 +41,7 @@ export function FormManageUser({
 	errors,
 	handleChange,
 	pending,
-}: FormManageType<FormValuesUsersType>) {
+}: FormManageType<UserFormValuesType>) {
 	const translationsKeys = useMemo(
 		() =>
 			[

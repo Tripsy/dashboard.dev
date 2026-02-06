@@ -3,11 +3,14 @@ import {
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
 import {
-	type DataTableEntryRecordType,
+	type DataTableFiltersType,
 	registerDataSource,
 } from '@/config/data-source';
 import { translateBatch } from '@/config/lang';
-import type { CronHistoryModel } from '@/entities/cron-history.model';
+import type {
+	CronHistoryModel,
+	CronHistoryStatusEnum,
+} from '@/models/cron-history.model';
 import {
 	deleteCronHistory,
 	findCronHistory,
@@ -21,19 +24,28 @@ const translations = await translateBatch([
 	'cron_history.data_table.column_run_time',
 ]);
 
-const DataSourceConfigCronHistory = {
+export type CronHistoryDataTableFiltersType = DataTableFiltersType & {
+	global: { value: string | null; matchMode: 'contains' };
+	status: { value: CronHistoryStatusEnum | null; matchMode: 'equals' };
+	start_date_start: { value: string | null; matchMode: 'equals' };
+	start_date_end: { value: string | null; matchMode: 'equals' };
+};
+
+export const cronHistoryDataTableFilters: CronHistoryDataTableFiltersType = {
+	global: { value: null, matchMode: 'contains' },
+	status: { value: null, matchMode: 'equals' },
+	start_date_start: { value: null, matchMode: 'equals' },
+	start_date_end: { value: null, matchMode: 'equals' },
+};
+
+const dataSourceConfigCronHistory = {
 	dataTableState: {
 		reloadTrigger: 0,
 		first: 0,
 		rows: 10,
 		sortField: 'id',
 		sortOrder: -1 as const,
-		filters: {
-			global: { value: null, matchMode: 'contains' },
-			status: { value: null, matchMode: 'equals' },
-			start_date_start: { value: null, matchMode: 'equals' },
-			start_date_end: { value: null, matchMode: 'equals' },
-		},
+		filters: cronHistoryDataTableFilters,
 	},
 	dataTableColumns: [
 		{
@@ -41,8 +53,8 @@ const DataSourceConfigCronHistory = {
 			header: translations['cron_history.data_table.column_id'],
 			sortable: true,
 			body: (
-				entry: DataTableEntryRecordType,
-				column: DataTableColumnType,
+				entry: CronHistoryModel,
+				column: DataTableColumnType<CronHistoryModel>,
 			) =>
 				DataTableValue(entry, column, {
 					markDeleted: true,
@@ -62,8 +74,8 @@ const DataSourceConfigCronHistory = {
 			header: translations['cron_history.data_table.column_start_at'],
 			sortable: true,
 			body: (
-				entry: DataTableEntryRecordType,
-				column: DataTableColumnType,
+				entry: CronHistoryModel,
+				column: DataTableColumnType<CronHistoryModel>,
 			) =>
 				DataTableValue(entry, column, {
 					displayDate: true,
@@ -73,8 +85,8 @@ const DataSourceConfigCronHistory = {
 			field: 'status',
 			header: translations['cron_history.data_table.column_status'],
 			body: (
-				entry: DataTableEntryRecordType,
-				column: DataTableColumnType,
+				entry: CronHistoryModel,
+				column: DataTableColumnType<CronHistoryModel>,
 			) =>
 				DataTableValue(entry, column, {
 					isStatus: true,
@@ -118,4 +130,4 @@ const DataSourceConfigCronHistory = {
 	},
 };
 
-registerDataSource('cron-history', DataSourceConfigCronHistory);
+registerDataSource('cron-history', dataSourceConfigCronHistory);

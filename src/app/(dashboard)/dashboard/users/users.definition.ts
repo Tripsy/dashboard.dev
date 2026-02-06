@@ -12,11 +12,12 @@ import { translateBatch } from '@/config/lang';
 import { Configuration } from '@/config/settings.config';
 import {
 	LanguageEnum,
+	type UserFormValuesType,
 	type UserModel,
 	UserOperatorTypeEnum,
 	UserRoleEnum,
 	UserStatusEnum,
-} from '@/entities/user.model';
+} from '@/models/user.model';
 import {
 	createUser,
 	deleteUser,
@@ -211,17 +212,7 @@ const ValidateSchemaUpdateUsers = ValidateSchemaBaseUsers.extend({
 		}
 	});
 
-export type FormValuesUsersType = {
-	name: string;
-	email: string;
-	password?: string;
-	password_confirm?: string;
-	language: LanguageEnum;
-	role: UserRoleEnum;
-	operator_type: UserOperatorTypeEnum | null;
-};
-
-function getFormValuesUsers(formData: FormData): FormValuesUsersType {
+function getFormValuesUser(formData: FormData): UserFormValuesType {
 	const language = formData.get('language');
 	const validLanguages = Object.values(LanguageEnum);
 
@@ -250,7 +241,7 @@ function getFormValuesUsers(formData: FormData): FormValuesUsersType {
 	};
 }
 
-export type DataTableStateFiltersUsersType = DataTableFiltersType & {
+export type UsersDataTableFiltersType = DataTableFiltersType & {
 	global: { value: string | null; matchMode: 'contains' };
 	role: { value: UserRoleEnum | null; matchMode: 'equals' };
 	status: { value: UserStatusEnum | null; matchMode: 'equals' };
@@ -259,7 +250,7 @@ export type DataTableStateFiltersUsersType = DataTableFiltersType & {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
-export const dataTableStateFiltersUsers: DataTableStateFiltersUsersType = {
+export const usersDataTableFilters: UsersDataTableFiltersType = {
 	global: { value: null, matchMode: 'contains' },
 	role: { value: null, matchMode: 'equals' },
 	status: { value: null, matchMode: 'equals' },
@@ -275,7 +266,7 @@ const dataSourceConfigUsers = {
 		rows: 10,
 		sortField: 'id',
 		sortOrder: -1 as const,
-		filters: dataTableStateFiltersUsers,
+		filters: usersDataTableFilters,
 	},
 	dataTableColumns: [
 		{
@@ -369,8 +360,8 @@ const dataSourceConfigUsers = {
 		find: findUsers,
 		// onRowSelect: (entry: UserModel) => console.log('selected', entry),
 		// onRowUnselect: (entry: UserModel) => console.log('unselected', entry),
-		getFormValues: getFormValuesUsers,
-		validateForm: (values: FormValuesUsersType, id?: number) => {
+		getFormValues: getFormValuesUser,
+		validateForm: (values: UserFormValuesType, id?: number) => {
 			if (id) {
 				return ValidateSchemaUpdateUsers.safeParse(values);
 			}
@@ -378,9 +369,9 @@ const dataSourceConfigUsers = {
 			return ValidateSchemaCreateUsers.safeParse(values);
 		},
 		syncFormState: (
-			state: FormStateType<'users', UserModel, FormValuesUsersType>,
+			state: FormStateType<'users', UserModel, UserFormValuesType>,
 			model: UserModel,
-		): FormStateType<'users', UserModel, FormValuesUsersType> => {
+		): FormStateType<'users', UserModel, UserFormValuesType> => {
 			return {
 				...state,
 				id: model.id,

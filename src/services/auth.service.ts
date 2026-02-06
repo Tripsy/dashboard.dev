@@ -2,7 +2,6 @@
 
 import { translate } from '@/config/lang';
 import { Configuration } from '@/config/settings.config';
-import { type AuthModel, prepareAuthModel } from '@/entities/auth.model';
 import { ApiError } from '@/exceptions/api.error';
 import { ApiRequest, getResponseData } from '@/helpers/api.helper';
 import {
@@ -11,6 +10,7 @@ import {
 	setupTrackedCookie,
 } from '@/helpers/session.helper';
 import { apiHeaders } from '@/helpers/system.helper';
+import { type AuthModel, prepareAuthModel } from '@/models/auth.model';
 import type { ApiResponseFetch } from '@/types/api.type';
 
 export async function createAuth(

@@ -9,6 +9,8 @@ import { createDataTableStore } from '@/app/(dashboard)/_stores/model.store';
 import { DataTableCronHistoryFilters } from '@/app/(dashboard)/dashboard/cron-history/data-table-cron-history-filters.component';
 import { ViewCronHistory } from '@/app/(dashboard)/dashboard/cron-history/view-cron-history.component';
 import { Loading } from '@/components/loading.component';
+import { useMounted } from '@/hooks/use-mounted.hook';
+import { useTranslation } from '@/hooks/use-translation.hook';
 
 const dataTableStore = createDataTableStore('cron_history');
 
@@ -34,7 +36,7 @@ export const DataTableCronHistory = (): JSX.Element => {
 				<DataTableList dataKey="id" scrollHeight="400px" />
 			</div>
 
-			<DataTableModal<'cron_history'>
+			<DataTableModal
 				modals={{
 					view: <ViewCronHistory />,
 				}}

@@ -1,7 +1,17 @@
-import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
-import type { DataTableColumnType } from '@/config/data-source';
+import {
+	type DataTableColumnType,
+	DataTableValue,
+} from '@/app/(dashboard)/_components/data-table-value';
+import {
+	type DataTableFiltersType,
+	registerDataSource,
+} from '@/config/data-source';
 import { translateBatch } from '@/config/lang';
-import type { LogDataModel } from '@/entities/log-data.model';
+import type {
+	LogCategoryEnum,
+	LogDataModel,
+	LogLevelEnum,
+} from '@/models/log-data.model';
 import { deleteLogData, findLogData } from '@/services/log-data.service';
 
 const translations = await translateBatch([
@@ -12,54 +22,15 @@ const translations = await translateBatch([
 	'log_data.data_table.column_created_at',
 ]);
 
-const DataTableColumnsLogData: DataTableColumnType<LogDataModel>[] = [
-	{
-		field: 'id',
-		header: translations['log_data.data_table.column_id'],
-		sortable: true,
-		body: (entry, column) =>
-			DataTableValue<'log_data'>(entry, column, {
-				markDeleted: true,
-				action: {
-					name: 'view',
-					source: 'log_data',
-				},
-			}),
-	},
-	{
-		field: 'category',
-		header: translations['log_data.data_table.column_category'],
-		sortable: true,
-		body: (entry, column) =>
-			DataTableValue<'log_data'>(entry, column, {
-				capitalize: true,
-			}),
-	},
-	{
-		field: 'level',
-		header: translations['log_data.data_table.column_level'],
-		sortable: true,
-		body: (entry, column) =>
-			DataTableValue<'log_data'>(entry, column, {
-				capitalize: true,
-			}),
-	},
-	{
-		field: 'message',
-		header: translations['log_data.data_table.column_message'],
-	},
-	{
-		field: 'created_at',
-		header: translations['log_data.data_table.column_created_at'],
-		sortable: true,
-		body: (entry, column) =>
-			DataTableValue<'log_data'>(entry, column, {
-				displayDate: true,
-			}),
-	},
-];
+export type LogDataDataTableFiltersType = DataTableFiltersType & {
+	global: { value: string | null; matchMode: 'contains' };
+	level: { value: LogLevelEnum | null; matchMode: 'equals' };
+	category: { value: LogCategoryEnum | null; matchMode: 'equals' };
+	create_date_start: { value: string | null; matchMode: 'equals' };
+	create_date_end: { value: string | null; matchMode: 'equals' };
+};
 
-const DataTableLogDataFilters = {
+export const logDataDataTableFilters: LogDataDataTableFiltersType = {
 	global: { value: null, matchMode: 'contains' },
 	level: { value: null, matchMode: 'equals' },
 	category: { value: null, matchMode: 'equals' },
@@ -67,21 +38,73 @@ const DataTableLogDataFilters = {
 	create_date_end: { value: null, matchMode: 'equals' },
 };
 
-export type DataSourceLogDataType = {
-	tableFilter: typeof DataTableLogDataFilters;
-	model: LogDataModel;
-};
-
-export const DataSourceConfigLogData = {
+const dataSourceConfigLogData = {
 	dataTableState: {
 		reloadTrigger: 0,
 		first: 0,
 		rows: 10,
 		sortField: 'id',
 		sortOrder: -1 as const,
-		filters: DataTableLogDataFilters,
+		filters: logDataDataTableFilters,
 	},
-	dataTableColumns: DataTableColumnsLogData,
+	dataTableColumns: [
+		{
+			field: 'id',
+			header: translations['log_data.data_table.column_id'],
+			sortable: true,
+			body: (
+				entry: LogDataModel,
+				column: DataTableColumnType<LogDataModel>,
+			) =>
+				DataTableValue(entry, column, {
+					markDeleted: true,
+					action: {
+						name: 'view',
+						source: 'log_data',
+					},
+				}),
+		},
+		{
+			field: 'category',
+			header: translations['log_data.data_table.column_category'],
+			sortable: true,
+			body: (
+				entry: LogDataModel,
+				column: DataTableColumnType<LogDataModel>,
+			) =>
+				DataTableValue(entry, column, {
+					capitalize: true,
+				}),
+		},
+		{
+			field: 'level',
+			header: translations['log_data.data_table.column_level'],
+			sortable: true,
+			body: (
+				entry: LogDataModel,
+				column: DataTableColumnType<LogDataModel>,
+			) =>
+				DataTableValue(entry, column, {
+					capitalize: true,
+				}),
+		},
+		{
+			field: 'message',
+			header: translations['log_data.data_table.column_message'],
+		},
+		{
+			field: 'created_at',
+			header: translations['log_data.data_table.column_created_at'],
+			sortable: true,
+			body: (
+				entry: LogDataModel,
+				column: DataTableColumnType<LogDataModel>,
+			) =>
+				DataTableValue(entry, column, {
+					displayDate: true,
+				}),
+		},
+	],
 	functions: {
 		find: findLogData,
 		displayActionEntries: (entries: LogDataModel[]) => {
@@ -110,3 +133,5 @@ export const DataSourceConfigLogData = {
 		},
 	},
 };
+
+registerDataSource('log_data', dataSourceConfigLogData);

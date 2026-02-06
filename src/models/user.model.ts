@@ -35,3 +35,13 @@ export type UserModel<D = Date | string> = {
 	updated_at: D;
 	deleted_at: D;
 };
+
+export type UserFormValuesType = {
+	name: string;
+	email: string;
+	password?: string;
+	password_confirm?: string;
+	language: LanguageEnum;
+	role: UserRoleEnum;
+	operator_type: UserOperatorTypeEnum | null;
+};

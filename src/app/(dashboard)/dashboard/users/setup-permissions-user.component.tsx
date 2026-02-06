@@ -5,9 +5,9 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useStore } from 'zustand/react';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import { Loading } from '@/components/loading.component';
-import type { PermissionModel } from '@/entities/permission.model';
-import type { UserModel } from '@/entities/user.model';
 import { useTranslation } from '@/hooks/use-translation.hook';
+import type { PermissionModel } from '@/models/permission.model';
+import type { UserModel } from '@/models/user.model';
 import { useToast } from '@/providers/toast.provider';
 import { findPermissions } from '@/services/permissions.service';
 import {

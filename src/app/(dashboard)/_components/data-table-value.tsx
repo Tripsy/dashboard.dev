@@ -7,18 +7,18 @@ import { formatDate } from '@/helpers/date.helper';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 
-export type DataTableColumnType<Entity> = {
+export type DataTableColumnType<Model> = {
 	field: string;
 	header: string;
 	sortable?: boolean;
 	body?: (
-		entry: Entity,
-		column: DataTableColumnType<Entity>,
+		entry: Model,
+		column: DataTableColumnType<Model>,
 	) => React.JSX.Element | string;
 	style?: React.CSSProperties;
 };
 
-type DataTableValueOptionsType<Entity> = {
+type DataTableValueOptionsType<Model> = {
 	customValue?: string;
 	capitalize?: boolean;
 	markDeleted?: boolean;
@@ -26,7 +26,7 @@ type DataTableValueOptionsType<Entity> = {
 	displayDate?: boolean;
 	source?: string;
 	action?: {
-		name: null | string | ((entry: Entity) => string | null);
+		name: null | string | ((entry: Model) => string | null);
 		source: string;
 	};
 };
@@ -96,14 +96,14 @@ export const DisplayStatus = ({ status }: { status: string }) => {
 	);
 };
 
-export const DisplayAction = <Entity extends Record<string, unknown>>({
+export const DisplayAction = <Model extends Record<string, unknown>>({
 	value,
 	action,
 	entry,
 }: {
 	value: string | JSX.Element;
-	action: NonNullable<DataTableValueOptionsType<Entity>['action']>;
-	entry: Entity;
+	action: NonNullable<DataTableValueOptionsType<Model>['action']>;
+	entry: Model;
 }) => {
 	const actionName =
 		typeof action.name === 'function' ? action.name(entry) : action.name;
@@ -145,10 +145,10 @@ export const DisplayAction = <Entity extends Record<string, unknown>>({
 	);
 };
 
-export const DataTableValue = <Entity extends Record<string, unknown>>(
-	entry: Entity,
-	column: DataTableColumnType<Entity>,
-	options: DataTableValueOptionsType<Entity>,
+export const DataTableValue = <Model extends Record<string, unknown>>(
+	entry: Model,
+	column: DataTableColumnType<Model>,
+	options: DataTableValueOptionsType<Model>,
 ) => {
 	let outputValue: string | JSX.Element;
 

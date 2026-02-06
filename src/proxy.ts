@@ -2,14 +2,14 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import RoutesSetup, { RouteAuth, type RouteMatch } from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
+import { ApiRequest, getResponseData } from '@/helpers/api.helper';
+import { getTrackedCookie } from '@/helpers/session.helper';
+import { apiHeaders } from '@/helpers/system.helper';
 import {
 	type AuthModel,
 	hasPermission,
 	prepareAuthModel,
-} from '@/entities/auth.model';
-import { ApiRequest, getResponseData } from '@/helpers/api.helper';
-import { getTrackedCookie } from '@/helpers/session.helper';
-import { apiHeaders } from '@/helpers/system.helper';
+} from '@/models/auth.model';
 import type { ApiResponseFetch } from '@/types/api.type';
 
 class MiddlewareContext {

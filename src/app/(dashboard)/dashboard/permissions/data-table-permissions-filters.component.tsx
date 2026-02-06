@@ -9,10 +9,17 @@ import {
 	FormFiltersShowDeleted,
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
+import type { PermissionDataTableFiltersType } from '@/app/(dashboard)/dashboard/permissions/permissions.definition';
 import { createFilterHandlers } from '@/helpers/data-table.helper';
+import { useSearchFilter } from '@/hooks/use-search-filter.hook';
+import { useTranslation } from '@/hooks/use-translation.hook';
+import type { PermissionModel } from '@/models/permission.model';
 
 export const DataTablePermissionsFilters = (): React.JSX.Element => {
-	const { stateDefault, dataTableStore } = useDataTable<'permissions'>();
+	const { stateDefault, dataTableStore } = useDataTable<
+		'permissions',
+		PermissionModel
+	>();
 
 	const translationsKeys = useMemo(
 		() => ['permissions.form_filters.label_global'] as const,
@@ -24,7 +31,8 @@ export const DataTablePermissionsFilters = (): React.JSX.Element => {
 	const filters = useStore(
 		dataTableStore,
 		(state) => state.tableState.filters,
-	);
+	) as PermissionDataTableFiltersType;
+
 	const updateTableState = useStore(
 		dataTableStore,
 		(state) => state.updateTableState,

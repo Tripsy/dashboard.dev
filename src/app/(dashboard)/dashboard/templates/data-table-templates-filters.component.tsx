@@ -10,10 +10,13 @@ import {
 	FormFiltersShowDeleted,
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
-import { TemplateTypeEnum } from '@/entities/template.model';
-import { LanguageEnum } from '@/entities/user.model';
+import type { TemplateDataTableFiltersType } from '@/app/(dashboard)/dashboard/templates/templates.definition';
 import { createFilterHandlers } from '@/helpers/data-table.helper';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
+import { useSearchFilter } from '@/hooks/use-search-filter.hook';
+import { useTranslation } from '@/hooks/use-translation.hook';
+import { type TemplateModel, TemplateTypeEnum } from '@/models/template.model';
+import { LanguageEnum } from '@/models/user.model';
 
 const languages = Object.values(LanguageEnum).map((language) => ({
 	label: capitalizeFirstLetter(language),
@@ -26,7 +29,10 @@ const types = Object.values(TemplateTypeEnum).map((v) => ({
 }));
 
 export const DataTableTemplatesFilters = (): React.JSX.Element => {
-	const { stateDefault, dataTableStore } = useDataTable<'templates'>();
+	const { stateDefault, dataTableStore } = useDataTable<
+		'templates',
+		TemplateModel
+	>();
 
 	const translationsKeys = useMemo(
 		() =>
@@ -43,7 +49,8 @@ export const DataTableTemplatesFilters = (): React.JSX.Element => {
 	const filters = useStore(
 		dataTableStore,
 		(state) => state.tableState.filters,
-	);
+	) as TemplateDataTableFiltersType;
+
 	const updateTableState = useStore(
 		dataTableStore,
 		(state) => state.updateTableState,
@@ -59,7 +66,7 @@ export const DataTableTemplatesFilters = (): React.JSX.Element => {
 	);
 
 	const handlers = useMemo(
-		() => createFilterHandlers<'templates'>(updateFilters),
+		() => createFilterHandlers(updateFilters),
 		[updateFilters],
 	);
 

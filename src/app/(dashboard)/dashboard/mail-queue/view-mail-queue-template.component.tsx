@@ -3,14 +3,16 @@ import { useStore } from 'zustand/react';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import { TemplateDetails } from '@/app/(dashboard)/dashboard/templates/template-details.component';
 import { Loading } from '@/components/loading.component';
-import type { TemplateModel } from '@/entities/template.model';
+import { useTranslation } from '@/hooks/use-translation.hook';
+import type { MailQueueModel } from '@/models/mail-queue.model';
+import type { TemplateModel } from '@/models/template.model';
 import { useToast } from '@/providers/toast.provider';
 import { getTemplate } from '@/services/templates.service';
 
 export function ViewMailQueueTemplate() {
 	const { showToast } = useToast();
 
-	const { dataTableStore } = useDataTable<'mail_queue'>();
+	const { dataTableStore } = useDataTable<'mail_queue', MailQueueModel>();
 	const actionEntry = useStore(dataTableStore, (state) => state.actionEntry);
 
 	const translationsKeys = useMemo(

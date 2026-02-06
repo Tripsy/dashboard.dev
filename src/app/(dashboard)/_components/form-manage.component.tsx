@@ -36,10 +36,10 @@ import { useToast } from '@/providers/toast.provider';
 
 export function FormManage<
 	K extends DataSourceKey,
-	Entity,
+	Model,
 	FormValues extends FormStateValuesType,
 >({ children }: { children: React.ReactNode }) {
-	const { dataSource, dataTableStore } = useDataTable<K, Entity>();
+	const { dataSource, dataTableStore } = useDataTable<K, Model>();
 	const { showToast } = useToast();
 
 	const actionName = useStore(dataTableStore, (state) => state.actionName);
@@ -54,7 +54,7 @@ export function FormManage<
 		throw new Error('actionName appears to be null');
 	}
 
-	const formState = getDataSourceConfig<K, Entity, FormValues, 'formState'>(
+	const formState = getDataSourceConfig<K, Model, FormValues, 'formState'>(
 		dataSource,
 		'formState',
 	);
@@ -88,21 +88,21 @@ export function FormManage<
 			? (
 					functions.syncFormState as ValidateSyncFormStateFunctionType<
 						K,
-						Entity,
+						Model,
 						FormValues
 					>
 				)(formState, actionEntry)
 			: formState;
 
 	const [state, action, pending] = useActionState<
-		FormStateType<K, Entity, FormValues>,
+		FormStateType<K, Model, FormValues>,
 		FormData
 	>(
 		async (
-			state: FormStateType<K, Entity, FormValues>,
+			state: FormStateType<K, Model, FormValues>,
 			formData: FormData,
 		) => formAction(state, formData),
-		initState as Awaited<FormStateType<K, Entity, FormValues>>,
+		initState as Awaited<FormStateType<K, Model, FormValues>>,
 	);
 
 	const [formValues, setFormValues] = useFormValues<FormValues>(state.values);

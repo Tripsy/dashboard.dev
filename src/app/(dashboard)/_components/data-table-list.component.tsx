@@ -55,7 +55,7 @@ const CurrentPageReport = (options: PaginatorCurrentPageReportOptions) => {
 	);
 };
 
-export default function DataTableList<Entity extends DataTableValue>(props: {
+export default function DataTableList<Model extends DataTableValue>(props: {
 	dataKey: string;
 	scrollHeight?: string;
 }) {
@@ -70,7 +70,7 @@ export default function DataTableList<Entity extends DataTableValue>(props: {
 	const selectedEntries = useStore(
 		dataTableStore,
 		(state) => state.selectedEntries,
-	) as Entity[];
+	) as Model[];
 	const setSelectedEntries = useStore(
 		dataTableStore,
 		(state) => state.setSelectedEntries,
@@ -82,7 +82,7 @@ export default function DataTableList<Entity extends DataTableValue>(props: {
 	const isLoading = useStore(dataTableStore, (state) => state.isLoading);
 	const setLoading = useStore(dataTableStore, (state) => state.setLoading);
 
-	const [data, setData] = useState<Entity[]>([]);
+	const [data, setData] = useState<Model[]>([]);
 	const [totalRecords, setTotalRecords] = useState(0);
 
 	const translationsKeys = useMemo(
@@ -197,7 +197,7 @@ export default function DataTableList<Entity extends DataTableValue>(props: {
 									) + 1
 								: 1,
 						filter: findFunctionFilter,
-					})) as FindFunctionResponseType<Entity>;
+					})) as FindFunctionResponseType<Model>;
 
 					if (signal?.aborted) {
 						return;
@@ -269,7 +269,7 @@ export default function DataTableList<Entity extends DataTableValue>(props: {
 	);
 
 	const onSelectionChange = useCallback(
-		(event: SelectionChangeEvent<Entity>) => {
+		(event: SelectionChangeEvent<Model>) => {
 			setSelectedEntries(event.value);
 		},
 		[setSelectedEntries],

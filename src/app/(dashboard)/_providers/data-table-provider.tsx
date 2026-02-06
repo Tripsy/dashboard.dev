@@ -17,19 +17,19 @@ import {
 } from '@/config/data-source';
 import { useDebouncedEffect } from '@/hooks/use-debounced-effect.hook';
 
-type DataTableContextType<K extends DataSourceKey, Entity> = {
+type DataTableContextType<K extends DataSourceKey, Model> = {
 	dataSource: K;
 	dataStorageKey: string;
 	selectionMode: DataTableSelectionModeType;
 	stateDefault: DataTableStateType;
-	dataTableStore: DataTableStoreType<K, Entity>;
+	dataTableStore: DataTableStoreType<K, Model>;
 };
 
 const DataTableContext = createContext<
 	DataTableContextType<any, any> | undefined
 >(undefined);
 
-function DataTableProvider<K extends DataSourceKey, Entity>({
+function DataTableProvider<K extends DataSourceKey, Model>({
 	dataSource,
 	selectionMode,
 	dataTableStore,
@@ -37,7 +37,7 @@ function DataTableProvider<K extends DataSourceKey, Entity>({
 }: {
 	dataSource: K;
 	selectionMode: DataTableSelectionModeType;
-	dataTableStore: DataTableStoreType<K, Entity>;
+	dataTableStore: DataTableStoreType<K, Model>;
 	children: ReactNode;
 }) {
 	const dataStorageKey = useMemo(
@@ -51,7 +51,7 @@ function DataTableProvider<K extends DataSourceKey, Entity>({
 		(state) => state.selectedEntries,
 	);
 
-	const prevSelectedEntriesRef = useRef<Entity[]>([]);
+	const prevSelectedEntriesRef = useRef<Model[]>([]);
 
 	useDebouncedEffect(
 		() => {
@@ -95,14 +95,14 @@ function DataTableProvider<K extends DataSourceKey, Entity>({
 	);
 }
 
-function useDataTable<K extends DataSourceKey, Entity>() {
+function useDataTable<K extends DataSourceKey, Model>() {
 	const context = useContext(DataTableContext);
 
 	if (!context) {
 		throw new Error('useDataTable must be used within a DataTableProvider');
 	}
 
-	return context as DataTableContextType<K, Entity>;
+	return context as DataTableContextType<K, Model>;
 }
 
 export { DataTableProvider, useDataTable };

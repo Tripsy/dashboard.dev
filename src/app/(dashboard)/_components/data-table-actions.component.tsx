@@ -5,8 +5,8 @@ import { useStore } from 'zustand/react';
 import { DataTableActionButton } from '@/app/(dashboard)/_components/data-table-action-button.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import { type DataSourceKey, getDataSourceConfig } from '@/config/data-source';
-import { hasPermission } from '@/entities/auth.model';
 import { useTranslation } from '@/hooks/use-translation.hook';
+import { hasPermission } from '@/models/auth.model';
 import { useAuth } from '@/providers/auth.provider';
 import { useToast } from '@/providers/toast.provider';
 
@@ -22,12 +22,12 @@ export const handleReset = (source: string) => {
 
 type ActionKey = 'create' | 'update' | 'delete' | string;
 
-export function DataTableActions<K extends DataSourceKey, Entity>() {
+export function DataTableActions<K extends DataSourceKey, Model>() {
 	const [error, setError] = useState<string | null>(null);
 
 	const { dataSource, selectionMode, dataTableStore } = useDataTable<
 		K,
-		Entity
+		Model
 	>();
 	const { auth } = useAuth();
 	const { showToast } = useToast();
@@ -62,10 +62,10 @@ export function DataTableActions<K extends DataSourceKey, Entity>() {
 
 	const allowAction = useCallback(
 		(
-			entries: Entity[],
+			entries: Model[],
 			permission: string,
 			allowedEntries: 'free' | 'single' | 'multiple',
-			customEntryCheck?: (entry: Entity) => boolean,
+			customEntryCheck?: (entry: Model) => boolean,
 		) => {
 			if (allowedEntries === 'single') {
 				if (entries.length !== 1) {
@@ -88,11 +88,11 @@ export function DataTableActions<K extends DataSourceKey, Entity>() {
 
 	const handleClick = useCallback(
 		(
-			entries: Entity[],
+			entries: Model[],
 			actionName: ActionKey,
 			permission: string,
 			allowedEntries: 'free' | 'single' | 'multiple',
-			customEntryCheck?: (entry: Entity) => boolean,
+			customEntryCheck?: (entry: Model) => boolean,
 		) => {
 			if (
 				!allowAction(
@@ -191,7 +191,7 @@ export function DataTableActions<K extends DataSourceKey, Entity>() {
 			event: CustomEvent<{
 				source: string;
 				actionName: string;
-				entry: Entity;
+				entry: Model;
 			}>,
 		) => {
 			const actionName = event.detail.actionName;
@@ -206,7 +206,7 @@ export function DataTableActions<K extends DataSourceKey, Entity>() {
 			}
 
 			const customCheck = actionProps.customEntryCheck as
-				| ((entry: Entity) => boolean)
+				| ((entry: Model) => boolean)
 				| undefined;
 
 			handleClick(

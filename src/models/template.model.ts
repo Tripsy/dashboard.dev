@@ -1,4 +1,4 @@
-import type { LanguageEnum } from '@/entities/user.model';
+import type { LanguageEnum } from '@/models/user.model';
 
 export enum TemplateTypeEnum {
 	PAGE = 'page',
@@ -38,3 +38,21 @@ export type TemplateModel<D = Date | string> = {
 	updated_at: D;
 	deleted_at: D;
 };
+
+type FormValuesTemplateFormEmail = {
+	label: string;
+	language: LanguageEnum;
+	type: TemplateTypeEnum.EMAIL;
+	content: TemplateContentEmailType;
+};
+
+type FormValuesTemplatePage = {
+	label: string;
+	language: LanguageEnum;
+	type: TemplateTypeEnum.PAGE;
+	content: TemplateContentPageType;
+};
+
+export type TemplateFormValuesType =
+	| FormValuesTemplateFormEmail
+	| FormValuesTemplatePage;

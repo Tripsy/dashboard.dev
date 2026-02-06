@@ -1,6 +1,6 @@
 services:
     node:
-        container_name: nextjs.test
+        container_name: dashboard.test
         ports:
             - "80:80"
         build:

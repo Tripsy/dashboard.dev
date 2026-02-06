@@ -13,8 +13,6 @@ async function handler(request: NextRequest, path: string[]) {
 	const baseUrl = getRemoteApiUrl(path.join('/'));
 	const url = `${baseUrl}${request.nextUrl.search || ''}`;
 
-	console.log(url);
-
 	const headers = {
 		'Content-Type': 'application/json',
 		...(token && { Authorization: `Bearer ${token}` }),

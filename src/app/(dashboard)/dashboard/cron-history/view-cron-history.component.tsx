@@ -8,7 +8,7 @@ import { useTranslation } from '@/hooks/use-translation.hook';
 import type { CronHistoryModel } from '@/models/cron-history.model';
 
 export function ViewCronHistory() {
-	const { dataTableStore } = useDataTable<'cron_history', CronHistoryModel>();
+	const { dataTableStore } = useDataTable<'cron-history', CronHistoryModel>();
 	const actionEntry = useStore(dataTableStore, (state) => state.actionEntry);
 
 	const translationsKeys = useMemo(

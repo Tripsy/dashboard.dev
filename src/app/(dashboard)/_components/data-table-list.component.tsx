@@ -16,7 +16,7 @@ import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import {
 	type FindFunctionResponseType,
 	getDataSourceConfig,
-} from '@/config/data-source';
+} from '@/config/data-source.config';
 import { toDateInstanceCustom } from '@/helpers/date.helper';
 import { replaceVars } from '@/helpers/string.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';

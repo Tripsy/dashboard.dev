@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Icons } from '@/components/icon.component';
-import { translate } from '@/config/lang';
 import RoutesSetup from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
+import { translate } from '@/config/translate.setup';
 import { ApiError } from '@/exceptions/api.error';
 import { ApiRequest } from '@/helpers/api.helper';
 import type { ApiResponseFetch } from '@/types/api.type';

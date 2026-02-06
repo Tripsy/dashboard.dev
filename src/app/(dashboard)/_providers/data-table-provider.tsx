@@ -14,7 +14,7 @@ import {
 	type DataTableSelectionModeType,
 	type DataTableStateType,
 	getDataSourceConfig,
-} from '@/config/data-source';
+} from '@/config/data-source.config';
 import { useDebouncedEffect } from '@/hooks/use-debounced-effect.hook';
 
 type DataTableContextType<K extends DataSourceKey, Model> = {
@@ -26,6 +26,7 @@ type DataTableContextType<K extends DataSourceKey, Model> = {
 };
 
 const DataTableContext = createContext<
+	// biome-ignore lint/suspicious/noExplicitAny: Context is initialized without concrete generics; actual types are provided by the DataTable provider.
 	DataTableContextType<any, any> | undefined
 >(undefined);
 

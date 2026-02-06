@@ -7,8 +7,8 @@ import {
 	type DataTableFiltersType,
 	type FormStateType,
 	registerDataSource,
-} from '@/config/data-source';
-import { translateBatch } from '@/config/lang';
+} from '@/config/data-source.config';
+import { translateBatch } from '@/config/translate.setup';
 import { safeHtml } from '@/helpers/form.helper';
 import { parseJson } from '@/helpers/string.helper';
 import type { ValidationReturnType } from '@/hooks/use-form-validation.hook';

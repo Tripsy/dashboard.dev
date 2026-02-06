@@ -13,7 +13,7 @@ import { Loading } from '@/components/loading.component';
 import { useMounted } from '@/hooks/use-mounted.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
 
-const dataTableStore = createDataTableStore('log_history');
+const dataTableStore = createDataTableStore('log-history');
 
 export const DataTableLogHistory = (): JSX.Element => {
 	const translationsKeys = useMemo(() => ['app.text.loading'] as const, []);
@@ -27,7 +27,7 @@ export const DataTableLogHistory = (): JSX.Element => {
 
 	return (
 		<DataTableProvider
-			dataSource="log_history"
+			dataSource="log-history"
 			selectionMode="multiple"
 			dataTableStore={dataTableStore}
 		>

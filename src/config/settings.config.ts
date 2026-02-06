@@ -27,16 +27,14 @@ function loadSettings(): Settings {
 			)
 				.trim()
 				.split(','),
-			environment: process.env.NODE_ENV || 'development',
-			url: process.env.FRONTEND_URL || 'http://wellawork.test',
-			name: process.env.NEXT_PUBLIC_FRONTEND_APP_NAME,
-			rootPath: process.env.ROOT_PATH || '/var/www/html',
-			srcPath: process.env.SRC_PATH || '/var/www/html/src',
+			environment: process.env.NEXT_PUBLIC_NODE_ENV || 'production',
+			url: process.env.NEXT_PUBLIC_APP_URL,
+			name: process.env.NEXT_PUBLIC_APP_NAME,
 		},
 		security: {
 			allowedOrigins: process.env.ALLOWED_ORIGINS?.split(',').map((v) =>
 				v.trim(),
-			) || ['http://localhost:3000', 'http://nextjs.test'],
+			) || ['http://localhost'],
 		},
 		csrf: {
 			cookieName: 'x-csrf-secret',
@@ -53,7 +51,7 @@ function loadSettings(): Settings {
 			sessionMaxAge: 60 * Number(process.env.SESSION_MAX_AGE || 10800),
 		},
 		remoteApi: {
-			url: process.env.REMOTE_API_URL || '',
+			url: process.env.REMOTE_API_URL,
 		},
 		middleware: {
 			rate_limit_window: Number(process.env.RATE_LIMIT_WINDOW) || 60, // seconds
@@ -66,14 +64,6 @@ function loadSettings(): Settings {
 		},
 		cache: {
 			ttl: process.env.CACHE_TTL || 60,
-		},
-		google: {
-			gtmId: process.env.NEXT_PUBLIC_GOOGLE_GTM_ID || '',
-		},
-		contact: {
-			email:
-				process.env.NEXT_PUBLIC_APP_EMAIL ||
-				'test-team20240828@yopmail.com',
 		},
 	};
 }

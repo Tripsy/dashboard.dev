@@ -10,7 +10,7 @@ import {
 	type DataSourceKey,
 	type DisplayActionEntriesFunctionType,
 	getDataSourceConfig,
-} from '@/config/data-source';
+} from '@/config/data-source.config';
 import { ApiError } from '@/exceptions/api.error';
 import ValueError from '@/exceptions/value.error';
 import { replaceVars } from '@/helpers/string.helper';

@@ -39,7 +39,7 @@ const sources = Object.values(LogHistorySource).map((v) => ({
 
 export const DataTableLogHistoryFilters = (): React.JSX.Element => {
 	const { stateDefault, dataTableStore } = useDataTable<
-		'log_history',
+		'log-history',
 		LogHistoryModel
 	>();
 

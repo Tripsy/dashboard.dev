@@ -12,7 +12,7 @@ import { Loading } from '@/components/loading.component';
 import { useMounted } from '@/hooks/use-mounted.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
 
-const dataTableStore = createDataTableStore('cron_history');
+const dataTableStore = createDataTableStore('cron-history');
 
 export const DataTableCronHistory = (): JSX.Element => {
 	const translationsKeys = useMemo(() => ['app.text.loading'] as const, []);
@@ -26,7 +26,7 @@ export const DataTableCronHistory = (): JSX.Element => {
 
 	return (
 		<DataTableProvider
-			dataSource="cron_history"
+			dataSource="cron-history"
 			selectionMode="multiple"
 			dataTableStore={dataTableStore}
 		>

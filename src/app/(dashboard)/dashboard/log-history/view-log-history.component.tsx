@@ -7,7 +7,7 @@ import { useTranslation } from '@/hooks/use-translation.hook';
 import type { LogHistoryModel } from '@/models/log-history.model';
 
 export function ViewLogHistory() {
-	const { dataTableStore } = useDataTable<'log_history', LogHistoryModel>();
+	const { dataTableStore } = useDataTable<'log-history', LogHistoryModel>();
 	const actionEntry = useStore(dataTableStore, (state) => state.actionEntry);
 
 	const translationsKeys = useMemo(

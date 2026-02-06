@@ -7,7 +7,7 @@ import { useTranslation } from '@/hooks/use-translation.hook';
 import type { MailQueueModel } from '@/models/mail-queue.model';
 
 export function ViewMailQueue() {
-	const { dataTableStore } = useDataTable<'mail_queue', MailQueueModel>();
+	const { dataTableStore } = useDataTable<'mail-queue', MailQueueModel>();
 	const actionEntry = useStore(dataTableStore, (state) => state.actionEntry);
 
 	const translationsKeys = useMemo(

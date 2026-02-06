@@ -5,8 +5,8 @@ import {
 import {
 	type DataTableFiltersType,
 	registerDataSource,
-} from '@/config/data-source';
-import { translateBatch } from '@/config/lang';
+} from '@/config/data-source.config';
+import { translateBatch } from '@/config/translate.setup';
 import { formatDate } from '@/helpers/date.helper';
 import type {
 	MailQueueModel,
@@ -156,4 +156,4 @@ const dataSourceConfigMailQueue = {
 	},
 };
 
-registerDataSource('mail_queue', dataSourceConfigMailQueue);
+registerDataSource('mail-queue', dataSourceConfigMailQueue);

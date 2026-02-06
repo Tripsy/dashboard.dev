@@ -7,9 +7,9 @@ import {
 	type DataTableFiltersType,
 	type FormStateType,
 	registerDataSource,
-} from '@/config/data-source';
-import { translateBatch } from '@/config/lang';
+} from '@/config/data-source.config';
 import { Configuration } from '@/config/settings.config';
+import { translateBatch } from '@/config/translate.setup';
 import {
 	LanguageEnum,
 	type UserFormValuesType,

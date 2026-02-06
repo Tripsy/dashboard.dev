@@ -4,8 +4,8 @@ import {
 	type EmailUpdateSituationType,
 	type EmailUpdateStateType,
 } from '@/app/(public)/account/email-update/email-update.definition';
-import { translate } from '@/config/lang';
 import { Configuration } from '@/config/settings.config';
+import { translate } from '@/config/translate.setup';
 import { ApiError } from '@/exceptions/api.error';
 import { accumulateZodErrors } from '@/helpers/form.helper';
 import { isValidCsrfToken } from '@/helpers/session.helper';

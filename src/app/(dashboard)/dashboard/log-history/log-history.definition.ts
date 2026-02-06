@@ -5,8 +5,8 @@ import {
 import {
 	type DataTableFiltersType,
 	registerDataSource,
-} from '@/config/data-source';
-import { translateBatch } from '@/config/lang';
+} from '@/config/data-source.config';
+import { translateBatch } from '@/config/translate.setup';
 import { toTitleCase } from '@/helpers/string.helper';
 import type {
 	LogHistoryModel,
@@ -166,4 +166,4 @@ const dataSourceConfigLogHistory = {
 	},
 };
 
-registerDataSource('log_history', dataSourceConfigLogHistory);
+registerDataSource('log-history', dataSourceConfigLogHistory);

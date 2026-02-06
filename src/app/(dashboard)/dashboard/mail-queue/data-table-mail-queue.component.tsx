@@ -13,7 +13,7 @@ import { Loading } from '@/components/loading.component';
 import { useMounted } from '@/hooks/use-mounted.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
 
-const dataTableStore = createDataTableStore('mail_queue');
+const dataTableStore = createDataTableStore('mail-queue');
 
 export const DataTableMailQueue = (): JSX.Element => {
 	const translationsKeys = useMemo(() => ['app.text.loading'] as const, []);
@@ -27,7 +27,7 @@ export const DataTableMailQueue = (): JSX.Element => {
 
 	return (
 		<DataTableProvider
-			dataSource="mail_queue"
+			dataSource="mail-queue"
 			selectionMode="multiple"
 			dataTableStore={dataTableStore}
 		>

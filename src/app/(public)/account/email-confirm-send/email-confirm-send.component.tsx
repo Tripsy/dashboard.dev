@@ -33,7 +33,7 @@ export default function EmailConfirmSend() {
 	const [formValues, setFormValues] =
 		useFormValues<EmailConfirmSendFormFieldsType>(state.values);
 
-	const { errors, submitted, setSubmitted, markFieldAsTouched } =
+	const { errors, submitted, markSubmit, markFieldAsTouched } =
 		useFormValidation({
 			formValues: formValues,
 			validate: emailConfirmSendValidate,
@@ -89,11 +89,7 @@ export default function EmailConfirmSend() {
 	}
 
 	return (
-		<form
-			action={action}
-			onSubmit={() => setSubmitted(true)}
-			className="form-section"
-		>
+		<form action={action} onSubmit={markSubmit} className="form-section">
 			<FormCsrf
 				inputName={Configuration.get('csrf.inputName') as string}
 			/>

@@ -7,7 +7,7 @@ import {
 	type DataTableFiltersType,
 	type DataTableStateType,
 	getDataSourceConfig,
-} from '@/config/data-source';
+} from '@/config/data-source.config';
 
 export interface DataTableModalSlice<Model> {
 	isOpen: boolean;

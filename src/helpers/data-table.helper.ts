@@ -1,5 +1,5 @@
 import type { Nullable } from 'primereact/ts-helpers';
-import type { DataTableFiltersType } from '@/config/data-source';
+import type { DataTableFiltersType } from '@/config/data-source.config';
 import { formatDate } from '@/helpers/date.helper';
 
 export type MatchModeType = 'contains' | 'equals' | 'dateAfter' | 'dateBefore';

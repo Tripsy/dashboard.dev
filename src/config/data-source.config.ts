@@ -3,52 +3,6 @@ import type { ValidateFormFunctionType } from '@/hooks/use-form-validation.hook'
 import type { FormSituationType } from '@/types';
 import type { ApiResponseFetch } from '@/types/api.type';
 
-const dataSourceConfig: Record<string, any> = {};
-export type DataSourceKey = keyof typeof dataSourceConfig;
-
-export type BaseModelType = {
-	id: number;
-};
-
-export type DataTableEntryRecordType = Record<string, unknown>;
-
-export type DataTableSelectionModeType = 'checkbox' | 'multiple' | null;
-
-type DataTableBaseFilterType = {
-	value: string | number | boolean | Date | null;
-	matchMode?: 'contains' | 'equals' | 'startsWith' | 'endsWith' | 'gt' | 'lt';
-};
-
-export type DataTableFiltersType = {
-	[key: string]: DataTableBaseFilterType;
-};
-
-export type DataTableStateType = {
-	reloadTrigger: number; // Flag used to reload the data table entries
-	first: number;
-	rows: number;
-	sortField: string;
-	sortOrder: 1 | 0 | -1 | null | undefined;
-	filters: DataTableFiltersType;
-};
-
-export type FormStateValuesType = Record<string, unknown>;
-type EmptyFormValues = Record<never, never>;
-
-export type FormStateType<
-	K extends DataSourceKey,
-	Model,
-	FormValues extends FormStateValuesType,
-> = {
-	dataSource: K;
-	id?: number;
-	values: FormValues;
-	errors: Partial<Record<keyof FormValues, string[]>>;
-	message: string | null;
-	situation: FormSituationType;
-	resultData?: Partial<Model>;
-};
-
 // ============================================================================
 // API Function Types
 // ============================================================================
@@ -89,47 +43,25 @@ export type DeleteFunctionType = (
 ) => Promise<ApiResponseFetch<null>>;
 
 // ============================================================================
-// Action Types
+// Form Types
 // ============================================================================
 
-type DataTableActionType = 'view' | 'create' | 'update' | 'delete';
-type DataTableActionMode = 'form' | 'action' | 'other';
-type DataTableEntryRequirement = 'free' | 'single' | 'multiple';
-type DataTableActionPosition = 'left' | 'right' | 'hidden';
+export type FormStateValuesType = Record<string, unknown>;
+type EmptyFormValues = Record<never, never>;
 
-export type DataTableActionConfigType<Model, Function> = {
-	type?: DataTableActionType;
-	mode: DataTableActionMode;
-	permission: string;
-	allowedEntries: DataTableEntryRequirement;
-	customEntryCheck?: (entry: Model) => boolean;
-	position: DataTableActionPosition;
-	function?: Function;
-	button?: {
-		className: string;
-	};
-};
-
-export type DataTableActionsType<
+export type FormStateType<
+	K extends DataSourceKey,
 	Model,
 	FormValues extends FormStateValuesType,
 > = {
-	[key: string]: DataTableActionConfigType<Model, unknown>;
-} & {
-	create?: DataTableActionConfigType<
-		Model,
-		CreateFunctionType<Model, FormValues>
-	>;
-	update?: DataTableActionConfigType<
-		Model,
-		UpdateFunctionType<Model, FormValues>
-	>;
-	delete?: DataTableActionConfigType<Model, DeleteFunctionType>;
+	dataSource: K;
+	id?: number;
+	values: FormValues;
+	errors: Partial<Record<keyof FormValues, string[]>>;
+	message: string | null;
+	situation: FormSituationType;
+	resultData?: Partial<Model>;
 };
-
-// ============================================================================
-// Form Types
-// ============================================================================
 
 export type FormManageType<FormValues extends FormStateValuesType> = {
 	actionName: 'create' | 'update';
@@ -155,9 +87,94 @@ export type ValidateSyncFormStateFunctionType<
 	model: Entity,
 ) => FormStateType<K, Entity, FormValues>;
 
+// ============================================================================
+// Action Types
+// ============================================================================
+
+type DataTableActionType = 'view' | 'create' | 'update' | 'delete';
+type DataTableActionMode = 'form' | 'action' | 'other';
+type DataTableEntryRequirement = 'free' | 'single' | 'multiple';
+type DataTableActionPosition = 'left' | 'right' | 'hidden';
+
+export type DataTableActionConfigType<Model, Function> = {
+	type?: DataTableActionType;
+	mode: DataTableActionMode;
+	permission: string;
+	allowedEntries: DataTableEntryRequirement;
+	customEntryCheck?: (entry: Model) => boolean;
+	position: DataTableActionPosition;
+	function?: Function;
+	button?: {
+		className: string;
+	};
+};
+
+// ============================================================================
+// Data Table Types
+// ============================================================================
+
+export type DataTableSelectionModeType = 'checkbox' | 'multiple' | null;
+
+type DataTableBaseFilterType = {
+	value: string | number | boolean | Date | null;
+	matchMode?: 'contains' | 'equals' | 'startsWith' | 'endsWith' | 'gt' | 'lt';
+};
+
+export type DataTableFiltersType = {
+	[key: string]: DataTableBaseFilterType;
+};
+
+export type DataTableStateType = {
+	reloadTrigger: number; // Flag used to reload the data table entries
+	first: number;
+	rows: number;
+	sortField: string;
+	sortOrder: 1 | 0 | -1 | null | undefined;
+	filters: DataTableFiltersType;
+};
+
 export type DisplayActionEntriesFunctionType<Entity> = (
 	entries: Entity[],
 ) => Array<{ id: number; label: string }>;
+
+export type DataTableActionsType<
+	Model,
+	FormValues extends FormStateValuesType,
+> = {
+	[key: string]: DataTableActionConfigType<Model, unknown>;
+} & {
+	create?: DataTableActionConfigType<
+		Model,
+		CreateFunctionType<Model, FormValues>
+	>;
+	update?: DataTableActionConfigType<
+		Model,
+		UpdateFunctionType<Model, FormValues>
+	>;
+	delete?: DataTableActionConfigType<Model, DeleteFunctionType>;
+};
+
+// ============================================================================
+// Data Source
+// ============================================================================
+
+export type BaseModelType = {
+	id: number;
+};
+
+export type DataSourceKey =
+	| 'cron-history'
+	| 'log-data'
+	| 'log-history'
+	| 'mail-queue'
+	| 'permissions'
+	| 'templates'
+	| 'users';
+
+const dataSourceConfig: Partial<
+	// biome-ignore lint/suspicious/noExplicitAny: Concrete types are enforced at the public API boundary (register/get),
+	Record<DataSourceKey, DataSourceConfigType<any, any, any>>
+> = {};
 
 export type DataSourceConfigType<
 	K extends DataSourceKey,
@@ -189,8 +206,8 @@ export type DataSourceConfigType<
 export function registerDataSource<
 	K extends DataSourceKey,
 	Entity,
-	FormValues extends FormStateValuesType,
->(key: string, config: DataSourceConfigType<K, Entity, FormValues>) {
+	FormValues extends FormStateValuesType = EmptyFormValues,
+>(key: K, config: DataSourceConfigType<K, Entity, FormValues>) {
 	dataSourceConfig[key] = config;
 }
 
@@ -199,6 +216,12 @@ export function getDataSourceConfig<
 	Entity,
 	FormValues extends FormStateValuesType,
 	P extends keyof DataSourceConfigType<K, Entity, FormValues>,
->(key: string, prop: P): DataSourceConfigType<K, Entity, FormValues>[P] {
-	return dataSourceConfig[key][prop];
+>(key: K, prop: P): DataSourceConfigType<K, Entity, FormValues>[P] {
+	const config = dataSourceConfig[key];
+
+	if (!config) {
+		throw new Error(`DataSource "${key}" is not registered`);
+	}
+
+	return config[prop];
 }

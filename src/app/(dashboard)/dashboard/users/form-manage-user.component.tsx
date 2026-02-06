@@ -6,7 +6,7 @@ import {
 	FormComponentRadio,
 	FormComponentSelect,
 } from '@/components/form/form-element.component';
-import type { FormManageType } from '@/config/data-source';
+import type { FormManageType } from '@/config/data-source.config';
 import {
 	capitalizeFirstLetter,
 	formatEnumLabel,

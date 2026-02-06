@@ -1,7 +1,7 @@
 'use server';
 
-import { translate } from '@/config/lang';
 import { Configuration } from '@/config/settings.config';
+import { translate } from '@/config/translate.setup';
 import { ApiError } from '@/exceptions/api.error';
 import { ApiRequest, getResponseData } from '@/helpers/api.helper';
 import {

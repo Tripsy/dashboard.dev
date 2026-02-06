@@ -23,7 +23,7 @@ import {
 	type FormStateValuesType,
 	getDataSourceConfig,
 	type ValidateSyncFormStateFunctionType,
-} from '@/config/data-source';
+} from '@/config/data-source.config';
 import ValueError from '@/exceptions/value.error';
 import { setObjectValue } from '@/helpers/objects.helper';
 import {
@@ -116,7 +116,7 @@ export function FormManage<
 		[state.id, functions.validateForm],
 	);
 
-	const { errors, submitted, setSubmitted, markFieldAsTouched } =
+	const { errors, submitted, markSubmit, markFieldAsTouched } =
 		useFormValidation<FormValues>({
 			formValues,
 			validate,
@@ -206,7 +206,7 @@ export function FormManage<
 		<form
 			key={`form-${actionName}`}
 			action={action}
-			onSubmit={() => setSubmitted(true)}
+			onSubmit={markSubmit}
 			className="form-section"
 		>
 			{injectedChild}

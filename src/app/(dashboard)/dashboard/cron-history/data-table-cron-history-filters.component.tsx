@@ -27,7 +27,7 @@ const statuses = Object.values(CronHistoryStatusEnum).map((v) => ({
 
 export const DataTableCronHistoryFilters = (): React.JSX.Element => {
 	const { stateDefault, dataTableStore } = useDataTable<
-		'cron_history',
+		'cron-history',
 		CronHistoryModel
 	>();
 

@@ -5,7 +5,7 @@ import type {
 	FindFunctionResponseType,
 	FindFunctionType,
 	UpdateFunctionType,
-} from '@/config/data-source';
+} from '@/config/data-source.config';
 import { ApiRequest, getResponseData } from '@/helpers/api.helper';
 import { buildQueryString } from '@/helpers/string.helper';
 import type { UserFormValuesType, UserModel } from '@/models/user.model';

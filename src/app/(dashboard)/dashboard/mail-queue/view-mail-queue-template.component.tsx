@@ -12,7 +12,7 @@ import { getTemplate } from '@/services/templates.service';
 export function ViewMailQueueTemplate() {
 	const { showToast } = useToast();
 
-	const { dataTableStore } = useDataTable<'mail_queue', MailQueueModel>();
+	const { dataTableStore } = useDataTable<'mail-queue', MailQueueModel>();
 	const actionEntry = useStore(dataTableStore, (state) => state.actionEntry);
 
 	const translationsKeys = useMemo(

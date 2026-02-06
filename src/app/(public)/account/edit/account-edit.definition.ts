@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { translateBatch } from '@/config/lang';
 import { Configuration } from '@/config/settings.config';
+import { translateBatch } from '@/config/translate.setup';
 import { LanguageEnum } from '@/models/user.model';
 import type { FormSituationType } from '@/types';
 

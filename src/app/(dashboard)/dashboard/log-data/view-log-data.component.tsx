@@ -7,7 +7,7 @@ import { useTranslation } from '@/hooks/use-translation.hook';
 import type { LogDataModel } from '@/models/log-data.model';
 
 export function ViewLogData() {
-	const { dataTableStore } = useDataTable<'log_data', LogDataModel>();
+	const { dataTableStore } = useDataTable<'log-data', LogDataModel>();
 	const actionEntry = useStore(dataTableStore, (state) => state.actionEntry);
 
 	const translationsKeys = useMemo(

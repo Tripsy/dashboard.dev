@@ -7,7 +7,7 @@
     3. data-table-cars.component.tsx
     4. form-manage-cars.component.tsx
     5. data-table-cars-filters.component.tsx
-3. Update data-source.ts
+3. Update data-source.config.ts
     - export type DataSourceType = {
     - export const DataSourceConfig: {
 4. Add `cars.json` to `src/locales/[language]` & update src/locales/en/index.ts

@@ -6,8 +6,8 @@ import {
 	getDataSourceConfig,
 	type UpdateFunctionType,
 	type ValidateGetFormValuesFunctionType,
-} from '@/config/data-source';
-import { translate } from '@/config/lang';
+} from '@/config/data-source.config';
+import { translate } from '@/config/translate.setup';
 import { ApiError } from '@/exceptions/api.error';
 import ValueError from '@/exceptions/value.error';
 import { accumulateZodErrors } from '@/helpers/form.helper';

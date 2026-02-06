@@ -11,7 +11,7 @@ import {
 import { FormElementError } from '@/components/form/form-element-error.component';
 import { FormPart } from '@/components/form/form-part.component';
 import { Icons } from '@/components/icon.component';
-import type { FormManageType } from '@/config/data-source';
+import type { FormManageType } from '@/config/data-source.config';
 import { getNestedError } from '@/helpers/form.helper';
 import { capitalizeFirstLetter, toKebabCase } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';

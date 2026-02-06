@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Login from '@/app/(public)/account/login/login.component';
-import { translate } from '@/config/lang';
 import { Configuration } from '@/config/settings.config';
+import { translate } from '@/config/translate.setup';
 
 export async function generateMetadata(): Promise<Metadata> {
 	return {

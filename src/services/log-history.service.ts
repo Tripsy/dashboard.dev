@@ -3,7 +3,7 @@ import type {
 	FindFunctionParamsType,
 	FindFunctionResponseType,
 	FindFunctionType,
-} from '@/config/data-source';
+} from '@/config/data-source.config';
 import { ApiRequest, getResponseData } from '@/helpers/api.helper';
 import { buildQueryString } from '@/helpers/string.helper';
 import type { LogHistoryModel } from '@/models/log-history.model';

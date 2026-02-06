@@ -27,7 +27,7 @@ const statuses = Object.values(MailQueueStatusEnum).map((v) => ({
 
 export const DataTableMailQueueFilters = (): React.JSX.Element => {
 	const { stateDefault, dataTableStore } = useDataTable<
-		'mail_queue',
+		'mail-queue',
 		MailQueueModel
 	>();
 

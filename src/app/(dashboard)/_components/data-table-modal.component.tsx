@@ -12,7 +12,7 @@ import {
 	type BaseModelType,
 	type DataSourceKey,
 	getDataSourceConfig,
-} from '@/config/data-source';
+} from '@/config/data-source.config';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { useToast } from '@/providers/toast.provider';
 

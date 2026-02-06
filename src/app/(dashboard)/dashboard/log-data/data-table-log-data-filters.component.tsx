@@ -33,7 +33,7 @@ const logCategories = Object.values(LogCategoryEnum).map((v) => ({
 
 export const DataTableLogDataFilters = (): React.JSX.Element => {
 	const { stateDefault, dataTableStore } = useDataTable<
-		'log_data',
+		'log-data',
 		LogDataModel
 	>();
 

@@ -4,7 +4,10 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useStore } from 'zustand/react';
 import { DataTableActionButton } from '@/app/(dashboard)/_components/data-table-action-button.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
-import { type DataSourceKey, getDataSourceConfig } from '@/config/data-source';
+import {
+	type DataSourceKey,
+	getDataSourceConfig,
+} from '@/config/data-source.config';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { hasPermission } from '@/models/auth.model';
 import { useAuth } from '@/providers/auth.provider';

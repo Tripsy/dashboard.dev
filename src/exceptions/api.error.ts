@@ -7,11 +7,12 @@ export class ApiError<T = unknown> extends Error {
 		public body?: ApiResponseFetch<T>,
 	) {
 		super(body?.message || message);
+
 		this.name = 'ApiError';
 		this.status = status;
 		this.body = body;
 
-		// Maintain proper stack trace
+		// Maintain a proper stack trace
 		if (Error.captureStackTrace) {
 			Error.captureStackTrace(this, ApiError);
 		}

@@ -51,14 +51,95 @@ export type OnChangeType = (
 export type FormComponentProps = {
 	labelText: string;
 	id: string;
+	fieldType?: 'text' | 'password' | 'email' | 'number';
 	fieldName: string;
 	fieldValue: string;
 	className?: string;
 	placeholderText?: string;
 	disabled: boolean;
-	autoComplete?: 'current-password' | 'new-password' | 'name' | 'email';
+	autoComplete?:
+		| 'current-password'
+		| 'new-password'
+		| 'name'
+		| 'email'
+		| 'organization';
 	onChange: OnChangeType;
 	error?: string[];
+};
+
+export const FormComponentInput = ({
+	labelText,
+	id,
+	fieldType = 'text',
+	fieldName,
+	fieldValue,
+	className = 'p-inputtext-sm w-full',
+	placeholderText,
+	disabled,
+	autoComplete,
+	onChange,
+	error,
+}: FormComponentProps) => (
+	<FormPart>
+		<FormElement labelText={labelText} labelFor={id}>
+			<div>
+				<InputText
+					type={fieldType}
+					id={id}
+					name={fieldName}
+					value={fieldValue}
+					className={className}
+					placeholder={placeholderText}
+					autoComplete={autoComplete}
+					disabled={disabled}
+					aria-invalid={!!error}
+					onChange={onChange}
+				/>
+				<FormElementError messages={error} />
+			</div>
+		</FormElement>
+	</FormPart>
+);
+
+export const FormComponentAutoComplete = ({
+	labelText,
+	id,
+	fieldType = 'text',
+	fieldName,
+	fieldValue,
+	className = 'p-inputtext-sm w-full',
+	placeholderText,
+	disabled,
+	onChange,
+	error,
+	suggestions = [],
+	completeMethod,
+}: FormComponentProps & {
+	suggestions: string[];
+	completeMethod: (event: AutoCompleteCompleteEvent) => void;
+}) => {
+	return (
+		<FormPart>
+			<FormElement labelText={labelText} labelFor={id}>
+				<div>
+					<AutoComplete
+						type={fieldType}
+						id={id}
+						name={fieldName}
+						value={fieldValue}
+						suggestions={suggestions}
+						completeMethod={completeMethod}
+						onChange={onChange}
+						className={className}
+						placeholder={placeholderText}
+						disabled={disabled}
+						dropdown
+					/>
+					<FormElementError messages={error} />
+				</div>
+			</FormElement>
+		</FormPart>
+	);
 };
 
 export const FormComponentSelect = ({
@@ -143,77 +224,6 @@ export const FormComponentRadio = ({
 	</FormPart>
 );
 
-export const FormComponentInput = ({
-	labelText,
-	id,
-	fieldName,
-	fieldValue,
-	className = 'p-inputtext-sm w-full',
-	placeholderText,
-	disabled,
-	autoComplete,
-	onChange,
-	error,
-}: FormComponentProps) => (
-	<FormPart>
-		<FormElement labelText={labelText} labelFor={id}>
-			<div>
-				<InputText
-					id={id}
-					name={fieldName}
-					value={fieldValue}
-					className={className}
-					placeholder={placeholderText}
-					autoComplete={autoComplete}
-					disabled={disabled}
-					invalid={!!error}
-					onChange={onChange}
-				/>
-				<FormElementError messages={error} />
-			</div>
-		</FormElement>
-	</FormPart>
-);
-
-export const FormComponentAutoComplete = ({
-	labelText,
-	id,
-	fieldName,
-	fieldValue,
-	className = 'p-inputtext-sm w-full',
-	placeholderText,
-	disabled,
-	onChange,
-	error,
-	suggestions = [],
-	completeMethod,
-}: FormComponentProps & {
-	suggestions: string[];
-	completeMethod: (event: AutoCompleteCompleteEvent) => void;
-}) => {
-	return (
-		<FormPart>
-			<FormElement labelText={labelText} labelFor={id}>
-				<div>
-					<AutoComplete
-						id={id}
-						name={fieldName}
-						value={fieldValue}
-						suggestions={suggestions}
-						completeMethod={completeMethod}
-						onChange={onChange}
-						className={className}
-						placeholder={placeholderText}
-						disabled={disabled}
-						dropdown
-					/>
-					<FormElementError messages={error} />
-				</div>
-			</FormElement>
-		</FormPart>
-	);
-};
-
 export const FormComponentSubmit = ({
 	pending,
 	submitted,
@@ -263,6 +273,39 @@ export const FormComponentSubmit = ({
 		</FormPart>
 	);
 };
+
+export const FormComponentTextarea = ({
+	labelText,
+	id,
+	fieldName,
+	fieldValue,
+	className = 'resize-none',
+	placeholderText,
+	disabled,
+	autoComplete,
+	onChange,
+	error,
+}: FormComponentProps) => (
+	<FormPart>
+		<FormElement labelText={labelText} labelFor={id}>
+			<div>
+				<textarea
+					id={id}
+					name={fieldName}
+					value={fieldValue}
+					className={className}
+					placeholder={placeholderText}
+					autoComplete={autoComplete}
+					disabled={disabled}
+					aria-invalid={!!error}
+					onChange={onChange}
+					rows={6}
+				/>
+				<FormElementError messages={error} />
+			</div>
+		</FormElement>
+	</FormPart>
+);
 
 export const FormComponentName = ({
 	labelText,

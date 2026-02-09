@@ -4,7 +4,7 @@ import { Checkbox } from 'primereact/checkbox';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useStore } from 'zustand/react';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
-import { Loading } from '@/components/loading.component';
+import { LoadingComponent } from '@/components/status.component';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import type { PermissionModel } from '@/models/permission.model';
 import type { UserModel } from '@/models/user.model';
@@ -228,7 +228,7 @@ export function SetupPermissionsUser() {
 
 	if (loading) {
 		return (
-			<Loading
+			<LoadingComponent
 				text={translations['app.text.loading']}
 				className="min-h-64 flex items-center justify-center"
 			/>

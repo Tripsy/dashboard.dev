@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useActionState, useEffect, useMemo, useState } from 'react';
+import React, { useActionState, useEffect, useMemo, useState } from 'react';
 import {
 	loginAction,
 	loginValidate,
@@ -11,10 +11,6 @@ import {
 	type LoginFormFieldsType,
 	LoginState,
 } from '@/app/(public)/account/login/login.definition';
-import {
-	ErrorIcon,
-	ErrorWrapperComponent,
-} from '@/components/error-wrapper.component';
 import { FormCsrf } from '@/components/form/form-csrf';
 import {
 	FormComponentEmail,
@@ -22,9 +18,9 @@ import {
 	FormComponentSubmit,
 } from '@/components/form/form-element.component';
 import { FormError } from '@/components/form/form-error.component';
-import { FormPart } from '@/components/form/form-part.component';
 import { FormWrapperComponent } from '@/components/form/form-wrapper';
 import { Icons } from '@/components/icon.component';
+import { ErrorComponent, ErrorIcon } from '@/components/status.component';
 import Routes, { isExcludedRoute } from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
 import { formatDate } from '@/helpers/date.helper';
@@ -108,25 +104,25 @@ export default function Login() {
 	const elementIds = useElementIds(['email', 'password']);
 
 	if (state?.situation === 'csrf_error') {
-		return <ErrorWrapperComponent description={state.message as string} />;
+		throw new Error(state.message as string);
 	}
 
 	if (state?.situation === 'pending_account') {
 		return (
-			<ErrorWrapperComponent description={state.message as string}>
-				<div className="text-center mt-2">
-					<span className="text-sm text-gray-500 dark:text-base-content">
+			<ErrorComponent title="Login" description={state.message as string}>
+				<div className="text-center mt-6">
+					<span className="text-muted-foreground">
 						Have you confirmed your email? If you’ve lost the
 						instructions, you can resend the{' '}
 					</span>
 					<Link
 						href={Routes.get('email-confirm-send')}
-						className="link link-info link-hover text-sm"
+						className="text-primary font-medium hover:underline"
 					>
 						confirmation email
 					</Link>
 				</div>
-			</ErrorWrapperComponent>
+			</ErrorComponent>
 		);
 	}
 
@@ -140,9 +136,7 @@ export default function Login() {
 				onSubmit={markSubmit}
 				className="form-section"
 			>
-				<FormCsrf
-					inputName={Configuration.get('csrf.inputName') as string}
-				/>
+				<FormCsrf />
 
 				<FormComponentEmail
 					labelText="Email Address"
@@ -156,6 +150,7 @@ export default function Login() {
 				<FormComponentPassword
 					labelText="Password"
 					id={elementIds.password}
+					fieldName="password"
 					fieldValue={formValues.password ?? ''}
 					autoComplete="current-password"
 					disabled={pending}
@@ -183,60 +178,52 @@ export default function Login() {
 
 				{state?.situation === 'max_active_sessions' &&
 					state.message && (
-						<FormPart>
-							<div className="space-y-4">
-								<div className="text-error text-sm">
-									<Icons.Status.Error /> {state.message}
-								</div>
-
-								<AuthTokenList
-									tokens={state.body?.authValidTokens || []}
-									callbackAction={(success, message) => {
-										showToast({
-											severity: success
-												? 'success'
-												: 'error',
-											summary: success
-												? 'Success'
-												: 'Error',
-											detail:
-												message ===
-												'session_destroy_success'
-													? translations[
-															'login.message.session_destroy_success'
-														]
-													: translations[
-															`login.message.session_destroy_error`
-														],
-										});
-									}}
-								/>
+						<div className="space-y-4">
+							<div className="text-error text-sm">
+								<ErrorIcon /> {state.message}
 							</div>
-						</FormPart>
+
+							<AuthTokenList
+								tokens={state.body?.authValidTokens || []}
+								callbackAction={(success, message) => {
+									showToast({
+										severity: success ? 'success' : 'error',
+										summary: success ? 'Success' : 'Error',
+										detail:
+											message ===
+											'session_destroy_success'
+												? translations[
+														'login.message.session_destroy_success'
+													]
+												: translations[
+														`login.message.session_destroy_error`
+													],
+									});
+								}}
+							/>
+						</div>
 					)}
 
-				<FormPart className="text-center">
-					<div className="space-y-2">
-						<p className="text-sm text-muted-foreground">
-							Don't have an account?{' '}
-							<Link
-								href={Routes.get('register')}
-								className="text-primary font-medium hover:underline"
-							>
-								Create an account
-							</Link>
-						</p>
-						<p className="text-sm text-muted-foreground">
-							Forgot your password?{' '}
-							<Link
-								href={Routes.get('password-recover')}
-								className="text-primary font-medium hover:underline"
-							>
-								Reset it here
-							</Link>
-						</p>
-					</div>
-				</FormPart>
+				<div className="text-center space-y-2">
+					<p className="text-sm text-muted-foreground">
+						Don't have an account?{' '}
+						<Link
+							href={Routes.get('register')}
+							className="text-primary font-medium hover:underline"
+						>
+							Create an account
+						</Link>
+					</p>
+					<p className="text-sm text-muted-foreground">
+						Forgot your password?{' '}
+						<Link
+							href={Routes.get('password-recover')}
+							className="text-primary font-medium hover:underline"
+						>
+							Reset it here
+						</Link>
+					</p>
+				</div>
 			</form>
 		</FormWrapperComponent>
 	);

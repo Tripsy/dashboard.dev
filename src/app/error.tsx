@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect } from 'react';
-import { ErrorWrapperComponent } from '@/components/error-wrapper.component';
+import { ErrorComponent } from '@/components/status.component';
 import { Button } from '@/components/ui/button';
 import Routes from '@/config/routes.setup';
 
@@ -18,7 +18,7 @@ export default function ErrorBoundary({
 	}, [error]);
 
 	return (
-		<ErrorWrapperComponent description={error.message}>
+		<ErrorComponent description={error.message}>
 			<div className="mt-8 text-center">
 				<Button onClick={() => reset()}>Try Again</Button> or go back to
 				the{' '}
@@ -26,6 +26,6 @@ export default function ErrorBoundary({
 					home page
 				</Link>
 			</div>
-		</ErrorWrapperComponent>
+		</ErrorComponent>
 	);
 }

@@ -1,24 +1,17 @@
-import { faGithub, faLinkedin } from '@fortawesome/free-brands-svg-icons';
 import {
 	faArrowRightToBracket,
 	faArrowsRotate,
 	faBan,
-	faBars,
 	faCalendar,
 	faCircleCheck,
-	faCircleExclamation,
 	faCircleInfo,
 	faCircleXmark,
 	faClock,
-	faEnvelope,
 	faEnvelopeCircleCheck,
 	faEye,
-	faEyeSlash,
 	faFileContract,
-	faKey,
 	faLock,
 	faMagnifyingGlass,
-	faMoon,
 	faPenToSquare,
 	faPlay,
 	faPlugCircleXmark,
@@ -26,20 +19,25 @@ import {
 	faRotateLeft,
 	faScrewdriverWrench,
 	faShield,
-	faSpinner,
-	faSun,
 	faTag,
 	faThumbsUp,
 	faTrashCan,
 	faTriangleExclamation,
-	faUser,
 } from '@fortawesome/free-solid-svg-icons';
 import {
 	FontAwesomeIcon,
 	type FontAwesomeIconProps,
 } from '@fortawesome/react-fontawesome';
+import {
+	CircleX,
+	Eye,
+	EyeOff,
+	KeyRound,
+	Loader,
+	Mail,
+	UserRound,
+} from 'lucide-react';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
-import {Mail} from "lucide-react";
 
 export function AwesomeIcon({
 	className = 'fa-md', // ex: fa-lg, fa-2xl, fa-sm
@@ -49,49 +47,18 @@ export function AwesomeIcon({
 }
 
 type IconsProps = {
-	className: string;
+	className?: string;
 	props?: Record<string, string>;
 };
 
 export const Icons = {
-	Design: {
-		SideMenuOpen: (props: Partial<FontAwesomeIconProps>) => (
-			<AwesomeIcon icon={faBars} {...props} />
-		),
-		SideMenuClosed: (props: Partial<FontAwesomeIconProps>) => (
-			<AwesomeIcon icon={faBars} {...props} />
-		),
-		ThemeLight: (props: Partial<FontAwesomeIconProps>) => (
-			<AwesomeIcon icon={faSun} {...props} />
-		),
-		ThemeDark: (props: Partial<FontAwesomeIconProps>) => (
-			<AwesomeIcon icon={faMoon} {...props} />
-		),
-		Github: (props: Partial<FontAwesomeIconProps>) => (
-			<AwesomeIcon icon={faGithub} {...props} />
-		),
-		Linkedin: (props: Partial<FontAwesomeIconProps>) => (
-			<AwesomeIcon icon={faLinkedin} {...props} />
-		),
-	},
-	Loading: (props: Partial<FontAwesomeIconProps>) => (
-		<AwesomeIcon icon={faSpinner} {...props} />
-	),
-	Email: (props: IconsProps) => (
-		<Mail {...props} />
-	),
-	Password: (props: Partial<FontAwesomeIconProps>) => (
-		<AwesomeIcon icon={faKey} {...props} />
-	),
+	Email: (props: IconsProps) => <Mail {...props} />,
+	Password: (props: IconsProps) => <KeyRound {...props} />,
 	Search: (props: Partial<FontAwesomeIconProps>) => (
 		<AwesomeIcon icon={faMagnifyingGlass} {...props} />
 	),
-	Visible: (props: Partial<FontAwesomeIconProps>) => (
-		<AwesomeIcon icon={faEye} {...props} />
-	),
-	Obscured: (props: Partial<FontAwesomeIconProps>) => (
-		<AwesomeIcon icon={faEyeSlash} {...props} />
-	),
+	Visible: (props: IconsProps) => <Eye {...props} />,
+	Obscured: (props: IconsProps) => <EyeOff {...props} />,
 	Tag: (props: Partial<FontAwesomeIconProps>) => (
 		<AwesomeIcon icon={faTag} {...props} />
 	),
@@ -126,9 +93,7 @@ export const Icons = {
 		Ok: (props: Partial<FontAwesomeIconProps>) => (
 			<AwesomeIcon icon={faThumbsUp} {...props} />
 		),
-		Error: (props: Partial<FontAwesomeIconProps>) => (
-			<AwesomeIcon icon={faCircleExclamation} {...props} />
-		),
+		Error: (props: IconsProps) => <CircleX {...props} />,
 		Warning: (props: Partial<FontAwesomeIconProps>) => (
 			<AwesomeIcon icon={faTriangleExclamation} {...props} />
 		),
@@ -138,6 +103,7 @@ export const Icons = {
 		Success: (props: Partial<FontAwesomeIconProps>) => (
 			<AwesomeIcon icon={faCircleCheck} {...props} />
 		),
+		Loading: (props: IconsProps) => <Loader {...props} />,
 	},
 	Action: {
 		Login: (props: Partial<FontAwesomeIconProps>) => (
@@ -181,9 +147,7 @@ export const Icons = {
 		),
 	},
 	Entity: {
-		User: (props: Partial<FontAwesomeIconProps>) => (
-			<AwesomeIcon icon={faUser} {...props} />
-		),
+		User: (props: IconsProps) => <UserRound {...props} />,
 	},
 };
 

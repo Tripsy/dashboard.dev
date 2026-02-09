@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { AuthTokenList } from '@/app/(public)/account/login/login.component';
 import { Icons } from '@/components/icon.component';
-import { Loading } from '@/components/loading.component';
+import { LoadingComponent } from '@/components/status.component';
 import Routes from '@/config/routes.setup';
 import { formatDate } from '@/helpers/date.helper';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
@@ -84,7 +84,7 @@ export default function AccountMe() {
 	}, [searchParams, showToast, isTranslationLoading, translations, router]);
 
 	if (authStatus === 'loading') {
-		return <Loading text="Loading..." />;
+		return <LoadingComponent text="Loading..." />;
 	}
 
 	if (!auth) {

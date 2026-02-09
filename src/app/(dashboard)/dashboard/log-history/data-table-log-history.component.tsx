@@ -9,7 +9,7 @@ import { createDataTableStore } from '@/app/(dashboard)/_stores/model.store';
 import { DataTableLogHistoryFilters } from '@/app/(dashboard)/dashboard/log-history/data-table-log-history-filters.component';
 import { ViewLogHistory } from '@/app/(dashboard)/dashboard/log-history/view-log-history.component';
 import { ViewLogHistoryUser } from '@/app/(dashboard)/dashboard/log-history/view-log-history-user.component';
-import { Loading } from '@/components/loading.component';
+import { LoadingComponent } from '@/components/status.component';
 import { useMounted } from '@/hooks/use-mounted.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
 
@@ -22,7 +22,7 @@ export const DataTableLogHistory = (): JSX.Element => {
 	const isMounted = useMounted();
 
 	if (!isMounted) {
-		return <Loading text={translations['app.text.loading']} />;
+		return <LoadingComponent text={translations['app.text.loading']} />;
 	}
 
 	return (

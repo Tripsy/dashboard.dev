@@ -10,7 +10,7 @@ import { DataTableUsersFilters } from '@/app/(dashboard)/dashboard/users/data-ta
 import { FormManageUser } from '@/app/(dashboard)/dashboard/users/form-manage-user.component';
 import { SetupPermissionsUser } from '@/app/(dashboard)/dashboard/users/setup-permissions-user.component';
 import { ViewUser } from '@/app/(dashboard)/dashboard/users/view-user.component';
-import { Loading } from '@/components/loading.component';
+import { LoadingComponent } from '@/components/status.component';
 import { useMounted } from '@/hooks/use-mounted.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
 
@@ -23,7 +23,7 @@ export const DataTableUsers = (): JSX.Element => {
 	const isMounted = useMounted();
 
 	if (!isMounted) {
-		return <Loading text={translations['app.text.loading']} />;
+		return <LoadingComponent text={translations['app.text.loading']} />;
 	}
 
 	return (

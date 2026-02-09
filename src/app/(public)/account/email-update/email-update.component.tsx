@@ -19,7 +19,7 @@ import {
 import { FormError } from '@/components/form/form-error.component';
 import { FormPart } from '@/components/form/form-part.component';
 import { Icons } from '@/components/icon.component';
-import { Loading } from '@/components/loading.component';
+import { LoadingComponent } from '@/components/status.component';
 import Routes from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
@@ -65,7 +65,7 @@ export default function EmailUpdate() {
 	const elementIds = useElementIds(['emailNew']);
 
 	if (authStatus === 'loading') {
-		return <Loading text="Loading..." />;
+		return <LoadingComponent text="Loading..." />;
 	}
 
 	if (!auth) {
@@ -103,9 +103,7 @@ export default function EmailUpdate() {
 
 	return (
 		<form action={action} onSubmit={markSubmit} className="form-section">
-			<FormCsrf
-				inputName={Configuration.get('csrf.inputName') as string}
-			/>
+			<FormCsrf />
 
 			<h1 className="text-center">My Account - Email update</h1>
 

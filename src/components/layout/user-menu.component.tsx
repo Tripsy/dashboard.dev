@@ -10,7 +10,7 @@ import {
 	UserX,
 } from 'lucide-react';
 import Link from 'next/link';
-import { LoadingIcon } from '@/components/loading.component';
+import { LoadingIcon } from '@/components/status.component';
 import { Button } from '@/components/ui/button';
 import {
 	DropdownMenu,

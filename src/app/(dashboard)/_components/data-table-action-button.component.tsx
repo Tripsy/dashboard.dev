@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { getActionIcon, Icons } from '@/components/icon.component';
+import { LoadingIcon } from '@/components/status.component';
 import type { DataSourceKey } from '@/config/data-source.config';
 import { useTranslation } from '@/hooks/use-translation.hook';
 
@@ -38,7 +39,7 @@ export function DataTableActionButton<K extends DataSourceKey>({
 		>
 			{disabled ? (
 				<>
-					<Icons.Loading className="animate-spin" />
+					<LoadingIcon />
 					{translations['app.text.please_wait']}
 				</>
 			) : (

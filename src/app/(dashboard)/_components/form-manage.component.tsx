@@ -16,6 +16,7 @@ import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import { FormError } from '@/components/form/form-error.component';
 import { FormPart } from '@/components/form/form-part.component';
 import { getActionIcon, Icons } from '@/components/icon.component';
+import { LoadingIcon } from '@/components/status.component';
 import {
 	type DataSourceKey,
 	type FormManageType,
@@ -224,7 +225,7 @@ export function FormManage<
 					>
 						{pending ? (
 							<span className="flex items-center gap-1.5">
-								<Icons.Loading className="animate-spin" />
+								<LoadingIcon />
 								{translations['app.text.saving']}
 							</span>
 						) : submitted && Object.keys(errors).length > 0 ? (

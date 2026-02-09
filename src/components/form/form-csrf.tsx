@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Configuration } from '@/config/settings.config';
 import { ApiRequest } from '@/helpers/api.helper';
 
 async function fetchCsrfToken() {
@@ -22,7 +23,7 @@ async function fetchCsrfToken() {
 	}
 }
 
-export function FormCsrf({ inputName }: { inputName: string }) {
+export function FormCsrf({ inputName }: { inputName?: string }) {
 	const [csrfToken, setCsrfToken] = useState('');
 
 	useEffect(() => {
@@ -33,5 +34,11 @@ export function FormCsrf({ inputName }: { inputName: string }) {
 		})();
 	}, []);
 
-	return <input type="hidden" name={inputName} value={csrfToken} />;
+	return (
+		<input
+			type="hidden"
+			name={inputName ?? (Configuration.get('csrf.inputName') as string)}
+			value={csrfToken}
+		/>
+	);
 }

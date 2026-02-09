@@ -9,7 +9,7 @@ import { createDataTableStore } from '@/app/(dashboard)/_stores/model.store';
 import { DataTableTemplatesFilters } from '@/app/(dashboard)/dashboard/templates/data-table-templates-filters.component';
 import { FormManageTemplate } from '@/app/(dashboard)/dashboard/templates/form-manage-template.component';
 import { ViewTemplate } from '@/app/(dashboard)/dashboard/templates/view-template.component';
-import { Loading } from '@/components/loading.component';
+import { LoadingComponent } from '@/components/status.component';
 import { useMounted } from '@/hooks/use-mounted.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
 
@@ -22,7 +22,7 @@ export const DataTableTemplates = (): JSX.Element => {
 	const isMounted = useMounted();
 
 	if (!isMounted) {
-		return <Loading text={translations['app.text.loading']} />;
+		return <LoadingComponent text={translations['app.text.loading']} />;
 	}
 
 	return (

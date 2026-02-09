@@ -1,5 +1,5 @@
-import clsx from 'clsx';
 import type { JSX } from 'react';
+import { cn } from '@/helpers/css.helper';
 
 export const FormElementError = ({
 	messages,
@@ -9,7 +9,7 @@ export const FormElementError = ({
 	className?: string;
 }): JSX.Element | null =>
 	messages?.length ? (
-		<div className={clsx('form-element-error', className)}>
+		<div className={cn('form-element-error', className)}>
 			{messages.length === 1 ? (
 				messages[0]
 			) : (

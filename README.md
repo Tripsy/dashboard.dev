@@ -106,7 +106,7 @@ $ pnpm run madge
 │   │   ├── form/    # Form related components
 │   │   ├── icon.component.tsx
 │   │   ├── footer.default.tsx
-│   │   ├── loading.component.tsx
+│   │   ├── status.component.tsx
         ???
 │   ├── config/            # Configuration files
 │   │   ├── data-source.config.ts # (dashboard) data source configuration

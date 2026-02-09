@@ -3,8 +3,10 @@
 import { usePathname, useRouter } from 'next/navigation';
 import type React from 'react';
 import { useEffect, useMemo } from 'react';
-import { Loading } from '@/components/loading.component';
-import { Notice } from '@/components/notice.component';
+import {
+	ErrorComponent,
+	LoadingComponent,
+} from '@/components/status.component';
 import Routes, { RouteAuth } from '@/config/routes.setup';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { hasPermission } from '@/models/auth.model';
@@ -40,7 +42,7 @@ export default function ProtectedRoute({
 	const router = useRouter();
 	const pathname = usePathname();
 
-	// Redirect to the login page if not authenticated and route is protected or authenticated
+	// Redirect to the login page if not authenticated, and route is protected or authenticated
 	useEffect(() => {
 		if (
 			[RouteAuth.AUTHENTICATED, RouteAuth.PROTECTED].includes(
@@ -84,7 +86,7 @@ export default function ProtectedRoute({
 
 	// Loading
 	if (isTranslationLoading) {
-		return <Loading text={translations['app.text.loading']} />;
+		return <LoadingComponent text={translations['app.text.loading']} />;
 	}
 
 	// Is a public route so return content
@@ -94,7 +96,7 @@ export default function ProtectedRoute({
 
 	// Loading
 	if (authStatus === 'loading') {
-		return <Loading text={translations['app.text.loading']} />;
+		return <LoadingComponent text={translations['app.text.loading']} />;
 	}
 
 	if (
@@ -103,12 +105,11 @@ export default function ProtectedRoute({
 	) {
 		return (
 			<ProtectedRouteWrapper className={className}>
-				<Notice
-					type="warning"
-					message={translations['auth.message.already_logged_in']}
+				<ErrorComponent
+					description={translations['auth.message.already_logged_in']}
 				>
 					{fallback}
-				</Notice>
+				</ErrorComponent>
 			</ProtectedRouteWrapper>
 		);
 	}
@@ -117,12 +118,11 @@ export default function ProtectedRoute({
 	if (routeAuth === RouteAuth.PROTECTED && !hasPermission(auth, permission)) {
 		return (
 			<ProtectedRouteWrapper className={className}>
-				<Notice
-					type="warning"
-					message={translations['auth.message.unauthorized']}
+				<ErrorComponent
+					description={translations['auth.message.unauthorized']}
 				>
 					{fallback}
-				</Notice>
+				</ErrorComponent>
 			</ProtectedRouteWrapper>
 		);
 	}

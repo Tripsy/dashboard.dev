@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useStore } from 'zustand/react';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import { UserDetails } from '@/app/(dashboard)/dashboard/users/user-details.component';
-import { Loading } from '@/components/loading.component';
+import { LoadingComponent } from '@/components/status.component';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import type { LogHistoryModel } from '@/models/log-history.model';
 import type { UserModel } from '@/models/user.model';
@@ -66,7 +66,7 @@ export function ViewLogHistoryUser() {
 
 	if (loading) {
 		return (
-			<Loading
+			<LoadingComponent
 				text={translations['app.text.loading']}
 				className="min-h-64 flex items-center justify-center"
 			/>

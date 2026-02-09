@@ -48,7 +48,7 @@ export function Footer() {
 			<div className="container-custom py-12 md:py-16">
 				<div className="flex flex-col md:flex-row gap-12 md:gap-20">
 					{/* Brand column */}
-					<div className="flex flex-col mx-auto md:mx-0">
+					<div className="flex flex-col mx-auto md:mx-0 items-center text-center md:items-start md:text-left">
 						<Link
 							href={Routes.get('home')}
 							className="flex items-center gap-2 mb-4"

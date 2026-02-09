@@ -120,7 +120,7 @@ export const RegisterSchema = z
 		language: z.enum(LanguageEnum, {
 			message: translations['register.validation.language_invalid'],
 		}),
-		terms: z.literal(true).refine((val) => val === true, {
+		terms: z.boolean().refine((val) => val === true, {
 			message: translations['register.validation.terms_required'],
 		}),
 	})

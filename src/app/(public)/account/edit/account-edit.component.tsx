@@ -19,7 +19,7 @@ import {
 } from '@/components/form/form-element.component';
 import { FormError } from '@/components/form/form-error.component';
 import { Icons } from '@/components/icon.component';
-import { Loading } from '@/components/loading.component';
+import { LoadingComponent } from '@/components/status.component';
 import Routes from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
@@ -85,7 +85,7 @@ export default function AccountEdit() {
 	const elementIds = useElementIds(['name', 'language']);
 
 	if (authStatus === 'loading') {
-		return <Loading text="Loading..." />;
+		return <LoadingComponent text="Loading..." />;
 	}
 
 	if (!auth) {
@@ -123,9 +123,7 @@ export default function AccountEdit() {
 
 	return (
 		<form action={action} onSubmit={markSubmit} className="form-section">
-			<FormCsrf
-				inputName={Configuration.get('csrf.inputName') as string}
-			/>
+			<FormCsrf />
 			<h1 className="text-center">My Account - Edit</h1>
 			<FormComponentName
 				labelText="Name"

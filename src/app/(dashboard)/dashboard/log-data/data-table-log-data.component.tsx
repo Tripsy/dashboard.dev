@@ -8,7 +8,7 @@ import { DataTableProvider } from '@/app/(dashboard)/_providers/data-table-provi
 import { createDataTableStore } from '@/app/(dashboard)/_stores/model.store';
 import { DataTableLogDataFilters } from '@/app/(dashboard)/dashboard/log-data/data-table-log-data-filters.component';
 import { ViewLogData } from '@/app/(dashboard)/dashboard/log-data/view-log-data.component';
-import { Loading } from '@/components/loading.component';
+import { LoadingComponent } from '@/components/status.component';
 import { useMounted } from '@/hooks/use-mounted.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
 
@@ -21,7 +21,7 @@ export const DataTableLogData = (): JSX.Element => {
 	const isMounted = useMounted();
 
 	if (!isMounted) {
-		return <Loading text={translations['app.text.loading']} />;
+		return <LoadingComponent text={translations['app.text.loading']} />;
 	}
 
 	return (

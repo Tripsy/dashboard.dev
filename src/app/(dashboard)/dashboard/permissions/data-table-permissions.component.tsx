@@ -8,7 +8,7 @@ import { DataTableProvider } from '@/app/(dashboard)/_providers/data-table-provi
 import { createDataTableStore } from '@/app/(dashboard)/_stores/model.store';
 import { DataTablePermissionsFilters } from '@/app/(dashboard)/dashboard/permissions/data-table-permissions-filters.component';
 import { FormManagePermission } from '@/app/(dashboard)/dashboard/permissions/form-manage-permission.component';
-import { Loading } from '@/components/loading.component';
+import { LoadingComponent } from '@/components/status.component';
 import { useMounted } from '@/hooks/use-mounted.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
 
@@ -21,7 +21,7 @@ export const DataTablePermissions = (): JSX.Element => {
 	const isMounted = useMounted();
 
 	if (!isMounted) {
-		return <Loading text={translations['app.text.loading']} />;
+		return <LoadingComponent text={translations['app.text.loading']} />;
 	}
 
 	return (

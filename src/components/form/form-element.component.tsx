@@ -1,46 +1,60 @@
-import { AlertCircle, AlertTriangle, CheckCircle } from 'lucide-react';
 import {
 	AutoComplete,
 	type AutoCompleteCompleteEvent,
 } from 'primereact/autocomplete';
-import { Dropdown, type DropdownChangeEvent } from 'primereact/dropdown';
-import { IconField } from 'primereact/iconfield';
-import { InputIcon } from 'primereact/inputicon';
+import type { DropdownChangeEvent } from 'primereact/dropdown';
 import React, { type JSX, useMemo } from 'react';
 import { FormElementError } from '@/components/form/form-element-error.component';
-import { FormPart } from '@/components/form/form-part.component';
 import { Icons } from '@/components/icon.component';
+import { LoadingIcon } from '@/components/status.component';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { cn } from '@/helpers/css.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
-import {cn} from "@/helpers/css.helper";
 
 export const FormElement = ({
 	children,
 	className,
-	labelText,
-	labelFor,
-	isRequired = false,
+	label,
+	error,
 }: {
 	children: JSX.Element;
 	className?: string;
-	labelText?: string;
-	labelFor?: string;
-	isRequired?: boolean;
+	label?: { text: string; for?: string; required?: boolean };
+	error?: string[];
 }): JSX.Element | null => (
 	<div className={cn('form-element', className)}>
-		{labelText &&
-			(labelFor ? (
-				<Label htmlFor={labelFor}>
-					{labelText}
-					{isRequired && <span className="text-error ml-1">*</span>}
+		{label &&
+			(label.for ? (
+				<Label htmlFor={label.for}>
+					{label.text}
+					{label.required && (
+						<span className="text-error ml-1">*</span>
+					)}
 				</Label>
 			) : (
-				<div className="label-placeholder">{labelText}</div>
+				<div className="label-placeholder">
+					{label.text}
+					{label.required && (
+						<span className="text-error ml-1">*</span>
+					)}
+				</div>
 			))}
-		{children}
+		<div>
+			{children}
+			<FormElementError messages={error} />
+		</div>
 	</div>
 );
 
@@ -51,9 +65,7 @@ export const FormElementWrapper = ({
 	children: JSX.Element;
 	className?: string;
 }): JSX.Element | null => (
-	<div className={cn('form-element-wrapper', className)}>
-		{children}
-	</div>
+	<div className={cn('form-element-wrapper', className)}>{children}</div>
 );
 
 export const FormElementIcon = ({
@@ -65,10 +77,51 @@ export const FormElementIcon = ({
 	className?: string;
 	position?: 'left' | 'right';
 }): JSX.Element | null => (
-	<div className={cn('form-element-icon', position === 'left' ? 'left-2' : 'right-2', className)}>
+	<div
+		className={cn(
+			'form-element-icon',
+			position === 'left'
+				? 'form-element-icon-left'
+				: 'form-element-icon-right',
+			className,
+		)}
+	>
 		{children}
 	</div>
 );
+
+const stateConfig = {
+	default: {
+		borderClass: '',
+	},
+	success: {
+		borderClass: 'border-success focus-visible:ring-success',
+	},
+	error: {
+		borderClass: 'border-error focus-visible:ring-error',
+	},
+	warning: {
+		borderClass: 'border-warning focus-visible:ring-warning',
+	},
+};
+
+const useFieldState = ({
+	value,
+	error,
+}: {
+	value?: string | number | boolean;
+	error?: string[];
+}) => {
+	if (error?.length) {
+		return stateConfig.error;
+	}
+
+	if (value) {
+		return stateConfig.success;
+	}
+
+	return stateConfig.default;
+};
 
 export type OptionsType = {
 	label: string;
@@ -83,32 +136,9 @@ export type OnChangeType = (
 		  >,
 ) => void;
 
-const stateConfig = {
-	default: {
-		borderClass: '',
-		icon: null,
-		iconClass: '',
-	},
-	success: {
-		borderClass: 'border-success focus-visible:ring-success',
-		icon: CheckCircle,
-		iconClass: 'text-success',
-	},
-	error: {
-		borderClass: 'border-error focus-visible:ring-error',
-		icon: AlertCircle,
-		iconClass: 'text-error',
-	},
-	warning: {
-		borderClass: 'border-warning focus-visible:ring-warning',
-		icon: AlertTriangle,
-		iconClass: 'text-warning',
-	},
-};
-
 export type FormComponentProps = {
-	labelText: string;
 	id: string;
+	labelText: string;
 	fieldType?: 'text' | 'password' | 'email' | 'number';
 	fieldName: string;
 	fieldValue: string;
@@ -124,6 +154,7 @@ export type FormComponentProps = {
 		| 'organization';
 	onChange: OnChangeType;
 	error?: string[];
+	icons?: { left?: JSX.Element; right?: JSX.Element };
 };
 
 /** Standard form elements **/
@@ -141,75 +172,44 @@ export const FormComponentInput = ({
 	autoComplete,
 	onChange,
 	error,
-}: FormComponentProps) => (
-	<FormPart>
-		<FormElement
-			labelText={labelText}
-			labelFor={id}
-			isRequired={isRequired}
-		>
-			<div>
-				<Input
-					type={fieldType}
-					id={id}
-					name={fieldName}
-					value={fieldValue}
-					className={className}
-					placeholder={placeholderText}
-					autoComplete={autoComplete}
-					disabled={disabled}
-					aria-invalid={!!error}
-					onChange={onChange}
-				/>
-				<FormElementError messages={error} />
-			</div>
-		</FormElement>
-	</FormPart>
-);
+	icons,
+}: FormComponentProps) => {
+	const { borderClass } = useFieldState({ value: fieldValue, error });
 
-export const FormComponentAutoComplete = ({
-	labelText,
-	id,
-	fieldType = 'text',
-	fieldName,
-	fieldValue,
-	isRequired = false,
-	className,
-	placeholderText,
-	disabled,
-	onChange,
-	error,
-	suggestions = [],
-	completeMethod,
-}: FormComponentProps & {
-	suggestions: string[];
-	completeMethod: (event: AutoCompleteCompleteEvent) => void;
-}) => {
 	return (
-		<FormPart>
-			<FormElement
-				labelText={labelText}
-				labelFor={id}
-				isRequired={isRequired}
-			>
-				<div>
-					<AutoComplete
+		<FormElement
+			label={{ for: id, text: labelText, required: isRequired }}
+			error={error}
+		>
+			<FormElementWrapper>
+				<>
+					{icons?.left && (
+						<FormElementIcon position="left">
+							{icons.left}
+						</FormElementIcon>
+					)}
+
+					<Input
 						type={fieldType}
 						id={id}
 						name={fieldName}
 						value={fieldValue}
-						suggestions={suggestions}
-						completeMethod={completeMethod}
-						onChange={onChange}
-						className={className}
+						className={cn(borderClass, className)}
 						placeholder={placeholderText}
+						autoComplete={autoComplete}
 						disabled={disabled}
-						dropdown
+						aria-invalid={!!error}
+						onChange={onChange}
 					/>
-					<FormElementError messages={error} />
-				</div>
-			</FormElement>
-		</FormPart>
+
+					{icons?.right && (
+						<FormElementIcon position="right">
+							{icons.right}
+						</FormElementIcon>
+					)}
+				</>
+			</FormElementWrapper>
+		</FormElement>
 	);
 };
 
@@ -220,123 +220,218 @@ export const FormComponentSelect = ({
 	fieldValue,
 	isRequired = false,
 	className,
-	panelStyle = { fontSize: '0.875rem' },
 	placeholderText = '-select-',
 	disabled,
-	onChange,
 	error,
 	options,
-}: FormComponentProps & {
-	panelStyle?: React.CSSProperties;
+	onValueChange,
+}: Omit<FormComponentProps, 'autoComplete' | 'icons' | 'onChange'> & {
 	options: OptionsType;
-}) => (
-	<FormPart>
+	onValueChange: (value: string) => void;
+}) => {
+	const { borderClass } = useFieldState({ value: fieldValue, error });
+
+	return (
 		<FormElement
-			labelText={labelText}
-			labelFor={id}
-			isRequired={isRequired}
+			label={{ for: id, text: labelText, required: isRequired }}
+			error={error}
 		>
-			<div>
+			<>
 				<input type="hidden" name={fieldName} value={fieldValue} />
-				<Dropdown
-					inputId={id}
-					className={className}
-					panelStyle={panelStyle}
-					placeholder={placeholderText}
-					disabled={disabled}
+
+				<Select
 					value={fieldValue}
-					options={options}
-					onChange={onChange}
+					onValueChange={onValueChange}
+					disabled={disabled}
+				>
+					<SelectTrigger id={id}>
+						<SelectValue placeholder={placeholderText} />
+					</SelectTrigger>
+					<SelectContent className={cn(borderClass, className)}>
+						{options.map(({ label, value }) => {
+							return (
+								<SelectItem value={value}>{label}</SelectItem>
+							);
+						})}
+					</SelectContent>
+				</Select>
+			</>
+		</FormElement>
+	);
+};
+
+export const FormComponentCheckbox = ({
+	children,
+	id,
+	fieldName,
+	checked,
+	className,
+	disabled,
+	error,
+	onCheckedChange,
+}: Omit<
+	FormComponentProps,
+	| 'labelText'
+	| 'fieldType'
+	| 'fieldValue'
+	| 'isRequired'
+	| 'placeholderText'
+	| 'autoComplete'
+	| 'icons'
+	| 'onChange'
+> & {
+	checked: boolean;
+	onCheckedChange: (checked: boolean) => void;
+	children: JSX.Element;
+}) => {
+	const { borderClass } = useFieldState({ value: checked, error });
+
+	return (
+		<FormElement error={error}>
+			<div className="flex items-center space-x-2">
+				<Checkbox
+					id={id}
+					name={fieldName}
+					disabled={disabled}
+					aria-invalid={!!error}
+					checked={checked}
+					onCheckedChange={onCheckedChange}
+					className={cn(borderClass, className)}
 				/>
-				<FormElementError messages={error} />
+				{children}
 			</div>
 		</FormElement>
-	</FormPart>
-);
+	);
+};
 
 export const FormComponentRadio = ({
 	labelText,
 	id,
 	fieldName,
 	fieldValue,
+	isRequired,
+	className = 'flex flex-wrap gap-4',
 	disabled,
-	onChange,
 	error,
 	options,
-}: FormComponentProps & {
+	onValueChange,
+}: Omit<
+	FormComponentProps,
+	'fieldType' | 'onChange' | 'placeholderText' | 'autoComplete' | 'icons'
+> & {
 	options: OptionsType;
+	onValueChange: (value: string) => void;
 }) => (
-	<FormPart>
-		<FormElement labelText={labelText}>
-			<div>
-				<div className="flex flex-wrap gap-4">
-					{options.map(({ label, value }) => (
-						<div key={value} className="flex items-center gap-1.5">
-							<input
-								type="radio"
-								id={`${id}-${value}`}
-								name={fieldName}
-								value={value}
-								className={cn('radio', {
-									'radio-error': error,
-									'radio-info': !error,
-								})}
-								disabled={disabled}
-								checked={fieldValue === value}
-								onChange={onChange}
-							/>
-							<label
-								htmlFor={`${id}-${value}`}
-								className="text-sm font-normal cursor-pointer"
+	<FormElement
+		label={{ text: labelText, required: isRequired }}
+		error={error}
+	>
+		<>
+			<input type="hidden" name={fieldName} value={fieldValue} />
+
+			<RadioGroup
+				value={fieldValue}
+				onValueChange={onValueChange}
+				className={className}
+				disabled={disabled}
+			>
+				{options.map(({ label, value }) => {
+					const key = `${id}-${value}`;
+
+					return (
+						<div key={key} className="flex items-center space-x-2">
+							<RadioGroupItem value={value} id={key} />
+							<Label
+								htmlFor={key}
+								className="font-normal cursor-pointer"
 							>
 								{label}
-							</label>
+							</Label>
 						</div>
-					))}
-				</div>
-				<FormElementError messages={error} />
-			</div>
-		</FormElement>
-	</FormPart>
+					);
+				})}
+			</RadioGroup>
+		</>
+	</FormElement>
 );
 
-export const FormComponentTextarea = ({
-	labelText,
-	id,
-	fieldName,
-	fieldValue,
-	isRequired = false,
-	className = 'resize-none',
-	placeholderText,
-	disabled,
-	autoComplete,
-	onChange,
-	error,
-}: FormComponentProps) => (
-	<FormPart>
-		<FormElement
-			labelText={labelText}
-			labelFor={id}
-			isRequired={isRequired}
-		>
-			<div>
-				<Textarea
-					id={id}
-					name={fieldName}
-					value={fieldValue}
-					className={className}
-					placeholder={placeholderText}
-					autoComplete={autoComplete}
-					disabled={disabled}
-					aria-invalid={!!error}
-					onChange={onChange}
-					rows={6}
-				/>
-				<FormElementError messages={error} />
-			</div>
-		</FormElement>
-	</FormPart>
-);
+// export const FormComponentTextarea = ({
+// 	labelText,
+// 	id,
+// 	fieldName,
+// 	fieldValue,
+// 	isRequired = false,
+// 	className = 'resize-none',
+// 	placeholderText,
+// 	disabled,
+// 	autoComplete,
+// 	onChange,
+// 	error,
+// }: FormComponentProps) => {
+// 	const { borderClass } = useFieldState({ value: fieldValue, error });
+//
+// 	return (
+// 		<FormElement
+// 			label={{ for: id, text: labelText, required: isRequired }}
+// 			error={error}
+// 		>
+// 			<Textarea
+// 				id={id}
+// 				name={fieldName}
+// 				value={fieldValue}
+// 				className={cn(borderClass, className)}
+// 				placeholder={placeholderText}
+// 				autoComplete={autoComplete}
+// 				disabled={disabled}
+// 				aria-invalid={!!error}
+// 				onChange={onChange}
+// 				rows={6}
+// 			/>
+// 		</FormElement>
+// 	);
+// };
+//
+// export const FormComponentAutoComplete = ({
+// 	labelText,
+// 	id,
+// 	fieldType = 'text',
+// 	fieldName,
+// 	fieldValue,
+// 	isRequired = false,
+// 	className,
+// 	placeholderText,
+// 	disabled,
+// 	onChange,
+// 	error,
+// 	suggestions = [],
+// 	completeMethod,
+// }: FormComponentProps & {
+// 	suggestions: string[];
+// 	completeMethod: (event: AutoCompleteCompleteEvent) => void;
+// }) => {
+// 	const { borderClass } = useFieldState({ value: fieldValue, error });
+//
+// 	return (
+// 		<FormElement
+// 			label={{ for: id, text: labelText, required: isRequired }}
+// 			error={error}
+// 		>
+// 			<AutoComplete
+// 				type={fieldType}
+// 				id={id}
+// 				name={fieldName}
+// 				value={fieldValue}
+// 				suggestions={suggestions}
+// 				completeMethod={completeMethod}
+// 				onChange={onChange}
+// 				className={cn(borderClass, className)}
+// 				placeholder={placeholderText}
+// 				disabled={disabled}
+// 				dropdown
+// 			/>
+// 		</FormElement>
+// 	);
+// };
 
 /** Common form elements **/
 
@@ -361,185 +456,98 @@ export const FormComponentSubmit = ({
 	const { translations } = useTranslation(translationsKeys);
 
 	return (
-		<FormPart>
-			<Button
-				type="submit"
-				className="w-full h-11"
-				disabled={
-					pending || (submitted && Object.keys(errors).length > 0)
-				}
-				aria-busy={pending}
-			>
-				{pending ? (
-					<span className="flex items-center gap-1.5">
-						<Icons.Loading className="animate-spin" />
-						{translations['app.text.please_wait']}
-					</span>
-				) : submitted && Object.keys(errors).length > 0 ? (
-					<span className="flex items-center gap-1.5">
-						<Icons.Status.Error className="animate-pulse" />
-						{buttonLabel}
-					</span>
-				) : (
-					<span className="flex items-center gap-1.5">
-						{buttonIcon} {buttonLabel}
-					</span>
-				)}
-			</Button>
-		</FormPart>
+		<Button
+			type="submit"
+			className="w-full h-11"
+			disabled={pending || (submitted && Object.keys(errors).length > 0)}
+			aria-busy={pending}
+		>
+			{pending ? (
+				<span className="flex items-center gap-1.5">
+					<LoadingIcon />
+					{translations['app.text.please_wait']}
+				</span>
+			) : submitted && Object.keys(errors).length > 0 ? (
+				<span className="flex items-center gap-1.5">
+					<Icons.Status.Error className="animate-pulse" />
+					{buttonLabel}
+				</span>
+			) : (
+				<span className="flex items-center gap-1.5">
+					{buttonIcon} {buttonLabel}
+				</span>
+			)}
+		</Button>
 	);
 };
 
-export const FormComponentName = ({
-	labelText,
-	id,
-	fieldName = 'name',
-	fieldValue,
-	isRequired = true,
-	className,
-	placeholderText = 'eg: John Doe',
-	autoComplete = 'name',
-	disabled,
-	onChange,
-	error,
-}: Omit<FormComponentProps, 'fieldName'> & { fieldName?: string }) => (
-	<FormPart>
-		<FormElement
-			labelText={labelText}
-			labelFor={id}
-			isRequired={isRequired}
-		>
-			<div>
-				<IconField iconPosition="left">
-					<InputIcon className="flex items-center">
-						<Icons.Entity.User className="opacity-60" />
-					</InputIcon>
-					<Input
-						className={className}
-						id={id}
-						name={fieldName}
-						placeholder={placeholderText}
-						autoComplete={autoComplete}
-						disabled={disabled}
-						aria-invalid={!!error}
-						value={fieldValue}
-						onChange={onChange}
-					/>
-				</IconField>
-				<FormElementError messages={error} />
-			</div>
-		</FormElement>
-	</FormPart>
+export const FormComponentName = (
+	props: Omit<
+		FormComponentProps,
+		'fieldName' | 'fieldType' | 'autoComplete' | 'icons'
+	>,
+) => (
+	<FormComponentInput
+		{...props}
+		fieldName="name"
+		isRequired={props.isRequired ?? true}
+		className={cn('pl-8', props.className)}
+		autoComplete="name"
+		placeholderText="eg: John Doe"
+		icons={{
+			left: <Icons.Entity.User className="opacity-40 h-4.5 w-4.5" />,
+		}}
+	/>
 );
 
-export const FormComponentEmail = ({
-	labelText,
-	id,
-	fieldName = 'email',
-	fieldValue,
-	isRequired = true,
-	className,
-	placeholderText = 'eg: example@domain.com',
-	autoComplete = 'email',
-	disabled,
-	onChange,
-	error,
-}: Omit<FormComponentProps, 'fieldName'> & { fieldName?: string }) => (
-	<FormPart>
-		<FormElement
-			labelText={labelText}
-			labelFor={id}
-			isRequired={isRequired}
-		>
-			<>
-				<FormElementWrapper>
-					<>
-						<FormElementIcon position="left">
-							<Icons.Email className="opacity-40 h-5 w-5" />
-						</FormElementIcon>
-						<Input
-							className={cn('pl-8', className)}
-							id={id}
-							name={fieldName}
-							placeholder={placeholderText}
-							autoComplete={autoComplete}
-							disabled={disabled}
-							aria-invalid={!!error}
-							value={fieldValue}
-							onChange={onChange}
-						/>
-					</>
-				</FormElementWrapper>
-				<FormElementError messages={error} />
-			</>
-		</FormElement>
-	</FormPart>
+export const FormComponentEmail = (
+	props: Omit<
+		FormComponentProps,
+		'fieldName' | 'fieldType' | 'autoComplete' | 'icons'
+	>,
+) => (
+	<FormComponentInput
+		{...props}
+		fieldName="email"
+		isRequired={props.isRequired ?? true}
+		className={cn('pl-8', props.className)}
+		autoComplete="email"
+		placeholderText="eg: example@domain.com"
+		icons={{ left: <Icons.Email className="opacity-40 h-4.5 w-4.5" /> }}
+	/>
 );
 
 export const FormComponentPassword = ({
-	labelText = 'Password',
-	id,
-	fieldName = 'password',
-	fieldValue,
-	isRequired = true,
-	className,
-	placeholderText = 'Password',
-	autoComplete = 'new-password',
-	disabled,
-	onChange,
-	error,
 	showPassword,
 	setShowPassword,
-}: Omit<FormComponentProps, 'fieldName' | 'autoComplete'> & {
-	fieldName?: string;
-	autoComplete?: 'current-password' | 'new-password';
+	...props
+}: FormComponentProps & {
 	showPassword: boolean;
 	setShowPassword?: (showPassword: boolean) => void;
 }) => (
-	<FormPart>
-		<FormElement
-			labelText={labelText}
-			labelFor={id}
-			isRequired={isRequired}
-		>
-			<>
-				<FormElementWrapper>
-					<>
-						<FormElementIcon position="left">
-							<Icons.Password className="opacity-40 h-5 w-5" />
-						</FormElementIcon>
-						<Input
-							className={cn('pl-8', className)}
-							id={id}
-							name={fieldName}
-							type={showPassword ? 'text' : 'password'}
-							placeholder={placeholderText}
-							autoComplete={autoComplete}
-							disabled={disabled}
-							aria-invalid={!!error}
-							value={fieldValue}
-							onChange={onChange}
-						/>
-						{setShowPassword && (
-							<button
-								type="button"
-								className="absolute right-3 top-3 focus:outline-none hover:opacity-100 transition-opacity"
-								onClick={() => setShowPassword(!showPassword)}
-								aria-label={
-									showPassword ? 'Hide password' : 'Show password'
-								}
-							>
-								{showPassword ? (
-									<Icons.Obscured className="opacity-60 hover:opacity-100 w-4 h-4" />
-								) : (
-									<Icons.Visible className="opacity-60 hover:opacity-100 w-4 h-4" />
-								)}
-							</button>
-						)}
-					</>
-				</FormElementWrapper>
-				<FormElementError messages={error} />
-			</>
-		</FormElement>
-	</FormPart>
+	<FormComponentInput
+		{...props}
+		fieldType={showPassword ? 'text' : 'password'}
+		fieldName={props.fieldName ?? 'password'}
+		isRequired={props.isRequired ?? true}
+		className={cn('px-8', props.className)}
+		autoComplete={props.autoComplete ?? 'new-password'}
+		placeholderText={props.placeholderText ?? 'Password'}
+		icons={{
+			left: <Icons.Password className="opacity-40 h-4.5 w-4.5" />,
+			right: setShowPassword && (
+				<button
+					type="button"
+					onClick={() => setShowPassword(!showPassword)}
+					className="focus:outline-none hover:opacity-100 transition-opacity"
+				>
+					{showPassword ? (
+						<Icons.Obscured className="opacity-60 hover:opacity-100 h-4.5 w-4.5" />
+					) : (
+						<Icons.Visible className="opacity-60 hover:opacity-100 h-4.5 w-4.5" />
+					)}
+				</button>
+			),
+		}}
+	/>
 );

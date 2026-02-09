@@ -237,20 +237,35 @@
 		@apply flex flex-col gap-6;
 	}
 
-	.form-section .form-part .form-element {
+	.form-section .form-element {
 		@apply w-full relative flex flex-col gap-3 h-full;
 	}
 
-	.form-section .form-part .form-element .form-element-wrapper {
+	.form-section .form-element .form-element-wrapper {
 		@apply relative;
 	}
 
-	.form-section .form-part .form-element .form-element-wrapper .form-element-icon {
-		@apply absolute top-1/2 right-2 transform -translate-y-1/2 z-10;
+	.form-section .form-element .form-element-wrapper .form-element-icon {
+		@apply absolute top-1/2 transform -translate-y-1/2;
 	}
 
-	.form-section .form-part .form-element label,
-	.form-section .form-part .form-element .label-placeholder {
+	.form-section
+		.form-element
+		.form-element-wrapper
+		.form-element-icon.form-element-icon-left {
+		@apply left-2;
+	}
+
+	.form-section
+		.form-element
+		.form-element-wrapper
+		.form-element-icon.form-element-icon-right {
+		@apply right-2;
+		top: 55%;
+	}
+
+	.form-section .form-element label,
+	.form-section .form-element .label-placeholder {
 		@apply text-sm font-semibold;
 	}
 
@@ -326,7 +341,7 @@
 	@keyframes gradient-shift {
 		0%,
 		100% {
-			background-position: 0% center;
+			background-position: 0 center;
 		}
 		50% {
 			background-position: 100% center;

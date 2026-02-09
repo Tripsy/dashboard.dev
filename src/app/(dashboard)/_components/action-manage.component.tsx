@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { useStore } from 'zustand/react';
 import { DataTableActionButton } from '@/app/(dashboard)/_components/data-table-action-button.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
-import { Loading } from '@/components/loading.component';
+import { LoadingComponent } from '@/components/status.component';
 import {
 	type BaseModelType,
 	type DataSourceKey,
@@ -84,7 +84,7 @@ export function ActionManage<
 	}
 
 	if (isTranslationLoading) {
-		return <Loading text={translations['app.text.loading']} />;
+		return <LoadingComponent text={translations['app.text.loading']} />;
 	}
 
 	const actions = getDataSourceConfig(dataSource, 'actions');

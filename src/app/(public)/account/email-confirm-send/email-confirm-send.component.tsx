@@ -90,9 +90,7 @@ export default function EmailConfirmSend() {
 
 	return (
 		<form action={action} onSubmit={markSubmit} className="form-section">
-			<FormCsrf
-				inputName={Configuration.get('csrf.inputName') as string}
-			/>
+			<FormCsrf />
 
 			<h1 className="text-center">Email Confirmation Send</h1>
 

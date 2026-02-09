@@ -24,7 +24,7 @@ import { FormElementError as RawFormElementError } from '@/components/form/form-
 import { FormError } from '@/components/form/form-error.component';
 import { FormPart } from '@/components/form/form-part.component';
 import { Icons } from '@/components/icon.component';
-import RoutesSetup from '@/config/routes.setup';
+import Routes from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
@@ -101,7 +101,7 @@ export default function Register() {
 						instructions, you can resend the{' '}
 					</span>
 					<Link
-						href={RoutesSetup.get('email-confirm-send')}
+						href={Routes.get('email-confirm-send')}
 						className="link link-info link-hover text-sm"
 					>
 						confirmation email
@@ -134,7 +134,7 @@ export default function Register() {
 					<span className="text-sm text-gray-500 dark:text-base-content">
 						Meanwhile you can go back to{' '}
 						<Link
-							href={RoutesSetup.get('home')}
+							href={Routes.get('home')}
 							className="link link-info link-hover text-sm"
 						>
 							home page
@@ -232,7 +232,7 @@ export default function Register() {
 								I agree with&nbsp;
 							</span>
 							<Link
-								href={RoutesSetup.get('page', {
+								href={Routes.get('page', {
 									label: 'terms-and-conditions',
 								})}
 								className="link link-info link-hover text-sm"
@@ -266,7 +266,7 @@ export default function Register() {
 						Already registered?{' '}
 					</span>
 					<Link
-						href={RoutesSetup.get('login')}
+						href={Routes.get('login')}
 						className="link link-info link-hover text-sm"
 					>
 						Sign in here

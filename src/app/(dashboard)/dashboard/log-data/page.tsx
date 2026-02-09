@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import NavBreadcrumbSetter from '@/app/(dashboard)/_components/nav-breadcrumb.setter';
 import type { BreadcrumbType } from '@/app/(dashboard)/_providers/breadcrumb.provider';
 import { DataTableLogData } from '@/app/(dashboard)/dashboard/log-data/data-table-log-data.component';
-import RoutesSetup from '@/config/routes.setup';
+import Routes from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
 import { translate } from '@/config/translate.setup';
 
@@ -17,7 +17,7 @@ export default async function Page() {
 	const items: BreadcrumbType[] = [
 		{
 			label: await translate('dashboard.labels.dashboard'),
-			href: RoutesSetup.get('dashboard'),
+			href: Routes.get('dashboard'),
 		},
 		{ label: await translate('dashboard.labels.log_data') },
 	];

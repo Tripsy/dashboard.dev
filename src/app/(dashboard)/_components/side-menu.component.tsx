@@ -14,7 +14,7 @@ import {
 import Link from 'next/link';
 import React, { useLayoutEffect, useMemo, useState } from 'react';
 import { AwesomeIcon } from '@/components/icon.component';
-import RoutesSetup from '@/config/routes.setup';
+import Routes from '@/config/routes.setup';
 import { useDebouncedEffect } from '@/hooks/use-debounced-effect.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { hasPermission } from '@/models/auth.model';
@@ -145,7 +145,7 @@ export function SideMenu() {
 				title: translations['dashboard.labels.settings'],
 				items: [
 					{
-						href: RoutesSetup.get('template'),
+						href: Routes.get('template'),
 						label: translations['dashboard.labels.templates'],
 						icon: faFileLines,
 						permission: hasPermission(auth, 'template.find'),
@@ -157,25 +157,25 @@ export function SideMenu() {
 				title: translations['dashboard.labels.logs'],
 				items: [
 					{
-						href: RoutesSetup.get('log-data'),
+						href: Routes.get('log-data'),
 						label: translations['dashboard.labels.log_data'],
 						icon: faDatabase,
 						permission: hasPermission(auth, 'log_data.find'),
 					},
 					{
-						href: RoutesSetup.get('log-history'),
+						href: Routes.get('log-history'),
 						label: translations['dashboard.labels.log_history'],
 						icon: faFileWaveform,
 						permission: hasPermission(auth, 'log_history.find'),
 					},
 					{
-						href: RoutesSetup.get('cron-history'),
+						href: Routes.get('cron-history'),
 						label: translations['dashboard.labels.cron_history'],
 						icon: faFileContract,
 						permission: hasPermission(auth, 'cron_history.find'),
 					},
 					{
-						href: RoutesSetup.get('mail-queue'),
+						href: Routes.get('mail-queue'),
 						label: translations['dashboard.labels.mail_queue'],
 						icon: faEnvelopesBulk,
 						permission: hasPermission(auth, 'mail_queue.find'),
@@ -188,13 +188,13 @@ export function SideMenu() {
 				defaultOpen: true,
 				items: [
 					{
-						href: RoutesSetup.get('user'),
+						href: Routes.get('user'),
 						label: translations['dashboard.labels.users'],
 						icon: faUserGroup,
 						permission: hasPermission(auth, 'user.find'),
 					},
 					{
-						href: RoutesSetup.get('permission'),
+						href: Routes.get('permission'),
 						label: translations['dashboard.labels.permissions'],
 						icon: faUserLock,
 						permission: hasPermission(auth, 'permission.find'),

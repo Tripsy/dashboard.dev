@@ -64,18 +64,6 @@
 			"label": "View details"
 		}
 	},
-	"text": {
-		"menu_link_login_anchor": "Login",
-		"menu_link_login_title": "Sign in",
-		"menu_link_register_anchor": "Register",
-		"menu_link_register_title": "Create account",
-		"menu_link_logout_anchor": "Logout",
-		"menu_link_logout_title": "Sign out",
-		"menu_link_account_me_anchor": "My account",
-		"menu_link_account_me_title": "My account",
-		"menu_link_dashboard_anchor": "Dashboard",
-		"menu_link_dashboard_title": "Go to administration"
-	},
 	"data_table": {
 		"column_id": "ID",
 		"column_name": "Name",

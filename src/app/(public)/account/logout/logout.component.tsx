@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { logoutAction } from '@/app/(public)/account/logout/logout.action';
 import { LogoutDefaultState } from '@/app/(public)/account/logout/logout.definition';
 import { Icons } from '@/components/icon.component';
-import RoutesSetup from '@/config/routes.setup';
+import Routes from '@/config/routes.setup';
 import { useAuth } from '@/providers/auth.provider';
 
 export default function Logout() {
@@ -57,14 +57,14 @@ export default function Logout() {
 							<span className="text-sm text-gray-500 dark:text-base-content">
 								What next? You can go back to{' '}
 								<Link
-									href={RoutesSetup.get('login')}
+									href={Routes.get('login')}
 									className="link link-info link-hover text-sm"
 								>
 									login
 								</Link>{' '}
 								or navigate to{' '}
 								<Link
-									href={RoutesSetup.get('home')}
+									href={Routes.get('home')}
 									className="link link-info link-hover text-sm"
 								>
 									home page

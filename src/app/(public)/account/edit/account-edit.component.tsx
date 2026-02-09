@@ -20,7 +20,7 @@ import {
 import { FormError } from '@/components/form/form-error.component';
 import { Icons } from '@/components/icon.component';
 import { Loading } from '@/components/loading.component';
-import RoutesSetup from '@/config/routes.setup';
+import Routes from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
@@ -78,7 +78,7 @@ export default function AccountEdit() {
 				await refreshAuth();
 			})();
 
-			router.replace(`${RoutesSetup.get('account-me')}?from=edit`);
+			router.replace(`${Routes.get('account-me')}?from=edit`);
 		}
 	}, [state?.situation, router, refreshAuth]);
 
@@ -96,7 +96,7 @@ export default function AccountEdit() {
 					<Icons.Status.Error className="text-error mr-1" />
 					Please{' '}
 					<Link
-						href={RoutesSetup.get('login')}
+						href={Routes.get('login')}
 						title="Sign in"
 						className="link link-info link-hover"
 					>
@@ -148,7 +148,7 @@ export default function AccountEdit() {
 
 			<div className="flex justify-end gap-2">
 				<a
-					href={RoutesSetup.get('account-me')}
+					href={Routes.get('account-me')}
 					className="btn btn-action-cancel"
 					title="Cancel & Go back to my account"
 				>

@@ -1,9 +1,9 @@
-import { Calendar } from 'primereact/calendar';
-import { Checkbox } from 'primereact/checkbox';
-import { Dropdown } from 'primereact/dropdown';
-import { IconField } from 'primereact/iconfield';
-import { InputIcon } from 'primereact/inputicon';
-import { InputText } from 'primereact/inputtext';
+// import { Calendar } from 'primereact/calendar';
+// import { Checkbox } from 'primereact/checkbox';
+// import { Dropdown } from 'primereact/dropdown';
+// import { IconField } from 'primereact/iconfield';
+// import { InputIcon } from 'primereact/inputicon';
+// import { InputText } from 'primereact/inputtext';
 import type { Nullable } from 'primereact/ts-helpers';
 import { useMemo } from 'react';
 import { handleReset } from '@/app/(dashboard)/_components/data-table-actions.component';
@@ -54,7 +54,6 @@ export function FormFiltersSelect<Filters>({
 				labelFor={elementIds[elementKey]}
 			>
 				<Dropdown
-					className="p-inputtext-sm"
 					panelStyle={{ fontSize: '0.875rem' }}
 					inputId={elementIds[elementKey]}
 					value={fieldValue}
@@ -99,7 +98,6 @@ export function FormFiltersSearch({
 						<Icons.Search />
 					</InputIcon>
 					<InputText
-						className="p-inputtext-sm"
 						id={elementIds[elementKey]}
 						placeholder={placeholderText}
 						value={search.value}
@@ -157,7 +155,7 @@ export function FormFiltersDateRange<Filters>(props: {
 			>
 				<div className="flex gap-2">
 					<Calendar
-						className="p-inputtext-sm h-11 w-[160px]"
+						className="h-11 w-[160px]"
 						id={elementIds[elementStartKey]}
 						value={toDateInstance(startDateValue)}
 						onChange={(e) =>
@@ -176,7 +174,7 @@ export function FormFiltersDateRange<Filters>(props: {
 						maxDate={getValidDate(endDateValue)}
 					/>
 					<Calendar
-						className="p-inputtext-sm h-11 w-[160px]"
+						className="h-11 w-[160px]"
 						id={elementIds[elementEndKey]}
 						value={toDateInstance(endDateValue)}
 						onChange={(e) =>

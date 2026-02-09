@@ -39,6 +39,7 @@ import {
 	type FontAwesomeIconProps,
 } from '@fortawesome/react-fontawesome';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
+import {Mail} from "lucide-react";
 
 export function AwesomeIcon({
 	className = 'fa-md', // ex: fa-lg, fa-2xl, fa-sm
@@ -46,6 +47,11 @@ export function AwesomeIcon({
 }: FontAwesomeIconProps) {
 	return <FontAwesomeIcon className={className} {...props} />;
 }
+
+type IconsProps = {
+	className: string;
+	props?: Record<string, string>;
+};
 
 export const Icons = {
 	Design: {
@@ -71,8 +77,8 @@ export const Icons = {
 	Loading: (props: Partial<FontAwesomeIconProps>) => (
 		<AwesomeIcon icon={faSpinner} {...props} />
 	),
-	Email: (props: Partial<FontAwesomeIconProps>) => (
-		<AwesomeIcon icon={faEnvelope} {...props} />
+	Email: (props: IconsProps) => (
+		<Mail {...props} />
 	),
 	Password: (props: Partial<FontAwesomeIconProps>) => (
 		<AwesomeIcon icon={faKey} {...props} />

@@ -4,12 +4,12 @@ import { NavBreadcrumb } from '@/app/(dashboard)/_components/nav-breadcrumb.comp
 import { SideMenu } from '@/app/(dashboard)/_components/side-menu.component';
 import SideMenuSetter from '@/app/(dashboard)/_components/side-menu.setter';
 import { SideMenuToggle } from '@/app/(dashboard)/_components/side-menu-toggle.component';
-import { UserMenu } from '@/app/(dashboard)/_components/user-menu.component';
 import { DashboardProvider } from '@/app/(dashboard)/_providers/dashboard.provider';
-import { Footer } from '@/components/layout-default.component';
+import { Footer } from '@/components/layout/footer.default';
+import { UserMenu } from '@/components/layout/user-menu.component';
 import ProtectedRoute from '@/components/protected-route.component';
 import { ToggleTheme } from '@/components/toggle-theme';
-import RoutesSetup, { RouteAuth } from '@/config/routes.setup';
+import Routes, { RouteAuth } from '@/config/routes.setup';
 
 function Header() {
 	return (
@@ -18,7 +18,7 @@ function Header() {
 				<div className="h-full flex items-center">
 					<SideMenuToggle />
 					<Link
-						href={RoutesSetup.get('home')}
+						href={Routes.get('home')}
 						className="flex items-end hover:link-info"
 					>
 						<span className="text-lg font-bold">

@@ -105,7 +105,7 @@ $ pnpm run madge
 │   ├── components/            # Common components
 │   │   ├── form/    # Form related components
 │   │   ├── icon.component.tsx
-│   │   ├── layout-default.component.tsx
+│   │   ├── footer.default.tsx
 │   │   ├── loading.component.tsx
         ???
 │   ├── config/            # Configuration files
@@ -151,7 +151,7 @@ $ pnpm run madge
 4. Update `src/config/data-source.dashboard.register.ts`
     - add `registerDataSource('cars', dataSourceConfigCars)`
 5. Add `cars.json` to `src/locales/[language]` & update src/locales/en/index.ts
-6. Update `RoutesSetup.group('dashboard')` in `src/config/routes.setup.ts`
+6. Update `Routes.group('dashboard')` in `src/config/routes.setup.ts`
 7. Create `src/services/cars.service.ts` from `src/services/users.service.ts`
 8. Update `src/app/(dashboard)/_components/side-menu.component.tsx`
 9. Update `src/models/permission.model.ts`

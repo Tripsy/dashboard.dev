@@ -148,20 +148,21 @@ class RoutesCollection {
 	}
 }
 
-const RoutesSetup = new RoutesCollection();
+const Routes = new RoutesCollection();
 
-RoutesSetup.add('home', '/');
-RoutesSetup.add('status', '/status/:type');
-RoutesSetup.add('page', '/page/:label');
+Routes.add('home', '/');
+Routes.add('status', '/status/:type');
+Routes.add('page', '/page/:label');
+Routes.add('docs', '/docs');
 
 // API
-RoutesSetup.group('api')
+Routes.group('api')
 	.add('proxy', '/api/proxy/:path*')
 	.add('csrf', '/api/csrf')
 	.add('language', '/api/language');
 
 // Account
-RoutesSetup.group('account')
+Routes.group('account')
 	.auth(RouteAuth.UNAUTHENTICATED)
 	.add('login', '/account/login')
 	.add('logout', '/account/logout', { auth: RouteAuth.AUTHENTICATED })
@@ -185,7 +186,7 @@ RoutesSetup.group('account')
 	});
 
 // Dashboard
-RoutesSetup.group('dashboard')
+Routes.group('dashboard')
 	.auth(RouteAuth.PROTECTED)
 	.add('dashboard', '/dashboard')
 	.add('template', '/dashboard/templates', {
@@ -219,16 +220,16 @@ RoutesSetup.group('dashboard')
  */
 export function isExcludedRoute(pathname: string) {
 	const excludeRoutes = [
-		RoutesSetup.get('login'),
-		RoutesSetup.get('logout'),
-		RoutesSetup.get('register'),
-		RoutesSetup.get('password-recover'),
-		RoutesSetup.get('password-recover-change'),
-		RoutesSetup.get('email-confirm'),
-		RoutesSetup.get('email-confirm-send'),
+		Routes.get('login'),
+		Routes.get('logout'),
+		Routes.get('register'),
+		Routes.get('password-recover'),
+		Routes.get('password-recover-change'),
+		Routes.get('email-confirm'),
+		Routes.get('email-confirm-send'),
 	];
 
 	return excludeRoutes.includes(pathname);
 }
 
-export default RoutesSetup;
+export default Routes;

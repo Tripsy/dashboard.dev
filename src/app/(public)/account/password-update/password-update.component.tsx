@@ -19,7 +19,7 @@ import {
 import { FormError } from '@/components/form/form-error.component';
 import { Icons } from '@/components/icon.component';
 import { Loading } from '@/components/loading.component';
-import RoutesSetup from '@/config/routes.setup';
+import Routes from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
@@ -59,9 +59,7 @@ export default function PasswordUpdate() {
 	// Refresh auth & redirect to `/account/me`
 	useEffect(() => {
 		if (state?.situation === 'success' && router) {
-			router.replace(
-				`${RoutesSetup.get('account-me')}?from=passwordUpdate`,
-			);
+			router.replace(`${Routes.get('account-me')}?from=passwordUpdate`);
 		}
 	}, [state?.situation, router]);
 
@@ -83,7 +81,7 @@ export default function PasswordUpdate() {
 					<Icons.Status.Error className="text-error mr-1" />
 					Please{' '}
 					<Link
-						href={RoutesSetup.get('login')}
+						href={Routes.get('login')}
 						title="Sign in"
 						className="link link-info link-hover"
 					>
@@ -160,7 +158,7 @@ export default function PasswordUpdate() {
 
 			<div className="flex justify-end gap-2">
 				<a
-					href={RoutesSetup.get('account-me')}
+					href={Routes.get('account-me')}
 					className="btn btn-action-cancel"
 					title="Cancel & Go back to my account"
 				>

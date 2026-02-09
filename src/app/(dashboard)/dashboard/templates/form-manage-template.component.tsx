@@ -1,7 +1,3 @@
-import { IconField } from 'primereact/iconfield';
-import { InputIcon } from 'primereact/inputicon';
-import { InputText } from 'primereact/inputtext';
-import { InputTextarea } from 'primereact/inputtextarea';
 import { useMemo } from 'react';
 import {
 	FormComponentInput,
@@ -79,7 +75,6 @@ export function FormManageTemplate({
 								<Icons.Tag className="opacity-60" />
 							</InputIcon>
 							<InputText
-								className="p-inputtext-sm w-full"
 								id={elementIds.label}
 								name="label"
 								placeholder="eg: password-recover"

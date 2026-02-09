@@ -1,41 +1,22 @@
 'use client';
 
+import { Moon, Sun } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { useTheme } from '@/providers/theme.provider';
-import { Icons } from './icon.component';
 
 export function ToggleTheme() {
-	const { theme, toggleTheme } = useTheme();
-
-	const handleToggle = () => {
-		toggleTheme(theme === 'light' ? 'dark' : 'light');
-	};
+	const { toggleTheme } = useTheme();
 
 	return (
-		<label className="relative inline-flex items-center cursor-pointer mr-4">
-			<input
-				type="checkbox"
-				className="sr-only"
-				checked={theme === 'dark'}
-				onChange={handleToggle}
-			/>
-			<div className="relative w-4">
-				<div
-					className={`absolute inset-0 transition-transform duration-500 ease-in-out ${
-						theme === 'dark' ? 'rotate-0' : 'rotate-180'
-					}`}
-				>
-					<Icons.Design.ThemeLight
-						className={`absolute inset-0 m-auto transition-opacity duration-300 ${
-							theme === 'light' ? 'opacity-100' : 'opacity-0'
-						}`}
-					/>
-					<Icons.Design.ThemeDark
-						className={`absolute inset-0 m-auto transition-opacity duration-300 ${
-							theme === 'dark' ? 'opacity-100' : 'opacity-0'
-						}`}
-					/>
-				</div>
-			</div>
-		</label>
+		<Button
+			variant="ghost"
+			size="icon"
+			onClick={toggleTheme}
+			className="relative h-10 w-10 rounded-full"
+			aria-label="Toggle theme"
+		>
+			<Sun className="absolute h-5 w-5 rotate-0 scale-100 origin-center transition-all duration-300 ease-in-out dark:-rotate-90 dark:scale-0" />
+			<Moon className="absolute h-5 w-5 rotate-90 scale-0 origin-center transition-all duration-300 ease-in-out dark:rotate-0 dark:scale-100" />
+		</Button>
 	);
 }

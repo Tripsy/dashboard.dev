@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { AuthTokenList } from '@/app/(public)/account/login/login.component';
 import { Icons } from '@/components/icon.component';
 import { Loading } from '@/components/loading.component';
-import RoutesSetup from '@/config/routes.setup';
+import Routes from '@/config/routes.setup';
 import { formatDate } from '@/helpers/date.helper';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
@@ -78,7 +78,7 @@ export default function AccountMe() {
 					break;
 			}
 
-			const newUrl = RoutesSetup.get('account-me');
+			const newUrl = Routes.get('account-me');
 			router.replace(newUrl, { scroll: false });
 		}
 	}, [searchParams, showToast, isTranslationLoading, translations, router]);
@@ -95,7 +95,7 @@ export default function AccountMe() {
 					<Icons.Status.Error className="text-error mr-1" />
 					Please{' '}
 					<Link
-						href={RoutesSetup.get('login')}
+						href={Routes.get('login')}
 						title="Sign in"
 						className="link link-info link-hover"
 					>
@@ -114,7 +114,7 @@ export default function AccountMe() {
 			<div className="flex justify-between items-center">
 				<h1 className="text-center">My Account</h1>
 				<Link
-					href={RoutesSetup.get('account-edit')}
+					href={Routes.get('account-edit')}
 					prefetch={false}
 					title="Edit my account"
 					className="btn btn-success btn-sm"
@@ -160,7 +160,7 @@ export default function AccountMe() {
 									</span>
 									// <a
 									// 	className="badge badge-warning badge-sm mt-1"
-									// 	href={RoutesSetup.get('email-confirm-send')}
+									// 	href={Routes.get('email-confirm-send')}
 									// 	title="Re-send email verification"
 									// >
 									// 	<Icons.Status.Warning />
@@ -169,7 +169,7 @@ export default function AccountMe() {
 								)}
 							</div>
 							<Link
-								href={RoutesSetup.get('email-update')}
+								href={Routes.get('email-update')}
 								className="btn btn-outline btn-sm"
 								title="Update email address"
 							>
@@ -227,7 +227,7 @@ export default function AccountMe() {
 								</p>
 							</div>
 							<Link
-								href={RoutesSetup.get('password-update')}
+								href={Routes.get('password-update')}
 								className="btn btn-outline btn-sm"
 								title="Update password"
 							>
@@ -240,7 +240,7 @@ export default function AccountMe() {
 					{/* Quick Actions */}
 					<div className="card-actions justify-end mt-6">
 						<Link
-							href={RoutesSetup.get('account-delete')}
+							href={Routes.get('account-delete')}
 							className="btn btn-error btn-sm"
 						>
 							<Icons.Action.Delete />

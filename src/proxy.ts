@@ -1,6 +1,6 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import RoutesSetup, { RouteAuth, type RouteMatch } from '@/config/routes.setup';
+import Routes, { RouteAuth, type RouteMatch } from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
 import { ApiRequest, getResponseData } from '@/helpers/api.helper';
 import { getTrackedCookie } from '@/helpers/session.helper';
@@ -44,7 +44,7 @@ class MiddlewareContext {
 		const destinationPath = currentUrl.pathname + currentUrl.search;
 
 		// Create the login URL
-		const loginUrl = new URL(RoutesSetup.get('login'), this.req.url);
+		const loginUrl = new URL(Routes.get('login'), this.req.url);
 
 		// Set from query parameter as `destinationPath`
 		loginUrl.searchParams.set('from', encodeURIComponent(destinationPath));
@@ -54,7 +54,7 @@ class MiddlewareContext {
 
 	redirectToError(r: string) {
 		const redirectUrl = new URL(
-			RoutesSetup.get('status', { type: 'error' }),
+			Routes.get('status', { type: 'error' }),
 			this.req.url,
 		);
 
@@ -285,7 +285,7 @@ export async function proxy(req: NextRequest) {
 	}
 
 	const pathname = req.nextUrl.pathname;
-	const routeMatch = RoutesSetup.match(pathname);
+	const routeMatch = Routes.match(pathname);
 
 	if (!routeMatch) {
 		return ctx.success();

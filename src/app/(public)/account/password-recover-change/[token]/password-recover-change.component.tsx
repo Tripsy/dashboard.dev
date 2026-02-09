@@ -19,7 +19,7 @@ import {
 import { FormError } from '@/components/form/form-error.component';
 import { FormPart } from '@/components/form/form-part.component';
 import { Icons } from '@/components/icon.component';
-import RoutesSetup from '@/config/routes.setup';
+import Routes from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
@@ -86,7 +86,7 @@ export default function PasswordRecoverChange() {
 					<span className="text-sm text-gray-500 dark:text-base-content">
 						You can now go to the{' '}
 						<Link
-							href={RoutesSetup.get('login')}
+							href={Routes.get('login')}
 							className="link link-info link-hover text-sm"
 						>
 							login page

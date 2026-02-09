@@ -1,4 +1,4 @@
-import clsx from 'clsx';
+import { AlertCircle, AlertTriangle, CheckCircle } from 'lucide-react';
 import {
 	AutoComplete,
 	type AutoCompleteCompleteEvent,
@@ -6,31 +6,66 @@ import {
 import { Dropdown, type DropdownChangeEvent } from 'primereact/dropdown';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
-import { InputText } from 'primereact/inputtext';
 import React, { type JSX, useMemo } from 'react';
 import { FormElementError } from '@/components/form/form-element-error.component';
 import { FormPart } from '@/components/form/form-part.component';
 import { Icons } from '@/components/icon.component';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { useTranslation } from '@/hooks/use-translation.hook';
+import {cn} from "@/helpers/css.helper";
 
 export const FormElement = ({
 	children,
+	className,
 	labelText,
 	labelFor,
-	className,
+	isRequired = false,
 }: {
 	children: JSX.Element;
 	className?: string;
 	labelText?: string;
 	labelFor?: string;
+	isRequired?: boolean;
 }): JSX.Element | null => (
-	<div className={clsx('form-element', className)}>
+	<div className={cn('form-element', className)}>
 		{labelText &&
 			(labelFor ? (
-				<label htmlFor={labelFor}>{labelText}</label>
+				<Label htmlFor={labelFor}>
+					{labelText}
+					{isRequired && <span className="text-error ml-1">*</span>}
+				</Label>
 			) : (
 				<div className="label-placeholder">{labelText}</div>
 			))}
+		{children}
+	</div>
+);
+
+export const FormElementWrapper = ({
+	children,
+	className,
+}: {
+	children: JSX.Element;
+	className?: string;
+}): JSX.Element | null => (
+	<div className={cn('form-element-wrapper', className)}>
+		{children}
+	</div>
+);
+
+export const FormElementIcon = ({
+	children,
+	className,
+	position = 'left',
+}: {
+	children: JSX.Element;
+	className?: string;
+	position?: 'left' | 'right';
+}): JSX.Element | null => (
+	<div className={cn('form-element-icon', position === 'left' ? 'left-2' : 'right-2', className)}>
 		{children}
 	</div>
 );
@@ -48,12 +83,36 @@ export type OnChangeType = (
 		  >,
 ) => void;
 
+const stateConfig = {
+	default: {
+		borderClass: '',
+		icon: null,
+		iconClass: '',
+	},
+	success: {
+		borderClass: 'border-success focus-visible:ring-success',
+		icon: CheckCircle,
+		iconClass: 'text-success',
+	},
+	error: {
+		borderClass: 'border-error focus-visible:ring-error',
+		icon: AlertCircle,
+		iconClass: 'text-error',
+	},
+	warning: {
+		borderClass: 'border-warning focus-visible:ring-warning',
+		icon: AlertTriangle,
+		iconClass: 'text-warning',
+	},
+};
+
 export type FormComponentProps = {
 	labelText: string;
 	id: string;
 	fieldType?: 'text' | 'password' | 'email' | 'number';
 	fieldName: string;
 	fieldValue: string;
+	isRequired?: boolean;
 	className?: string;
 	placeholderText?: string;
 	disabled: boolean;
@@ -67,13 +126,16 @@ export type FormComponentProps = {
 	error?: string[];
 };
 
+/** Standard form elements **/
+
 export const FormComponentInput = ({
 	labelText,
 	id,
 	fieldType = 'text',
 	fieldName,
 	fieldValue,
-	className = 'p-inputtext-sm w-full',
+	isRequired = false,
+	className = 'w-full',
 	placeholderText,
 	disabled,
 	autoComplete,
@@ -81,9 +143,13 @@ export const FormComponentInput = ({
 	error,
 }: FormComponentProps) => (
 	<FormPart>
-		<FormElement labelText={labelText} labelFor={id}>
+		<FormElement
+			labelText={labelText}
+			labelFor={id}
+			isRequired={isRequired}
+		>
 			<div>
-				<InputText
+				<Input
 					type={fieldType}
 					id={id}
 					name={fieldName}
@@ -107,7 +173,8 @@ export const FormComponentAutoComplete = ({
 	fieldType = 'text',
 	fieldName,
 	fieldValue,
-	className = 'p-inputtext-sm w-full',
+	isRequired = false,
+	className,
 	placeholderText,
 	disabled,
 	onChange,
@@ -120,7 +187,11 @@ export const FormComponentAutoComplete = ({
 }) => {
 	return (
 		<FormPart>
-			<FormElement labelText={labelText} labelFor={id}>
+			<FormElement
+				labelText={labelText}
+				labelFor={id}
+				isRequired={isRequired}
+			>
 				<div>
 					<AutoComplete
 						type={fieldType}
@@ -147,7 +218,8 @@ export const FormComponentSelect = ({
 	id,
 	fieldName,
 	fieldValue,
-	className = 'p-inputtext-sm',
+	isRequired = false,
+	className,
 	panelStyle = { fontSize: '0.875rem' },
 	placeholderText = '-select-',
 	disabled,
@@ -159,7 +231,11 @@ export const FormComponentSelect = ({
 	options: OptionsType;
 }) => (
 	<FormPart>
-		<FormElement labelText={labelText} labelFor={id}>
+		<FormElement
+			labelText={labelText}
+			labelFor={id}
+			isRequired={isRequired}
+		>
 			<div>
 				<input type="hidden" name={fieldName} value={fieldValue} />
 				<Dropdown
@@ -201,7 +277,7 @@ export const FormComponentRadio = ({
 								id={`${id}-${value}`}
 								name={fieldName}
 								value={value}
-								className={clsx('radio', {
+								className={cn('radio', {
 									'radio-error': error,
 									'radio-info': !error,
 								})}
@@ -223,6 +299,46 @@ export const FormComponentRadio = ({
 		</FormElement>
 	</FormPart>
 );
+
+export const FormComponentTextarea = ({
+	labelText,
+	id,
+	fieldName,
+	fieldValue,
+	isRequired = false,
+	className = 'resize-none',
+	placeholderText,
+	disabled,
+	autoComplete,
+	onChange,
+	error,
+}: FormComponentProps) => (
+	<FormPart>
+		<FormElement
+			labelText={labelText}
+			labelFor={id}
+			isRequired={isRequired}
+		>
+			<div>
+				<Textarea
+					id={id}
+					name={fieldName}
+					value={fieldValue}
+					className={className}
+					placeholder={placeholderText}
+					autoComplete={autoComplete}
+					disabled={disabled}
+					aria-invalid={!!error}
+					onChange={onChange}
+					rows={6}
+				/>
+				<FormElementError messages={error} />
+			</div>
+		</FormElement>
+	</FormPart>
+);
+
+/** Common form elements **/
 
 export const FormComponentSubmit = ({
 	pending,
@@ -246,9 +362,9 @@ export const FormComponentSubmit = ({
 
 	return (
 		<FormPart>
-			<button
+			<Button
 				type="submit"
-				className="btn btn-info w-full"
+				className="w-full h-11"
 				disabled={
 					pending || (submitted && Object.keys(errors).length > 0)
 				}
@@ -269,50 +385,18 @@ export const FormComponentSubmit = ({
 						{buttonIcon} {buttonLabel}
 					</span>
 				)}
-			</button>
+			</Button>
 		</FormPart>
 	);
 };
-
-export const FormComponentTextarea = ({
-	labelText,
-	id,
-	fieldName,
-	fieldValue,
-	className = 'resize-none',
-	placeholderText,
-	disabled,
-	autoComplete,
-	onChange,
-	error,
-}: FormComponentProps) => (
-	<FormPart>
-		<FormElement labelText={labelText} labelFor={id}>
-			<div>
-				<textarea
-					id={id}
-					name={fieldName}
-					value={fieldValue}
-					className={className}
-					placeholder={placeholderText}
-					autoComplete={autoComplete}
-					disabled={disabled}
-					aria-invalid={!!error}
-					onChange={onChange}
-					rows={6}
-				/>
-				<FormElementError messages={error} />
-			</div>
-		</FormElement>
-	</FormPart>
-);
 
 export const FormComponentName = ({
 	labelText,
 	id,
 	fieldName = 'name',
 	fieldValue,
-	className = 'p-inputtext-sm w-full',
+	isRequired = true,
+	className,
 	placeholderText = 'eg: John Doe',
 	autoComplete = 'name',
 	disabled,
@@ -320,20 +404,24 @@ export const FormComponentName = ({
 	error,
 }: Omit<FormComponentProps, 'fieldName'> & { fieldName?: string }) => (
 	<FormPart>
-		<FormElement labelText={labelText} labelFor={id}>
+		<FormElement
+			labelText={labelText}
+			labelFor={id}
+			isRequired={isRequired}
+		>
 			<div>
 				<IconField iconPosition="left">
 					<InputIcon className="flex items-center">
 						<Icons.Entity.User className="opacity-60" />
 					</InputIcon>
-					<InputText
+					<Input
 						className={className}
 						id={id}
 						name={fieldName}
 						placeholder={placeholderText}
 						autoComplete={autoComplete}
 						disabled={disabled}
-						invalid={!!error}
+						aria-invalid={!!error}
 						value={fieldValue}
 						onChange={onChange}
 					/>
@@ -349,7 +437,8 @@ export const FormComponentEmail = ({
 	id,
 	fieldName = 'email',
 	fieldValue,
-	className = 'p-inputtext-sm w-full',
+	isRequired = true,
+	className,
 	placeholderText = 'eg: example@domain.com',
 	autoComplete = 'email',
 	disabled,
@@ -357,26 +446,32 @@ export const FormComponentEmail = ({
 	error,
 }: Omit<FormComponentProps, 'fieldName'> & { fieldName?: string }) => (
 	<FormPart>
-		<FormElement labelText={labelText} labelFor={id}>
-			<div>
-				<IconField iconPosition="left">
-					<InputIcon className="flex items-center">
-						<Icons.Email className="opacity-60" />
-					</InputIcon>
-					<InputText
-						className={className}
-						id={id}
-						name={fieldName}
-						placeholder={placeholderText}
-						autoComplete={autoComplete}
-						disabled={disabled}
-						invalid={!!error}
-						value={fieldValue}
-						onChange={onChange}
-					/>
-				</IconField>
+		<FormElement
+			labelText={labelText}
+			labelFor={id}
+			isRequired={isRequired}
+		>
+			<>
+				<FormElementWrapper>
+					<>
+						<FormElementIcon position="left">
+							<Icons.Email className="opacity-40 h-5 w-5" />
+						</FormElementIcon>
+						<Input
+							className={cn('pl-8', className)}
+							id={id}
+							name={fieldName}
+							placeholder={placeholderText}
+							autoComplete={autoComplete}
+							disabled={disabled}
+							aria-invalid={!!error}
+							value={fieldValue}
+							onChange={onChange}
+						/>
+					</>
+				</FormElementWrapper>
 				<FormElementError messages={error} />
-			</div>
+			</>
 		</FormElement>
 	</FormPart>
 );
@@ -386,7 +481,8 @@ export const FormComponentPassword = ({
 	id,
 	fieldName = 'password',
 	fieldValue,
-	className = 'p-inputtext-sm w-full !pr-10',
+	isRequired = true,
+	className,
 	placeholderText = 'Password',
 	autoComplete = 'new-password',
 	disabled,
@@ -401,45 +497,49 @@ export const FormComponentPassword = ({
 	setShowPassword?: (showPassword: boolean) => void;
 }) => (
 	<FormPart>
-		<FormElement labelText={labelText} labelFor={id}>
-			<div>
-				<div className="relative">
-					<IconField iconPosition="left">
-						<InputIcon className="flex items-center">
-							<Icons.Password className="opacity-60" />
-						</InputIcon>
-						<InputText
-							className={className}
+		<FormElement
+			labelText={labelText}
+			labelFor={id}
+			isRequired={isRequired}
+		>
+			<>
+				<FormElementWrapper>
+					<>
+						<FormElementIcon position="left">
+							<Icons.Password className="opacity-40 h-5 w-5" />
+						</FormElementIcon>
+						<Input
+							className={cn('pl-8', className)}
 							id={id}
 							name={fieldName}
 							type={showPassword ? 'text' : 'password'}
 							placeholder={placeholderText}
 							autoComplete={autoComplete}
 							disabled={disabled}
-							invalid={!!error}
+							aria-invalid={!!error}
 							value={fieldValue}
 							onChange={onChange}
 						/>
-					</IconField>
-					{setShowPassword && (
-						<button
-							type="button"
-							className="absolute right-3 top-3 focus:outline-none hover:opacity-100 transition-opacity"
-							onClick={() => setShowPassword(!showPassword)}
-							aria-label={
-								showPassword ? 'Hide password' : 'Show password'
-							}
-						>
-							{showPassword ? (
-								<Icons.Obscured className="opacity-60 hover:opacity-100 w-4 h-4" />
-							) : (
-								<Icons.Visible className="opacity-60 hover:opacity-100 w-4 h-4" />
-							)}
-						</button>
-					)}
-				</div>
+						{setShowPassword && (
+							<button
+								type="button"
+								className="absolute right-3 top-3 focus:outline-none hover:opacity-100 transition-opacity"
+								onClick={() => setShowPassword(!showPassword)}
+								aria-label={
+									showPassword ? 'Hide password' : 'Show password'
+								}
+							>
+								{showPassword ? (
+									<Icons.Obscured className="opacity-60 hover:opacity-100 w-4 h-4" />
+								) : (
+									<Icons.Visible className="opacity-60 hover:opacity-100 w-4 h-4" />
+								)}
+							</button>
+						)}
+					</>
+				</FormElementWrapper>
 				<FormElementError messages={error} />
-			</div>
+			</>
 		</FormElement>
 	</FormPart>
 );

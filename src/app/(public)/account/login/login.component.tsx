@@ -11,6 +11,10 @@ import {
 	type LoginFormFieldsType,
 	LoginState,
 } from '@/app/(public)/account/login/login.definition';
+import {
+	ErrorIcon,
+	ErrorWrapperComponent,
+} from '@/components/error-wrapper.component';
 import { FormCsrf } from '@/components/form/form-csrf';
 import {
 	FormComponentEmail,
@@ -19,8 +23,9 @@ import {
 } from '@/components/form/form-element.component';
 import { FormError } from '@/components/form/form-error.component';
 import { FormPart } from '@/components/form/form-part.component';
+import { FormWrapperComponent } from '@/components/form/form-wrapper';
 import { Icons } from '@/components/icon.component';
-import RoutesSetup, { isExcludedRoute } from '@/config/routes.setup';
+import Routes, { isExcludedRoute } from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
 import { formatDate } from '@/helpers/date.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
@@ -81,7 +86,7 @@ export default function Login() {
 			// Get the original destination from query params
 			const fromParam = searchParams.get('from');
 
-			let redirectUrl = RoutesSetup.get('home');
+			let redirectUrl = Routes.get('home');
 
 			if (fromParam) {
 				const decodedFrom = decodeURIComponent(fromParam);
@@ -103,146 +108,137 @@ export default function Login() {
 	const elementIds = useElementIds(['email', 'password']);
 
 	if (state?.situation === 'csrf_error') {
-		return (
-			<div className="form-section">
-				<h1 className="text-center">Sign In</h1>
-
-				<div className="text-sm text-error">
-					<Icons.Status.Error /> {state.message}
-				</div>
-			</div>
-		);
+		return <ErrorWrapperComponent description={state.message as string} />;
 	}
 
 	if (state?.situation === 'pending_account') {
 		return (
-			<div className="form-section">
-				<h1 className="text-center">Sign In</h1>
-
-				<div className="text-sm text-error">
-					<Icons.Status.Error /> {state.message}
-				</div>
-
+			<ErrorWrapperComponent description={state.message as string}>
 				<div className="text-center mt-2">
 					<span className="text-sm text-gray-500 dark:text-base-content">
 						Have you confirmed your email? If you’ve lost the
 						instructions, you can resend the{' '}
 					</span>
 					<Link
-						href={RoutesSetup.get('email-confirm-send')}
+						href={Routes.get('email-confirm-send')}
 						className="link link-info link-hover text-sm"
 					>
 						confirmation email
 					</Link>
 				</div>
-			</div>
+			</ErrorWrapperComponent>
 		);
 	}
 
 	return (
-		<form action={action} onSubmit={markSubmit} className="form-section">
-			<FormCsrf
-				inputName={Configuration.get('csrf.inputName') as string}
-			/>
+		<FormWrapperComponent
+			title="Welcome back"
+			description="Sign in to your account to continue"
+		>
+			<form
+				action={action}
+				onSubmit={markSubmit}
+				className="form-section"
+			>
+				<FormCsrf
+					inputName={Configuration.get('csrf.inputName') as string}
+				/>
 
-			<h1 className="text-center">Sign In</h1>
+				<FormComponentEmail
+					labelText="Email Address"
+					id={elementIds.email}
+					fieldValue={formValues.email ?? ''}
+					disabled={pending}
+					onChange={(e) => handleChange('email', e.target.value)}
+					error={errors.email}
+				/>
 
-			<FormPart className="text-sm text-center md:max-w-xs">
-				<span>Secure login. Resume your personalized experience.</span>
-			</FormPart>
+				<FormComponentPassword
+					labelText="Password"
+					id={elementIds.password}
+					fieldValue={formValues.password ?? ''}
+					autoComplete="current-password"
+					disabled={pending}
+					onChange={(e) => handleChange('password', e.target.value)}
+					error={errors.password}
+					showPassword={showPassword}
+					setShowPassword={setShowPassword}
+				/>
 
-			<FormComponentEmail
-				labelText="Email Address"
-				id={elementIds.email}
-				fieldValue={formValues.email ?? ''}
-				disabled={pending}
-				onChange={(e) => handleChange('email', e.target.value)}
-				error={errors.email}
-			/>
+				<FormComponentSubmit
+					pending={pending}
+					submitted={submitted}
+					errors={errors}
+					buttonLabel="Login"
+					buttonIcon={<Icons.Action.Login />}
+				/>
 
-			<FormComponentPassword
-				labelText="Password"
-				id={elementIds.password}
-				fieldValue={formValues.password ?? ''}
-				autoComplete="current-password"
-				disabled={pending}
-				onChange={(e) => handleChange('password', e.target.value)}
-				error={errors.password}
-				showPassword={showPassword}
-				setShowPassword={setShowPassword}
-			/>
-
-			<FormComponentSubmit
-				pending={pending}
-				submitted={submitted}
-				errors={errors}
-				buttonLabel="Login"
-				buttonIcon={<Icons.Action.Login />}
-			/>
-
-			{state?.situation === 'error' && state.message && (
-				<FormError>
-					<div>
-						<Icons.Status.Error /> {state.message}
-					</div>
-				</FormError>
-			)}
-
-			{state?.situation === 'max_active_sessions' && state.message && (
-				<FormPart>
-					<div className="space-y-4">
-						<div className="text-error text-sm">
-							<Icons.Status.Error /> {state.message}
+				{state?.situation === 'error' && state.message && (
+					<FormError>
+						<div>
+							<ErrorIcon /> {state.message}
 						</div>
+					</FormError>
+				)}
 
-						<AuthTokenList
-							tokens={state.body?.authValidTokens || []}
-							callbackAction={(success, message) => {
-								showToast({
-									severity: success ? 'success' : 'error',
-									summary: success ? 'Success' : 'Error',
-									detail:
-										message === 'session_destroy_success'
-											? translations[
-													'login.message.session_destroy_success'
-												]
-											: translations[
-													`login.message.session_destroy_error`
-												],
-								});
-							}}
-						/>
+				{state?.situation === 'max_active_sessions' &&
+					state.message && (
+						<FormPart>
+							<div className="space-y-4">
+								<div className="text-error text-sm">
+									<Icons.Status.Error /> {state.message}
+								</div>
+
+								<AuthTokenList
+									tokens={state.body?.authValidTokens || []}
+									callbackAction={(success, message) => {
+										showToast({
+											severity: success
+												? 'success'
+												: 'error',
+											summary: success
+												? 'Success'
+												: 'Error',
+											detail:
+												message ===
+												'session_destroy_success'
+													? translations[
+															'login.message.session_destroy_success'
+														]
+													: translations[
+															`login.message.session_destroy_error`
+														],
+										});
+									}}
+								/>
+							</div>
+						</FormPart>
+					)}
+
+				<FormPart className="text-center">
+					<div className="space-y-2">
+						<p className="text-sm text-muted-foreground">
+							Don't have an account?{' '}
+							<Link
+								href={Routes.get('register')}
+								className="text-primary font-medium hover:underline"
+							>
+								Create an account
+							</Link>
+						</p>
+						<p className="text-sm text-muted-foreground">
+							Forgot your password?{' '}
+							<Link
+								href={Routes.get('password-recover')}
+								className="text-primary font-medium hover:underline"
+							>
+								Reset it here
+							</Link>
+						</p>
 					</div>
 				</FormPart>
-			)}
-
-			<FormPart className="text-center">
-				<div>
-					<div className="mb-2">
-						<span className="text-sm text-gray-500 dark:text-base-content">
-							Not registered yet?{' '}
-						</span>
-						<Link
-							href={RoutesSetup.get('register')}
-							className="link link-info link-hover text-sm"
-						>
-							Create an account
-						</Link>
-					</div>
-					<div>
-						<span className="text-sm text-gray-500 dark:text-base-content">
-							Forgot your password?{' '}
-						</span>
-						<Link
-							href={RoutesSetup.get('password-recover')}
-							className="link link-info link-hover text-sm"
-						>
-							Reset it here
-						</Link>
-					</div>
-				</div>
-			</FormPart>
-		</form>
+			</form>
+		</FormWrapperComponent>
 	);
 }
 

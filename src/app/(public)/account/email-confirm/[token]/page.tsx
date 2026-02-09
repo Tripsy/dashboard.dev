@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Icons } from '@/components/icon.component';
-import RoutesSetup from '@/config/routes.setup';
+import Routes from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
 import { translate } from '@/config/translate.setup';
 import { ApiError } from '@/exceptions/api.error';
@@ -80,14 +80,14 @@ export default async function Page(props: Props) {
 						<span className="text-sm text-gray-500 dark:text-base-content">
 							What's next? Check{' '}
 							<Link
-								href={RoutesSetup.get('account-me')}
+								href={Routes.get('account-me')}
 								className="link link-info link-hover text-sm"
 							>
 								your account
 							</Link>{' '}
 							or navigate to{' '}
 							<Link
-								href={RoutesSetup.get('home')}
+								href={Routes.get('home')}
 								className="link link-info link-hover text-sm"
 							>
 								home page
@@ -99,14 +99,14 @@ export default async function Page(props: Props) {
 						<span className="text-sm text-gray-500 dark:text-base-content">
 							What now? You can register for a{' '}
 							<Link
-								href={RoutesSetup.get('register')}
+								href={Routes.get('register')}
 								className="link link-info link-hover text-sm"
 							>
 								new account
 							</Link>{' '}
 							or request{' '}
 							<Link
-								href={RoutesSetup.get('email-confirm-send')}
+								href={Routes.get('email-confirm-send')}
 								className="link link-info link-hover text-sm"
 							>
 								another confirmation link

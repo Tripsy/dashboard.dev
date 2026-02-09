@@ -5,7 +5,7 @@ import type React from 'react';
 import { useEffect, useMemo } from 'react';
 import { Loading } from '@/components/loading.component';
 import { Notice } from '@/components/notice.component';
-import RoutesSetup, { RouteAuth } from '@/config/routes.setup';
+import Routes, { RouteAuth } from '@/config/routes.setup';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { hasPermission } from '@/models/auth.model';
 import { useAuth } from '@/providers/auth.provider';
@@ -49,7 +49,7 @@ export default function ProtectedRoute({
 			authStatus === 'unauthenticated'
 		) {
 			router.push(
-				`${RoutesSetup.get('login')}?from=${encodeURIComponent(pathname)}`,
+				`${Routes.get('login')}?from=${encodeURIComponent(pathname)}`,
 			);
 		}
 	}, [authStatus, pathname, routeAuth, router]);
@@ -76,7 +76,7 @@ export default function ProtectedRoute({
 			routeAuth === RouteAuth.PROTECTED &&
 			authStatus === 'authenticated'
 		) {
-			return RoutesSetup.match(pathname)?.props?.permission;
+			return Routes.match(pathname)?.props?.permission;
 		}
 
 		return undefined;

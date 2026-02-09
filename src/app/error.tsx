@@ -1,7 +1,10 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect } from 'react';
-import { Notice } from '@/components/notice.component';
+import { ErrorWrapperComponent } from '@/components/error-wrapper.component';
+import { Button } from '@/components/ui/button';
+import Routes from '@/config/routes.setup';
 
 export default function ErrorBoundary({
 	error,
@@ -15,16 +18,14 @@ export default function ErrorBoundary({
 	}, [error]);
 
 	return (
-		<Notice type="error" message={error.message}>
-			<div className="mt-4">
-				<button
-					type="reset"
-					className="btn btn-error"
-					onClick={() => reset()}
-				>
-					Try Again
-				</button>
+		<ErrorWrapperComponent description={error.message}>
+			<div className="mt-8 text-center">
+				<Button onClick={() => reset()}>Try Again</Button> or go back to
+				the{' '}
+				<Link href={Routes.get('home')} className="underline link">
+					home page
+				</Link>
 			</div>
-		</Notice>
+		</ErrorWrapperComponent>
 	);
 }

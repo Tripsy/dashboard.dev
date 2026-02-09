@@ -1,3 +1,15 @@
+import { Loader2 } from 'lucide-react';
+import { cn } from '@/helpers/css.helper';
+
+export function LoadingIcon({ className }: { className?: string }) {
+	return (
+		<Loader2
+			className={cn('animate-spin h-6 w-6', className)}
+			aria-label="Loading"
+		/>
+	);
+}
+
 type LoadingProps = {
 	text: string;
 	className?: string;

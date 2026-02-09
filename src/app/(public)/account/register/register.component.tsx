@@ -83,11 +83,11 @@ export default function Register() {
 		'terms',
 	]);
 
-	if (state?.situation === 'csrf_error') {
+	if (state.situation === 'csrf_error') {
 		throw new Error(state.message as string);
 	}
 
-	if (state?.situation === 'pending_account') {
+	if (state.situation === 'pending_account') {
 		return (
 			<ErrorComponent
 				title="Create Account"
@@ -109,7 +109,7 @@ export default function Register() {
 		);
 	}
 
-	if (state?.situation === 'success') {
+	if (state.situation === 'success') {
 		return (
 			<SuccessComponent
 				title="Create Account"
@@ -258,7 +258,7 @@ export default function Register() {
 					buttonIcon={<Icons.Action.Go />}
 				/>
 
-				{state?.situation === 'error' && state.message && (
+				{state.situation === 'error' && state.message && (
 					<FormError>
 						<div>
 							<ErrorIcon /> {state.message}

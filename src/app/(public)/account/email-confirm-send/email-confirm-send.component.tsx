@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useActionState } from 'react';
+import React, { useActionState } from 'react';
 import {
 	emailConfirmSendAction,
 	emailConfirmSendValidate,
@@ -16,10 +16,10 @@ import {
 	FormComponentSubmit,
 } from '@/components/form/form-element.component';
 import { FormError } from '@/components/form/form-error.component';
-import { FormPart } from '@/components/form/form-part.component';
+import { FormWrapperComponent } from '@/components/form/form-wrapper';
 import { Icons } from '@/components/icon.component';
+import { SuccessComponent } from '@/components/status.component';
 import Routes from '@/config/routes.setup';
-import { Configuration } from '@/config/settings.config';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
@@ -50,95 +50,80 @@ export default function EmailConfirmSend() {
 
 	const elementIds = useElementIds(['email']);
 
-	if (state?.situation === 'csrf_error') {
-		return (
-			<div className="form-section">
-				<h1 className="text-center">Email Confirmation Send</h1>
-
-				<div className="text-sm text-error">
-					<Icons.Status.Error /> {state.message}
-				</div>
-			</div>
-		);
+	if (state.situation === 'csrf_error') {
+		throw new Error(state.message as string);
 	}
 
-	if (state?.situation === 'success') {
+	if (state.situation === 'success') {
 		return (
-			<div className="form-section">
-				<h1 className="text-center">Email Confirmation Send</h1>
-
-				<div className="text-sm">
-					<Icons.Status.Success className="text-success" /> Please
+			<SuccessComponent
+				title="Email Confirmation Sent"
+				description="Please
 					check your email and follow instructions to complete the
-					confirmation process.
+					confirmation process."
+			>
+				<div className="text-center mt-6">
+					Meanwhile you can go back to{' '}
+					<Link
+						href={Routes.get('home')}
+						className="text-primary font-medium hover:underline"
+					>
+						home page
+					</Link>
 				</div>
-
-				<p className="mt-2 text-center">
-					<span className="text-sm text-gray-500 dark:text-base-content">
-						Meanwhile you can go back to{' '}
-						<Link
-							href={Routes.get('home')}
-							className="link link-info link-hover text-sm"
-						>
-							home page
-						</Link>
-					</span>
-				</p>
-			</div>
+			</SuccessComponent>
 		);
 	}
 
 	return (
-		<form action={action} onSubmit={markSubmit} className="form-section">
-			<FormCsrf />
+		<FormWrapperComponent
+			title="Get Your Email Confirmation"
+			description="Use the form below to re-send the confirmation email to the email address you used to register."
+		>
+			<form
+				action={action}
+				onSubmit={markSubmit}
+				className="form-section"
+			>
+				<FormCsrf />
 
-			<h1 className="text-center">Email Confirmation Send</h1>
+				<FormComponentEmail
+					labelText="Email Address"
+					id={elementIds.email}
+					fieldValue={formValues.email ?? ''}
+					disabled={pending}
+					onChange={(e) => handleChange('email', e.target.value)}
+					error={errors.email}
+				/>
 
-			<FormPart className="text-sm text-center md:max-w-xs">
-				<span>
-					Use the form below to re-send the confirmation email to the
-					email address you used to register.
-				</span>
-			</FormPart>
+				<FormComponentSubmit
+					pending={pending}
+					submitted={submitted}
+					errors={errors}
+					buttonLabel="Get confirmation"
+					buttonIcon={<Icons.Action.Go />}
+				/>
 
-			<FormComponentEmail
-				labelText="Email Address"
-				id={elementIds.email}
-				fieldValue={formValues.email ?? ''}
-				disabled={pending}
-				onChange={(e) => handleChange('email', e.target.value)}
-				error={errors.email}
-			/>
+				{state.situation === 'error' && state.message && (
+					<FormError>
+						<div>
+							<Icons.Status.Error /> {state.message}
+						</div>
+					</FormError>
+				)}
 
-			<FormComponentSubmit
-				pending={pending}
-				submitted={submitted}
-				errors={errors}
-				buttonLabel="Get confirmation"
-				buttonIcon={<Icons.Action.Go />}
-			/>
-
-			{state?.situation === 'error' && state.message && (
-				<FormError>
-					<div>
-						<Icons.Status.Error /> {state.message}
-					</div>
-				</FormError>
-			)}
-
-			<FormPart className="text-center">
-				<div>
-					<span className="text-sm text-gray-500 dark:text-base-content">
+				<div className="text-center space-y-2">
+					<p className="text-sm text-muted-foreground">
 						Not registered yet?{' '}
-					</span>
-					<Link
-						href={Routes.get('register')}
-						className="link link-info link-hover text-sm"
-					>
-						Create an account
-					</Link>
+						<Link
+							href={Routes.get('register')}
+							className="text-primary font-medium hover:underline"
+						>
+							Create an account
+						</Link>
+					</p>
 				</div>
-			</FormPart>
-		</form>
+			</form>
+		</FormWrapperComponent>
 	);
 }

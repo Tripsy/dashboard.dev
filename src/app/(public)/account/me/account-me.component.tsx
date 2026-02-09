@@ -84,7 +84,7 @@ export default function AccountMe() {
 	}, [searchParams, showToast, isTranslationLoading, translations, router]);
 
 	if (authStatus === 'loading') {
-		return <LoadingComponent text="Loading..." />;
+		return <LoadingComponent description="Loading..." />;
 	}
 
 	if (!auth) {

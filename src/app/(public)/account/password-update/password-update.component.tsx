@@ -20,7 +20,6 @@ import { FormError } from '@/components/form/form-error.component';
 import { Icons } from '@/components/icon.component';
 import { LoadingComponent } from '@/components/status.component';
 import Routes from '@/config/routes.setup';
-import { Configuration } from '@/config/settings.config';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
@@ -58,10 +57,10 @@ export default function PasswordUpdate() {
 
 	// Refresh auth & redirect to `/account/me`
 	useEffect(() => {
-		if (state?.situation === 'success' && router) {
+		if (state.situation === 'success' && router) {
 			router.replace(`${Routes.get('account-me')}?from=passwordUpdate`);
 		}
-	}, [state?.situation, router]);
+	}, [state.situation, router]);
 
 	const elementIds = useElementIds([
 		'passwordCurrent',
@@ -70,7 +69,7 @@ export default function PasswordUpdate() {
 	]);
 
 	if (authStatus === 'loading') {
-		return <LoadingComponent text="Loading..." />;
+		return <LoadingComponent description="Loading..." />;
 	}
 
 	if (!auth) {
@@ -94,16 +93,8 @@ export default function PasswordUpdate() {
 		);
 	}
 
-	if (state?.situation === 'csrf_error') {
-		return (
-			<div className="form-section">
-				<h1 className="text-center">My Account - Password update</h1>
-
-				<div className="text-sm text-error">
-					<Icons.Status.Error /> {state.message}
-				</div>
-			</div>
-		);
+	if (state.situation === 'csrf_error') {
+		throw new Error(state.message as string);
 	}
 
 	return (
@@ -171,7 +162,7 @@ export default function PasswordUpdate() {
 				/>
 			</div>
 
-			{state?.situation === 'error' && state.message && (
+			{state.situation === 'error' && state.message && (
 				<FormError>
 					<div>
 						<Icons.Status.Error /> {state.message}

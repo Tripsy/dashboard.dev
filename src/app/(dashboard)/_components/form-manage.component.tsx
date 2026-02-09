@@ -162,7 +162,7 @@ export function FormManage<
 
 	// Handle success state
 	useEffect(() => {
-		if (state?.situation === 'success') {
+		if (state.situation === 'success') {
 			if (state?.resultData) {
 				if (actionName === 'create') {
 					handleReset('FormManage'); // Reset the form
@@ -181,7 +181,7 @@ export function FormManage<
 			closeOut();
 		}
 	}, [
-		state?.situation,
+		state.situation,
 		showToast,
 		closeOut,
 		actionName,
@@ -243,7 +243,7 @@ export function FormManage<
 				</div>
 			</FormPart>
 
-			{state?.situation === 'error' && state.message && (
+			{state.situation === 'error' && state.message && (
 				<FormError>
 					<div>
 						<Icons.Status.Error /> {state.message}

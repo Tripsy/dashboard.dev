@@ -59,17 +59,17 @@ export default function AccountDelete() {
 
 	// Refresh auth & redirect to `/status/error`
 	useEffect(() => {
-		if (state?.situation === 'success' && router) {
+		if (state.situation === 'success' && router) {
 			router.replace(
 				`${Routes.get('status', { type: 'error' })}?r=account_delete`,
 			);
 		}
-	}, [state?.situation, router]);
+	}, [state.situation, router]);
 
 	const elementIds = useElementIds(['passwordCurrent']);
 
 	if (authStatus === 'loading') {
-		return <LoadingComponent text="Loading..." />;
+		return <LoadingComponent description="Loading..." />;
 	}
 
 	if (!auth) {
@@ -93,16 +93,8 @@ export default function AccountDelete() {
 		);
 	}
 
-	if (state?.situation === 'csrf_error') {
-		return (
-			<div className="form-section">
-				<h1 className="text-center">My Account - Delete request</h1>
-
-				<div className="text-sm text-error">
-					<Icons.Status.Error /> {state.message}
-				</div>
-			</div>
-		);
+	if (state.situation === 'csrf_error') {
+		throw new Error(state.message as string);
 	}
 
 	return (
@@ -156,7 +148,7 @@ export default function AccountDelete() {
 				/>
 			</div>
 
-			{state?.situation === 'error' && state.message && (
+			{state.situation === 'error' && state.message && (
 				<FormError>
 					<div>
 						<Icons.Status.Error /> {state.message}

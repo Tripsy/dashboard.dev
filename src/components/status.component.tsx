@@ -14,15 +14,28 @@ export function LoadingIcon({ className }: { className?: string }) {
 }
 
 type LoadingProps = {
-	text: string;
-	className?: string;
+	children?: React.ReactNode;
+	title?: string;
+	description?: string;
 };
 
-export function LoadingComponent({ text, className }: LoadingProps) {
+export function LoadingComponent({
+	children,
+	title = 'Loading',
+	description = 'Please wait ...',
+}: LoadingProps) {
 	return (
-		<div className={className}>
-			<LoadingIcon />
-			<span>{text}</span>
+		<div className="min-h-[calc(80vh-4rem)] flex items-center justify-center px-4 py-12">
+			<div className="w-full max-w-md">
+				<div className="text-center">
+					<div className="flex justify-center mb-4">
+						<LoadingIcon className="w-12 h-12 text-warning bg-warning/10 rounded-full p-3" />
+					</div>
+					<h1 className="text-2xl font-bold mb-8">{title}</h1>
+					<p className="text-muted-foreground">{description}</p>
+				</div>
+				{children}
+			</div>
 		</div>
 	);
 }

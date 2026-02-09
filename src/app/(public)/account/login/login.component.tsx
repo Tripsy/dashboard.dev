@@ -74,7 +74,7 @@ export default function Login() {
 	};
 
 	useEffect(() => {
-		if (state?.situation === 'success' && router) {
+		if (state.situation === 'success' && router) {
 			(async () => {
 				await refreshAuth();
 			})();
@@ -99,15 +99,15 @@ export default function Login() {
 
 			router.replace(redirectUrl);
 		}
-	}, [state?.situation, router, refreshAuth, searchParams]);
+	}, [state.situation, router, refreshAuth, searchParams]);
 
 	const elementIds = useElementIds(['email', 'password']);
 
-	if (state?.situation === 'csrf_error') {
+	if (state.situation === 'csrf_error') {
 		throw new Error(state.message as string);
 	}
 
-	if (state?.situation === 'pending_account') {
+	if (state.situation === 'pending_account') {
 		return (
 			<ErrorComponent title="Login" description={state.message as string}>
 				<div className="text-center mt-6">
@@ -168,7 +168,7 @@ export default function Login() {
 					buttonIcon={<Icons.Action.Login />}
 				/>
 
-				{state?.situation === 'error' && state.message && (
+				{state.situation === 'error' && state.message && (
 					<FormError>
 						<div>
 							<ErrorIcon /> {state.message}
@@ -176,33 +176,31 @@ export default function Login() {
 					</FormError>
 				)}
 
-				{state?.situation === 'max_active_sessions' &&
-					state.message && (
-						<div className="space-y-4">
-							<div className="text-error text-sm">
-								<ErrorIcon /> {state.message}
-							</div>
-
-							<AuthTokenList
-								tokens={state.body?.authValidTokens || []}
-								callbackAction={(success, message) => {
-									showToast({
-										severity: success ? 'success' : 'error',
-										summary: success ? 'Success' : 'Error',
-										detail:
-											message ===
-											'session_destroy_success'
-												? translations[
-														'login.message.session_destroy_success'
-													]
-												: translations[
-														`login.message.session_destroy_error`
-													],
-									});
-								}}
-							/>
+				{state.situation === 'max_active_sessions' && state.message && (
+					<div className="space-y-4">
+						<div className="text-error text-sm">
+							<ErrorIcon /> {state.message}
 						</div>
-					)}
+
+						<AuthTokenList
+							tokens={state.body?.authValidTokens || []}
+							callbackAction={(success, message) => {
+								showToast({
+									severity: success ? 'success' : 'error',
+									summary: success ? 'Success' : 'Error',
+									detail:
+										message === 'session_destroy_success'
+											? translations[
+													'login.message.session_destroy_success'
+												]
+											: translations[
+													`login.message.session_destroy_error`
+												],
+								});
+							}}
+						/>
+					</div>
+				)}
 
 				<div className="text-center space-y-2">
 					<p className="text-sm text-muted-foreground">

@@ -73,19 +73,19 @@ export default function AccountEdit() {
 
 	// Refresh auth & redirect to `/account/me`
 	useEffect(() => {
-		if (state?.situation === 'success' && router) {
+		if (state.situation === 'success' && router) {
 			(async () => {
 				await refreshAuth();
 			})();
 
 			router.replace(`${Routes.get('account-me')}?from=edit`);
 		}
-	}, [state?.situation, router, refreshAuth]);
+	}, [state.situation, router, refreshAuth]);
 
 	const elementIds = useElementIds(['name', 'language']);
 
 	if (authStatus === 'loading') {
-		return <LoadingComponent text="Loading..." />;
+		return <LoadingComponent description="Loading..." />;
 	}
 
 	if (!auth) {
@@ -109,16 +109,8 @@ export default function AccountEdit() {
 		);
 	}
 
-	if (state?.situation === 'csrf_error') {
-		return (
-			<div className="form-section">
-				<h1 className="text-center">My Account - Edit</h1>
-
-				<div className="text-sm text-error">
-					<Icons.Status.Error /> {state.message}
-				</div>
-			</div>
-		);
+	if (state.situation === 'csrf_error') {
+		throw new Error(state.message as string);
 	}
 
 	return (
@@ -161,7 +153,7 @@ export default function AccountEdit() {
 				/>
 			</div>
 
-			{state?.situation === 'error' && state.message && (
+			{state.situation === 'error' && state.message && (
 				<FormError>
 					<div>
 						<Icons.Status.Error /> {state.message}

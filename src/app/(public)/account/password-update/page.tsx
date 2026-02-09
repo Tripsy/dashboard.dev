@@ -15,12 +15,10 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Page() {
 	return (
-		<section className="fit-container">
-			<ProtectedRoute routeAuth={RouteAuth.AUTHENTICATED}>
-				<div className="standard-box p-4 sm:p-8 shadow-md md:w-[28rem]">
-					<PasswordUpdate />
-				</div>
-			</ProtectedRoute>
-		</section>
+		<ProtectedRoute routeAuth={RouteAuth.AUTHENTICATED}>
+			<div className="bg-gradient-hero">
+				<PasswordUpdate />
+			</div>
+		</ProtectedRoute>
 	);
 }

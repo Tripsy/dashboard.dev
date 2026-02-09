@@ -84,7 +84,9 @@ export function ActionManage<
 	}
 
 	if (isTranslationLoading) {
-		return <LoadingComponent text={translations['app.text.loading']} />;
+		return (
+			<LoadingComponent description={translations['app.text.loading']} />
+		);
 	}
 
 	const actions = getDataSourceConfig(dataSource, 'actions');

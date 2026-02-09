@@ -22,7 +22,9 @@ export const DataTableLogHistory = (): JSX.Element => {
 	const isMounted = useMounted();
 
 	if (!isMounted) {
-		return <LoadingComponent text={translations['app.text.loading']} />;
+		return (
+			<LoadingComponent description={translations['app.text.loading']} />
+		);
 	}
 
 	return (

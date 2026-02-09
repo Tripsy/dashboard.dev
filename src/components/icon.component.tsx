@@ -34,7 +34,9 @@ import {
 	EyeOff,
 	KeyRound,
 	Loader,
+	LogIn,
 	Mail,
+	Play,
 	UserRound,
 } from 'lucide-react';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
@@ -106,12 +108,8 @@ export const Icons = {
 		Loading: (props: IconsProps) => <Loader {...props} />,
 	},
 	Action: {
-		Login: (props: Partial<FontAwesomeIconProps>) => (
-			<AwesomeIcon icon={faArrowRightToBracket} {...props} />
-		),
-		Go: (props: Partial<FontAwesomeIconProps>) => (
-			<AwesomeIcon icon={faPlay} {...props} />
-		),
+		Login: (props: IconsProps) => <LogIn {...props} />,
+		Go: (props: IconsProps) => <Play {...props} />,
 		Create: (props: Partial<FontAwesomeIconProps>) => (
 			<AwesomeIcon icon={faPlus} {...props} />
 		),

@@ -12,9 +12,5 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function Page() {
-	return (
-		<div className="bg-gradient-hero">
-			<Logout />
-		</div>
-	);
+	return <Logout />;
 }

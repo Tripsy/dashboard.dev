@@ -57,15 +57,15 @@ export default function EmailUpdate() {
 
 	// Refresh auth & redirect to `/account/me`
 	useEffect(() => {
-		if (state?.situation === 'success' && router) {
+		if (state.situation === 'success' && router) {
 			router.replace(`${Routes.get('account-me')}?from=emailUpdate`);
 		}
-	}, [state?.situation, router]);
+	}, [state.situation, router]);
 
 	const elementIds = useElementIds(['emailNew']);
 
 	if (authStatus === 'loading') {
-		return <LoadingComponent text="Loading..." />;
+		return <LoadingComponent description="Loading..." />;
 	}
 
 	if (!auth) {
@@ -89,16 +89,8 @@ export default function EmailUpdate() {
 		);
 	}
 
-	if (state?.situation === 'csrf_error') {
-		return (
-			<div className="form-section">
-				<h1 className="text-center">My Account - Email update</h1>
-
-				<div className="text-sm text-error">
-					<Icons.Status.Error /> {state.message}
-				</div>
-			</div>
-		);
+	if (state.situation === 'csrf_error') {
+		throw new Error(state.message as string);
 	}
 
 	return (
@@ -142,7 +134,7 @@ export default function EmailUpdate() {
 				/>
 			</div>
 
-			{state?.situation === 'error' && state.message && (
+			{state.situation === 'error' && state.message && (
 				<FormError>
 					<div>
 						<Icons.Status.Error /> {state.message}

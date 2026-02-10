@@ -1,14 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { logoutAction } from '@/app/(public)/account/logout/logout.action';
 import { LogoutDefaultState } from '@/app/(public)/account/logout/logout.definition';
-import { Icons } from '@/components/icon.component';
 import {
 	ErrorComponent,
 	LoadingComponent,
-	LoadingIcon,
 	SuccessComponent,
 } from '@/components/status.component';
 import Routes from '@/config/routes.setup';

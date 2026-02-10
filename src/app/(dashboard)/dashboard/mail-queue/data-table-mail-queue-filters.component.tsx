@@ -1,7 +1,6 @@
 'use client';
 
-import type React from 'react';
-import { useCallback, useEffect, useMemo } from 'react';
+import { type JSX, useCallback, useEffect, useMemo } from 'react';
 import { useStore } from 'zustand/react';
 import {
 	FormFiltersDateRange,
@@ -25,7 +24,7 @@ const statuses = Object.values(MailQueueStatusEnum).map((v) => ({
 	value: v,
 }));
 
-export const DataTableMailQueueFilters = (): React.JSX.Element => {
+export const DataTableMailQueueFilters = (): JSX.Element => {
 	const { stateDefault, dataTableStore } = useDataTable<
 		'mail-queue',
 		MailQueueModel

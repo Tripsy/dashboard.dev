@@ -18,10 +18,11 @@ import {
 	FormComponentSubmit,
 } from '@/components/form/form-element.component';
 import { FormError } from '@/components/form/form-error.component';
+import { FormWrapperComponent } from '@/components/form/form-wrapper';
 import { Icons } from '@/components/icon.component';
 import { LoadingComponent } from '@/components/status.component';
+import { Button } from '@/components/ui/button';
 import Routes from '@/config/routes.setup';
-import { Configuration } from '@/config/settings.config';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
@@ -85,28 +86,11 @@ export default function AccountEdit() {
 	const elementIds = useElementIds(['name', 'language']);
 
 	if (authStatus === 'loading') {
-		return <LoadingComponent description="Loading..." />;
+		return <LoadingComponent />;
 	}
 
 	if (!auth) {
-		return (
-			<div>
-				<h1 className="text-center">Not Authenticated</h1>
-				<div className="text-sm">
-					<Icons.Status.Error className="text-error mr-1" />
-					Please{' '}
-					<Link
-						href={Routes.get('login')}
-						title="Sign in"
-						className="link link-info link-hover"
-					>
-						{' '}
-						log in{' '}
-					</Link>{' '}
-					to view your account.
-				</div>
-			</div>
-		);
+		throw new Error('Not authenticated.');
 	}
 
 	if (state.situation === 'csrf_error') {
@@ -114,52 +98,64 @@ export default function AccountEdit() {
 	}
 
 	return (
-		<form action={action} onSubmit={markSubmit} className="form-section">
-			<FormCsrf />
-			<h1 className="text-center">My Account - Edit</h1>
-			<FormComponentName
-				labelText="Name"
-				id={elementIds.name}
-				fieldValue={formValues.name ?? ''}
-				disabled={pending}
-				onChange={(e) => handleChange('name', e.target.value)}
-				error={errors.name}
-			/>
-			<FormComponentRadio
-				labelText="Language"
-				id={elementIds.language}
-				fieldName="language"
-				fieldValue={formValues.language}
-				options={languages}
-				disabled={pending}
-				onChange={(e) => handleChange('language', e.target.value)}
-				error={errors.language}
-			/>
+		<FormWrapperComponent
+			title="My Account - Edit"
+			description="Change your account details below."
+		>
+			<form
+				action={action}
+				onSubmit={markSubmit}
+				className="form-section"
+			>
+				<FormCsrf />
 
-			<div className="flex justify-end gap-2">
-				<a
-					href={Routes.get('account-me')}
-					className="btn btn-action-cancel"
-					title="Cancel & Go back to my account"
-				>
-					Cancel
-				</a>
-				<FormComponentSubmit
-					pending={pending}
-					submitted={submitted}
-					errors={errors}
-					buttonLabel="Save"
-					buttonIcon={<Icons.Action.Go />}
+				<FormComponentName
+					labelText="Name"
+					id={elementIds.name}
+					fieldValue={formValues.name ?? ''}
+					disabled={pending}
+					onChange={(e) => handleChange('name', e.target.value)}
+					error={errors.name}
 				/>
-			</div>
 
-			{state.situation === 'error' && state.message && (
-				<FormError>
-					<div>
-						<Icons.Status.Error /> {state.message}
-					</div>
-				</FormError>
-			)}
-		</form>
+				<FormComponentRadio
+					labelText="Language"
+					id={elementIds.language}
+					fieldName="language"
+					fieldValue={formValues.language}
+					disabled={pending}
+					options={languages}
+					onValueChange={(value) => handleChange('language', value)}
+					error={errors.language}
+				/>
+
+				<div className="flex justify-end gap-2">
+					<Button variant="cancel">
+						<Link
+							href={Routes.get('account-me')}
+							title="Cancel & Go back to my account"
+							className="flex items-center gap-1"
+						>
+							<Icons.Action.Cancel /> Cancel
+						</Link>
+					</Button>
+					<FormComponentSubmit
+						pending={pending}
+						submitted={submitted}
+						errors={errors}
+						buttonLabel="Save"
+						buttonIcon={<Icons.Action.Go />}
+					/>
+				</div>
+
+				{state.situation === 'error' && state.message && (
+					<FormError>
+						<div>
+							<Icons.Status.Error /> {state.message}
+						</div>
+					</FormError>
+				)}
+			</form>
+		</FormWrapperComponent>
 	);
 }

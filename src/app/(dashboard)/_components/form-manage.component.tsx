@@ -14,7 +14,6 @@ import { formAction } from '@/app/(dashboard)/_actions';
 import { handleReset } from '@/app/(dashboard)/_components/data-table-actions.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import { FormError } from '@/components/form/form-error.component';
-import { FormPart } from '@/components/form/form-part.component';
 import { getActionIcon, Icons } from '@/components/icon.component';
 import { LoadingIcon } from '@/components/status.component';
 import {

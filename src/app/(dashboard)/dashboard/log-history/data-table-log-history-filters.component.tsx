@@ -1,7 +1,6 @@
 'use client';
 
-import type React from 'react';
-import { useCallback, useEffect, useMemo } from 'react';
+import { type JSX, useCallback, useEffect, useMemo } from 'react';
 import { useStore } from 'zustand/react';
 import {
 	FormFiltersDateRange,
@@ -37,7 +36,7 @@ const sources = Object.values(LogHistorySource).map((v) => ({
 	value: v,
 }));
 
-export const DataTableLogHistoryFilters = (): React.JSX.Element => {
+export const DataTableLogHistoryFilters = (): JSX.Element => {
 	const { stateDefault, dataTableStore } = useDataTable<
 		'log-history',
 		LogHistoryModel

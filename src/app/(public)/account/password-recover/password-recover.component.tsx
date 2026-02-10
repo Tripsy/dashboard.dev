@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import React, { useActionState } from 'react';
+import { useActionState } from 'react';
 import {
 	passwordRecoverAction,
 	passwordRecoverValidate,

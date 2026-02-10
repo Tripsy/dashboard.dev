@@ -2,6 +2,12 @@ import type React from 'react';
 import { Icons } from '@/components/icon.component';
 import { cn } from '@/helpers/css.helper';
 
+type StatusProps = {
+	children?: React.ReactNode;
+	title?: string;
+	description?: string;
+};
+
 // Loading
 
 export function LoadingIcon({ className }: { className?: string }) {
@@ -13,17 +19,11 @@ export function LoadingIcon({ className }: { className?: string }) {
 	);
 }
 
-type LoadingProps = {
-	children?: React.ReactNode;
-	title?: string;
-	description?: string;
-};
-
 export function LoadingComponent({
 	children,
 	title = 'Loading',
 	description = 'Please wait ...',
-}: LoadingProps) {
+}: StatusProps) {
 	return (
 		<div className="min-h-[calc(80vh-4rem)] flex items-center justify-center px-4 py-12">
 			<div className="w-full max-w-md">
@@ -46,17 +46,11 @@ export const ErrorIcon = ({ className }: { className?: string }) => (
 	<Icons.Status.Error className={cn('inline-block', className)} />
 );
 
-type ErrorProps = {
-	children?: React.ReactNode;
-	title?: string;
-	description?: string;
-};
-
 export function ErrorComponent({
 	children,
 	title = 'An error occurred!',
 	description = 'Something went wrong!',
-}: ErrorProps) {
+}: StatusProps) {
 	return (
 		<div className="min-h-[calc(80vh-4rem)] flex items-center justify-center px-4 py-12">
 			<div className="w-full max-w-md">
@@ -75,23 +69,40 @@ export function ErrorComponent({
 
 // Success
 
-type SuccessProps = {
-	children?: React.ReactNode;
-	title?: string;
-	description?: string;
-};
-
 export function SuccessComponent({
 	children,
 	title = 'Success!',
 	description = 'It&apos;s done!',
-}: SuccessProps) {
+}: StatusProps) {
 	return (
 		<div className="min-h-[calc(80vh-4rem)] flex items-center justify-center px-4 py-12">
 			<div className="w-full max-w-md">
 				<div className="text-center">
 					<div className="flex justify-center mb-4">
 						<Icons.Status.Success className="w-12 h-12 text-success bg-success/30 rounded-full p-3" />
+					</div>
+					<h1 className="text-2xl font-bold mb-8">{title}</h1>
+					<p className="text-muted-foreground">{description}</p>
+				</div>
+				{children}
+			</div>
+		</div>
+	);
+}
+
+// Info
+
+export function InfoComponent({
+	children,
+	title = 'Info!',
+	description = 'Life is life!',
+}: StatusProps) {
+	return (
+		<div className="min-h-[calc(80vh-4rem)] flex items-center justify-center px-4 py-12">
+			<div className="w-full max-w-md">
+				<div className="text-center">
+					<div className="flex justify-center mb-4">
+						<Icons.Info className="w-12 h-12 text-info bg-info/30 rounded-full p-3" />
 					</div>
 					<h1 className="text-2xl font-bold mb-8">{title}</h1>
 					<p className="text-muted-foreground">{description}</p>

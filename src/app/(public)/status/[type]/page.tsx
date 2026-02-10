@@ -1,11 +1,18 @@
 'use client';
 
+import Link from 'next/link';
 import { useParams, useSearchParams } from 'next/navigation';
 import { useMemo } from 'react';
-import { Notice } from '@/components/notice.component';
+import {
+	ErrorComponent,
+	InfoComponent,
+	LoadingComponent,
+	SuccessComponent,
+} from '@/components/status.component';
+import Routes from '@/config/routes.setup';
 import { useTranslation } from '@/hooks/use-translation.hook';
 
-type ParamsType = 'error' | 'warning' | 'info' | 'success';
+type ParamsType = 'error' | 'info' | 'success';
 
 export default function Page() {
 	const params = useParams<{ type: ParamsType }>();
@@ -18,11 +25,64 @@ export default function Page() {
 
 	const translationsKeys = useMemo(() => [messageKey] as const, [messageKey]);
 
-	const { translations } = useTranslation(translationsKeys);
+	const { translations, isTranslationLoading } =
+		useTranslation(translationsKeys);
 
-	return (
-		<div className="fit-container max-w-[32rem]">
-			<Notice type={type} message={translations[messageKey]} />
-		</div>
-	);
+	if (isTranslationLoading) {
+		return <LoadingComponent />;
+	}
+
+	switch (type) {
+		case 'error':
+			return (
+				<ErrorComponent
+					title="Error"
+					description={translations[messageKey]}
+				>
+					<div className="text-center mt-6">
+						Go back to{' '}
+						<Link
+							href={Routes.get('home')}
+							className="text-primary font-medium hover:underline"
+						>
+							home page
+						</Link>
+					</div>
+				</ErrorComponent>
+			);
+		case 'success':
+			return (
+				<SuccessComponent
+					title="Success"
+					description={translations[messageKey]}
+				>
+					<div className="text-center mt-6">
+						Go back to{' '}
+						<Link
+							href={Routes.get('home')}
+							className="text-primary font-medium hover:underline"
+						>
+							home page
+						</Link>
+					</div>
+				</SuccessComponent>
+			);
+		case 'info':
+			return (
+				<InfoComponent
+					title="Info"
+					description={translations[messageKey]}
+				>
+					<div className="text-center mt-6">
+						Go back to{' '}
+						<Link
+							href={Routes.get('home')}
+							className="text-primary font-medium hover:underline"
+						>
+							home page
+						</Link>
+					</div>
+				</InfoComponent>
+			);
+	}
 }

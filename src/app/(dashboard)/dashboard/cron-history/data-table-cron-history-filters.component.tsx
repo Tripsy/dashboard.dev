@@ -1,7 +1,6 @@
 'use client';
 
-import type React from 'react';
-import { useCallback, useEffect, useMemo } from 'react';
+import { type JSX, useCallback, useEffect, useMemo } from 'react';
 import { useStore } from 'zustand/react';
 import {
 	FormFiltersDateRange,
@@ -25,7 +24,7 @@ const statuses = Object.values(CronHistoryStatusEnum).map((v) => ({
 	value: v,
 }));
 
-export const DataTableCronHistoryFilters = (): React.JSX.Element => {
+export const DataTableCronHistoryFilters = (): JSX.Element => {
 	const { stateDefault, dataTableStore } = useDataTable<
 		'cron-history',
 		CronHistoryModel

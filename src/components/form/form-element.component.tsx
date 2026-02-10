@@ -3,7 +3,7 @@ import {
 	type AutoCompleteCompleteEvent,
 } from 'primereact/autocomplete';
 import type { DropdownChangeEvent } from 'primereact/dropdown';
-import React, { type JSX, useMemo } from 'react';
+import { type JSX, useMemo } from 'react';
 import { FormElementError } from '@/components/form/form-element-error.component';
 import { Icons } from '@/components/icon.component';
 import { LoadingIcon } from '@/components/status.component';
@@ -249,8 +249,12 @@ export const FormComponentSelect = ({
 					</SelectTrigger>
 					<SelectContent className={cn(borderClass, className)}>
 						{options.map(({ label, value }) => {
+							const key = `${id}-${value}`;
+
 							return (
-								<SelectItem value={value}>{label}</SelectItem>
+								<SelectItem key={key} value={value}>
+									{label}
+								</SelectItem>
 							);
 						})}
 					</SelectContent>
@@ -439,14 +443,16 @@ export const FormComponentSubmit = ({
 	pending,
 	submitted,
 	errors,
+	buttonVariant = 'default',
 	buttonLabel,
 	buttonIcon,
 }: {
 	pending: boolean;
 	submitted: boolean;
 	errors: Record<string, string[]>;
+	buttonVariant?: 'default' | 'error' | 'success' | 'warning';
 	buttonLabel: string;
-	buttonIcon?: React.JSX.Element;
+	buttonIcon?: JSX.Element;
 }) => {
 	const translationsKeys = useMemo(
 		() => ['app.text.please_wait'] as const,
@@ -458,7 +464,8 @@ export const FormComponentSubmit = ({
 	return (
 		<Button
 			type="submit"
-			className="w-full h-11"
+			variant={buttonVariant}
+			className="w-full cursor-pointer"
 			disabled={pending || (submitted && Object.keys(errors).length > 0)}
 			aria-busy={pending}
 		>
@@ -504,11 +511,13 @@ export const FormComponentEmail = (
 	props: Omit<
 		FormComponentProps,
 		'fieldName' | 'fieldType' | 'autoComplete' | 'icons'
-	>,
+	> & {
+		fieldName?: 'email' | 'email_new';
+	},
 ) => (
 	<FormComponentInput
 		{...props}
-		fieldName="email"
+		fieldName={props.fieldName || 'email'}
 		isRequired={props.isRequired ?? true}
 		className={cn('pl-8', props.className)}
 		autoComplete="email"

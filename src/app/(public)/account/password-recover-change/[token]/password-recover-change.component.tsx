@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import React, { useActionState, useState } from 'react';
+import { useActionState, useState } from 'react';
 import {
 	passwordRecoverChangeAction,
 	passwordRecoverChangeValidate,

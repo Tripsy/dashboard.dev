@@ -228,10 +228,7 @@ export function SetupPermissionsUser() {
 
 	if (loading) {
 		return (
-			<LoadingComponent
-				text={translations['app.text.loading']}
-				className="min-h-64 flex items-center justify-center"
-			/>
+			<LoadingComponent description={translations['app.text.loading']} />
 		);
 	}
 

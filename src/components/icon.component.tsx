@@ -1,25 +1,16 @@
 import {
-	faArrowRightToBracket,
 	faArrowsRotate,
 	faBan,
-	faCalendar,
 	faCircleCheck,
-	faCircleInfo,
-	faCircleXmark,
 	faClock,
 	faEnvelopeCircleCheck,
 	faEye,
-	faFileContract,
 	faLock,
-	faMagnifyingGlass,
 	faPenToSquare,
-	faPlay,
 	faPlugCircleXmark,
 	faPlus,
 	faRotateLeft,
 	faScrewdriverWrench,
-	faShield,
-	faTag,
 	faThumbsUp,
 	faTrashCan,
 	faTriangleExclamation,
@@ -29,15 +20,23 @@ import {
 	type FontAwesomeIconProps,
 } from '@fortawesome/react-fontawesome';
 import {
+	Calendar,
 	CircleX,
 	Eye,
 	EyeOff,
+	FileStack,
+	Info,
 	KeyRound,
 	Loader,
 	LogIn,
 	Mail,
 	Play,
+	Search,
+	Settings,
+	Shield,
+	Tag,
 	UserRound,
+	X,
 } from 'lucide-react';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
 
@@ -56,29 +55,15 @@ type IconsProps = {
 export const Icons = {
 	Email: (props: IconsProps) => <Mail {...props} />,
 	Password: (props: IconsProps) => <KeyRound {...props} />,
-	Search: (props: Partial<FontAwesomeIconProps>) => (
-		<AwesomeIcon icon={faMagnifyingGlass} {...props} />
-	),
+	Search: (props: IconsProps) => <Search {...props} />,
 	Visible: (props: IconsProps) => <Eye {...props} />,
 	Obscured: (props: IconsProps) => <EyeOff {...props} />,
-	Tag: (props: Partial<FontAwesomeIconProps>) => (
-		<AwesomeIcon icon={faTag} {...props} />
-	),
-	Calendar: (props: Partial<FontAwesomeIconProps>) => (
-		<AwesomeIcon icon={faCalendar} {...props} />
-	),
-	Settings: (props: Partial<FontAwesomeIconProps>) => (
-		<AwesomeIcon icon={faScrewdriverWrench} {...props} />
-	),
-	Security: (props: Partial<FontAwesomeIconProps>) => (
-		<AwesomeIcon icon={faShield} {...props} />
-	),
-	Session: (props: Partial<FontAwesomeIconProps>) => (
-		<AwesomeIcon icon={faFileContract} {...props} />
-	),
-	Info: (props: Partial<FontAwesomeIconProps>) => (
-		<AwesomeIcon icon={faCircleInfo} {...props} />
-	),
+	Tag: (props: IconsProps) => <Tag {...props} />,
+	Calendar: (props: IconsProps) => <Calendar {...props} />,
+	Settings: (props: IconsProps) => <Settings {...props} />,
+	Security: (props: IconsProps) => <Shield {...props} />,
+	Session: (props: IconsProps) => <FileStack {...props} />,
+	Info: (props: IconsProps) => <Info {...props} />,
 	Status: {
 		Active: (props: Partial<FontAwesomeIconProps>) => (
 			<AwesomeIcon icon={faCircleCheck} {...props} />
@@ -119,9 +104,7 @@ export const Icons = {
 		Delete: (props: Partial<FontAwesomeIconProps>) => (
 			<AwesomeIcon icon={faTrashCan} {...props} />
 		),
-		Cancel: (props: Partial<FontAwesomeIconProps>) => (
-			<AwesomeIcon icon={faCircleXmark} {...props} />
-		),
+		Cancel: (props: IconsProps) => <X {...props} />,
 		Destroy: (props: Partial<FontAwesomeIconProps>) => (
 			<AwesomeIcon icon={faPlugCircleXmark} {...props} />
 		),

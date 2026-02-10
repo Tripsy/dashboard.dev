@@ -161,10 +161,14 @@ $ pnpm run madge
 
 # TODO
 
-1. inspire from wellatwork components
-2. use AI to create a clean dashboard
-3. Review How to section 
-4. Recreate docker image
+1. fresh design
+    - dashboard layout
+    - dashboard filters / manage
+    - docs page
+    - features page
+    - changelog page 
+2. Review Readme > How to section 
+3. Recreate docker image
 
 # Bugs & Issues & Ideas
 

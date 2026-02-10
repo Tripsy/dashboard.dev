@@ -14,7 +14,7 @@ export type DataTableColumnType<Model> = {
 	body?: (
 		entry: Model,
 		column: DataTableColumnType<Model>,
-	) => React.JSX.Element | string;
+	) => JSX.Element | string;
 	style?: React.CSSProperties;
 };
 

@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Icons } from '@/components/icon.component';
+import {
+	ErrorComponent,
+	SuccessComponent,
+} from '@/components/status.component';
 import Routes from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
 import { translate } from '@/config/translate.setup';
@@ -57,64 +60,50 @@ export default async function Page(props: Props) {
 		}
 	}
 
-	return (
-		<section className="fit-container">
-			<div className="standard-box p-4 sm:p-8 shadow-md md:w-[24rem]">
-				<div className="form-section">
-					<h1 className="text-center">Email Confirmation</h1>
-
-					<div className="text-sm">
-						<div className="flex items-center gap-1">
-							{success ? (
-								<Icons.Status.Success className="text-success" />
-							) : (
-								<Icons.Status.Error className="text-error" />
-							)}
-							{message}
-						</div>
-					</div>
+	if (success) {
+		return (
+			<SuccessComponent title="Email Confirmation" description={message}>
+				<div className="text-center mt-6">
+					What's next? Check{' '}
+					<Link
+						href={Routes.get('account-me')}
+						className="text-primary font-medium hover:underline"
+						title="Go to your account"
+					>
+						your account
+					</Link>{' '}
+					or navigate to{' '}
+					<Link
+						href={Routes.get('home')}
+						className="text-primary font-medium hover:underline"
+					>
+						home page
+					</Link>
 				</div>
+			</SuccessComponent>
+		);
+	}
 
-				{success ? (
-					<p className="mt-4 text-center">
-						<span className="text-sm text-gray-500 dark:text-base-content">
-							What's next? Check{' '}
-							<Link
-								href={Routes.get('account-me')}
-								className="link link-info link-hover text-sm"
-							>
-								your account
-							</Link>{' '}
-							or navigate to{' '}
-							<Link
-								href={Routes.get('home')}
-								className="link link-info link-hover text-sm"
-							>
-								home page
-							</Link>
-						</span>
-					</p>
-				) : (
-					<p className="mt-4 text-center">
-						<span className="text-sm text-gray-500 dark:text-base-content">
-							What now? You can register for a{' '}
-							<Link
-								href={Routes.get('register')}
-								className="link link-info link-hover text-sm"
-							>
-								new account
-							</Link>{' '}
-							or request{' '}
-							<Link
-								href={Routes.get('email-confirm-send')}
-								className="link link-info link-hover text-sm"
-							>
-								another confirmation link
-							</Link>
-						</span>
-					</p>
-				)}
+	return (
+		<ErrorComponent title="Email Confirmation" description={message}>
+			<div className="text-center mt-6">
+				What now? You can register for a{' '}
+				<Link
+					href={Routes.get('register')}
+					className="text-primary font-medium hover:underline"
+					title="Create account"
+				>
+					new account
+				</Link>{' '}
+				or request{' '}
+				<Link
+					href={Routes.get('email-confirm-send')}
+					className="text-primary font-medium hover:underline"
+					title="Send confirmation link again"
+				>
+					another confirmation link
+				</Link>
 			</div>
-		</section>
+		</ErrorComponent>
 	);
 }

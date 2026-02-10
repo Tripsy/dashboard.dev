@@ -17,8 +17,10 @@ import {
 	FormComponentSubmit,
 } from '@/components/form/form-element.component';
 import { FormError } from '@/components/form/form-error.component';
+import { FormWrapperComponent } from '@/components/form/form-wrapper';
 import { Icons } from '@/components/icon.component';
 import { LoadingComponent } from '@/components/status.component';
+import { Button } from '@/components/ui/button';
 import Routes from '@/config/routes.setup';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
@@ -69,28 +71,11 @@ export default function PasswordUpdate() {
 	]);
 
 	if (authStatus === 'loading') {
-		return <LoadingComponent description="Loading..." />;
+		return <LoadingComponent />;
 	}
 
 	if (!auth) {
-		return (
-			<div>
-				<h1 className="text-center">Not Authenticated</h1>
-				<div className="text-sm">
-					<Icons.Status.Error className="text-error mr-1" />
-					Please{' '}
-					<Link
-						href={Routes.get('login')}
-						title="Sign in"
-						className="link link-info link-hover"
-					>
-						{' '}
-						log in{' '}
-					</Link>{' '}
-					to view your account.
-				</div>
-			</div>
-		);
+		throw new Error('Not authenticated.');
 	}
 
 	if (state.situation === 'csrf_error') {
@@ -98,77 +83,88 @@ export default function PasswordUpdate() {
 	}
 
 	return (
-		<form action={action} onSubmit={markSubmit} className="form-section">
-			<FormCsrf />
+		<FormWrapperComponent
+			title="My Account - Password update"
+			description="Change your password by entering the current password and a new one.."
+		>
+			<form
+				action={action}
+				onSubmit={markSubmit}
+				className="form-section"
+			>
+				<FormCsrf />
 
-			<h1 className="text-center">My Account - Password update</h1>
-
-			<FormComponentPassword
-				labelText="Current Password"
-				id={elementIds.passwordCurrent}
-				fieldName="password_current"
-				fieldValue={formValues.password_current ?? ''}
-				placeholderText="Current password"
-				autoComplete="current-password"
-				disabled={pending}
-				onChange={(e) =>
-					handleChange('password_current', e.target.value)
-				}
-				error={errors.password_current}
-				showPassword={showPassword}
-				setShowPassword={setShowPassword}
-			/>
-
-			<FormComponentPassword
-				labelText="New Password"
-				id={elementIds.passwordNew}
-				fieldName="password_new"
-				fieldValue={formValues.password_new ?? ''}
-				placeholderText="New password"
-				disabled={pending}
-				onChange={(e) => handleChange('password_new', e.target.value)}
-				error={errors.password_new}
-				showPassword={showPassword}
-			/>
-
-			<FormComponentPassword
-				labelText="Confirm Password"
-				id={elementIds.passwordConfirm}
-				fieldName="password_confirm"
-				fieldValue={formValues.password_confirm ?? ''}
-				placeholderText="Password confirmation"
-				disabled={pending}
-				onChange={(e) =>
-					handleChange('password_confirm', e.target.value)
-				}
-				error={errors.password_confirm}
-				showPassword={showPassword}
-			/>
-
-			<div className="flex justify-end gap-2">
-				<a
-					href={Routes.get('account-me')}
-					className="btn btn-action-cancel"
-					title="Cancel & Go back to my account"
-				>
-					Cancel
-				</a>
-				<FormComponentSubmit
-					pending={pending}
-					submitted={submitted}
-					errors={errors}
-					buttonLabel="Update password"
-					buttonIcon={<Icons.Action.Go />}
+				<FormComponentPassword
+					labelText="Current Password"
+					id={elementIds.passwordCurrent}
+					fieldName="password_current"
+					fieldValue={formValues.password_current ?? ''}
+					placeholderText="Current password"
+					autoComplete="current-password"
+					disabled={pending}
+					onChange={(e) =>
+						handleChange('password_current', e.target.value)
+					}
+					error={errors.password_current}
+					showPassword={showPassword}
+					setShowPassword={setShowPassword}
 				/>
-			</div>
 
-			{state.situation === 'error' && state.message && (
-				<FormError>
-					<div>
-						<Icons.Status.Error /> {state.message}
-					</div>
-				</FormError>
-			)}
-		</form>
+				<FormComponentPassword
+					labelText="New Password"
+					id={elementIds.passwordNew}
+					fieldName="password_new"
+					fieldValue={formValues.password_new ?? ''}
+					placeholderText="New password"
+					disabled={pending}
+					onChange={(e) =>
+						handleChange('password_new', e.target.value)
+					}
+					error={errors.password_new}
+					showPassword={showPassword}
+				/>
+
+				<FormComponentPassword
+					labelText="Confirm Password"
+					id={elementIds.passwordConfirm}
+					fieldName="password_confirm"
+					fieldValue={formValues.password_confirm ?? ''}
+					placeholderText="Password confirmation"
+					disabled={pending}
+					onChange={(e) =>
+						handleChange('password_confirm', e.target.value)
+					}
+					error={errors.password_confirm}
+					showPassword={showPassword}
+				/>
+
+				<div className="flex justify-end gap-2">
+					<Button variant="cancel">
+						<Link
+							href={Routes.get('account-me')}
+							title="Cancel & Go back to my account"
+							className="flex items-center gap-1"
+						>
+							<Icons.Action.Cancel /> Cancel
+						</Link>
+					</Button>
+					<FormComponentSubmit
+						pending={pending}
+						submitted={submitted}
+						errors={errors}
+						buttonLabel="Update password"
+						buttonIcon={<Icons.Action.Go />}
+					/>
+				</div>
+
+				{state.situation === 'error' && state.message && (
+					<FormError>
+						<div>
+							<Icons.Status.Error /> {state.message}
+						</div>
+					</FormError>
+				)}
+			</form>
+		</FormWrapperComponent>
 	);
 }

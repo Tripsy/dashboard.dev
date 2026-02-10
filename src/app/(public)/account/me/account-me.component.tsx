@@ -5,10 +5,12 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { AuthTokenList } from '@/app/(public)/account/login/login.component';
 import { Icons } from '@/components/icon.component';
+import { LogoComponent } from '@/components/layout/logo.default';
 import { LoadingComponent } from '@/components/status.component';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import Routes from '@/config/routes.setup';
 import { formatDate } from '@/helpers/date.helper';
-import { capitalizeFirstLetter } from '@/helpers/string.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { useAuth } from '@/providers/auth.provider';
 import { useToast } from '@/providers/toast.provider';
@@ -84,176 +86,153 @@ export default function AccountMe() {
 	}, [searchParams, showToast, isTranslationLoading, translations, router]);
 
 	if (authStatus === 'loading') {
-		return <LoadingComponent description="Loading..." />;
+		return <LoadingComponent />;
 	}
 
 	if (!auth) {
-		return (
-			<div>
-				<h1 className="text-center">Not Authenticated</h1>
-				<div className="text-sm">
-					<Icons.Status.Error className="text-error mr-1" />
-					Please{' '}
-					<Link
-						href={Routes.get('login')}
-						title="Sign in"
-						className="link link-info link-hover"
-					>
-						{' '}
-						log in{' '}
-					</Link>{' '}
-					to view your account.
-				</div>
-			</div>
-		);
+		throw new Error('Not authenticated.');
 	}
 
 	return (
-		<div className="grid grid-cols-1 gap-6">
-			{/* Header */}
-			<div className="flex justify-between items-center">
-				<h1 className="text-center">My Account</h1>
-				<Link
-					href={Routes.get('account-edit')}
-					prefetch={false}
-					title="Edit my account"
-					className="btn btn-success btn-sm"
-				>
-					<Icons.Action.Update />
-					Edit
-				</Link>
+		<div className="min-h-[calc(80vh-4rem)] px-4 py-12">
+			<div className="text-center mb-8">
+				<div className="flex justify-center mb-4">
+					<LogoComponent />
+				</div>
+				<h1 className="text-2xl font-bold mb-2">My Account</h1>
 			</div>
 
-			{/* Personal Information */}
-			<div className="card bg-base-100 shadow-xl">
-				<div className="card-body">
-					<h2 className="card-title">
-						<Icons.Entity.User />
-						Personal Information
-					</h2>
+			<div className="flex flex-wrap justify-center gap-8">
+				{/* Personal Information */}
+				<div className="bg-card border border-border rounded-xl p-6 shadow-xl space-y-4 w-full max-w-md">
+					<div className="flex justify-between items-center">
+						<h2 className="text-lg font-bold flex items-center gap-2">
+							<Icons.Entity.User />
+							Personal Information
+						</h2>
+						<Button variant="outline" size="sm">
+							<Link
+								href={Routes.get('account-edit')}
+								prefetch={false}
+								title="Edit my account"
+							>
+								<Icons.Action.Update /> Edit
+							</Link>
+						</Button>
+					</div>
 
-					<div className="space-y-4">
-						<div className="flex justify-between items-center py-2 border-b border-base-300">
-							<div>
-								<div className="label label-text font-semibold">
-									Full Name
-								</div>
-								<p className="text-lg">{auth.name}</p>
-							</div>
+					<div className="border-b pb-4">
+						<div className="text-sm text-muted-foreground font-semibold">
+							Full Name
 						</div>
+						<p>{auth.name}</p>
+					</div>
 
-						<div className="flex justify-between items-center py-2 border-b border-base-300">
+					<div className="border-b pb-4">
+						<div className="flex justify-between">
 							<div>
-								<div className="label label-text font-semibold">
+								<div className="text-sm text-muted-foreground font-semibold">
 									Email Address
 								</div>
-								<p className="text-lg">{auth.email}</p>
+								<p>{auth.email}</p>
 								{auth.email_verified_at ? (
-									<span className="badge badge-success badge-sm mt-1">
+									<Badge
+										variant="success"
+										size="sm"
+										className="rounded-lg mt-1"
+									>
 										<Icons.Status.Ok />
 										Verified
-									</span>
+									</Badge>
 								) : (
-									<span className="badge badge-warning badge-sm mt-1">
+									<Badge
+										variant="success"
+										size="xs"
+										className="rounded-lg mt-1"
+									>
 										<Icons.Status.Warning />
 										Not Verified
-									</span>
-									// <a
-									// 	className="badge badge-warning badge-sm mt-1"
-									// 	href={Routes.get('email-confirm-send')}
-									// 	title="Re-send email verification"
-									// >
-									// 	<Icons.Status.Warning />
-									// 	Not Verified
-									// </a>
+									</Badge>
 								)}
 							</div>
-							<Link
-								href={Routes.get('email-update')}
-								className="btn btn-outline btn-sm"
-								title="Update email address"
-							>
-								<Icons.Action.Update />
-								Change
-							</Link>
-						</div>
-
-						<div className="flex justify-between items-center py-2">
-							<div>
-								<div className="label label-text font-semibold">
-									Language preference
-								</div>
-								<p className="text-lg">
-									{capitalizeFirstLetter(auth.language)}
-								</p>
-							</div>
-						</div>
-
-						<div className="flex justify-between items-center py-2">
-							<div>
-								<div className="label label-text font-semibold">
-									Member Since
-								</div>
-								<p className="text-lg">
-									{formatDate(auth.created_at, 'MMMM D, Y')}
-								</p>
-							</div>
+							<Button variant="outline" size="sm">
+								<Link
+									href={Routes.get('email-update')}
+									prefetch={false}
+									title="Update email address"
+								>
+									<Icons.Action.Update /> Change
+								</Link>
+							</Button>
 						</div>
 					</div>
-				</div>
-			</div>
 
-			{/* Security & Account */}
-			<div className="card bg-base-100 shadow-xl">
-				<div className="card-body">
-					<h2 className="card-title">
+					<div className="border-b pb-4">
+						<div className="text-sm text-muted-foreground font-semibold">
+							Language
+						</div>
+						<p>{auth.language}</p>
+					</div>
+
+					<div>
+						<div className="text-sm text-muted-foreground font-semibold">
+							Member Since
+						</div>
+						<p>{formatDate(auth.created_at, 'MMMM D, YYYY')}</p>
+					</div>
+				</div>
+
+				{/* Security & Account */}
+				<div className="bg-card border border-border rounded-xl p-6 shadow-xl space-y-4 w-full max-w-md">
+					<h2 className="text-lg font-bold flex items-center gap-2">
 						<Icons.Security />
 						Security & Account
 					</h2>
 
-					<div className="space-y-4">
-						{/* Password Section */}
-						<div className="flex justify-between items-center py-2 border-b border-base-300">
+					<div className="border-b pb-4">
+						<div className="flex justify-between">
 							<div>
-								<div className="label label-text font-semibold">
+								<div className="text-sm text-muted-foreground font-semibold">
 									Password
 								</div>
-								<p className="text-sm text-base-content/70">
+								<p className="text-xs italic">
 									Last updated:{' '}
 									{formatDate(
 										auth.password_updated_at,
-										'date-time',
+										'D MMMM YYYY, h:mm A',
 									)}
 								</p>
 							</div>
-							<Link
-								href={Routes.get('password-update')}
-								className="btn btn-outline btn-sm"
-								title="Update password"
-							>
-								<Icons.Password />
-								Change
-							</Link>
+							<Button variant="outline" size="sm">
+								<Link
+									href={Routes.get('password-update')}
+									prefetch={false}
+									title="Update password"
+									className="flex items-center gap-1"
+								>
+									<Icons.Password /> Change
+								</Link>
+							</Button>
 						</div>
 					</div>
 
-					{/* Quick Actions */}
-					<div className="card-actions justify-end mt-6">
-						<Link
-							href={Routes.get('account-delete')}
-							className="btn btn-error btn-sm"
-						>
-							<Icons.Action.Delete />
-							Delete Account
-						</Link>
+					<div className="flex justify-end mt-6">
+						<Button variant="error" size="sm">
+							<Link
+								href={Routes.get('account-delete')}
+								prefetch={false}
+								title="Delete my account"
+								className="flex items-center gap-1"
+							>
+								<Icons.Action.Delete /> Delete Account
+							</Link>
+						</Button>
 					</div>
 				</div>
-			</div>
 
-			{/* Sessions Management */}
-			<div className="card bg-base-200">
-				<div className="card-body">
-					<h2 className="card-title">
+				{/* Sessions Management */}
+				<div className="bg-card border border-border rounded-xl p-6 shadow-xl space-y-4 w-full max-w-md">
+					<h2 className="text-lg font-bold flex items-center gap-2">
 						<Icons.Session />
 						Sessions
 					</h2>

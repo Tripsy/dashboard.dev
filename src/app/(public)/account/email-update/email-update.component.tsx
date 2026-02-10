@@ -17,11 +17,11 @@ import {
 	FormComponentSubmit,
 } from '@/components/form/form-element.component';
 import { FormError } from '@/components/form/form-error.component';
-import { FormPart } from '@/components/form/form-part.component';
+import { FormWrapperComponent } from '@/components/form/form-wrapper';
 import { Icons } from '@/components/icon.component';
 import { LoadingComponent } from '@/components/status.component';
+import { Button } from '@/components/ui/button';
 import Routes from '@/config/routes.setup';
-import { Configuration } from '@/config/settings.config';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
@@ -65,28 +65,11 @@ export default function EmailUpdate() {
 	const elementIds = useElementIds(['emailNew']);
 
 	if (authStatus === 'loading') {
-		return <LoadingComponent description="Loading..." />;
+		return <LoadingComponent />;
 	}
 
 	if (!auth) {
-		return (
-			<div>
-				<h1 className="text-center">Not Authenticated</h1>
-				<div className="text-sm">
-					<Icons.Status.Error className="text-error mr-1" />
-					Please{' '}
-					<Link
-						href={Routes.get('login')}
-						title="Sign in"
-						className="link link-info link-hover"
-					>
-						{' '}
-						log in{' '}
-					</Link>{' '}
-					to view your account.
-				</div>
-			</div>
-		);
+		throw new Error('Not authenticated.');
 	}
 
 	if (state.situation === 'csrf_error') {
@@ -94,53 +77,55 @@ export default function EmailUpdate() {
 	}
 
 	return (
-		<form action={action} onSubmit={markSubmit} className="form-section">
-			<FormCsrf />
+		<FormWrapperComponent
+			title="My Account - Email update"
+			description="Email confirmation will be required before switching to the
+					new email address."
+		>
+			<form
+				action={action}
+				onSubmit={markSubmit}
+				className="form-section"
+			>
+				<FormCsrf />
 
-			<h1 className="text-center">My Account - Email update</h1>
-
-			<FormPart className="text-sm">
-				<span>
-					<Icons.Info className="mr-1 text-info" />
-					Email confirmation will be required before switching to the
-					new email address.
-				</span>
-			</FormPart>
-
-			<FormComponentEmail
-				labelText="New Email"
-				id={elementIds.emailNew}
-				fieldName="email_new"
-				fieldValue={formValues.email_new ?? ''}
-				disabled={pending}
-				onChange={(e) => handleChange('email_new', e.target.value)}
-				error={errors.email_new}
-			/>
-
-			<div className="flex justify-end gap-2">
-				<a
-					href={Routes.get('account-me')}
-					className="btn btn-action-cancel"
-					title="Cancel & Go back to my account"
-				>
-					Cancel
-				</a>
-				<FormComponentSubmit
-					pending={pending}
-					submitted={submitted}
-					errors={errors}
-					buttonLabel="Update"
-					buttonIcon={<Icons.Action.Go />}
+				<FormComponentEmail
+					labelText="New Email"
+					id={elementIds.emailNew}
+					fieldName="email_new"
+					fieldValue={formValues.email_new ?? ''}
+					disabled={pending}
+					onChange={(e) => handleChange('email_new', e.target.value)}
+					error={errors.email_new}
 				/>
-			</div>
 
-			{state.situation === 'error' && state.message && (
-				<FormError>
-					<div>
-						<Icons.Status.Error /> {state.message}
-					</div>
-				</FormError>
-			)}
-		</form>
+				<div className="flex justify-end gap-2">
+					<Button variant="cancel">
+						<Link
+							href={Routes.get('account-me')}
+							title="Cancel & Go back to my account"
+							className="flex items-center gap-1"
+						>
+							<Icons.Action.Cancel /> Cancel
+						</Link>
+					</Button>
+					<FormComponentSubmit
+						pending={pending}
+						submitted={submitted}
+						errors={errors}
+						buttonLabel="Update"
+						buttonIcon={<Icons.Action.Go />}
+					/>
+				</div>
+
+				{state.situation === 'error' && state.message && (
+					<FormError>
+						<div>
+							<Icons.Status.Error /> {state.message}
+						</div>
+					</FormError>
+				)}
+			</form>
+		</FormWrapperComponent>
 	);
 }

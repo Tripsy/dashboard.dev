@@ -1,9 +1,7 @@
 'use client';
 
-import clsx from 'clsx';
 import Link from 'next/link';
-import type { DropdownChangeEvent } from 'primereact/dropdown';
-import React, { useActionState, useState } from 'react';
+import { useActionState, useState } from 'react';
 import {
 	registerAction,
 	registerValidate,
@@ -19,11 +17,8 @@ import {
 	FormComponentName,
 	FormComponentPassword,
 	FormComponentRadio,
-	FormComponentSelect,
 	FormComponentSubmit,
-	FormElement,
 } from '@/components/form/form-element.component';
-import { FormElementError as RawFormElementError } from '@/components/form/form-element-error.component';
 import { FormError } from '@/components/form/form-error.component';
 import { FormWrapperComponent } from '@/components/form/form-wrapper';
 import { Icons } from '@/components/icon.component';
@@ -34,14 +29,11 @@ import {
 } from '@/components/status.component';
 import { Label } from '@/components/ui/label';
 import Routes from '@/config/routes.setup';
-import { Configuration } from '@/config/settings.config';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
 import { LanguageEnum } from '@/models/user.model';
-
-const FormElementError = React.memo(RawFormElementError);
 
 const languages = Object.values(LanguageEnum).map((language) => ({
 	label: capitalizeFirstLetter(language),

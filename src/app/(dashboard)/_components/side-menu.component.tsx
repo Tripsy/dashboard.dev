@@ -12,7 +12,7 @@ import {
 	type IconDefinition,
 } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
-import React, { useLayoutEffect, useMemo, useState } from 'react';
+import { useLayoutEffect, useMemo, useState } from 'react';
 import { AwesomeIcon } from '@/components/icon.component';
 import Routes from '@/config/routes.setup';
 import { useDebouncedEffect } from '@/hooks/use-debounced-effect.hook';

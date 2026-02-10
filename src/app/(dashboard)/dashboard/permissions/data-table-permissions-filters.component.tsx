@@ -1,7 +1,6 @@
 'use client';
 
-import type React from 'react';
-import { useCallback, useEffect, useMemo } from 'react';
+import { type JSX, useCallback, useEffect, useMemo } from 'react';
 import { useStore } from 'zustand/react';
 import {
 	FormFiltersReset,
@@ -15,7 +14,7 @@ import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import type { PermissionModel } from '@/models/permission.model';
 
-export const DataTablePermissionsFilters = (): React.JSX.Element => {
+export const DataTablePermissionsFilters = (): JSX.Element => {
 	const { stateDefault, dataTableStore } = useDataTable<
 		'permissions',
 		PermissionModel

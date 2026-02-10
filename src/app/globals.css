@@ -156,8 +156,8 @@
 	--color-warning-foreground: hsl(38 92% 10%);
 	--color-warning-light: hsl(38 40% 15%);
 
-	--color-error: hsl(0 72% 60%);
-	--color-error-foreground: hsl(0 72% 10%);
+	--color-error: hsl(0 72% 30%);
+	--color-error-foreground: hsl(0 72% 85%);
 	--color-error-light: hsl(0 40% 15%);
 
 	--color-info: hsl(210 80% 60%);
@@ -270,10 +270,10 @@
 	}
 
 	.form-section .form-element .form-element-error {
-		@apply w-full text-error text-xs md:text-sm absolute left-0 top-full mt-2 z-50 px-4 py-2 bg-error-light rounded shadow-md transition-opacity duration-150 opacity-100 pointer-events-auto md:opacity-0 md:pointer-events-none;
+		@apply w-full text-error-foreground text-xs md:text-sm absolute left-0 top-full mt-2 z-50 px-4 py-2 bg-error rounded shadow-md transition-opacity duration-150 opacity-100 pointer-events-auto md:opacity-0 md:pointer-events-none;
 
 		&::before {
-			@apply absolute -top-1.5 left-4 w-3 h-3 bg-error-light rotate-45;
+			@apply absolute -top-1.5 left-4 w-3 h-3 bg-error rotate-45;
 			content: "";
 		}
 	}

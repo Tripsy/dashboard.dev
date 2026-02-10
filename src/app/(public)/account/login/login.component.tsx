@@ -1,8 +1,9 @@
 'use client';
 
+import { ArrowDownRight } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import React, { useActionState, useEffect, useMemo, useState } from 'react';
+import { useActionState, useEffect, useMemo, useState } from 'react';
 import {
 	loginAction,
 	loginValidate,
@@ -21,8 +22,10 @@ import { FormError } from '@/components/form/form-error.component';
 import { FormWrapperComponent } from '@/components/form/form-wrapper';
 import { Icons } from '@/components/icon.component';
 import { ErrorComponent, ErrorIcon } from '@/components/status.component';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Modal } from '@/components/ui/modal';
 import Routes, { isExcludedRoute } from '@/config/routes.setup';
-import { Configuration } from '@/config/settings.config';
 import { formatDate } from '@/helpers/date.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
@@ -275,62 +278,65 @@ export const AuthTokenList = ({
 	return (
 		<>
 			{tokenList.map((token: AuthTokenType) => (
-				<div key={token.ident} className="card bg-base-100 shadow-xl">
-					<div className="card-body">
-						<div className="text-sm">{token.label}</div>
+				<div key={token.ident} className="pb-4">
+					<div className="text-sm">
+						<ArrowDownRight className="h-4 w-4" />
+						{token.label}
+					</div>
+					<div className="flex justify-between items-center">
 						<div className="text-xs mt-1">
 							Last used: {formatDate(token.used_at, 'date-time')}
 						</div>
-						<div className="card-actions">
-							{token.used_now ? (
-								<div className="mt-2 btn btn-success btn-sm border-none cursor-default">
-									<Icons.Status.Active /> Active Session
-								</div>
-							) : (
-								<button
-									type="button"
-									className="mt-2 btn btn-neutral btn-sm border-none hover:bg-error"
-									onClick={() =>
-										setSelectedToken(token.ident)
-									}
-								>
-									<Icons.Action.Destroy /> Destroy Session
-								</button>
-							)}
-						</div>
+						{token.used_now ? (
+							<Badge variant="success" size="xs">
+								<Icons.Status.Active /> Active Session
+							</Badge>
+						) : (
+							<Button
+								variant="error"
+								size="xs"
+								onClick={() => setSelectedToken(token.ident)}
+							>
+								<Icons.Action.Destroy /> Destroy Session
+							</Button>
+						)}
 					</div>
 				</div>
 			))}
 
 			{selectedToken && (
-				<div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-					<div className="bg-base-200 p-4 md:p-8 rounded-md shadow-xl max-w-sm w-full">
-						<p className="text-sm semi-bold">
-							Are you sure you want to destroy the session?
-						</p>
-						<p className="font-mono text-xs break-words mt-2">
-							{selectedTokenData?.label}
-						</p>
-						<div className="flex justify-end gap-2 mt-4">
-							<button
-								type="button"
-								className="btn btn-neutral"
-								onClick={() => setSelectedToken(null)}
-								disabled={loading}
-							>
-								Cancel
-							</button>
-							<button
-								type="button"
-								className="btn btn-success"
+				<Modal
+					isOpen={true}
+					onClose={() => setSelectedToken(null)}
+					title="Destroy session"
+					footer={
+						<>
+							<Button
+								variant="error"
+								size="sm"
 								onClick={handleConfirmDestroy}
 								disabled={loading}
 							>
 								{loading ? 'Deleting...' : 'Confirm'}
-							</button>
-						</div>
-					</div>
-				</div>
+							</Button>
+							<Button
+								variant="outline"
+								size="sm"
+								onClick={() => setSelectedToken(null)}
+								disabled={loading}
+							>
+								Cancel
+							</Button>
+						</>
+					}
+				>
+					<p className="text-sm semi-bold">
+						Are you sure you want to destroy the session?
+					</p>
+					<p className="font-mono text-xs break-words mt-2">
+						{selectedTokenData?.label}
+					</p>
+				</Modal>
 			)}
 		</>
 	);

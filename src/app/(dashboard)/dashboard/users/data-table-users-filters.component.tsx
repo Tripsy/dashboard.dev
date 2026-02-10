@@ -1,7 +1,6 @@
 'use client';
 
-import type React from 'react';
-import { useCallback, useEffect, useMemo } from 'react';
+import { type JSX, useCallback, useEffect, useMemo } from 'react';
 import { useStore } from 'zustand/react';
 import {
 	FormFiltersDateRange,
@@ -32,7 +31,7 @@ const roles = Object.values(UserRoleEnum).map((v) => ({
 	value: v,
 }));
 
-export const DataTableUsersFilters = (): React.JSX.Element => {
+export const DataTableUsersFilters = (): JSX.Element => {
 	const { stateDefault, dataTableStore } = useDataTable<'users', UserModel>();
 
 	const translationsKeys = useMemo(

@@ -108,7 +108,9 @@ export function UserMenu() {
 						<div className="h-8 w-8 bg-primary text-primary-foreground text-sm shrink-0 overflow-hidden flex items-center justify-center rounded-full">
 							{auth.name.charAt(0).toUpperCase()}
 						</div>
-						<span className="text-sm font-medium">{auth.name}</span>
+						<span className="text-sm font-medium hidden sm:inline-block">
+							{auth.name}
+						</span>
 						<ChevronDown className="h-4 w-4 text-muted-foreground" />
 					</Button>
 				</DropdownMenuTrigger>

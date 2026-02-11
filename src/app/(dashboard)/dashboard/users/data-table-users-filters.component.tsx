@@ -3,7 +3,7 @@
 import { type JSX, useCallback, useEffect, useMemo } from 'react';
 import { useStore } from 'zustand/react';
 import {
-	FormFiltersDateRange,
+	createValueChangeHandler,
 	FormFiltersReset,
 	FormFiltersSearch,
 	FormFiltersSelect,
@@ -11,7 +11,6 @@ import {
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import type { UsersDataTableFiltersType } from '@/app/(dashboard)/dashboard/users/users.definition';
-import { createFilterHandlers } from '@/helpers/data-table.helper';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
@@ -66,25 +65,22 @@ export const DataTableUsersFilters = (): JSX.Element => {
 		[filters, updateTableState],
 	);
 
-	const handlers = useMemo(
-		() => createFilterHandlers(updateFilters),
-		[updateFilters],
-	);
+	console.log(filters);
 
-	const {
-		handleInputChange,
-		handleSelectChange,
-		handleCheckboxChange,
-		handleDateChange,
-	} = handlers;
+	const onValueChange = useMemo(
+		() =>
+			createValueChangeHandler(filters, updateFilters, (prev, value) => ({
+				...prev,
+				value,
+			})),
+		[filters, updateFilters],
+	);
 
 	const searchGlobal = useSearchFilter({
 		initialValue: filters.global?.value ?? '',
 		debounceDelay: 1000,
 		minLength: 3,
-		onSearch: (value) => {
-			handleInputChange('global', value);
-		},
+		onSearch: onValueChange('global'),
 	});
 
 	useEffect(() => {
@@ -113,7 +109,6 @@ export const DataTableUsersFilters = (): JSX.Element => {
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
 			<FormFiltersSearch
 				labelText={translations['users.form_filters.label_global']}
-				fieldName="global"
 				search={searchGlobal}
 			/>
 
@@ -121,30 +116,34 @@ export const DataTableUsersFilters = (): JSX.Element => {
 				labelText={translations['users.form_filters.label_status']}
 				fieldName="status"
 				fieldValue={filters.status.value}
-				selectOptions={statuses}
-				handleSelectChange={handleSelectChange}
+				options={statuses}
+				onValueChange={(value) =>
+					onValueChange('status')(value as UserStatusEnum)
+				}
 			/>
 
 			<FormFiltersSelect
 				labelText={translations['users.form_filters.label_role']}
 				fieldName="role"
 				fieldValue={filters.role.value}
-				selectOptions={roles}
-				handleSelectChange={handleSelectChange}
+				options={roles}
+				onValueChange={(value) =>
+					onValueChange('role')(value as UserRoleEnum)
+				}
 			/>
 
-			<FormFiltersDateRange
-				labelText={translations['users.form_filters.label_create_date']}
-				startDateField="create_date_start"
-				startDateValue={filters.create_date_start?.value ?? ''}
-				endDateField="create_date_end"
-				endDateValue={filters.create_date_end?.value ?? ''}
-				handleDateChange={handleDateChange}
-			/>
+			{/*<FormFiltersDateRange*/}
+			{/*	labelText={translations['users.form_filters.label_create_date']}*/}
+			{/*	startDateField="create_date_start"*/}
+			{/*	startDateValue={filters.create_date_start?.value ?? ''}*/}
+			{/*	endDateField="create_date_end"*/}
+			{/*	endDateValue={filters.create_date_end?.value ?? ''}*/}
+			{/*	handleDateChange={handleDateChange}*/}
+			{/*/>*/}
 
 			<FormFiltersShowDeleted
-				is_deleted={filters.is_deleted?.value || false}
-				handleCheckboxChange={handleCheckboxChange}
+				checked={filters.is_deleted?.value || false}
+				onCheckedChange={(value) => onValueChange('is_deleted')(value)}
 			/>
 
 			<FormFiltersReset source="DataTableUsersFilters" />

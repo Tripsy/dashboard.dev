@@ -10,6 +10,8 @@ export default function SideMenuSetter(): null {
 		const mainContainerElement: Element | null =
 			document.querySelector('main.main-section');
 
+		console.log(mainContainerElement);
+
 		if (mainContainerElement) {
 			if (status === 'open') {
 				mainContainerElement.classList.add('side-menu-open');

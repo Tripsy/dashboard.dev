@@ -21,21 +21,34 @@ import {
 } from '@fortawesome/react-fontawesome';
 import {
 	Calendar,
+	CircleUser,
 	CircleX,
+	ClipboardClock,
 	Eye,
 	EyeOff,
 	FileStack,
+	HardDrive,
 	Info,
 	KeyRound,
+	LayoutTemplate,
+	ListStart,
 	Loader,
+	LockKeyhole,
 	LogIn,
 	Mail,
+	Mails,
+	Minus,
 	Play,
+	Plus,
+	RefreshCcw,
 	Search,
 	Settings,
 	Shield,
+	SquareStack,
+	TableOfContents,
 	Tag,
 	UserRound,
+	Users,
 	X,
 } from 'lucide-react';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
@@ -53,17 +66,32 @@ type IconsProps = {
 };
 
 export const Icons = {
-	Email: (props: IconsProps) => <Mail {...props} />,
-	Password: (props: IconsProps) => <KeyRound {...props} />,
 	Search: (props: IconsProps) => <Search {...props} />,
 	Visible: (props: IconsProps) => <Eye {...props} />,
 	Obscured: (props: IconsProps) => <EyeOff {...props} />,
+	Info: (props: IconsProps) => <Info {...props} />,
+
+	Email: (props: IconsProps) => <Mail {...props} />,
+	Password: (props: IconsProps) => <KeyRound {...props} />,
 	Tag: (props: IconsProps) => <Tag {...props} />,
 	Calendar: (props: IconsProps) => <Calendar {...props} />,
 	Settings: (props: IconsProps) => <Settings {...props} />,
 	Security: (props: IconsProps) => <Shield {...props} />,
 	Session: (props: IconsProps) => <FileStack {...props} />,
-	Info: (props: IconsProps) => <Info {...props} />,
+	User: (props: IconsProps) => <UserRound {...props} />,
+	Users: (props: IconsProps) => <Users {...props} />,
+	HardDrive: (props: IconsProps) => <HardDrive {...props} />,
+	History: (props: IconsProps) => <ClipboardClock {...props} />,
+	Cron: (props: IconsProps) => <SquareStack {...props} />,
+	List: (props: IconsProps) => <ListStart {...props} />,
+	Mails: (props: IconsProps) => <Mails {...props} />,
+	Template: (props: IconsProps) => <LayoutTemplate {...props} />,
+	Logs: (props: IconsProps) => <TableOfContents {...props} />,
+	Account: (props: IconsProps) => <CircleUser {...props} />,
+	Permission: (props: IconsProps) => <LockKeyhole {...props} />,
+	Plus: (props: IconsProps) => <Plus {...props} />,
+	Minus: (props: IconsProps) => <Minus {...props} />,
+
 	Status: {
 		Active: (props: Partial<FontAwesomeIconProps>) => (
 			<AwesomeIcon icon={faCircleCheck} {...props} />
@@ -108,9 +136,7 @@ export const Icons = {
 		Destroy: (props: Partial<FontAwesomeIconProps>) => (
 			<AwesomeIcon icon={faPlugCircleXmark} {...props} />
 		),
-		Reset: (props: Partial<FontAwesomeIconProps>) => (
-			<AwesomeIcon icon={faArrowsRotate} {...props} />
-		),
+		Reset: (props: IconsProps) => <RefreshCcw {...props} />,
 		Enable: (props: Partial<FontAwesomeIconProps>) => (
 			<AwesomeIcon icon={faCircleCheck} {...props} />
 		),
@@ -126,9 +152,6 @@ export const Icons = {
 		View: (props: Partial<FontAwesomeIconProps>) => (
 			<AwesomeIcon icon={faEye} {...props} />
 		),
-	},
-	Entity: {
-		User: (props: IconsProps) => <UserRound {...props} />,
 	},
 };
 

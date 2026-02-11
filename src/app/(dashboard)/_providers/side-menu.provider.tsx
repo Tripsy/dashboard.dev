@@ -14,7 +14,9 @@ type Status = 'open' | 'closed';
 const SideMenuContext = createContext<
 	| {
 			status: Status;
-			toggleStatus: (status: Status) => void;
+			toggle: () => void;
+			open: () => void;
+			close: () => void;
 	  }
 	| undefined
 >(undefined);
@@ -45,14 +47,27 @@ const SideMenuProvider = ({ children }: { children: ReactNode }) => {
 		}
 	}, []);
 
-	const toggleStatus = (status: Status): void => {
-		setStatus(status);
-
-		localStorage.setItem('_providers-side-menu', status);
+	const setAndPersist = (next: Status) => {
+		setStatus(next);
+		localStorage.setItem('_providers-side-menu', next);
 	};
 
+	const toggle = () => {
+		setAndPersist(status === 'open' ? 'closed' : 'open');
+	};
+
+	const open = () => setAndPersist('open');
+	const close = () => setAndPersist('closed');
+
 	return (
-		<SideMenuContext.Provider value={{ status, toggleStatus }}>
+		<SideMenuContext.Provider
+			value={{
+				status,
+				toggle,
+				open,
+				close,
+			}}
+		>
 			{children}
 		</SideMenuContext.Provider>
 	);

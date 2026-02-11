@@ -1,9 +1,10 @@
+import { Calendar, CalendarIcon } from 'lucide-react';
 import {
 	AutoComplete,
 	type AutoCompleteCompleteEvent,
 } from 'primereact/autocomplete';
 import type { DropdownChangeEvent } from 'primereact/dropdown';
-import { type JSX, useMemo } from 'react';
+import React, { type JSX, useMemo } from 'react';
 import { FormElementError } from '@/components/form/form-element-error.component';
 import { Icons } from '@/components/icon.component';
 import { LoadingIcon } from '@/components/status.component';
@@ -11,6 +12,11 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from '@/components/ui/popover';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
 	Select,
@@ -20,8 +26,14 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import type { FilterValueType } from '@/config/data-source.config';
 import { cn } from '@/helpers/css.helper';
+import { formatDate } from '@/helpers/date.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
+
+export type InputValueType = string | number | null;
+export type OptionValueType = string | null;
+export type CheckboxValueType = boolean;
 
 export const FormElement = ({
 	children,
@@ -53,7 +65,7 @@ export const FormElement = ({
 			))}
 		<div>
 			{children}
-			<FormElementError messages={error} />
+			{error && <FormElementError messages={error} />}
 		</div>
 	</div>
 );
@@ -95,13 +107,13 @@ const stateConfig = {
 		borderClass: '',
 	},
 	success: {
-		borderClass: 'border-success focus-visible:ring-success',
+		borderClass: 'border border-success focus-visible:ring-success',
 	},
 	error: {
-		borderClass: 'border-error focus-visible:ring-error',
+		borderClass: 'border border-error focus-visible:ring-error',
 	},
 	warning: {
-		borderClass: 'border-warning focus-visible:ring-warning',
+		borderClass: 'border border-warning focus-visible:ring-warning',
 	},
 };
 
@@ -109,39 +121,31 @@ const useFieldState = ({
 	value,
 	error,
 }: {
-	value?: string | number | boolean;
+	value?: FilterValueType;
 	error?: string[];
 }) => {
 	if (error?.length) {
 		return stateConfig.error;
 	}
 
-	if (value) {
+	if (value !== null && value !== undefined && value !== '') {
 		return stateConfig.success;
 	}
 
 	return stateConfig.default;
 };
 
-export type OptionsType = {
+export type OptionsType<TValue extends string = string> = {
 	label: string;
-	value: string;
+	value: TValue;
 }[];
 
-export type OnChangeType = (
-	e:
-		| DropdownChangeEvent
-		| React.ChangeEvent<
-				HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-		  >,
-) => void;
-
-export type FormComponentProps = {
+export type FormComponentProps<TValue> = {
 	id: string;
 	labelText: string;
 	fieldType?: 'text' | 'password' | 'email' | 'number';
 	fieldName: string;
-	fieldValue: string;
+	fieldValue: TValue;
 	isRequired?: boolean;
 	className?: string;
 	placeholderText?: string;
@@ -152,14 +156,14 @@ export type FormComponentProps = {
 		| 'name'
 		| 'email'
 		| 'organization';
-	onChange: OnChangeType;
+	onChange: React.ChangeEventHandler<HTMLInputElement>;
 	error?: string[];
 	icons?: { left?: JSX.Element; right?: JSX.Element };
 };
 
 /** Standard form elements **/
 
-export const FormComponentInput = ({
+export const FormComponentInput = <TValue extends InputValueType>({
 	labelText,
 	id,
 	fieldType = 'text',
@@ -173,7 +177,7 @@ export const FormComponentInput = ({
 	onChange,
 	error,
 	icons,
-}: FormComponentProps) => {
+}: FormComponentProps<TValue>) => {
 	const { borderClass } = useFieldState({ value: fieldValue, error });
 
 	return (
@@ -193,7 +197,7 @@ export const FormComponentInput = ({
 						type={fieldType}
 						id={id}
 						name={fieldName}
-						value={fieldValue}
+						value={fieldValue ?? ''}
 						className={cn(borderClass, className)}
 						placeholder={placeholderText}
 						autoComplete={autoComplete}
@@ -213,7 +217,7 @@ export const FormComponentInput = ({
 	);
 };
 
-export const FormComponentSelect = ({
+export const FormComponentSelect = <TValue extends OptionValueType>({
 	labelText,
 	id,
 	fieldName,
@@ -225,7 +229,7 @@ export const FormComponentSelect = ({
 	error,
 	options,
 	onValueChange,
-}: Omit<FormComponentProps, 'autoComplete' | 'icons' | 'onChange'> & {
+}: Omit<FormComponentProps<TValue>, 'autoComplete' | 'icons' | 'onChange'> & {
 	options: OptionsType;
 	onValueChange: (value: string) => void;
 }) => {
@@ -237,17 +241,24 @@ export const FormComponentSelect = ({
 			error={error}
 		>
 			<>
-				<input type="hidden" name={fieldName} value={fieldValue} />
+				<input
+					type="hidden"
+					name={fieldName}
+					value={fieldValue ?? ''}
+				/>
 
 				<Select
-					value={fieldValue}
+					value={fieldValue ?? ''}
 					onValueChange={onValueChange}
 					disabled={disabled}
 				>
-					<SelectTrigger id={id}>
+					<SelectTrigger
+						id={id}
+						className={cn(borderClass, className)}
+					>
 						<SelectValue placeholder={placeholderText} />
 					</SelectTrigger>
-					<SelectContent className={cn(borderClass, className)}>
+					<SelectContent>
 						{options.map(({ label, value }) => {
 							const key = `${id}-${value}`;
 
@@ -264,7 +275,7 @@ export const FormComponentSelect = ({
 	);
 };
 
-export const FormComponentCheckbox = ({
+export const FormComponentCheckbox = <TValue extends CheckboxValueType>({
 	children,
 	id,
 	fieldName,
@@ -274,7 +285,7 @@ export const FormComponentCheckbox = ({
 	error,
 	onCheckedChange,
 }: Omit<
-	FormComponentProps,
+	FormComponentProps<TValue>,
 	| 'labelText'
 	| 'fieldType'
 	| 'fieldValue'
@@ -286,13 +297,16 @@ export const FormComponentCheckbox = ({
 > & {
 	checked: boolean;
 	onCheckedChange: (checked: boolean) => void;
-	children: JSX.Element;
+	children: JSX.Element | string;
 }) => {
 	const { borderClass } = useFieldState({ value: checked, error });
 
 	return (
 		<FormElement error={error}>
-			<div className="flex items-center space-x-2">
+			<Label
+				htmlFor={id}
+				className="flex items-center gap-2"
+			>
 				<Checkbox
 					id={id}
 					name={fieldName}
@@ -303,12 +317,12 @@ export const FormComponentCheckbox = ({
 					className={cn(borderClass, className)}
 				/>
 				{children}
-			</div>
+			</Label>
 		</FormElement>
 	);
 };
 
-export const FormComponentRadio = ({
+export const FormComponentRadio = <TValue extends OptionValueType>({
 	labelText,
 	id,
 	fieldName,
@@ -320,7 +334,7 @@ export const FormComponentRadio = ({
 	options,
 	onValueChange,
 }: Omit<
-	FormComponentProps,
+	FormComponentProps<TValue>,
 	'fieldType' | 'onChange' | 'placeholderText' | 'autoComplete' | 'icons'
 > & {
 	options: OptionsType;
@@ -331,7 +345,7 @@ export const FormComponentRadio = ({
 		error={error}
 	>
 		<>
-			<input type="hidden" name={fieldName} value={fieldValue} />
+			<input type="hidden" name={fieldName} value={fieldValue ?? ''} />
 
 			<RadioGroup
 				value={fieldValue}
@@ -358,6 +372,63 @@ export const FormComponentRadio = ({
 		</>
 	</FormElement>
 );
+
+// export const FormComponentCalendar = <TValue extends string | null>({
+// 	labelText,
+// 	id,
+// 	fieldName,
+// 	fieldValue,
+// 	isRequired,
+// 	className = 'flex flex-wrap gap-4',
+// 	disabled,
+// 	error,
+// 	onChange,
+// }: Omit<
+// 	FormComponentProps<TValue>,
+// 	'fieldType' | 'placeholderText' | 'autoComplete' | 'icons'
+// > & {
+// 	options: OptionsType;
+// 	onChange: (value: string) => void;
+// }) => {
+// 	return (
+// 		<>
+// 			<input type="hidden" name={fieldName} value={fieldValue ?? ''} />
+//
+// 			<FormElement>
+// 				<div className="space-y-2">
+// 					<Label>{labelText}</Label>
+// 					<Popover>
+// 						<PopoverTrigger asChild>
+// 							<Button
+// 								variant="outline"
+// 								className={cn(
+// 									'w-full justify-start text-left font-normal',
+// 									!fieldValue && 'text-muted-foreground',
+// 								)}
+// 							>
+// 								<CalendarIcon className="mr-2 h-4 w-4" />
+// 								{fieldValue ? (
+// 									formatDate(fieldValue, 'default')
+// 								) : (
+// 									<span>Pick a date</span>
+// 								)}
+// 							</Button>
+// 						</PopoverTrigger>
+// 						<PopoverContent className="w-auto p-0" align="start">
+// 							<Calendar
+// 								mode="single"
+// 								selected={fieldValue}
+// 								onSelect={onChange}
+// 								initialFocus
+// 								className="pointer-events-auto"
+// 							/>
+// 						</PopoverContent>
+// 					</Popover>
+// 				</div>
+// 			</FormElement>
+// 		</>
+// 	);
+// };
 
 // export const FormComponentTextarea = ({
 // 	labelText,
@@ -488,9 +559,9 @@ export const FormComponentSubmit = ({
 	);
 };
 
-export const FormComponentName = (
+export const FormComponentName = <TValue extends InputValueType>(
 	props: Omit<
-		FormComponentProps,
+		FormComponentProps<TValue>,
 		'fieldName' | 'fieldType' | 'autoComplete' | 'icons'
 	>,
 ) => (
@@ -502,14 +573,14 @@ export const FormComponentName = (
 		autoComplete="name"
 		placeholderText="eg: John Doe"
 		icons={{
-			left: <Icons.Entity.User className="opacity-40 h-4.5 w-4.5" />,
+			left: <Icons.User className="opacity-40 h-4.5 w-4.5" />,
 		}}
 	/>
 );
 
-export const FormComponentEmail = (
+export const FormComponentEmail = <TValue extends InputValueType>(
 	props: Omit<
-		FormComponentProps,
+		FormComponentProps<TValue>,
 		'fieldName' | 'fieldType' | 'autoComplete' | 'icons'
 	> & {
 		fieldName?: 'email' | 'email_new';
@@ -526,11 +597,11 @@ export const FormComponentEmail = (
 	/>
 );
 
-export const FormComponentPassword = ({
+export const FormComponentPassword = <TValue extends InputValueType>({
 	showPassword,
 	setShowPassword,
 	...props
-}: FormComponentProps & {
+}: FormComponentProps<TValue> & {
 	showPassword: boolean;
 	setShowPassword?: (showPassword: boolean) => void;
 }) => (

@@ -115,8 +115,10 @@ export type DataTableActionConfigType<Model, Function> = {
 
 export type DataTableSelectionModeType = 'checkbox' | 'multiple' | null;
 
+export type FilterValueType = string | number | boolean | Date | null;
+
 type DataTableBaseFilterType = {
-	value: string | number | boolean | Date | null;
+	value: FilterValueType;
 	matchMode?: 'contains' | 'equals' | 'startsWith' | 'endsWith' | 'gt' | 'lt';
 };
 

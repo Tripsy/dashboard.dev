@@ -3,36 +3,37 @@ import type { JSX } from 'react';
 import { NavBreadcrumb } from '@/app/(dashboard)/_components/nav-breadcrumb.component';
 import { SideMenu } from '@/app/(dashboard)/_components/side-menu.component';
 import SideMenuSetter from '@/app/(dashboard)/_components/side-menu.setter';
-import { SideMenuToggle } from '@/app/(dashboard)/_components/side-menu-toggle.component';
 import { DashboardProvider } from '@/app/(dashboard)/_providers/dashboard.provider';
-import { Footer } from '@/components/layout/footer.default';
+import { LogoComponent } from '@/components/layout/logo.default';
 import { UserMenu } from '@/components/layout/user-menu.component';
 import ProtectedRoute from '@/components/protected-route.component';
 import { ToggleTheme } from '@/components/toggle-theme';
 import Routes, { RouteAuth } from '@/config/routes.setup';
+import { Configuration } from '@/config/settings.config';
 
 function Header() {
 	return (
-		<header className="fixed z-90 w-full">
-			<div className="header-section">
-				<div className="h-full flex items-center">
-					<SideMenuToggle />
+		<header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+			<div className="container-default">
+				<div className="flex items-center h-16">
 					<Link
 						href={Routes.get('home')}
-						className="flex items-end hover:link-info"
+						className="flex items-center gap-2"
 					>
-						<span className="text-lg font-bold">
-							nextjs
-							<sup className="text-xs">TEST</sup>
+						<LogoComponent divClass="h-9 w-9" spanClass="text-lg" />
+						<span className="text-xl font-semibold text-foreground">
+							{Configuration.get('app.name')}
 						</span>
 					</Link>
-				</div>
-				<div className="w-full pl-16">
-					<NavBreadcrumb />
-				</div>
-				<div className="flex items-center">
-					<ToggleTheme />
-					<UserMenu />
+
+					<div className="w-full pl-16">
+						<NavBreadcrumb />
+					</div>
+
+					<div className="flex items-center gap-2">
+						<ToggleTheme />
+						<UserMenu />
+					</div>
 				</div>
 			</div>
 		</header>
@@ -42,19 +43,18 @@ function Header() {
 export default async function Layout({ children }: { children: JSX.Element }) {
 	return (
 		<DashboardProvider>
-			<div className="dashboard-layout">
+			<div className="dashboard-layout min-h-screen bg-background">
 				<Header />
-				<SideMenuSetter />
-				<main className="main-section">
-					<SideMenu />
-					<div className="content-section">
-						<NavBreadcrumb />
-						<ProtectedRoute routeAuth={RouteAuth.PROTECTED}>
+				<ProtectedRoute routeAuth={RouteAuth.PROTECTED}>
+					<SideMenuSetter />
+					<main className="main-section">
+						<SideMenu />
+						<div className="container-dashboard">
+							<NavBreadcrumb />
 							{children}
-						</ProtectedRoute>
-					</div>
-				</main>
-				<Footer />
+						</div>
+					</main>
+				</ProtectedRoute>
 			</div>
 		</DashboardProvider>
 	);

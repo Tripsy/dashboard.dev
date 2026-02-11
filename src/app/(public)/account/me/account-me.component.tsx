@@ -107,7 +107,7 @@ export default function AccountMe() {
 				<div className="bg-card border border-border rounded-xl p-6 shadow-xl space-y-4 w-full max-w-md">
 					<div className="flex justify-between items-center">
 						<h2 className="text-lg font-bold flex items-center gap-2">
-							<Icons.Entity.User />
+							<Icons.User />
 							Personal Information
 						</h2>
 						<Button variant="outline" size="sm">

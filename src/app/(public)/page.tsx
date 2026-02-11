@@ -66,7 +66,7 @@ export default function Page() {
 		<>
 			{/* Hero Section */}
 			<section className="relative overflow-hidden bg-gradient-hero">
-				<div className="container-custom py-20 md:py-32">
+				<div className="container-default py-20 md:py-32">
 					<div className="max-w-3xl mx-auto text-center">
 						<div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary text-secondary-foreground text-sm font-medium mb-6">
 							<Sparkles className="h-4 w-4" />
@@ -115,7 +115,7 @@ export default function Page() {
 
 			{/* Features Section */}
 			<section className="py-20 md:py-28">
-				<div className="container-custom">
+				<div className="container-default">
 					<div className="text-center mb-16">
 						<h2 className="text-3xl md:text-4xl font-bold mb-4">
 							Everything You Need
@@ -150,7 +150,7 @@ export default function Page() {
 
 			{/* CTA Section */}
 			<section className="py-20 md:py-28 bg-muted/30">
-				<div className="container-custom">
+				<div className="container-default">
 					<div className="max-w-3xl mx-auto text-center">
 						<h2 className="text-3xl md:text-4xl font-bold mb-4">
 							Ready to Get Started?

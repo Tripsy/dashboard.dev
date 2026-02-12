@@ -11,12 +11,11 @@ import {
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import type { TemplateDataTableFiltersType } from '@/app/(dashboard)/dashboard/templates/templates.definition';
-import { createFilterHandlers } from '@/helpers/data-table.helper';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { type TemplateModel, TemplateTypeEnum } from '@/models/template.model';
-import { LanguageEnum } from '@/models/user.model';
+import {LanguageEnum} from '@/models/user.model';
 
 const languages = Object.values(LanguageEnum).map((language) => ({
 	label: capitalizeFirstLetter(language),
@@ -56,30 +55,29 @@ export const DataTableTemplatesFilters = (): React.JSX.Element => {
 		(state) => state.updateTableState,
 	);
 
-	const updateFilters = useCallback(
-		(newFilters: Partial<typeof DataTableTemplatesFilters>) => {
+	const setFilterValue = useCallback(
+		<K extends keyof TemplateDataTableFiltersType>(
+			key: K,
+			value: TemplateDataTableFiltersType[K]['value'],
+		) => {
 			updateTableState({
-				filters: { ...filters, ...newFilters },
+				filters: {
+					...filters,
+					[key]: {
+						...filters[key],
+						value,
+					},
+				},
 			});
 		},
 		[filters, updateTableState],
 	);
 
-	const handlers = useMemo(
-		() => createFilterHandlers(updateFilters),
-		[updateFilters],
-	);
-
-	const { handleInputChange, handleSelectChange, handleCheckboxChange } =
-		handlers;
-
 	const searchGlobal = useSearchFilter({
 		initialValue: filters.global?.value ?? '',
 		debounceDelay: 1000,
 		minLength: 3,
-		onSearch: (value) => {
-			handleInputChange('global', value);
-		},
+		onSearch: (value) => setFilterValue('global', value),
 	});
 
 	useEffect(() => {
@@ -106,33 +104,34 @@ export const DataTableTemplatesFilters = (): React.JSX.Element => {
 
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
-			<FormFiltersSearch
+			<FormFiltersSearch<TemplateDataTableFiltersType>
 				labelText={translations['templates.form_filters.label_global']}
-				fieldName="global"
 				search={searchGlobal}
 			/>
 
-			<FormFiltersSelect
-				labelText={
-					translations['templates.form_filters.label_language']
-				}
+			<FormFiltersSelect<TemplateDataTableFiltersType>
+				labelText={translations['templates.form_filters.label_language']}
 				fieldName="language"
 				fieldValue={filters.language.value}
-				selectOptions={languages}
-				handleSelectChange={handleSelectChange}
+				options={languages}
+				onValueChange={(value) =>
+					setFilterValue('language', value)
+				}
 			/>
 
-			<FormFiltersSelect
+			<FormFiltersSelect<TemplateDataTableFiltersType>
 				labelText={translations['templates.form_filters.label_type']}
 				fieldName="type"
 				fieldValue={filters.type.value}
-				selectOptions={types}
-				handleSelectChange={handleSelectChange}
+				options={types}
+				onValueChange={(value) =>
+					setFilterValue('type', value as TemplateTypeEnum)
+				}
 			/>
 
 			<FormFiltersShowDeleted
-				is_deleted={filters.is_deleted?.value || false}
-				handleCheckboxChange={handleCheckboxChange}
+				checked={filters.is_deleted?.value || false}
+				onCheckedChange={(value) => setFilterValue('is_deleted', value)}
 			/>
 
 			<FormFiltersReset source="DataTableTemplatesFilters" />

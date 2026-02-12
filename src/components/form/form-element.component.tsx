@@ -1,14 +1,10 @@
-import { Calendar, CalendarIcon } from 'lucide-react';
-import {
-	AutoComplete,
-	type AutoCompleteCompleteEvent,
-} from 'primereact/autocomplete';
-import type { DropdownChangeEvent } from 'primereact/dropdown';
+import { CalendarIcon } from 'lucide-react';
 import React, { type JSX, useMemo } from 'react';
 import { FormElementError } from '@/components/form/form-element-error.component';
 import { Icons } from '@/components/icon.component';
 import { LoadingIcon } from '@/components/status.component';
 import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -25,10 +21,9 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import type { FilterValueType } from '@/config/data-source.config';
 import { cn } from '@/helpers/css.helper';
-import { formatDate } from '@/helpers/date.helper';
+import { formatDate, toDateInstance } from '@/helpers/date.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 
 export type InputValueType = string | number | null;
@@ -186,7 +181,7 @@ export const FormComponentInput = <TValue extends InputValueType>({
 			error={error}
 		>
 			<FormElementWrapper>
-				<>
+				<div>
 					{icons?.left && (
 						<FormElementIcon position="left">
 							{icons.left}
@@ -211,7 +206,7 @@ export const FormComponentInput = <TValue extends InputValueType>({
 							{icons.right}
 						</FormElementIcon>
 					)}
-				</>
+				</div>
 			</FormElementWrapper>
 		</FormElement>
 	);
@@ -240,11 +235,12 @@ export const FormComponentSelect = <TValue extends OptionValueType>({
 			label={{ for: id, text: labelText, required: isRequired }}
 			error={error}
 		>
-			<>
+			<div>
 				<input
 					type="hidden"
 					name={fieldName}
 					value={fieldValue ?? ''}
+					disabled={disabled}
 				/>
 
 				<Select
@@ -270,7 +266,7 @@ export const FormComponentSelect = <TValue extends OptionValueType>({
 						})}
 					</SelectContent>
 				</Select>
-			</>
+			</div>
 		</FormElement>
 	);
 };
@@ -303,10 +299,7 @@ export const FormComponentCheckbox = <TValue extends CheckboxValueType>({
 
 	return (
 		<FormElement error={error}>
-			<Label
-				htmlFor={id}
-				className="flex items-center gap-2"
-			>
+			<Label htmlFor={id} className="flex items-center gap-2">
 				<Checkbox
 					id={id}
 					name={fieldName}
@@ -344,8 +337,13 @@ export const FormComponentRadio = <TValue extends OptionValueType>({
 		label={{ text: labelText, required: isRequired }}
 		error={error}
 	>
-		<>
-			<input type="hidden" name={fieldName} value={fieldValue ?? ''} />
+		<div>
+			<input
+				type="hidden"
+				name={fieldName}
+				value={fieldValue ?? ''}
+				disabled={disabled}
+			/>
 
 			<RadioGroup
 				value={fieldValue}
@@ -369,66 +367,130 @@ export const FormComponentRadio = <TValue extends OptionValueType>({
 					);
 				})}
 			</RadioGroup>
-		</>
+		</div>
 	</FormElement>
 );
 
-// export const FormComponentCalendar = <TValue extends string | null>({
-// 	labelText,
-// 	id,
-// 	fieldName,
-// 	fieldValue,
-// 	isRequired,
-// 	className = 'flex flex-wrap gap-4',
-// 	disabled,
-// 	error,
-// 	onChange,
-// }: Omit<
-// 	FormComponentProps<TValue>,
-// 	'fieldType' | 'placeholderText' | 'autoComplete' | 'icons'
-// > & {
-// 	options: OptionsType;
-// 	onChange: (value: string) => void;
-// }) => {
-// 	return (
-// 		<>
-// 			<input type="hidden" name={fieldName} value={fieldValue ?? ''} />
-//
-// 			<FormElement>
-// 				<div className="space-y-2">
-// 					<Label>{labelText}</Label>
-// 					<Popover>
-// 						<PopoverTrigger asChild>
-// 							<Button
-// 								variant="outline"
-// 								className={cn(
-// 									'w-full justify-start text-left font-normal',
-// 									!fieldValue && 'text-muted-foreground',
-// 								)}
-// 							>
-// 								<CalendarIcon className="mr-2 h-4 w-4" />
-// 								{fieldValue ? (
-// 									formatDate(fieldValue, 'default')
-// 								) : (
-// 									<span>Pick a date</span>
-// 								)}
-// 							</Button>
-// 						</PopoverTrigger>
-// 						<PopoverContent className="w-auto p-0" align="start">
-// 							<Calendar
-// 								mode="single"
-// 								selected={fieldValue}
-// 								onSelect={onChange}
-// 								initialFocus
-// 								className="pointer-events-auto"
-// 							/>
-// 						</PopoverContent>
-// 					</Popover>
-// 				</div>
-// 			</FormElement>
-// 		</>
-// 	);
-// };
+export const FormComponentCalendarWithoutFormElement = <
+	TValue extends string | null,
+>({
+	id,
+	fieldName,
+	fieldValue,
+	className = 'min-w-40',
+	placeholderText,
+	disabled,
+	onSelect,
+	minDate,
+	maxDate,
+}: Omit<
+	FormComponentProps<TValue>,
+	| 'labelText'
+	| 'fieldType'
+	| 'isRequired'
+	| 'autoComplete'
+	| 'icons'
+	| 'onChange'
+> & {
+	onSelect: (value: string) => void;
+	minDate?: Date | string;
+	maxDate?: Date | string;
+}) => {
+	const fieldValueAsDate = toDateInstance(fieldValue) || undefined;
+	const minDateAsDate = (minDate && toDateInstance(minDate)) || undefined;
+	const maxDateAsDate = (maxDate && toDateInstance(maxDate)) || undefined;
+
+	return (
+		<>
+			<input
+				type="hidden"
+				name={fieldName}
+				value={fieldValue ?? ''}
+				disabled={disabled}
+			/>
+
+			<Popover>
+				<PopoverTrigger asChild>
+					<Button
+						id={id}
+						variant="outline"
+						className={cn(
+							'justify-start text-left text-sm',
+							!fieldValue && 'text-muted-foreground',
+							className,
+						)}
+						disabled={disabled}
+					>
+						<CalendarIcon className="mr-2 h-4 w-4" />
+						{fieldValue ? (
+							formatDate(fieldValue, 'default')
+						) : (
+							<span>{placeholderText}</span>
+						)}
+					</Button>
+				</PopoverTrigger>
+				<PopoverContent className="w-auto p-0" align="start">
+					<Calendar
+						mode="single"
+						required={false}
+						selected={fieldValueAsDate}
+						onSelect={(date: Date | undefined) => {
+							const value = date
+								? (formatDate(date, 'default') as string)
+								: '';
+
+							onSelect(value);
+						}}
+						aria-placeholder={placeholderText}
+						disabled={[
+							...(minDateAsDate
+								? [{ before: minDateAsDate }]
+								: []),
+							...(maxDateAsDate
+								? [{ after: maxDateAsDate }]
+								: []),
+						]}
+					/>
+				</PopoverContent>
+			</Popover>
+		</>
+	);
+};
+
+export const FormComponentCalendar = <TValue extends string | null>({
+	labelText,
+	id,
+	fieldName,
+	fieldValue,
+	isRequired,
+	className,
+	placeholderText,
+	disabled,
+	error,
+	onSelect,
+}: Omit<
+	FormComponentProps<TValue>,
+	'fieldType' | 'autoComplete' | 'icons' | 'onChange'
+> & {
+	onSelect: (value: string) => void;
+}) => {
+	return (
+		<FormElement
+			label={{ for: id, text: labelText, required: isRequired }}
+			error={error}
+		>
+			<FormComponentCalendarWithoutFormElement
+				id={id}
+				fieldName={fieldName}
+				fieldValue={fieldValue}
+				className={className}
+				placeholderText={placeholderText}
+				disabled={disabled}
+				onSelect={onSelect}
+			/>
+		</FormElement>
+	);
+};
 
 // export const FormComponentTextarea = ({
 // 	labelText,
@@ -536,7 +598,7 @@ export const FormComponentSubmit = ({
 		<Button
 			type="submit"
 			variant={buttonVariant}
-			className="w-full cursor-pointer"
+			className="w-full"
 			disabled={pending || (submitted && Object.keys(errors).length > 0)}
 			aria-busy={pending}
 		>

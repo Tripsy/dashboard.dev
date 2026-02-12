@@ -33,10 +33,10 @@ export const DataTableMailQueue = (): JSX.Element => {
 			selectionMode="multiple"
 			dataTableStore={dataTableStore}
 		>
-			<div className="standard-box p-4 shadow-md">
+			<div className="table-container">
 				<DataTableMailQueueFilters />
 				<DataTableActions />
-				<DataTableList dataKey="id" scrollHeight="400px" />
+				<DataTableList dataKey="id" scrollHeight="420px" />
 			</div>
 
 			<DataTableModal

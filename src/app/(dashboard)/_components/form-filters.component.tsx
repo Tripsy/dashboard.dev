@@ -1,6 +1,7 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { handleReset } from '@/app/(dashboard)/_components/data-table-actions.component';
 import {
+	FormComponentCalendarWithoutFormElement,
 	FormComponentCheckbox,
 	FormComponentInput,
 	FormComponentSelect,
@@ -9,54 +10,32 @@ import {
 import { Icons } from '@/components/icon.component';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import type { DataTableFiltersType } from '@/config/data-source.config';
+import { cn } from '@/helpers/css.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import type { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
-import {cn} from "@/helpers/css.helper";
 
-export function createValueChangeHandler<TFilters extends DataTableFiltersType>(
-	filters: TFilters,
-	updateFilters: <K extends keyof TFilters>(
-		key: K,
-		value: TFilters[K],
-	) => void,
-	mapper?: <K extends keyof TFilters>(
-		prev: TFilters[K],
-		value: TFilters[K]['value'],
-	) => TFilters[K],
-) {
-	return <K extends keyof TFilters>(key: K) =>
-		(value: TFilters[K]['value']) => {
-			const prev = filters[key];
-
-			const next = mapper ? mapper(prev, value) : { ...prev, value };
-
-			updateFilters(key, next);
-		};
-}
-
-export function FormFiltersSearch({
+export function FormFiltersSearch<TFilters>({
 	labelText,
-	fieldName = 'global',
+	fieldName = 'global' as keyof TFilters,
 	placeholderText = 'Search',
 	search,
 	className,
 }: {
 	labelText: string;
-	fieldName?: string;
+	fieldName?: keyof TFilters;
 	placeholderText?: string;
 	search: ReturnType<typeof useSearchFilter>;
 	className?: string;
 }) {
-	const elementKey = `search-${fieldName}`;
+	const elementKey = `search-${String(fieldName)}`;
 	const elementIds = useElementIds([elementKey]);
 
 	return (
 		<FormComponentInput
 			labelText={labelText}
 			id={elementIds[elementKey]}
-			fieldName={fieldName}
+			fieldName={String(fieldName)}
 			fieldValue={search.value}
 			className={cn('pl-8 max-w-64', className)}
 			placeholderText={placeholderText}
@@ -69,7 +48,7 @@ export function FormFiltersSearch({
 	);
 }
 
-export function FormFiltersSelect({
+export function FormFiltersSelect<TFilters>({
 	labelText,
 	fieldName,
 	fieldValue,
@@ -79,21 +58,21 @@ export function FormFiltersSelect({
 	className,
 }: {
 	labelText: string;
-	fieldName: string;
+	fieldName: keyof TFilters;
 	fieldValue: string | null;
 	placeholderText?: string;
 	options: OptionsType;
 	onValueChange: (value: string) => void;
 	className?: string;
 }) {
-	const elementKey = `search-${fieldName}`;
+	const elementKey = `search-${String(fieldName)}`;
 	const elementIds = useElementIds([elementKey]);
 
 	return (
 		<FormComponentSelect
 			labelText={labelText}
 			id={elementIds[elementKey]}
-			fieldName={fieldName}
+			fieldName={String(fieldName)}
 			fieldValue={fieldValue}
 			className={cn('max-w-64 min-w-32', className)}
 			disabled={false}
@@ -104,83 +83,69 @@ export function FormFiltersSelect({
 	);
 }
 
-// export function FormFiltersDateRange<Filters>({
-//   labelText,
-//   start,
-//   end,
-//   onValueChange
-// }: {
-// 	labelText: string;
-// 	start: { fieldName: keyof Filters extends string; fieldValue: string };
-// 	end: { fieldName: keyof Filters extends string; fieldValue: string };
-// 	onValueChange: (value: string) => void;
-// }) {
-//
-// 	const elementStartKey = `search-${start.fieldName}`;
-// 	const elementEndKey = `search-${end.fieldName}`;
-// 	const elementIds = useElementIds([elementStartKey, elementEndKey]);
-//
-// 	const translationsKeys = useMemo(
-// 		() =>
-// 			[
-// 				'dashboard.text.placeholder_start_date',
-// 				'dashboard.text.placeholder_end_date',
-// 			] as const,
-// 		[],
-// 	);
-//
-// 	const { translations } = useTranslation(translationsKeys);
-//
-// 	return (
-// 		<FormPart>
-// 			<FormElement
-// 				labelText={labelText}
-// 				labelFor={elementIds[elementStartKey]}
-// 			>
-// 				<div className="flex gap-2">
-// 					<Calendar
-// 						className="h-11 w-[160px]"
-// 						id={elementIds[elementStartKey]}
-// 						value={toDateInstance(startDateValue)}
-// 						onChange={(e) =>
-// 							handleDateChange(
-// 								startDateField as keyof Filters,
-// 								e.value,
-// 								'dateAfter',
-// 							)
-// 						}
-// 						placeholder={
-// 							translations[
-// 								'dashboard.text.placeholder_start_date'
-// 							]
-// 						}
-// 						showIcon
-// 						maxDate={getValidDate(endDateValue)}
-// 					/>
-// 					<Calendar
-// 						className="h-11 w-[160px]"
-// 						id={elementIds[elementEndKey]}
-// 						value={toDateInstance(endDateValue)}
-// 						onChange={(e) =>
-// 							handleDateChange(
-// 								endDateField as keyof Filters,
-// 								e.value,
-// 								'dateBefore',
-// 							)
-// 						}
-// 						placeholder={
-// 							translations['dashboard.text.placeholder_end_date']
-// 						}
-// 						showIcon
-// 						minDate={getValidDate(startDateValue)}
-// 					/>
-// 				</div>
-// 			</FormElement>
-// 		</FormPart>
-// 	);
-// }
+type FormFilterDateRangeElementType<K> = {
+	fieldName: K;
+	fieldValue: string | null;
+	placeholderText?: string;
+	onSelect: (value: string) => void;
+};
 
-export function FormFiltersShowDeleted<Filters>({
+export function FormFiltersDateRange<Filters>({
+	labelText,
+	start,
+	end,
+}: {
+	labelText: string;
+	start: FormFilterDateRangeElementType<keyof Filters>;
+	end: FormFilterDateRangeElementType<keyof Filters>;
+}) {
+	const elementKeyStart = `search-${String(start.fieldName)}`;
+	const elementKeyEnd = `search-${String(end.fieldName)}`;
+	const elementIds = useElementIds([elementKeyStart, elementKeyEnd]);
+
+	const translationsKeys = useMemo(
+		() =>
+			[
+				'dashboard.text.placeholder_start_date',
+				'dashboard.text.placeholder_end_date',
+			] as const,
+		[],
+	);
+
+	const { translations } = useTranslation(translationsKeys);
+
+	return (
+		<div className="flex flex-col gap-3 h-full">
+			<Label htmlFor={elementIds[elementKeyStart]}>{labelText}</Label>
+			<div className="flex flex-wrap gap-2">
+				<FormComponentCalendarWithoutFormElement
+					id={elementIds[elementKeyStart]}
+					fieldName={String(start.fieldName)}
+					fieldValue={start.fieldValue}
+					placeholderText={
+						translations['dashboard.text.placeholder_start_date']
+					}
+					disabled={false}
+					onSelect={start.onSelect}
+					maxDate={end.fieldValue || undefined}
+				/>
+				<FormComponentCalendarWithoutFormElement
+					id={elementIds[elementKeyEnd]}
+					fieldName={String(end.fieldName)}
+					fieldValue={end.fieldValue}
+					placeholderText={
+						translations['dashboard.text.placeholder_end_date']
+					}
+					disabled={false}
+					onSelect={end.onSelect}
+					minDate={start.fieldValue || undefined}
+				/>
+			</div>
+		</div>
+	);
+}
+
+export function FormFiltersShowDeleted({
 	checked = false,
 	onCheckedChange,
 }: {
@@ -205,11 +170,7 @@ export function FormFiltersShowDeleted<Filters>({
 				checked={checked}
 				disabled={false}
 			>
-				{
-					translations[
-						'dashboard.text.label_checkbox_show_deleted'
-						]
-				}
+				{translations['dashboard.text.label_checkbox_show_deleted']}
 			</FormComponentCheckbox>
 		</div>
 	);

@@ -10,14 +10,13 @@ import {
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import type { CronHistoryDataTableFiltersType } from '@/app/(dashboard)/dashboard/cron-history/cron-history.definition';
-import { createFilterHandlers } from '@/helpers/data-table.helper';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import {
 	type CronHistoryModel,
 	CronHistoryStatusEnum,
-} from '@/models/cron-history.model';
+} from '@/models/cron-history.model';;
 
 const statuses = Object.values(CronHistoryStatusEnum).map((v) => ({
 	label: capitalizeFirstLetter(v),
@@ -52,30 +51,29 @@ export const DataTableCronHistoryFilters = (): JSX.Element => {
 		(state) => state.updateTableState,
 	);
 
-	const updateFilters = useCallback(
-		(newFilters: Partial<typeof DataTableCronHistoryFilters>) => {
+	const setFilterValue = useCallback(
+		<K extends keyof CronHistoryDataTableFiltersType>(
+			key: K,
+			value: CronHistoryDataTableFiltersType[K]['value'],
+		) => {
 			updateTableState({
-				filters: { ...filters, ...newFilters },
+				filters: {
+					...filters,
+					[key]: {
+						...filters[key],
+						value,
+					},
+				},
 			});
 		},
 		[filters, updateTableState],
 	);
 
-	const handlers = useMemo(
-		() => createFilterHandlers(updateFilters),
-		[updateFilters],
-	);
-
-	const { handleInputChange, handleSelectChange, handleDateChange } =
-		handlers;
-
 	const searchGlobal = useSearchFilter({
 		initialValue: filters.global?.value ?? '',
 		debounceDelay: 1000,
 		minLength: 3,
-		onSearch: (value) => {
-			handleInputChange('global', value);
-		},
+		onSearch: (value) => setFilterValue('global', value),
 	});
 
 	useEffect(() => {
@@ -107,7 +105,7 @@ export const DataTableCronHistoryFilters = (): JSX.Element => {
 
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
-			<FormFiltersSearch
+			<FormFiltersSearch<CronHistoryDataTableFiltersType>
 				labelText={
 					translations['cron_history.form_filters.label_global']
 				}
@@ -115,25 +113,30 @@ export const DataTableCronHistoryFilters = (): JSX.Element => {
 				search={searchGlobal}
 			/>
 
-			<FormFiltersSelect
-				labelText={
-					translations['cron_history.form_filters.label_status']
-				}
+			<FormFiltersSelect<CronHistoryDataTableFiltersType>
+				labelText={translations['cron_history.form_filters.label_status']}
 				fieldName="status"
 				fieldValue={filters.status.value}
-				selectOptions={statuses}
-				handleSelectChange={handleSelectChange}
+				options={statuses}
+				onValueChange={(value) =>
+					setFilterValue('status', value as CronHistoryStatusEnum)
+				}
 			/>
 
-			<FormFiltersDateRange
-				labelText={
-					translations['cron_history.form_filters.label_start_date']
-				}
-				startDateField="start_date_start"
-				startDateValue={filters.start_date_start?.value ?? ''}
-				endDateField="start_date_end"
-				endDateValue={filters.start_date_end?.value ?? ''}
-				handleDateChange={handleDateChange}
+			<FormFiltersDateRange<CronHistoryDataTableFiltersType>
+				labelText={translations['cron_history.form_filters.label_start_date']}
+				start={{
+					fieldName: 'start_date_start',
+					fieldValue: filters.start_date_start.value,
+					onSelect: (value) =>
+						setFilterValue('start_date_start', value),
+				}}
+				end={{
+					fieldName: 'start_date_end',
+					fieldValue: filters.start_date_end.value,
+					onSelect: (value) =>
+						setFilterValue('start_date_end', value),
+				}}
 			/>
 
 			<FormFiltersReset source="DataTableCronHistoryFilters" />

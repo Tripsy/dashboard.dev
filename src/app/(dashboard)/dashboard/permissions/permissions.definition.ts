@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import type {
-	DataTableFiltersType,
 	FormStateType,
 } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
@@ -40,7 +39,7 @@ function getFormValuesPermission(formData: FormData): PermissionFormValuesType {
 	};
 }
 
-export type PermissionDataTableFiltersType = DataTableFiltersType & {
+export type PermissionDataTableFiltersType = {
 	global: { value: string | null; matchMode: 'contains' };
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };

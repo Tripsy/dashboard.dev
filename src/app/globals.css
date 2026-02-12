@@ -321,6 +321,21 @@
 	.dashboard-layout .main-section .side-menu-section .side-menu-content {
 		@apply flex-1;
 	}
+
+	.dashboard-layout .table-container {
+		@apply bg-primary-foreground rounded-2xl p-4 shadow-lg;
+	}
+
+	.dashboard-layout .p-paginator.data-table-paginator {
+		@apply relative !border-b-0;
+	}
+
+	.dashboard-layout
+	.p-paginator.data-table-paginator
+	.data-table-paginator-showing {
+		@apply absolute left-0 hidden md:block text-sm px-4;
+	}
+
 }
 
 @layer utilities {

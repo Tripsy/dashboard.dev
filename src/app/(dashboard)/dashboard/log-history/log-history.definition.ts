@@ -2,7 +2,6 @@ import {
 	type DataTableColumnType,
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
-import type { DataTableFiltersType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import { toTitleCase } from '@/helpers/string.helper';
 import type {
@@ -24,7 +23,7 @@ const translations = await translateBatch([
 	'log_history.data_table.column_recorded_at',
 ]);
 
-export type LogHistoryDataTableFiltersType = DataTableFiltersType & {
+export type LogHistoryDataTableFiltersType = {
 	request_id: { value: string | null; matchMode: 'contains' };
 	entity: { value: string | null; matchMode: 'equals' };
 	entity_id: { value: string | null; matchMode: 'equals' };

@@ -33,7 +33,7 @@ export const DataTableTemplates = (): JSX.Element => {
 			selectionMode="checkbox"
 			dataTableStore={dataTableStore}
 		>
-			<div className="standard-box p-4 shadow-md">
+			<div className="table-container">
 				<DataTableTemplatesFilters />
 				<DataTableActions />
 				<DataTableList dataKey="id" scrollHeight="400px" />

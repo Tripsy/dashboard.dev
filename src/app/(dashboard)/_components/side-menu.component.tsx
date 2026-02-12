@@ -2,7 +2,7 @@
 
 import { ArrowDown, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
-import React, {
+import {
 	type ComponentType,
 	useLayoutEffect,
 	useMemo,
@@ -153,7 +153,7 @@ export function SideMenu() {
 					<Button
 						variant="ghost"
 						onClick={menuToggle}
-						className="h-8 w-8 rounded-md cursor-pointer"
+						className="h-8 w-8 rounded-md"
 					>
 						{menuStatus === 'closed' ? (
 							<ChevronRight className="h-4 w-4" />
@@ -261,6 +261,7 @@ function SideMenuPartOpen({
 	return (
 		<div className="side-menu-part">
 			<button
+				type="button"
 				onClick={handleToggle}
 				className="flex items-center text-left gap-2 px-3 py-2.5 w-full transition-all duration-200 text-sidebar-foreground hover:bg-sidebar-accent"
 			>

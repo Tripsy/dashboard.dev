@@ -14,7 +14,7 @@ import { Configuration } from '@/config/settings.config';
 function Header() {
 	return (
 		<header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-			<div className="container-default">
+			<div className="container-dashboard mx-4 md:mx-16">
 				<div className="flex items-center h-16">
 					<Link
 						href={Routes.get('home')}
@@ -26,7 +26,7 @@ function Header() {
 						</span>
 					</Link>
 
-					<div className="w-full pl-16">
+					<div className="w-full pl-28">
 						<NavBreadcrumb />
 					</div>
 

@@ -2,7 +2,6 @@ import {
 	type DataTableColumnType,
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
-import type { DataTableFiltersType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import type {
 	LogCategoryEnum,
@@ -19,7 +18,7 @@ const translations = await translateBatch([
 	'log_data.data_table.column_created_at',
 ]);
 
-export type LogDataDataTableFiltersType = DataTableFiltersType & {
+export type LogDataDataTableFiltersType = {
 	global: { value: string | null; matchMode: 'contains' };
 	level: { value: LogLevelEnum | null; matchMode: 'equals' };
 	category: { value: LogCategoryEnum | null; matchMode: 'equals' };

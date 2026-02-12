@@ -32,7 +32,7 @@ export const DataTableCronHistory = (): JSX.Element => {
 			selectionMode="multiple"
 			dataTableStore={dataTableStore}
 		>
-			<div className="standard-box p-4 shadow-md">
+			<div className="table-container">
 				<DataTableCronHistoryFilters />
 				<DataTableActions />
 				<DataTableList dataKey="id" scrollHeight="400px" />

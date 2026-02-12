@@ -33,7 +33,7 @@ export const DataTableLogHistory = (): JSX.Element => {
 			selectionMode="multiple"
 			dataTableStore={dataTableStore}
 		>
-			<div className="standard-box p-4 shadow-md">
+			<div className="table-container">
 				<DataTableLogHistoryFilters />
 				<DataTableActions />
 				<DataTableList dataKey="id" scrollHeight="400px" />

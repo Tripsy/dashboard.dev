@@ -1,5 +1,4 @@
 import {
-	faArrowsRotate,
 	faBan,
 	faCircleCheck,
 	faClock,

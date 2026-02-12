@@ -9,10 +9,10 @@ import {
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import type { PermissionDataTableFiltersType } from '@/app/(dashboard)/dashboard/permissions/permissions.definition';
-import { createFilterHandlers } from '@/helpers/data-table.helper';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import type { PermissionModel } from '@/models/permission.model';
+import type {UsersDataTableFiltersType} from "@/app/(dashboard)/dashboard/users/users.definition";
 
 export const DataTablePermissionsFilters = (): JSX.Element => {
 	const { stateDefault, dataTableStore } = useDataTable<
@@ -37,28 +37,30 @@ export const DataTablePermissionsFilters = (): JSX.Element => {
 		(state) => state.updateTableState,
 	);
 
-	const updateFilters = useCallback(
-		(newFilters: Partial<typeof DataTablePermissionsFilters>) => {
+	const setFilterValue = useCallback(
+		<K extends keyof PermissionDataTableFiltersType>(
+			key: K,
+			value: PermissionDataTableFiltersType[K]['value'],
+		) => {
 			updateTableState({
-				filters: { ...filters, ...newFilters },
+				filters: {
+					...filters,
+					[key]: {
+						...filters[key],
+						value,
+					},
+				},
 			});
 		},
 		[filters, updateTableState],
 	);
 
-	const handlers = useMemo(
-		() => createFilterHandlers(updateFilters),
-		[updateFilters],
-	);
-	const { handleInputChange, handleCheckboxChange } = handlers;
 
 	const searchGlobal = useSearchFilter({
 		initialValue: filters.global?.value ?? '',
 		debounceDelay: 1000,
 		minLength: 3,
-		onSearch: (value) => {
-			handleInputChange('global', value);
-		},
+		onSearch: (value) => setFilterValue('global', value),
 	});
 
 	useEffect(() => {
@@ -85,17 +87,14 @@ export const DataTablePermissionsFilters = (): JSX.Element => {
 
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
-			<FormFiltersSearch
-				labelText={
-					translations['permissions.form_filters.label_global']
-				}
-				fieldName="global"
+			<FormFiltersSearch<PermissionDataTableFiltersType>
+				labelText={translations['permissions.form_filters.label_global']}
 				search={searchGlobal}
 			/>
 
 			<FormFiltersShowDeleted
-				is_deleted={filters.is_deleted?.value || false}
-				handleCheckboxChange={handleCheckboxChange}
+				checked={filters.is_deleted?.value || false}
+				onCheckedChange={(value) => setFilterValue('is_deleted', value)}
 			/>
 
 			<FormFiltersReset source="DataTablePermissionsFilters" />

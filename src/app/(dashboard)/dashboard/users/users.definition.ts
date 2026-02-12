@@ -4,7 +4,6 @@ import {
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
 import type {
-	DataTableFiltersType,
 	FormStateType,
 } from '@/config/data-source.config';
 import { Configuration } from '@/config/settings.config';
@@ -240,7 +239,7 @@ function getFormValuesUser(formData: FormData): UserFormValuesType {
 	};
 }
 
-export type UsersDataTableFiltersType = DataTableFiltersType & {
+export type UsersDataTableFiltersType = {
 	global: { value: string | null; matchMode: 'contains' };
 	role: { value: UserRoleEnum | null; matchMode: 'equals' };
 	status: { value: UserStatusEnum | null; matchMode: 'equals' };

@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { getActionIcon, Icons } from '@/components/icon.component';
+import { getActionIcon } from '@/components/icon.component';
 import { LoadingIcon } from '@/components/status.component';
 import type { DataSourceKey } from '@/config/data-source.config';
 import { useTranslation } from '@/hooks/use-translation.hook';

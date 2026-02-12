@@ -10,7 +10,6 @@ import {
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import type { LogHistoryDataTableFiltersType } from '@/app/(dashboard)/dashboard/log-history/log-history.definition';
-import { createFilterHandlers } from '@/helpers/data-table.helper';
 import { capitalizeFirstLetter, toTitleCase } from '@/helpers/string.helper';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
@@ -67,39 +66,36 @@ export const DataTableLogHistoryFilters = (): JSX.Element => {
 		(state) => state.updateTableState,
 	);
 
-	const updateFilters = useCallback(
-		(newFilters: Partial<typeof DataTableLogHistoryFilters>) => {
+	const setFilterValue = useCallback(
+		<K extends keyof LogHistoryDataTableFiltersType>(
+			key: K,
+			value: LogHistoryDataTableFiltersType[K]['value'],
+		) => {
 			updateTableState({
-				filters: { ...filters, ...newFilters },
+				filters: {
+					...filters,
+					[key]: {
+						...filters[key],
+						value,
+					},
+				},
 			});
 		},
 		[filters, updateTableState],
 	);
 
-	const handlers = useMemo(
-		() => createFilterHandlers(updateFilters),
-		[updateFilters],
-	);
-
-	const { handleInputChange, handleSelectChange, handleDateChange } =
-		handlers;
-
 	const searchRequestId = useSearchFilter({
 		initialValue: filters.request_id?.value ?? '',
 		debounceDelay: 1000,
 		minLength: 36,
-		onSearch: (value) => {
-			handleInputChange('request_id', value);
-		},
+		onSearch: (value) => setFilterValue('request_id', value),
 	});
 
 	const searchEntityId = useSearchFilter({
 		initialValue: filters.entity_id?.value ?? '',
 		debounceDelay: 1000,
 		minLength: 2,
-		onSearch: (value) => {
-			handleInputChange('entity_id', value);
-		},
+		onSearch: (value) => setFilterValue('entity_id', value),
 	});
 
 	useEffect(() => {
@@ -134,7 +130,7 @@ export const DataTableLogHistoryFilters = (): JSX.Element => {
 
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
-			<FormFiltersSearch
+			<FormFiltersSearch<LogHistoryDataTableFiltersType>
 				labelText={
 					translations['log_history.form_filters.label_request_id']
 				}
@@ -142,17 +138,17 @@ export const DataTableLogHistoryFilters = (): JSX.Element => {
 				search={searchRequestId}
 			/>
 
-			<FormFiltersSelect
-				labelText={
-					translations['log_history.form_filters.label_entity']
-				}
+			<FormFiltersSelect<LogHistoryDataTableFiltersType>
+				labelText={translations['log_history.form_filters.label_entity']}
 				fieldName="entity"
 				fieldValue={filters.entity.value}
-				selectOptions={entities}
-				handleSelectChange={handleSelectChange}
+				options={entities}
+				onValueChange={(value) =>
+					setFilterValue('entity', value)
+				}
 			/>
 
-			<FormFiltersSearch
+			<FormFiltersSearch<LogHistoryDataTableFiltersType>
 				labelText={
 					translations['log_history.form_filters.label_entity_id']
 				}
@@ -160,35 +156,40 @@ export const DataTableLogHistoryFilters = (): JSX.Element => {
 				search={searchEntityId}
 			/>
 
-			<FormFiltersSelect
-				labelText={
-					translations['log_history.form_filters.label_action']
-				}
+			<FormFiltersSelect<LogHistoryDataTableFiltersType>
+				labelText={translations['log_history.form_filters.label_action']}
 				fieldName="action"
 				fieldValue={filters.action.value}
-				selectOptions={actions}
-				handleSelectChange={handleSelectChange}
+				options={actions}
+				onValueChange={(value) =>
+					setFilterValue('action', value)
+				}
 			/>
 
-			<FormFiltersSelect
-				labelText={
-					translations['log_history.form_filters.label_source']
-				}
+			<FormFiltersSelect<LogHistoryDataTableFiltersType>
+				labelText={translations['log_history.form_filters.label_source']}
 				fieldName="source"
 				fieldValue={filters.source.value}
-				selectOptions={sources}
-				handleSelectChange={handleSelectChange}
+				options={sources}
+				onValueChange={(value) =>
+					setFilterValue('source', value as LogHistorySource)
+				}
 			/>
 
-			<FormFiltersDateRange
-				labelText={
-					translations['log_history.form_filters.label_recorded_at']
-				}
-				startDateField="recorded_at_start"
-				startDateValue={filters.recorded_at_start?.value ?? ''}
-				endDateField="recorded_at_end"
-				endDateValue={filters.recorded_at_end?.value ?? ''}
-				handleDateChange={handleDateChange}
+			<FormFiltersDateRange<LogHistoryDataTableFiltersType>
+				labelText={translations['log_history.form_filters.label_recorded_at']}
+				start={{
+					fieldName: 'recorded_at_start',
+					fieldValue: filters.recorded_at_start.value,
+					onSelect: (value) =>
+						setFilterValue('recorded_at_start', value),
+				}}
+				end={{
+					fieldName: 'recorded_at_end',
+					fieldValue: filters.recorded_at_end.value,
+					onSelect: (value) =>
+						setFilterValue('recorded_at_end', value),
+				}}
 			/>
 
 			<FormFiltersReset source="DataTableLogHistoryFilters" />

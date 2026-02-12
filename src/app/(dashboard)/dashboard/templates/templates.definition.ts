@@ -4,7 +4,6 @@ import {
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
 import type {
-	DataTableFiltersType,
 	FormStateType,
 } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
@@ -159,7 +158,7 @@ export function getFormValuesTemplates(
 	};
 }
 
-export type TemplateDataTableFiltersType = DataTableFiltersType & {
+export type TemplateDataTableFiltersType = {
 	global: { value: string | null; matchMode: 'contains' };
 	language: { value: string | null; matchMode: 'equals' };
 	type: { value: TemplateTypeEnum | null; matchMode: 'equals' };

@@ -2,7 +2,6 @@ import {
 	type DataTableColumnType,
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
-import type { DataTableFiltersType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import type {
 	CronHistoryModel,
@@ -21,7 +20,7 @@ const translations = await translateBatch([
 	'cron_history.data_table.column_run_time',
 ]);
 
-export type CronHistoryDataTableFiltersType = DataTableFiltersType & {
+export type CronHistoryDataTableFiltersType = {
 	global: { value: string | null; matchMode: 'contains' };
 	status: { value: CronHistoryStatusEnum | null; matchMode: 'equals' };
 	start_date_start: { value: string | null; matchMode: 'equals' };

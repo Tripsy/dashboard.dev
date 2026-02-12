@@ -2,7 +2,6 @@ import {
 	type DataTableColumnType,
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
-import type { DataTableFiltersType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import { formatDate } from '@/helpers/date.helper';
 import type {
@@ -19,7 +18,7 @@ const translations = await translateBatch([
 	'mail_queue.data_table.column_sent_at',
 ]);
 
-export type MailQueueDataTableFiltersType = DataTableFiltersType & {
+export type MailQueueDataTableFiltersType = {
 	status: { value: MailQueueStatusEnum | null; matchMode: 'equals' };
 	template: { value: string | null; matchMode: 'contains' };
 	content: { value: string | null; matchMode: 'contains' };

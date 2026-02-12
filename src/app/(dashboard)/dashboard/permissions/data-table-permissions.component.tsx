@@ -32,7 +32,7 @@ export const DataTablePermissions = (): JSX.Element => {
 			selectionMode="checkbox"
 			dataTableStore={dataTableStore}
 		>
-			<div className="standard-box p-4 shadow-md">
+			<div className="table-container">
 				<DataTablePermissionsFilters />
 				<DataTableActions />
 				<DataTableList dataKey="id" scrollHeight="400px" />

@@ -3,9 +3,7 @@ import {
 	type DataTableColumnType,
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
-import type {
-	FormStateType,
-} from '@/config/data-source.config';
+import type { FormStateType } from '@/config/data-source.config';
 import { Configuration } from '@/config/settings.config';
 import { translateBatch } from '@/config/translate.setup';
 import {
@@ -397,8 +395,8 @@ export const dataSourceConfigUsers = {
 			allowedEntries: 'free' as const,
 			position: 'right' as const,
 			function: createUser,
-			button: {
-				className: 'btn btn-action-create',
+			buttonProps: {
+				variant: 'info' as const,
 			},
 		},
 		update: {
@@ -407,8 +405,9 @@ export const dataSourceConfigUsers = {
 			allowedEntries: 'single' as const,
 			position: 'left' as const,
 			function: updateUser,
-			button: {
-				className: 'btn btn-action-update',
+			buttonProps: {
+				variant: 'outline' as const,
+				hover: 'success' as const,
 			},
 		},
 		delete: {
@@ -418,8 +417,9 @@ export const dataSourceConfigUsers = {
 			customEntryCheck: (entry: UserModel) => !entry.deleted_at, // Return true if the entry is not deleted
 			position: 'left' as const,
 			function: deleteUser,
-			button: {
-				className: 'btn btn-action-delete',
+			buttonProps: {
+				variant: 'outline' as const,
+				hover: 'error' as const,
 			},
 		},
 		enable: {
@@ -433,8 +433,9 @@ export const dataSourceConfigUsers = {
 				),
 			position: 'left' as const,
 			function: enableUser,
-			button: {
-				className: 'btn btn-action-enable',
+			buttonProps: {
+				variant: 'outline' as const,
+				hover: 'info' as const,
 			},
 		},
 		disable: {
@@ -448,8 +449,9 @@ export const dataSourceConfigUsers = {
 				),
 			position: 'left' as const,
 			function: disableUser,
-			button: {
-				className: 'btn btn-action-disable',
+			buttonProps: {
+				variant: 'outline' as const,
+				hover: 'error' as const,
 			},
 		},
 		restore: {
@@ -459,8 +461,9 @@ export const dataSourceConfigUsers = {
 			customEntryCheck: (entry: UserModel) => !!entry.deleted_at, // Return true if the entry is deleted
 			position: 'left' as const,
 			function: restoreUser,
-			button: {
-				className: 'btn btn-action-restore',
+			buttonProps: {
+				variant: 'outline' as const,
+				hover: 'info' as const,
 			},
 		},
 		permissions: {
@@ -470,8 +473,9 @@ export const dataSourceConfigUsers = {
 			customEntryCheck: (entry: UserModel) =>
 				entry.role === UserRoleEnum.OPERATOR,
 			position: 'left' as const,
-			button: {
-				className: 'btn btn-action-update',
+			buttonProps: {
+				variant: 'outline' as const,
+				hover: 'success' as const,
 			},
 		},
 		view: {

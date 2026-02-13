@@ -1,7 +1,5 @@
 import { z } from 'zod';
-import type {
-	FormStateType,
-} from '@/config/data-source.config';
+import type { FormStateType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import type {
 	PermissionFormValuesType,
@@ -128,8 +126,8 @@ export const dataSourceConfigPermissions = {
 			allowedEntries: 'free' as const,
 			position: 'right' as const,
 			function: createPermissions,
-			button: {
-				className: 'btn btn-action-create',
+			buttonProps: {
+				variant: 'info' as const,
 			},
 		},
 		update: {
@@ -138,8 +136,9 @@ export const dataSourceConfigPermissions = {
 			allowedEntries: 'single' as const,
 			position: 'left' as const,
 			function: updatePermissions,
-			button: {
-				className: 'btn btn-action-update',
+			buttonProps: {
+				variant: 'outline' as const,
+				hover: 'success' as const,
 			},
 		},
 		delete: {
@@ -149,8 +148,9 @@ export const dataSourceConfigPermissions = {
 			position: 'left' as const,
 			customEntryCheck: (entry: PermissionModel) => !entry.deleted_at, // Return true if the entry is not deleted
 			function: deletePermissions,
-			button: {
-				className: 'btn btn-action-delete',
+			buttonProps: {
+				variant: 'outline' as const,
+				hover: 'error' as const,
 			},
 		},
 		restore: {
@@ -160,8 +160,9 @@ export const dataSourceConfigPermissions = {
 			position: 'left' as const,
 			customEntryCheck: (entry: PermissionModel) => !!entry.deleted_at, // Return true if the entry is deleted
 			function: restorePermissions,
-			button: {
-				className: 'btn btn-action-restore',
+			buttonProps: {
+				variant: 'outline' as const,
+				hover: 'info' as const,
 			},
 		},
 	},

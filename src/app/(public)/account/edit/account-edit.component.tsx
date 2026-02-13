@@ -130,7 +130,7 @@ export default function AccountEdit() {
 				/>
 
 				<div className="flex justify-end gap-2">
-					<Button variant="cancel">
+					<Button variant="outline" hover="warning">
 						<Link
 							href={Routes.get('account-me')}
 							title="Cancel & Go back to my account"

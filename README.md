@@ -161,6 +161,7 @@ $ pnpm run madge
 
 # TODO
 
+1. Operator permissions error while trying to update
 1. fresh design
     - dashboard layout
     - dashboard filters / manage

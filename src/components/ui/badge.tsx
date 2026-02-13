@@ -20,6 +20,7 @@ const badgeVariants = cva(
 				xs: 'text-xs px-2 py-1.5',
 				sm: 'text-sm p-2',
 				lg: 'px-8',
+				status: 'text-sm px-2 py-1.5',
 			},
 		},
 		defaultVariants: {
@@ -28,6 +29,9 @@ const badgeVariants = cva(
 		},
 	},
 );
+
+export type BadgeVariant = VariantProps<typeof badgeVariants>['variant'];
+export type BadgeSize = VariantProps<typeof badgeVariants>['size'];
 
 export interface BadgeProps
 	extends React.HTMLAttributes<HTMLDivElement>,

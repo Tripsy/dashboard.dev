@@ -188,7 +188,8 @@ export function FormFiltersReset({ source }: { source: string }) {
 		<div className="flex self-end">
 			<Button
 				type="reset"
-				variant="cancel"
+				variant="outline"
+				hover="warning"
 				onClick={() => handleReset(source)}
 				title="Reset filters"
 			>

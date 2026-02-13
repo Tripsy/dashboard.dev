@@ -1,4 +1,5 @@
 import type { DataTableColumnType } from '@/app/(dashboard)/_components/data-table-value';
+import {ButtonHover, ButtonSize, ButtonVariant} from '@/components/ui/button';
 import type { ValidateFormFunctionType } from '@/hooks/use-form-validation.hook';
 import type { FormSituationType } from '@/types';
 import type { ApiResponseFetch } from '@/types/api.type';
@@ -95,6 +96,12 @@ type DataTableActionType = 'view' | 'create' | 'update' | 'delete';
 type DataTableActionMode = 'form' | 'action' | 'other';
 type DataTableEntryRequirement = 'free' | 'single' | 'multiple';
 type DataTableActionPosition = 'left' | 'right' | 'hidden';
+export type DataTableActionButtonPropsType = {
+	className?: string;
+	variant?: ButtonVariant;
+	size?: ButtonSize;
+	hover?: ButtonHover;
+};
 
 export type DataTableActionConfigType<Model, Function> = {
 	type?: DataTableActionType;
@@ -104,9 +111,7 @@ export type DataTableActionConfigType<Model, Function> = {
 	customEntryCheck?: (entry: Model) => boolean;
 	position: DataTableActionPosition;
 	function?: Function;
-	button?: {
-		className: string;
-	};
+	buttonProps?: DataTableActionButtonPropsType;
 };
 
 // ============================================================================

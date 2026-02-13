@@ -49,9 +49,9 @@ export const DataTableUsers = (): JSX.Element => {
 					permissions: <SetupPermissionsUser />,
 					view: <ViewUser />,
 				}}
-				modalClass={{
-					permissions: 'max-w-xl',
-					view: 'max-w-2xl!',
+				modalsProps={{
+					permissions: { size: 'lg' },
+					view: { size: 'xl' },
 				}}
 			/>
 		</DataTableProvider>

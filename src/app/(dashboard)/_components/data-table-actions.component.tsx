@@ -174,7 +174,7 @@ export function DataTableActions<K extends DataSourceKey, Model>() {
 					key={`button-${actionName}`}
 					dataSource={dataSource}
 					actionName={actionName}
-					className={actionProps.button?.className}
+					buttonProps={actionProps.buttonProps}
 					handleClick={() =>
 						handleClick(
 							selectedEntries,

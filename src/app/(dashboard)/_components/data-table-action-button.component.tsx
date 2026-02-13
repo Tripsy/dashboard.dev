@@ -1,19 +1,20 @@
 import { useMemo } from 'react';
 import { getActionIcon } from '@/components/icon.component';
 import { LoadingIcon } from '@/components/status.component';
-import type { DataSourceKey } from '@/config/data-source.config';
+import {Button} from '@/components/ui/button';
+import {DataSourceKey, DataTableActionButtonPropsType} from '@/config/data-source.config';
 import { useTranslation } from '@/hooks/use-translation.hook';
 
 export function DataTableActionButton<K extends DataSourceKey>({
 	dataSource,
 	actionName,
-	className,
+	buttonProps,
 	handleClick,
 	disabled = false,
 }: {
 	dataSource: K;
 	actionName: string;
-	className?: string;
+	buttonProps?: DataTableActionButtonPropsType;
 	handleClick: () => void;
 	disabled?: boolean;
 }) {
@@ -30,9 +31,12 @@ export function DataTableActionButton<K extends DataSourceKey>({
 	const ActionIcon = getActionIcon(actionName);
 
 	return (
-		<button
+		<Button
 			type="button"
-			className={className || 'btn'}
+			variant={buttonProps?.variant}
+			hover={buttonProps?.hover}
+			size={buttonProps?.size}
+			className={buttonProps?.className}
 			title={translations[actionTitleKey]}
 			onClick={handleClick}
 			disabled={disabled}
@@ -48,6 +52,6 @@ export function DataTableActionButton<K extends DataSourceKey>({
 					{translations[actionLabelKey]}
 				</>
 			)}
-		</button>
+		</Button>
 	);
 }

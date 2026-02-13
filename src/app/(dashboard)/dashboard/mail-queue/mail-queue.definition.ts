@@ -132,8 +132,9 @@ export const dataSourceConfigMailQueue = {
 			allowedEntries: 'multiple' as const,
 			position: 'left' as const,
 			function: deleteMailQueue,
-			button: {
-				className: 'btn btn-action-delete',
+			buttonProps: {
+				variant: 'outline' as const,
+				hover: 'error' as const,
 			},
 		},
 		view: {

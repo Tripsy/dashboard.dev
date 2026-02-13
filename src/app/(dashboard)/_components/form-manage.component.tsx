@@ -1,7 +1,6 @@
 'use client';
 
-import type React from 'react';
-import {
+import React, {
 	cloneElement,
 	isValidElement,
 	useActionState,
@@ -13,9 +12,9 @@ import { useStore } from 'zustand/react';
 import { formAction } from '@/app/(dashboard)/_actions';
 import { handleReset } from '@/app/(dashboard)/_components/data-table-actions.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
+import { FormComponentSubmit } from '@/components/form/form-element.component';
 import { FormError } from '@/components/form/form-error.component';
 import { getActionIcon, Icons } from '@/components/icon.component';
-import { LoadingIcon } from '@/components/status.component';
 import {
 	type DataSourceKey,
 	type FormManageType,
@@ -42,17 +41,31 @@ export function FormManage<
 	const { dataSource, dataTableStore } = useDataTable<K, Model>();
 	const { showToast } = useToast();
 
+	const actions = useMemo(
+		() =>
+			getDataSourceConfig<K, Model, FormValues, 'actions'>(
+				dataSource,
+				'actions',
+			),
+		[dataSource],
+	);
+
+	if (!actions) {
+		throw new ValueError(`'actions' are not defined for ${dataSource}`);
+	}
+
 	const actionName = useStore(dataTableStore, (state) => state.actionName);
+
+	if (!actionName) {
+		throw new Error('actionName appears to be null');
+	}
+
 	const actionEntry = useStore(dataTableStore, (state) => state.actionEntry);
 	const closeOut = useStore(dataTableStore, (state) => state.closeOut);
 	const refreshTableState = useStore(
 		dataTableStore,
 		(state) => state.refreshTableState,
 	);
-
-	if (!actionName) {
-		throw new Error('actionName appears to be null');
-	}
 
 	const formState = getDataSourceConfig<K, Model, FormValues, 'formState'>(
 		dataSource,
@@ -63,7 +76,10 @@ export function FormManage<
 		throw new ValueError(`'formState' is not defined for ${dataSource}`);
 	}
 
-	const functions = getDataSourceConfig(dataSource, 'functions');
+	const functions = getDataSourceConfig<K, Model, FormValues, 'functions'>(
+		dataSource,
+		'functions',
+	);
 
 	if (
 		!('syncFormState' in functions) ||
@@ -117,7 +133,7 @@ export function FormManage<
 	);
 
 	const { errors, submitted, markSubmit, markFieldAsTouched } =
-		useFormValidation<FormValues>({
+		useFormValidation({
 			formValues,
 			validate,
 			debounceDelay: 800,
@@ -211,42 +227,26 @@ export function FormManage<
 		>
 			{injectedChild}
 
-			<FormPart>
-				<div className="flex justify-end gap-3">
-					<button
-						type="submit"
-						className="btn btn-info"
-						disabled={
-							pending ||
-							(submitted && Object.keys(errors).length > 0)
-						}
-						aria-busy={pending}
-					>
-						{pending ? (
-							<span className="flex items-center gap-1.5">
-								<LoadingIcon />
-								{translations['app.text.saving']}
-							</span>
-						) : submitted && Object.keys(errors).length > 0 ? (
-							<span className="flex items-center gap-1.5">
-								<Icons.Status.Error className="animate-pulse" />
-								{translations[actionLabelKey]}
-							</span>
-						) : (
-							<span className="flex items-center gap-1.5">
-								<ActionButtonIcon />
-								{translations[actionLabelKey]}
-							</span>
-						)}
-					</button>
-				</div>
-			</FormPart>
+			<div className="flex justify-end gap-3">
+				<FormComponentSubmit
+					pending={pending}
+					submitted={submitted}
+					errors={errors as Record<string, string[]>}
+					buttonLabel={translations[actionLabelKey]}
+					buttonVariant={
+						actions[actionName as keyof typeof actions]?.button
+							?.variant || 'info'
+					}
+					buttonIcon={<ActionButtonIcon />}
+				/>
+			</div>
 
 			{state.situation === 'error' && state.message && (
 				<FormError>
-					<div>
-						<Icons.Status.Error /> {state.message}
-					</div>
+					<React.Fragment key="error-content">
+						<Icons.Status.Error />
+						{state.message}
+					</React.Fragment>
 				</FormError>
 			)}
 		</form>

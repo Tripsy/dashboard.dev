@@ -115,6 +115,7 @@ export default function AccountMe() {
 								href={Routes.get('account-edit')}
 								prefetch={false}
 								title="Edit my account"
+								className="inline-flex items-center justify-center gap-1"
 							>
 								<Icons.Action.Update /> Edit
 							</Link>
@@ -139,18 +140,18 @@ export default function AccountMe() {
 									<Badge
 										variant="success"
 										size="sm"
-										className="rounded-lg mt-1"
+										className="rounded-lg mt-2"
 									>
-										<Icons.Status.Ok />
+										<Icons.Status.Ok className="w-4 h-4" />
 										Verified
 									</Badge>
 								) : (
 									<Badge
-										variant="success"
-										size="xs"
-										className="rounded-lg mt-1"
+										variant="error"
+										size="sm"
+										className="rounded-lg mt-2"
 									>
-										<Icons.Status.Warning />
+										<Icons.Status.Warning className="w-4 h-4" />
 										Not Verified
 									</Badge>
 								)}
@@ -160,6 +161,7 @@ export default function AccountMe() {
 									href={Routes.get('email-update')}
 									prefetch={false}
 									title="Update email address"
+									className="inline-flex items-center justify-center gap-1"
 								>
 									<Icons.Action.Update /> Change
 								</Link>
@@ -208,7 +210,7 @@ export default function AccountMe() {
 									href={Routes.get('password-update')}
 									prefetch={false}
 									title="Update password"
-									className="flex items-center gap-1"
+									className="inline-flex items-center justify-center gap-1"
 								>
 									<Icons.Password /> Change
 								</Link>

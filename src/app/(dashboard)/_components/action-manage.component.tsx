@@ -204,7 +204,7 @@ export function ActionManage<
 					key={`button-modal-${actionName}`}
 					dataSource={dataSource}
 					actionName={actionName}
-					className={actionProps.button?.className}
+					buttonProps={actionProps.buttonProps}
 					handleClick={handleAction}
 					disabled={isLoading}
 				/>

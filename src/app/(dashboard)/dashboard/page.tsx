@@ -33,6 +33,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const stats = [
 	{
+		id: 1,
 		title: 'Total Entries',
 		value: '1,284',
 		change: '+12%',
@@ -40,6 +41,7 @@ const stats = [
 		icon: FileText,
 	},
 	{
+		id: 2,
 		title: 'Active Users',
 		value: '892',
 		change: '+8%',
@@ -47,6 +49,7 @@ const stats = [
 		icon: Users,
 	},
 	{
+		id: 3,
 		title: 'Page Views',
 		value: '24.5K',
 		change: '-3%',
@@ -54,6 +57,7 @@ const stats = [
 		icon: Eye,
 	},
 	{
+		id: 4,
 		title: 'Revenue',
 		value: '$12,840',
 		change: '+18%',
@@ -63,19 +67,39 @@ const stats = [
 ];
 
 const recentActivity = [
-	{ action: 'New entry created', user: 'John Doe', time: '2 minutes ago' },
-	{ action: 'Entry updated', user: 'Jane Smith', time: '15 minutes ago' },
-	{ action: 'Comment added', user: 'Bob Johnson', time: '1 hour ago' },
-	{ action: 'Entry deleted', user: 'Alice Williams', time: '2 hours ago' },
-	{ action: 'New user signup', user: 'Charlie Brown', time: '3 hours ago' },
+	{
+		id: 1,
+		action: 'New entry created',
+		user: 'John Doe',
+		time: '2 minutes ago',
+	},
+	{
+		id: 2,
+		action: 'Entry updated',
+		user: 'Jane Smith',
+		time: '15 minutes ago',
+	},
+	{ id: 3, action: 'Comment added', user: 'Bob Johnson', time: '1 hour ago' },
+	{
+		id: 4,
+		action: 'Entry deleted',
+		user: 'Alice Williams',
+		time: '2 hours ago',
+	},
+	{
+		id: 5,
+		action: 'New user signup',
+		user: 'Charlie Brown',
+		time: '3 hours ago',
+	},
 ];
 
 const topEntries = [
-	{ title: 'Getting Started Guide', views: 1234, trend: 'up' },
-	{ title: 'API Reference', views: 987, trend: 'up' },
-	{ title: 'Best Practices', views: 756, trend: 'down' },
-	{ title: 'Troubleshooting', views: 654, trend: 'up' },
-	{ title: 'FAQ', views: 543, trend: 'down' },
+	{ id: 1, title: 'Getting Started Guide', views: 1234, trend: 'up' },
+	{ id: 2, title: 'API Reference', views: 987, trend: 'up' },
+	{ id: 3, title: 'Best Practices', views: 756, trend: 'down' },
+	{ id: 4, title: 'Troubleshooting', views: 654, trend: 'up' },
+	{ id: 5, title: 'FAQ', views: 543, trend: 'down' },
 ];
 
 export default async function Page() {
@@ -86,7 +110,7 @@ export default async function Page() {
 			{/* Stats grid */}
 			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
 				{stats.map((stat) => (
-					<Card key={stat.title} className="card-hover">
+					<Card key={stat.id} className="card-hover">
 						<CardHeader className="flex flex-row items-center justify-between pb-2">
 							<CardTitle className="text-sm font-medium text-muted-foreground">
 								{stat.title}
@@ -145,9 +169,9 @@ export default async function Page() {
 						<div className="h-64 flex items-end gap-2">
 							{[
 								40, 65, 45, 80, 55, 70, 90, 60, 75, 85, 50, 95,
-							].map((height, i) => (
+							].map((height) => (
 								<div
-									key={i}
+									key={height}
 									className="flex-1 bg-primary/20 rounded-t-md transition-all hover:bg-primary/40"
 									style={{ height: `${height}%` }}
 								/>
@@ -182,7 +206,7 @@ export default async function Page() {
 						<div className="space-y-4">
 							{topEntries.map((entry, i) => (
 								<div
-									key={i}
+									key={entry.id}
 									className="flex items-center justify-between"
 								>
 									<div className="flex items-center gap-3">
@@ -217,9 +241,9 @@ export default async function Page() {
 				</CardHeader>
 				<CardContent>
 					<div className="space-y-4">
-						{recentActivity.map((activity, i) => (
+						{recentActivity.map((activity) => (
 							<div
-								key={i}
+								key={activity.id}
 								className="flex items-center justify-between py-2 border-b border-border last:border-0"
 							>
 								<div>

@@ -2,12 +2,7 @@
 
 import { ArrowDown, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
-import {
-	type ComponentType,
-	useLayoutEffect,
-	useMemo,
-	useState,
-} from 'react';
+import { type ComponentType, useLayoutEffect, useMemo, useState } from 'react';
 import { useSideMenu } from '@/app/(dashboard)/_providers/side-menu.provider';
 import { Icons } from '@/components/icon.component';
 import { Button } from '@/components/ui/button';

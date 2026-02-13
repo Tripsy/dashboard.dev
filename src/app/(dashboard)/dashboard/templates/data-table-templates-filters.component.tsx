@@ -15,7 +15,7 @@ import { capitalizeFirstLetter } from '@/helpers/string.helper';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { type TemplateModel, TemplateTypeEnum } from '@/models/template.model';
-import {LanguageEnum} from '@/models/user.model';
+import { LanguageEnum } from '@/models/user.model';
 
 const languages = Object.values(LanguageEnum).map((language) => ({
 	label: capitalizeFirstLetter(language),
@@ -110,13 +110,13 @@ export const DataTableTemplatesFilters = (): React.JSX.Element => {
 			/>
 
 			<FormFiltersSelect<TemplateDataTableFiltersType>
-				labelText={translations['templates.form_filters.label_language']}
+				labelText={
+					translations['templates.form_filters.label_language']
+				}
 				fieldName="language"
 				fieldValue={filters.language.value}
 				options={languages}
-				onValueChange={(value) =>
-					setFilterValue('language', value)
-				}
+				onValueChange={(value) => setFilterValue('language', value)}
 			/>
 
 			<FormFiltersSelect<TemplateDataTableFiltersType>

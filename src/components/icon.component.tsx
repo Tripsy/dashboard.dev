@@ -1,28 +1,14 @@
 import {
-	faBan,
-	faCircleCheck,
-	faClock,
-	faEnvelopeCircleCheck,
-	faEye,
-	faLock,
-	faPenToSquare,
-	faPlugCircleXmark,
-	faPlus,
-	faRotateLeft,
-	faScrewdriverWrench,
-	faThumbsUp,
-	faTrashCan,
-	faTriangleExclamation,
-} from '@fortawesome/free-solid-svg-icons';
-import {
-	FontAwesomeIcon,
-	type FontAwesomeIconProps,
-} from '@fortawesome/react-fontawesome';
-import {
+	ArchiveRestore,
+	Ban,
 	Calendar,
+	CircleCheck,
+	CircleSlash,
 	CircleUser,
 	CircleX,
 	ClipboardClock,
+	Clock,
+	CloudAlert,
 	Eye,
 	EyeOff,
 	FileStack,
@@ -35,6 +21,7 @@ import {
 	LockKeyhole,
 	LogIn,
 	Mail,
+	MailCheck,
 	Mails,
 	Minus,
 	Play,
@@ -43,114 +30,78 @@ import {
 	Search,
 	Settings,
 	Shield,
+	SquarePen,
 	SquareStack,
 	TableOfContents,
 	Tag,
+	ThumbsUp,
+	Trash2,
+	TriangleAlert,
 	UserRound,
 	Users,
+	Wrench,
 	X,
 } from 'lucide-react';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
 
-export function AwesomeIcon({
-	className = 'fa-md', // ex: fa-lg, fa-2xl, fa-sm
-	...props
-}: FontAwesomeIconProps) {
-	return <FontAwesomeIcon className={className} {...props} />;
-}
-
-type IconsProps = {
+type IconProps = {
 	className?: string;
 	props?: Record<string, string>;
 };
 
 export const Icons = {
-	Search: (props: IconsProps) => <Search {...props} />,
-	Visible: (props: IconsProps) => <Eye {...props} />,
-	Obscured: (props: IconsProps) => <EyeOff {...props} />,
-	Info: (props: IconsProps) => <Info {...props} />,
+	Search: (props: IconProps) => <Search {...props} />,
+	Visible: (props: IconProps) => <Eye {...props} />,
+	Obscured: (props: IconProps) => <EyeOff {...props} />,
+	Info: (props: IconProps) => <Info {...props} />,
 
-	Email: (props: IconsProps) => <Mail {...props} />,
-	Password: (props: IconsProps) => <KeyRound {...props} />,
-	Tag: (props: IconsProps) => <Tag {...props} />,
-	Calendar: (props: IconsProps) => <Calendar {...props} />,
-	Settings: (props: IconsProps) => <Settings {...props} />,
-	Security: (props: IconsProps) => <Shield {...props} />,
-	Session: (props: IconsProps) => <FileStack {...props} />,
-	User: (props: IconsProps) => <UserRound {...props} />,
-	Users: (props: IconsProps) => <Users {...props} />,
-	HardDrive: (props: IconsProps) => <HardDrive {...props} />,
-	History: (props: IconsProps) => <ClipboardClock {...props} />,
-	Cron: (props: IconsProps) => <SquareStack {...props} />,
-	List: (props: IconsProps) => <ListStart {...props} />,
-	Mails: (props: IconsProps) => <Mails {...props} />,
-	Template: (props: IconsProps) => <LayoutTemplate {...props} />,
-	Logs: (props: IconsProps) => <TableOfContents {...props} />,
-	Account: (props: IconsProps) => <CircleUser {...props} />,
-	Permission: (props: IconsProps) => <LockKeyhole {...props} />,
-	Plus: (props: IconsProps) => <Plus {...props} />,
-	Minus: (props: IconsProps) => <Minus {...props} />,
+	Email: (props: IconProps) => <Mail {...props} />,
+	Password: (props: IconProps) => <KeyRound {...props} />,
+	Tag: (props: IconProps) => <Tag {...props} />,
+	Calendar: (props: IconProps) => <Calendar {...props} />,
+	Settings: (props: IconProps) => <Settings {...props} />,
+	Security: (props: IconProps) => <Shield {...props} />,
+	Session: (props: IconProps) => <FileStack {...props} />,
+	User: (props: IconProps) => <UserRound {...props} />,
+	Users: (props: IconProps) => <Users {...props} />,
+	HardDrive: (props: IconProps) => <HardDrive {...props} />,
+	History: (props: IconProps) => <ClipboardClock {...props} />,
+	Cron: (props: IconProps) => <SquareStack {...props} />,
+	List: (props: IconProps) => <ListStart {...props} />,
+	Mails: (props: IconProps) => <Mails {...props} />,
+	Template: (props: IconProps) => <LayoutTemplate {...props} />,
+	Logs: (props: IconProps) => <TableOfContents {...props} />,
+	Account: (props: IconProps) => <CircleUser {...props} />,
+	Permission: (props: IconProps) => <Wrench {...props} />,
+	Plus: (props: IconProps) => <Plus {...props} />,
+	Minus: (props: IconProps) => <Minus {...props} />,
 
 	Status: {
-		Active: (props: Partial<FontAwesomeIconProps>) => (
-			<AwesomeIcon icon={faCircleCheck} {...props} />
-		),
-		Pending: (props: Partial<FontAwesomeIconProps>) => (
-			<AwesomeIcon icon={faClock} {...props} />
-		),
-		Inactive: (props: Partial<FontAwesomeIconProps>) => (
-			<AwesomeIcon icon={faLock} {...props} />
-		),
-		Deleted: (props: Partial<FontAwesomeIconProps>) => (
-			<AwesomeIcon icon={faBan} {...props} />
-		),
-		Ok: (props: Partial<FontAwesomeIconProps>) => (
-			<AwesomeIcon icon={faThumbsUp} {...props} />
-		),
-		Error: (props: IconsProps) => <CircleX {...props} />,
-		Warning: (props: Partial<FontAwesomeIconProps>) => (
-			<AwesomeIcon icon={faTriangleExclamation} {...props} />
-		),
-		Sent: (props: Partial<FontAwesomeIconProps>) => (
-			<AwesomeIcon icon={faEnvelopeCircleCheck} {...props} />
-		),
-		Success: (props: Partial<FontAwesomeIconProps>) => (
-			<AwesomeIcon icon={faCircleCheck} {...props} />
-		),
-		Loading: (props: IconsProps) => <Loader {...props} />,
+		Active: (props: IconProps) => <CircleCheck {...props} />,
+		Pending: (props: IconProps) => <Clock {...props} />,
+		Inactive: (props: IconProps) => <CircleSlash {...props} />,
+		Deleted: (props: IconProps) => <Ban {...props} />,
+		Ok: (props: IconProps) => <ThumbsUp {...props} />,
+		Error: (props: IconProps) => <CloudAlert {...props} />,
+		Warning: (props: IconProps) => <TriangleAlert {...props} />,
+		Sent: (props: IconProps) => <MailCheck {...props} />,
+		Success: (props: IconProps) => <CircleCheck {...props} />,
+		Loading: (props: IconProps) => <Loader {...props} />,
 	},
 	Action: {
-		Login: (props: IconsProps) => <LogIn {...props} />,
-		Go: (props: IconsProps) => <Play {...props} />,
-		Create: (props: Partial<FontAwesomeIconProps>) => (
-			<AwesomeIcon icon={faPlus} {...props} />
-		),
-		Update: (props: Partial<FontAwesomeIconProps>) => (
-			<AwesomeIcon icon={faPenToSquare} {...props} />
-		),
-		Delete: (props: Partial<FontAwesomeIconProps>) => (
-			<AwesomeIcon icon={faTrashCan} {...props} />
-		),
-		Cancel: (props: IconsProps) => <X {...props} />,
-		Destroy: (props: Partial<FontAwesomeIconProps>) => (
-			<AwesomeIcon icon={faPlugCircleXmark} {...props} />
-		),
-		Reset: (props: IconsProps) => <RefreshCcw {...props} />,
-		Enable: (props: Partial<FontAwesomeIconProps>) => (
-			<AwesomeIcon icon={faCircleCheck} {...props} />
-		),
-		Disable: (props: Partial<FontAwesomeIconProps>) => (
-			<AwesomeIcon icon={faLock} {...props} />
-		),
-		Restore: (props: Partial<FontAwesomeIconProps>) => (
-			<AwesomeIcon icon={faRotateLeft} {...props} />
-		),
-		Permissions: (props: Partial<FontAwesomeIconProps>) => (
-			<AwesomeIcon icon={faScrewdriverWrench} {...props} />
-		),
-		View: (props: Partial<FontAwesomeIconProps>) => (
-			<AwesomeIcon icon={faEye} {...props} />
-		),
+		Login: (props: IconProps) => <LogIn {...props} />,
+		Go: (props: IconProps) => <Play {...props} />,
+		Create: (props: IconProps) => <Plus {...props} />,
+		Update: (props: IconProps) => <SquarePen {...props} />,
+		Delete: (props: IconProps) => <Trash2 {...props} />,
+		Cancel: (props: IconProps) => <X {...props} />,
+		Destroy: (props: IconProps) => <CircleX {...props} />,
+		Reset: (props: IconProps) => <RefreshCcw {...props} />,
+		Enable: (props: IconProps) => <CircleCheck {...props} />,
+		Disable: (props: IconProps) => <LockKeyhole {...props} />,
+		Restore: (props: IconProps) => <ArchiveRestore {...props} />,
+		Permissions: (props: IconProps) => <Wrench {...props} />,
+		View: (props: IconProps) => <Eye {...props} />,
 	},
 };
 

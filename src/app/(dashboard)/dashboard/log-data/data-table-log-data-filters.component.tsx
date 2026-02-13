@@ -138,7 +138,9 @@ export const DataTableLogDataFilters = (): JSX.Element => {
 			/>
 
 			<FormFiltersDateRange<LogDataDataTableFiltersType>
-				labelText={translations['log_data.form_filters.label_created_at']}
+				labelText={
+					translations['log_data.form_filters.label_created_at']
+				}
 				start={{
 					fieldName: 'create_date_start',
 					fieldValue: filters.create_date_start.value,

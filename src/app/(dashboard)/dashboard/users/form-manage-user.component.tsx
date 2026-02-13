@@ -150,9 +150,9 @@ export function FormManageUser({
 				id={elementIds.language}
 				fieldName="language"
 				fieldValue={formValues.language}
-				options={languages}
 				disabled={pending}
-				onChange={(e) => handleChange('language', e.target.value)}
+				options={languages}
+				onValueChange={(value) => handleChange('language', value)}
 				error={errors.language}
 			/>
 
@@ -163,7 +163,7 @@ export function FormManageUser({
 				fieldValue={formValues.role}
 				options={roles}
 				disabled={pending}
-				onChange={(e) => handleChange('role', e.target.value)}
+				onValueChange={(value) => handleChange('role', value)}
 				error={errors.role}
 			/>
 
@@ -177,8 +177,8 @@ export function FormManageUser({
 					fieldValue={formValues.operator_type ?? ''}
 					options={operatorTypes}
 					disabled={pending}
-					onChange={(e) =>
-						handleChange('operator_type', e.target.value)
+					onValueChange={(value) =>
+						handleChange('operator_type', value)
 					}
 					error={errors.operator_type}
 				/>

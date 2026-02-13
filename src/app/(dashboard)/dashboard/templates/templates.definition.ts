@@ -3,9 +3,7 @@ import {
 	type DataTableColumnType,
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
-import type {
-	FormStateType,
-} from '@/config/data-source.config';
+import type { FormStateType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import { safeHtml } from '@/helpers/form.helper';
 import { parseJson } from '@/helpers/string.helper';
@@ -296,8 +294,8 @@ export const dataSourceConfigTemplates = {
 			allowedEntries: 'free' as const,
 			position: 'right' as const,
 			function: createTemplate,
-			button: {
-				className: 'btn btn-action-create',
+			buttonProps: {
+				variant: 'info' as const,
 			},
 		},
 		update: {
@@ -306,8 +304,9 @@ export const dataSourceConfigTemplates = {
 			allowedEntries: 'single' as const,
 			position: 'left' as const,
 			function: updateTemplate,
-			button: {
-				className: 'btn btn-action-update',
+			buttonProps: {
+				variant: 'outline' as const,
+				hover: 'success' as const,
 			},
 		},
 		delete: {
@@ -317,8 +316,9 @@ export const dataSourceConfigTemplates = {
 			customEntryCheck: (entry: TemplateModel) => !entry.deleted_at, // Return true if the entry is not deleted
 			position: 'left' as const,
 			function: deleteTemplate,
-			button: {
-				className: 'btn btn-action-delete',
+			buttonProps: {
+				variant: 'outline' as const,
+				hover: 'error' as const,
 			},
 		},
 		restore: {
@@ -328,8 +328,9 @@ export const dataSourceConfigTemplates = {
 			customEntryCheck: (entry: TemplateModel) => !!entry.deleted_at, // Return true if the entry is deleted
 			position: 'left' as const,
 			function: restoreTemplate,
-			button: {
-				className: 'btn btn-action-restore',
+			buttonProps: {
+				variant: 'outline' as const,
+				hover: 'info' as const,
 			},
 		},
 		view: {

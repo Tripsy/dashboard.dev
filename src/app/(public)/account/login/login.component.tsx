@@ -288,16 +288,16 @@ export const AuthTokenList = ({
 							Last used: {formatDate(token.used_at, 'date-time')}
 						</div>
 						{token.used_now ? (
-							<Badge variant="success" size="xs">
-								<Icons.Status.Active /> Active Session
+							<Badge variant="success" size="sm">
+								<Icons.Status.Active className="w-4 h-4" /> Active Session
 							</Badge>
 						) : (
 							<Button
 								variant="error"
-								size="xs"
+								size="sm"
 								onClick={() => setSelectedToken(token.ident)}
 							>
-								<Icons.Action.Destroy /> Destroy Session
+								<Icons.Action.Destroy className="w-4 h-4" /> Destroy Session
 							</Button>
 						)}
 					</div>

@@ -22,7 +22,12 @@ const buttonVariants = cva(
 				warning:
 					'bg-warning text-warning-foreground hover:bg-warning/90',
 				info: 'bg-info text-info-foreground hover:bg-info/90',
-				cancel: 'bg-muted text-muted-foreground hover:bg-warning hover:text-primary-foreground',
+			},
+			hover: {
+				success: 'hover:bg-success/90 hover:text-success-foreground hover:border-success-foreground',
+				error: 'hover:bg-error/80 hover:text-error-foreground hover:text-error-foreground',
+				info: 'hover:bg-info/90 hover:text-info-foreground hover:text-info-foreground',
+				warning: 'hover:bg-warning/70 hover:text-warning-foreground hover:text-warning-foreground',
 			},
 			size: {
 				xs: 'text-xs px-2 py-1.5',
@@ -38,6 +43,10 @@ const buttonVariants = cva(
 	},
 );
 
+export type ButtonVariant = VariantProps<typeof buttonVariants>['variant'];
+export type ButtonSize = VariantProps<typeof buttonVariants>['size'];
+export type ButtonHover = VariantProps<typeof buttonVariants>['hover'];
+
 export interface ButtonProps
 	extends React.ButtonHTMLAttributes<HTMLButtonElement>,
 		VariantProps<typeof buttonVariants> {
@@ -45,11 +54,11 @@ export interface ButtonProps
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-	({ className, variant, size, asChild = false, ...props }, ref) => {
+	({ className, variant, size, hover, asChild = false, ...props }, ref) => {
 		const Comp = asChild ? Slot : 'button';
 		return (
 			<Comp
-				className={cn(buttonVariants({ variant, size, className }))}
+				className={cn(buttonVariants({ variant, size, hover, className }))}
 				ref={ref}
 				{...props}
 			/>

@@ -1,8 +1,9 @@
 'use client';
 
 import clsx from 'clsx';
-import { type JSX, useMemo } from 'react';
+import { type ComponentType, type JSX, useMemo } from 'react';
 import { Icons } from '@/components/icon.component';
+import { Badge, type BadgeVariant } from '@/components/ui/badge';
 import { formatDate } from '@/helpers/date.helper';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
@@ -31,38 +32,41 @@ type DataTableValueOptionsType<Model> = {
 	};
 };
 
-export const statusList = {
+const statusList: Record<
+	string,
+	{ variant: BadgeVariant; icon: ComponentType<{ className?: string }> }
+> = {
 	active: {
-		class: 'badge badge-success h-8',
-		icon: <Icons.Status.Active />,
+		variant: 'success',
+		icon: Icons.Status.Active,
 	},
 	pending: {
-		class: 'badge badge-warning h-8',
-		icon: <Icons.Status.Pending />,
+		variant: 'warning',
+		icon: Icons.Status.Pending,
 	},
 	inactive: {
-		class: 'badge badge-error h-8',
-		icon: <Icons.Status.Inactive />,
+		variant: 'error',
+		icon: Icons.Status.Inactive,
 	},
 	deleted: {
-		class: 'badge badge-neutral h-8',
-		icon: <Icons.Status.Deleted />,
+		variant: 'default',
+		icon: Icons.Status.Deleted,
 	},
 	ok: {
-		class: 'badge badge-success h-8',
-		icon: <Icons.Status.Ok />,
+		variant: 'success',
+		icon: Icons.Status.Ok,
 	},
 	error: {
-		class: 'badge badge-error h-8',
-		icon: <Icons.Status.Error />,
+		variant: 'error',
+		icon: Icons.Status.Error,
 	},
 	warning: {
-		class: 'badge badge-warning h-8',
-		icon: <Icons.Status.Warning />,
+		variant: 'warning',
+		icon: Icons.Status.Warning,
 	},
 	sent: {
-		class: 'badge badge-success h-8',
-		icon: <Icons.Status.Sent />,
+		variant: 'success',
+		icon: Icons.Status.Sent,
 	},
 };
 
@@ -76,9 +80,11 @@ export const DisplayDeleted = ({
 	return <div className={clsx(isDeleted && 'line-through')}>{value}</div>;
 };
 
-export const DisplayStatus = ({ status }: { status: string }) => {
-	const statusProps = statusList[status as keyof typeof statusList];
-
+export const DisplayStatus = ({
+	status,
+}: {
+	status: keyof typeof statusList;
+}) => {
 	const translationsKeys = useMemo(
 		() => [`app.status.${status}`] as const,
 		[status],
@@ -86,13 +92,22 @@ export const DisplayStatus = ({ status }: { status: string }) => {
 
 	const { translations } = useTranslation(translationsKeys);
 
+	const { variant, icon: Icon } = statusList[status] || {};
+
+	// When status props are not defined
+	if (!variant || !Icon) {
+		return <Badge variant="default">{status}</Badge>;
+	}
+
 	return (
-		<div
-			className={`${statusProps.class} w-full text-white dark:text-black opacity-70 hover:opacity-100`}
+		<Badge
+			variant={variant}
+			size="status"
+			className="min-w-28 opacity-70 hover:opacity-100"
 		>
-			{statusProps.icon}
+			<Icon className="w-4 h-4" />
 			{translations[`app.status.${status}`]}
-		</div>
+		</Badge>
 	);
 };
 

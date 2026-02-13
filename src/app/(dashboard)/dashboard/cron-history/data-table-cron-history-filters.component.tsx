@@ -16,7 +16,7 @@ import { useTranslation } from '@/hooks/use-translation.hook';
 import {
 	type CronHistoryModel,
 	CronHistoryStatusEnum,
-} from '@/models/cron-history.model';;
+} from '@/models/cron-history.model';
 
 const statuses = Object.values(CronHistoryStatusEnum).map((v) => ({
 	label: capitalizeFirstLetter(v),
@@ -114,7 +114,9 @@ export const DataTableCronHistoryFilters = (): JSX.Element => {
 			/>
 
 			<FormFiltersSelect<CronHistoryDataTableFiltersType>
-				labelText={translations['cron_history.form_filters.label_status']}
+				labelText={
+					translations['cron_history.form_filters.label_status']
+				}
 				fieldName="status"
 				fieldValue={filters.status.value}
 				options={statuses}
@@ -124,7 +126,9 @@ export const DataTableCronHistoryFilters = (): JSX.Element => {
 			/>
 
 			<FormFiltersDateRange<CronHistoryDataTableFiltersType>
-				labelText={translations['cron_history.form_filters.label_start_date']}
+				labelText={
+					translations['cron_history.form_filters.label_start_date']
+				}
 				start={{
 					fieldName: 'start_date_start',
 					fieldValue: filters.start_date_start.value,

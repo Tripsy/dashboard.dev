@@ -12,7 +12,6 @@ import type { PermissionDataTableFiltersType } from '@/app/(dashboard)/dashboard
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import type { PermissionModel } from '@/models/permission.model';
-import type {UsersDataTableFiltersType} from "@/app/(dashboard)/dashboard/users/users.definition";
 
 export const DataTablePermissionsFilters = (): JSX.Element => {
 	const { stateDefault, dataTableStore } = useDataTable<
@@ -55,7 +54,6 @@ export const DataTablePermissionsFilters = (): JSX.Element => {
 		[filters, updateTableState],
 	);
 
-
 	const searchGlobal = useSearchFilter({
 		initialValue: filters.global?.value ?? '',
 		debounceDelay: 1000,
@@ -88,7 +86,9 @@ export const DataTablePermissionsFilters = (): JSX.Element => {
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
 			<FormFiltersSearch<PermissionDataTableFiltersType>
-				labelText={translations['permissions.form_filters.label_global']}
+				labelText={
+					translations['permissions.form_filters.label_global']
+				}
 				search={searchGlobal}
 			/>
 

@@ -3,7 +3,7 @@ import React, { type JSX, useMemo } from 'react';
 import { FormElementError } from '@/components/form/form-element-error.component';
 import { Icons } from '@/components/icon.component';
 import { LoadingIcon } from '@/components/status.component';
-import { Button } from '@/components/ui/button';
+import { Button, type ButtonVariant } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -583,7 +583,7 @@ export const FormComponentSubmit = ({
 	pending: boolean;
 	submitted: boolean;
 	errors: Record<string, string[]>;
-	buttonVariant?: 'default' | 'error' | 'success' | 'warning';
+	buttonVariant?: ButtonVariant;
 	buttonLabel: string;
 	buttonIcon?: JSX.Element;
 }) => {

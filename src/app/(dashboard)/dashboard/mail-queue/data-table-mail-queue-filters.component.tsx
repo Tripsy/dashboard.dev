@@ -17,8 +17,6 @@ import {
 	type MailQueueModel,
 	MailQueueStatusEnum,
 } from '@/models/mail-queue.model';
-import type {UsersDataTableFiltersType} from "@/app/(dashboard)/dashboard/users/users.definition";
-import {UserRoleEnum} from "@/models/user.model";
 
 const statuses = Object.values(MailQueueStatusEnum).map((v) => ({
 	label: capitalizeFirstLetter(v),
@@ -127,7 +125,11 @@ export const DataTableMailQueueFilters = (): JSX.Element => {
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
 			<FormFiltersDateRange<MailQueueDataTableFiltersType>
-				labelText={translations['mail_queue.form_filters.label_sent_date_start']}
+				labelText={
+					translations[
+						'mail_queue.form_filters.label_sent_date_start'
+					]
+				}
 				start={{
 					fieldName: 'sent_date_start',
 					fieldValue: filters.sent_date_start.value,
@@ -137,8 +139,7 @@ export const DataTableMailQueueFilters = (): JSX.Element => {
 				end={{
 					fieldName: 'sent_date_end',
 					fieldValue: filters.sent_date_end.value,
-					onSelect: (value) =>
-						setFilterValue('sent_date_end', value),
+					onSelect: (value) => setFilterValue('sent_date_end', value),
 				}}
 			/>
 
@@ -153,13 +154,17 @@ export const DataTableMailQueueFilters = (): JSX.Element => {
 			/>
 
 			<FormFiltersSearch<MailQueueDataTableFiltersType>
-				labelText={translations['mail_queue.form_filters.label_template']}
+				labelText={
+					translations['mail_queue.form_filters.label_template']
+				}
 				fieldName="template"
 				search={searchTemplate}
 			/>
 
 			<FormFiltersSearch<MailQueueDataTableFiltersType>
-				labelText={translations['mail_queue.form_filters.label_content']}
+				labelText={
+					translations['mail_queue.form_filters.label_content']
+				}
 				fieldName="content"
 				search={searchContent}
 			/>

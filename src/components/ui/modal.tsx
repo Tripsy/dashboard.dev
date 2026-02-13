@@ -1,7 +1,17 @@
 import { X } from 'lucide-react';
+import type React from 'react';
 import { useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/helpers/css.helper';
+
+const sizeClasses = {
+	sm: 'max-w-sm',
+	md: 'max-w-md',
+	lg: 'max-w-lg',
+	xl: 'max-w-xl',
+};
+
+export type ModalSizeType = keyof typeof sizeClasses;
 
 interface ModalProps {
 	isOpen: boolean;
@@ -10,17 +20,10 @@ interface ModalProps {
 	description?: string;
 	children: React.ReactNode;
 	footer?: React.ReactNode;
-	size?: 'sm' | 'md' | 'lg' | 'xl';
+	size?: ModalSizeType;
 	closeOnBackdrop?: boolean;
 	closeOnEscape?: boolean;
 }
-
-const sizeClasses = {
-	sm: 'max-w-sm',
-	md: 'max-w-md',
-	lg: 'max-w-lg',
-	xl: 'max-w-xl',
-};
 
 export function Modal({
 	isOpen,

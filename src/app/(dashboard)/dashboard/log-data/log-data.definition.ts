@@ -117,8 +117,9 @@ export const dataSourceConfigLogData = {
 			allowedEntries: 'multiple' as const,
 			position: 'left' as const,
 			function: deleteLogData,
-			button: {
-				className: 'btn btn-action-delete',
+			buttonProps: {
+				variant: 'outline' as const,
+				hover: 'error' as const,
 			},
 		},
 		view: {

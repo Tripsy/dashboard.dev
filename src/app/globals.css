@@ -331,11 +331,10 @@
 	}
 
 	.dashboard-layout
-	.p-paginator.data-table-paginator
-	.data-table-paginator-showing {
+		.p-paginator.data-table-paginator
+		.data-table-paginator-showing {
 		@apply absolute left-0 hidden md:block text-sm px-4;
 	}
-
 }
 
 @layer utilities {

@@ -7,14 +7,12 @@ import { dataSourceConfigTemplates } from '@/app/(dashboard)/dashboard/templates
 import { dataSourceConfigUsers } from '@/app/(dashboard)/dashboard/users/users.definition';
 import { registerDataSource } from '@/config/data-source.config';
 
-registerDataSource('cron-history', dataSourceConfigCronHistory);
-registerDataSource('log-data', dataSourceConfigLogData);
-registerDataSource('log-history', dataSourceConfigLogHistory);
-registerDataSource('mail-queue', dataSourceConfigMailQueue);
-registerDataSource('permissions', dataSourceConfigPermissions);
-registerDataSource('templates', dataSourceConfigTemplates);
-registerDataSource('users', dataSourceConfigUsers);
-
 export function registerDashboardDataSource() {
+	registerDataSource('cron-history', dataSourceConfigCronHistory);
+	registerDataSource('log-data', dataSourceConfigLogData);
+	registerDataSource('log-history', dataSourceConfigLogHistory);
+	registerDataSource('mail-queue', dataSourceConfigMailQueue);
+	registerDataSource('permissions', dataSourceConfigPermissions);
+	registerDataSource('templates', dataSourceConfigTemplates);
 	registerDataSource('users', dataSourceConfigUsers);
 }

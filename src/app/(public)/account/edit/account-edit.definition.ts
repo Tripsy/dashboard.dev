@@ -29,26 +29,26 @@ export const AccountEditState: AccountEditStateType = {
 };
 
 const translations = await translateBatch([
-	'account_edit.validation.name_invalid',
+	'account-edit.validation.name_invalid',
 	{
-		key: 'account_edit.validation.name_min',
+		key: 'account-edit.validation.name_min',
 		vars: {
 			min: Configuration.get('user.nameMinLength') as string,
 		},
 	},
-	'account_edit.validation.language_invalid',
+	'account-edit.validation.language_invalid',
 ]);
 
 export const AccountEditSchema = z.object({
 	name: z
 		.string({
-			message: translations['account_edit.validation.name_invalid'],
+			message: translations['account-edit.validation.name_invalid'],
 		})
 		.trim()
 		.min(Configuration.get('user.nameMinLength') as number, {
-			message: translations['account_edit.validation.name_min'],
+			message: translations['account-edit.validation.name_min'],
 		}),
 	language: z.enum(LanguageEnum, {
-		message: translations['account_edit.validation.language_invalid'],
+		message: translations['account-edit.validation.language_invalid'],
 	}),
 });

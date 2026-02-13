@@ -25,11 +25,11 @@ export default function AccountMe() {
 	const translationsKeys = useMemo(
 		() =>
 			[
-				'account_me.message.session_destroy_success',
-				'account_me.message.session_destroy_error',
-				'account_edit.message.success',
-				'account_email_update.message.success',
-				'account_password_update.message.success',
+				'account-me.message.session_destroy_success',
+				'account-me.message.session_destroy_error',
+				'account-edit.message.success',
+				'account-email-update.message.success',
+				'account-password-update.message.success',
 			] as const,
 		[],
 	);
@@ -57,7 +57,7 @@ export default function AccountMe() {
 					showToast({
 						severity: 'success',
 						summary: 'Success',
-						detail: translations['account_edit.message.success'],
+						detail: translations['account-edit.message.success'],
 					});
 					break;
 				case 'emailUpdate':
@@ -65,7 +65,7 @@ export default function AccountMe() {
 						severity: 'success',
 						summary: 'Success',
 						detail: translations[
-							'account_email_update.message.success'
+							'account-email-update.message.success'
 						],
 					});
 					break;
@@ -74,7 +74,7 @@ export default function AccountMe() {
 						severity: 'success',
 						summary: 'Success',
 						detail: translations[
-							'account_password_update.message.success'
+							'account-password-update.message.success'
 						],
 					});
 					break;
@@ -249,10 +249,10 @@ export default function AccountMe() {
 									detail:
 										message === 'session_destroy_success'
 											? translations[
-													'account_me.message.session_destroy_success'
+													'account-me.message.session_destroy_success'
 												]
 											: translations[
-													'account_me.message.session_destroy_error'
+													'account-me.message.session_destroy_error'
 												],
 								});
 							}}

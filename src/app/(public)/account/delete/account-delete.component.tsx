@@ -61,7 +61,7 @@ export default function AccountDelete() {
 	useEffect(() => {
 		if (state.situation === 'success' && router) {
 			router.replace(
-				`${Routes.get('status', { type: 'error' })}?r=account_delete`,
+				`${Routes.get('status', { type: 'error' })}?r=account-delete`,
 			);
 		}
 	}, [state.situation, router]);

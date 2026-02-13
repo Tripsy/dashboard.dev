@@ -77,7 +77,7 @@ export async function emailUpdateAction(
 			switch (error.status) {
 				case 409:
 					message = await translate(
-						'account_email_update.validation.email_already_used',
+						'account-email-update.validation.email_already_used',
 					);
 					break;
 			}

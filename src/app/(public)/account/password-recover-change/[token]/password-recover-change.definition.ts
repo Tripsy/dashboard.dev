@@ -34,18 +34,18 @@ export const PasswordRecoverChangeState: PasswordRecoverChangeStateType = {
 };
 
 const translations = await translateBatch([
-	'password_recover_change.validation.password_invalid',
+	'password-recover-change.validation.password_invalid',
 	{
-		key: 'password_recover_change.validation.password_min',
+		key: 'password-recover-change.validation.password_min',
 		vars: {
 			min: Configuration.get('user.passwordMinLength') as string,
 		},
 	},
-	'password_recover_change.validation.password_condition_capital_letter',
-	'password_recover_change.validation.password_condition_number',
-	'password_recover_change.validation.password_condition_special_character',
-	'password_recover_change.validation.password_confirm_required',
-	'password_recover_change.validation.password_confirm_mismatch',
+	'password-recover-change.validation.password_condition_capital_letter',
+	'password-recover-change.validation.password_condition_number',
+	'password-recover-change.validation.password_condition_special_character',
+	'password-recover-change.validation.password_confirm_required',
+	'password-recover-change.validation.password_confirm_mismatch',
 ]);
 
 export const PasswordRecoverChangeSchema = z
@@ -54,46 +54,46 @@ export const PasswordRecoverChangeSchema = z
 			.string({
 				message:
 					translations[
-						'password_recover_change.validation.password_invalid'
+						'password-recover-change.validation.password_invalid'
 					],
 			})
 			.trim()
 			.min(Configuration.get('user.passwordMinLength') as number, {
 				message:
 					translations[
-						'password_recover_change.validation.password_min'
+						'password-recover-change.validation.password_min'
 					],
 			})
 			.refine((value) => /[A-Z]/.test(value), {
 				message:
 					translations[
-						'password_recover_change.validation.password_condition_capital_letter'
+						'password-recover-change.validation.password_condition_capital_letter'
 					],
 			})
 			.refine((value) => /[0-9]/.test(value), {
 				message:
 					translations[
-						'password_recover_change.validation.password_condition_number'
+						'password-recover-change.validation.password_condition_number'
 					],
 			})
 			.refine((value) => /[!@#$%^&*()_+{}[\]:;<>,.?~\\/-]/.test(value), {
 				message:
 					translations[
-						'password_recover_change.validation.password_condition_special_character'
+						'password-recover-change.validation.password_condition_special_character'
 					],
 			}),
 		password_confirm: z
 			.string({
 				message:
 					translations[
-						'password_recover_change.validation.password_confirm_required'
+						'password-recover-change.validation.password_confirm_required'
 					],
 			})
 			.trim()
 			.nonempty({
 				message:
 					translations[
-						'password_recover_change.validation.password_confirm_required'
+						'password-recover-change.validation.password_confirm_required'
 					],
 			}),
 	})
@@ -103,7 +103,7 @@ export const PasswordRecoverChangeSchema = z
 				path: ['password_confirm'],
 				message:
 					translations[
-						'password_recover_change.validation.password_confirm_mismatch'
+						'password-recover-change.validation.password_confirm_mismatch'
 					],
 				code: 'custom',
 			});

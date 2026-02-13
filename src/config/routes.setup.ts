@@ -196,7 +196,7 @@ Routes.group('dashboard')
 		permission: 'log_data.find',
 	})
 	.add('log-history', '/dashboard/log-history', {
-		permission: 'log-history.find',
+		permission: 'log_history.find',
 	})
 	.add('cron-history', '/dashboard/cron-history', {
 		permission: 'cron_history.find',

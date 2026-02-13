@@ -79,12 +79,12 @@ export async function emailConfirmSendAction(
 			switch (error.status) {
 				case 403:
 					message = await translate(
-						'email_confirm_send.message.not_allowed',
+						'email-confirm-send.message.not_allowed',
 					);
 					break;
 				case 404:
 					message = await translate(
-						'email_confirm_send.message.not_active',
+						'email-confirm-send.message.not_active',
 					);
 					break;
 				default:
@@ -96,7 +96,7 @@ export async function emailConfirmSendAction(
 			...result,
 			message:
 				message ||
-				(await translate('email_confirm_send.message.failed')),
+				(await translate('email-confirm-send.message.failed')),
 			situation: situation,
 		};
 	}

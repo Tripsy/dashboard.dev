@@ -25,11 +25,11 @@ export const PasswordRecoverState: PasswordRecoverStateType = {
 };
 
 const translations = await translateBatch([
-	'password_recover.validation.email_invalid',
+	'password-recover.validation.email_invalid',
 ]);
 
 export const PasswordRecoverSchema = z.object({
 	email: z.email({
-		message: translations['password_recover.validation.email_invalid'],
+		message: translations['password-recover.validation.email_invalid'],
 	}),
 });

@@ -7,7 +7,7 @@ import { translate } from '@/config/translate.setup';
 
 export async function generateMetadata(): Promise<Metadata> {
 	return {
-		title: await translate('account_email_update.meta.title', {
+		title: await translate('account-email-update.meta.title', {
 			app_name: Configuration.get('app.name') as string,
 		}),
 	};

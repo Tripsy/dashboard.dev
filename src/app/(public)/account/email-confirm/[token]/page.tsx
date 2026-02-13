@@ -19,7 +19,7 @@ interface Props {
 
 export async function generateMetadata(): Promise<Metadata> {
 	return {
-		title: await translate('email_confirm.meta.title', {
+		title: await translate('email-confirm.meta.title', {
 			app_name: Configuration.get('app.name') as string,
 		}),
 		robots: 'noindex, nofollow',
@@ -47,16 +47,16 @@ export default async function Page(props: Props) {
 		if (fetchResponse?.success === false) {
 			message =
 				fetchResponse?.message ||
-				(await translate('email_confirm.message.failed'));
+				(await translate('email-confirm.message.failed'));
 		} else {
 			success = true;
-			message = await translate('email_confirm.message.success');
+			message = await translate('email-confirm.message.success');
 		}
 	} catch (error: unknown) {
 		if (error instanceof ApiError) {
 			message = error.message;
 		} else {
-			message = await translate('email_confirm.message.failed');
+			message = await translate('email-confirm.message.failed');
 		}
 	}
 

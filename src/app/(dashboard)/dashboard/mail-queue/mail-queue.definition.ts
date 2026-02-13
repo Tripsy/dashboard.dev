@@ -11,11 +11,11 @@ import type {
 import { deleteMailQueue, findMailQueue } from '@/services/mail-queue.service';
 
 const translations = await translateBatch([
-	'mail_queue.data_table.column_id',
-	'mail_queue.data_table.column_template',
-	'mail_queue.data_table.column_to',
-	'mail_queue.data_table.column_status',
-	'mail_queue.data_table.column_sent_at',
+	'mail-queue.data_table.column_id',
+	'mail-queue.data_table.column_template',
+	'mail-queue.data_table.column_to',
+	'mail-queue.data_table.column_status',
+	'mail-queue.data_table.column_sent_at',
 ]);
 
 export type MailQueueDataTableFiltersType = {
@@ -48,7 +48,7 @@ export const dataSourceConfigMailQueue = {
 	dataTableColumns: [
 		{
 			field: 'id',
-			header: translations['mail_queue.data_table.column_id'],
+			header: translations['mail-queue.data_table.column_id'],
 			sortable: true,
 			body: (
 				entry: MailQueueModel,
@@ -58,13 +58,13 @@ export const dataSourceConfigMailQueue = {
 					markDeleted: true,
 					action: {
 						name: 'view',
-						source: 'mail_queue',
+						source: 'mail-queue',
 					},
 				}),
 		},
 		{
 			field: 'template',
-			header: translations['mail_queue.data_table.column_template'],
+			header: translations['mail-queue.data_table.column_template'],
 			body: (
 				entry: MailQueueModel,
 				column: DataTableColumnType<MailQueueModel>,
@@ -73,13 +73,13 @@ export const dataSourceConfigMailQueue = {
 					customValue: entry.template?.label || 'n/a',
 					action: {
 						name: 'viewTemplate',
-						source: 'mail_queue',
+						source: 'mail-queue',
 					},
 				}),
 		},
 		{
 			field: 'to',
-			header: translations['mail_queue.data_table.column_to'],
+			header: translations['mail-queue.data_table.column_to'],
 			body: (
 				entry: MailQueueModel,
 				column: DataTableColumnType<MailQueueModel>,
@@ -90,7 +90,7 @@ export const dataSourceConfigMailQueue = {
 		},
 		{
 			field: 'status',
-			header: translations['mail_queue.data_table.column_status'],
+			header: translations['mail-queue.data_table.column_status'],
 			body: (
 				entry: MailQueueModel,
 				column: DataTableColumnType<MailQueueModel>,
@@ -105,7 +105,7 @@ export const dataSourceConfigMailQueue = {
 		},
 		{
 			field: 'sent_at',
-			header: translations['mail_queue.data_table.column_sent_at'],
+			header: translations['mail-queue.data_table.column_sent_at'],
 			sortable: true,
 			body: (
 				entry: MailQueueModel,
@@ -128,7 +128,7 @@ export const dataSourceConfigMailQueue = {
 	actions: {
 		delete: {
 			mode: 'action' as const,
-			permission: 'mail_queue.delete',
+			permission: 'mail-queue.delete',
 			allowedEntries: 'multiple' as const,
 			position: 'left' as const,
 			function: deleteMailQueue,
@@ -139,7 +139,7 @@ export const dataSourceConfigMailQueue = {
 		},
 		view: {
 			mode: 'other' as const,
-			permission: 'mail_queue.read',
+			permission: 'mail-queue.read',
 			allowedEntries: 'single' as const,
 			position: 'hidden' as const,
 		},

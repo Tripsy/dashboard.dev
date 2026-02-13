@@ -101,7 +101,7 @@ export async function passwordUpdateAction(
 			switch (error.status) {
 				case 401:
 					message = await translate(
-						'account_password_update.validation.password_current_incorrect',
+						'account-password-update.validation.password_current_incorrect',
 					);
 					break;
 			}

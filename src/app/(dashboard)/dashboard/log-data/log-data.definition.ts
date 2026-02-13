@@ -11,11 +11,11 @@ import type {
 import { deleteLogData, findLogData } from '@/services/log-data.service';
 
 const translations = await translateBatch([
-	'log_data.data_table.column_id',
-	'log_data.data_table.column_category',
-	'log_data.data_table.column_level',
-	'log_data.data_table.column_message',
-	'log_data.data_table.column_created_at',
+	'log-data.data_table.column_id',
+	'log-data.data_table.column_category',
+	'log-data.data_table.column_level',
+	'log-data.data_table.column_message',
+	'log-data.data_table.column_created_at',
 ]);
 
 export type LogDataDataTableFiltersType = {
@@ -46,7 +46,7 @@ export const dataSourceConfigLogData = {
 	dataTableColumns: [
 		{
 			field: 'id',
-			header: translations['log_data.data_table.column_id'],
+			header: translations['log-data.data_table.column_id'],
 			sortable: true,
 			body: (
 				entry: LogDataModel,
@@ -56,13 +56,13 @@ export const dataSourceConfigLogData = {
 					markDeleted: true,
 					action: {
 						name: 'view',
-						source: 'log_data',
+						source: 'log-data',
 					},
 				}),
 		},
 		{
 			field: 'category',
-			header: translations['log_data.data_table.column_category'],
+			header: translations['log-data.data_table.column_category'],
 			sortable: true,
 			body: (
 				entry: LogDataModel,
@@ -74,7 +74,7 @@ export const dataSourceConfigLogData = {
 		},
 		{
 			field: 'level',
-			header: translations['log_data.data_table.column_level'],
+			header: translations['log-data.data_table.column_level'],
 			sortable: true,
 			body: (
 				entry: LogDataModel,
@@ -86,11 +86,11 @@ export const dataSourceConfigLogData = {
 		},
 		{
 			field: 'message',
-			header: translations['log_data.data_table.column_message'],
+			header: translations['log-data.data_table.column_message'],
 		},
 		{
 			field: 'created_at',
-			header: translations['log_data.data_table.column_created_at'],
+			header: translations['log-data.data_table.column_created_at'],
 			sortable: true,
 			body: (
 				entry: LogDataModel,
@@ -113,7 +113,7 @@ export const dataSourceConfigLogData = {
 	actions: {
 		delete: {
 			mode: 'action' as const,
-			permission: 'log_data.delete',
+			permission: 'log-data.delete',
 			allowedEntries: 'multiple' as const,
 			position: 'left' as const,
 			function: deleteLogData,
@@ -124,7 +124,7 @@ export const dataSourceConfigLogData = {
 		},
 		view: {
 			mode: 'other' as const,
-			permission: 'log_data.read',
+			permission: 'log-data.read',
 			allowedEntries: 'single' as const,
 			position: 'hidden' as const,
 		},

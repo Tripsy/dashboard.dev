@@ -14,13 +14,13 @@ import {
 } from '@/services/log-history.service';
 
 const translations = await translateBatch([
-	'log_history.data_table.column_id',
-	'log_history.data_table.column_request_id',
-	'log_history.data_table.column_entity',
-	'log_history.data_table.column_entity_id',
-	'log_history.data_table.column_action',
-	'log_history.data_table.column_performed_by',
-	'log_history.data_table.column_recorded_at',
+	'log-history.data_table.column_id',
+	'log-history.data_table.column_request_id',
+	'log-history.data_table.column_entity',
+	'log-history.data_table.column_entity_id',
+	'log-history.data_table.column_action',
+	'log-history.data_table.column_performed_by',
+	'log-history.data_table.column_recorded_at',
 ]);
 
 export type LogHistoryDataTableFiltersType = {
@@ -55,7 +55,7 @@ export const dataSourceConfigLogHistory = {
 	dataTableColumns: [
 		{
 			field: 'id',
-			header: translations['log_history.data_table.column_id'],
+			header: translations['log-history.data_table.column_id'],
 			sortable: true,
 			body: (
 				entry: LogHistoryModel,
@@ -65,17 +65,17 @@ export const dataSourceConfigLogHistory = {
 					markDeleted: true,
 					action: {
 						name: 'view',
-						source: 'log_history',
+						source: 'log-history',
 					},
 				}),
 		},
 		{
 			field: 'request_id',
-			header: translations['log_history.data_table.column_request_id'],
+			header: translations['log-history.data_table.column_request_id'],
 		},
 		{
 			field: 'entity',
-			header: translations['log_history.data_table.column_entity'],
+			header: translations['log-history.data_table.column_entity'],
 			sortable: true,
 			body: (
 				entry: LogHistoryModel,
@@ -87,16 +87,16 @@ export const dataSourceConfigLogHistory = {
 		},
 		{
 			field: 'entity_id',
-			header: translations['log_history.data_table.column_entity_id'],
+			header: translations['log-history.data_table.column_entity_id'],
 		},
 		{
 			field: 'action',
-			header: translations['log_history.data_table.column_action'],
+			header: translations['log-history.data_table.column_action'],
 			sortable: true,
 		},
 		{
 			field: 'performed_by',
-			header: translations['log_history.data_table.column_performed_by'],
+			header: translations['log-history.data_table.column_performed_by'],
 			body: (
 				entry: LogHistoryModel,
 				column: DataTableColumnType<LogHistoryModel>,
@@ -108,14 +108,14 @@ export const dataSourceConfigLogHistory = {
 					action: entry.auth_id
 						? {
 								name: 'viewUser',
-								source: 'log_history',
+								source: 'log-history',
 							}
 						: undefined,
 				}),
 		},
 		{
 			field: 'recorded_at',
-			header: translations['log_history.data_table.column_recorded_at'],
+			header: translations['log-history.data_table.column_recorded_at'],
 			sortable: true,
 			body: (
 				entry: LogHistoryModel,
@@ -138,7 +138,7 @@ export const dataSourceConfigLogHistory = {
 	actions: {
 		delete: {
 			mode: 'action' as const,
-			permission: 'log_history.delete',
+			permission: 'log-history.delete',
 			allowedEntries: 'multiple' as const,
 			position: 'left' as const,
 			function: deleteLogHistory,
@@ -149,7 +149,7 @@ export const dataSourceConfigLogHistory = {
 		},
 		view: {
 			mode: 'other' as const,
-			permission: 'log_history.read',
+			permission: 'log-history.read',
 			allowedEntries: 'single' as const,
 			position: 'hidden' as const,
 		},

@@ -14,17 +14,17 @@ export function ViewLogHistory() {
 		() =>
 			[
 				'dashboard.text.no_entry_selected',
-				'log_history.view.section_info',
-				'log_history.view.section_details',
-				'log_history.view.label_id',
-				'log_history.view.label_entity',
-				'log_history.view.label_entity_id',
-				'log_history.view.label_action',
-				'log_history.view.label_auth_id',
-				'log_history.view.label_performed_by',
-				'log_history.view.label_request_id',
-				'log_history.view.label_source',
-				'log_history.view.label_recorded_at',
+				'log-history.view.section_info',
+				'log-history.view.section_details',
+				'log-history.view.label_id',
+				'log-history.view.label_entity',
+				'log-history.view.label_entity_id',
+				'log-history.view.label_action',
+				'log-history.view.label_auth_id',
+				'log-history.view.label_performed_by',
+				'log-history.view.label_request_id',
+				'log-history.view.label_source',
+				'log-history.view.label_recorded_at',
 			] as const,
 		[],
 	);
@@ -58,42 +58,42 @@ export function ViewLogHistory() {
 		<div className="space-y-6">
 			<div>
 				<h3 className="font-bold border-b border-line pb-2 mb-3">
-					{translations['log_history.view.section_info']}
+					{translations['log-history.view.section_info']}
 				</h3>
 				<div className="ml-4 space-y-1">
 					<div>
 						<span className="font-semibold">
-							{translations['log_history.view.label_id']}
+							{translations['log-history.view.label_id']}
 						</span>{' '}
 						{id}
 					</div>
 					<div>
 						<span className="font-semibold">
-							{translations['log_history.view.label_request_id']}
+							{translations['log-history.view.label_request_id']}
 						</span>{' '}
 						{request_id}
 					</div>
 					<div>
 						<span className="font-semibold">
-							{translations['log_history.view.label_entity']}
+							{translations['log-history.view.label_entity']}
 						</span>{' '}
 						{entity}
 					</div>
 					<div>
 						<span className="font-semibold">
-							{translations['log_history.view.label_entity_id']}
+							{translations['log-history.view.label_entity_id']}
 						</span>{' '}
 						{entity_id}
 					</div>
 					<div>
 						<span className="font-semibold">
-							{translations['log_history.view.label_action']}
+							{translations['log-history.view.label_action']}
 						</span>{' '}
 						{action}
 					</div>
 					<div>
 						<span className="font-semibold">
-							{translations['log_history.view.label_auth_id']}
+							{translations['log-history.view.label_auth_id']}
 						</span>{' '}
 						{auth_id}
 					</div>
@@ -101,7 +101,7 @@ export function ViewLogHistory() {
 						<span className="font-semibold">
 							{
 								translations[
-									'log_history.view.label_performed_by'
+									'log-history.view.label_performed_by'
 								]
 							}
 						</span>{' '}
@@ -109,13 +109,13 @@ export function ViewLogHistory() {
 					</div>
 					<div>
 						<span className="font-semibold">
-							{translations['log_history.view.label_source']}
+							{translations['log-history.view.label_source']}
 						</span>{' '}
 						{source}
 					</div>
 					<div>
 						<span className="font-semibold">
-							{translations['log_history.view.label_recorded_at']}
+							{translations['log-history.view.label_recorded_at']}
 						</span>{' '}
 						{formatDate(recorded_at, 'date-time')}
 					</div>
@@ -125,7 +125,7 @@ export function ViewLogHistory() {
 			{parsedDetails?.request && (
 				<div>
 					<h3 className="font-bold border-b border-line pb-2 mb-3">
-						{translations['log_history.view.section_details']}
+						{translations['log-history.view.section_details']}
 					</h3>
 					<div className="ml-4 space-y-1">
 						{Object.entries(parsedDetails).map(([key, value]) => (

@@ -32,11 +32,11 @@ export const DataTableMailQueueFilters = (): JSX.Element => {
 	const translationsKeys = useMemo(
 		() =>
 			[
-				'mail_queue.form_filters.label_sent_date_start',
-				'mail_queue.form_filters.label_status',
-				'mail_queue.form_filters.label_template',
-				'mail_queue.form_filters.label_content',
-				'mail_queue.form_filters.label_to',
+				'mail-queue.form_filters.label_sent_date_start',
+				'mail-queue.form_filters.label_status',
+				'mail-queue.form_filters.label_template',
+				'mail-queue.form_filters.label_content',
+				'mail-queue.form_filters.label_to',
 			] as const,
 		[],
 	);
@@ -127,7 +127,7 @@ export const DataTableMailQueueFilters = (): JSX.Element => {
 			<FormFiltersDateRange<MailQueueDataTableFiltersType>
 				labelText={
 					translations[
-						'mail_queue.form_filters.label_sent_date_start'
+						'mail-queue.form_filters.label_sent_date_start'
 					]
 				}
 				start={{
@@ -144,7 +144,7 @@ export const DataTableMailQueueFilters = (): JSX.Element => {
 			/>
 
 			<FormFiltersSelect<MailQueueDataTableFiltersType>
-				labelText={translations['mail_queue.form_filters.label_status']}
+				labelText={translations['mail-queue.form_filters.label_status']}
 				fieldName="status"
 				fieldValue={filters.status.value}
 				options={statuses}
@@ -155,7 +155,7 @@ export const DataTableMailQueueFilters = (): JSX.Element => {
 
 			<FormFiltersSearch<MailQueueDataTableFiltersType>
 				labelText={
-					translations['mail_queue.form_filters.label_template']
+					translations['mail-queue.form_filters.label_template']
 				}
 				fieldName="template"
 				search={searchTemplate}
@@ -163,14 +163,14 @@ export const DataTableMailQueueFilters = (): JSX.Element => {
 
 			<FormFiltersSearch<MailQueueDataTableFiltersType>
 				labelText={
-					translations['mail_queue.form_filters.label_content']
+					translations['mail-queue.form_filters.label_content']
 				}
 				fieldName="content"
 				search={searchContent}
 			/>
 
 			<FormFiltersSearch<MailQueueDataTableFiltersType>
-				labelText={translations['mail_queue.form_filters.label_to']}
+				labelText={translations['mail-queue.form_filters.label_to']}
 				fieldName="to"
 				search={searchTo}
 			/>

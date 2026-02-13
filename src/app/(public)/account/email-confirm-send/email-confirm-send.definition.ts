@@ -25,11 +25,11 @@ export const EmailConfirmSendState: EmailConfirmSendStateType = {
 };
 
 const translations = await translateBatch([
-	'email_confirm_send.validation.email_invalid',
+	'email-confirm-send.validation.email_invalid',
 ]);
 
 export const EmailConfirmSendSchema = z.object({
 	email: z.email({
-		message: translations['email_confirm_send.validation.email_invalid'],
+		message: translations['email-confirm-send.validation.email_invalid'],
 	}),
 });

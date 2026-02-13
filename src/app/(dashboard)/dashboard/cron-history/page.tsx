@@ -8,7 +8,7 @@ import { translate } from '@/config/translate.setup';
 
 export async function generateMetadata(): Promise<Metadata> {
 	return {
-		title: await translate('cron_history.meta.title', {
+		title: await translate('cron-history.meta.title', {
 			app_name: Configuration.get('app.name') as string,
 		}),
 	};
@@ -19,7 +19,7 @@ export default async function Page() {
 			label: await translate('dashboard.labels.dashboard'),
 			href: Routes.get('dashboard'),
 		},
-		{ label: await translate('dashboard.labels.cron_history') },
+		{ label: await translate('dashboard.labels.cron-history') },
 	];
 
 	return (

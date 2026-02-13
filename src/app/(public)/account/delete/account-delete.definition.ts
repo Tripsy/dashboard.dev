@@ -25,7 +25,7 @@ export const AccountDeleteState: AccountDeleteStateType = {
 };
 
 const translations = await translateBatch([
-	'account_delete.validation.password_current_invalid',
+	'account-delete.validation.password_current_invalid',
 ]);
 
 export const AccountDeleteSchema = z.object({
@@ -33,14 +33,14 @@ export const AccountDeleteSchema = z.object({
 		.string({
 			message:
 				translations[
-					'account_delete.validation.password_current_invalid'
+					'account-delete.validation.password_current_invalid'
 				],
 		})
 		.trim()
 		.nonempty({
 			message:
 				translations[
-					'account_delete.validation.password_current_invalid'
+					'account-delete.validation.password_current_invalid'
 				],
 		}),
 });

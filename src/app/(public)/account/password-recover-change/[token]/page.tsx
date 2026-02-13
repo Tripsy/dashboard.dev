@@ -7,7 +7,7 @@ import { translate } from '@/config/translate.setup';
 
 export async function generateMetadata(): Promise<Metadata> {
 	return {
-		title: await translate('password_recover_change.meta.title', {
+		title: await translate('password-recover-change.meta.title', {
 			app_name: Configuration.get('app.name') as string,
 		}),
 		robots: 'noindex, nofollow',

@@ -30,19 +30,19 @@ export const PasswordUpdateState: PasswordUpdateStateType = {
 };
 
 const translations = await translateBatch([
-	'account_password_update.validation.password_current_invalid',
-	'account_password_update.validation.password_new_invalid',
+	'account-password-update.validation.password_current_invalid',
+	'account-password-update.validation.password_new_invalid',
 	{
-		key: 'account_password_update.validation.password_new_min',
+		key: 'account-password-update.validation.password_new_min',
 		vars: {
 			min: Configuration.get('user.passwordMinLength') as string,
 		},
 	},
-	'account_password_update.validation.password_new_condition_capital_letter',
-	'account_password_update.validation.password_new_condition_number',
-	'account_password_update.validation.password_new_condition_special_character',
-	'account_password_update.validation.password_confirm_required',
-	'account_password_update.validation.password_confirm_mismatch',
+	'account-password-update.validation.password_new_condition_capital_letter',
+	'account-password-update.validation.password_new_condition_number',
+	'account-password-update.validation.password_new_condition_special_character',
+	'account-password-update.validation.password_confirm_required',
+	'account-password-update.validation.password_confirm_mismatch',
 ]);
 
 export const PasswordUpdateSchema = z
@@ -51,60 +51,60 @@ export const PasswordUpdateSchema = z
 			.string({
 				message:
 					translations[
-						'account_password_update.validation.password_current_invalid'
+						'account-password-update.validation.password_current_invalid'
 					],
 			})
 			.trim()
 			.nonempty({
 				message:
 					translations[
-						'account_password_update.validation.password_current_invalid'
+						'account-password-update.validation.password_current_invalid'
 					],
 			}),
 		password_new: z
 			.string({
 				message:
 					translations[
-						'account_password_update.validation.password_new_invalid'
+						'account-password-update.validation.password_new_invalid'
 					],
 			})
 			.trim()
 			.min(Configuration.get('user.passwordMinLength') as number, {
 				message:
 					translations[
-						'account_password_update.validation.password_new_min'
+						'account-password-update.validation.password_new_min'
 					],
 			})
 			.refine((value) => /[A-Z]/.test(value), {
 				message:
 					translations[
-						'account_password_update.validation.password_new_condition_capital_letter'
+						'account-password-update.validation.password_new_condition_capital_letter'
 					],
 			})
 			.refine((value) => /[0-9]/.test(value), {
 				message:
 					translations[
-						'account_password_update.validation.password_new_condition_number'
+						'account-password-update.validation.password_new_condition_number'
 					],
 			})
 			.refine((value) => /[!@#$%^&*()_+{}[\]:;<>,.?~\\/-]/.test(value), {
 				message:
 					translations[
-						'account_password_update.validation.password_new_condition_special_character'
+						'account-password-update.validation.password_new_condition_special_character'
 					],
 			}),
 		password_confirm: z
 			.string({
 				message:
 					translations[
-						'account_password_update.validation.password_confirm_required'
+						'account-password-update.validation.password_confirm_required'
 					],
 			})
 			.trim()
 			.nonempty({
 				message:
 					translations[
-						'account_password_update.validation.password_confirm_required'
+						'account-password-update.validation.password_confirm_required'
 					],
 			}),
 	})
@@ -114,7 +114,7 @@ export const PasswordUpdateSchema = z
 				path: ['password_confirm'],
 				message:
 					translations[
-						'account_password_update.validation.password_confirm_mismatch'
+						'account-password-update.validation.password_confirm_mismatch'
 					],
 				code: 'custom',
 			});

@@ -25,11 +25,11 @@ export const EmailUpdateState: EmailUpdateStateType = {
 };
 
 const translations = await translateBatch([
-	'account_email_update.validation.email_invalid',
+	'account-email-update.validation.email_invalid',
 ]);
 
 export const EmailUpdateSchema = z.object({
 	email_new: z.email({
-		message: translations['account_email_update.validation.email_invalid'],
+		message: translations['account-email-update.validation.email_invalid'],
 	}),
 });

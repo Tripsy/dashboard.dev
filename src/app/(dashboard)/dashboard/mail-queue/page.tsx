@@ -8,7 +8,7 @@ import { translate } from '@/config/translate.setup';
 
 export async function generateMetadata(): Promise<Metadata> {
 	return {
-		title: await translate('log_data.meta.title', {
+		title: await translate('log-data.meta.title', {
 			app_name: Configuration.get('app.name') as string,
 		}),
 	};
@@ -19,7 +19,7 @@ export default async function Page() {
 			label: await translate('dashboard.labels.dashboard'),
 			href: Routes.get('dashboard'),
 		},
-		{ label: await translate('dashboard.labels.mail_queue') },
+		{ label: await translate('dashboard.labels.mail-queue') },
 	];
 
 	return (

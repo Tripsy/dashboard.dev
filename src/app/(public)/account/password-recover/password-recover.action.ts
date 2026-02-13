@@ -77,12 +77,12 @@ export async function passwordRecoverAction(
 			switch (error.status) {
 				case 425:
 					message = await translate(
-						'password_recover.message.recovery_attempts_exceeded',
+						'password-recover.message.recovery_attempts_exceeded',
 					);
 					break;
 				case 404:
 					message = await translate(
-						'password_recover.message.not_active',
+						'password-recover.message.not_active',
 					);
 					break;
 				default:
@@ -93,7 +93,7 @@ export async function passwordRecoverAction(
 		return {
 			...result,
 			message:
-				message || (await translate('password_recover.message.failed')),
+				message || (await translate('password-recover.message.failed')),
 			situation: situation,
 		};
 	}

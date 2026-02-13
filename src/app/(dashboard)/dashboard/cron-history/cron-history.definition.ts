@@ -13,11 +13,11 @@ import {
 } from '@/services/cron-history.service';
 
 const translations = await translateBatch([
-	'cron_history.data_table.column_id',
-	'cron_history.data_table.column_label',
-	'cron_history.data_table.column_start_at',
-	'cron_history.data_table.column_status',
-	'cron_history.data_table.column_run_time',
+	'cron-history.data_table.column_id',
+	'cron-history.data_table.column_label',
+	'cron-history.data_table.column_start_at',
+	'cron-history.data_table.column_status',
+	'cron-history.data_table.column_run_time',
 ]);
 
 export type CronHistoryDataTableFiltersType = {
@@ -46,7 +46,7 @@ export const dataSourceConfigCronHistory = {
 	dataTableColumns: [
 		{
 			field: 'id',
-			header: translations['cron_history.data_table.column_id'],
+			header: translations['cron-history.data_table.column_id'],
 			sortable: true,
 			body: (
 				entry: CronHistoryModel,
@@ -56,18 +56,18 @@ export const dataSourceConfigCronHistory = {
 					markDeleted: true,
 					action: {
 						name: 'view',
-						source: 'cron_history',
+						source: 'cron-history',
 					},
 				}),
 		},
 		{
 			field: 'label',
-			header: translations['cron_history.data_table.column_label'],
+			header: translations['cron-history.data_table.column_label'],
 			sortable: true,
 		},
 		{
 			field: 'start_at',
-			header: translations['cron_history.data_table.column_start_at'],
+			header: translations['cron-history.data_table.column_start_at'],
 			sortable: true,
 			body: (
 				entry: CronHistoryModel,
@@ -79,7 +79,7 @@ export const dataSourceConfigCronHistory = {
 		},
 		{
 			field: 'status',
-			header: translations['cron_history.data_table.column_status'],
+			header: translations['cron-history.data_table.column_status'],
 			body: (
 				entry: CronHistoryModel,
 				column: DataTableColumnType<CronHistoryModel>,
@@ -94,7 +94,7 @@ export const dataSourceConfigCronHistory = {
 		},
 		{
 			field: 'run_time',
-			header: translations['cron_history.data_table_column_run_time'],
+			header: translations['cron-history.data_table_column_run_time'],
 		},
 	],
 	functions: {
@@ -109,7 +109,7 @@ export const dataSourceConfigCronHistory = {
 	actions: {
 		delete: {
 			mode: 'action' as const,
-			permission: 'cron_history.delete',
+			permission: 'cron-history.delete',
 			allowedEntries: 'multiple' as const,
 			position: 'left' as const,
 			function: deleteCronHistory,
@@ -120,7 +120,7 @@ export const dataSourceConfigCronHistory = {
 		},
 		view: {
 			mode: 'other' as const,
-			permission: 'cron_history.read',
+			permission: 'cron-history.read',
 			allowedEntries: 'single' as const,
 			position: 'hidden' as const,
 		},

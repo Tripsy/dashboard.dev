@@ -87,7 +87,7 @@ export async function passwordRecoverChangeAction(
 			...result,
 			message:
 				message ||
-				(await translate('password_recover_change.message.failed')),
+				(await translate('password-recover-change.message.failed')),
 			situation: situation,
 		};
 	}

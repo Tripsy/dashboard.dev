@@ -32,9 +32,9 @@ export const DataTableCronHistoryFilters = (): JSX.Element => {
 	const translationsKeys = useMemo(
 		() =>
 			[
-				'cron_history.form_filters.label_global',
-				'cron_history.form_filters.label_status',
-				'cron_history.form_filters.label_start_date',
+				'cron-history.form_filters.label_global',
+				'cron-history.form_filters.label_status',
+				'cron-history.form_filters.label_start_date',
 			] as const,
 		[],
 	);
@@ -107,7 +107,7 @@ export const DataTableCronHistoryFilters = (): JSX.Element => {
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
 			<FormFiltersSearch<CronHistoryDataTableFiltersType>
 				labelText={
-					translations['cron_history.form_filters.label_global']
+					translations['cron-history.form_filters.label_global']
 				}
 				fieldName="global"
 				search={searchGlobal}
@@ -115,7 +115,7 @@ export const DataTableCronHistoryFilters = (): JSX.Element => {
 
 			<FormFiltersSelect<CronHistoryDataTableFiltersType>
 				labelText={
-					translations['cron_history.form_filters.label_status']
+					translations['cron-history.form_filters.label_status']
 				}
 				fieldName="status"
 				fieldValue={filters.status.value}
@@ -127,7 +127,7 @@ export const DataTableCronHistoryFilters = (): JSX.Element => {
 
 			<FormFiltersDateRange<CronHistoryDataTableFiltersType>
 				labelText={
-					translations['cron_history.form_filters.label_start_date']
+					translations['cron-history.form_filters.label_start_date']
 				}
 				start={{
 					fieldName: 'start_date_start',

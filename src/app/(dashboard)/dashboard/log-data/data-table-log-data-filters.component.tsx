@@ -38,10 +38,10 @@ export const DataTableLogDataFilters = (): JSX.Element => {
 	const translationsKeys = useMemo(
 		() =>
 			[
-				'log_data.form_filters.label_global',
-				'log_data.form_filters.label_category',
-				'log_data.form_filters.label_level',
-				'log_data.form_filters.label_created_at',
+				'log-data.form_filters.label_global',
+				'log-data.form_filters.label_category',
+				'log-data.form_filters.label_level',
+				'log-data.form_filters.label_created_at',
 			] as const,
 		[],
 	);
@@ -113,12 +113,12 @@ export const DataTableLogDataFilters = (): JSX.Element => {
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
 			<FormFiltersSearch<LogDataDataTableFiltersType>
-				labelText={translations['log_data.form_filters.label_global']}
+				labelText={translations['log-data.form_filters.label_global']}
 				search={searchGlobal}
 			/>
 
 			<FormFiltersSelect<LogDataDataTableFiltersType>
-				labelText={translations['log_data.form_filters.label_category']}
+				labelText={translations['log-data.form_filters.label_category']}
 				fieldName="category"
 				fieldValue={filters.category.value}
 				options={logCategories}
@@ -128,7 +128,7 @@ export const DataTableLogDataFilters = (): JSX.Element => {
 			/>
 
 			<FormFiltersSelect<LogDataDataTableFiltersType>
-				labelText={translations['log_data.form_filters.label_level']}
+				labelText={translations['log-data.form_filters.label_level']}
 				fieldName="level"
 				fieldValue={filters.level.value}
 				options={logLevels}
@@ -139,7 +139,7 @@ export const DataTableLogDataFilters = (): JSX.Element => {
 
 			<FormFiltersDateRange<LogDataDataTableFiltersType>
 				labelText={
-					translations['log_data.form_filters.label_created_at']
+					translations['log-data.form_filters.label_created_at']
 				}
 				start={{
 					fieldName: 'create_date_start',

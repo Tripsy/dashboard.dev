@@ -29,6 +29,7 @@ import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
 import { LanguageEnum } from '@/models/user.model';
 import { useAuth } from '@/providers/auth.provider';
+import {createHandleChange} from "@/helpers/form.helper";
 
 const languages = Object.values(LanguageEnum).map((language) => ({
 	label: capitalizeFirstLetter(language),
@@ -62,13 +63,10 @@ export default function AccountEdit() {
 			debounceDelay: 800,
 		});
 
-	const handleChange = (
-		name: string,
-		value: string | boolean | number | Date,
-	) => {
-		setFormValues((prev) => ({ ...prev, [name]: value }));
-		markFieldAsTouched(name as keyof AccountEditFormFieldsType);
-	};
+	const handleChange = createHandleChange(
+		setFormValues,
+		markFieldAsTouched
+	);
 
 	const router = useRouter();
 
@@ -109,7 +107,7 @@ export default function AccountEdit() {
 			>
 				<FormCsrf />
 
-				<FormComponentName
+				<FormComponentName<AccountEditFormFieldsType>
 					labelText="Name"
 					id={elementIds.name}
 					fieldValue={formValues.name ?? ''}
@@ -118,14 +116,14 @@ export default function AccountEdit() {
 					error={errors.name}
 				/>
 
-				<FormComponentRadio
+				<FormComponentRadio<AccountEditFormFieldsType>
 					labelText="Language"
 					id={elementIds.language}
 					fieldName="language"
 					fieldValue={formValues.language}
 					disabled={pending}
 					options={languages}
-					onValueChange={(value) => handleChange('language', value)}
+					onValueChange={(value) => handleChange('language', value as LanguageEnum)}
 					error={errors.language}
 				/>
 

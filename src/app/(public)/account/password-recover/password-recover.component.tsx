@@ -23,6 +23,7 @@ import Routes from '@/config/routes.setup';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
+import {createHandleChange} from "@/helpers/form.helper";
 
 export default function PasswordRecover() {
 	const [state, action, pending] = useActionState(
@@ -40,13 +41,10 @@ export default function PasswordRecover() {
 			debounceDelay: 800,
 		});
 
-	const handleChange = (
-		name: string,
-		value: string | boolean | number | Date,
-	) => {
-		setFormValues((prev) => ({ ...prev, [name]: value }));
-		markFieldAsTouched(name as keyof PasswordRecoverFormFieldsType);
-	};
+	const handleChange = createHandleChange(
+		setFormValues,
+		markFieldAsTouched
+	);
 
 	const elementIds = useElementIds(['email']);
 
@@ -87,7 +85,7 @@ export default function PasswordRecover() {
 			>
 				<FormCsrf />
 
-				<FormComponentEmail
+				<FormComponentEmail<PasswordRecoverFormFieldsType>
 					labelText="Email Address"
 					id={elementIds.email}
 					fieldValue={formValues.email ?? ''}

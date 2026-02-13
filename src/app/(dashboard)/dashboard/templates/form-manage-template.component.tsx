@@ -62,7 +62,7 @@ export function FormManageTemplate({
 
 	return (
 		<>
-			<FormComponentInput
+			<FormComponentInput<TemplateFormValuesType>
 				id={elementIds.label}
 				labelText={translations['templates.form_manage.label_label']}
 				fieldName="label"
@@ -83,7 +83,7 @@ export function FormManageTemplate({
 			/>
 
 			<div className="flex flex-wrap gap-4">
-				<FormComponentSelect
+				<FormComponentSelect<TemplateFormValuesType>
 					labelText={
 						translations['templates.form_manage.label_language']
 					}
@@ -96,7 +96,7 @@ export function FormManageTemplate({
 					onValueChange={(value) => handleChange('language', value)}
 					error={errors.language}
 				/>
-				<FormComponentSelect
+				<FormComponentSelect<TemplateFormValuesType>
 					labelText={translations['templates.form_manage.label_type']}
 					id={elementIds.type}
 					fieldName="type"
@@ -111,7 +111,7 @@ export function FormManageTemplate({
 
 			{formValues.type === TemplateTypeEnum.EMAIL && (
 				<>
-					<FormComponentInput
+					<FormComponentInput<TemplateFormValuesType>
 						id={`${elementIds.content}-subject`}
 						labelText={translations['templates.form_manage.label_email_content_subject']}
 						fieldName="content[subject]"
@@ -127,7 +127,7 @@ export function FormManageTemplate({
 						}}
 					/>
 
-					<FormComponentSelect
+					<FormComponentSelect<TemplateFormValuesType>
 						labelText={translations['templates.form_manage.label_email_content_layout']}
 						id={`${elementIds.content}-layout`}
 						fieldName="content[layout]"

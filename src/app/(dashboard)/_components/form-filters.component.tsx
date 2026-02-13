@@ -4,7 +4,7 @@ import {
 	FormComponentCalendarWithoutFormElement,
 	FormComponentCheckbox,
 	FormComponentInput,
-	FormComponentSelect,
+	FormComponentSelect, InputValueType,
 	type OptionsType,
 } from '@/components/form/form-element.component';
 import { Icons } from '@/components/icon.component';
@@ -15,15 +15,15 @@ import { useElementIds } from '@/hooks/use-element-ids.hook';
 import type { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
 
-export function FormFiltersSearch<TFilters>({
+export function FormFiltersSearch<Fields>({
 	labelText,
-	fieldName = 'global' as keyof TFilters,
+	fieldName,
 	placeholderText = 'Search',
 	search,
 	className,
 }: {
 	labelText: string;
-	fieldName?: keyof TFilters;
+	fieldName?: keyof Fields & string;
 	placeholderText?: string;
 	search: ReturnType<typeof useSearchFilter>;
 	className?: string;
@@ -32,10 +32,10 @@ export function FormFiltersSearch<TFilters>({
 	const elementIds = useElementIds([elementKey]);
 
 	return (
-		<FormComponentInput
+		<FormComponentInput<Fields>
 			labelText={labelText}
 			id={elementIds[elementKey]}
-			fieldName={String(fieldName)}
+			fieldName={fieldName || 'global' as keyof Fields & string}
 			fieldValue={search.value}
 			className={cn('pl-8 max-w-64', className)}
 			placeholderText={placeholderText}
@@ -48,7 +48,7 @@ export function FormFiltersSearch<TFilters>({
 	);
 }
 
-export function FormFiltersSelect<TFilters>({
+export function FormFiltersSelect<Fields>({
 	labelText,
 	fieldName,
 	fieldValue,
@@ -58,7 +58,7 @@ export function FormFiltersSelect<TFilters>({
 	className,
 }: {
 	labelText: string;
-	fieldName: keyof TFilters;
+	fieldName: keyof Fields & string;
 	fieldValue: string | null;
 	placeholderText?: string;
 	options: OptionsType;
@@ -72,7 +72,7 @@ export function FormFiltersSelect<TFilters>({
 		<FormComponentSelect
 			labelText={labelText}
 			id={elementIds[elementKey]}
-			fieldName={String(fieldName)}
+			fieldName={fieldName}
 			fieldValue={fieldValue}
 			className={cn('max-w-64 min-w-32', className)}
 			disabled={false}
@@ -84,20 +84,20 @@ export function FormFiltersSelect<TFilters>({
 }
 
 type FormFilterDateRangeElementType<K> = {
-	fieldName: K;
-	fieldValue: string | null;
+	fieldName: K & string;
+	fieldValue: InputValueType;
 	placeholderText?: string;
 	onSelect: (value: string) => void;
 };
 
-export function FormFiltersDateRange<Filters>({
+export function FormFiltersDateRange<Fields>({
 	labelText,
 	start,
 	end,
 }: {
 	labelText: string;
-	start: FormFilterDateRangeElementType<keyof Filters>;
-	end: FormFilterDateRangeElementType<keyof Filters>;
+	start: FormFilterDateRangeElementType<keyof Fields>;
+	end: FormFilterDateRangeElementType<keyof Fields>;
 }) {
 	const elementKeyStart = `search-${String(start.fieldName)}`;
 	const elementKeyEnd = `search-${String(end.fieldName)}`;
@@ -120,7 +120,7 @@ export function FormFiltersDateRange<Filters>({
 			<div className="flex flex-wrap gap-2">
 				<FormComponentCalendarWithoutFormElement
 					id={elementIds[elementKeyStart]}
-					fieldName={String(start.fieldName)}
+					fieldName={start.fieldName}
 					fieldValue={start.fieldValue}
 					placeholderText={
 						translations['dashboard.text.placeholder_start_date']
@@ -131,7 +131,7 @@ export function FormFiltersDateRange<Filters>({
 				/>
 				<FormComponentCalendarWithoutFormElement
 					id={elementIds[elementKeyEnd]}
-					fieldName={String(end.fieldName)}
+					fieldName={end.fieldName}
 					fieldValue={end.fieldValue}
 					placeholderText={
 						translations['dashboard.text.placeholder_end_date']

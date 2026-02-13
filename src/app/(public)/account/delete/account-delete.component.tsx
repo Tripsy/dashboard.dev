@@ -26,6 +26,7 @@ import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
 import { useAuth } from '@/providers/auth.provider';
+import {createHandleChange} from "@/helpers/form.helper";
 
 export default function AccountDelete() {
 	const { auth, authStatus } = useAuth();
@@ -47,13 +48,10 @@ export default function AccountDelete() {
 			debounceDelay: 800,
 		});
 
-	const handleChange = (
-		name: string,
-		value: string | boolean | number | Date,
-	) => {
-		setFormValues((prev) => ({ ...prev, [name]: value }));
-		markFieldAsTouched(name as keyof AccountDeleteFormFieldsType);
-	};
+	const handleChange = createHandleChange(
+		setFormValues,
+		markFieldAsTouched
+	);
 
 	const router = useRouter();
 
@@ -94,7 +92,7 @@ export default function AccountDelete() {
 			>
 				<FormCsrf />
 
-				<FormComponentPassword
+				<FormComponentPassword<AccountDeleteFormFieldsType>
 					labelText="Current Password"
 					id={elementIds.passwordCurrent}
 					fieldName="password_current"

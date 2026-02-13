@@ -26,6 +26,7 @@ import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
 import { useAuth } from '@/providers/auth.provider';
+import {createHandleChange} from "@/helpers/form.helper";
 
 export default function PasswordUpdate() {
 	const { auth, authStatus } = useAuth();
@@ -47,13 +48,10 @@ export default function PasswordUpdate() {
 			debounceDelay: 800,
 		});
 
-	const handleChange = (
-		name: string,
-		value: string | boolean | number | Date,
-	) => {
-		setFormValues((prev) => ({ ...prev, [name]: value }));
-		markFieldAsTouched(name as keyof PasswordUpdateFormFieldsType);
-	};
+	const handleChange = createHandleChange(
+		setFormValues,
+		markFieldAsTouched
+	);
 
 	const router = useRouter();
 
@@ -94,7 +92,7 @@ export default function PasswordUpdate() {
 			>
 				<FormCsrf />
 
-				<FormComponentPassword
+				<FormComponentPassword<PasswordUpdateFormFieldsType>
 					labelText="Current Password"
 					id={elementIds.passwordCurrent}
 					fieldName="password_current"
@@ -110,7 +108,7 @@ export default function PasswordUpdate() {
 					setShowPassword={setShowPassword}
 				/>
 
-				<FormComponentPassword
+				<FormComponentPassword<PasswordUpdateFormFieldsType>
 					labelText="New Password"
 					id={elementIds.passwordNew}
 					fieldName="password_new"
@@ -124,7 +122,7 @@ export default function PasswordUpdate() {
 					showPassword={showPassword}
 				/>
 
-				<FormComponentPassword
+				<FormComponentPassword<PasswordUpdateFormFieldsType>
 					labelText="Confirm Password"
 					id={elementIds.passwordConfirm}
 					fieldName="password_confirm"

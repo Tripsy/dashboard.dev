@@ -26,9 +26,14 @@ import { cn } from '@/helpers/css.helper';
 import { formatDate, toDateInstance } from '@/helpers/date.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 
-export type InputValueType = string | number | null;
+// export type InputValueType = string | number | null;
+export type InputValueType = string | null;
 export type OptionValueType = string | null;
 export type CheckboxValueType = boolean;
+export type OptionsType = {
+	label: string;
+	value: string;
+}[];
 
 export const FormElement = ({
 	children,
@@ -130,17 +135,12 @@ const useFieldState = ({
 	return stateConfig.default;
 };
 
-export type OptionsType<TValue extends string = string> = {
-	label: string;
-	value: TValue;
-}[];
-
-export type FormComponentProps<TValue> = {
+export type FormComponentProps<Fields, Value> = {
 	id: string;
 	labelText: string;
 	fieldType?: 'text' | 'password' | 'email' | 'number';
-	fieldName: string;
-	fieldValue: TValue;
+	fieldName: keyof Fields & string;
+	fieldValue: Value;
 	isRequired?: boolean;
 	className?: string;
 	placeholderText?: string;
@@ -158,7 +158,7 @@ export type FormComponentProps<TValue> = {
 
 /** Standard form elements **/
 
-export const FormComponentInput = <TValue extends InputValueType>({
+export const FormComponentInput = <Fields,>({
 	labelText,
 	id,
 	fieldType = 'text',
@@ -172,7 +172,7 @@ export const FormComponentInput = <TValue extends InputValueType>({
 	onChange,
 	error,
 	icons,
-}: FormComponentProps<TValue>) => {
+}: FormComponentProps<Fields, InputValueType>) => {
 	const { borderClass } = useFieldState({ value: fieldValue, error });
 
 	return (
@@ -212,7 +212,7 @@ export const FormComponentInput = <TValue extends InputValueType>({
 	);
 };
 
-export const FormComponentSelect = <TValue extends OptionValueType>({
+export const FormComponentSelect = <Fields,>({
 	labelText,
 	id,
 	fieldName,
@@ -224,7 +224,7 @@ export const FormComponentSelect = <TValue extends OptionValueType>({
 	error,
 	options,
 	onValueChange,
-}: Omit<FormComponentProps<TValue>, 'autoComplete' | 'icons' | 'onChange'> & {
+}: Omit<FormComponentProps<Fields, OptionValueType>, 'autoComplete' | 'icons' | 'onChange'> & {
 	options: OptionsType;
 	onValueChange: (value: string) => void;
 }) => {
@@ -271,7 +271,7 @@ export const FormComponentSelect = <TValue extends OptionValueType>({
 	);
 };
 
-export const FormComponentCheckbox = <TValue extends CheckboxValueType>({
+export const FormComponentCheckbox = <Fields,>({
 	children,
 	id,
 	fieldName,
@@ -281,7 +281,7 @@ export const FormComponentCheckbox = <TValue extends CheckboxValueType>({
 	error,
 	onCheckedChange,
 }: Omit<
-	FormComponentProps<TValue>,
+	FormComponentProps<Fields, CheckboxValueType>,
 	| 'labelText'
 	| 'fieldType'
 	| 'fieldValue'
@@ -315,7 +315,7 @@ export const FormComponentCheckbox = <TValue extends CheckboxValueType>({
 	);
 };
 
-export const FormComponentRadio = <TValue extends OptionValueType>({
+export const FormComponentRadio = <Fields,>({
 	labelText,
 	id,
 	fieldName,
@@ -327,7 +327,7 @@ export const FormComponentRadio = <TValue extends OptionValueType>({
 	options,
 	onValueChange,
 }: Omit<
-	FormComponentProps<TValue>,
+	FormComponentProps<Fields, OptionValueType>,
 	'fieldType' | 'onChange' | 'placeholderText' | 'autoComplete' | 'icons'
 > & {
 	options: OptionsType;
@@ -371,9 +371,7 @@ export const FormComponentRadio = <TValue extends OptionValueType>({
 	</FormElement>
 );
 
-export const FormComponentCalendarWithoutFormElement = <
-	TValue extends string | null,
->({
+export const FormComponentCalendarWithoutFormElement = <Fields,>({
 	id,
 	fieldName,
 	fieldValue,
@@ -384,7 +382,7 @@ export const FormComponentCalendarWithoutFormElement = <
 	minDate,
 	maxDate,
 }: Omit<
-	FormComponentProps<TValue>,
+	FormComponentProps<Fields, InputValueType>,
 	| 'labelText'
 	| 'fieldType'
 	| 'isRequired'
@@ -457,7 +455,7 @@ export const FormComponentCalendarWithoutFormElement = <
 	);
 };
 
-export const FormComponentCalendar = <TValue extends string | null>({
+export const FormComponentCalendar = <Fields,>({
 	labelText,
 	id,
 	fieldName,
@@ -469,7 +467,7 @@ export const FormComponentCalendar = <TValue extends string | null>({
 	error,
 	onSelect,
 }: Omit<
-	FormComponentProps<TValue>,
+	FormComponentProps<Fields, InputValueType>,
 	'fieldType' | 'autoComplete' | 'icons' | 'onChange'
 > & {
 	onSelect: (value: string) => void;
@@ -624,9 +622,9 @@ export const FormComponentSubmit = ({
 	);
 };
 
-export const FormComponentName = <TValue extends InputValueType>(
+export const FormComponentName = <Fields,>(
 	props: Omit<
-		FormComponentProps<TValue>,
+		FormComponentProps<Fields, InputValueType>,
 		'fieldName' | 'fieldType' | 'autoComplete' | 'icons'
 	>,
 ) => (
@@ -643,9 +641,9 @@ export const FormComponentName = <TValue extends InputValueType>(
 	/>
 );
 
-export const FormComponentEmail = <TValue extends InputValueType>(
+export const FormComponentEmail = <Fields,>(
 	props: Omit<
-		FormComponentProps<TValue>,
+		FormComponentProps<Fields, InputValueType>,
 		'fieldName' | 'fieldType' | 'autoComplete' | 'icons'
 	> & {
 		fieldName?: 'email' | 'email_new';
@@ -662,11 +660,11 @@ export const FormComponentEmail = <TValue extends InputValueType>(
 	/>
 );
 
-export const FormComponentPassword = <TValue extends InputValueType>({
+export const FormComponentPassword = <Fields,>({
 	showPassword,
 	setShowPassword,
 	...props
-}: FormComponentProps<TValue> & {
+}: FormComponentProps<Fields, InputValueType> & {
 	showPassword: boolean;
 	setShowPassword?: (showPassword: boolean) => void;
 }) => (

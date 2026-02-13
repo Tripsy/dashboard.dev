@@ -73,7 +73,7 @@ export type FormManageType<FormValues extends FormStateValuesType> = {
 	formValues: FormValues;
 	errors: Partial<Record<keyof FormValues, string[]>>;
 	handleChange: (
-		field: string,
+		field: keyof FormValues,
 		value: string | boolean | number | Date | null,
 	) => void;
 	pending: boolean;

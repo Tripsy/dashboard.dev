@@ -35,6 +35,7 @@ import { useAuth } from '@/providers/auth.provider';
 import { useToast } from '@/providers/toast.provider';
 import { removeTokenAccount } from '@/services/account.service';
 import type { AuthTokenListType, AuthTokenType } from '@/types/auth.type';
+import {createHandleChange} from "@/helpers/form.helper";
 
 export default function Login() {
 	const { showToast } = useToast();
@@ -68,13 +69,10 @@ export default function Login() {
 
 	const { translations } = useTranslation(translationsKeys);
 
-	const handleChange = (
-		name: keyof LoginFormFieldsType,
-		value: string | boolean | number | Date,
-	) => {
-		setFormValues((prev) => ({ ...prev, [name]: value }));
-		markFieldAsTouched(name);
-	};
+	const handleChange = createHandleChange(
+		setFormValues,
+		markFieldAsTouched
+	);
 
 	useEffect(() => {
 		if (state.situation === 'success' && router) {
@@ -141,7 +139,7 @@ export default function Login() {
 			>
 				<FormCsrf />
 
-				<FormComponentEmail
+				<FormComponentEmail<LoginFormFieldsType>
 					labelText="Email Address"
 					id={elementIds.email}
 					fieldValue={formValues.email ?? ''}
@@ -150,7 +148,7 @@ export default function Login() {
 					error={errors.email}
 				/>
 
-				<FormComponentPassword
+				<FormComponentPassword<LoginFormFieldsType>
 					labelText="Password"
 					id={elementIds.password}
 					fieldName="password"

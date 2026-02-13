@@ -140,7 +140,7 @@ export function FormManage<
 		});
 
 	const handleChange = (
-		name: string, // eg: content OR content[subject] OR content.subject
+		name: keyof FormValues & string, // eg: content OR content[subject] OR content.subject
 		value: string | boolean | number | Date,
 	) => {
 		setFormValues((prev) => {
@@ -156,7 +156,7 @@ export function FormManage<
 			return newValues;
 		});
 
-		markFieldAsTouched(name as keyof FormValues);
+		markFieldAsTouched(name);
 	};
 
 	const actionLabelKey = `${dataSource}.action.${actionName}.label`;

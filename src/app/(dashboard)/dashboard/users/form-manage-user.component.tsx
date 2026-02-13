@@ -91,7 +91,7 @@ export function FormManageUser({
 
 	return (
 		<>
-			<FormComponentName
+			<FormComponentName<UserFormValuesType>
 				labelText={translations['users.form_manage.label_name']}
 				id={elementIds.name}
 				fieldValue={formValues.name ?? ''}
@@ -100,7 +100,7 @@ export function FormManageUser({
 				error={errors.name}
 			/>
 
-			<FormComponentEmail
+			<FormComponentEmail<UserFormValuesType>
 				labelText={translations['users.form_manage.label_email']}
 				id={elementIds.email}
 				fieldValue={formValues.email ?? ''}
@@ -109,7 +109,7 @@ export function FormManageUser({
 				error={errors.email}
 			/>
 
-			<FormComponentPassword
+			<FormComponentPassword<UserFormValuesType>
 				labelText={
 					actionName === 'create'
 						? translations[
@@ -129,7 +129,7 @@ export function FormManageUser({
 				setShowPassword={setShowPassword}
 			/>
 
-			<FormComponentPassword
+			<FormComponentPassword<UserFormValuesType>
 				labelText={
 					translations['users.form_manage.label_password_confirm']
 				}
@@ -145,7 +145,7 @@ export function FormManageUser({
 				showPassword={showPassword}
 			/>
 
-			<FormComponentSelect
+			<FormComponentSelect<UserFormValuesType>
 				labelText={translations['users.form_manage.label_language']}
 				id={elementIds.language}
 				fieldName="language"
@@ -156,7 +156,7 @@ export function FormManageUser({
 				error={errors.language}
 			/>
 
-			<FormComponentRadio
+			<FormComponentRadio<UserFormValuesType>
 				labelText={translations['users.form_manage.label_role']}
 				id={elementIds.role}
 				fieldName="role"
@@ -168,7 +168,7 @@ export function FormManageUser({
 			/>
 
 			{formValues.role === UserRoleEnum.OPERATOR && (
-				<FormComponentSelect
+				<FormComponentSelect<UserFormValuesType>
 					labelText={
 						translations['users.form_manage.label_operator_type']
 					}

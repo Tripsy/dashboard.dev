@@ -26,6 +26,10 @@ import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
 import { useAuth } from '@/providers/auth.provider';
+import type {
+	EmailConfirmSendFormFieldsType
+} from "@/app/(public)/account/email-confirm-send/email-confirm-send.definition";
+import {createHandleChange} from "@/helpers/form.helper";
 
 export default function EmailUpdate() {
 	const { auth, authStatus } = useAuth();
@@ -45,13 +49,10 @@ export default function EmailUpdate() {
 			debounceDelay: 800,
 		});
 
-	const handleChange = (
-		name: string,
-		value: string | boolean | number | Date,
-	) => {
-		setFormValues((prev) => ({ ...prev, [name]: value }));
-		markFieldAsTouched(name as keyof EmailUpdateFormFieldsType);
-	};
+	const handleChange = createHandleChange(
+		setFormValues,
+		markFieldAsTouched
+	);
 
 	const router = useRouter();
 
@@ -89,7 +90,7 @@ export default function EmailUpdate() {
 			>
 				<FormCsrf />
 
-				<FormComponentEmail
+				<FormComponentEmail<EmailUpdateFormFieldsType>
 					labelText="New Email"
 					id={elementIds.emailNew}
 					fieldName="email_new"

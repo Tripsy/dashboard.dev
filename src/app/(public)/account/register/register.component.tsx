@@ -33,6 +33,7 @@ import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
 import { LanguageEnum } from '@/models/user.model';
+import {createHandleChange} from "@/helpers/form.helper";
 
 const languages = Object.values(LanguageEnum).map((language) => ({
 	label: capitalizeFirstLetter(language),
@@ -57,13 +58,10 @@ export default function Register() {
 			debounceDelay: 800,
 		});
 
-	const handleChange = (
-		name: string,
-		value: string | boolean | number | Date,
-	) => {
-		setFormValues((prev) => ({ ...prev, [name]: value }));
-		markFieldAsTouched(name as keyof RegisterFormFieldsType);
-	};
+	const handleChange = createHandleChange(
+		setFormValues,
+		markFieldAsTouched
+	);
 
 	const elementIds = useElementIds([
 		'name',
@@ -144,7 +142,7 @@ export default function Register() {
 			>
 				<FormCsrf />
 
-				<FormComponentName
+				<FormComponentName<RegisterFormFieldsType>
 					labelText="Name"
 					id={elementIds.name}
 					fieldValue={formValues.name ?? ''}
@@ -153,7 +151,7 @@ export default function Register() {
 					error={errors.name}
 				/>
 
-				<FormComponentEmail
+				<FormComponentEmail<RegisterFormFieldsType>
 					labelText="Email Address"
 					id={elementIds.email}
 					fieldValue={formValues.email ?? ''}
@@ -162,7 +160,7 @@ export default function Register() {
 					error={errors.email}
 				/>
 
-				<FormComponentPassword
+				<FormComponentPassword<RegisterFormFieldsType>
 					labelText="Password"
 					id={elementIds.password}
 					fieldName="password"
@@ -174,7 +172,7 @@ export default function Register() {
 					setShowPassword={setShowPassword}
 				/>
 
-				<FormComponentPassword
+				<FormComponentPassword<RegisterFormFieldsType>
 					labelText="Confirm Password"
 					id={elementIds.passwordConfirm}
 					fieldName="password_confirm"
@@ -188,18 +186,18 @@ export default function Register() {
 					showPassword={showPassword}
 				/>
 
-				<FormComponentRadio
+				<FormComponentRadio<RegisterFormFieldsType>
 					labelText="Language"
 					id={elementIds.language}
 					fieldName="language"
 					fieldValue={formValues.language}
 					disabled={pending}
 					options={languages}
-					onValueChange={(value) => handleChange('language', value)}
+					onValueChange={(value) => handleChange('language', value as LanguageEnum)}
 					error={errors.language}
 				/>
 
-				<FormComponentCheckbox
+				<FormComponentCheckbox<RegisterFormFieldsType>
 					id={elementIds.terms}
 					onCheckedChange={(checked) =>
 						handleChange('terms', checked)

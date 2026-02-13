@@ -24,6 +24,7 @@ import Routes from '@/config/routes.setup';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
+import {createHandleChange} from "@/helpers/form.helper";
 
 export default function PasswordRecoverChange() {
 	const params = useParams<{ token: string }>();
@@ -50,13 +51,10 @@ export default function PasswordRecoverChange() {
 			debounceDelay: 800,
 		});
 
-	const handleChange = (
-		name: string,
-		value: string | boolean | number | Date,
-	) => {
-		setFormValues((prev) => ({ ...prev, [name]: value }));
-		markFieldAsTouched(name as keyof PasswordRecoverChangeFormFieldsType);
-	};
+	const handleChange = createHandleChange(
+		setFormValues,
+		markFieldAsTouched
+	);
 
 	const elementIds = useElementIds(['password', 'passwordConfirm']);
 
@@ -96,7 +94,7 @@ export default function PasswordRecoverChange() {
 			>
 				<FormCsrf />
 
-				<FormComponentPassword
+				<FormComponentPassword<PasswordRecoverChangeFormFieldsType>
 					labelText="New Password"
 					id={elementIds.password}
 					fieldName="password"
@@ -108,7 +106,7 @@ export default function PasswordRecoverChange() {
 					setShowPassword={setShowPassword}
 				/>
 
-				<FormComponentPassword
+				<FormComponentPassword<PasswordRecoverChangeFormFieldsType>
 					labelText="Confirm Password"
 					id={elementIds.passwordConfirm}
 					fieldName="password_confirm"

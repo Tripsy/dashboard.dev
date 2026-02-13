@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useActionState, useState } from 'react';
+import React, { useActionState, useState } from 'react';
 import {
 	passwordRecoverChangeAction,
 	passwordRecoverChangeValidate,
@@ -134,9 +134,10 @@ export default function PasswordRecoverChange() {
 
 				{state.situation === 'error' && state.message && (
 					<FormError>
-						<div>
-							<Icons.Status.Error /> {state.message}
-						</div>
+						<React.Fragment key="error-content">
+							<Icons.Status.Error />
+							<div>{state.message}</div>
+						</React.Fragment>
 					</FormError>
 				)}
 			</form>

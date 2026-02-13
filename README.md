@@ -12,7 +12,7 @@ A ready-to-use Docker environment is provided for quick [setup](#Setup).
 
 This project is still a work in progress, and the next goals are:
 - Improve the UI/UX
-- Include additional [NReady](https://github.com/Tripsy/nready) features in the adminstration dashboard
+- Include additional [NReady](https://github.com/Tripsy/nready) features in the administration dashboard
 
 Meanwhile, we're open to suggestions / feedback, and if you find this project useful, please consider giving it a star ⭐
 
@@ -42,8 +42,10 @@ Meanwhile, we're open to suggestions / feedback, and if you find this project us
 
 ### Core features
 
-- [x] (Public) Auth system: Login, register, logout, forgot password, reset password, email confirmation, etc.
-- [x] (Dashboard) cron-history, log-data, log-history, mail-queue, permissions, templates, users
+- [x] (Public) 
+    - Auth system: login, register, logout, forgot password, reset password, email confirmation, etc.
+- [x] (Dashboard) 
+    - cron-history, log-data, log-history, mail-queue, permissions, templates, users
 
 # Setup
 
@@ -162,14 +164,12 @@ $ pnpm run madge
 # TODO
 
 1. Operator permissions error while trying to update
-1. fresh design
-    - dashboard layout
-    - dashboard filters / manage
+2. fresh design
     - docs page
     - features page
     - changelog page 
-2. Review Readme > How to section 
-3. Recreate docker image
+3. Review Readme > How to section 
+4. Recreate docker image
 
 # Bugs & Issues & Ideas
 

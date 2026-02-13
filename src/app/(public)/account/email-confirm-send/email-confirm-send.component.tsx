@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useActionState } from 'react';
+import React, { useActionState } from 'react';
 import {
 	emailConfirmSendAction,
 	emailConfirmSendValidate,
@@ -108,9 +108,10 @@ export default function EmailConfirmSend() {
 
 				{state.situation === 'error' && state.message && (
 					<FormError>
-						<div>
-							<Icons.Status.Error /> {state.message}
-						</div>
+						<React.Fragment key="error-content">
+							<Icons.Status.Error />
+							<div>{state.message}</div>
+						</React.Fragment>
 					</FormError>
 				)}
 

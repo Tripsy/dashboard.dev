@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useActionState, useEffect } from 'react';
+import React, { useActionState, useEffect } from 'react';
 import {
 	accountEditAction,
 	accountEditValidate,
@@ -152,9 +152,10 @@ export default function AccountEdit() {
 
 				{state.situation === 'error' && state.message && (
 					<FormError>
-						<div>
-							<Icons.Status.Error /> {state.message}
-						</div>
+						<React.Fragment key="error-content">
+							<Icons.Status.Error />
+							<div>{state.message}</div>
+						</React.Fragment>
 					</FormError>
 				)}
 			</form>

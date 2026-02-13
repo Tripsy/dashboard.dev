@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useActionState, useEffect, useState } from 'react';
+import React, { useActionState, useEffect, useState } from 'react';
 import {
 	accountDeleteAction,
 	accountDeleteValidate,
@@ -134,9 +134,10 @@ export default function AccountDelete() {
 
 				{state.situation === 'error' && state.message && (
 					<FormError>
-						<div>
-							<Icons.Status.Error /> {state.message}
-						</div>
+						<React.Fragment key="error-content">
+							<Icons.Status.Error />
+							<div>{state.message}</div>
+						</React.Fragment>
 					</FormError>
 				)}
 			</form>

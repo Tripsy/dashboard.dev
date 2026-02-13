@@ -246,7 +246,7 @@ export function FormManage<
 				<FormError>
 					<React.Fragment key="error-content">
 						<Icons.Status.Error />
-						{state.message}
+						<div>{state.message}</div>
 					</React.Fragment>
 				</FormError>
 			)}

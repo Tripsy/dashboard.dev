@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useActionState, useState } from 'react';
+import React, { useActionState, useState } from 'react';
 import {
 	registerAction,
 	registerValidate,
@@ -24,7 +24,6 @@ import { FormWrapperComponent } from '@/components/form/form-wrapper';
 import { Icons } from '@/components/icon.component';
 import {
 	ErrorComponent,
-	ErrorIcon,
 	SuccessComponent,
 } from '@/components/status.component';
 import { Label } from '@/components/ui/label';
@@ -254,9 +253,10 @@ export default function Register() {
 
 				{state.situation === 'error' && state.message && (
 					<FormError>
-						<div>
-							<ErrorIcon /> {state.message}
-						</div>
+						<React.Fragment key="error-content">
+							<Icons.Status.Error />
+							<div>{state.message}</div>
+						</React.Fragment>
 					</FormError>
 				)}
 

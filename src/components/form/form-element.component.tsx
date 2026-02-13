@@ -576,6 +576,7 @@ type FormComponentSubmitButtonType = {
 	label: string;
 	variant?: ButtonVariant;
 	icon: ComponentType<{ className?: string }>;
+	className?: string;
 };
 
 export const FormComponentSubmit = ({
@@ -600,7 +601,7 @@ export const FormComponentSubmit = ({
 		<Button
 			type="submit"
 			variant={button.variant}
-			className="w-full"
+			className={button.className}
 			disabled={pending || (submitted && Object.keys(errors).length > 0)}
 			aria-busy={pending}
 		>

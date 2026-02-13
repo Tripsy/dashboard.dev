@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useActionState } from 'react';
+import React, { useActionState } from 'react';
 import {
 	passwordRecoverAction,
 	passwordRecoverValidate,
@@ -18,7 +18,7 @@ import {
 import { FormError } from '@/components/form/form-error.component';
 import { FormWrapperComponent } from '@/components/form/form-wrapper';
 import { Icons } from '@/components/icon.component';
-import { ErrorIcon, SuccessComponent } from '@/components/status.component';
+import { SuccessComponent } from '@/components/status.component';
 import Routes from '@/config/routes.setup';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
@@ -108,9 +108,10 @@ export default function PasswordRecover() {
 
 				{state.situation === 'error' && state.message && (
 					<FormError>
-						<div>
-							<ErrorIcon /> {state.message}
-						</div>
+						<React.Fragment key="error-content">
+							<Icons.Status.Error />
+							<div>{state.message}</div>
+						</React.Fragment>
 					</FormError>
 				)}
 

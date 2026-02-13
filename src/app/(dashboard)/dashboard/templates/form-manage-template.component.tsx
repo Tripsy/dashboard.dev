@@ -1,4 +1,4 @@
-import { type ChangeEvent, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import {
 	FormComponentInput,
 	FormComponentSelect,
@@ -7,6 +7,7 @@ import {
 import { FormElementError } from '@/components/form/form-element-error.component';
 import { Icons } from '@/components/icon.component';
 import type { FormManageType } from '@/config/data-source.config';
+import { cn } from '@/helpers/css.helper';
 import { getNestedError } from '@/helpers/form.helper';
 import { capitalizeFirstLetter, toKebabCase } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
@@ -62,47 +63,24 @@ export function FormManageTemplate({
 	return (
 		<>
 			<FormComponentInput
-				id={''}
-				labelText={''}
-				fieldName={''}
-				fieldValue={null}
-				disabled={false}
-				onChange={(
-					event: ChangeEvent<HTMLInputElement, Element>,
-				): void => {
-					throw new Error('Function not implemented.');
-				}}
-			></FormComponentInput>
-			<FormPart>
-				<FormElement
-					labelText={
-						translations['templates.form_manage.label_label']
-					}
-					labelFor={elementIds.label}
-				>
-					<div>
-						<IconField iconPosition="left">
-							<InputIcon className="flex items-center">
-								<Icons.Tag className="opacity-60" />
-							</InputIcon>
-							<InputText
-								id={elementIds.label}
-								name="label"
-								placeholder="eg: password-recover"
-								disabled={pending}
-								invalid={!!errors.label}
-								value={formValues.label ?? ''}
-								onChange={(e) => {
-									const value = toKebabCase(e.target.value);
+				id={elementIds.label}
+				labelText={translations['templates.form_manage.label_label']}
+				fieldName="label"
+				fieldValue={formValues.label}
+				isRequired={true}
+				className="pl-8"
+				placeholderText="eg: password-recover"
+				disabled={pending}
+				onChange={(e) => {
+					const value = toKebabCase(e.target.value);
 
-									handleChange('label', value);
-								}}
-							/>
-						</IconField>
-						<FormElementError messages={errors.label} />
-					</div>
-				</FormElement>
-			</FormPart>
+					handleChange('label', value);
+				}}
+				error={errors.label}
+				icons={{
+					left: <Icons.Tag className="opacity-40 h-4.5 w-4.5" />,
+				}}
+			/>
 
 			<div className="flex flex-wrap gap-4">
 				<FormComponentSelect
@@ -112,20 +90,21 @@ export function FormManageTemplate({
 					id={elementIds.language}
 					fieldName="language"
 					fieldValue={formValues.language}
-					options={languages}
+					className="min-w-32"
 					disabled={pending}
-					onChange={(e) => handleChange('language', e.target.value)}
+					options={languages}
+					onValueChange={(value) => handleChange('language', value)}
 					error={errors.language}
 				/>
-
 				<FormComponentSelect
 					labelText={translations['templates.form_manage.label_type']}
 					id={elementIds.type}
 					fieldName="type"
 					fieldValue={formValues.type}
-					options={types}
+					className="min-w-32"
 					disabled={pending}
-					onChange={(e) => handleChange('type', e.target.value)}
+					options={types}
+					onValueChange={(value) => handleChange('type', value)}
 					error={errors.type}
 				/>
 			</div>
@@ -133,140 +112,137 @@ export function FormManageTemplate({
 			{formValues.type === TemplateTypeEnum.EMAIL && (
 				<>
 					<FormComponentInput
-						labelText={
-							translations[
-								'templates.form_manage.label_email_content_subject'
-							]
-						}
 						id={`${elementIds.content}-subject`}
+						labelText={translations['templates.form_manage.label_email_content_subject']}
 						fieldName="content[subject]"
-						fieldValue={formValues.content.subject ?? ''}
+						fieldValue={formValues.content.subject}
+						isRequired={true}
+						className="pl-8"
 						placeholderText="eg: Recover password"
 						disabled={pending}
-						onChange={(e) =>
-							handleChange('content.subject', e.target.value)
-						}
+						onChange={(e) => handleChange('content.subject', e.target.value)}
 						error={getNestedError(errors, 'content.subject')}
+						icons={{
+							left: <Icons.Tag className="opacity-40 h-4.5 w-4.5" />,
+						}}
 					/>
-					<FormPart>
-						<FormElement
-							labelText={
-								translations[
-									'templates.form_manage.label_email_content_html'
-								]
-							}
-							labelFor={`${elementIds.content}-html`}
-						>
-							<div>
-								<InputTextarea
-									id={`${elementIds.content}-html`}
-									name="content[html]"
-									value={formValues.content.html ?? ''}
-									onChange={(e) =>
-										handleChange(
-											'content.html',
-											e.target.value ?? '',
-										)
-									}
-									style={{ width: '100%', height: '320px' }}
-								/>
-								<FormElementError
-									messages={getNestedError(
-										errors,
-										'content.html',
-									)}
-								/>
-							</div>
-						</FormElement>
-					</FormPart>
+
 					<FormComponentSelect
-						labelText={
-							translations[
-								'templates.form_manage.label_email_content_layout'
-							]
-						}
+						labelText={translations['templates.form_manage.label_email_content_layout']}
 						id={`${elementIds.content}-layout`}
 						fieldName="content[layout]"
 						fieldValue={formValues.content.layout}
-						options={emailLayouts}
+						className="max-w-64"
 						disabled={pending}
-						onChange={(e) =>
-							handleChange('content.layout', e.target.value)
-						}
+						options={emailLayouts}
+						onValueChange={(value) => handleChange('content.layout', value)}
 						error={getNestedError(errors, 'content.layout')}
 					/>
+
+					{/*<FormPart>*/}
+					{/*	<FormElement*/}
+					{/*		labelText={*/}
+					{/*			translations[*/}
+					{/*				'templates.form_manage.label_email_content_html'*/}
+					{/*			]*/}
+					{/*		}*/}
+					{/*		labelFor={`${elementIds.content}-html`}*/}
+					{/*	>*/}
+					{/*		<div>*/}
+					{/*			<InputTextarea*/}
+					{/*				id={`${elementIds.content}-html`}*/}
+					{/*				name="content[html]"*/}
+					{/*				value={formValues.content.html ?? ''}*/}
+					{/*				onChange={(e) =>*/}
+					{/*					handleChange(*/}
+					{/*						'content.html',*/}
+					{/*						e.target.value ?? '',*/}
+					{/*					)*/}
+					{/*				}*/}
+					{/*				style={{ width: '100%', height: '320px' }}*/}
+					{/*			/>*/}
+					{/*			<FormElementError*/}
+					{/*				messages={getNestedError(*/}
+					{/*					errors,*/}
+					{/*					'content.html',*/}
+					{/*				)}*/}
+					{/*			/>*/}
+					{/*		</div>*/}
+					{/*	</FormElement>*/}
+					{/*</FormPart>*/}
+
 				</>
 			)}
 
-			{formValues.type === TemplateTypeEnum.PAGE && (
-				<>
-					<FormComponentInput
-						labelText={
-							translations[
-								'templates.form_manage.label_page_content_title'
-							]
-						}
-						id={`${elementIds.content}-title`}
-						fieldName="content[title]"
-						fieldValue={formValues.content.title ?? ''}
-						placeholderText="eg: Terms & conditions"
-						disabled={pending}
-						onChange={(e) =>
-							handleChange('content.title', e.target.value)
-						}
-						error={getNestedError(errors, 'content.title')}
-					/>
+			{/*{formValues.type === TemplateTypeEnum.PAGE && (*/}
+			{/*	<>*/}
+			{/*		<FormComponentInput*/}
+			{/*			labelText={*/}
+			{/*				translations[*/}
+			{/*					'templates.form_manage.label_page_content_title'*/}
+			{/*				]*/}
+			{/*			}*/}
+			{/*			id={`${elementIds.content}-title`}*/}
+			{/*			fieldName="content[title]"*/}
+			{/*			fieldValue={formValues.content.title ?? ''}*/}
+			{/*			placeholderText="eg: Terms & conditions"*/}
+			{/*			disabled={pending}*/}
+			{/*			onChange={(e) =>*/}
+			{/*				handleChange('content.title', e.target.value)*/}
+			{/*			}*/}
+			{/*			error={getNestedError(errors, 'content.title')}*/}
+			{/*		/>*/}
 
-					<FormPart>
-						<FormElement
-							labelText={
-								translations[
-									'templates.form_manage.label_page_content_html'
-								]
-							}
-							labelFor={`${elementIds.content}-html`}
-						>
-							<div>
-								<InputTextarea
-									id={`${elementIds.content}-html`}
-									name="content[html]"
-									value={formValues.content.html ?? ''}
-									onChange={(e) =>
-										handleChange(
-											'content.html',
-											e.target.value ?? '',
-										)
-									}
-									style={{ width: '100%', height: '320px' }}
-								/>
-								<FormElementError
-									messages={getNestedError(
-										errors,
-										'content.html',
-									)}
-								/>
-							</div>
-						</FormElement>
-					</FormPart>
+			{/*		<FormPart>*/}
+			{/*			<FormElement*/}
+			{/*				labelText={*/}
+			{/*					translations[*/}
+			{/*						'templates.form_manage.label_page_content_html'*/}
+			{/*					]*/}
+			{/*				}*/}
+			{/*				labelFor={`${elementIds.content}-html`}*/}
+			{/*			>*/}
+			{/*				<div>*/}
+			{/*					<InputTextarea*/}
+			{/*						id={`${elementIds.content}-html`}*/}
+			{/*						name="content[html]"*/}
+			{/*						value={formValues.content.html ?? ''}*/}
+			{/*						onChange={(e) =>*/}
+			{/*							handleChange(*/}
+			{/*								'content.html',*/}
+			{/*								e.target.value ?? '',*/}
+			{/*							)*/}
+			{/*						}*/}
+			{/*						style={{ width: '100%', height: '320px' }}*/}
+			{/*					/>*/}
+			{/*					<FormElementError*/}
+			{/*						messages={getNestedError(*/}
+			{/*							errors,*/}
+			{/*							'content.html',*/}
+			{/*						)}*/}
+			{/*					/>*/}
+			{/*				</div>*/}
+			{/*			</FormElement>*/}
+			{/*		</FormPart>*/}
 
-					<FormComponentSelect
-						labelText={
-							translations[
-								'templates.form_manage.label_page_content_layout'
-							]
-						}
-						id={`${elementIds.content}-layout`}
-						fieldName="content[layout]"
-						fieldValue={formValues.content.layout}
-						options={emailLayouts}
-						disabled={pending}
-						onChange={(e) =>
-							handleChange('content.layout', e.target.value)
-						}
-						error={getNestedError(errors, 'content.layout')}
-					/>
-				</>
-			)}
+			{/*		<FormComponentSelect*/}
+			{/*			labelText={*/}
+			{/*				translations[*/}
+			{/*					'templates.form_manage.label_page_content_layout'*/}
+			{/*				]*/}
+			{/*			}*/}
+			{/*			id={`${elementIds.content}-layout`}*/}
+			{/*			fieldName="content[layout]"*/}
+			{/*			fieldValue={formValues.content.layout}*/}
+			{/*			options={emailLayouts}*/}
+			{/*			disabled={pending}*/}
+			{/*			onChange={(e) =>*/}
+			{/*				handleChange('content.layout', e.target.value)*/}
+			{/*			}*/}
+			{/*			error={getNestedError(errors, 'content.layout')}*/}
+			{/*		/>*/}
+			{/*	</>*/}
+			{/*)}*/}
 		</>
 	);
 }

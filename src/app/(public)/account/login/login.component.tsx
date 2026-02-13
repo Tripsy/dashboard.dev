@@ -3,7 +3,7 @@
 import { ArrowDownRight } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useActionState, useEffect, useMemo, useState } from 'react';
+import React, { useActionState, useEffect, useMemo, useState } from 'react';
 import {
 	loginAction,
 	loginValidate,
@@ -175,9 +175,10 @@ export default function Login() {
 
 				{state.situation === 'error' && state.message && (
 					<FormError>
-						<div>
-							<ErrorIcon /> {state.message}
-						</div>
+						<React.Fragment key="error-content">
+							<Icons.Status.Error />
+							<div>{state.message}</div>
+						</React.Fragment>
 					</FormError>
 				)}
 

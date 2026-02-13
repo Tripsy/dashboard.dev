@@ -246,8 +246,10 @@ export default function Register() {
 					pending={pending}
 					submitted={submitted}
 					errors={errors}
-					buttonLabel="Create account"
-					buttonIcon={<Icons.Action.Go />}
+					button={{
+						label: 'Create account',
+						icon: Icons.Action.Go,
+					}}
 				/>
 
 				{state.situation === 'error' && state.message && (

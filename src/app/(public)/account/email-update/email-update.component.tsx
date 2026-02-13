@@ -113,8 +113,10 @@ export default function EmailUpdate() {
 						pending={pending}
 						submitted={submitted}
 						errors={errors}
-						buttonLabel="Update"
-						buttonIcon={<Icons.Action.Go />}
+						button={{
+							label: 'Update',
+							icon: Icons.Action.Go,
+						}}
 					/>
 				</div>
 

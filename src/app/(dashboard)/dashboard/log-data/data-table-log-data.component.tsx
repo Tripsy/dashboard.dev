@@ -42,8 +42,8 @@ export const DataTableLogData = (): JSX.Element => {
 				modals={{
 					view: <ViewLogData />,
 				}}
-				modalClass={{
-					view: 'max-w-3xl!',
+				modalsProps={{
+					view: { size: 'x3l' },
 				}}
 			/>
 		</DataTableProvider>

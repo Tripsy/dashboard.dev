@@ -47,10 +47,10 @@ export const DataTableTemplates = (): JSX.Element => {
 					update: <FormManageTemplate />,
 					view: <ViewTemplate />,
 				}}
-				modalClass={{
-					create: 'max-w-4xl!',
-					update: 'max-w-4xl!',
-					view: 'max-w-4xl!',
+				modalsProps={{
+					create: { size: 'x4l' },
+					update: { size: 'x4l' },
+					view: { size: 'x4l' },
 				}}
 			/>
 		</DataTableProvider>

@@ -1,8 +1,11 @@
 import { useMemo } from 'react';
 import { getActionIcon } from '@/components/icon.component';
 import { LoadingIcon } from '@/components/status.component';
-import {Button} from '@/components/ui/button';
-import {DataSourceKey, DataTableActionButtonPropsType} from '@/config/data-source.config';
+import { Button } from '@/components/ui/button';
+import type {
+	DataSourceKey,
+	DataTableActionButtonPropsType,
+} from '@/config/data-source.config';
 import { useTranslation } from '@/hooks/use-translation.hook';
 
 export function DataTableActionButton<K extends DataSourceKey>({

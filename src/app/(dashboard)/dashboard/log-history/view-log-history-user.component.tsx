@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useStore } from 'zustand/react';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import { UserDetails } from '@/app/(dashboard)/dashboard/users/user-details.component';
-import { LoadingComponent } from '@/components/status.component';
+import { LoadingContent } from '@/components/status.component';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import type { LogHistoryModel } from '@/models/log-history.model';
 import type { UserModel } from '@/models/user.model';
@@ -64,11 +64,8 @@ export function ViewLogHistoryUser() {
 		);
 	}
 
-	// TODO test this
 	if (loading) {
-		return (
-			<LoadingComponent description={translations['app.text.loading']} />
-		);
+		return <LoadingContent />;
 	}
 
 	return <UserDetails entry={entry} />;

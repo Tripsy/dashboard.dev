@@ -9,6 +9,9 @@ const sizeClasses = {
 	md: 'max-w-md',
 	lg: 'max-w-lg',
 	xl: 'max-w-xl',
+	x2l: 'max-w-2xl',
+	x3l: 'max-w-3xl',
+	x4l: 'max-w-4xl',
 };
 
 export type ModalSizeType = keyof typeof sizeClasses;

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useStore } from 'zustand/react';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import { TemplateDetails } from '@/app/(dashboard)/dashboard/templates/template-details.component';
-import { LoadingComponent } from '@/components/status.component';
+import { LoadingContent } from '@/components/status.component';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import type { MailQueueModel } from '@/models/mail-queue.model';
 import type { TemplateModel } from '@/models/template.model';
@@ -65,12 +65,7 @@ export function ViewMailQueueTemplate() {
 	}
 
 	if (loading) {
-		return (
-			<LoadingComponent
-				text={translations['app.text.loading']}
-				className="min-h-64 flex items-center justify-center"
-			/>
-		);
+		return <LoadingContent />;
 	}
 
 	return <TemplateDetails entry={entry} />;

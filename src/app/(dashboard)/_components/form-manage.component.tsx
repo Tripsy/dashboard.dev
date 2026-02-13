@@ -232,12 +232,13 @@ export function FormManage<
 					pending={pending}
 					submitted={submitted}
 					errors={errors as Record<string, string[]>}
-					buttonLabel={translations[actionLabelKey]}
-					buttonVariant={
-						actions[actionName as keyof typeof actions]?.button
-							?.variant || 'info'
-					}
-					buttonIcon={<ActionButtonIcon />}
+					button={{
+						variant:
+							actions[actionName as keyof typeof actions]
+								?.buttonProps?.variant || 'info',
+						label: translations[actionLabelKey],
+						icon: ActionButtonIcon,
+					}}
 				/>
 			</div>
 

@@ -100,8 +100,10 @@ export default function PasswordRecover() {
 					pending={pending}
 					submitted={submitted}
 					errors={errors}
-					buttonLabel="Recover password"
-					buttonIcon={<Icons.Action.Go />}
+					button={{
+						label: 'Recover password',
+						icon: Icons.Action.Go,
+					}}
 				/>
 
 				{state.situation === 'error' && state.message && (

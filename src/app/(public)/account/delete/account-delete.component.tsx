@@ -124,9 +124,11 @@ export default function AccountDelete() {
 						pending={pending}
 						submitted={submitted}
 						errors={errors}
-						buttonVariant="error"
-						buttonLabel="Delete account"
-						buttonIcon={<Icons.Action.Destroy />}
+						button={{
+							variant: 'error',
+							label: 'Delete account',
+							icon: Icons.Action.Destroy,
+						}}
 					/>
 				</div>
 

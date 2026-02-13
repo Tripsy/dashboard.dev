@@ -143,8 +143,10 @@ export default function AccountEdit() {
 						pending={pending}
 						submitted={submitted}
 						errors={errors}
-						buttonLabel="Save"
-						buttonIcon={<Icons.Action.Go />}
+						button={{
+							label: 'Save',
+							icon: Icons.Action.Go,
+						}}
 					/>
 				</div>
 

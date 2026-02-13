@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { type ChangeEvent, useMemo } from 'react';
 import {
 	FormComponentInput,
 	FormComponentSelect,
@@ -61,6 +61,18 @@ export function FormManageTemplate({
 
 	return (
 		<>
+			<FormComponentInput
+				id={''}
+				labelText={''}
+				fieldName={''}
+				fieldValue={null}
+				disabled={false}
+				onChange={(
+					event: ChangeEvent<HTMLInputElement, Element>,
+				): void => {
+					throw new Error('Function not implemented.');
+				}}
+			></FormComponentInput>
 			<FormPart>
 				<FormElement
 					labelText={

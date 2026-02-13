@@ -42,8 +42,8 @@ export const DataTableCronHistory = (): JSX.Element => {
 				modals={{
 					view: <ViewCronHistory />,
 				}}
-				modalClass={{
-					view: 'max-w-3xl!',
+				modalsProps={{
+					view: { size: 'x2l' },
 				}}
 			/>
 		</DataTableProvider>

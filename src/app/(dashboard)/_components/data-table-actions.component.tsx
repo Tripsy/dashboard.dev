@@ -253,7 +253,7 @@ export function DataTableActions<K extends DataSourceKey, Model>() {
 	}
 
 	return (
-		<div className="flex flex-wrap gap-4 justify-between min-h-18 py-4">
+		<div className="flex flex-wrap gap-4 justify-between min-h-[74px] py-4">
 			<div className="flex flex-wrap gap-4 items-center">
 				{selectionMode === 'multiple' && (
 					<div>{selectedEntries.length} selected</div>

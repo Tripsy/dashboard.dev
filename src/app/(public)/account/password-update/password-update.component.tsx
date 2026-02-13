@@ -152,8 +152,10 @@ export default function PasswordUpdate() {
 						pending={pending}
 						submitted={submitted}
 						errors={errors}
-						buttonLabel="Update password"
-						buttonIcon={<Icons.Action.Go />}
+						button={{
+							label: 'Update password',
+							icon: Icons.Action.Go,
+						}}
 					/>
 				</div>
 

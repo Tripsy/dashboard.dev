@@ -24,10 +24,12 @@ const buttonVariants = cva(
 				info: 'bg-info text-info-foreground hover:bg-info/90',
 			},
 			hover: {
-				success: 'hover:bg-success/90 hover:text-success-foreground hover:border-success-foreground',
-				error: 'hover:bg-error/80 hover:text-error-foreground hover:text-error-foreground',
-				info: 'hover:bg-info/90 hover:text-info-foreground hover:text-info-foreground',
-				warning: 'hover:bg-warning/70 hover:text-warning-foreground hover:text-warning-foreground',
+				success:
+					'hover:bg-success/90 hover:text-success-foreground hover:border-transparent',
+				error: 'hover:bg-error/80 hover:text-error-foreground hover:border-transparent',
+				info: 'hover:bg-info/90 hover:text-info-foreground hover:border-transparent',
+				warning:
+					'hover:bg-warning/70 hover:text-warning-foreground hover:border-transparent',
 			},
 			size: {
 				xs: 'text-xs px-2 py-1.5',
@@ -58,7 +60,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 		const Comp = asChild ? Slot : 'button';
 		return (
 			<Comp
-				className={cn(buttonVariants({ variant, size, hover, className }))}
+				className={cn(
+					buttonVariants({ variant, size, hover, className }),
+				)}
 				ref={ref}
 				{...props}
 			/>

@@ -19,6 +19,25 @@ export function LoadingIcon({ className }: { className?: string }) {
 	);
 }
 
+export function LoadingContent({
+	children,
+	title = 'Loading',
+	description = 'Please wait ...',
+}: StatusProps) {
+	return (
+		<div className="flex items-center justify-center w-full px-4 py-12 ">
+			<div className="text-center">
+				<div className="flex justify-center mb-4">
+					<LoadingIcon className="w-12 h-12 text-warning bg-warning/10 rounded-full p-3" />
+				</div>
+				<h1 className="text-2xl font-bold mb-8">{title}</h1>
+				<p className="text-muted-foreground">{description}</p>
+			</div>
+			{children}
+		</div>
+	);
+}
+
 export function LoadingComponent({
 	children,
 	title = 'Loading',

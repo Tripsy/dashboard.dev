@@ -1,5 +1,5 @@
 import { CalendarIcon } from 'lucide-react';
-import React, { type JSX, useMemo } from 'react';
+import React, { type ComponentType, type JSX, useMemo } from 'react';
 import { FormElementError } from '@/components/form/form-element-error.component';
 import { Icons } from '@/components/icon.component';
 import { LoadingIcon } from '@/components/status.component';
@@ -572,20 +572,22 @@ export const FormComponentCalendar = <TValue extends string | null>({
 
 /** Common form elements **/
 
+type FormComponentSubmitButtonType = {
+	label: string;
+	variant?: ButtonVariant;
+	icon: ComponentType<{ className?: string }>;
+};
+
 export const FormComponentSubmit = ({
 	pending,
 	submitted,
 	errors,
-	buttonVariant = 'default',
-	buttonLabel,
-	buttonIcon,
+	button,
 }: {
 	pending: boolean;
 	submitted: boolean;
 	errors: Record<string, string[]>;
-	buttonVariant?: ButtonVariant;
-	buttonLabel: string;
-	buttonIcon?: JSX.Element;
+	button: FormComponentSubmitButtonType;
 }) => {
 	const translationsKeys = useMemo(
 		() => ['app.text.please_wait'] as const,
@@ -597,7 +599,7 @@ export const FormComponentSubmit = ({
 	return (
 		<Button
 			type="submit"
-			variant={buttonVariant}
+			variant={button.variant}
 			className="w-full"
 			disabled={pending || (submitted && Object.keys(errors).length > 0)}
 			aria-busy={pending}
@@ -610,11 +612,11 @@ export const FormComponentSubmit = ({
 			) : submitted && Object.keys(errors).length > 0 ? (
 				<span className="flex items-center gap-1.5">
 					<Icons.Status.Error className="animate-pulse" />
-					{buttonLabel}
+					{button.label}
 				</span>
 			) : (
 				<span className="flex items-center gap-1.5">
-					{buttonIcon} {buttonLabel}
+					<button.icon /> {button.label}
 				</span>
 			)}
 		</Button>

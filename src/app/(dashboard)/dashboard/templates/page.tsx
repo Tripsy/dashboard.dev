@@ -15,6 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
+	// TODO update this & also add the label to be used in the menu component
 	const items: BreadcrumbType[] = [
 		{
 			label: await translate('dashboard.labels.dashboard'),

@@ -100,8 +100,10 @@ export default function EmailConfirmSend() {
 					pending={pending}
 					submitted={submitted}
 					errors={errors}
-					buttonLabel="Get confirmation"
-					buttonIcon={<Icons.Action.Go />}
+					button={{
+						label: 'Get confirmation',
+						icon: Icons.Action.Go,
+					}}
 				/>
 
 				{state.situation === 'error' && state.message && (

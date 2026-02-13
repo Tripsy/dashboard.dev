@@ -167,8 +167,10 @@ export default function Login() {
 					pending={pending}
 					submitted={submitted}
 					errors={errors}
-					buttonLabel="Login"
-					buttonIcon={<Icons.Action.Login />}
+					button={{
+						label: 'Login',
+						icon: Icons.Action.Login,
+					}}
 				/>
 
 				{state.situation === 'error' && state.message && (
@@ -289,7 +291,8 @@ export const AuthTokenList = ({
 						</div>
 						{token.used_now ? (
 							<Badge variant="success" size="sm">
-								<Icons.Status.Active className="w-4 h-4" /> Active Session
+								<Icons.Status.Active className="w-4 h-4" />{' '}
+								Active Session
 							</Badge>
 						) : (
 							<Button
@@ -297,7 +300,8 @@ export const AuthTokenList = ({
 								size="sm"
 								onClick={() => setSelectedToken(token.ident)}
 							>
-								<Icons.Action.Destroy className="w-4 h-4" /> Destroy Session
+								<Icons.Action.Destroy className="w-4 h-4" />{' '}
+								Destroy Session
 							</Button>
 						)}
 					</div>

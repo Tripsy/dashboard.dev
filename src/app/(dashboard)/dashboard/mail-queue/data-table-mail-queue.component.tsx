@@ -44,9 +44,9 @@ export const DataTableMailQueue = (): JSX.Element => {
 					view: <ViewMailQueue />,
 					viewTemplate: <ViewMailQueueTemplate />,
 				}}
-				modalClass={{
-					view: 'max-w-3xl!',
-					viewTemplate: 'max-w-3xl!',
+				modalsProps={{
+					view: { size: 'x4l' },
+					viewTemplate: { size: 'x4l' },
 				}}
 			/>
 		</DataTableProvider>

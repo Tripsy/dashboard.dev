@@ -44,9 +44,9 @@ export const DataTableLogHistory = (): JSX.Element => {
 					view: <ViewLogHistory />,
 					viewUser: <ViewLogHistoryUser />,
 				}}
-				modalClass={{
-					view: 'max-w-3xl!',
-					viewUser: 'max-w-2xl!',
+				modalsProps={{
+					view: { size: 'x2l' },
+					viewUser: { size: 'x2l' },
 				}}
 			/>
 		</DataTableProvider>

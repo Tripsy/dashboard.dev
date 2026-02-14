@@ -4,7 +4,8 @@ import {
 	FormComponentCalendarWithoutFormElement,
 	FormComponentCheckbox,
 	FormComponentInput,
-	FormComponentSelect, InputValueType,
+	FormComponentSelect,
+	type InputValueType,
 	type OptionsType,
 } from '@/components/form/form-element.component';
 import { Icons } from '@/components/icon.component';
@@ -35,7 +36,7 @@ export function FormFiltersSearch<Fields>({
 		<FormComponentInput<Fields>
 			labelText={labelText}
 			id={elementIds[elementKey]}
-			fieldName={fieldName || 'global' as keyof Fields & string}
+			fieldName={fieldName || ('global' as keyof Fields & string)}
 			fieldValue={search.value}
 			className={cn('pl-8 max-w-64', className)}
 			placeholderText={placeholderText}

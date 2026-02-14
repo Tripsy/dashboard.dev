@@ -23,13 +23,13 @@ import { Icons } from '@/components/icon.component';
 import { LoadingComponent } from '@/components/status.component';
 import { Button } from '@/components/ui/button';
 import Routes from '@/config/routes.setup';
+import { createHandleChange } from '@/helpers/form.helper';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
 import { LanguageEnum } from '@/models/user.model';
 import { useAuth } from '@/providers/auth.provider';
-import {createHandleChange} from "@/helpers/form.helper";
 
 const languages = Object.values(LanguageEnum).map((language) => ({
 	label: capitalizeFirstLetter(language),
@@ -63,10 +63,7 @@ export default function AccountEdit() {
 			debounceDelay: 800,
 		});
 
-	const handleChange = createHandleChange(
-		setFormValues,
-		markFieldAsTouched
-	);
+	const handleChange = createHandleChange(setFormValues, markFieldAsTouched);
 
 	const router = useRouter();
 
@@ -123,7 +120,9 @@ export default function AccountEdit() {
 					fieldValue={formValues.language}
 					disabled={pending}
 					options={languages}
-					onValueChange={(value) => handleChange('language', value as LanguageEnum)}
+					onValueChange={(value) =>
+						handleChange('language', value as LanguageEnum)
+					}
 					error={errors.language}
 				/>
 

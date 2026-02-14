@@ -10,13 +10,6 @@ export enum TemplateLayoutEmailEnum {
 	SPECIAL = 'special',
 }
 
-export type TemplateContentEmailType = {
-	subject: string;
-	text?: string;
-	html: string;
-	layout: TemplateLayoutEmailEnum;
-};
-
 export enum TemplateLayoutPageEnum {
 	DEFAULT = 'default',
 	ARTICLE = 'article',
@@ -26,6 +19,14 @@ export type TemplateContentPageType = {
 	title: string;
 	html: string;
 	layout: TemplateLayoutPageEnum;
+};
+
+export type TemplateContentEmailType = {
+	subject: string;
+	layout: TemplateLayoutEmailEnum;
+	html: string;
+	text?: string;
+	vars: Record<string, unknown>;
 };
 
 export type TemplateModel<D = Date | string> = {
@@ -39,20 +40,14 @@ export type TemplateModel<D = Date | string> = {
 	deleted_at: D;
 };
 
-type FormValuesTemplateFormEmail = {
+export type TemplateFormValuesType = {
 	label: string;
 	language: LanguageEnum;
-	type: TemplateTypeEnum.EMAIL;
-	content: TemplateContentEmailType;
-};
+	type: TemplateTypeEnum;
 
-type FormValuesTemplatePage = {
-	label: string;
-	language: LanguageEnum;
-	type: TemplateTypeEnum.PAGE;
-	content: TemplateContentPageType;
-};
+	subject?: string; // Email specific
+	title?: string; // Page specific
 
-export type TemplateFormValuesType =
-	| FormValuesTemplateFormEmail
-	| FormValuesTemplatePage;
+	layout: TemplateLayoutEmailEnum | TemplateLayoutPageEnum;
+	html: string;
+};

@@ -1,4 +1,3 @@
-import type { AutoCompleteCompleteEvent } from 'primereact/autocomplete';
 import { useCallback, useState } from 'react';
 
 export interface UseAutocompleteOptions {
@@ -12,21 +11,16 @@ export function useAutocomplete(
 ) {
 	const { filterMode = 'startsWith', caseSensitive = false } = options;
 
-	const [suggestions, setSuggestions] = useState<string[]>([]);
+	const [suggestions, setSuggestions] = useState<string[]>(suggestionList);
 
-	const completeMethod = useCallback(
-		(event: AutoCompleteCompleteEvent) => {
-			const currentQuery = event.query;
-
-			if (!currentQuery.trim()) {
+	const onSearch = useCallback(
+		(query: string) => {
+			if (!query.trim()) {
 				setSuggestions(suggestionList);
-
 				return;
 			}
 
-			const compareQuery = caseSensitive
-				? currentQuery
-				: currentQuery.toLowerCase();
+			const compareQuery = caseSensitive ? query : query.toLowerCase();
 
 			const filtered = suggestionList.filter((item) => {
 				const compareItem = caseSensitive ? item : item.toLowerCase();
@@ -49,7 +43,7 @@ export function useAutocomplete(
 
 	return {
 		suggestions,
-		completeMethod,
+		onSearch,
 		resetSuggestions,
 	};
 }

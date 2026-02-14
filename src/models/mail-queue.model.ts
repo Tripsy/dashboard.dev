@@ -14,9 +14,7 @@ export type MailQueueModel<D = Date | string> = {
 		label: string;
 	} | null;
 	language: LanguageEnum;
-	content: TemplateContentEmailType & {
-		vars: Record<string, unknown>;
-	};
+	content: TemplateContentEmailType;
 	to: {
 		name: string;
 		address: string;

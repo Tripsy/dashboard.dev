@@ -1,6 +1,6 @@
+import type React from 'react';
 import sanitizeHtml from 'sanitize-html';
 import type { z } from 'zod';
-import React from "react";
 
 export function accumulateZodErrors<T>(
 	zodError: z.ZodError,
@@ -18,13 +18,6 @@ export function accumulateZodErrors<T>(
 	}
 
 	return fieldErrors;
-}
-
-export function getNestedError<T>(
-	errors: Partial<Record<keyof T, string[]>>,
-	path: string,
-): string[] | undefined {
-	return errors[path as keyof T];
 }
 
 export function safeHtml(dirtyHtml: string): string {
@@ -72,13 +65,10 @@ export function safeHtml(dirtyHtml: string): string {
 
 export function createHandleChange<Fields>(
 	setFormValues: React.Dispatch<React.SetStateAction<Fields>>,
-	markFieldAsTouched: (name: keyof Fields) => void
+	markFieldAsTouched: (name: keyof Fields) => void,
 ) {
-	return <K extends keyof Fields>(
-		name: K,
-		value: Fields[K]
-	) => {
-		setFormValues(prev => ({
+	return <K extends keyof Fields>(name: K, value: Fields[K]) => {
+		setFormValues((prev) => ({
 			...prev,
 			[name]: value,
 		}));

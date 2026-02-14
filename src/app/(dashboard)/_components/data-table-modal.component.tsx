@@ -30,6 +30,7 @@ export function DataTableModal<
 	modalsProps?: {
 		[key: string]: {
 			size: ModalSizeType;
+			className?: string;
 		};
 	};
 }) {
@@ -94,6 +95,7 @@ export function DataTableModal<
 	return (
 		<Modal
 			size={modalsProps?.[actionName]?.size || 'md'}
+			className={modalsProps?.[actionName]?.className}
 			isOpen={isOpen}
 			title={translations[actionTitleKey]}
 			onClose={handleClose}

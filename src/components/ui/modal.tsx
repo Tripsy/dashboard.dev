@@ -24,6 +24,7 @@ interface ModalProps {
 	children: React.ReactNode;
 	footer?: React.ReactNode;
 	size?: ModalSizeType;
+	className?: string;
 	closeOnBackdrop?: boolean;
 	closeOnEscape?: boolean;
 }
@@ -36,6 +37,7 @@ export function Modal({
 	children,
 	footer,
 	size = 'md',
+	className,
 	closeOnBackdrop = true,
 	closeOnEscape = true,
 }: ModalProps) {
@@ -78,17 +80,19 @@ export function Modal({
 				aria-labelledby={title ? 'modal-title' : undefined}
 				aria-describedby={description ? 'modal-description' : undefined}
 				className={cn(
-					'relative w-full bg-card rounded-xl shadow-xl border border-border animate-scale-in',
+					'relative w-full bg-card rounded-xl shadow-xl border border-border animate-scale-in flex flex-col',
+					'max-h-[90vh]', // Limit height to 90% of viewport
+					className,
 					sizeClasses[size],
 				)}
 			>
-				{/* Header */}
+				{/* Header - Fixed */}
 				{(title || description) && (
-					<div className="px-6 pt-6 pb-0">
+					<div className="px-6 pt-6 pb-4 flex-shrink-0">
 						{title && (
 							<h2
 								id="modal-title"
-								className="text-lg font-semibold text-card-foreground"
+								className="text-lg font-semibold text-card-foreground pr-8" // Add padding for close button
 							>
 								{title}
 							</h2>
@@ -104,22 +108,24 @@ export function Modal({
 					</div>
 				)}
 
-				{/* Close button */}
+				{/* Close button - Fixed */}
 				<Button
 					variant="ghost"
-					className="absolute right-4 top-4 h-8 w-8 rounded-full"
+					className="absolute right-4 top-4 h-8 w-8 rounded-full flex-shrink-0 z-10"
 					onClick={onClose}
 					aria-label="Close modal"
 				>
 					<X className="h-4 w-4" />
 				</Button>
 
-				{/* Body */}
-				<div className="px-6 py-6">{children}</div>
+				{/* Body - Scrollable */}
+				<div className="px-6 py-2 overflow-y-auto flex-1">
+					{children}
+				</div>
 
-				{/* Footer */}
+				{/* Footer - Fixed */}
 				{footer && (
-					<div className="px-6 pb-6 pt-0 flex justify-end gap-3">
+					<div className="px-6 pb-6 pt-4 flex justify-end gap-3 flex-shrink-0 border-t border-border mt-2">
 						{footer}
 					</div>
 				)}

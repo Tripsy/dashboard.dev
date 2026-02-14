@@ -9,6 +9,7 @@ import {
 	CircleX,
 	ClipboardClock,
 	Clock,
+	Eraser,
 	Eye,
 	EyeOff,
 	FileStack,
@@ -34,6 +35,7 @@ import {
 	SquareStack,
 	TableOfContents,
 	Tag,
+	TextSearch,
 	ThumbsUp,
 	Trash2,
 	TriangleAlert,
@@ -54,6 +56,7 @@ export const Icons = {
 	Visible: (props: IconProps) => <Eye {...props} />,
 	Obscured: (props: IconProps) => <EyeOff {...props} />,
 	Info: (props: IconProps) => <Info {...props} />,
+	Clear: (props: IconProps) => <Eraser {...props} />,
 
 	Email: (props: IconProps) => <Mail {...props} />,
 	Password: (props: IconProps) => <KeyRound {...props} />,
@@ -75,6 +78,7 @@ export const Icons = {
 	Permission: (props: IconProps) => <Wrench {...props} />,
 	Plus: (props: IconProps) => <Plus {...props} />,
 	Minus: (props: IconProps) => <Minus {...props} />,
+	TextSearch: (props: IconProps) => <TextSearch {...props} />,
 
 	Status: {
 		Active: (props: IconProps) => <CircleCheck {...props} />,

@@ -7,7 +7,6 @@ import type { FormStateType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import { safeHtml } from '@/helpers/form.helper';
 import { parseJson } from '@/helpers/string.helper';
-import type { ValidationReturnType } from '@/hooks/use-form-validation.hook';
 import {
 	type TemplateFormValuesType,
 	TemplateLayoutEmailEnum,
@@ -55,51 +54,43 @@ const ValidateSchemaBaseTemplates = z.object({
 
 const ValidateSchemaEmailTemplates = ValidateSchemaBaseTemplates.extend({
 	type: z.literal(TemplateTypeEnum.EMAIL),
-	content: z.object({
-		subject: z.string().nonempty({
-			message: translations['templates.validation.email_subject_invalid'],
-		}),
-		text: z
-			.string({
-				message:
-					translations['templates.validation.email_text_invalid'],
-			})
-			.optional(),
-		html: z
-			.string()
-			.nonempty({
-				message:
-					translations['templates.validation.email_html_invalid'],
-			})
-			.transform((val) => safeHtml(val)),
-		layout: z
-			.string({
-				message:
-					translations['templates.validation.email_layout_invalid'],
-			})
-			.optional(),
+	subject: z.string().nonempty({
+		message: translations['templates.validation.email_subject_invalid'],
 	}),
+	text: z
+		.string({
+			message: translations['templates.validation.email_text_invalid'],
+		})
+		.optional(),
+	html: z
+		.string()
+		.nonempty({
+			message: translations['templates.validation.email_html_invalid'],
+		})
+		.transform((val) => safeHtml(val)),
+	layout: z
+		.string({
+			message: translations['templates.validation.email_layout_invalid'],
+		})
+		.optional(),
 });
 
 const ValidateSchemaPageTemplates = ValidateSchemaBaseTemplates.extend({
 	type: z.literal(TemplateTypeEnum.PAGE),
-	content: z.object({
-		title: z.string().nonempty({
-			message: translations['templates.validation.page_title_invalid'],
-		}),
-		html: z
-			.string()
-			.nonempty({
-				message: translations['templates.validation.page_html_invalid'],
-			})
-			.transform((val) => safeHtml(val)),
-		layout: z
-			.string({
-				message:
-					translations['templates.validation.page_layout_invalid'],
-			})
-			.optional(),
+	title: z.string().nonempty({
+		message: translations['templates.validation.page_title_invalid'],
 	}),
+	html: z
+		.string()
+		.nonempty({
+			message: translations['templates.validation.page_html_invalid'],
+		})
+		.transform((val) => safeHtml(val)),
+	layout: z
+		.string({
+			message: translations['templates.validation.page_layout_invalid'],
+		})
+		.optional(),
 });
 
 export const ValidateSchemaTemplates = z.union([
@@ -130,15 +121,11 @@ export function getFormValuesTemplates(
 			label: (formData.get('label') as string) ?? '',
 			language: selectedLanguage,
 			type: TemplateTypeEnum.EMAIL,
-			content: {
-				subject: (formData.get('content[subject]') as string) ?? '',
-				html: (formData.get('content[html]') as string) ?? '',
-				layout:
-					(formData.get(
-						'content[layout]',
-					) as TemplateLayoutEmailEnum) ??
-					TemplateLayoutEmailEnum.DEFAULT,
-			},
+			subject: (formData.get('subject') as string) ?? '',
+			html: (formData.get('html') as string) ?? '',
+			layout:
+				(formData.get('layout') as TemplateLayoutEmailEnum) ??
+				TemplateLayoutEmailEnum.DEFAULT,
 		};
 	}
 
@@ -146,13 +133,11 @@ export function getFormValuesTemplates(
 		label: (formData.get('label') as string) ?? '',
 		language: selectedLanguage,
 		type: TemplateTypeEnum.PAGE,
-		content: {
-			title: (formData.get('content[title]') as string) ?? '',
-			html: (formData.get('content[html]') as string) ?? '',
-			layout:
-				(formData.get('content[layout]') as TemplateLayoutPageEnum) ??
-				TemplateLayoutPageEnum.DEFAULT,
-		},
+		title: (formData.get('title') as string) ?? '',
+		html: (formData.get('html') as string) ?? '',
+		layout:
+			(formData.get('content[layout]') as TemplateLayoutPageEnum) ??
+			TemplateLayoutPageEnum.DEFAULT,
 	};
 }
 
@@ -236,11 +221,9 @@ export const dataSourceConfigTemplates = {
 			label: '',
 			language: LanguageEnum.EN,
 			type: TemplateTypeEnum.EMAIL,
-			content: {
-				subject: '',
-				html: '',
-				layout: TemplateLayoutEmailEnum.DEFAULT,
-			},
+			subject: '',
+			html: '',
+			layout: TemplateLayoutEmailEnum.DEFAULT,
 		} as TemplateFormValuesType,
 		errors: {},
 		message: null,
@@ -249,12 +232,8 @@ export const dataSourceConfigTemplates = {
 	functions: {
 		find: findTemplates,
 		getFormValues: getFormValuesTemplates,
-		validateForm: (
-			values: TemplateFormValuesType,
-		): ValidationReturnType<TemplateFormValuesType> => {
-			return ValidateSchemaTemplates.safeParse(
-				values,
-			) as ValidationReturnType<TemplateFormValuesType>;
+		validateForm: (values: TemplateFormValuesType) => {
+			return ValidateSchemaTemplates.safeParse(values);
 		},
 		syncFormState: (
 			state: FormStateType<
@@ -268,15 +247,34 @@ export const dataSourceConfigTemplates = {
 			TemplateModel,
 			TemplateFormValuesType
 		> => {
+			const parsed = parseJson(model.content);
+
+			if (model.type === TemplateTypeEnum.EMAIL) {
+				return {
+					...state,
+					id: model.id,
+					values: {
+						label: model.label,
+						language: model.language,
+						type: TemplateTypeEnum.EMAIL,
+						subject: parsed.subject ?? '',
+						html: parsed.html ?? '',
+						layout:
+							parsed.layout ?? TemplateLayoutEmailEnum.DEFAULT,
+					},
+				};
+			}
+
 			return {
 				...state,
 				id: model.id,
 				values: {
-					...state.values,
 					label: model.label,
 					language: model.language,
-					type: model.type,
-					content: parseJson(model.content),
+					type: TemplateTypeEnum.PAGE,
+					title: parsed.title ?? '',
+					html: parsed.html ?? '',
+					layout: parsed.layout ?? TemplateLayoutPageEnum.DEFAULT,
 				},
 			};
 		},

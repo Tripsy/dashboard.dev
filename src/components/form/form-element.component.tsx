@@ -1,5 +1,12 @@
-import { CalendarIcon } from 'lucide-react';
-import React, { type ComponentType, type JSX, useMemo } from 'react';
+import React, {
+	type ComponentType,
+	type JSX,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from 'react';
 import { FormElementError } from '@/components/form/form-element-error.component';
 import { Icons } from '@/components/icon.component';
 import { LoadingIcon } from '@/components/status.component';
@@ -21,12 +28,12 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import type { FilterValueType } from '@/config/data-source.config';
 import { cn } from '@/helpers/css.helper';
 import { formatDate, toDateInstance } from '@/helpers/date.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 
-// export type InputValueType = string | number | null;
 export type InputValueType = string | null;
 export type OptionValueType = string | null;
 export type CheckboxValueType = boolean;
@@ -212,6 +219,49 @@ export const FormComponentInput = <Fields,>({
 	);
 };
 
+export const FormComponentTextarea = <Fields,>({
+	labelText,
+	id,
+	fieldName,
+	fieldValue,
+	isRequired = false,
+	className = 'w-full',
+	placeholderText,
+	disabled,
+	onChange,
+	error,
+	rows,
+}: Omit<
+	FormComponentProps<Fields, InputValueType>,
+	'fieldType' | 'autoComplete' | 'onChange' | 'icons'
+> & {
+	onChange: React.ChangeEventHandler<HTMLTextAreaElement>;
+	rows: number;
+}) => {
+	const { borderClass } = useFieldState({ value: fieldValue, error });
+
+	return (
+		<FormElement
+			label={{ for: id, text: labelText, required: isRequired }}
+			error={error}
+		>
+			<FormElementWrapper>
+				<Textarea
+					id={id}
+					name={fieldName}
+					value={fieldValue ?? ''}
+					className={cn(borderClass, className)}
+					placeholder={placeholderText}
+					disabled={disabled}
+					aria-invalid={!!error}
+					onChange={onChange}
+					rows={rows}
+				/>
+			</FormElementWrapper>
+		</FormElement>
+	);
+};
+
 export const FormComponentSelect = <Fields,>({
 	labelText,
 	id,
@@ -224,7 +274,10 @@ export const FormComponentSelect = <Fields,>({
 	error,
 	options,
 	onValueChange,
-}: Omit<FormComponentProps<Fields, OptionValueType>, 'autoComplete' | 'icons' | 'onChange'> & {
+}: Omit<
+	FormComponentProps<Fields, OptionValueType>,
+	'autoComplete' | 'icons' | 'onChange'
+> & {
 	options: OptionsType;
 	onValueChange: (value: string) => void;
 }) => {
@@ -419,7 +472,7 @@ export const FormComponentCalendarWithoutFormElement = <Fields,>({
 						)}
 						disabled={disabled}
 					>
-						<CalendarIcon className="mr-2 h-4 w-4" />
+						<Icons.Calendar className="mr-2 h-4 w-4" />
 						{fieldValue ? (
 							formatDate(fieldValue, 'default')
 						) : (
@@ -490,83 +543,247 @@ export const FormComponentCalendar = <Fields,>({
 	);
 };
 
-// export const FormComponentTextarea = ({
-// 	labelText,
-// 	id,
-// 	fieldName,
-// 	fieldValue,
-// 	isRequired = false,
-// 	className = 'resize-none',
-// 	placeholderText,
-// 	disabled,
-// 	autoComplete,
-// 	onChange,
-// 	error,
-// }: FormComponentProps) => {
-// 	const { borderClass } = useFieldState({ value: fieldValue, error });
-//
-// 	return (
-// 		<FormElement
-// 			label={{ for: id, text: labelText, required: isRequired }}
-// 			error={error}
-// 		>
-// 			<Textarea
-// 				id={id}
-// 				name={fieldName}
-// 				value={fieldValue}
-// 				className={cn(borderClass, className)}
-// 				placeholder={placeholderText}
-// 				autoComplete={autoComplete}
-// 				disabled={disabled}
-// 				aria-invalid={!!error}
-// 				onChange={onChange}
-// 				rows={6}
-// 			/>
-// 		</FormElement>
-// 	);
-// };
-//
-// export const FormComponentAutoComplete = ({
-// 	labelText,
-// 	id,
-// 	fieldType = 'text',
-// 	fieldName,
-// 	fieldValue,
-// 	isRequired = false,
-// 	className,
-// 	placeholderText,
-// 	disabled,
-// 	onChange,
-// 	error,
-// 	suggestions = [],
-// 	completeMethod,
-// }: FormComponentProps & {
-// 	suggestions: string[];
-// 	completeMethod: (event: AutoCompleteCompleteEvent) => void;
-// }) => {
-// 	const { borderClass } = useFieldState({ value: fieldValue, error });
-//
-// 	return (
-// 		<FormElement
-// 			label={{ for: id, text: labelText, required: isRequired }}
-// 			error={error}
-// 		>
-// 			<AutoComplete
-// 				type={fieldType}
-// 				id={id}
-// 				name={fieldName}
-// 				value={fieldValue}
-// 				suggestions={suggestions}
-// 				completeMethod={completeMethod}
-// 				onChange={onChange}
-// 				className={cn(borderClass, className)}
-// 				placeholder={placeholderText}
-// 				disabled={disabled}
-// 				dropdown
-// 			/>
-// 		</FormElement>
-// 	);
-// };
+export const FormComponentAutoComplete = <Fields,>({
+	labelText,
+	id,
+	fieldName,
+	fieldValue,
+	isRequired = false,
+	className = 'w-full',
+	placeholderText,
+	disabled,
+	error,
+	icons,
+	onChange,
+	autoCompleteProps,
+}: Omit<
+	FormComponentProps<Fields, InputValueType>,
+	'fieldType' | 'autoComplete' | 'onChange' | 'icons'
+> & {
+	icons?: { left?: JSX.Element };
+	onChange?: (value: string) => void;
+	autoCompleteProps: {
+		suggestions: string[];
+		onSearch: (query: string) => void;
+		debounceMs?: number;
+		minQueryLength: number;
+		maxSuggestions?: number;
+		dropdown?: boolean;
+	};
+}) => {
+	const [isOpen, setIsOpen] = useState(false);
+	const [inputValue, setInputValue] = useState(fieldValue ?? '');
+	const [highlightedIndex, setHighlightedIndex] = useState(-1);
+	const wrapperRef = useRef<HTMLDivElement>(null);
+	const inputRef = useRef<HTMLInputElement>(null);
+	const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+	// Update input value when prop changes
+	useEffect(() => {
+		setInputValue(fieldValue ?? '');
+	}, [fieldValue]);
+
+	// Handle click outside
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (
+				wrapperRef.current &&
+				!wrapperRef.current.contains(event.target as Node)
+			) {
+				setIsOpen(false);
+			}
+		};
+
+		document.addEventListener('mousedown', handleClickOutside);
+
+		return () =>
+			document.removeEventListener('mousedown', handleClickOutside);
+	}, []);
+
+	// Debounced search
+	const debouncedSearch = useCallback(
+		(query: string) => {
+			if (debounceTimerRef.current) {
+				clearTimeout(debounceTimerRef.current);
+			}
+
+			debounceTimerRef.current = setTimeout(() => {
+				if (query.length >= autoCompleteProps.minQueryLength) {
+					autoCompleteProps.onSearch(query);
+				}
+			}, autoCompleteProps.debounceMs || 300);
+		},
+		[autoCompleteProps],
+	);
+
+	const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const newValue = e.target.value;
+		setInputValue(newValue);
+
+		if (onChange) {
+			onChange(newValue);
+		}
+
+		setIsOpen(true);
+		setHighlightedIndex(-1);
+		debouncedSearch(newValue);
+	};
+
+	const handleSuggestionClick = (suggestion: string) => {
+		setInputValue(suggestion);
+		if (onChange) {
+			onChange(suggestion);
+		}
+		setIsOpen(false);
+		setHighlightedIndex(-1);
+	};
+
+	const handleKeyDown = (e: React.KeyboardEvent) => {
+		if (!isOpen) {
+			if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+				setIsOpen(true);
+			}
+			return;
+		}
+
+		const suggestionsList = autoCompleteProps.suggestions.slice(
+			0,
+			autoCompleteProps.maxSuggestions || 99,
+		);
+
+		switch (e.key) {
+			case 'ArrowDown':
+				e.preventDefault();
+				setHighlightedIndex((prev) =>
+					prev < suggestionsList.length - 1 ? prev + 1 : prev,
+				);
+				break;
+			case 'ArrowUp':
+				e.preventDefault();
+				setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : -1));
+				break;
+			case 'Enter':
+				e.preventDefault();
+				if (
+					highlightedIndex >= 0 &&
+					highlightedIndex < suggestionsList.length
+				) {
+					handleSuggestionClick(suggestionsList[highlightedIndex]);
+				}
+				break;
+			case 'Escape':
+				setIsOpen(false);
+				setHighlightedIndex(-1);
+				break;
+			case 'Tab':
+				setIsOpen(false);
+				setHighlightedIndex(-1);
+				break;
+		}
+	};
+
+	const handleClear = () => {
+		setInputValue('');
+
+		if (onChange) {
+			onChange('');
+		}
+
+		inputRef.current?.focus();
+	};
+
+	const shouldShowDropdown =
+		isOpen && autoCompleteProps.suggestions.length > 0 && !disabled;
+	const displayedSuggestions = autoCompleteProps.suggestions.slice(
+		0,
+		autoCompleteProps.maxSuggestions || 99,
+	);
+
+	const { borderClass } = useFieldState({ value: fieldValue, error });
+
+	return (
+		<FormElement
+			label={{ for: id, text: labelText, required: isRequired }}
+			error={error}
+		>
+			<div ref={wrapperRef} className="relative w-full">
+				<FormElementWrapper>
+					<div>
+						{icons?.left && (
+							<FormElementIcon position="left">
+								{icons.left}
+							</FormElementIcon>
+						)}
+
+						<Input
+							ref={inputRef}
+							type="text"
+							id={id}
+							name={fieldName}
+							value={inputValue}
+							className={cn(borderClass, 'pr-8', className)}
+							placeholder={placeholderText}
+							disabled={disabled}
+							aria-invalid={!!error}
+							onChange={handleOnChange}
+							onKeyDown={handleKeyDown}
+							onFocus={() =>
+								setIsOpen(autoCompleteProps.dropdown ?? false)
+							}
+						/>
+
+						{/* Clear button */}
+						{inputValue && !disabled && (
+							<FormElementIcon position="right">
+								<button
+									type="button"
+									onClick={handleClear}
+									className="cursor-pointer focus:outline-none hover:opacity-100 transition-opacity"
+								>
+									<Icons.Clear className="h-4.5 w-4.5 text-muted-foreground hover:text-foreground" />
+								</button>
+							</FormElementIcon>
+						)}
+					</div>
+				</FormElementWrapper>
+
+				{/* Dropdown */}
+				{shouldShowDropdown && (
+					<ul className="absolute z-50 w-full mt-1 max-h-60 overflow-auto bg-popover border border-border rounded-md shadow-lg">
+						{displayedSuggestions.map((suggestion) => (
+							<li key={suggestion} className="list-none">
+								<button
+									type="button"
+									onClick={() =>
+										handleSuggestionClick(suggestion)
+									}
+									onMouseEnter={() =>
+										setHighlightedIndex(
+											displayedSuggestions.indexOf(
+												suggestion,
+											),
+										)
+									}
+									className={cn(
+										'w-full px-3 py-2 text-sm text-left cursor-pointer',
+										'hover:bg-accent hover:text-accent-foreground',
+										'focus:bg-accent focus:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-inset',
+										displayedSuggestions.indexOf(
+											suggestion,
+										) === highlightedIndex &&
+											'bg-accent text-accent-foreground',
+									)}
+								>
+									{suggestion}
+								</button>
+							</li>
+						))}
+					</ul>
+				)}
+			</div>
+		</FormElement>
+	);
+};
 
 /** Common form elements **/
 

@@ -57,12 +57,12 @@
 		"label_label": "Label",
 		"label_language": "Language",
 		"label_type": "Type",
-		"label_email_content_subject": "Email - Subject",
-		"label_email_content_html": "Email - HTML",
-		"label_email_content_layout": "Email - Layout",
-		"label_page_content_title": "Page - Title",
-		"label_page_content_html": "Page - HTML",
-		"label_page_content_layout": "Page - Layout"
+		"label_email_subject": "Email - Subject",
+		"label_email_html": "Email - HTML",
+		"label_email_layout": "Email - Layout",
+		"label_page_title": "Page - Title",
+		"label_page_html": "Page - HTML",
+		"label_page_layout": "Page - Layout"
 	},
 	"view": {
 		"section_details": "Details",

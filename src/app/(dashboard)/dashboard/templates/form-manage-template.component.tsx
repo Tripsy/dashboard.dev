@@ -1,14 +1,11 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import {
 	FormComponentInput,
 	FormComponentSelect,
-	FormElement,
+	FormComponentTextarea,
 } from '@/components/form/form-element.component';
-import { FormElementError } from '@/components/form/form-element-error.component';
 import { Icons } from '@/components/icon.component';
 import type { FormManageType } from '@/config/data-source.config';
-import { cn } from '@/helpers/css.helper';
-import { getNestedError } from '@/helpers/form.helper';
 import { capitalizeFirstLetter, toKebabCase } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
@@ -46,12 +43,12 @@ export function FormManageTemplate({
 				'templates.form_manage.label_label',
 				'templates.form_manage.label_language',
 				'templates.form_manage.label_type',
-				'templates.form_manage.label_email_content_subject',
-				'templates.form_manage.label_email_content_html',
-				'templates.form_manage.label_email_content_layout',
-				'templates.form_manage.label_page_content_title',
-				'templates.form_manage.label_page_content_html',
-				'templates.form_manage.label_page_content_layout',
+				'templates.form_manage.label_email_subject',
+				'templates.form_manage.label_email_html',
+				'templates.form_manage.label_email_layout',
+				'templates.form_manage.label_page_title',
+				'templates.form_manage.label_page_html',
+				'templates.form_manage.label_page_layout',
 			] as const,
 		[],
 	);
@@ -113,136 +110,107 @@ export function FormManageTemplate({
 				<>
 					<FormComponentInput<TemplateFormValuesType>
 						id={`${elementIds.content}-subject`}
-						labelText={translations['templates.form_manage.label_email_content_subject']}
-						fieldName="content[subject]"
-						fieldValue={formValues.content.subject}
+						labelText={
+							translations[
+								'templates.form_manage.label_email_subject'
+							]
+						}
+						fieldName="subject"
+						fieldValue={formValues.subject ?? ''}
 						isRequired={true}
-						className="pl-8"
 						placeholderText="eg: Recover password"
 						disabled={pending}
-						onChange={(e) => handleChange('content.subject', e.target.value)}
-						error={getNestedError(errors, 'content.subject')}
-						icons={{
-							left: <Icons.Tag className="opacity-40 h-4.5 w-4.5" />,
-						}}
+						onChange={(e) =>
+							handleChange('subject', e.target.value)
+						}
+						error={errors.subject}
 					/>
 
 					<FormComponentSelect<TemplateFormValuesType>
-						labelText={translations['templates.form_manage.label_email_content_layout']}
+						labelText={
+							translations[
+								'templates.form_manage.label_email_layout'
+							]
+						}
 						id={`${elementIds.content}-layout`}
-						fieldName="content[layout]"
-						fieldValue={formValues.content.layout}
+						fieldName="layout"
+						fieldValue={formValues.layout}
 						className="max-w-64"
 						disabled={pending}
 						options={emailLayouts}
-						onValueChange={(value) => handleChange('content.layout', value)}
-						error={getNestedError(errors, 'content.layout')}
+						onValueChange={(value) => handleChange('layout', value)}
+						error={errors.layout}
 					/>
 
-					{/*<FormPart>*/}
-					{/*	<FormElement*/}
-					{/*		labelText={*/}
-					{/*			translations[*/}
-					{/*				'templates.form_manage.label_email_content_html'*/}
-					{/*			]*/}
-					{/*		}*/}
-					{/*		labelFor={`${elementIds.content}-html`}*/}
-					{/*	>*/}
-					{/*		<div>*/}
-					{/*			<InputTextarea*/}
-					{/*				id={`${elementIds.content}-html`}*/}
-					{/*				name="content[html]"*/}
-					{/*				value={formValues.content.html ?? ''}*/}
-					{/*				onChange={(e) =>*/}
-					{/*					handleChange(*/}
-					{/*						'content.html',*/}
-					{/*						e.target.value ?? '',*/}
-					{/*					)*/}
-					{/*				}*/}
-					{/*				style={{ width: '100%', height: '320px' }}*/}
-					{/*			/>*/}
-					{/*			<FormElementError*/}
-					{/*				messages={getNestedError(*/}
-					{/*					errors,*/}
-					{/*					'content.html',*/}
-					{/*				)}*/}
-					{/*			/>*/}
-					{/*		</div>*/}
-					{/*	</FormElement>*/}
-					{/*</FormPart>*/}
-
+					<FormComponentTextarea<TemplateFormValuesType>
+						id={`${elementIds.content}-html`}
+						labelText={
+							translations[
+								'templates.form_manage.label_email_html'
+							]
+						}
+						fieldName="html"
+						fieldValue={formValues.html}
+						isRequired={true}
+						disabled={pending}
+						onChange={(e) => handleChange('html', e.target.value)}
+						error={errors.html}
+						rows={6}
+					/>
 				</>
 			)}
 
-			{/*{formValues.type === TemplateTypeEnum.PAGE && (*/}
-			{/*	<>*/}
-			{/*		<FormComponentInput*/}
-			{/*			labelText={*/}
-			{/*				translations[*/}
-			{/*					'templates.form_manage.label_page_content_title'*/}
-			{/*				]*/}
-			{/*			}*/}
-			{/*			id={`${elementIds.content}-title`}*/}
-			{/*			fieldName="content[title]"*/}
-			{/*			fieldValue={formValues.content.title ?? ''}*/}
-			{/*			placeholderText="eg: Terms & conditions"*/}
-			{/*			disabled={pending}*/}
-			{/*			onChange={(e) =>*/}
-			{/*				handleChange('content.title', e.target.value)*/}
-			{/*			}*/}
-			{/*			error={getNestedError(errors, 'content.title')}*/}
-			{/*		/>*/}
+			{formValues.type === TemplateTypeEnum.PAGE && (
+				<>
+					<FormComponentInput<TemplateFormValuesType>
+						id={`${elementIds.content}-title`}
+						labelText={
+							translations[
+								'templates.form_manage.label_page_title'
+							]
+						}
+						fieldName="title"
+						fieldValue={formValues.title ?? ''}
+						isRequired={true}
+						placeholderText="eg: Terms & Conditions"
+						disabled={pending}
+						onChange={(e) => handleChange('title', e.target.value)}
+						error={errors.title}
+					/>
 
-			{/*		<FormPart>*/}
-			{/*			<FormElement*/}
-			{/*				labelText={*/}
-			{/*					translations[*/}
-			{/*						'templates.form_manage.label_page_content_html'*/}
-			{/*					]*/}
-			{/*				}*/}
-			{/*				labelFor={`${elementIds.content}-html`}*/}
-			{/*			>*/}
-			{/*				<div>*/}
-			{/*					<InputTextarea*/}
-			{/*						id={`${elementIds.content}-html`}*/}
-			{/*						name="content[html]"*/}
-			{/*						value={formValues.content.html ?? ''}*/}
-			{/*						onChange={(e) =>*/}
-			{/*							handleChange(*/}
-			{/*								'content.html',*/}
-			{/*								e.target.value ?? '',*/}
-			{/*							)*/}
-			{/*						}*/}
-			{/*						style={{ width: '100%', height: '320px' }}*/}
-			{/*					/>*/}
-			{/*					<FormElementError*/}
-			{/*						messages={getNestedError(*/}
-			{/*							errors,*/}
-			{/*							'content.html',*/}
-			{/*						)}*/}
-			{/*					/>*/}
-			{/*				</div>*/}
-			{/*			</FormElement>*/}
-			{/*		</FormPart>*/}
+					<FormComponentSelect<TemplateFormValuesType>
+						labelText={
+							translations[
+								'templates.form_manage.label_page_layout'
+							]
+						}
+						id={`${elementIds.content}-layout`}
+						fieldName="layout"
+						fieldValue={formValues.layout}
+						className="max-w-64"
+						disabled={pending}
+						options={emailLayouts}
+						onValueChange={(value) => handleChange('layout', value)}
+						error={errors.layout}
+					/>
 
-			{/*		<FormComponentSelect*/}
-			{/*			labelText={*/}
-			{/*				translations[*/}
-			{/*					'templates.form_manage.label_page_content_layout'*/}
-			{/*				]*/}
-			{/*			}*/}
-			{/*			id={`${elementIds.content}-layout`}*/}
-			{/*			fieldName="content[layout]"*/}
-			{/*			fieldValue={formValues.content.layout}*/}
-			{/*			options={emailLayouts}*/}
-			{/*			disabled={pending}*/}
-			{/*			onChange={(e) =>*/}
-			{/*				handleChange('content.layout', e.target.value)*/}
-			{/*			}*/}
-			{/*			error={getNestedError(errors, 'content.layout')}*/}
-			{/*		/>*/}
-			{/*	</>*/}
-			{/*)}*/}
+					<FormComponentTextarea<TemplateFormValuesType>
+						id={`${elementIds.content}-html`}
+						labelText={
+							translations[
+								'templates.form_manage.label_email_html'
+							]
+						}
+						fieldName="html"
+						fieldValue={formValues.html}
+						isRequired={true}
+						disabled={pending}
+						onChange={(e) => handleChange('html', e.target.value)}
+						error={errors.html}
+						rows={11}
+					/>
+				</>
+			)}
 		</>
 	);
 }

@@ -21,10 +21,10 @@ import { FormWrapperComponent } from '@/components/form/form-wrapper';
 import { Icons } from '@/components/icon.component';
 import { SuccessComponent } from '@/components/status.component';
 import Routes from '@/config/routes.setup';
+import { createHandleChange } from '@/helpers/form.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
-import {createHandleChange} from "@/helpers/form.helper";
 
 export default function PasswordRecoverChange() {
 	const params = useParams<{ token: string }>();
@@ -51,10 +51,7 @@ export default function PasswordRecoverChange() {
 			debounceDelay: 800,
 		});
 
-	const handleChange = createHandleChange(
-		setFormValues,
-		markFieldAsTouched
-	);
+	const handleChange = createHandleChange(setFormValues, markFieldAsTouched);
 
 	const elementIds = useElementIds(['password', 'passwordConfirm']);
 

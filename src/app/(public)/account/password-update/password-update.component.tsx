@@ -22,11 +22,11 @@ import { Icons } from '@/components/icon.component';
 import { LoadingComponent } from '@/components/status.component';
 import { Button } from '@/components/ui/button';
 import Routes from '@/config/routes.setup';
+import { createHandleChange } from '@/helpers/form.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
 import { useAuth } from '@/providers/auth.provider';
-import {createHandleChange} from "@/helpers/form.helper";
 
 export default function PasswordUpdate() {
 	const { auth, authStatus } = useAuth();
@@ -48,10 +48,7 @@ export default function PasswordUpdate() {
 			debounceDelay: 800,
 		});
 
-	const handleChange = createHandleChange(
-		setFormValues,
-		markFieldAsTouched
-	);
+	const handleChange = createHandleChange(setFormValues, markFieldAsTouched);
 
 	const router = useRouter();
 

@@ -45,6 +45,9 @@ export const DataTablePermissions = (): JSX.Element => {
 					// @ts-expect-error FormManagePermission props are injected at runtime via FormManage
 					update: <FormManagePermission />,
 				}}
+				modalsProps={{
+					create: { size: 'xl' },
+				}}
 			/>
 		</DataTableProvider>
 	);

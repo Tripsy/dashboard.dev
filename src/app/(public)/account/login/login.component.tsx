@@ -27,6 +27,7 @@ import { Button } from '@/components/ui/button';
 import { Modal } from '@/components/ui/modal';
 import Routes, { isExcludedRoute } from '@/config/routes.setup';
 import { formatDate } from '@/helpers/date.helper';
+import { createHandleChange } from '@/helpers/form.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
@@ -35,7 +36,6 @@ import { useAuth } from '@/providers/auth.provider';
 import { useToast } from '@/providers/toast.provider';
 import { removeTokenAccount } from '@/services/account.service';
 import type { AuthTokenListType, AuthTokenType } from '@/types/auth.type';
-import {createHandleChange} from "@/helpers/form.helper";
 
 export default function Login() {
 	const { showToast } = useToast();
@@ -69,10 +69,7 @@ export default function Login() {
 
 	const { translations } = useTranslation(translationsKeys);
 
-	const handleChange = createHandleChange(
-		setFormValues,
-		markFieldAsTouched
-	);
+	const handleChange = createHandleChange(setFormValues, markFieldAsTouched);
 
 	useEffect(() => {
 		if (state.situation === 'success' && router) {

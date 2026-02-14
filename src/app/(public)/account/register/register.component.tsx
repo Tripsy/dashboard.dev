@@ -28,12 +28,12 @@ import {
 } from '@/components/status.component';
 import { Label } from '@/components/ui/label';
 import Routes from '@/config/routes.setup';
+import { createHandleChange } from '@/helpers/form.helper';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
 import { LanguageEnum } from '@/models/user.model';
-import {createHandleChange} from "@/helpers/form.helper";
 
 const languages = Object.values(LanguageEnum).map((language) => ({
 	label: capitalizeFirstLetter(language),
@@ -58,10 +58,7 @@ export default function Register() {
 			debounceDelay: 800,
 		});
 
-	const handleChange = createHandleChange(
-		setFormValues,
-		markFieldAsTouched
-	);
+	const handleChange = createHandleChange(setFormValues, markFieldAsTouched);
 
 	const elementIds = useElementIds([
 		'name',
@@ -193,7 +190,9 @@ export default function Register() {
 					fieldValue={formValues.language}
 					disabled={pending}
 					options={languages}
-					onValueChange={(value) => handleChange('language', value as LanguageEnum)}
+					onValueChange={(value) =>
+						handleChange('language', value as LanguageEnum)
+					}
 					error={errors.language}
 				/>
 

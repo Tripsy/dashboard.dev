@@ -36,7 +36,7 @@ export const DataTableTemplates = (): JSX.Element => {
 			<div className="table-container">
 				<DataTableTemplatesFilters />
 				<DataTableActions />
-				<DataTableList dataKey="id" scrollHeight="400px" />
+				<DataTableList dataKey="id" />
 			</div>
 
 			<DataTableModal

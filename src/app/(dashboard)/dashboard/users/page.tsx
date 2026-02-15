@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import NavBreadcrumbSetter from '@/app/(dashboard)/_components/nav-breadcrumb.setter';
+import BreadcrumbSetter from '@/app/(dashboard)/_components/breadcrumb.setter';
 import type { BreadcrumbType } from '@/app/(dashboard)/_providers/breadcrumb.provider';
 import { DataTableUsers } from '@/app/(dashboard)/dashboard/users/data-table-users.component';
 import { Configuration } from '@/config/settings.config';
@@ -20,7 +20,7 @@ export default async function Page() {
 
 	return (
 		<>
-			<NavBreadcrumbSetter items={items} />
+			<BreadcrumbSetter page="users" items={items} />
 			<DataTableUsers />
 		</>
 	);

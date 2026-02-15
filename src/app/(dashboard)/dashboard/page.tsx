@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import type { Metadata } from 'next';
 import { Card } from 'primereact/card';
-import NavBreadcrumbSetter from '@/app/(dashboard)/_components/nav-breadcrumb.setter';
+import BreadcrumbSetter from '@/app/(dashboard)/_components/breadcrumb.setter';
 import { Button } from '@/components/ui/button';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -105,7 +105,7 @@ const topEntries = [
 export default async function Page() {
 	return (
 		<>
-			<NavBreadcrumbSetter items={[]} />
+			<BreadcrumbSetter page={null} items={[]} />
 
 			{/* Stats grid */}
 			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">

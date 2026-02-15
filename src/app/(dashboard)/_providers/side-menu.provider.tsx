@@ -7,14 +7,13 @@ import {
 	useLayoutEffect,
 	useState,
 } from 'react';
-import { isLargeScreen } from '@/helpers/window.helper';
 
-type Status = 'open' | 'closed';
+type MenuState = 'open' | 'closed';
 
 const SideMenuContext = createContext<
 	| {
-			status: Status;
-			toggle: () => void;
+			menuState: MenuState;
+			menuToggle: () => void;
 			open: () => void;
 			close: () => void;
 	  }
@@ -22,38 +21,21 @@ const SideMenuContext = createContext<
 >(undefined);
 
 const SideMenuProvider = ({ children }: { children: ReactNode }) => {
-	const [status, setStatus] = useState<Status>('open');
+	const [menuState, setMenuState] = useState<MenuState>('open');
 
 	useLayoutEffect(() => {
-		let status: Status;
+		const saved = localStorage.getItem('side-menu-state') as MenuState;
 
-		if (isLargeScreen()) {
-			const saved = localStorage.getItem(
-				'_providers-side-menu',
-			) as Status;
-
-			status = saved || 'open';
-		} else {
-			status = 'closed';
-		}
-
-		setStatus(status);
+		setMenuState(saved || 'open');
 	}, []);
 
-	// On route change, close menu on small screens
-	useLayoutEffect(() => {
-		if (!isLargeScreen()) {
-			setStatus('closed');
-		}
-	}, []);
-
-	const setAndPersist = (next: Status) => {
-		setStatus(next);
-		localStorage.setItem('_providers-side-menu', next);
+	const setAndPersist = (next: MenuState) => {
+		setMenuState(next);
+		localStorage.setItem('side-menu-state', next);
 	};
 
-	const toggle = () => {
-		setAndPersist(status === 'open' ? 'closed' : 'open');
+	const menuToggle = () => {
+		setAndPersist(menuState === 'open' ? 'closed' : 'open');
 	};
 
 	const open = () => setAndPersist('open');
@@ -62,8 +44,8 @@ const SideMenuProvider = ({ children }: { children: ReactNode }) => {
 	return (
 		<SideMenuContext.Provider
 			value={{
-				status,
-				toggle,
+				menuState,
+				menuToggle,
 				open,
 				close,
 			}}

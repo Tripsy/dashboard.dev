@@ -36,7 +36,7 @@ export const DataTableLogHistory = (): JSX.Element => {
 			<div className="table-container">
 				<DataTableLogHistoryFilters />
 				<DataTableActions />
-				<DataTableList dataKey="id" scrollHeight="400px" />
+				<DataTableList dataKey="id" />
 			</div>
 
 			<DataTableModal

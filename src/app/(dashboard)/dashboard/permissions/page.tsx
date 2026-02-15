@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
-import NavBreadcrumbSetter from '@/app/(dashboard)/_components/nav-breadcrumb.setter';
+import BreadcrumbSetter from '@/app/(dashboard)/_components/breadcrumb.setter';
 import type { BreadcrumbType } from '@/app/(dashboard)/_providers/breadcrumb.provider';
 import { DataTablePermissions } from '@/app/(dashboard)/dashboard/permissions/data-table-permissions.component';
-import Routes from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
 import { translate } from '@/config/translate.setup';
 
@@ -16,16 +15,12 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Page() {
 	const items: BreadcrumbType[] = [
-		{
-			label: await translate('dashboard.labels.dashboard'),
-			href: Routes.get('dashboard'),
-		},
 		{ label: await translate('dashboard.labels.permissions') },
 	];
 
 	return (
 		<>
-			<NavBreadcrumbSetter items={items} />
+			<BreadcrumbSetter page="permissions" items={items} />
 			<DataTablePermissions />
 		</>
 	);

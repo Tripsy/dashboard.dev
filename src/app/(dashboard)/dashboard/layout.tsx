@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import type { JSX } from 'react';
-import { NavBreadcrumb } from '@/app/(dashboard)/_components/nav-breadcrumb.component';
+import { Breadcrumb } from '@/app/(dashboard)/_components/breadcrumb.component';
+import DashboardMain from '@/app/(dashboard)/_components/dashboard-main.component';
 import { SideMenu } from '@/app/(dashboard)/_components/side-menu.component';
-import SideMenuSetter from '@/app/(dashboard)/_components/side-menu.setter';
 import { DashboardProvider } from '@/app/(dashboard)/_providers/dashboard.provider';
 import { LogoComponent } from '@/components/layout/logo.default';
 import { UserMenu } from '@/components/layout/user-menu.component';
@@ -10,12 +10,14 @@ import ProtectedRoute from '@/components/protected-route.component';
 import { ToggleTheme } from '@/components/toggle-theme';
 import Routes, { RouteAuth } from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
+import {SideMenuToggle} from "@/app/(dashboard)/_components/side-menu-toggle.component";
 
 function Header() {
 	return (
 		<header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-			<div className="container-dashboard mx-4 md:mx-16">
-				<div className="flex items-center h-16">
+			<div className="container-dashboard mx-4">
+				<div className="flex items-center h-16 gap-2">
+					<SideMenuToggle />
 					<Link
 						href={Routes.get('home')}
 						className="flex items-center gap-2"
@@ -26,8 +28,8 @@ function Header() {
 						</span>
 					</Link>
 
-					<div className="w-full pl-28">
-						<NavBreadcrumb />
+					<div className="w-full pl-26">
+						<Breadcrumb />
 					</div>
 
 					<div className="flex items-center gap-2">
@@ -46,14 +48,13 @@ export default async function Layout({ children }: { children: JSX.Element }) {
 			<div className="dashboard-layout min-h-screen bg-background">
 				<Header />
 				<ProtectedRoute routeAuth={RouteAuth.PROTECTED}>
-					<SideMenuSetter />
-					<main className="main-section">
+					<DashboardMain>
 						<SideMenu />
 						<div className="container-dashboard">
-							<NavBreadcrumb />
+							<Breadcrumb />
 							{children}
 						</div>
-					</main>
+					</DashboardMain>
 				</ProtectedRoute>
 			</div>
 		</DashboardProvider>

@@ -325,7 +325,7 @@ export default function DataTableList<Model extends DataTableValue>(props: {
 			loading={isLoading}
 			stripedRows
 			scrollable
-			scrollHeight={props.scrollHeight || 'flex'}
+			scrollHeight={props.scrollHeight}
 			resizableColumns
 			reorderableColumns
 			stateStorage="local"

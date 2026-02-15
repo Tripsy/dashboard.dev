@@ -35,7 +35,7 @@ export const DataTableLogData = (): JSX.Element => {
 			<div className="table-container">
 				<DataTableLogDataFilters />
 				<DataTableActions />
-				<DataTableList dataKey="id" scrollHeight="400px" />
+				<DataTableList dataKey="id" />
 			</div>
 
 			<DataTableModal

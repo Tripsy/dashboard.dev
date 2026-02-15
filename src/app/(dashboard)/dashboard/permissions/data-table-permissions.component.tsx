@@ -35,7 +35,7 @@ export const DataTablePermissions = (): JSX.Element => {
 			<div className="table-container">
 				<DataTablePermissionsFilters />
 				<DataTableActions />
-				<DataTableList dataKey="id" scrollHeight="400px" />
+				<DataTableList dataKey="id" />
 			</div>
 
 			<DataTableModal

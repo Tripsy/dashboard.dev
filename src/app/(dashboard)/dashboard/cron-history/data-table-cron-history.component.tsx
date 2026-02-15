@@ -35,7 +35,7 @@ export const DataTableCronHistory = (): JSX.Element => {
 			<div className="table-container">
 				<DataTableCronHistoryFilters />
 				<DataTableActions />
-				<DataTableList dataKey="id" scrollHeight="400px" />
+				<DataTableList dataKey="id" />
 			</div>
 
 			<DataTableModal

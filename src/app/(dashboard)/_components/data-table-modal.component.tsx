@@ -3,7 +3,7 @@
 import type React from 'react';
 import { useEffect, useMemo } from 'react';
 import { useStore } from 'zustand/react';
-import { ActionManage } from '@/app/(dashboard)/_components/action-manage.component';
+import { DataTableActionManage } from '@/app/(dashboard)/_components/data-table-action-manage.component';
 import { FormManage } from '@/app/(dashboard)/_components/form-manage.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import { Modal, type ModalSizeType } from '@/components/ui/modal';
@@ -114,7 +114,7 @@ export function DataTableModal<
 				</FormManage>
 			)}
 			{actionMode === 'action' && (
-				<ActionManage key={`action-${actionName}`} />
+				<DataTableActionManage key={`action-${actionName}`} />
 			)}
 		</Modal>
 	);

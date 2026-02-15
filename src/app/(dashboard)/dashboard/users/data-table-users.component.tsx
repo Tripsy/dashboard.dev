@@ -37,7 +37,7 @@ export const DataTableUsers = (): JSX.Element => {
 			<div className="table-container">
 				<DataTableUsersFilters />
 				<DataTableActions />
-				<DataTableList dataKey="id" scrollHeight="400px" />
+				<DataTableList dataKey="id" />
 			</div>
 
 			<DataTableModal

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useBreadcrumb } from '@/app/(dashboard)/_providers/breadcrumb.provider';
 import Routes from '@/config/routes.setup';
 
-export const NavBreadcrumb = () => {
+export const Breadcrumb = () => {
 	const { items } = useBreadcrumb();
 
 	if (!items.length) {

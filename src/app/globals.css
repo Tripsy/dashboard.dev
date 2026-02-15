@@ -292,34 +292,32 @@
 		@apply hidden md:block;
 	}
 
-	.dashboard-layout .main-section .container-dashboard {
-		@apply mx-auto w-full m-8 px-4 sm:px-6 lg:px-8;
+	.dashboard-layout .main-section .breadcrumb-container {
+		@apply block pb-4 md:hidden;
 	}
 
-	.dashboard-layout .main-section .breadcrumb-container {
-		@apply block md:hidden;
+	.dashboard-layout .main-section .container-dashboard {
+		@apply mx-auto w-full;
 	}
 
 	.dashboard-layout .main-section {
-		@apply min-h-[calc(100vh-4rem)] pt-4 pb-8 transition-all duration-300 ml-64;
+		@apply min-h-[calc(100vh-4rem)] p-4 sm:p-6 lg:p-8 transition-all duration-300 ml-64;
 	}
 
 	.dashboard-layout .main-section.side-menu-closed {
 		@apply ml-16;
 	}
 
-	.dashboard-layout .main-section .side-menu-section {
-		/*@apply fixed left-0 z-80 transition-all duration-400 p-6;*/
+	.dashboard-layout .main-section .side-menu-container {
 		@apply fixed left-0 top-16 h-[calc(100vh-4rem)] z-40 border-r border-sidebar-border bg-sidebar-background transition-all duration-300 w-64;
 	}
 
-	.dashboard-layout .main-section.side-menu-closed .side-menu-section {
-		/*left: calc(-1 * var(--side-menu-width));*/
+	.dashboard-layout .main-section.side-menu-closed .side-menu-container {
 		@apply w-16;
 	}
 
-	.dashboard-layout .main-section .side-menu-section .side-menu-content {
-		@apply flex-1;
+	.dashboard-layout .main-section .side-menu-container .side-menu-content {
+		@apply flex-1 px-2 py-4 space-y-1;
 	}
 
 	.dashboard-layout .table-container {

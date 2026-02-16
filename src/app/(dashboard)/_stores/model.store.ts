@@ -8,7 +8,7 @@ import {
 	type DataTableStateType,
 	getDataSourceConfig,
 } from '@/config/data-source.config';
-import { registerDashboardDataSource } from '@/config/data-source.dashboard.register';
+import { registerDashboardDataSource } from '@/config/data-source.register';
 
 registerDashboardDataSource();
 

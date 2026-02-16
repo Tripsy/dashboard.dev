@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { LogoComponent } from '@/components/layout/logo.default';
 import { UserMenu } from '@/components/layout/user-menu.component';
-import { ToggleTheme } from '@/components/toggle-theme';
+import { ToggleTheme } from '@/components/layout/toggle-theme';
 import { Button } from '@/components/ui/button';
 import Routes from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';

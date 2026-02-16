@@ -51,7 +51,6 @@
 		"@types/react-dom": "^19.2.3",
 		"@types/sanitize-html": "^2.16.0",
 		"autoprefixer": "^10.4.24",
-		"daisyui": "^5.5.18",
 		"madge": "^8.0.0",
 		"tailwindcss": "^4.1.18",
 		"typescript": "^5.9.3"

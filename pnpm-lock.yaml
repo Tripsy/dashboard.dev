@@ -123,9 +123,6 @@ importers:
       autoprefixer:
         specifier: ^10.4.24
         version: 10.4.24(postcss@8.5.6)
-      daisyui:
-        specifier: ^5.5.18
-        version: 5.5.18
       madge:
         specifier: ^8.0.0
         version: 8.0.0(typescript@5.9.3)
@@ -1172,9 +1169,6 @@ packages:
 
   csstype@3.2.3:
     resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
-
-  daisyui@5.5.18:
-    resolution: {integrity: sha512-VVzjpOitMGB6DWIBeRSapbjdOevFqyzpk9u5Um6a4tyId3JFrU5pbtF0vgjXDth76mJZbueN/j9Ok03SPrh/og==}
 
   date-fns-jalali@4.1.0-0:
     resolution: {integrity: sha512-hTIP/z+t+qKwBDcmmsnmjWTduxCg+5KfdqWQvb2X/8C9+knYY6epN/pfxdDuyVlSVeFz0sM5eEfwIUQ70U4ckg==}
@@ -2905,8 +2899,6 @@ snapshots:
   css-mediaquery@0.1.2: {}
 
   csstype@3.2.3: {}
-
-  daisyui@5.5.18: {}
 
   date-fns-jalali@4.1.0-0: {}
 

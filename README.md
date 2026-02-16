@@ -6,12 +6,11 @@ This boilerplate provide implementation for authentication system and include an
 
 The codebase is fully typed in **TypeScript** — no as any shortcuts. **Biome** (on top of ESLint) ensures code quality.
 
-At this date (e.g.: 2026 January), all [dependencies](#Dependencies) are updated to their latest versions, and Node.js 22 is supported.
+At this date (e.g.: 2026 February), all [dependencies](#Dependencies) are updated to their latest versions, and Node.js 22 is supported.
 
 A ready-to-use Docker environment is provided for quick [setup](#Setup).
 
 This project is still a work in progress, and the next goals are:
-- Improve the UI/UX
 - Include additional [NReady](https://github.com/Tripsy/nready) features in the administration dashboard
 
 Meanwhile, we're open to suggestions / feedback, and if you find this project useful, please consider giving it a star ⭐
@@ -103,18 +102,41 @@ $ pnpm run madge
 ├── docker/
 ├── public/
 ├── src/
-│   ├── app/            
-│   ├── components/            # Common components
-│   │   ├── form/    # Form related components
+│   ├── app/    
+│   │   ├── (dashboard)/   # Dashboard related     
+│   │   ├── (public)/  
+│   │   │   ├── account/ 
+│   │   │   ├── docs/ 
+│   │   │   ├── page/ 
+│   │   │   ├── status/ 
+│   │   │   ├── layout.tsx # Public specific layout
+│   │   │   ├── page.tsx
+│   │   ├── api/  
+│   │   │   ├── csrf/ 
+│   │   │   ├── language/ 
+│   │   │   ├── proxy/ 
+│   │   │   ├── error.tsx 
+│   │   │   ├── global.css
+│   │   │   ├── layout.css  # Base layout
+│   │   │   ├── providers.tsx # Base providers
+│   ├── components/        # Common components
+│   │   ├── form/          # Form related components
+│   │   ├── layout/        # Layout components
+│   │   │   ├── footer-default.component.tsx
+│   │   │   ├── header-default.component.tsx
+│   │   │   ├── logo-default.component.tsx
+│   │   │   ├── toggle-theme.component.tsx
+│   │   │   ├── user-menu.component.tsx
+│   │   ├── ui/            # UI related components
 │   │   ├── icon.component.tsx
-│   │   ├── footer.default.tsx
+│   │   ├── protected-route.component.tsx
 │   │   ├── status.component.tsx
-        ???
 │   ├── config/            # Configuration files
-│   │   ├── data-source.config.ts # (dashboard) data source configuration
+│   │   ├── data-source.config.ts
+│   │   ├── data-source.register.ts
 │   │   ├── daysjs.config.ts 
 │   │   ├── init-redis.config.ts 
-│   │   ├── routes.config.ts # Routes related helpers & configuration
+│   │   ├── routes.setup.ts
 │   │   ├── settings.config.ts 
 │   │   ├── translate.setup.ts 
 │   ├── exceptions/        # Custom error classes
@@ -124,7 +146,9 @@ $ pnpm run madge
 │   ├── models/            # Models (entities) related to (dashboard)
 │   ├── provider/           
 │   │   ├── auth.provider.tsx 
-        ???
+│   │   ├── prime.provider.tsx 
+│   │   ├── theme.provider.tsx 
+│   │   ├── toast.provider.tsx 
 │   ├── services/          # Back-end (eg: NReady) services
 │   │   ├── account.service.ts
 │   │   ├── auth.service.ts
@@ -132,8 +156,10 @@ $ pnpm run madge
 │   ├── types/             # Some types
 │   └── proxy.ts           
 ├── .env
-├── docker-compose.yml
+├── .madgerc
 ├── biome.json
+├── docker-compose.yml
+├── next.config.ts
 └── tsconfig.json
 ```
 
@@ -150,7 +176,7 @@ $ pnpm run madge
     - data-table-cars-filters.component.tsx
 3. Update `src/config/data-source.config.ts`
     - export type DataSourceKey
-4. Update `src/config/data-source.dashboard.register.ts`
+4. Update `src/config/data-source.register.ts`
     - add `registerDataSource('cars', dataSourceConfigCars)`
 5. Add `cars.json` to `src/locales/[language]` & update src/locales/en/index.ts
 6. Update `Routes.group('dashboard')` in `src/config/routes.setup.ts`
@@ -164,12 +190,6 @@ $ pnpm run madge
 # TODO
 
 1. Operator permissions error while trying to update
-2. fresh design
-    - docs page
-    - features page
-    - changelog page 
-3. Review Readme > How to section 
-4. Recreate docker image
 
 # Bugs & Issues & Ideas
 
@@ -204,6 +224,7 @@ Dev only:
 - [typescript](https://www.typescriptlang.org/)
 - [tailwindcss](https://tailwindcss.com/)
 - [madge](https://github.com/pahen/madge) — Helps finding circular dependencies
+- [biome](https://biomejs.dev/) — Biome is a fast formatter for JavaScript, TypeScript, JSX, TSX, JSON, HTML, CSS and GraphQL
 
 # RESOURCES
 

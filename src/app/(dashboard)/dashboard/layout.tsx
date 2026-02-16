@@ -8,7 +8,7 @@ import { DashboardProvider } from '@/app/(dashboard)/_providers/dashboard.provid
 import { LogoComponent } from '@/components/layout/logo.default';
 import { UserMenu } from '@/components/layout/user-menu.component';
 import ProtectedRoute from '@/components/protected-route.component';
-import { ToggleTheme } from '@/components/toggle-theme';
+import { ToggleTheme } from '@/components/layout/toggle-theme';
 import Routes, { RouteAuth } from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
 

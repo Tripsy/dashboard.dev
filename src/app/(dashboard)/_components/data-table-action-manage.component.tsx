@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useStore } from 'zustand/react';
 import { DataTableActionButton } from '@/app/(dashboard)/_components/data-table-action-button.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
@@ -16,6 +16,8 @@ import ValueError from '@/exceptions/value.error';
 import { replaceVars } from '@/helpers/string.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { useToast } from '@/providers/toast.provider';
+import {Button} from "@/components/ui/button";
+import {Icons} from "@/components/icon.component";
 
 function displayActionEntries<K extends DataSourceKey, Model>(
 	dataSource: K,
@@ -191,15 +193,16 @@ export function DataTableActionManage<
 			</p>
 
 			<div className="flex justify-end gap-3">
-				<button
-					type="button"
+				<Button
+					variant="outline"
+					hover="warning"
 					onClick={handleClose}
 					title="Cancel"
-					className="btn btn-action-cancel"
 					disabled={isLoading}
 				>
+					<Icons.Action.Cancel />
 					Cancel
-				</button>
+				</Button>
 				<DataTableActionButton
 					key={`button-modal-${actionName}`}
 					dataSource={dataSource}

@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { Configuration } from '@/config/settings.config';
 import { translateBatch } from '@/config/translate.setup';
 import { LanguageEnum } from '@/models/user.model';
-import type { FormSituationType } from '@/types';
+import {FormSituationType} from "@/types/form.type";
 
 export type RegisterFormFieldsType = {
 	name: string;

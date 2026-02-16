@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { translateBatch } from '@/config/translate.setup';
-import type { FormSituationType } from '@/types';
+import {FormSituationType} from "@/types/form.type";
 
 export type AccountDeleteFormFieldsType = {
 	password_current: string;

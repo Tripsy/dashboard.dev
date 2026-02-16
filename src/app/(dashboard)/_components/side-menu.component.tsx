@@ -1,6 +1,7 @@
 'use client';
 
-import { ArrowDown, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Tooltip } from '@radix-ui/react-tooltip';
+import { ArrowDown, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import React, {
 	type ComponentType,
@@ -15,6 +16,11 @@ import {
 import { useSideMenu } from '@/app/(dashboard)/_providers/side-menu.provider';
 import { Icons } from '@/components/icon.component';
 import { Button } from '@/components/ui/button';
+import {
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from '@/components/ui/tooltip';
 import type { DataSourceKey } from '@/config/data-source.config';
 import Routes from '@/config/routes.setup';
 import { cn } from '@/helpers/css.helper';
@@ -22,8 +28,6 @@ import { useDebouncedEffect } from '@/hooks/use-debounced-effect.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { hasPermission } from '@/models/auth.model';
 import { useAuth } from '@/providers/auth.provider';
-import {Tooltip} from "@radix-ui/react-tooltip";
-import {TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
 
 type SideMenuSectionProps = {
 	isExpanded?: boolean;
@@ -63,7 +67,7 @@ type SectionStateType = 'expanded' | 'collapsed';
 
 export function SideMenu() {
 	const { auth } = useAuth();
-	const { menuState, menuToggle } = useSideMenu();
+	const { menuState } = useSideMenu();
 	const { selectedPage } = useBreadcrumb();
 
 	const translationsKeys = useMemo(
@@ -193,22 +197,10 @@ export function SideMenu() {
 	return (
 		<div className="side-menu-container">
 			<div className="flex flex-col h-full">
-				{/*<div className="flex justify-end p-2">*/}
-				{/*	<Button*/}
-				{/*		variant="ghost"*/}
-				{/*		onClick={menuToggle}*/}
-				{/*		className="h-8 w-8 rounded-md"*/}
-				{/*	>*/}
-				{/*		{menuState === 'closed' ? (*/}
-				{/*			<ChevronRight className="h-4 w-4" />*/}
-				{/*		) : (*/}
-				{/*			<ChevronLeft className="h-4 w-4" />*/}
-				{/*		)}*/}
-				{/*	</Button>*/}
-				{/*</div>*/}
-
 				<nav aria-description="Side menu" className="side-menu-content">
-					{menuState === 'open' ? menuContent : (
+					{menuState === 'open' ? (
+						menuContent
+					) : (
 						<TooltipProvider delayDuration={0}>
 							{menuContent}
 						</TooltipProvider>
@@ -341,23 +333,25 @@ function SideMenuClosedSection({
 	text,
 	icon: SectionIcon,
 	items,
-	selectedPage
+	selectedPage,
 }: SideMenuClosedSectionProps) {
 	if (items.length === 0) {
 		return null;
 	}
 
-	const isSelected: boolean = items.some((item) => item.page === selectedPage);
+	const isSelected: boolean = items.some(
+		(item) => item.page === selectedPage,
+	);
 
 	return (
 		<Tooltip key={`tooltip-${label}`} delayDuration={0}>
 			<TooltipTrigger asChild>
 				<div
 					className={cn(
-						"flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group",
+						'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group',
 						isSelected
-							? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-							: "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+							? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
+							: 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground',
 					)}
 					aria-description={text}
 				>
@@ -369,7 +363,11 @@ function SideMenuClosedSection({
 					/>
 				</div>
 			</TooltipTrigger>
-			<TooltipContent side="right" align="start" className="flex items-center gap-2">
+			<TooltipContent
+				side="right"
+				align="start"
+				className="flex items-center gap-2"
+			>
 				<ul className="py-1">
 					{items.map((item) => (
 						<li key={`side-menu-item-${item.page}`}>

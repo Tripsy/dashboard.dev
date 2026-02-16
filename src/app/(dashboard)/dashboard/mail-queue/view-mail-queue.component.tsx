@@ -168,7 +168,6 @@ export function ViewMailQueue() {
 						<span className="font-semibold">
 							{translations['mail-queue.view.label_vars']}
 						</span>{' '}
-						{/*TODO: security issues - sensitive information are displayed here*/}
 						{JSON.stringify(content.vars, null, 2)}
 					</div>
 				</div>

@@ -29,7 +29,6 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import type { FilterValueType } from '@/config/data-source.config';
 import { cn } from '@/helpers/css.helper';
 import { formatDate, toDateInstance } from '@/helpers/date.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
@@ -128,7 +127,7 @@ const useFieldState = ({
 	value,
 	error,
 }: {
-	value?: FilterValueType;
+	value?: string | number | boolean | Date | null;
 	error?: string[];
 }) => {
 	if (error?.length) {

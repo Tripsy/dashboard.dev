@@ -167,7 +167,7 @@ $ pnpm run madge
 
 ## Adding new model for `dashboard` (ex: `cars`)
 
-1. Create `lib/entities/cars.model.ts` from `lib/entities/users.model.ts`
+1. Create `models/cars.model.ts` from `models/users.model.ts`
 2. Duplicate `src/(dashboard)/dashboard/users` > `src/(dashboard)/dashboard/cars` & rename files
     - page.tsx
     - cars.definition.ts

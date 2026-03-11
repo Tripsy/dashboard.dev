@@ -36,12 +36,10 @@ export type UserModel<D = Date | string> = {
 	deleted_at: D;
 };
 
-export type UserFormValuesType = {
-	name: string;
-	email: string;
+export type UserFormValuesType = Pick<
+	UserModel,
+	'name' | 'email' | 'language' | 'role' | 'operator_type'
+> & {
 	password?: string;
 	password_confirm?: string;
-	language: LanguageEnum;
-	role: UserRoleEnum;
-	operator_type: UserOperatorTypeEnum | null;
 };

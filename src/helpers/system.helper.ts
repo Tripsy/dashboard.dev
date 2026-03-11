@@ -1,4 +1,16 @@
+import path from 'node:path';
 import { headers } from 'next/headers';
+
+export const ROOT_PATH = process.cwd();
+export const SRC_PATH = path.join(ROOT_PATH, 'src');
+
+export function buildSrcPath(...args: string[]) {
+	return path.join(SRC_PATH, ...args);
+}
+
+export function getErrorMessage(error: unknown): string {
+	return error instanceof Error ? error.message : String(error);
+}
 
 export async function getClientIp(
 	headersProvided?: Headers,

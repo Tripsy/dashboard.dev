@@ -40,14 +40,12 @@ export type TemplateModel<D = Date | string> = {
 	deleted_at: D;
 };
 
-export type TemplateFormValuesType = {
-	label: string;
-	language: LanguageEnum;
-	type: TemplateTypeEnum;
-
+export type TemplateFormValuesType = Pick<
+	TemplateModel,
+	'label' | 'language' | 'type'
+> & {
 	subject?: string; // Email specific
 	title?: string; // Page specific
-
 	layout: TemplateLayoutEmailEnum | TemplateLayoutPageEnum;
 	html: string;
 };

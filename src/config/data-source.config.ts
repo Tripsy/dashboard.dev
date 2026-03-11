@@ -180,7 +180,10 @@ export type DataSourceKey =
 	| 'mail-queue'
 	| 'permissions'
 	| 'templates'
-	| 'users';
+	| 'users'
+	| 'clients'
+	| 'places'
+	| 'brands';
 
 const dataSourceConfig: Partial<
 	// biome-ignore lint/suspicious/noExplicitAny: Concrete types are enforced at the public API boundary (register/get),

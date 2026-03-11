@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { translateBatch } from '@/config/translate.setup';
-import {FormSituationType} from "@/types/form.type";
+import type { FormSituationType } from '@/types/form.type';
 
 export type PasswordRecoverFormFieldsType = {
 	email: string;

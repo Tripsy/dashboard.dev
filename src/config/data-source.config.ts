@@ -6,7 +6,7 @@ import type {
 } from '@/components/ui/button';
 import type { ValidateFormFunctionType } from '@/hooks/use-form-validation.hook';
 import type { ApiResponseFetch } from '@/types/api.type';
-import {FormSituationType} from "@/types/form.type";
+import type { FormSituationType } from '@/types/form.type';
 
 // ============================================================================
 // API Function Types

@@ -189,7 +189,7 @@ $ pnpm run madge
 
 # TODO
 
-1. Operator permissions error while trying to update
+1. Displayed dates should be converted to local TZ
 
 # Bugs & Issues & Ideas
 

@@ -6,16 +6,6 @@ import {
 
 type Settings = { [key: string]: ObjectValue };
 
-let settings: Settings;
-
-function getSettings(): Settings {
-	if (!settings) {
-		settings = loadSettings();
-	}
-
-	return settings;
-}
-
 function loadSettings(): Settings {
 	return {
 		app: {
@@ -64,12 +54,24 @@ function loadSettings(): Settings {
 		cache: {
 			ttl: process.env.CACHE_TTL || 60,
 		},
+		mail: {
+			provider: process.env.MAIL_PROVIDER || 'smtp', // 'smtp' or 'ses'
+			from: {
+				name: process.env.MAIL_FROM_NAME || 'NReady',
+				address: process.env.MAIL_FROM_ADDRESS || 'engine@play-zone.ro',
+			},
+			host: process.env.MAIL_HOST,
+			port: parseInt(process.env.MAIL_PORT || '2525', 10),
+			encryption: process.env.MAIL_ENCRYPTION === 'true',
+			username: process.env.MAIL_USERNAME || '',
+			password: process.env.MAIL_PASSWORD || '',
+		},
 	};
 }
 
 export const Configuration = {
 	get: <T = ObjectValue>(key: string): T | undefined => {
-		const value = getObjectValue(getSettings(), key);
+		const value = getObjectValue(loadSettings(), key);
 
 		if (value === undefined) {
 			console.warn(`Configuration key not found: ${key}`);
@@ -79,7 +81,7 @@ export const Configuration = {
 	},
 
 	set: (key: string, value: ObjectValue): void => {
-		const success = setObjectValue(getSettings(), key, value);
+		const success = setObjectValue(loadSettings(), key, value);
 
 		if (!success) {
 			console.warn(`Failed to set configuration key: ${key}`);
@@ -93,7 +95,7 @@ export const Configuration = {
 	},
 
 	environment: () => {
-		return Configuration.get('app.env') as string;
+		return Configuration.get('app.environment') as string;
 	},
 
 	isEnvironment: (value: string) => {

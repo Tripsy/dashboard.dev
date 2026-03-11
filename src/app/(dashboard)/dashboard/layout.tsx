@@ -6,9 +6,9 @@ import { SideMenu } from '@/app/(dashboard)/_components/side-menu.component';
 import { SideMenuToggle } from '@/app/(dashboard)/_components/side-menu-toggle.component';
 import { DashboardProvider } from '@/app/(dashboard)/_providers/dashboard.provider';
 import { LogoComponent } from '@/components/layout/logo.default';
+import { ToggleTheme } from '@/components/layout/toggle-theme';
 import { UserMenu } from '@/components/layout/user-menu.component';
 import ProtectedRoute from '@/components/protected-route.component';
-import { ToggleTheme } from '@/components/layout/toggle-theme';
 import Routes, { RouteAuth } from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
 

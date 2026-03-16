@@ -63,7 +63,7 @@ docker compose up
 Once the container is running, connect to it with:
 
 ```
-docker exec -it dashboard.dev /bin/bash
+docker exec -it dashboard.test /bin/bash
 ```
 
 ### 4. Install dependencies inside the container

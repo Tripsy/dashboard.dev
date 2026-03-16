@@ -1,7 +1,7 @@
 'use client';
 
 import clsx from 'clsx';
-import { type ComponentType, type JSX, useMemo } from 'react';
+import React, { type ComponentType, type JSX, useMemo } from 'react';
 import { Icons } from '@/components/icon.component';
 import { Badge, type BadgeVariant } from '@/components/ui/badge';
 import { formatDate } from '@/helpers/date.helper';

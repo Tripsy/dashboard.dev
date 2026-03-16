@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { formatDate } from '@/helpers/date.helper';
-import { capitalizeFirstLetter, parseJson } from '@/helpers/string.helper';
+import {parseJson} from '@/helpers/string.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import type { TemplateModel } from '@/models/template.model';
 
@@ -13,16 +13,6 @@ export function TemplateDetails({
 		() =>
 			[
 				'dashboard.text.no_entry_selected',
-				'templates.view.section_details',
-				'templates.view.label_id',
-				'templates.view.label_label',
-				'templates.view.label_language',
-				'templates.view.label_type',
-				'templates.view.section_timestamps',
-				'templates.view.label_created_at',
-				'templates.view.label_updated_at',
-				'templates.view.label_deleted_at',
-				'templates.view.section_content',
 			] as const,
 		[],
 	);
@@ -37,81 +27,61 @@ export function TemplateDetails({
 		);
 	}
 
-	const {
-		id,
-		label,
-		language,
-		type,
-		content,
-		created_at,
-		updated_at,
-		deleted_at,
-	} = entry;
-
-	const parsedContent = parseJson(content);
+	const parsedContent = parseJson(entry.content);
 
 	return (
 		<div className="space-y-6">
-			<div>
-				<h3 className="font-bold border-b border-line pb-2 mb-3">
-					{translations['templates.view.section_details']}
-				</h3>
-				<div className="ml-4 space-y-1 text-sm">
-					<div>
-						<span className="font-semibold">
-							{translations['templates.view.label_id']}
-						</span>{' '}
-						{id}
-					</div>
-					<div>
-						<span className="font-semibold">
-							{translations['templates.view.label_label']}
-						</span>{' '}
-						{label}
-					</div>
-					<div>
-						<span className="font-semibold">
-							{translations['templates.view.label_language']}
-						</span>{' '}
-						{language}
-					</div>
-					<div>
-						<span className="font-semibold">
-							{translations['templates.view.label_type']}
-						</span>{' '}
-						{capitalizeFirstLetter(type)}
-					</div>
+			<div className="space-y-1">
+				<div>
+					<span className="font-semibold">
+						ID
+					</span>{' '}
+					{entry.id}
+				</div>
+				<div>
+					<span className="font-semibold">
+						Label
+					</span>{' '}
+					{entry.label}
+				</div>
+				<div>
+					<span className="font-semibold">
+						Language
+					</span>{' '}
+					{entry.language}
+				</div>
+				<div>
+					<span className="font-semibold">
+						Type
+					</span>{' '}
+					{entry.type}
 				</div>
 			</div>
 
 			<div>
 				<h3 className="font-bold border-b border-line pb-2 mb-3">
-					{translations['templates.view.section_timestamps']}
+					Timestamps
 				</h3>
 				<div className="ml-4 space-y-1 text-sm">
 					<div>
 						<span className="font-semibold">
-							{translations['templates.view.label_created_at']}
+							Created At
 						</span>{' '}
-						{formatDate(created_at, 'date-time')}
+						{formatDate(entry.created_at, 'date-time')}
 					</div>
 					<div>
 						<span className="font-semibold">
-							{translations['templates.view.label_updated_at']}
+							Updated At
 						</span>{' '}
-						{formatDate(updated_at, 'date-time')}
+						{formatDate(entry.updated_at, 'date-time')}
 					</div>
-					{deleted_at && (
+					{entry.deleted_at && (
 						<div>
 							<span className="font-semibold">
-								{
-									translations[
-										'templates.view.label_deleted_at'
-									]
-								}
+								Deleted At
 							</span>{' '}
 							<span className="text-red-500">
-								{formatDate(deleted_at, 'date-time')}
+								{formatDate(entry.deleted_at, 'date-time')}
 							</span>
 						</div>
 					)}
@@ -121,13 +91,13 @@ export function TemplateDetails({
 			{parsedContent && (
 				<div>
 					<h3 className="font-bold border-b border-line pb-2 mb-3">
-						{translations['templates.view.section_content']}
+						Content
 					</h3>
 					<div className="ml-4 space-y-1">
 						{Object.entries(parsedContent).map(([key, value]) => (
 							<div key={key}>
 								<span className="font-semibold capitalize">
-									{key}:
+									{key}
 								</span>{' '}
 								<span>
 									{typeof value === 'object'

@@ -34,18 +34,5 @@
 		"label_action": "Action",
 		"label_source": "Source",
 		"label_recorded_at": "Recorded At"
-	},
-	"view": {
-		"section_info": "Info",
-		"section_details": "Details",
-		"label_id": "ID:",
-		"label_request_id": "Request ID:",
-		"label_entity": "Entity:",
-		"label_entity_id": "Entity ID:",
-		"label_action": "Action:",
-		"label_auth_id": "Auth ID:",
-		"label_performed_by": "Performed By:",
-		"label_source": "Source:",
-		"label_recorded_at": "Recorded At:"
 	}
 }

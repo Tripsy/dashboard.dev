@@ -8,7 +8,6 @@ import { Icons } from '@/components/icon.component';
 import type { FormManageType } from '@/config/data-source.config';
 import { capitalizeFirstLetter, toKebabCase } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
-import { useTranslation } from '@/hooks/use-translation.hook';
 import {
 	type TemplateFormValuesType,
 	TemplateLayoutEmailEnum,
@@ -37,31 +36,13 @@ export function FormManageTemplate({
 	handleChange,
 	pending,
 }: FormManageType<TemplateFormValuesType>) {
-	const translationsKeys = useMemo(
-		() =>
-			[
-				'templates.form_manage.label_label',
-				'templates.form_manage.label_language',
-				'templates.form_manage.label_type',
-				'templates.form_manage.label_email_subject',
-				'templates.form_manage.label_email_html',
-				'templates.form_manage.label_email_layout',
-				'templates.form_manage.label_page_title',
-				'templates.form_manage.label_page_html',
-				'templates.form_manage.label_page_layout',
-			] as const,
-		[],
-	);
-
-	const { translations } = useTranslation(translationsKeys);
-
 	const elementIds = useElementIds(['label', 'language', 'type', 'content']);
 
 	return (
 		<>
 			<FormComponentInput<TemplateFormValuesType>
 				id={elementIds.label}
-				labelText={translations['templates.form_manage.label_label']}
+				labelText="Label"
 				fieldName="label"
 				fieldValue={formValues.label}
 				isRequired={true}
@@ -81,9 +62,7 @@ export function FormManageTemplate({
 
 			<div className="flex flex-wrap gap-4">
 				<FormComponentSelect<TemplateFormValuesType>
-					labelText={
-						translations['templates.form_manage.label_language']
-					}
+					labelText="Language"
 					id={elementIds.language}
 					fieldName="language"
 					fieldValue={formValues.language}
@@ -94,7 +73,7 @@ export function FormManageTemplate({
 					error={errors.language}
 				/>
 				<FormComponentSelect<TemplateFormValuesType>
-					labelText={translations['templates.form_manage.label_type']}
+					labelText="Type"
 					id={elementIds.type}
 					fieldName="type"
 					fieldValue={formValues.type}
@@ -110,11 +89,7 @@ export function FormManageTemplate({
 				<>
 					<FormComponentInput<TemplateFormValuesType>
 						id={`${elementIds.content}-subject`}
-						labelText={
-							translations[
-								'templates.form_manage.label_email_subject'
-							]
-						}
+						labelText="Subject"
 						fieldName="subject"
 						fieldValue={formValues.subject ?? ''}
 						isRequired={true}
@@ -127,11 +102,7 @@ export function FormManageTemplate({
 					/>
 
 					<FormComponentSelect<TemplateFormValuesType>
-						labelText={
-							translations[
-								'templates.form_manage.label_email_layout'
-							]
-						}
+						labelText="layout"
 						id={`${elementIds.content}-layout`}
 						fieldName="layout"
 						fieldValue={formValues.layout}
@@ -144,11 +115,7 @@ export function FormManageTemplate({
 
 					<FormComponentTextarea<TemplateFormValuesType>
 						id={`${elementIds.content}-html`}
-						labelText={
-							translations[
-								'templates.form_manage.label_email_html'
-							]
-						}
+						labelText="HTML Content"
 						fieldName="html"
 						fieldValue={formValues.html}
 						isRequired={true}
@@ -164,11 +131,7 @@ export function FormManageTemplate({
 				<>
 					<FormComponentInput<TemplateFormValuesType>
 						id={`${elementIds.content}-title`}
-						labelText={
-							translations[
-								'templates.form_manage.label_page_title'
-							]
-						}
+						labelText="Title"
 						fieldName="title"
 						fieldValue={formValues.title ?? ''}
 						isRequired={true}
@@ -179,11 +142,7 @@ export function FormManageTemplate({
 					/>
 
 					<FormComponentSelect<TemplateFormValuesType>
-						labelText={
-							translations[
-								'templates.form_manage.label_page_layout'
-							]
-						}
+						labelText="Layout"
 						id={`${elementIds.content}-layout`}
 						fieldName="layout"
 						fieldValue={formValues.layout}
@@ -196,11 +155,7 @@ export function FormManageTemplate({
 
 					<FormComponentTextarea<TemplateFormValuesType>
 						id={`${elementIds.content}-html`}
-						labelText={
-							translations[
-								'templates.form_manage.label_email_html'
-							]
-						}
+						labelText="HTML Content"
 						fieldName="html"
 						fieldValue={formValues.html}
 						isRequired={true}

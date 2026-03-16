@@ -14,18 +14,6 @@ export function UserDetails({ entry }: { entry: UserModel | undefined }) {
 		() =>
 			[
 				'dashboard.text.no_entry_selected',
-				'users.view.section_details',
-				'users.view.label_id',
-				'users.view.label_name',
-				'users.view.label_email',
-				'users.view.label_language',
-				'users.view.section_info',
-				'users.view.label_role',
-				'users.view.label_status',
-				'users.view.label_deleted_at',
-				'users.view.section_timestamps',
-				'users.view.label_created_at',
-				'users.view.label_updated_at',
 			] as const,
 		[],
 	);
@@ -40,50 +28,32 @@ export function UserDetails({ entry }: { entry: UserModel | undefined }) {
 		);
 	}
 
-	const {
-		id,
-		name,
-		email,
-		role,
-		status,
-		language,
-		operator_type,
-		created_at,
-		updated_at,
-		deleted_at,
-	} = entry;
-
 	return (
 		<div className="space-y-6">
-			<div>
-				<h3 className="font-bold border-b border-line pb-2 mb-3">
-					{translations['users.view.section_details']}
-				</h3>
-				<div className="ml-4 space-y-1 text-sm">
-					<div>
-						<span className="font-semibold">
-							{translations['users.view.label_id']}
-						</span>{' '}
-						{id}
-					</div>
-					<div>
-						<span className="font-semibold">
-							{translations['users.view.label_name']}
-						</span>{' '}
-						{name}
-					</div>
-					<div>
-						<span className="font-semibold">
-							{translations['users.view.label_email']}
-						</span>{' '}
-						{email}
-					</div>
-					<div>
-						<span className="font-semibold">
-							{translations['users.view.label_language']}
-						</span>{' '}
-						{language}
-					</div>
+			<div className="space-y-1">
+				<div>
+					<span className="font-semibold">
+						ID
+					</span>{' '}
+					{entry.id}
+				</div>
+				<div>
+					<span className="font-semibold">
+						Name
+					</span>{' '}
+					{entry.name}
+				</div>
+				<div>
+					<span className="font-semibold">
+						Email
+					</span>{' '}
+					{entry.email}
+				</div>
+				<div>
+					<span className="font-semibold">
+						Language
+					</span>{' '}
+					{entry.language}
 				</div>
 			</div>
 
@@ -94,28 +64,28 @@ export function UserDetails({ entry }: { entry: UserModel | undefined }) {
 				<div className="ml-4 space-y-1 text-sm">
 					<div>
 						<span className="font-semibold">
-							{translations['users.view.label_role']}
+							Role
 						</span>{' '}
-						{capitalizeFirstLetter(role)}
-						{role === UserRoleEnum.OPERATOR && operator_type && (
-							<span>/ {formatEnumLabel(operator_type)}</span>
+						{capitalizeFirstLetter(entry.role)}
+						{entry.role === UserRoleEnum.OPERATOR && entry.operator_type && (
+							<span>/ {formatEnumLabel(entry.operator_type)}</span>
 						)}
 					</div>
 					<div className="flex items-center gap-2">
 						<span className="font-semibold">
-							{translations['users.view.label_status']}
+							Status
 						</span>{' '}
-						<div className="max-w-[240px]">
-							<DisplayStatus status={status} />
+						<div className="max-w-60">
+							<DisplayStatus status={entry.status} />
 						</div>
 					</div>
-					{deleted_at && (
+					{entry.deleted_at && (
 						<div>
 							<span className="font-semibold">
-								{translations['users.view.label_deleted_at']}
+								Deleted At
 							</span>{' '}
 							<span className="text-red-500">
-								{formatDate(deleted_at, 'date-time')}
+								{formatDate(entry.deleted_at, 'date-time')}
 							</span>
 						</div>
 					)}
@@ -124,20 +94,20 @@ export function UserDetails({ entry }: { entry: UserModel | undefined }) {
 
 			<div>
 				<h3 className="font-bold border-b border-line pb-2 mb-3">
-					{translations['users.view.section_timestamps']}
+					Timestamps
 				</h3>
 				<div className="ml-4 space-y-1 text-sm">
 					<div>
 						<span className="font-semibold">
-							{translations['users.view.label_created_at']}
+							Created At
 						</span>{' '}
-						{formatDate(created_at, 'date-time')}
+						{formatDate(entry.created_at, 'date-time')}
 					</div>
 					<div>
 						<span className="font-semibold">
-							{translations['users.view.label_updated_at']}
+							Updated At
 						</span>{' '}
-						{formatDate(updated_at, 'date-time') || '-'}
+						{formatDate(entry.updated_at, 'date-time') || '-'}
 					</div>
 				</div>
 			</div>

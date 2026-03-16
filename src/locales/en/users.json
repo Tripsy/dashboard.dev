@@ -77,29 +77,5 @@
 		"label_status": "Status",
 		"label_role": "Role",
 		"label_create_date": "Register Date"
-	},
-	"form_manage": {
-		"label_name": "Name",
-		"label_email": "Email",
-		"label_password_on_create": "New Password",
-		"label_password_on_update": "Password",
-		"label_password_confirm": "Confirm Password",
-		"label_language": "Language",
-		"label_role": "Role",
-		"label_operator_type": "Operator Type"
-	},
-	"view": {
-		"section_details": "Details",
-		"label_id": "ID:",
-		"label_name": "Name:",
-		"label_email": "Email:",
-		"label_language": "Language:",
-		"section_info": "Account Info",
-		"label_role": "Role:",
-		"label_status": "Status:",
-		"label_deleted_at": "Deleted At:",
-		"section_timestamps": "Timestamps",
-		"label_created_at": "Created At:",
-		"label_updated_at": "Updated At:"
 	}
 }

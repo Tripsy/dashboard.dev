@@ -1,10 +1,8 @@
-import { useMemo } from 'react';
 import { FormComponentAutoComplete } from '@/components/form/form-element.component';
 import { Icons } from '@/components/icon.component';
 import type { FormManageType } from '@/config/data-source.config';
 import { useAutocomplete } from '@/hooks/use-autocomplete';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
-import { useTranslation } from '@/hooks/use-translation.hook';
 import {
 	PermissionEntitiesSuggestions,
 	type PermissionFormValuesType,
@@ -17,17 +15,6 @@ export function FormManagePermission({
 	handleChange,
 	pending,
 }: FormManageType<PermissionFormValuesType>) {
-	const translationsKeys = useMemo(
-		() =>
-			[
-				'permissions.form_manage.label_entity',
-				'permissions.form_manage.label_operation',
-			] as const,
-		[],
-	);
-
-	const { translations } = useTranslation(translationsKeys);
-
 	const entityAutocomplete = useAutocomplete(PermissionEntitiesSuggestions, {
 		filterMode: 'includes',
 		caseSensitive: false,
@@ -46,7 +33,7 @@ export function FormManagePermission({
 	return (
 		<>
 			<FormComponentAutoComplete<PermissionFormValuesType>
-				labelText={translations['permissions.form_manage.label_entity']}
+				labelText="Entity"
 				id={elementIds.entity}
 				fieldName="entity"
 				fieldValue={formValues.entity}
@@ -69,9 +56,7 @@ export function FormManagePermission({
 			/>
 
 			<FormComponentAutoComplete<PermissionFormValuesType>
-				labelText={
-					translations['permissions.form_manage.label_operation']
-				}
+				labelText="Operation"
 				id={elementIds.operation}
 				fieldName="operation"
 				fieldValue={formValues.operation}

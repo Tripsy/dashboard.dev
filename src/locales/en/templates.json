@@ -52,28 +52,5 @@
 		"label_global": "ID / Label / Content",
 		"label_language": "Language",
 		"label_type": "Type"
-	},
-	"form_manage": {
-		"label_label": "Label",
-		"label_language": "Language",
-		"label_type": "Type",
-		"label_email_subject": "Email - Subject",
-		"label_email_html": "Email - HTML",
-		"label_email_layout": "Email - Layout",
-		"label_page_title": "Page - Title",
-		"label_page_html": "Page - HTML",
-		"label_page_layout": "Page - Layout"
-	},
-	"view": {
-		"section_details": "Details",
-		"label_id": "ID:",
-		"label_label": "Label:",
-		"label_language": "Language:",
-		"label_type": "Type:",
-		"section_timestamps": "Timestamps",
-		"label_created_at": "Created At:",
-		"label_updated_at": "Updated At:",
-		"label_deleted_at": "Deleted At:",
-		"section_content": "Content"
 	}
 }

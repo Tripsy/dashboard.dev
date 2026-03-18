@@ -192,6 +192,21 @@ Routes.group('dashboard')
 	.add('template', '/dashboard/templates', {
 		permission: 'template.find',
 	})
+	.add('client', '/dashboard/clients', {
+		permission: 'client.find',
+	})
+	.add('client-address', '/dashboard/client-address', {
+		permission: 'client_address.find',
+	})
+	.add('place', '/dashboard/places', {
+		permission: 'place.find',
+	})
+	.add('brand', '/dashboard/brands', {
+		permission: 'brand.find',
+	})
+	.add('cash-flow', '/dashboard/cash-flow', {
+		permission: 'cash_flow.find',
+	})
 	.add('log-data', '/dashboard/log-data', {
 		permission: 'log_data.find',
 	})

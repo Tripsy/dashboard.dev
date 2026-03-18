@@ -9,23 +9,24 @@ export enum ClientStatusEnum {
 	PENDING = 'pending',
 }
 
-// Status transition configuration
-export const CLIENT_STATUS_TRANSITIONS: Record<
-	ClientStatusEnum,
-	ClientStatusEnum[]
-> = {
-	[ClientStatusEnum.ACTIVE]: [ClientStatusEnum.INACTIVE],
-	[ClientStatusEnum.INACTIVE]: [ClientStatusEnum.ACTIVE],
-	[ClientStatusEnum.PENDING]: [
-		ClientStatusEnum.ACTIVE,
-		ClientStatusEnum.INACTIVE,
-	],
-};
+// // Status transition configuration
+// export const CLIENT_STATUS_TRANSITIONS: Record<
+// 	ClientStatusEnum,
+// 	ClientStatusEnum[]
+// > = {
+// 	[ClientStatusEnum.ACTIVE]: [ClientStatusEnum.INACTIVE],
+// 	[ClientStatusEnum.INACTIVE]: [ClientStatusEnum.ACTIVE],
+// 	[ClientStatusEnum.PENDING]: [
+// 		ClientStatusEnum.ACTIVE,
+// 		ClientStatusEnum.INACTIVE,
+// 	],
+// };
 
 export type ClientAddress = {
-	address_country: number | null;
-	address_region: number | null;
-	address_city: number | null;
+	address_location: string | null;
+	address_country_id: number | null;
+	address_region_id: number | null;
+	address_city_id: number | null;
 	address_info: string | null;
 	address_postal_code: number | null;
 };
@@ -40,8 +41,6 @@ export type ClientFinancial = {
 	iban: string | null;
 	bank_name: string | null;
 };
-
-// Discriminated union ensures that company and person fields cannot exist together.
 
 export type ClientIdentity =
 	| {
@@ -77,14 +76,16 @@ type ClientBase<D = Date | string> = {
 	deleted_at: D;
 };
 
-export type ClientModel<D = Date | string> = ClientBase<D> &
+export type ClientModel<D = Date | string> =
+	ClientBase<D> &
 	ClientIdentity &
-	ClientFinancial;
+	ClientFinancial &
+	ClientAddress &
+	ClientContact;
 
 export type ClientFormValuesType = ClientIdentity &
 	ClientFinancial &
 	ClientContact &
 	ClientAddress & {
-		status: ClientStatusEnum;
 		notes: string | null;
 	};

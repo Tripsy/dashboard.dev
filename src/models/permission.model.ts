@@ -6,6 +6,11 @@ export const PermissionEntitiesSuggestions = [
 	'permission',
 	'template',
 	'user',
+	'client',
+	'client_address',
+	'place',
+	'brand',
+	'cash_flow',
 ];
 
 export const PermissionOperationSuggestions = [

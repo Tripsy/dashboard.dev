@@ -21,6 +21,10 @@ import permissions from '@/locales/en/permissions.json';
 import register from '@/locales/en/register.json';
 import templates from '@/locales/en/templates.json';
 import users from '@/locales/en/users.json';
+import clients from '@/locales/en/clients.json';
+import places from '@/locales/en/places.json';
+import brands from '@/locales/en/brands.json';
+import cash_flow from '@/locales/en/cash_flow.json';
 
 const en = {
 	'account-delete': account_delete,
@@ -46,6 +50,10 @@ const en = {
 	register,
 	templates,
 	users,
+	clients,
+	places,
+	brands,
+	'cash-flow': cash_flow,
 };
 
 export default en;

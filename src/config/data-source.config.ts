@@ -182,8 +182,10 @@ export type DataSourceKey =
 	| 'templates'
 	| 'users'
 	| 'clients'
+	| 'client-address'
 	| 'places'
-	| 'brands';
+	| 'brands'
+	| 'cash-flow';
 
 const dataSourceConfig: Partial<
 	// biome-ignore lint/suspicious/noExplicitAny: Concrete types are enforced at the public API boundary (register/get),

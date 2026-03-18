@@ -41,21 +41,6 @@ export const DataTableLogHistoryFilters = (): JSX.Element => {
 		LogHistoryModel
 	>();
 
-	const translationsKeys = useMemo(
-		() =>
-			[
-				'log-history.form_filters.label_request_id',
-				'log-history.form_filters.label_entity',
-				'log-history.form_filters.label_entity_id',
-				'log-history.form_filters.label_action',
-				'log-history.form_filters.label_source',
-				'log-history.form_filters.label_recorded_at',
-			] as const,
-		[],
-	);
-
-	const { translations } = useTranslation(translationsKeys);
-
 	const filters = useStore(
 		dataTableStore,
 		(state) => state.tableState.filters,
@@ -131,17 +116,13 @@ export const DataTableLogHistoryFilters = (): JSX.Element => {
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
 			<FormFiltersSearch<LogHistoryDataTableFiltersType>
-				labelText={
-					translations['log-history.form_filters.label_request_id']
-				}
+				labelText="Request ID"
 				fieldName="request_id"
 				search={searchRequestId}
 			/>
 
 			<FormFiltersSelect<LogHistoryDataTableFiltersType>
-				labelText={
-					translations['log-history.form_filters.label_entity']
-				}
+				labelText="Entity"
 				fieldName="entity"
 				fieldValue={filters.entity.value}
 				options={entities}
@@ -149,17 +130,13 @@ export const DataTableLogHistoryFilters = (): JSX.Element => {
 			/>
 
 			<FormFiltersSearch<LogHistoryDataTableFiltersType>
-				labelText={
-					translations['log-history.form_filters.label_entity_id']
-				}
+				labelText="Entity ID"
 				fieldName="entity_id"
 				search={searchEntityId}
 			/>
 
 			<FormFiltersSelect<LogHistoryDataTableFiltersType>
-				labelText={
-					translations['log-history.form_filters.label_action']
-				}
+				labelText="Action"
 				fieldName="action"
 				fieldValue={filters.action.value}
 				options={actions}
@@ -167,9 +144,7 @@ export const DataTableLogHistoryFilters = (): JSX.Element => {
 			/>
 
 			<FormFiltersSelect<LogHistoryDataTableFiltersType>
-				labelText={
-					translations['log-history.form_filters.label_source']
-				}
+				labelText="Source"
 				fieldName="source"
 				fieldValue={filters.source.value}
 				options={sources}
@@ -179,9 +154,7 @@ export const DataTableLogHistoryFilters = (): JSX.Element => {
 			/>
 
 			<FormFiltersDateRange<LogHistoryDataTableFiltersType>
-				labelText={
-					translations['log-history.form_filters.label_recorded_at']
-				}
+				labelText="Recorded At"
 				start={{
 					fieldName: 'recorded_at_start',
 					fieldValue: filters.recorded_at_start.value,

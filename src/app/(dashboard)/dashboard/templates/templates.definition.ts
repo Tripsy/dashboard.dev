@@ -33,11 +33,6 @@ const translations = await translateBatch([
 	'templates.validation.page_title_invalid',
 	'templates.validation.page_body_invalid',
 	'templates.validation.page_layout_invalid',
-	'templates.data_table.column_id',
-	'templates.data_table.column_label',
-	'templates.data_table.column_language',
-	'templates.data_table.column_type',
-	'templates.data_table.column_created_at',
 ]);
 
 const ValidateSchemaBaseTemplates = z.object({
@@ -167,7 +162,7 @@ export const dataSourceConfigTemplates = {
 	dataTableColumns: [
 		{
 			field: 'id',
-			header: translations['templates.data_table.column_id'],
+			header: "ID",
 			sortable: true,
 			body: (
 				entry: TemplateModel,
@@ -183,16 +178,16 @@ export const dataSourceConfigTemplates = {
 		},
 		{
 			field: 'label',
-			header: translations['templates.data_table.column_label'],
+			header: "Label",
 			sortable: true,
 		},
 		{
 			field: 'language',
-			header: translations['templates.data_table.column_language'],
+			header: "Language",
 		},
 		{
 			field: 'type',
-			header: translations['templates.data_table.column_type'],
+			header: "Type",
 			body: (
 				entry: TemplateModel,
 				column: DataTableColumnType<TemplateModel>,
@@ -203,7 +198,7 @@ export const dataSourceConfigTemplates = {
 		},
 		{
 			field: 'created_at',
-			header: translations['templates.data_table.column_created_at'],
+			header: "Created At",
 			sortable: true,
 			body: (
 				entry: TemplateModel,

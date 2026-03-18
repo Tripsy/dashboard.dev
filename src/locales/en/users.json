@@ -63,19 +63,5 @@
 			"title": "User details",
 			"label": "View details"
 		}
-	},
-	"data_table": {
-		"column_id": "ID",
-		"column_name": "Name",
-		"column_email": "Email",
-		"column_role": "Role",
-		"column_status": "Status",
-		"column_created_at": "Registered At"
-	},
-	"form_filters": {
-		"label_global": "ID / Email / Name",
-		"label_status": "Status",
-		"label_role": "Role",
-		"label_create_date": "Register Date"
 	}
 }

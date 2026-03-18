@@ -13,7 +13,6 @@ import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import type { TemplateDataTableFiltersType } from '@/app/(dashboard)/dashboard/templates/templates.definition';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
-import { useTranslation } from '@/hooks/use-translation.hook';
 import { type TemplateModel, TemplateTypeEnum } from '@/models/template.model';
 import { LanguageEnum } from '@/models/user.model';
 
@@ -32,18 +31,6 @@ export const DataTableTemplatesFilters = (): React.JSX.Element => {
 		'templates',
 		TemplateModel
 	>();
-
-	const translationsKeys = useMemo(
-		() =>
-			[
-				'templates.form_filters.label_global',
-				'templates.form_filters.label_language',
-				'templates.form_filters.label_type',
-			] as const,
-		[],
-	);
-
-	const { translations } = useTranslation(translationsKeys);
 
 	const filters = useStore(
 		dataTableStore,
@@ -105,14 +92,12 @@ export const DataTableTemplatesFilters = (): React.JSX.Element => {
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
 			<FormFiltersSearch<TemplateDataTableFiltersType>
-				labelText={translations['templates.form_filters.label_global']}
+				labelText="ID / Label / Content"
 				search={searchGlobal}
 			/>
 
 			<FormFiltersSelect<TemplateDataTableFiltersType>
-				labelText={
-					translations['templates.form_filters.label_language']
-				}
+				labelText="Language"
 				fieldName="language"
 				fieldValue={filters.language.value}
 				options={languages}
@@ -120,7 +105,7 @@ export const DataTableTemplatesFilters = (): React.JSX.Element => {
 			/>
 
 			<FormFiltersSelect<TemplateDataTableFiltersType>
-				labelText={translations['templates.form_filters.label_type']}
+				labelText="Type"
 				fieldName="type"
 				fieldValue={filters.type.value}
 				options={types}

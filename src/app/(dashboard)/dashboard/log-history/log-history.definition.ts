@@ -2,7 +2,6 @@ import {
 	type DataTableColumnType,
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
-import { translateBatch } from '@/config/translate.setup';
 import { toTitleCase } from '@/helpers/string.helper';
 import type {
 	LogHistoryModel,
@@ -12,16 +11,6 @@ import {
 	deleteLogHistory,
 	findLogHistory,
 } from '@/services/log-history.service';
-
-const translations = await translateBatch([
-	'log-history.data_table.column_id',
-	'log-history.data_table.column_request_id',
-	'log-history.data_table.column_entity',
-	'log-history.data_table.column_entity_id',
-	'log-history.data_table.column_action',
-	'log-history.data_table.column_performed_by',
-	'log-history.data_table.column_recorded_at',
-]);
 
 export type LogHistoryDataTableFiltersType = {
 	request_id: { value: string | null; matchMode: 'contains' };
@@ -55,7 +44,7 @@ export const dataSourceConfigLogHistory = {
 	dataTableColumns: [
 		{
 			field: 'id',
-			header: translations['log-history.data_table.column_id'],
+			header: "ID",
 			sortable: true,
 			body: (
 				entry: LogHistoryModel,
@@ -71,11 +60,11 @@ export const dataSourceConfigLogHistory = {
 		},
 		{
 			field: 'request_id',
-			header: translations['log-history.data_table.column_request_id'],
+			header: "Request ID",
 		},
 		{
 			field: 'entity',
-			header: translations['log-history.data_table.column_entity'],
+			header: "Entity",
 			sortable: true,
 			body: (
 				entry: LogHistoryModel,
@@ -87,16 +76,16 @@ export const dataSourceConfigLogHistory = {
 		},
 		{
 			field: 'entity_id',
-			header: translations['log-history.data_table.column_entity_id'],
+			header: "Entity ID",
 		},
 		{
 			field: 'action',
-			header: translations['log-history.data_table.column_action'],
+			header: "Action",
 			sortable: true,
 		},
 		{
 			field: 'performed_by',
-			header: translations['log-history.data_table.column_performed_by'],
+			header: "Performed By",
 			body: (
 				entry: LogHistoryModel,
 				column: DataTableColumnType<LogHistoryModel>,
@@ -115,7 +104,7 @@ export const dataSourceConfigLogHistory = {
 		},
 		{
 			field: 'recorded_at',
-			header: translations['log-history.data_table.column_recorded_at'],
+			header: "Recorded At",
 			sortable: true,
 			body: (
 				entry: LogHistoryModel,

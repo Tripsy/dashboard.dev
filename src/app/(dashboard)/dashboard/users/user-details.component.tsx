@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 import { DisplayStatus } from '@/app/(dashboard)/_components/data-table-value';
 import { formatDate } from '@/helpers/date.helper';
 import {
-	capitalizeFirstLetter,
 	formatEnumLabel,
 } from '@/helpers/string.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
@@ -66,7 +65,7 @@ export function UserDetails({ entry }: { entry: UserModel | undefined }) {
 						<span className="font-semibold">
 							Role
 						</span>{' '}
-						{capitalizeFirstLetter(entry.role)}
+						{formatEnumLabel(entry.role)}
 						{entry.role === UserRoleEnum.OPERATOR && entry.operator_type && (
 							<span>/ {formatEnumLabel(entry.operator_type)}</span>
 						)}

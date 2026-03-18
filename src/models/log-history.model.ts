@@ -10,6 +10,7 @@ export const LogHistoryEntities = [
 	'template',
 	'user',
 	'client',
+	'client_address',
 	'place',
 	'brand',
 	'cash_flow',

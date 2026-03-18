@@ -17,22 +17,5 @@
 			"title": "User details",
 			"label": "View user"
 		}
-	},
-	"data_table": {
-		"column_id": "ID",
-		"column_request_id": "Request ID",
-		"column_entity": "Entity",
-		"column_entity_id": "Entity ID",
-		"column_action": "Action",
-		"column_performed_by": "Performed By",
-		"column_recorded_at": "Recorded At"
-	},
-	"form_filters": {
-		"label_request_id": "Request ID",
-		"label_entity": "Entity",
-		"label_entity_id": "Entity ID",
-		"label_action": "Action",
-		"label_source": "Source",
-		"label_recorded_at": "Recorded At"
 	}
 }

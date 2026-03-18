@@ -29,18 +29,6 @@ export const DataTableCronHistoryFilters = (): JSX.Element => {
 		CronHistoryModel
 	>();
 
-	const translationsKeys = useMemo(
-		() =>
-			[
-				'cron-history.form_filters.label_global',
-				'cron-history.form_filters.label_status',
-				'cron-history.form_filters.label_start_date',
-			] as const,
-		[],
-	);
-
-	const { translations } = useTranslation(translationsKeys);
-
 	const filters = useStore(
 		dataTableStore,
 		(state) => state.tableState.filters,
@@ -106,17 +94,13 @@ export const DataTableCronHistoryFilters = (): JSX.Element => {
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
 			<FormFiltersSearch<CronHistoryDataTableFiltersType>
-				labelText={
-					translations['cron-history.form_filters.label_global']
-				}
+				labelText="ID / Label / Content"
 				fieldName="global"
 				search={searchGlobal}
 			/>
 
 			<FormFiltersSelect<CronHistoryDataTableFiltersType>
-				labelText={
-					translations['cron-history.form_filters.label_status']
-				}
+				labelText="Status"
 				fieldName="status"
 				fieldValue={filters.status.value}
 				options={statuses}
@@ -126,9 +110,7 @@ export const DataTableCronHistoryFilters = (): JSX.Element => {
 			/>
 
 			<FormFiltersDateRange<CronHistoryDataTableFiltersType>
-				labelText={
-					translations['cron-history.form_filters.label_start_date']
-				}
+				labelText="Start Date"
 				start={{
 					fieldName: 'start_date_start',
 					fieldValue: filters.start_date_start.value,

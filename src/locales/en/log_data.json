@@ -14,15 +14,8 @@
 			"label": "View"
 		}
 	},
-	"data_table": {
-		"column_id": "ID",
-		"column_category": "Category",
-		"column_level": "Level",
-		"column_message": "Message",
-		"column_created_at": "Created At"
-	},
 	"form_filters": {
-		"label_global": "ID / Pid / Message / Context",
+		"label_global": "",
 		"label_category": "Category",
 		"label_level": "Level",
 		"label_created_at": "Created At"

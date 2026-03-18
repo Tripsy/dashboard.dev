@@ -10,7 +10,6 @@ import {
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import type { PermissionDataTableFiltersType } from '@/app/(dashboard)/dashboard/permissions/permissions.definition';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
-import { useTranslation } from '@/hooks/use-translation.hook';
 import type { PermissionModel } from '@/models/permission.model';
 
 export const DataTablePermissionsFilters = (): JSX.Element => {
@@ -18,13 +17,6 @@ export const DataTablePermissionsFilters = (): JSX.Element => {
 		'permissions',
 		PermissionModel
 	>();
-
-	const translationsKeys = useMemo(
-		() => ['permissions.form_filters.label_global'] as const,
-		[],
-	);
-
-	const { translations } = useTranslation(translationsKeys);
 
 	const filters = useStore(
 		dataTableStore,
@@ -86,9 +78,7 @@ export const DataTablePermissionsFilters = (): JSX.Element => {
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
 			<FormFiltersSearch<PermissionDataTableFiltersType>
-				labelText={
-					translations['permissions.form_filters.label_global']
-				}
+				labelText="ID / Entity / Operation"
 				search={searchGlobal}
 			/>
 

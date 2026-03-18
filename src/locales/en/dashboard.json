@@ -3,17 +3,29 @@
 		"title": "Dashboard | {{app_name}}"
 	},
 	"labels": {
-		"content": "Content",
-		"settings": "Settings",
 		"dashboard": "Dashboard",
+
+		"financial": "Financial",
+		"cash-flow": "Cash Flow",
+		"clients": "Clients",
+
+		"content": "Content",
+		"brands": "Brands",
+		"client-address": "Client Addresses",
+		"places": "Places",
+
+		"settings": "Settings",
+		"templates": "Templates",
+
+		"logs": "System Logs",
+
 		"cron-history": "Cron History",
 		"log-data": "Log Data",
 		"log-history": "Log History",
 		"mail-queue": "Mail Queue",
-		"permissions": "Permissions",
-		"logs": "System Logs",
-		"templates": "Templates",
-		"users": "Users"
+
+		"users": "Users",
+		"permissions": "Permissions"
 	},
 	"text": {
 		"showing_entries": "Showing {{first}} to {{last}} of {{total}} entries",

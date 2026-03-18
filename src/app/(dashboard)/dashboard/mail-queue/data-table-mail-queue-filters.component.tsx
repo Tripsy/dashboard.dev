@@ -29,20 +29,6 @@ export const DataTableMailQueueFilters = (): JSX.Element => {
 		MailQueueModel
 	>();
 
-	const translationsKeys = useMemo(
-		() =>
-			[
-				'mail-queue.form_filters.label_sent_date_start',
-				'mail-queue.form_filters.label_status',
-				'mail-queue.form_filters.label_template',
-				'mail-queue.form_filters.label_content',
-				'mail-queue.form_filters.label_to',
-			] as const,
-		[],
-	);
-
-	const { translations } = useTranslation(translationsKeys);
-
 	const filters = useStore(
 		dataTableStore,
 		(state) => state.tableState.filters,
@@ -125,11 +111,7 @@ export const DataTableMailQueueFilters = (): JSX.Element => {
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
 			<FormFiltersDateRange<MailQueueDataTableFiltersType>
-				labelText={
-					translations[
-						'mail-queue.form_filters.label_sent_date_start'
-					]
-				}
+				labelText="Sent Date"
 				start={{
 					fieldName: 'sent_date_start',
 					fieldValue: filters.sent_date_start.value,
@@ -144,7 +126,7 @@ export const DataTableMailQueueFilters = (): JSX.Element => {
 			/>
 
 			<FormFiltersSelect<MailQueueDataTableFiltersType>
-				labelText={translations['mail-queue.form_filters.label_status']}
+				labelText="Status"
 				fieldName="status"
 				fieldValue={filters.status.value}
 				options={statuses}
@@ -154,23 +136,19 @@ export const DataTableMailQueueFilters = (): JSX.Element => {
 			/>
 
 			<FormFiltersSearch<MailQueueDataTableFiltersType>
-				labelText={
-					translations['mail-queue.form_filters.label_template']
-				}
+				labelText="Template"
 				fieldName="template"
 				search={searchTemplate}
 			/>
 
 			<FormFiltersSearch<MailQueueDataTableFiltersType>
-				labelText={
-					translations['mail-queue.form_filters.label_content']
-				}
+				labelText="Content"
 				fieldName="content"
 				search={searchContent}
 			/>
 
 			<FormFiltersSearch<MailQueueDataTableFiltersType>
-				labelText={translations['mail-queue.form_filters.label_to']}
+				labelText="To"
 				fieldName="to"
 				search={searchTo}
 			/>

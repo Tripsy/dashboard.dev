@@ -2,21 +2,12 @@ import {
 	type DataTableColumnType,
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
-import { translateBatch } from '@/config/translate.setup';
 import { formatDate } from '@/helpers/date.helper';
 import type {
 	MailQueueModel,
 	MailQueueStatusEnum,
 } from '@/models/mail-queue.model';
 import { deleteMailQueue, findMailQueue } from '@/services/mail-queue.service';
-
-const translations = await translateBatch([
-	'mail-queue.data_table.column_id',
-	'mail-queue.data_table.column_template',
-	'mail-queue.data_table.column_to',
-	'mail-queue.data_table.column_status',
-	'mail-queue.data_table.column_sent_at',
-]);
 
 export type MailQueueDataTableFiltersType = {
 	status: { value: MailQueueStatusEnum | null; matchMode: 'equals' };
@@ -48,7 +39,7 @@ export const dataSourceConfigMailQueue = {
 	dataTableColumns: [
 		{
 			field: 'id',
-			header: translations['mail-queue.data_table.column_id'],
+			header: "ID",
 			sortable: true,
 			body: (
 				entry: MailQueueModel,
@@ -64,7 +55,7 @@ export const dataSourceConfigMailQueue = {
 		},
 		{
 			field: 'template',
-			header: translations['mail-queue.data_table.column_template'],
+			header: "Template",
 			body: (
 				entry: MailQueueModel,
 				column: DataTableColumnType<MailQueueModel>,
@@ -79,7 +70,7 @@ export const dataSourceConfigMailQueue = {
 		},
 		{
 			field: 'to',
-			header: translations['mail-queue.data_table.column_to'],
+			header: "To",
 			body: (
 				entry: MailQueueModel,
 				column: DataTableColumnType<MailQueueModel>,
@@ -90,7 +81,7 @@ export const dataSourceConfigMailQueue = {
 		},
 		{
 			field: 'status',
-			header: translations['mail-queue.data_table.column_status'],
+			header: "Status",
 			body: (
 				entry: MailQueueModel,
 				column: DataTableColumnType<MailQueueModel>,
@@ -105,7 +96,7 @@ export const dataSourceConfigMailQueue = {
 		},
 		{
 			field: 'sent_at',
-			header: translations['mail-queue.data_table.column_sent_at'],
+			header: "Sent At",
 			sortable: true,
 			body: (
 				entry: MailQueueModel,

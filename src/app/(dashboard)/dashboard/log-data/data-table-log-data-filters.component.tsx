@@ -12,7 +12,6 @@ import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import type { LogDataDataTableFiltersType } from '@/app/(dashboard)/dashboard/log-data/log-data.definition';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
-import { useTranslation } from '@/hooks/use-translation.hook';
 import {
 	LogCategoryEnum,
 	type LogDataModel,
@@ -34,19 +33,6 @@ export const DataTableLogDataFilters = (): JSX.Element => {
 		'log-data',
 		LogDataModel
 	>();
-
-	const translationsKeys = useMemo(
-		() =>
-			[
-				'log-data.form_filters.label_global',
-				'log-data.form_filters.label_category',
-				'log-data.form_filters.label_level',
-				'log-data.form_filters.label_created_at',
-			] as const,
-		[],
-	);
-
-	const { translations } = useTranslation(translationsKeys);
 
 	const filters = useStore(
 		dataTableStore,
@@ -113,12 +99,12 @@ export const DataTableLogDataFilters = (): JSX.Element => {
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
 			<FormFiltersSearch<LogDataDataTableFiltersType>
-				labelText={translations['log-data.form_filters.label_global']}
+				labelText="ID / PID / Message / Context"
 				search={searchGlobal}
 			/>
 
 			<FormFiltersSelect<LogDataDataTableFiltersType>
-				labelText={translations['log-data.form_filters.label_category']}
+				labelText="Category"
 				fieldName="category"
 				fieldValue={filters.category.value}
 				options={logCategories}
@@ -128,7 +114,7 @@ export const DataTableLogDataFilters = (): JSX.Element => {
 			/>
 
 			<FormFiltersSelect<LogDataDataTableFiltersType>
-				labelText={translations['log-data.form_filters.label_level']}
+				labelText="Level"
 				fieldName="level"
 				fieldValue={filters.level.value}
 				options={logLevels}
@@ -138,9 +124,7 @@ export const DataTableLogDataFilters = (): JSX.Element => {
 			/>
 
 			<FormFiltersDateRange<LogDataDataTableFiltersType>
-				labelText={
-					translations['log-data.form_filters.label_created_at']
-				}
+				labelText="Created At"
 				start={{
 					fieldName: 'create_date_start',
 					fieldValue: filters.create_date_start.value,

@@ -1,6 +1,6 @@
 'use client';
 
-import { type JSX, useCallback, useEffect, useMemo } from 'react';
+import { type JSX, useCallback, useEffect } from 'react';
 import { useStore } from 'zustand/react';
 import {
 	FormFiltersDateRange,
@@ -13,7 +13,6 @@ import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import type { UsersDataTableFiltersType } from '@/app/(dashboard)/dashboard/users/users.definition';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
-import { useTranslation } from '@/hooks/use-translation.hook';
 import {
 	type UserModel,
 	UserRoleEnum,
@@ -32,19 +31,6 @@ const roles = Object.values(UserRoleEnum).map((v) => ({
 
 export const DataTableUsersFilters = (): JSX.Element => {
 	const { stateDefault, dataTableStore } = useDataTable<'users', UserModel>();
-
-	const translationsKeys = useMemo(
-		() =>
-			[
-				'users.form_filters.label_global',
-				'users.form_filters.label_status',
-				'users.form_filters.label_role',
-				'users.form_filters.label_create_date',
-			] as const,
-		[],
-	);
-
-	const { translations } = useTranslation(translationsKeys);
 
 	const filters = useStore(
 		dataTableStore,
@@ -106,12 +92,12 @@ export const DataTableUsersFilters = (): JSX.Element => {
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
 			<FormFiltersSearch<UsersDataTableFiltersType>
-				labelText={translations['users.form_filters.label_global']}
+				labelText="ID / Email / Name"
 				search={searchGlobal}
 			/>
 
 			<FormFiltersSelect<UsersDataTableFiltersType>
-				labelText={translations['users.form_filters.label_status']}
+				labelText="Status"
 				fieldName="status"
 				fieldValue={filters.status.value}
 				options={statuses}
@@ -121,7 +107,7 @@ export const DataTableUsersFilters = (): JSX.Element => {
 			/>
 
 			<FormFiltersSelect<UsersDataTableFiltersType>
-				labelText={translations['users.form_filters.label_role']}
+				labelText="Role"
 				fieldName="role"
 				fieldValue={filters.role.value}
 				options={roles}
@@ -131,7 +117,7 @@ export const DataTableUsersFilters = (): JSX.Element => {
 			/>
 
 			<FormFiltersDateRange<UsersDataTableFiltersType>
-				labelText={translations['users.form_filters.label_create_date']}
+				labelText="Create Date"
 				start={{
 					fieldName: 'create_date_start',
 					fieldValue: filters.create_date_start.value,

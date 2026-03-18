@@ -16,9 +16,6 @@ import {
 const translations = await translateBatch([
 	'permissions.validation.entity_invalid',
 	'permissions.validation.operation_invalid',
-	'permissions.data_table.column_id',
-	'permissions.data_table.column_entity',
-	'permissions.data_table.column_operation',
 ]);
 
 const ValidateSchemaBasePermissions = z.object({
@@ -59,17 +56,17 @@ export const dataSourceConfigPermissions = {
 	dataTableColumns: [
 		{
 			field: 'id',
-			header: translations['permissions.data_table.column_id'],
+			header: "ID",
 			sortable: true,
 		},
 		{
 			field: 'entity',
-			header: translations['permissions.data_table.column_entity'],
+			header: "Entity",
 			sortable: true,
 		},
 		{
 			field: 'operation',
-			header: translations['permissions.data_table.column_operation'],
+			header: "Operation",
 			sortable: true,
 		},
 	],

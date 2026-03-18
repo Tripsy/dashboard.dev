@@ -17,19 +17,5 @@
 			"title": "Template details",
 			"label": "View template"
 		}
-	},
-	"data_table": {
-		"column_id": "ID",
-		"column_template": "Template",
-		"column_to": "To",
-		"column_status": "Status",
-		"column_sent_at": "Sent At"
-	},
-	"form_filters": {
-		"label_sent_date_start": "Sent Date",
-		"label_status": "Status",
-		"label_template": "Template",
-		"label_content": "Content",
-		"label_to": "To"
 	}
 }

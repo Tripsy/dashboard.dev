@@ -2,21 +2,12 @@ import {
 	type DataTableColumnType,
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
-import { translateBatch } from '@/config/translate.setup';
 import type {
 	LogCategoryEnum,
 	LogDataModel,
 	LogLevelEnum,
 } from '@/models/log-data.model';
 import { deleteLogData, findLogData } from '@/services/log-data.service';
-
-const translations = await translateBatch([
-	'log-data.data_table.column_id',
-	'log-data.data_table.column_category',
-	'log-data.data_table.column_level',
-	'log-data.data_table.column_message',
-	'log-data.data_table.column_created_at',
-]);
 
 export type LogDataDataTableFiltersType = {
 	global: { value: string | null; matchMode: 'contains' };
@@ -46,7 +37,7 @@ export const dataSourceConfigLogData = {
 	dataTableColumns: [
 		{
 			field: 'id',
-			header: translations['log-data.data_table.column_id'],
+			header: "ID",
 			sortable: true,
 			body: (
 				entry: LogDataModel,
@@ -62,7 +53,7 @@ export const dataSourceConfigLogData = {
 		},
 		{
 			field: 'category',
-			header: translations['log-data.data_table.column_category'],
+			header: "Category",
 			sortable: true,
 			body: (
 				entry: LogDataModel,
@@ -74,7 +65,7 @@ export const dataSourceConfigLogData = {
 		},
 		{
 			field: 'level',
-			header: translations['log-data.data_table.column_level'],
+			header: "Level",
 			sortable: true,
 			body: (
 				entry: LogDataModel,
@@ -86,11 +77,11 @@ export const dataSourceConfigLogData = {
 		},
 		{
 			field: 'message',
-			header: translations['log-data.data_table.column_message'],
+			header: "Message",
 		},
 		{
 			field: 'created_at',
-			header: translations['log-data.data_table.column_created_at'],
+			header: "Created At",
 			sortable: true,
 			body: (
 				entry: LogDataModel,

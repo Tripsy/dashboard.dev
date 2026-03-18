@@ -12,14 +12,6 @@ import {
 	findCronHistory,
 } from '@/services/cron-history.service';
 
-const translations = await translateBatch([
-	'cron-history.data_table.column_id',
-	'cron-history.data_table.column_label',
-	'cron-history.data_table.column_start_at',
-	'cron-history.data_table.column_status',
-	'cron-history.data_table.column_run_time',
-]);
-
 export type CronHistoryDataTableFiltersType = {
 	global: { value: string | null; matchMode: 'contains' };
 	status: { value: CronHistoryStatusEnum | null; matchMode: 'equals' };
@@ -46,7 +38,7 @@ export const dataSourceConfigCronHistory = {
 	dataTableColumns: [
 		{
 			field: 'id',
-			header: translations['cron-history.data_table.column_id'],
+			header: "ID",
 			sortable: true,
 			body: (
 				entry: CronHistoryModel,
@@ -62,12 +54,12 @@ export const dataSourceConfigCronHistory = {
 		},
 		{
 			field: 'label',
-			header: translations['cron-history.data_table.column_label'],
+			header: "Label",
 			sortable: true,
 		},
 		{
 			field: 'start_at',
-			header: translations['cron-history.data_table.column_start_at'],
+			header: "Start At",
 			sortable: true,
 			body: (
 				entry: CronHistoryModel,
@@ -79,7 +71,7 @@ export const dataSourceConfigCronHistory = {
 		},
 		{
 			field: 'status',
-			header: translations['cron-history.data_table.column_status'],
+			header: "Status",
 			body: (
 				entry: CronHistoryModel,
 				column: DataTableColumnType<CronHistoryModel>,
@@ -94,7 +86,7 @@ export const dataSourceConfigCronHistory = {
 		},
 		{
 			field: 'run_time',
-			header: translations['cron-history.data_table_column_run_time'],
+			header: "Run time",
 		},
 	],
 	functions: {

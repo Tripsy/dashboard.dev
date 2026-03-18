@@ -193,20 +193,22 @@ $ pnpm run madge
 
 # Bugs & Issues & Ideas
 
-1. Review security
-2. Add section "documentation"
-3. login with google / facebook
-4. Replace all console.error with logging
-5. Implement kill all sessions except current
+1. Clients > Client Address > Brands > Places > Cash Flow
+2. For Places add icons region > area, city > building, country -> map
+3. Review security
+4. Add section "documentation"
+5. login with google / facebook
+6. Replace all console.error with logging
+7. Implement kill all sessions except current
       // // This will actually remove all sessions - keep it for further implementation
       // await AccountTokenRepository.createQuery()
       //     .filterBy('user_id', policy.getUserId())
       //     .delete(false, true);
-6. For template section
+8. For template section
     - would be a nice idea to keep track of the last changes (maybe add a new column - prev version id and a button to restore to that version)
     - view presentation could be enhanced
-7. https://nextjs.org/docs/app/getting-started/partial-prerendering
-8. https://react.dev/learn/react-compiler/introduction
+9. https://nextjs.org/docs/app/getting-started/partial-prerendering
+10. https://react.dev/learn/react-compiler/introduction
 
 # Dependencies
 

@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "title": "Places - Dashboard | {{app_name}}"
+  },
+  "validation": {
+    "type_invalid": "Select a valid place type",
+    "code_invalid": "Enter a valid name",
+    "contents_invalid": "Add at least one translation"
+  }
+}
+

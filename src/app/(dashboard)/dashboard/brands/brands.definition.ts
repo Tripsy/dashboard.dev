@@ -1,0 +1,267 @@
+import { z } from 'zod';
+import {
+	type DataTableColumnType,
+	DataTableValue,
+} from '@/app/(dashboard)/_components/data-table-value';
+import type { FormStateType } from '@/config/data-source.config';
+import { translateBatch } from '@/config/translate.setup';
+import { capitalizeFirstLetter } from '@/helpers/string.helper';
+import {
+	type BrandFormValuesType,
+	type BrandModel,
+	BrandStatusEnum,
+	BrandTypeEnum,
+} from '@/models/brand.model';
+import {
+	createBrand,
+	deleteBrand,
+	findBrands,
+	updateBrand,
+} from '@/services/brands.service';
+
+const translations = await translateBatch([
+	'brands.validation.name_invalid',
+	'brands.validation.slug_invalid',
+	'brands.validation.status_invalid',
+	'brands.validation.type_invalid',
+]);
+
+const ValidateSchemaBrands = z.object({
+	name: z
+		.string()
+		.trim()
+		.nonempty({ message: translations['brands.validation.name_invalid'] }),
+	slug: z
+		.string()
+		.trim()
+		.nonempty({ message: translations['brands.validation.slug_invalid'] }),
+	status: z.nativeEnum(BrandStatusEnum, {
+		errorMap: () => ({
+			message: translations['brands.validation.status_invalid'],
+		}),
+	}),
+	type: z.nativeEnum(BrandTypeEnum, {
+		errorMap: () => ({
+			message: translations['brands.validation.type_invalid'],
+		}),
+	}),
+	sort_order: z.number().int().nonnegative().default(0),
+	details: z
+		.record(z.union([z.string(), z.number(), z.boolean()]))
+		.nullable(),
+	contents: z.array(
+		z.object({
+			language: z.string(),
+			description: z.string().nullable().optional(),
+			meta: z.any().nullable().optional(),
+		}),
+	),
+});
+
+export function getFormValuesBrand(formData: FormData): BrandFormValuesType {
+	const statusRaw = formData.get('status') as BrandStatusEnum | null;
+	const status = Object.values(BrandStatusEnum).includes(
+		statusRaw as BrandStatusEnum,
+	)
+		? (statusRaw as BrandStatusEnum)
+		: BrandStatusEnum.ACTIVE;
+
+	const typeRaw = formData.get('type') as BrandTypeEnum | null;
+	const type = Object.values(BrandTypeEnum).includes(typeRaw as BrandTypeEnum)
+		? (typeRaw as BrandTypeEnum)
+		: BrandTypeEnum.PRODUCT;
+
+	const sortRaw = formData.get('sort_order');
+
+	const detailsJson = formData.get('details') as string | null;
+	let details: BrandFormValuesType['details'] = null;
+
+	if (detailsJson) {
+		try {
+			details = JSON.parse(detailsJson) as BrandFormValuesType['details'];
+		} catch {
+			details = null;
+		}
+	}
+
+	const contentsJson = formData.get('contents') as string | null;
+	let contents: BrandFormValuesType['contents'] = [];
+
+	if (contentsJson) {
+		try {
+			const parsed = JSON.parse(contentsJson) as Array<{
+				language: string;
+				description?: string | null;
+			}>;
+
+			contents = parsed.map((c) => ({
+				language: c.language,
+				description: c.description ?? null,
+				meta: null,
+			}));
+		} catch {
+			contents = [];
+		}
+	}
+
+	return {
+		name: (formData.get('name') as string) || '',
+		slug: (formData.get('slug') as string) || '',
+		status,
+		type,
+		sort_order: sortRaw ? Number(sortRaw) : 0,
+		details,
+		contents,
+	};
+}
+
+export type BrandsDataTableFiltersType = {
+	global: { value: string | null; matchMode: 'contains' };
+	status: { value: BrandStatusEnum | null; matchMode: 'equals' };
+	type: { value: BrandTypeEnum | null; matchMode: 'equals' };
+	create_date_start: { value: string | null; matchMode: 'equals' };
+	create_date_end: { value: string | null; matchMode: 'equals' };
+};
+
+export const brandsDataTableFilters: BrandsDataTableFiltersType = {
+	global: { value: null, matchMode: 'contains' },
+	status: { value: null, matchMode: 'equals' },
+	type: { value: null, matchMode: 'equals' },
+	create_date_start: { value: null, matchMode: 'equals' },
+	create_date_end: { value: null, matchMode: 'equals' },
+};
+
+export const dataSourceConfigBrands = {
+	dataTableState: {
+		reloadTrigger: 0,
+		first: 0,
+		rows: 10,
+		sortField: 'id',
+		sortOrder: -1 as const,
+		filters: brandsDataTableFilters,
+	},
+	dataTableColumns: [
+		{
+			field: 'id',
+			header: "ID",
+			sortable: true,
+			body: (
+				entry: BrandModel,
+				column: DataTableColumnType<BrandModel>,
+			) =>
+				DataTableValue(entry, column, {
+					markDeleted: true,
+				}),
+		},
+		{
+			field: 'name',
+			header: "Name",
+			sortable: true,
+		},
+		{
+			field: 'status',
+			header: "Status",
+			sortable: true,
+			body: (
+				entry: BrandModel,
+				column: DataTableColumnType<BrandModel>,
+			) =>
+				DataTableValue(entry, column, {
+					capitalize: true,
+				}),
+		},
+		{
+			field: 'type',
+			header: "Type",
+			sortable: true,
+			body: (
+				entry: BrandModel,
+				column: DataTableColumnType<BrandModel>,
+			) =>
+				DataTableValue(entry, column, {
+					customValue: capitalizeFirstLetter(entry.type),
+				}),
+		}
+	],
+	formState: {
+		dataSource: 'brands' as const,
+		id: undefined,
+		values: {
+			name: '',
+			slug: '',
+			status: BrandStatusEnum.ACTIVE,
+			type: BrandTypeEnum.PRODUCT,
+			sort_order: 0,
+			details: null,
+			contents: [],
+		} as BrandFormValuesType,
+		errors: {},
+		message: null,
+		situation: null,
+	},
+	functions: {
+		find: findBrands,
+		getFormValues: getFormValuesBrand,
+		validateForm: (values: BrandFormValuesType) => {
+			return ValidateSchemaBrands.safeParse(values);
+		},
+		syncFormState: (
+			state: FormStateType<'brands', BrandModel, BrandFormValuesType>,
+			model: BrandModel,
+		): FormStateType<'brands', BrandModel, BrandFormValuesType> => {
+			return {
+				...state,
+				id: model.id,
+				values: {
+					...state.values,
+					name: model.name,
+					slug: model.slug,
+					status: model.status,
+					type: model.type,
+					sort_order: model.sort_order,
+					details: model.details,
+					contents:
+						model.contents?.map((c) => ({
+							language: c.language,
+							description: c.description ?? null,
+							meta: c.meta ?? null,
+						})) ?? [],
+				},
+			};
+		},
+	},
+	actions: {
+		create: {
+			mode: 'form' as const,
+			permission: 'brand.create',
+			allowedEntries: 'free' as const,
+			position: 'right' as const,
+			function: createBrand,
+			buttonProps: {
+				variant: 'info' as const,
+			},
+		},
+		update: {
+			mode: 'form' as const,
+			permission: 'brand.update',
+			allowedEntries: 'single' as const,
+			position: 'left' as const,
+			function: updateBrand,
+			buttonProps: {
+				variant: 'outline' as const,
+				hover: 'success' as const,
+			},
+		},
+		delete: {
+			mode: 'action' as const,
+			permission: 'brand.delete',
+			allowedEntries: 'single' as const,
+			position: 'left' as const,
+			function: deleteBrand,
+			buttonProps: {
+				variant: 'outline' as const,
+				hover: 'error' as const,
+			},
+		},
+	},
+};

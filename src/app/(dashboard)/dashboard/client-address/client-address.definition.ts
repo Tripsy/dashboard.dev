@@ -4,85 +4,94 @@ import {
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
 import type { FormStateType } from '@/config/data-source.config';
-import { Configuration } from '@/config/settings.config';
 import { translateBatch } from '@/config/translate.setup';
 import {
+	isValidPostalCode,
+	validateEnum,
+	validateId,
+	validateString,
+} from '@/helpers/form.helper';
+import { getClientDisplayName } from '@/models/client.model';
+import {
 	type ClientAddressFormValuesType,
-	type ClientAddressModel, ClientAddressTypeEnum,
+	type ClientAddressModel,
+	ClientAddressTypeEnum,
 } from '@/models/client-address.model';
 import {
 	createClientAddress,
-	updateClientAddress,
 	deleteClientAddress,
 	findClientAddress,
 	restoreClientAddress,
+	updateClientAddress,
 } from '@/services/client-address.service';
 
 const translations = await translateBatch([
-	'client-address.validation.name_invalid',
-	{
-		key: 'client-address.validation.name_min',
-		vars: {
-			min: Configuration.get('client-address.nameMinLength') as string,
-		},
-	},
-	'client-address.validation.email_invalid',
-	'client-address.validation.language_invalid',
-	'client-address.validation.role_invalid',
-	{
-		key: 'client-address.validation.password_invalid',
-		vars: {
-			min: Configuration.get('client-address.passwordMinLength') as string,
-		},
-	},
-	{
-		key: 'client-address.validation.password_min',
-		vars: {
-			min: Configuration.get('client-address.passwordMinLength') as string,
-		},
-	},
-	'client-address.validation.password_condition_capital_letter',
-	'client-address.validation.password_condition_number',
-	'client-address.validation.password_condition_special_character',
-	'client-address.validation.password_confirm_required',
-	'client-address.validation.password_confirm_mismatch',
-	'client-address.validation.operator_type_invalid',
-	'client-address.data_table.column_id',
-	'client-address.data_table.column_name',
-	'client-address.data_table.column_email',
-	'client-address.data_table.column_role',
-	'client-address.data_table.column_status',
-	'client-address.data_table.column_created_at',
+	'client-address.validation.address_client_id_invalid',
+	'client-address.validation.address_type_invalid',
+	'client-address.validation.address_city_id_invalid',
+	'client-address.validation.address_info_invalid',
+	'client-address.validation.address_postal_code_invalid',
+	'client-address.validation.notes_invalid',
 ]);
 
 const ValidateSchemaBaseClientAddress = z.object({
-	client_id: z.number({ message: translations['client-address.validation.address_client_id_invalid'] }),
-	address_type: z.enum(
-		ClientAddressTypeEnum,
-		translations['client-address.validation.address_type_invalid']
+	client_id: validateId(
+		translations['client-address.validation.address_client_id_invalid'],
 	),
-	address_city_id: z.number({ message: translations['client-address.validation.address_city_id_invalid'] }).optional(),
-	address_info: z.string({ message: translations['client-address.validation.address_info_invalid'] }),
+	address_type: validateEnum(
+		ClientAddressTypeEnum,
+		translations['client-address.validation.address_type_invalid'],
+	),
+	address_city_id: validateId(
+		translations['client-address.validation.address_city_id_invalid'],
+	).optional(),
+	address_info: validateString(
+		translations['client-address.validation.address_info_invalid'],
+	),
 	address_postal_code: z
 		.string()
-		.regex(/^\d{6}$/, translations['client-address.validation.address_postal_code_invalid'])
-		.optional(),
-	notes: z.string({ message: translations['client-address.validation.notes_invalid'] }).optional(),
+		.nullable()
+		.refine(
+			(val) => {
+				if (val === null || val === '') {
+					return true;
+				}
+
+				return isValidPostalCode(val);
+			},
+			{
+				message:
+					translations[
+						'client-address.validation.address_postal_code_invalid'
+					],
+			},
+		),
+	notes: validateString(
+		translations['client-address.validation.notes_invalid'],
+	).optional(),
 });
 
-function getFormValuesClientAddress(formData: FormData): ClientAddressFormValuesType {
-	const address_type = formData.get('address_type') as ClientAddressTypeEnum | null;
+function getFormValuesClientAddress(
+	formData: FormData,
+): ClientAddressFormValuesType {
+	const address_type = formData.get(
+		'address_type',
+	) as ClientAddressTypeEnum | null;
 
 	return {
 		client_id: Number(formData.get('client_id')),
-		address_type: address_type && Object.values(ClientAddressTypeEnum).includes(address_type)
-			? address_type
-			: ClientAddressTypeEnum.DELIVERY,
+		address_type:
+			address_type &&
+			Object.values(ClientAddressTypeEnum).includes(address_type)
+				? address_type
+				: ClientAddressTypeEnum.DELIVERY,
 		address_city_id: formData.get('address_city_id')
 			? Number(formData.get('address_city_id'))
 			: null,
 		address_info: formData.get('address_info') as string,
-		address_postal_code: formData.get('address_postal_code') as string | null,
+		address_postal_code: formData.get('address_postal_code') as
+			| string
+			| null,
 		notes: formData.get('notes') as string | null,
 	};
 }
@@ -93,11 +102,12 @@ export type ClientAddressDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
-export const clientAddressDataTableFilters: ClientAddressDataTableFiltersType = {
-	global: { value: null, matchMode: 'contains' },
-	address_type: { value: null, matchMode: 'equals' },
-	is_deleted: { value: false, matchMode: 'equals' },
-};
+export const clientAddressDataTableFilters: ClientAddressDataTableFiltersType =
+	{
+		global: { value: null, matchMode: 'contains' },
+		address_type: { value: null, matchMode: 'equals' },
+		is_deleted: { value: false, matchMode: 'equals' },
+	};
 
 export const dataSourceConfigClientAddress = {
 	dataTableState: {
@@ -111,9 +121,12 @@ export const dataSourceConfigClientAddress = {
 	dataTableColumns: [
 		{
 			field: 'id',
-			header: translations['client-address.data_table.column_id'],
+			header: 'ID',
 			sortable: true,
-			body: (entry: ClientAddressModel, column: DataTableColumnType<ClientAddressModel>) =>
+			body: (
+				entry: ClientAddressModel,
+				column: DataTableColumnType<ClientAddressModel>,
+			) =>
 				DataTableValue(entry, column, {
 					markDeleted: true,
 					action: {
@@ -123,37 +136,49 @@ export const dataSourceConfigClientAddress = {
 				}),
 		},
 		{
+			field: 'client',
+			header: 'Client',
+			body: (
+				entry: ClientAddressModel,
+				column: DataTableColumnType<ClientAddressModel>,
+			) =>
+				DataTableValue(entry, column, {
+					customValue: getClientDisplayName(entry.client),
+				}),
+		},
+		{
 			field: 'address_type',
-			header: translations['client-address.data_table.column_address_type'],
-			body: (entry: ClientAddressModel, column: DataTableColumnType<ClientAddressModel>) =>
+			header: 'Type',
+			body: (
+				entry: ClientAddressModel,
+				column: DataTableColumnType<ClientAddressModel>,
+			) =>
 				DataTableValue(entry, column, {
 					capitalize: true,
 				}),
 		},
 		{
-			field: 'address-info',
-			header: translations['client-address.data_table.column_address_info'],
-			sortable: true,
-		},
-		// {
-		// 	field: 'email',
-		// 	header: translations['client-address.data_table.column_email'],
-		// },
-		{
-			field: 'created_at',
-			header: translations['client-address.data_table.column_created_at'],
-			sortable: true,
-			body: (entry: ClientAddressModel, column: DataTableColumnType<ClientAddressModel>) =>
+			field: 'city',
+			header: 'City',
+			body: (
+				entry: ClientAddressModel,
+				column: DataTableColumnType<ClientAddressModel>,
+			) =>
 				DataTableValue(entry, column, {
-					displayDate: true,
+					customValue: entry.city?.code || '',
 				}),
+		},
+		{
+			field: 'address_info',
+			header: 'Address',
+			sortable: true,
 		},
 	],
 	formState: {
 		dataSource: 'client-address' as const,
 		id: undefined,
 		values: {
-			client_id: '',
+			client_id: null,
 			address_type: ClientAddressTypeEnum.BILLING,
 			address_city_id: null,
 			address_info: '',
@@ -167,13 +192,21 @@ export const dataSourceConfigClientAddress = {
 	functions: {
 		find: findClientAddress,
 		getFormValues: getFormValuesClientAddress,
-		validateForm: (values: ClientAddressFormValuesType, id?: number) => {
+		validateForm: (values: ClientAddressFormValuesType) => {
 			return ValidateSchemaBaseClientAddress.safeParse(values);
 		},
 		syncFormState: (
-			state: FormStateType<'client-address', ClientAddressModel, ClientAddressFormValuesType>,
+			state: FormStateType<
+				'client-address',
+				ClientAddressModel,
+				ClientAddressFormValuesType
+			>,
 			model: ClientAddressModel,
-		): FormStateType<'client-address', ClientAddressModel, ClientAddressFormValuesType> => {
+		): FormStateType<
+			'client-address',
+			ClientAddressModel,
+			ClientAddressFormValuesType
+		> => {
 			return {
 				...state,
 				id: model.id,

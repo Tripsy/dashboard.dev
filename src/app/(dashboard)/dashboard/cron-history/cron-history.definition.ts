@@ -2,7 +2,6 @@ import {
 	type DataTableColumnType,
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
-import { translateBatch } from '@/config/translate.setup';
 import type {
 	CronHistoryModel,
 	CronHistoryStatusEnum,
@@ -38,7 +37,7 @@ export const dataSourceConfigCronHistory = {
 	dataTableColumns: [
 		{
 			field: 'id',
-			header: "ID",
+			header: 'ID',
 			sortable: true,
 			body: (
 				entry: CronHistoryModel,
@@ -54,12 +53,12 @@ export const dataSourceConfigCronHistory = {
 		},
 		{
 			field: 'label',
-			header: "Label",
+			header: 'Label',
 			sortable: true,
 		},
 		{
 			field: 'start_at',
-			header: "Start At",
+			header: 'Start At',
 			sortable: true,
 			body: (
 				entry: CronHistoryModel,
@@ -71,7 +70,7 @@ export const dataSourceConfigCronHistory = {
 		},
 		{
 			field: 'status',
-			header: "Status",
+			header: 'Status',
 			body: (
 				entry: CronHistoryModel,
 				column: DataTableColumnType<CronHistoryModel>,
@@ -86,7 +85,7 @@ export const dataSourceConfigCronHistory = {
 		},
 		{
 			field: 'run_time',
-			header: "Run time",
+			header: 'Run time',
 		},
 	],
 	functions: {

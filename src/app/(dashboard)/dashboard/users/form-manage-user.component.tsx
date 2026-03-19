@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
 	FormComponentEmail,
 	FormComponentName,
@@ -35,7 +35,6 @@ const operatorTypes = Object.values(UserOperatorTypeEnum).map((v) => ({
 }));
 
 export function FormManageUser({
-	actionName,
 	formValues,
 	errors,
 	handleChange,

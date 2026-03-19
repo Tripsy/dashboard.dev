@@ -37,7 +37,7 @@ export const dataSourceConfigLogData = {
 	dataTableColumns: [
 		{
 			field: 'id',
-			header: "ID",
+			header: 'ID',
 			sortable: true,
 			body: (
 				entry: LogDataModel,
@@ -53,7 +53,7 @@ export const dataSourceConfigLogData = {
 		},
 		{
 			field: 'category',
-			header: "Category",
+			header: 'Category',
 			sortable: true,
 			body: (
 				entry: LogDataModel,
@@ -65,7 +65,7 @@ export const dataSourceConfigLogData = {
 		},
 		{
 			field: 'level',
-			header: "Level",
+			header: 'Level',
 			sortable: true,
 			body: (
 				entry: LogDataModel,
@@ -77,11 +77,11 @@ export const dataSourceConfigLogData = {
 		},
 		{
 			field: 'message',
-			header: "Message",
+			header: 'Message',
 		},
 		{
 			field: 'created_at',
-			header: "Created At",
+			header: 'Created At',
 			sortable: true,
 			body: (
 				entry: LogDataModel,

@@ -1,6 +1,6 @@
 'use client';
 
-import { type JSX, useCallback, useEffect, useMemo } from 'react';
+import { type JSX, useCallback, useEffect } from 'react';
 import { useStore } from 'zustand/react';
 import {
 	FormFiltersDateRange,
@@ -13,9 +13,9 @@ import type { CashFlowDataTableFiltersType } from '@/app/(dashboard)/dashboard/c
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import {
-	type CashFlowModel,
 	CashFlowCategoryEnum,
 	CashFlowDirectionEnum,
+	type CashFlowModel,
 	CashFlowStatusEnum,
 	CurrencyEnum,
 } from '@/models/cash-flow.model';

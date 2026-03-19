@@ -8,10 +8,10 @@ import { DataTableProvider } from '@/app/(dashboard)/_providers/data-table-provi
 import { createDataTableStore } from '@/app/(dashboard)/_stores/model.store';
 import { DataTableClientsFilters } from '@/app/(dashboard)/dashboard/clients/data-table-clients-filters.component';
 import { FormManageClient } from '@/app/(dashboard)/dashboard/clients/form-manage-client.component';
+import { ViewClient } from '@/app/(dashboard)/dashboard/clients/view-client.component';
 import { LoadingComponent } from '@/components/status.component';
 import { useMounted } from '@/hooks/use-mounted.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
-import {ViewClient} from "@/app/(dashboard)/dashboard/clients/view-client.component";
 
 const dataTableStore = createDataTableStore('clients');
 
@@ -48,8 +48,8 @@ export const DataTableClients = (): JSX.Element => {
 					view: <ViewClient />,
 				}}
 				modalsProps={{
-					create: { size: 'x4l' },
-					update: { size: 'x4l' },
+					create: { size: 'x2l' },
+					update: { size: 'x2l' },
 					view: { size: 'x4l' },
 				}}
 			/>

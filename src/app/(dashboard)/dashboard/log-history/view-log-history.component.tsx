@@ -11,10 +11,7 @@ export function ViewLogHistory() {
 	const entry = useStore(dataTableStore, (state) => state.actionEntry);
 
 	const translationsKeys = useMemo(
-		() =>
-			[
-				'dashboard.text.no_entry_selected',
-			] as const,
+		() => ['dashboard.text.no_entry_selected'] as const,
 		[],
 	);
 
@@ -34,57 +31,36 @@ export function ViewLogHistory() {
 		<div className="space-y-6">
 			<div className="space-y-1">
 				<div>
-					<span className="font-semibold">
-						ID
-					</span>{' '}
-					{entry.id}
+					<span className="font-semibold">ID</span> {entry.id}
 				</div>
 				<div>
-					<span className="font-semibold">
-						Request ID
-					</span>{' '}
+					<span className="font-semibold">Request ID</span>{' '}
 					{entry.request_id}
 				</div>
 				<div>
-					<span className="font-semibold">
-						Entity Type
-					</span>{' '}
+					<span className="font-semibold">Entity Type</span>{' '}
 					{entry.entity}
 				</div>
 				<div>
-					<span className="font-semibold">
-						Entity ID
-					</span>{' '}
+					<span className="font-semibold">Entity ID</span>{' '}
 					{entry.entity_id}
 				</div>
 				<div>
-					<span className="font-semibold">
-						Action
-					</span>{' '}
-					{entry.action}
+					<span className="font-semibold">Action</span> {entry.action}
 				</div>
 				<div>
-					<span className="font-semibold">
-						Auth ID
-					</span>{' '}
+					<span className="font-semibold">Auth ID</span>{' '}
 					{entry.auth_id}
 				</div>
 				<div>
-					<span className="font-semibold">
-						Performed By
-					</span>{' '}
+					<span className="font-semibold">Performed By</span>{' '}
 					{entry.performed_by}
 				</div>
 				<div>
-					<span className="font-semibold">
-						Source
-					</span>{' '}
-					{entry.source}
+					<span className="font-semibold">Source</span> {entry.source}
 				</div>
 				<div>
-					<span className="font-semibold">
-						Recorded At
-					</span>{' '}
+					<span className="font-semibold">Recorded At</span>{' '}
 					{formatDate(entry.recorded_at, 'date-time')}
 				</div>
 			</div>

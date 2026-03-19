@@ -20,7 +20,7 @@ export type DataTableColumnType<Model> = {
 };
 
 type DataTableValueOptionsType<Model> = {
-	customValue?: string;
+	customValue?: string | JSX.Element;
 	capitalize?: boolean;
 	markDeleted?: boolean;
 	isStatus?: boolean;
@@ -165,6 +165,7 @@ export const DataTableValue = <Model extends Record<string, unknown>>(
 	column: DataTableColumnType<Model>,
 	options: DataTableValueOptionsType<Model>,
 ) => {
+	// TODO: console.log(entry);
 	let outputValue: string | JSX.Element;
 
 	if (options.customValue) {
@@ -185,11 +186,11 @@ export const DataTableValue = <Model extends Record<string, unknown>>(
 		}
 	}
 
-	if (options.capitalize) {
+	if (options.capitalize && typeof outputValue === 'string') {
 		outputValue = capitalizeFirstLetter(outputValue);
 	}
 
-	if (options.displayDate) {
+	if (options.displayDate && typeof outputValue === 'string') {
 		outputValue = formatDate(outputValue, 'date-time') || '-';
 	}
 

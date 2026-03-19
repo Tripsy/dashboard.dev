@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { Configuration } from '@/config/settings.config';
 import { translateBatch } from '@/config/translate.setup';
+import { validatePassword, validateString } from '@/helpers/form.helper';
 import type { FormSituationType } from '@/types/form.type';
 
 export type PasswordRecoverChangeFormFieldsType = {
@@ -50,52 +51,40 @@ const translations = await translateBatch([
 
 export const PasswordRecoverChangeSchema = z
 	.object({
-		password: z
-			.string({
-				message:
+		password: validatePassword(
+			{
+				password_invalid:
 					translations[
 						'password-recover-change.validation.password_invalid'
 					],
-			})
-			.trim()
-			.min(Configuration.get('user.passwordMinLength') as number, {
-				message:
+				password_min:
 					translations[
 						'password-recover-change.validation.password_min'
 					],
-			})
-			.refine((value) => /[A-Z]/.test(value), {
-				message:
+				password_condition_capital_letter:
 					translations[
 						'password-recover-change.validation.password_condition_capital_letter'
 					],
-			})
-			.refine((value) => /[0-9]/.test(value), {
-				message:
+				password_condition_number:
 					translations[
 						'password-recover-change.validation.password_condition_number'
 					],
-			})
-			.refine((value) => /[!@#$%^&*()_+{}[\]:;<>,.?~\\/-]/.test(value), {
-				message:
+				password_condition_special_character:
 					translations[
 						'password-recover-change.validation.password_condition_special_character'
 					],
-			}),
-		password_confirm: z
-			.string({
-				message:
-					translations[
-						'password-recover-change.validation.password_confirm_required'
-					],
-			})
-			.trim()
-			.nonempty({
-				message:
-					translations[
-						'password-recover-change.validation.password_confirm_required'
-					],
-			}),
+			},
+			{
+				minLength: Configuration.get(
+					'user.passwordMinLength',
+				) as number,
+			},
+		),
+		password_confirm: validateString(
+			translations[
+				'password-recover-change.validation.password_confirm_required'
+			],
+		),
 	})
 	.superRefine(({ password, password_confirm }, ctx) => {
 		if (password !== password_confirm) {

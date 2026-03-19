@@ -8,7 +8,10 @@ import type {
 } from '@/config/data-source.config';
 import { ApiRequest, getResponseData } from '@/helpers/api.helper';
 import { buildQueryString } from '@/helpers/string.helper';
-import type { ClientAddressFormValuesType, ClientAddressModel } from '@/models/client-address.model';
+import type {
+	ClientAddressFormValuesType,
+	ClientAddressModel,
+} from '@/models/client-address.model';
 import type { ApiResponseFetch } from '@/types/api.type';
 
 export const findClientAddress: FindFunctionType<ClientAddressModel> = async (
@@ -16,10 +19,13 @@ export const findClientAddress: FindFunctionType<ClientAddressModel> = async (
 ) => {
 	const query = buildQueryString(params);
 
-	const response: ApiResponseFetch<FindFunctionResponseType<ClientAddressModel>> =
-		await new ApiRequest().doFetch(`/client-address?${query}`);
+	const response: ApiResponseFetch<
+		FindFunctionResponseType<ClientAddressModel>
+	> = await new ApiRequest().doFetch(`/client-address?${query}`);
 
-	return getResponseData<FindFunctionResponseType<ClientAddressModel>>(response);
+	return getResponseData<FindFunctionResponseType<ClientAddressModel>>(
+		response,
+	);
 };
 
 export const createClientAddress: CreateFunctionType<
@@ -42,7 +48,9 @@ export const updateClientAddress: UpdateFunctionType<
 	});
 };
 
-export const deleteClientAddress: DeleteFunctionType = async (ids: number[]) => {
+export const deleteClientAddress: DeleteFunctionType = async (
+	ids: number[],
+) => {
 	const id = ids[0];
 
 	return await new ApiRequest().doFetch(`/client-address/${id}`, {

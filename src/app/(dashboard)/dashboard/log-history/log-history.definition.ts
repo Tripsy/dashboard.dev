@@ -44,7 +44,7 @@ export const dataSourceConfigLogHistory = {
 	dataTableColumns: [
 		{
 			field: 'id',
-			header: "ID",
+			header: 'ID',
 			sortable: true,
 			body: (
 				entry: LogHistoryModel,
@@ -60,11 +60,11 @@ export const dataSourceConfigLogHistory = {
 		},
 		{
 			field: 'request_id',
-			header: "Request ID",
+			header: 'Request ID',
 		},
 		{
 			field: 'entity',
-			header: "Entity",
+			header: 'Entity',
 			sortable: true,
 			body: (
 				entry: LogHistoryModel,
@@ -76,16 +76,16 @@ export const dataSourceConfigLogHistory = {
 		},
 		{
 			field: 'entity_id',
-			header: "Entity ID",
+			header: 'Entity ID',
 		},
 		{
 			field: 'action',
-			header: "Action",
+			header: 'Action',
 			sortable: true,
 		},
 		{
 			field: 'performed_by',
-			header: "Performed By",
+			header: 'Performed By',
 			body: (
 				entry: LogHistoryModel,
 				column: DataTableColumnType<LogHistoryModel>,
@@ -104,7 +104,7 @@ export const dataSourceConfigLogHistory = {
 		},
 		{
 			field: 'recorded_at',
-			header: "Recorded At",
+			header: 'Recorded At',
 			sortable: true,
 			body: (
 				entry: LogHistoryModel,

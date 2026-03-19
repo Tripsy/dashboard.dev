@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { translateBatch } from '@/config/translate.setup';
+import { validateString } from '@/helpers/form.helper';
 import type { FormSituationType } from '@/types/form.type';
 
 export type AccountDeleteFormFieldsType = {
@@ -29,18 +30,7 @@ const translations = await translateBatch([
 ]);
 
 export const AccountDeleteSchema = z.object({
-	password_current: z
-		.string({
-			message:
-				translations[
-					'account-delete.validation.password_current_invalid'
-				],
-		})
-		.trim()
-		.nonempty({
-			message:
-				translations[
-					'account-delete.validation.password_current_invalid'
-				],
-		}),
+	password_current: validateString(
+		translations['account-delete.validation.password_current_invalid'],
+	),
 });

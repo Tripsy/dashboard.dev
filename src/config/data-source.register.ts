@@ -1,7 +1,7 @@
 import { dataSourceConfigBrands } from '@/app/(dashboard)/dashboard/brands/brands.definition';
 import { dataSourceConfigCashFlow } from '@/app/(dashboard)/dashboard/cash-flow/cash-flow.definition';
-import { dataSourceConfigClients } from '@/app/(dashboard)/dashboard/clients/clients.definition';
 import { dataSourceConfigClientAddress } from '@/app/(dashboard)/dashboard/client-address/client-address.definition';
+import { dataSourceConfigClients } from '@/app/(dashboard)/dashboard/clients/clients.definition';
 import { dataSourceConfigCronHistory } from '@/app/(dashboard)/dashboard/cron-history/cron-history.definition';
 import { dataSourceConfigLogData } from '@/app/(dashboard)/dashboard/log-data/log-data.definition';
 import { dataSourceConfigLogHistory } from '@/app/(dashboard)/dashboard/log-history/log-history.definition';

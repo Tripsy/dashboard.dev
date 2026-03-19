@@ -5,19 +5,23 @@ import {
 } from '@/app/(dashboard)/_components/data-table-value';
 import type { FormStateType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
+import { isValidCnp, isValidIBAN, validateString } from '@/helpers/form.helper';
 import {
 	type ClientFormValuesType,
 	type ClientModel,
 	ClientStatusEnum,
 	ClientTypeEnum,
+	getClientDisplayName,
 } from '@/models/client.model';
 import {
 	createClient,
-	deleteClient, disableClient, enableClient,
-	findClients, restoreClient,
+	deleteClient,
+	disableClient,
+	enableClient,
+	findClients,
+	restoreClient,
 	updateClient,
 } from '@/services/clients.service';
-import type {UserModel} from "@/models/user.model";
 
 const translations = await translateBatch([
 	'clients.validation.client_type_invalid',
@@ -29,64 +33,93 @@ const translations = await translateBatch([
 
 	'clients.validation.person_name_invalid',
 	'clients.validation.person_cnp_invalid',
+
+	'clients.validation.iban_invalid',
+	'clients.validation.contact_email_invalid',
 ]);
 
-const ValidateSchemaBaseClients = z.object({
-	client_type: z.enum(ClientTypeEnum, {
-		message: translations['clients.validation.client_type_invalid'],
-	}),
-	notes: z.string({
-		message: translations['clients.validation.notes_invalid'],
-	}).nullable().optional(),
-});
+const ClientBaseSchema = {
+	iban: z
+		.string()
+		.nullable()
+		.refine(
+			(val) => {
+				if (val === null || val === '') {
+					return true;
+				}
 
-const ValidateSchemaCompanyIdentity = z.object({
-	client_type: z.literal(ClientTypeEnum.COMPANY),
-	company_name: z
-		.string({
-			message: translations['clients.validation.company_name_invalid'],
-		})
-		.trim()
-		.nonempty({
-			message: translations['clients.validation.company_name_invalid'],
-		}),
-	company_cui: z.string({
-		message: translations['clients.validation.company_cui_invalid'],
-	}).nullable().optional(),
-	company_reg_com: z.string({
-		message: translations['clients.validation.company_reg_com_invalid'],
-	}).nullable().optional(),
-});
+				return isValidIBAN(val);
+			},
+			{
+				message: translations['clients.validation.iban_invalid'],
+			},
+		),
+	bank_name: z.string().nullable(),
 
-const ValidateSchemaPersonIdentity = z.object({
-	client_type: z.literal(ClientTypeEnum.PERSON),
-	person_name: z
-		.string({
-			message: translations['clients.validation.person_name_invalid'],
-		})
-		.trim()
-		.nonempty({
-			message: translations['clients.validation.person_name_invalid'],
-		}),
-	person_cnp: z.string()
-		.length(13, {
-			message: translations['clients.validation.cnp_invalid'],
-		})
-		.regex(/^\d+$/, {
-			message: translations['clients.validation.cnp_invalid'],
+	contact_name: z.string().nullable(),
+	contact_email: z
+		.email({
+			message: translations['clients.validation.contact_email_invalid'],
 		})
 		.nullable()
-		.optional(),
-});
+		.or(z.literal('')),
+	contact_phone: z.string().nullable(),
 
-const ValidateSchemaClientIdentity = z.union([
-	ValidateSchemaCompanyIdentity,
-	ValidateSchemaPersonIdentity,
+	notes: z.string().nullable(),
+};
+
+const ValidateSchemaClient = z.discriminatedUnion('client_type', [
+	// Company schema
+	z
+		.object({
+			client_type: z.literal(ClientTypeEnum.COMPANY),
+			company_name: validateString(
+				translations['clients.validation.company_name_invalid'],
+			),
+			company_cui: validateString(
+				translations['clients.validation.company_cui_invalid'],
+			),
+			company_reg_com: validateString(
+				translations['clients.validation.company_reg_com_invalid'],
+			)
+				.nullable()
+				.optional(),
+			person_name: z.never().optional(),
+			person_cnp: z.never().optional(),
+		})
+		.extend(ClientBaseSchema),
+
+	// Person schema
+	z
+		.object({
+			client_type: z.literal(ClientTypeEnum.PERSON),
+			person_name: validateString(
+				translations['clients.validation.person_name_invalid'],
+			),
+			person_cnp: z
+				.string()
+				.nullable()
+				.refine(
+					(val) => {
+						if (val === null || val === '') {
+							return true;
+						}
+
+						return isValidCnp(val);
+					},
+					{
+						message:
+							translations[
+								'clients.validation.person_cnp_invalid'
+							],
+					},
+				),
+			company_name: z.never().optional(),
+			company_cui: z.never().optional(),
+			company_reg_com: z.never().optional(),
+		})
+		.extend(ClientBaseSchema),
 ]);
-
-const ValidateSchemaClients = ValidateSchemaBaseClients.and(
-	ValidateSchemaClientIdentity,
-);
 
 export function getFormValuesClient(formData: FormData): ClientFormValuesType {
 	const client_type = formData.get('client_type') as ClientTypeEnum;
@@ -96,19 +129,6 @@ export function getFormValuesClient(formData: FormData): ClientFormValuesType {
 
 		iban: (formData.get('iban') as string) || null,
 		bank_name: (formData.get('bank_name') as string) || null,
-
-		address_location: formData.get('address_location') as string,
-		address_country_id: formData.get('address_country_id')
-			? Number(formData.get('address_country_id'))
-			: null,
-		address_region_id: formData.get('address_region_id')
-			? Number(formData.get('address_region_id'))
-			: null,
-		address_city_id: formData.get('address_city_id')
-			? Number(formData.get('address_city_id'))
-			: null,
-		address_info: (formData.get('address_info') as string) || null,
-		address_postal_code: formData.get('address_postal_code'),
 
 		contact_name: (formData.get('contact_name') as string) || null,
 		contact_email: (formData.get('contact_email') as string) || null,
@@ -122,7 +142,8 @@ export function getFormValuesClient(formData: FormData): ClientFormValuesType {
 
 			company_name: (formData.get('company_name') as string) || null,
 			company_cui: (formData.get('company_cui') as string) || null,
-			company_reg_com: (formData.get('company_reg_com') as string) || null,
+			company_reg_com:
+				(formData.get('company_reg_com') as string) || null,
 		};
 	}
 
@@ -153,14 +174,6 @@ export const clientsDataTableFilters: ClientsDataTableFiltersType = {
 	is_deleted: { value: false, matchMode: 'equals' },
 };
 
-function getClientDisplayName(client: ClientModel): string {
-	if (client.client_type === ClientTypeEnum.COMPANY) {
-		return client.company_name ?? '';
-	}
-
-	return client.person_name ?? '';
-}
-
 export const dataSourceConfigClients = {
 	dataTableState: {
 		reloadTrigger: 0,
@@ -173,7 +186,7 @@ export const dataSourceConfigClients = {
 	dataTableColumns: [
 		{
 			field: 'id',
-			header: "ID",
+			header: 'ID',
 			sortable: true,
 			body: (
 				entry: ClientModel,
@@ -189,7 +202,7 @@ export const dataSourceConfigClients = {
 		},
 		{
 			field: 'client_type',
-			header: "Type",
+			header: 'Type',
 			sortable: true,
 			body: (
 				entry: ClientModel,
@@ -201,7 +214,7 @@ export const dataSourceConfigClients = {
 		},
 		{
 			field: 'name',
-			header: "Name",
+			header: 'Name',
 			body: (
 				entry: ClientModel,
 				column: DataTableColumnType<ClientModel>,
@@ -212,8 +225,11 @@ export const dataSourceConfigClients = {
 		},
 		{
 			field: 'status',
-			header: "Status",
-			body: (entry: ClientModel, column: DataTableColumnType<ClientModel>) =>
+			header: 'Status',
+			body: (
+				entry: ClientModel,
+				column: DataTableColumnType<ClientModel>,
+			) =>
 				DataTableValue(entry, column, {
 					isStatus: true,
 					markDeleted: true,
@@ -235,7 +251,7 @@ export const dataSourceConfigClients = {
 		},
 		{
 			field: 'created_at',
-			header: "Created At",
+			header: 'Created At',
 			sortable: true,
 			body: (
 				entry: ClientModel,
@@ -275,7 +291,7 @@ export const dataSourceConfigClients = {
 		find: findClients,
 		getFormValues: getFormValuesClient,
 		validateForm: (values: ClientFormValuesType) => {
-			return ValidateSchemaClients.safeParse(values);
+			return ValidateSchemaClient.safeParse(values);
 		},
 		syncFormState: (
 			state: FormStateType<'clients', ClientModel, ClientFormValuesType>,
@@ -286,13 +302,6 @@ export const dataSourceConfigClients = {
 
 				iban: model.iban,
 				bank_name: model.bank_name,
-
-				address_location: model.address_location,
-				address_country_id: model.address_country_id,
-				address_region_id: model.address_region_id,
-				address_city_id: model.address_city_id,
-				address_info: model.address_info,
-				address_postal_code: model.address_postal_code,
 
 				contact_name: model.contact_name,
 				contact_email: model.contact_email,

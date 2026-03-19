@@ -19,9 +19,8 @@ export const findCashFlows: FindFunctionType<CashFlowModel> = async (
 ) => {
 	const query = buildQueryString(params);
 
-	const response: ApiResponseFetch<
-		FindFunctionResponseType<CashFlowModel>
-	> = await new ApiRequest().doFetch(`/cash-flow?${query}`);
+	const response: ApiResponseFetch<FindFunctionResponseType<CashFlowModel>> =
+		await new ApiRequest().doFetch(`/cash-flow?${query}`);
 
 	return getResponseData(response);
 };

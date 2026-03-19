@@ -1,17 +1,16 @@
 import { useMemo } from 'react';
 import { formatDate } from '@/helpers/date.helper';
-import {
-	formatEnumLabel,
-} from '@/helpers/string.helper';
+import { formatEnumLabel } from '@/helpers/string.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import type { ClientAddressModel } from '@/models/client-address.model';
 
-export function ClientAddressDetails({ entry }: { entry: ClientAddressModel | undefined }) {
+export function ClientAddressDetails({
+	entry,
+}: {
+	entry: ClientAddressModel | undefined;
+}) {
 	const translationsKeys = useMemo(
-		() =>
-			[
-				'dashboard.text.no_entry_selected',
-			] as const,
+		() => ['dashboard.text.no_entry_selected'] as const,
 		[],
 	);
 
@@ -29,21 +28,14 @@ export function ClientAddressDetails({ entry }: { entry: ClientAddressModel | un
 		<div className="space-y-6">
 			<div className="space-y-1">
 				<div>
-					<span className="font-semibold">
-						ID
-					</span>{' '}
-					{entry.id}
+					<span className="font-semibold">ID</span> {entry.id}
 				</div>
 				<div>
-					<span className="font-semibold">
-						Client
-					</span>{' '}
+					<span className="font-semibold">Client</span>{' '}
 					{/*{entry.name}*/}
 				</div>
 				<div>
-					<span className="font-semibold">
-						Address Type
-					</span>{' '}
+					<span className="font-semibold">Address Type</span>{' '}
 					{formatEnumLabel(entry.address_type)}
 				</div>
 			</div>
@@ -54,9 +46,7 @@ export function ClientAddressDetails({ entry }: { entry: ClientAddressModel | un
 				</h3>
 				<div className="ml-4 space-y-1 text-sm">
 					<div>
-						<span className="font-semibold">
-							Address - Info
-						</span>{' '}
+						<span className="font-semibold">Address - Info</span>{' '}
 						{entry.address_info}
 					</div>
 					<div>
@@ -74,15 +64,11 @@ export function ClientAddressDetails({ entry }: { entry: ClientAddressModel | un
 				</h3>
 				<div className="ml-4 space-y-1 text-sm">
 					<div>
-						<span className="font-semibold">
-							Created At
-						</span>{' '}
+						<span className="font-semibold">Created At</span>{' '}
 						{formatDate(entry.created_at, 'date-time')}
 					</div>
 					<div>
-						<span className="font-semibold">
-							Updated At
-						</span>{' '}
+						<span className="font-semibold">Updated At</span>{' '}
 						{formatDate(entry.updated_at, 'date-time') || '-'}
 					</div>
 				</div>

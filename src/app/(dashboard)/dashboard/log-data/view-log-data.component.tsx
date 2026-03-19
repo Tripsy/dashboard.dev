@@ -11,10 +11,7 @@ export function ViewLogData() {
 	const entry = useStore(dataTableStore, (state) => state.actionEntry);
 
 	const translationsKeys = useMemo(
-		() =>
-			[
-				'dashboard.text.no_entry_selected',
-			] as const,
+		() => ['dashboard.text.no_entry_selected'] as const,
 		[],
 	);
 
@@ -35,45 +32,28 @@ export function ViewLogData() {
 		<div className="space-y-6">
 			<div className="space-y-1">
 				<div>
-					<span className="font-semibold">
-						ID
-					</span>{' '}
-					{entry.id}
+					<span className="font-semibold">ID</span> {entry.id}
 				</div>
 				<div>
-					<span className="font-semibold">
-						PID
-					</span>{' '}
-					{entry.pid}
+					<span className="font-semibold">PID</span> {entry.pid}
 				</div>
 				<div>
-					<span className="font-semibold">
-						Request ID
-					</span>{' '}
+					<span className="font-semibold">Request ID</span>{' '}
 					{entry.request_id ?? 'n/a'}
 				</div>
 				<div>
-					<span className="font-semibold">
-						Category
-					</span>{' '}
+					<span className="font-semibold">Category</span>{' '}
 					{entry.category}
 				</div>
 				<div>
-					<span className="font-semibold">
-						Level
-					</span>{' '}
-					{entry.level}
+					<span className="font-semibold">Level</span> {entry.level}
 				</div>
 				<div>
-					<span className="font-semibold">
-						Message
-					</span>{' '}
+					<span className="font-semibold">Message</span>{' '}
 					{entry.message}
 				</div>
 				<div>
-					<span className="font-semibold">
-						Created At
-					</span>{' '}
+					<span className="font-semibold">Created At</span>{' '}
 					{formatDate(entry.created_at, 'date-time')}
 				</div>
 			</div>
@@ -85,33 +65,23 @@ export function ViewLogData() {
 					</h3>
 					<div className="ml-4 space-y-1">
 						<div>
-							<span className="font-semibold">
-								Method
-							</span>{' '}
+							<span className="font-semibold">Method</span>{' '}
 							{parsedContext.request.method}
 						</div>
 						<div>
-							<span className="font-semibold">
-								URL
-							</span>{' '}
+							<span className="font-semibold">URL</span>{' '}
 							{decodeURI(parsedContext.request.url)}
 						</div>
 						<div>
-							<span className="font-semibold">
-								Body
-							</span>{' '}
+							<span className="font-semibold">Body</span>{' '}
 							{JSON.stringify(parsedContext.request.body)}
 						</div>
 						<div>
-							<span className="font-semibold">
-								Params
-							</span>{' '}
+							<span className="font-semibold">Params</span>{' '}
 							{JSON.stringify(parsedContext.request.params)}
 						</div>
 						<div>
-							<span className="font-semibold">
-								Query
-							</span>{' '}
+							<span className="font-semibold">Query</span>{' '}
 							{JSON.stringify(parsedContext.request.query)}
 						</div>
 					</div>
@@ -125,28 +95,20 @@ export function ViewLogData() {
 					</h3>
 					<div className="ml-4 space-y-1">
 						<div>
-							<span className="font-semibold">
-								File
-							</span>{' '}
+							<span className="font-semibold">File</span>{' '}
 							{parsedDebugStack.file}
 						</div>
 						<div>
-							<span className="font-semibold">
-								Line
-							</span>{' '}
+							<span className="font-semibold">Line</span>{' '}
 							{parsedDebugStack.line}
 						</div>
 						<div>
-							<span className="font-semibold">
-								Function
-							</span>{' '}
+							<span className="font-semibold">Function</span>{' '}
 							{parsedDebugStack.function}
 						</div>
 						{parsedDebugStack.trace && (
 							<div>
-								<span className="font-semibold">
-									Trace
-								</span>
+								<span className="font-semibold">Trace</span>
 								<pre className="bg-gray-50 border rounded p-2 text-xs mt-1 overflow-x-auto">
 									{parsedDebugStack.trace.join('\n')}
 								</pre>

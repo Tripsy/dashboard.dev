@@ -4,16 +4,9 @@ import { formatEnumLabel } from '@/helpers/string.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import type { ClientModel } from '@/models/client.model';
 
-export function ClientDetails({
-	entry,
-}: {
-	entry: ClientModel | undefined;
-}) {
+export function ClientDetails({ entry }: { entry: ClientModel | undefined }) {
 	const translationsKeys = useMemo(
-		() =>
-			[
-				'dashboard.text.no_entry_selected',
-			] as const,
+		() => ['dashboard.text.no_entry_selected'] as const,
 		[],
 	);
 
@@ -27,21 +20,14 @@ export function ClientDetails({
 		);
 	}
 
-	console.log(entry)
-
 	return (
 		<div className="space-y-6">
 			<div className="space-y-1 text-sm">
 				<div>
-					<span className="font-semibold">
-						ID
-					</span>{' '}
-					{entry.id}
+					<span className="font-semibold">ID</span> {entry.id}
 				</div>
 				<div>
-					<span className="font-semibold">
-						Type
-					</span>{' '}
+					<span className="font-semibold">Type</span>{' '}
 					{formatEnumLabel(entry.client_type)}
 				</div>
 			</div>
@@ -52,21 +38,15 @@ export function ClientDetails({
 				</h3>
 				<div className="ml-4 space-y-1 text-sm">
 					<div>
-						<span className="font-semibold">
-							Name
-						</span>{' '}
+						<span className="font-semibold">Name</span>{' '}
 						{entry.contact_name}
 					</div>
 					<div>
-						<span className="font-semibold">
-							Email
-						</span>{' '}
+						<span className="font-semibold">Email</span>{' '}
 						{entry.contact_email}
 					</div>
 					<div>
-						<span className="font-semibold">
-							Phone
-						</span>{' '}
+						<span className="font-semibold">Phone</span>{' '}
 						{entry.contact_phone}
 					</div>
 				</div>
@@ -78,42 +58,11 @@ export function ClientDetails({
 				</h3>
 				<div className="ml-4 space-y-1 text-sm">
 					<div>
-						<span className="font-semibold">
-							IBAN
-						</span>{' '}
-						{entry.iban}
+						<span className="font-semibold">IBAN</span> {entry.iban}
 					</div>
 					<div>
-						<span className="font-semibold">
-							Bank Name
-						</span>{' '}
+						<span className="font-semibold">Bank Name</span>{' '}
 						{entry.bank_name}
-					</div>
-				</div>
-			</div>
-
-			<div>
-				<h3 className="font-bold border-b border-line pb-2 mb-3">
-					Address Details
-				</h3>
-				<div className="ml-4 space-y-1 text-sm">
-					<div>
-						<span className="font-semibold">
-							Place
-						</span>{' '}
-						{entry.address_location}
-					</div>
-					<div>
-						<span className="font-semibold">
-							Location
-						</span>{' '}
-						{entry.address_info}
-					</div>
-					<div>
-						<span className="font-semibold">
-							Postal Code
-						</span>{' '}
-						{entry.address_postal_code}
 					</div>
 				</div>
 			</div>
@@ -124,22 +73,16 @@ export function ClientDetails({
 				</h3>
 				<div className="ml-4 space-y-1 text-sm">
 					<div>
-						<span className="font-semibold">
-							Created At
-						</span>{' '}
+						<span className="font-semibold">Created At</span>{' '}
 						{formatDate(entry.created_at, 'date-time')}
 					</div>
 					<div>
-						<span className="font-semibold">
-							Updated At
-						</span>{' '}
+						<span className="font-semibold">Updated At</span>{' '}
 						{formatDate(entry.updated_at, 'date-time')}
 					</div>
 					{entry.deleted_at && (
 						<div>
-							<span className="font-semibold">
-								Deleted At
-							</span>{' '}
+							<span className="font-semibold">Deleted At</span>{' '}
 							<span className="text-red-500">
 								{formatDate(entry.deleted_at, 'date-time')}
 							</span>

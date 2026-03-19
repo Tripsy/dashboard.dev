@@ -49,7 +49,7 @@ export const FormElement = ({
 }: {
 	children: JSX.Element;
 	className?: string;
-	label?: { text: string; for?: string; required?: boolean };
+	label?: { text?: string; for?: string; required?: boolean };
 	error?: string[];
 }): JSX.Element | null => (
 	<div className={cn('form-element', className)}>
@@ -143,7 +143,7 @@ const useFieldState = ({
 
 export type FormComponentProps<Fields, Value> = {
 	id: string;
-	labelText: string;
+	labelText?: string;
 	fieldType?: 'text' | 'password' | 'email' | 'number';
 	fieldName: keyof Fields & string;
 	fieldValue: Value;

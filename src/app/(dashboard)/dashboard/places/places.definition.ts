@@ -5,12 +5,18 @@ import {
 } from '@/app/(dashboard)/_components/data-table-value';
 import type { FormStateType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
+import {
+	validateEnum,
+	validateId,
+	validateString,
+} from '@/helpers/form.helper';
 import { toTitleCase } from '@/helpers/string.helper';
 import {
 	type PlaceFormValuesType,
 	type PlaceModel,
 	PlaceTypeEnum,
 } from '@/models/place.model';
+import { LanguageEnum } from '@/models/user.model';
 import {
 	createPlace,
 	deletePlace,
@@ -25,28 +31,35 @@ const translations = await translateBatch([
 	'places.validation.contents_invalid',
 ]);
 
-// TODO contents / validation
 const ValidateSchemaPlaceBase = z.object({
-	type: z.enum(PlaceTypeEnum, translations['places.validation.type_invalid']),
-	code: z.string(translations['places.validation.type_invalid']).trim().max(3, translations['places.validation.type_invalid']).nullable().optional(),
-	parent_id: z.number().nullable(),
+	type: validateEnum(
+		PlaceTypeEnum,
+		translations['places.validation.type_invalid'],
+	),
+	code: validateString(translations['places.validation.type_invalid'])
+		.max(3, translations['places.validation.type_invalid'])
+		.nullable()
+		.optional(),
+	parent_id: validateId(
+		translations['places.validation.parent_id_invalid'],
+	).optional(),
 });
 
 const ValidateSchemaContent = z.object({
-	language: z.string(),
-	name: z
-		.string()
-		.trim()
-		.nonempty({ message: translations['places.validation.name_invalid'] }),
-	type_label: z.string().trim().nonempty(),
+	language: validateEnum(
+		LanguageEnum,
+		translations['places.validation.language_valid'],
+	),
+	name: validateString(translations['places.validation.name_invalid']),
+	type_label: validateString(
+		translations['places.validation.type_label_invalid'],
+	),
 });
 
 const ValidateSchemaPlace = ValidateSchemaPlaceBase.extend({
-	contents: z
-		.array(ValidateSchemaContent)
-		.min(1, {
-			message: translations['places.validation.contents_invalid'],
-		}),
+	contents: z.array(ValidateSchemaContent).min(1, {
+		message: translations['places.validation.contents_invalid'],
+	}),
 });
 
 export function getFormValuesPlace(formData: FormData): PlaceFormValuesType {
@@ -118,7 +131,7 @@ export const dataSourceConfigPlaces = {
 	dataTableColumns: [
 		{
 			field: 'id',
-			header: "ID",
+			header: 'ID',
 			sortable: true,
 			body: (
 				entry: PlaceModel,
@@ -130,7 +143,7 @@ export const dataSourceConfigPlaces = {
 		},
 		{
 			field: 'type',
-			header: "Type",
+			header: 'Type',
 			sortable: true,
 			body: (
 				entry: PlaceModel,
@@ -142,12 +155,12 @@ export const dataSourceConfigPlaces = {
 		},
 		{
 			field: 'code',
-			header: "Code",
+			header: 'Code',
 			sortable: true,
 		},
 		{
 			field: 'name',
-			header: "Name",
+			header: 'Name',
 			body: (
 				entry: PlaceModel,
 				column: DataTableColumnType<PlaceModel>,
@@ -158,7 +171,7 @@ export const dataSourceConfigPlaces = {
 		},
 		{
 			field: 'created_at',
-			header: "Created At",
+			header: 'Created At',
 			sortable: true,
 			body: (
 				entry: PlaceModel,

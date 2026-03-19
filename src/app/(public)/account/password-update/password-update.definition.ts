@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { Configuration } from '@/config/settings.config';
 import { translateBatch } from '@/config/translate.setup';
+import { validatePassword, validateString } from '@/helpers/form.helper';
 import type { FormSituationType } from '@/types/form.type';
 
 export type PasswordUpdateFormFieldsType = {
@@ -47,66 +48,43 @@ const translations = await translateBatch([
 
 export const PasswordUpdateSchema = z
 	.object({
-		password_current: z
-			.string({
-				message:
+		password_current: validateString(
+			translations[
+				'account-password-update.validation.password_current_invalid'
+			],
+		),
+		password_new: validatePassword(
+			{
+				password_invalid:
 					translations[
-						'account-password-update.validation.password_current_invalid'
+						'account-password-update.validation.password_invalid'
 					],
-			})
-			.trim()
-			.nonempty({
-				message:
+				password_min:
 					translations[
-						'account-password-update.validation.password_current_invalid'
+						'account-password-update.validation.password_min'
 					],
-			}),
-		password_new: z
-			.string({
-				message:
+				password_condition_capital_letter:
 					translations[
-						'account-password-update.validation.password_new_invalid'
+						'account-password-update.validation.password_condition_capital_letter'
 					],
-			})
-			.trim()
-			.min(Configuration.get('user.passwordMinLength') as number, {
-				message:
+				password_condition_number:
 					translations[
-						'account-password-update.validation.password_new_min'
+						'account-password-update.validation.password_condition_number'
 					],
-			})
-			.refine((value) => /[A-Z]/.test(value), {
-				message:
+				password_condition_special_character:
 					translations[
-						'account-password-update.validation.password_new_condition_capital_letter'
+						'account-password-update.validation.password_condition_special_character'
 					],
-			})
-			.refine((value) => /[0-9]/.test(value), {
-				message:
-					translations[
-						'account-password-update.validation.password_new_condition_number'
-					],
-			})
-			.refine((value) => /[!@#$%^&*()_+{}[\]:;<>,.?~\\/-]/.test(value), {
-				message:
-					translations[
-						'account-password-update.validation.password_new_condition_special_character'
-					],
-			}),
-		password_confirm: z
-			.string({
-				message:
-					translations[
-						'account-password-update.validation.password_confirm_required'
-					],
-			})
-			.trim()
-			.nonempty({
-				message:
-					translations[
-						'account-password-update.validation.password_confirm_required'
-					],
-			}),
+			},
+			{
+				minLength: Configuration.get(
+					'user.passwordMinLength',
+				) as number,
+			},
+		),
+		password_confirm: validateString(
+			translations['users.validation.password_confirm_required'],
+		),
 	})
 	.superRefine(({ password_new, password_confirm }, ctx) => {
 		if (password_new !== password_confirm) {

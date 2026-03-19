@@ -1,0 +1,41 @@
+{
+	"meta": {
+		"title": "Client addresses - Dashboard | {{app_name}}"
+	},
+	"validation": {
+		"address_client_id_invalid": "Invalid client ID",
+		"address_type_invalid": "Address type is required",
+		"address_city_id_invalid": "Invalid city ID",
+		"address_info_invalid": "Invalid address info",
+		"address_postal_code_invalid": "Invalid postal code",
+		"notes_invalid": "Invalid notes"
+	},
+	"action": {
+		"create": {
+			"title": "Add new address",
+			"label": "Add",
+			"success": "New client address added successfully"
+		},
+		"update": {
+			"title": "Edit address",
+			"label": "Update",
+			"success": "Client address updated successfully"
+		},
+		"delete": {
+			"title": "Delete client address",
+			"label": "Delete",
+			"success": "Client address deleted successfully",
+			"confirmText": "Are you sure you want to delete this client address?"
+		},
+		"restore": {
+			"title": "Restore client address",
+			"label": "Restore",
+			"success": "Client address restored successfully",
+			"confirmText": "Are you sure you want to restore this client address?"
+		},
+		"view": {
+			"title": "Address details",
+			"label": "View details"
+		}
+	}
+}

@@ -7,6 +7,11 @@ import type { FormStateType } from '@/config/data-source.config';
 import { Configuration } from '@/config/settings.config';
 import { translateBatch } from '@/config/translate.setup';
 import {
+	validateEnum,
+	validatePassword,
+	validateString,
+} from '@/helpers/form.helper';
+import {
 	LanguageEnum,
 	type UserFormValuesType,
 	type UserModel,
@@ -56,58 +61,52 @@ const translations = await translateBatch([
 ]);
 
 const ValidateSchemaBaseUsers = z.object({
-	name: z
-		.string({ message: translations['users.validation.name_invalid'] })
-		.trim()
-		.min(Configuration.get('user.nameMinLength') as number, {
+	name: validateString(translations['users.validation.name_invalid']).min(
+		Configuration.get('user.nameMinLength') as number,
+		{
 			message: translations['users.validation.name_min'],
-		}),
+		},
+	),
 	email: z.email({
 		message: translations['users.validation.email_invalid'],
 	}),
-	language: z.enum(LanguageEnum, {
-		message: translations['users.validation.language_invalid'],
-	}),
-	role: z.enum(UserRoleEnum, {
-		message: translations['users.validation.role_invalid'],
-	}),
-	operator_type: z
-		.enum(UserOperatorTypeEnum, {
-			message: translations['users.validation.operator_type_invalid'],
-		})
-		.nullable(),
+	language: validateEnum(
+		LanguageEnum,
+		translations['users.validation.language_valid'],
+	),
+	role: validateEnum(
+		UserRoleEnum,
+		translations['users.validation.role_invalid'],
+	),
+	operator_type: validateEnum(
+		UserOperatorTypeEnum,
+		translations['users.validation.operator_type_invalid'],
+	).nullable(),
 });
 
 const ValidateSchemaCreateUsers = ValidateSchemaBaseUsers.extend({
-	password: z
-		.string({ message: translations['users.validation.password_invalid'] })
-		.trim()
-		.min(Configuration.get('user.passwordMinLength') as number, {
-			message: translations['users.validation.password_min'],
-		})
-		.refine((value) => /[A-Z]/.test(value), {
-			message:
+	password: validatePassword(
+		{
+			password_invalid: translations['users.validation.password_invalid'],
+			password_min: translations['users.validation.password_min'],
+			password_condition_capital_letter:
 				translations[
 					'users.validation.password_condition_capital_letter'
 				],
-		})
-		.refine((value) => /[0-9]/.test(value), {
-			message: translations['users.validation.password_condition_number'],
-		})
-		.refine((value) => /[!@#$%^&*()_+{}[\]:;<>,.?~\\/-]/.test(value), {
-			message:
+			password_condition_number:
+				translations['users.validation.password_condition_number'],
+			password_condition_special_character:
 				translations[
 					'users.validation.password_condition_special_character'
 				],
-		}),
-	password_confirm: z
-		.string({
-			message: translations['users.validation.password_confirm_required'],
-		})
-		.trim()
-		.nonempty({
-			message: translations['users.validation.password_confirm_required'],
-		}),
+		},
+		{
+			minLength: Configuration.get('user.passwordMinLength') as number,
+		},
+	),
+	password_confirm: validateString(
+		translations['users.validation.password_confirm_required'],
+	),
 })
 	.superRefine(({ password, password_confirm }, ctx) => {
 		if (password !== password_confirm) {
@@ -130,44 +129,52 @@ const ValidateSchemaCreateUsers = ValidateSchemaBaseUsers.extend({
 	});
 
 const ValidateSchemaUpdateUsers = ValidateSchemaBaseUsers.extend({
-	password: z.preprocess(
-		(val) => (val === '' ? undefined : val),
-		z
-			.string({
+	password: z
+		.string()
+		.nullable()
+		.optional()
+		.refine(
+			(val) => {
+				if (!val) {
+					return true;
+				}
+
+				return validatePassword(
+					{
+						password_invalid:
+							translations['users.validation.password_invalid'],
+						password_min:
+							translations['users.validation.password_min'],
+						password_condition_capital_letter:
+							translations[
+								'users.validation.password_condition_capital_letter'
+							],
+						password_condition_number:
+							translations[
+								'users.validation.password_condition_number'
+							],
+						password_condition_special_character:
+							translations[
+								'users.validation.password_condition_special_character'
+							],
+					},
+					{
+						minLength: Configuration.get(
+							'user.passwordMinLength',
+						) as number,
+					},
+				).safeParse(val).success;
+			},
+			{
 				message: translations['users.validation.password_invalid'],
-			})
-			.trim()
-			.min(Configuration.get('user.passwordMinLength') as number, {
-				message: translations['users.validation.password_min'],
-			})
-			.refine((value) => /[A-Z]/.test(value), {
-				message:
-					translations[
-						'users.validation.password_condition_capital_letter'
-					],
-			})
-			.refine((value) => /[0-9]/.test(value), {
-				message:
-					translations['users.validation.password_condition_number'],
-			})
-			.refine((value) => /[!@#$%^&*()_+{}[\]:;<>,.?~\\/-]/.test(value), {
-				message:
-					translations[
-						'users.validation.password_condition_special_character'
-					],
-			})
-			.optional(),
-	),
-	password_confirm: z.preprocess(
-		(val) => (val === '' ? undefined : val),
-		z
-			.string({
-				message:
-					translations['users.validation.password_confirm_required'],
-			})
-			.trim()
-			.optional(),
-	),
+			},
+		),
+	password_confirm: z
+		.string({
+			message: translations['users.validation.password_confirm_required'],
+		})
+		.nullable()
+		.optional(),
 })
 	.superRefine(({ password, password_confirm }, ctx) => {
 		if (password || password_confirm) {
@@ -261,7 +268,7 @@ export const dataSourceConfigUsers = {
 	dataTableColumns: [
 		{
 			field: 'id',
-			header: "ID",
+			header: 'ID',
 			sortable: true,
 			body: (entry: UserModel, column: DataTableColumnType<UserModel>) =>
 				DataTableValue(entry, column, {
@@ -274,16 +281,16 @@ export const dataSourceConfigUsers = {
 		},
 		{
 			field: 'name',
-			header: "Name",
+			header: 'Name',
 			sortable: true,
 		},
 		{
 			field: 'email',
-			header: "Email",
+			header: 'Email',
 		},
 		{
 			field: 'role',
-			header: "Role",
+			header: 'Role',
 			body: (entry: UserModel, column: DataTableColumnType<UserModel>) =>
 				DataTableValue(entry, column, {
 					capitalize: true,
@@ -299,7 +306,7 @@ export const dataSourceConfigUsers = {
 		},
 		{
 			field: 'status',
-			header: "Status",
+			header: 'Status',
 			body: (entry: UserModel, column: DataTableColumnType<UserModel>) =>
 				DataTableValue(entry, column, {
 					isStatus: true,
@@ -322,7 +329,7 @@ export const dataSourceConfigUsers = {
 		},
 		{
 			field: 'created_at',
-			header: "Created At",
+			header: 'Created At',
 			sortable: true,
 			body: (entry: UserModel, column: DataTableColumnType<UserModel>) =>
 				DataTableValue(entry, column, {

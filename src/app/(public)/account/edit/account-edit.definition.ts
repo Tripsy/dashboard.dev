@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { Configuration } from '@/config/settings.config';
 import { translateBatch } from '@/config/translate.setup';
+import { validateEnum, validateString } from '@/helpers/form.helper';
 import { LanguageEnum } from '@/models/user.model';
 import type { FormSituationType } from '@/types/form.type';
 
@@ -40,15 +41,13 @@ const translations = await translateBatch([
 ]);
 
 export const AccountEditSchema = z.object({
-	name: z
-		.string({
-			message: translations['account-edit.validation.name_invalid'],
-		})
-		.trim()
-		.min(Configuration.get('user.nameMinLength') as number, {
-			message: translations['account-edit.validation.name_min'],
-		}),
-	language: z.enum(LanguageEnum, {
-		message: translations['account-edit.validation.language_invalid'],
+	name: validateString(
+		translations['account-edit.validation.name_invalid'],
+	).min(Configuration.get('user.nameMinLength') as number, {
+		message: translations['account-edit.validation.name_min'],
 	}),
+	language: validateEnum(
+		LanguageEnum,
+		translations['account-edit.validation.language_valid'],
+	),
 });

@@ -22,26 +22,6 @@ export enum ClientStatusEnum {
 // 	],
 // };
 
-export type ClientAddress = {
-	address_location: string | null;
-	address_country_id: number | null;
-	address_region_id: number | null;
-	address_city_id: number | null;
-	address_info: string | null;
-	address_postal_code: number | null;
-};
-
-export type ClientContact = {
-	contact_name: string | null;
-	contact_email: string | null;
-	contact_phone: string | null;
-};
-
-export type ClientFinancial = {
-	iban: string | null;
-	bank_name: string | null;
-};
-
 export type ClientIdentity =
 	| {
 			client_type: ClientTypeEnum.COMPANY;
@@ -64,6 +44,17 @@ export type ClientIdentity =
 			company_reg_com?: never;
 	  };
 
+export type ClientFinancial = {
+	iban: string | null;
+	bank_name: string | null;
+};
+
+export type ClientContact = {
+	contact_name: string | null;
+	contact_email: string | null;
+	contact_phone: string | null;
+};
+
 type ClientBase<D = Date | string> = {
 	id: number;
 
@@ -76,16 +67,29 @@ type ClientBase<D = Date | string> = {
 	deleted_at: D;
 };
 
-export type ClientModel<D = Date | string> =
-	ClientBase<D> &
+export type ClientModel<D = Date | string> = ClientBase<D> &
 	ClientIdentity &
 	ClientFinancial &
-	ClientAddress &
 	ClientContact;
 
-export type ClientFormValuesType = ClientIdentity &
-	ClientFinancial &
-	ClientContact &
-	ClientAddress & {
+export type ClientFormValuesType = {
+	client_type: ClientTypeEnum;
+
+	company_name?: string | null;
+	company_cui?: string | null;
+	company_reg_com?: string | null;
+
+	person_name?: string | null;
+	person_cnp?: string | null;
+} & ClientFinancial &
+	ClientContact & {
 		notes: string | null;
 	};
+
+export function getClientDisplayName(client: ClientModel): string {
+	if (client.client_type === ClientTypeEnum.COMPANY) {
+		return client.company_name ?? '';
+	}
+
+	return client.person_name ?? '';
+}

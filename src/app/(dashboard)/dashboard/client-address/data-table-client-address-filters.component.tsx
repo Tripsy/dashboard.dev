@@ -1,20 +1,21 @@
 'use client';
 
-import { type JSX, useCallback, useEffect, useMemo } from 'react';
+import { type JSX, useCallback, useEffect } from 'react';
 import { useStore } from 'zustand/react';
 import {
-	FormFiltersDateRange,
 	FormFiltersReset,
 	FormFiltersSearch,
 	FormFiltersSelect,
 	FormFiltersShowDeleted,
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
+import type { ClientAddressDataTableFiltersType } from '@/app/(dashboard)/dashboard/client-address/client-address.definition';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
-import { useTranslation } from '@/hooks/use-translation.hook';
-import {ClientAddressModel, ClientAddressTypeEnum} from "@/models/client-address.model";
-import {ClientAddressDataTableFiltersType} from "@/app/(dashboard)/dashboard/client-address/client-address.definition";
+import {
+	type ClientAddressModel,
+	ClientAddressTypeEnum,
+} from '@/models/client-address.model';
 
 const addressTypes = Object.values(ClientAddressTypeEnum).map((v) => ({
 	label: capitalizeFirstLetter(v),
@@ -22,7 +23,10 @@ const addressTypes = Object.values(ClientAddressTypeEnum).map((v) => ({
 }));
 
 export const DataTableClientAddressFilters = (): JSX.Element => {
-	const { stateDefault, dataTableStore } = useDataTable<'client-address', ClientAddressModel>();
+	const { stateDefault, dataTableStore } = useDataTable<
+		'client-address',
+		ClientAddressModel
+	>();
 
 	const filters = useStore(
 		dataTableStore,
@@ -84,7 +88,7 @@ export const DataTableClientAddressFilters = (): JSX.Element => {
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
 			<FormFiltersSearch<ClientAddressDataTableFiltersType>
-				labelText="ID / Address / Postal Code / Notes"
+				labelText="ID / Address / Postal Code"
 				search={searchGlobal}
 			/>
 
@@ -96,7 +100,10 @@ export const DataTableClientAddressFilters = (): JSX.Element => {
 				fieldValue={filters.address_type.value}
 				options={addressTypes}
 				onValueChange={(value) =>
-					setFilterValue('address_type', value as ClientAddressTypeEnum)
+					setFilterValue(
+						'address_type',
+						value as ClientAddressTypeEnum,
+					)
 				}
 			/>
 

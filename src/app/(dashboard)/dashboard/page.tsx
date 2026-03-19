@@ -1,16 +1,16 @@
 import {
-	ArrowUpRight, BanknoteArrowDown,
+	ArrowUpRight,
+	BanknoteArrowDown,
 	DollarSign,
-	Eye,
-	FileText, Hourglass,
+	Hourglass,
 	MoreHorizontal,
 	TrendingDown,
-	TrendingUp, Truck,
-	Users,
+	TrendingUp,
+	Truck,
 } from 'lucide-react';
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { Card } from 'primereact/card';
-import BreadcrumbSetter from '@/app/(dashboard)/_components/breadcrumb.setter';
 import { Button } from '@/components/ui/button';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -19,11 +19,10 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import Routes from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
 import { translate } from '@/config/translate.setup';
 import { cn } from '@/helpers/css.helper';
-import Link from "next/link";
-import Routes from "@/config/routes.setup";
 
 export async function generateMetadata(): Promise<Metadata> {
 	return {
@@ -168,8 +167,8 @@ export default async function Page() {
 										</p>
 									</div>
 									<span className="text-sm text-muted-foreground">
-									{activity.time}
-								</span>
+										{activity.time}
+									</span>
 								</div>
 							))}
 						</div>
@@ -182,8 +181,13 @@ export default async function Page() {
 						<CardHeader className="flex flex-row items-center justify-between">
 							<CardTitle>Work Sessions</CardTitle>
 							<Link href="#">
-								<Button variant="ghost" size="sm" className="gap-1">
-									View all <ArrowUpRight className="h-4 w-4" />
+								<Button
+									variant="ghost"
+									size="sm"
+									className="gap-1"
+								>
+									View all{' '}
+									<ArrowUpRight className="h-4 w-4" />
 								</Button>
 							</Link>
 						</CardHeader>
@@ -195,17 +199,18 @@ export default async function Page() {
 										className="flex items-center justify-between"
 									>
 										<div className="flex items-center gap-3">
-										<span className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-sm font-medium">
-											{i + 1}
-										</span>
+											<span className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-sm font-medium">
+												{i + 1}
+											</span>
 											<span className="font-medium">
-											{entry.title}
-										</span>
+												{entry.title}
+											</span>
 										</div>
 										<div className="flex items-center gap-2">
-										<span className="text-sm text-muted-foreground">
-											{entry.views.toLocaleString()} views
-										</span>
+											<span className="text-sm text-muted-foreground">
+												{entry.views.toLocaleString()}{' '}
+												views
+											</span>
 											{entry.trend === 'up' ? (
 												<TrendingUp className="h-4 w-4 text-success" />
 											) : (
@@ -223,8 +228,13 @@ export default async function Page() {
 						<CardHeader className="flex flex-row items-center justify-between">
 							<CardTitle>Latest CMRs</CardTitle>
 							<Link href="#">
-								<Button variant="ghost" size="sm" className="gap-1">
-									View all <ArrowUpRight className="h-4 w-4" />
+								<Button
+									variant="ghost"
+									size="sm"
+									className="gap-1"
+								>
+									View all{' '}
+									<ArrowUpRight className="h-4 w-4" />
 								</Button>
 							</Link>
 						</CardHeader>
@@ -236,17 +246,18 @@ export default async function Page() {
 										className="flex items-center justify-between"
 									>
 										<div className="flex items-center gap-3">
-										<span className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-sm font-medium">
-											{i + 1}
-										</span>
+											<span className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-sm font-medium">
+												{i + 1}
+											</span>
 											<span className="font-medium">
-											{entry.title}
-										</span>
+												{entry.title}
+											</span>
 										</div>
 										<div className="flex items-center gap-2">
-										<span className="text-sm text-muted-foreground">
-											{entry.views.toLocaleString()} views
-										</span>
+											<span className="text-sm text-muted-foreground">
+												{entry.views.toLocaleString()}{' '}
+												views
+											</span>
 											{entry.trend === 'up' ? (
 												<TrendingUp className="h-4 w-4 text-success" />
 											) : (
@@ -270,7 +281,9 @@ export default async function Page() {
 									</Button>
 								</DropdownMenuTrigger>
 								<DropdownMenuContent align="end">
-									<DropdownMenuItem>Last 7 days</DropdownMenuItem>
+									<DropdownMenuItem>
+										Last 7 days
+									</DropdownMenuItem>
 									<DropdownMenuItem>
 										Last 30 days
 									</DropdownMenuItem>
@@ -284,7 +297,8 @@ export default async function Page() {
 							{/* Placeholder chart visualization */}
 							<div className="h-64 flex items-end gap-2">
 								{[
-									40, 65, 45, 80, 55, 70, 90, 60, 75, 85, 50, 95,
+									40, 65, 45, 80, 55, 70, 90, 60, 75, 85, 50,
+									95,
 								].map((height) => (
 									<div
 										key={height}

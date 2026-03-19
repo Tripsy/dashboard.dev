@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import {
 	FormComponentInput,
 	FormComponentSelect,
@@ -8,8 +7,8 @@ import type { FormManageType } from '@/config/data-source.config';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import {
-	type CashFlowFormValuesType,
 	CashFlowCategoryEnum,
+	type CashFlowFormValuesType,
 	CashFlowMethodEnum,
 	CurrencyEnum,
 } from '@/models/cash-flow.model';
@@ -83,7 +82,10 @@ export function FormManageCashFlow({
 				isRequired={true}
 				disabled={pending}
 				onChange={(e) =>
-					handleChange('amount', e.target.value ? Number(e.target.value) : 0)
+					handleChange(
+						'amount',
+						e.target.value ? Number(e.target.value) : 0,
+					)
 				}
 				error={errors.amount}
 			/>

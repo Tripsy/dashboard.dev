@@ -8,7 +8,10 @@ import { useTranslation } from '@/hooks/use-translation.hook';
 import type { ClientAddressModel } from '@/models/client-address.model';
 
 export function ViewClientAddress() {
-	const { dataTableStore } = useDataTable<'client-address', ClientAddressModel>();
+	const { dataTableStore } = useDataTable<
+		'client-address',
+		ClientAddressModel
+	>();
 	const actionEntry = useStore(dataTableStore, (state) => state.actionEntry);
 
 	const translationsKeys = useMemo(

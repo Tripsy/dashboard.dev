@@ -39,7 +39,7 @@ export const dataSourceConfigMailQueue = {
 	dataTableColumns: [
 		{
 			field: 'id',
-			header: "ID",
+			header: 'ID',
 			sortable: true,
 			body: (
 				entry: MailQueueModel,
@@ -55,7 +55,7 @@ export const dataSourceConfigMailQueue = {
 		},
 		{
 			field: 'template',
-			header: "Template",
+			header: 'Template',
 			body: (
 				entry: MailQueueModel,
 				column: DataTableColumnType<MailQueueModel>,
@@ -70,7 +70,7 @@ export const dataSourceConfigMailQueue = {
 		},
 		{
 			field: 'to',
-			header: "To",
+			header: 'To',
 			body: (
 				entry: MailQueueModel,
 				column: DataTableColumnType<MailQueueModel>,
@@ -81,7 +81,7 @@ export const dataSourceConfigMailQueue = {
 		},
 		{
 			field: 'status',
-			header: "Status",
+			header: 'Status',
 			body: (
 				entry: MailQueueModel,
 				column: DataTableColumnType<MailQueueModel>,
@@ -96,7 +96,7 @@ export const dataSourceConfigMailQueue = {
 		},
 		{
 			field: 'sent_at',
-			header: "Sent At",
+			header: 'Sent At',
 			sortable: true,
 			body: (
 				entry: MailQueueModel,

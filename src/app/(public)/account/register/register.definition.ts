@@ -1,6 +1,11 @@
 import { z } from 'zod';
 import { Configuration } from '@/config/settings.config';
 import { translateBatch } from '@/config/translate.setup';
+import {
+	validateEnum,
+	validatePassword,
+	validateString,
+} from '@/helpers/form.helper';
 import { LanguageEnum } from '@/models/user.model';
 import type { FormSituationType } from '@/types/form.type';
 
@@ -66,60 +71,45 @@ const translations = await translateBatch([
 
 export const RegisterSchema = z
 	.object({
-		name: z
-			.string({
-				message: translations['register.validation.name_invalid'],
-			})
-			.trim()
-			.min(Configuration.get('user.nameMinLength') as number, {
-				message: translations['register.validation.name_min'],
-			}),
+		name: validateString(
+			translations['register.validation.name_invalid'],
+		).min(Configuration.get('user.nameMinLength') as number, {
+			message: translations['register.validation.name_min'],
+		}),
 		email: z.email({
 			message: translations['register.validation.email_invalid'],
 		}),
-		password: z
-			.string({
-				message: translations['register.validation.password_invalid'],
-			})
-			.trim()
-			.min(Configuration.get('user.passwordMinLength') as number, {
-				message: translations['register.validation.password_min'],
-			})
-			.refine((value) => /[A-Z]/.test(value), {
-				message:
+		password: validatePassword(
+			{
+				password_invalid:
+					translations['register.validation.password_invalid'],
+				password_min: translations['register.validation.password_min'],
+				password_condition_capital_letter:
 					translations[
 						'register.validation.password_condition_capital_letter'
 					],
-			})
-			.refine((value) => /[0-9]/.test(value), {
-				message:
+				password_condition_number:
 					translations[
 						'register.validation.password_condition_number'
 					],
-			})
-			.refine((value) => /[!@#$%^&*()_+{}[\]:;<>,.?~\\/-]/.test(value), {
-				message:
+				password_condition_special_character:
 					translations[
 						'register.validation.password_condition_special_character'
 					],
-			}),
-		password_confirm: z
-			.string({
-				message:
-					translations[
-						'register.validation.password_confirm_required'
-					],
-			})
-			.trim()
-			.nonempty({
-				message:
-					translations[
-						'register.validation.password_confirm_required'
-					],
-			}),
-		language: z.enum(LanguageEnum, {
-			message: translations['register.validation.language_invalid'],
-		}),
+			},
+			{
+				minLength: Configuration.get(
+					'user.passwordMinLength',
+				) as number,
+			},
+		),
+		password_confirm: validateString(
+			translations['register.validation.password_confirm_required'],
+		),
+		language: validateEnum(
+			LanguageEnum,
+			translations['register.validation.language_invalid'],
+		),
 		terms: z.boolean().refine((val) => val === true, {
 			message: translations['register.validation.terms_required'],
 		}),

@@ -193,8 +193,14 @@ $ pnpm run madge
 
 # Bugs & Issues & Ideas
 
-1. Clients > Client Address > Brands > Places > Cash Flow
-2. For Places add icons region > area, city > building, country -> map
+1. Strange interaction on login after existing session is removed
+2. Clients > Client Address > Brands > Places > Cash Flow
+    - address details
+    - address manage
+    - cash flow status update 
+    - cash flow manage
+    - cash flow details
+    - add places  icons region > area, city > building, country -> map
 3. Review security
 4. Add section "documentation"
 5. login with google / facebook

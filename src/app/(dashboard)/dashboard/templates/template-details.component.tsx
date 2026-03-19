@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { formatDate } from '@/helpers/date.helper';
-import {parseJson} from '@/helpers/string.helper';
+import { parseJson } from '@/helpers/string.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import type { TemplateModel } from '@/models/template.model';
 
@@ -10,10 +10,7 @@ export function TemplateDetails({
 	entry: TemplateModel | undefined;
 }) {
 	const translationsKeys = useMemo(
-		() =>
-			[
-				'dashboard.text.no_entry_selected',
-			] as const,
+		() => ['dashboard.text.no_entry_selected'] as const,
 		[],
 	);
 
@@ -33,28 +30,17 @@ export function TemplateDetails({
 		<div className="space-y-6">
 			<div className="space-y-1">
 				<div>
-					<span className="font-semibold">
-						ID
-					</span>{' '}
-					{entry.id}
+					<span className="font-semibold">ID</span> {entry.id}
 				</div>
 				<div>
-					<span className="font-semibold">
-						Label
-					</span>{' '}
-					{entry.label}
+					<span className="font-semibold">Label</span> {entry.label}
 				</div>
 				<div>
-					<span className="font-semibold">
-						Language
-					</span>{' '}
+					<span className="font-semibold">Language</span>{' '}
 					{entry.language}
 				</div>
 				<div>
-					<span className="font-semibold">
-						Type
-					</span>{' '}
-					{entry.type}
+					<span className="font-semibold">Type</span> {entry.type}
 				</div>
 			</div>
 
@@ -64,22 +50,16 @@ export function TemplateDetails({
 				</h3>
 				<div className="ml-4 space-y-1 text-sm">
 					<div>
-						<span className="font-semibold">
-							Created At
-						</span>{' '}
+						<span className="font-semibold">Created At</span>{' '}
 						{formatDate(entry.created_at, 'date-time')}
 					</div>
 					<div>
-						<span className="font-semibold">
-							Updated At
-						</span>{' '}
+						<span className="font-semibold">Updated At</span>{' '}
 						{formatDate(entry.updated_at, 'date-time')}
 					</div>
 					{entry.deleted_at && (
 						<div>
-							<span className="font-semibold">
-								Deleted At
-							</span>{' '}
+							<span className="font-semibold">Deleted At</span>{' '}
 							<span className="text-red-500">
 								{formatDate(entry.deleted_at, 'date-time')}
 							</span>

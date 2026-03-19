@@ -64,16 +64,6 @@ export function toTitleCase(str: string): string {
 		.trim();
 }
 
-export function formatCurrency(
-	value: number,
-	currency: string = 'USD',
-): string {
-	return value.toLocaleString('en-US', {
-		style: 'currency',
-		currency: currency,
-	});
-}
-
 /**
  * Replace variables in a string
  * Ex variables: {{key}}, {{Key}}, {{sub_key}}, {{key1}}
@@ -125,4 +115,40 @@ export function parseJson(val: unknown) {
 	}
 
 	return val;
+}
+
+/**
+ * Formats an amount in cents to a currency string
+ *
+ * @param cents Should be a number without decimals
+ * @param currencyCode
+ * @param sign 1 | -1
+ */
+export function formatAmount(
+	cents: number,
+	currencyCode: string,
+	sign: 1 | -1,
+) {
+	const value = Math.abs(cents) / 100;
+
+	const numberFormatter = new Intl.NumberFormat(undefined, {
+		minimumFractionDigits: 2,
+		maximumFractionDigits: 2,
+	});
+
+	const symbolFormatter = new Intl.NumberFormat(undefined, {
+		style: 'currency',
+		currency: currencyCode,
+		currencyDisplay: 'symbol',
+	});
+
+	const parts = symbolFormatter.formatToParts(0);
+	const currency =
+		parts.find((part) => part.type === 'currency')?.value ?? currencyCode;
+
+	return {
+		sign: sign === 1 ? '+' : '-',
+		value: numberFormatter.format(value),
+		currency,
+	};
 }

@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import type { FormStateType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
+import { validateString } from '@/helpers/form.helper';
 import type {
 	PermissionFormValuesType,
 	PermissionModel,
@@ -19,12 +20,12 @@ const translations = await translateBatch([
 ]);
 
 const ValidateSchemaBasePermissions = z.object({
-	entity: z.string().trim().nonempty({
-		message: translations['permissions.validation.entity_invalid'],
-	}),
-	operation: z.string().trim().nonempty({
-		message: translations['permissions.validation.operation_invalid'],
-	}),
+	entity: validateString(
+		translations['permissions.validation.entity_invalid'],
+	),
+	operation: validateString(
+		translations['permissions.validation.operation_invalid'],
+	),
 });
 
 function getFormValuesPermission(formData: FormData): PermissionFormValuesType {
@@ -56,17 +57,17 @@ export const dataSourceConfigPermissions = {
 	dataTableColumns: [
 		{
 			field: 'id',
-			header: "ID",
+			header: 'ID',
 			sortable: true,
 		},
 		{
 			field: 'entity',
-			header: "Entity",
+			header: 'Entity',
 			sortable: true,
 		},
 		{
 			field: 'operation',
-			header: "Operation",
+			header: 'Operation',
 			sortable: true,
 		},
 	],

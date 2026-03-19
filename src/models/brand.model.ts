@@ -67,28 +67,6 @@ export type BrandFormValuesType = {
 	contents: BrandContentInput[];
 };
 
-// Type for product brands (specific type)
-export type ProductBrandModel<D = Date | string> = BrandModel<D> & {
-	type: BrandTypeEnum.PRODUCT;
-};
-
-// Discriminated union for brand types (if you add more types later)
-export type TypedBrandModel<D = Date | string> = ProductBrandModel<D>;
-
-// Type guard for product brands
-export const isProductBrand = <D = Date | string>(
-	brand: BrandModel<D>,
-): brand is ProductBrandModel<D> => brand.type === BrandTypeEnum.PRODUCT;
-
-// Simplified type for lists
-export type BrandListItem = Pick<
-	BrandModel,
-	'id' | 'name' | 'slug' | 'status' | 'type' | 'sort_order' | 'created_at'
->;
-
-// For dropdown/select components
-export type BrandOption = Pick<BrandModel, 'id' | 'name' | 'slug' | 'type'>;
-
 // For forms, ensure at least one content if required
 export type BrandFormValuesWithContent = BrandFormValuesType & {
 	contents: [BrandContentInput, ...BrandContentInput[]]; // At least one content

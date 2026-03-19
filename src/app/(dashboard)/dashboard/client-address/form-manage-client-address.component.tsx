@@ -7,12 +7,12 @@ import {
 	FormComponentSelect,
 } from '@/components/form/form-element.component';
 import type { FormManageType } from '@/config/data-source.config';
-import {
-	capitalizeFirstLetter,
-	formatEnumLabel,
-} from '@/helpers/string.helper';
+import { formatEnumLabel } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
-import {ClientAddressFormValuesType, ClientAddressTypeEnum} from "@/models/client-address.model";
+import {
+	type ClientAddressFormValuesType,
+	ClientAddressTypeEnum,
+} from '@/models/client-address.model';
 
 const addressTypes = Object.values(ClientAddressTypeEnum).map((v) => ({
 	label: formatEnumLabel(v),
@@ -20,7 +20,6 @@ const addressTypes = Object.values(ClientAddressTypeEnum).map((v) => ({
 }));
 
 export function FormManageClientAddress({
-	actionName,
 	formValues,
 	errors,
 	handleChange,

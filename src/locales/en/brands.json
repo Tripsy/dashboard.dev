@@ -1,12 +1,11 @@
 {
-  "meta": {
-    "title": "Brands - Dashboard | {{app_name}}"
-  },
-  "validation": {
-    "name_invalid": "Enter a brand name",
-    "slug_invalid": "Enter a valid slug",
-    "status_invalid": "Select a valid status",
-    "type_invalid": "Select a valid brand type"
-  }
+	"meta": {
+		"title": "Brands - Dashboard | {{app_name}}"
+	},
+	"validation": {
+		"name_invalid": "Enter a brand name",
+		"slug_invalid": "Enter a valid slug",
+		"status_invalid": "Select a valid status",
+		"type_invalid": "Select a valid brand type"
+	}
 }
-

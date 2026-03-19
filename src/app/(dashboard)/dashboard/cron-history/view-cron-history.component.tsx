@@ -12,10 +12,7 @@ export function ViewCronHistory() {
 	const entry = useStore(dataTableStore, (state) => state.actionEntry);
 
 	const translationsKeys = useMemo(
-		() =>
-			[
-				'dashboard.text.no_entry_selected',
-			] as const,
+		() => ['dashboard.text.no_entry_selected'] as const,
 		[],
 	);
 
@@ -35,41 +32,27 @@ export function ViewCronHistory() {
 		<div className="space-y-6">
 			<div className="space-y-1">
 				<div>
-					<span className="font-semibold">
-						ID
-					</span>{' '}
-					{entry.id}
+					<span className="font-semibold">ID</span> {entry.id}
 				</div>
 				<div>
-					<span className="font-semibold">
-						Label
-					</span>{' '}
-					{entry.label}
+					<span className="font-semibold">Label</span> {entry.label}
 				</div>
 				<div>
-					<span className="font-semibold">
-						Start At
-					</span>{' '}
+					<span className="font-semibold">Start At</span>{' '}
 					{formatDate(entry.start_at, 'date-time')}
 				</div>
 				<div>
-					<span className="font-semibold">
-						End At
-					</span>{' '}
+					<span className="font-semibold">End At</span>{' '}
 					{formatDate(entry.end_at, 'date-time') || 'n/a'}
 				</div>
 				<div className="flex items-center gap-2">
-					<span className="font-semibold">
-						Status
-					</span>{' '}
+					<span className="font-semibold">Status</span>{' '}
 					<div className="max-w-60">
 						<DisplayStatus status={entry.status} />
 					</div>
 				</div>
 				<div>
-					<span className="font-semibold">
-						Run Time
-					</span>{' '}
+					<span className="font-semibold">Run Time</span>{' '}
 					{entry.run_time} second(s)
 				</div>
 			</div>

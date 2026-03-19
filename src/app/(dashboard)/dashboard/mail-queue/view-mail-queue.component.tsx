@@ -11,10 +11,7 @@ export function ViewMailQueue() {
 	const entry = useStore(dataTableStore, (state) => state.actionEntry);
 
 	const translationsKeys = useMemo(
-		() =>
-			[
-				'dashboard.text.no_entry_selected',
-			] as const,
+		() => ['dashboard.text.no_entry_selected'] as const,
 		[],
 	);
 
@@ -32,21 +29,14 @@ export function ViewMailQueue() {
 		<div className="space-y-6">
 			<div className="space-y-1">
 				<div>
-					<span className="font-semibold">
-						ID
-					</span>{' '}
-					{entry.id}
+					<span className="font-semibold">ID</span> {entry.id}
 				</div>
 				<div>
-					<span className="font-semibold">
-						Created At
-					</span>{' '}
+					<span className="font-semibold">Created At</span>{' '}
 					{formatDate(entry.created_at, 'date-time')}
 				</div>
 				<div>
-					<span className="font-semibold">
-						Updated At
-					</span>{' '}
+					<span className="font-semibold">Updated At</span>{' '}
 					{formatDate(entry.updated_at, 'date-time') || '-'}
 				</div>
 			</div>
@@ -57,36 +47,26 @@ export function ViewMailQueue() {
 				</h3>
 				<div className="ml-4 space-y-1">
 					<div className="flex items-center gap-2">
-						<span className="font-semibold">
-							Status
-						</span>{' '}
+						<span className="font-semibold">Status</span>{' '}
 						<div className="max-w-60">
 							<DisplayStatus status={entry.status} />
 						</div>
 					</div>
 					<div>
-						<span className="font-semibold">
-							Error
-						</span>{' '}
+						<span className="font-semibold">Error</span>{' '}
 						{entry.error || '-'}
 					</div>
 					<div>
-						<span className="font-semibold">
-							Sent At
-						</span>{' '}
+						<span className="font-semibold">Sent At</span>{' '}
 						{formatDate(entry.sent_at, 'date-time') || '-'}
 					</div>
 					<div>
-						<span className="font-semibold">
-							Email To
-						</span>{' '}
+						<span className="font-semibold">Email To</span>{' '}
 						{entry.to.name} &lt;{entry.to.address}&gt;
 					</div>
 					{entry.from && (
 						<div>
-							<span className="font-semibold">
-								Email From
-							</span>{' '}
+							<span className="font-semibold">Email From</span>{' '}
 							{entry.from?.name} &lt;{entry.from?.address}&gt;
 						</div>
 					)}
@@ -99,39 +79,27 @@ export function ViewMailQueue() {
 				</h3>
 				<div className="ml-4 space-y-1">
 					<div>
-						<span className="font-semibold">
-							Template
-						</span>{' '}
+						<span className="font-semibold">Template</span>{' '}
 						{entry.template?.label || 'n/a'}
 					</div>
 					<div>
-						<span className="font-semibold">
-							Language
-						</span>{' '}
+						<span className="font-semibold">Language</span>{' '}
 						{entry.language}
 					</div>
 					<div>
-						<span className="font-semibold">
-							Layout
-						</span>{' '}
+						<span className="font-semibold">Layout</span>{' '}
 						{entry.content.layout}
 					</div>
 					<div>
-						<span className="font-semibold">
-							Subject
-						</span>{' '}
+						<span className="font-semibold">Subject</span>{' '}
 						{entry.content.subject}
 					</div>
 					<div>
-						<span className="font-semibold">
-							Content
-						</span>{' '}
+						<span className="font-semibold">Content</span>{' '}
 						{entry.content.html}
 					</div>
 					<div>
-						<span className="font-semibold">
-							Vars
-						</span>{' '}
+						<span className="font-semibold">Vars</span>{' '}
 						{JSON.stringify(entry.content.vars, null, 2)}
 					</div>
 				</div>

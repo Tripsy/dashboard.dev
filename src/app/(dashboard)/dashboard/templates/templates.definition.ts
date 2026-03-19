@@ -5,7 +5,7 @@ import {
 } from '@/app/(dashboard)/_components/data-table-value';
 import type { FormStateType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
-import { safeHtml } from '@/helpers/form.helper';
+import { safeHtml, validateEnum, validateString } from '@/helpers/form.helper';
 import { parseJson } from '@/helpers/string.helper';
 import {
 	type TemplateFormValuesType,
@@ -35,62 +35,52 @@ const translations = await translateBatch([
 	'templates.validation.page_layout_invalid',
 ]);
 
-const ValidateSchemaBaseTemplates = z.object({
-	label: z.string().nonempty({
-		message: translations['templates.validation.label_invalid'],
-	}),
-	language: z.enum(LanguageEnum, {
-		message: translations['templates.validation.language_invalid'],
-	}),
-	type: z.enum(TemplateTypeEnum, {
-		message: translations['templates.validation.type_invalid'],
-	}),
+const ValidateSchemaBaseTemplate = z.object({
+	label: validateString(translations['templates.validation.label_invalid']),
+	language: validateEnum(
+		LanguageEnum,
+		translations['templates.validation.language_invalid'],
+	),
+	type: validateEnum(
+		TemplateTypeEnum,
+		translations['templates.validation.type_invalid'],
+	),
 });
 
-const ValidateSchemaEmailTemplates = ValidateSchemaBaseTemplates.extend({
+const ValidateSchemaEmailTemplate = ValidateSchemaBaseTemplate.extend({
 	type: z.literal(TemplateTypeEnum.EMAIL),
-	subject: z.string().nonempty({
-		message: translations['templates.validation.email_subject_invalid'],
-	}),
-	text: z
-		.string({
-			message: translations['templates.validation.email_text_invalid'],
-		})
-		.optional(),
-	html: z
-		.string()
-		.nonempty({
-			message: translations['templates.validation.email_html_invalid'],
-		})
-		.transform((val) => safeHtml(val)),
-	layout: z
-		.string({
-			message: translations['templates.validation.email_layout_invalid'],
-		})
-		.optional(),
+	subject: validateString(
+		translations['templates.validation.email_subject_invalid'],
+	),
+	text: validateString(
+		translations['templates.validation.email_text_invalid'],
+	).optional(),
+	html: validateString(
+		translations['templates.validation.email_html_invalid'],
+	).transform((val) => safeHtml(val)),
+	layout: validateEnum(
+		TemplateLayoutEmailEnum,
+		translations['templates.validation.email_layout_invalid'],
+	).optional(),
 });
 
-const ValidateSchemaPageTemplates = ValidateSchemaBaseTemplates.extend({
+const ValidateSchemaPageTemplate = ValidateSchemaBaseTemplate.extend({
 	type: z.literal(TemplateTypeEnum.PAGE),
-	title: z.string().nonempty({
-		message: translations['templates.validation.page_title_invalid'],
-	}),
-	html: z
-		.string()
-		.nonempty({
-			message: translations['templates.validation.page_html_invalid'],
-		})
-		.transform((val) => safeHtml(val)),
-	layout: z
-		.string({
-			message: translations['templates.validation.page_layout_invalid'],
-		})
-		.optional(),
+	title: validateString(
+		translations['templates.validation.page_title_invalid'],
+	),
+	html: validateString(
+		translations['templates.validation.page_html_invalid'],
+	).transform((val) => safeHtml(val)),
+	layout: validateEnum(
+		TemplateLayoutPageEnum,
+		translations['templates.validation.page_layout_invalid'],
+	).optional(),
 });
 
-export const ValidateSchemaTemplates = z.union([
-	ValidateSchemaEmailTemplates,
-	ValidateSchemaPageTemplates,
+export const ValidateSchemaTemplate = z.discriminatedUnion('type', [
+	ValidateSchemaEmailTemplate,
+	ValidateSchemaPageTemplate,
 ]);
 
 export function getFormValuesTemplates(
@@ -162,7 +152,7 @@ export const dataSourceConfigTemplates = {
 	dataTableColumns: [
 		{
 			field: 'id',
-			header: "ID",
+			header: 'ID',
 			sortable: true,
 			body: (
 				entry: TemplateModel,
@@ -178,16 +168,16 @@ export const dataSourceConfigTemplates = {
 		},
 		{
 			field: 'label',
-			header: "Label",
+			header: 'Label',
 			sortable: true,
 		},
 		{
 			field: 'language',
-			header: "Language",
+			header: 'Language',
 		},
 		{
 			field: 'type',
-			header: "Type",
+			header: 'Type',
 			body: (
 				entry: TemplateModel,
 				column: DataTableColumnType<TemplateModel>,
@@ -198,7 +188,7 @@ export const dataSourceConfigTemplates = {
 		},
 		{
 			field: 'created_at',
-			header: "Created At",
+			header: 'Created At',
 			sortable: true,
 			body: (
 				entry: TemplateModel,
@@ -228,7 +218,7 @@ export const dataSourceConfigTemplates = {
 		find: findTemplates,
 		getFormValues: getFormValuesTemplates,
 		validateForm: (values: TemplateFormValuesType) => {
-			return ValidateSchemaTemplates.safeParse(values);
+			return ValidateSchemaTemplate.safeParse(values);
 		},
 		syncFormState: (
 			state: FormStateType<

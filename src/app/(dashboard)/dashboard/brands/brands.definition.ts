@@ -5,6 +5,7 @@ import {
 } from '@/app/(dashboard)/_components/data-table-value';
 import type { FormStateType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
+import { validateEnum, validateString } from '@/helpers/form.helper';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
 import {
 	type BrandFormValuesType,
@@ -12,6 +13,7 @@ import {
 	BrandStatusEnum,
 	BrandTypeEnum,
 } from '@/models/brand.model';
+import { ClientAddressTypeEnum } from '@/models/client-address.model';
 import {
 	createBrand,
 	deleteBrand,
@@ -27,25 +29,12 @@ const translations = await translateBatch([
 ]);
 
 const ValidateSchemaBrands = z.object({
-	name: z
-		.string()
-		.trim()
-		.nonempty({ message: translations['brands.validation.name_invalid'] }),
-	slug: z
-		.string()
-		.trim()
-		.nonempty({ message: translations['brands.validation.slug_invalid'] }),
-	status: z.nativeEnum(BrandStatusEnum, {
-		errorMap: () => ({
-			message: translations['brands.validation.status_invalid'],
-		}),
-	}),
-	type: z.nativeEnum(BrandTypeEnum, {
-		errorMap: () => ({
-			message: translations['brands.validation.type_invalid'],
-		}),
-	}),
-	sort_order: z.number().int().nonnegative().default(0),
+	name: validateString(translations['brands.validation.name_invalid']),
+	slug: validateString(translations['brands.validation.slug_invalid']),
+	type: validateEnum(
+		BrandTypeEnum,
+		translations['brands.validation.type_invalid'],
+	),
 	details: z
 		.record(z.union([z.string(), z.number(), z.boolean()]))
 		.nullable(),
@@ -143,7 +132,7 @@ export const dataSourceConfigBrands = {
 	dataTableColumns: [
 		{
 			field: 'id',
-			header: "ID",
+			header: 'ID',
 			sortable: true,
 			body: (
 				entry: BrandModel,
@@ -155,12 +144,12 @@ export const dataSourceConfigBrands = {
 		},
 		{
 			field: 'name',
-			header: "Name",
+			header: 'Name',
 			sortable: true,
 		},
 		{
 			field: 'status',
-			header: "Status",
+			header: 'Status',
 			sortable: true,
 			body: (
 				entry: BrandModel,
@@ -172,7 +161,7 @@ export const dataSourceConfigBrands = {
 		},
 		{
 			field: 'type',
-			header: "Type",
+			header: 'Type',
 			sortable: true,
 			body: (
 				entry: BrandModel,
@@ -181,7 +170,7 @@ export const dataSourceConfigBrands = {
 				DataTableValue(entry, column, {
 					customValue: capitalizeFirstLetter(entry.type),
 				}),
-		}
+		},
 	],
 	formState: {
 		dataSource: 'brands' as const,

@@ -1,11 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import {
-	FormComponentEmail,
-	FormComponentName,
-	FormComponentPassword,
-	FormComponentRadio,
-	FormComponentSelect,
-} from '@/components/form/form-element.component';
+import { useState } from 'react';
+import { FormComponentRadio } from '@/components/form/form-element.component';
 import type { FormManageType } from '@/config/data-source.config';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
@@ -25,73 +19,71 @@ export function FormManageClientAddress({
 	handleChange,
 	pending,
 }: FormManageType<ClientAddressFormValuesType>) {
-	const [showPassword, setShowPassword] = useState(false);
-
 	const elementIds = useElementIds([
 		'client_id',
 		'address_type',
-		'address_city_id',
-		'address_info',
-		'address_postal_code',
+		'city_id',
+		'details',
+		'postal_code',
 		'notes',
 	]);
 
 	return (
 		<>
-			{/*<FormComponentName<ClientAddressFormValuesType>*/}
-			{/*	labelText="Name"*/}
-			{/*	id={elementIds.name}*/}
-			{/*	fieldValue={formValues.name ?? ''}*/}
-			{/*	disabled={pending}*/}
-			{/*	onChange={(e) => handleChange('name', e.target.value)}*/}
-			{/*	error={errors.name}*/}
-			{/*/>*/}
+			<FormComponentName<ClientAddressFormValuesType>
+				labelText="Name"
+				id={elementIds.name}
+				fieldValue={formValues.name ?? ''}
+				disabled={pending}
+				onChange={(e) => handleChange('name', e.target.value)}
+				error={errors.name}
+			/>
 
-			{/*<FormComponentEmail<ClientAddressFormValuesType>*/}
-			{/*	labelText="Email"*/}
-			{/*	id={elementIds.email}*/}
-			{/*	fieldValue={formValues.email ?? ''}*/}
-			{/*	disabled={pending}*/}
-			{/*	onChange={(e) => handleChange('email', e.target.value)}*/}
-			{/*	error={errors.email}*/}
-			{/*/>*/}
+			<FormComponentEmail<ClientAddressFormValuesType>
+				labelText="Email"
+				id={elementIds.email}
+				fieldValue={formValues.email ?? ''}
+				disabled={pending}
+				onChange={(e) => handleChange('email', e.target.value)}
+				error={errors.email}
+			/>
 
-			{/*<FormComponentPassword<ClientAddressFormValuesType>*/}
-			{/*	labelText="Password"*/}
-			{/*	id={elementIds.password}*/}
-			{/*	fieldName="password"*/}
-			{/*	fieldValue={formValues.password ?? ''}*/}
-			{/*	disabled={pending}*/}
-			{/*	onChange={(e) => handleChange('password', e.target.value)}*/}
-			{/*	error={errors.password}*/}
-			{/*	showPassword={showPassword}*/}
-			{/*	setShowPassword={setShowPassword}*/}
-			{/*/>*/}
+			<FormComponentPassword<ClientAddressFormValuesType>
+				labelText="Password"
+				id={elementIds.password}
+				fieldName="password"
+				fieldValue={formValues.password ?? ''}
+				disabled={pending}
+				onChange={(e) => handleChange('password', e.target.value)}
+				error={errors.password}
+				showPassword={showPassword}
+				setShowPassword={setShowPassword}
+			/>
 
-			{/*<FormComponentPassword<ClientAddressFormValuesType>*/}
-			{/*	labelText="Confirm Password"*/}
-			{/*	id={elementIds.passwordConfirm}*/}
-			{/*	fieldName="password_confirm"*/}
-			{/*	fieldValue={formValues.password_confirm ?? ''}*/}
-			{/*	placeholderText="Password confirmation"*/}
-			{/*	disabled={pending}*/}
-			{/*	onChange={(e) =>*/}
-			{/*		handleChange('password_confirm', e.target.value)*/}
-			{/*	}*/}
-			{/*	error={errors.password_confirm}*/}
-			{/*	showPassword={showPassword}*/}
-			{/*/>*/}
+			<FormComponentPassword<ClientAddressFormValuesType>
+				labelText="Confirm Password"
+				id={elementIds.passwordConfirm}
+				fieldName="password_confirm"
+				fieldValue={formValues.password_confirm ?? ''}
+				placeholderText="Password confirmation"
+				disabled={pending}
+				onChange={(e) =>
+					handleChange('password_confirm', e.target.value)
+				}
+				error={errors.password_confirm}
+				showPassword={showPassword}
+			/>
 
-			{/*<FormComponentSelect<ClientAddressFormValuesType>*/}
-			{/*	labelText="Language"*/}
-			{/*	id={elementIds.language}*/}
-			{/*	fieldName="language"*/}
-			{/*	fieldValue={formValues.language}*/}
-			{/*	disabled={pending}*/}
-			{/*	options={languages}*/}
-			{/*	onValueChange={(value) => handleChange('language', value)}*/}
-			{/*	error={errors.language}*/}
-			{/*/>*/}
+			<FormComponentSelect<ClientAddressFormValuesType>
+				labelText="Language"
+				id={elementIds.language}
+				fieldName="language"
+				fieldValue={formValues.language}
+				disabled={pending}
+				options={languages}
+				onValueChange={(value) => handleChange('language', value)}
+				error={errors.language}
+			/>
 
 			<FormComponentRadio<ClientAddressFormValuesType>
 				labelText="Role"

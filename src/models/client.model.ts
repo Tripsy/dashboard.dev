@@ -31,13 +31,13 @@ export type ClientIdentity =
 			company_reg_com: string | null;
 
 			person_name?: never;
-			person_cnp?: never;
+			person_identification_number?: never;
 	  }
 	| {
 			client_type: ClientTypeEnum.PERSON;
 
 			person_name: string | null;
-			person_cnp: string | null;
+			person_identification_number: string | null;
 
 			company_name?: never;
 			company_cui?: never;
@@ -80,7 +80,7 @@ export type ClientFormValuesType = {
 	company_reg_com?: string | null;
 
 	person_name?: string | null;
-	person_cnp?: string | null;
+	person_identification_number?: string | null;
 } & ClientFinancial &
 	ClientContact & {
 		notes: string | null;

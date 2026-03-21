@@ -3,15 +3,18 @@
 		"title": "Clients - Dashboard | {{app_name}}"
 	},
 	"validation": {
-		"client_type_invalid": "Select a valid client type",
-		"notes_invalid": "Invalid notes",
-		"company_name_invalid": "Invalid company name",
-		"company_cui_invalid": "Invalid CUI",
-		"company_reg_com_invalid": "Invalid reg com",
-		"person_name_invalid": "Invalid person name",
-		"person_cnp_invalid": "Invalid CNP (it must contain 13 digits)",
-		"iban_invalid": "Invalid IBAN",
-		"contact_email_invalid": "Invalid contact email"
+		"invalid_client_type": "Select a valid client type",
+		"invalid_iban": "Invalid IBAN",
+		"invalid_bank_name": "Invalid bank name",
+		"invalid_contact_name": "Invalid contact name",
+		"invalid_contact_email": "Invalid contact email",
+		"invalid_contact_phone": "Invalid contact phone",
+		"invalid_notes": "Invalid notes",
+		"invalid_company_name": "Invalid company name",
+		"invalid_company_cui": "Invalid CUI",
+		"invalid_company_reg_com": "Invalid reg com",
+		"invalid_person_name": "Invalid person name",
+		"invalid_person_identification_number": "Invalid CNP (it must contain 13 digits)"
 	},
 	"action": {
 		"create": {

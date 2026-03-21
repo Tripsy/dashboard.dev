@@ -58,6 +58,9 @@ export default function Register() {
 			debounceDelay: 800,
 		});
 
+	console.log(formValues);
+	console.log(errors);
+
 	const handleChange = createHandleChange(setFormValues, markFieldAsTouched);
 
 	const elementIds = useElementIds([

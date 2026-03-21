@@ -90,11 +90,11 @@ export const DataTablePlacesFilters = (): JSX.Element => {
 
 			<FormFiltersSelect<PlacesDataTableFiltersType>
 				labelText="Type"
-				fieldName="type"
-				fieldValue={filters.type.value}
+				fieldName="place_type"
+				fieldValue={filters.place_type.value}
 				options={placeTypes}
 				onValueChange={(value) =>
-					setFilterValue('type', value as PlaceTypeEnum)
+					setFilterValue('place_type', value as PlaceTypeEnum)
 				}
 			/>
 

@@ -24,7 +24,7 @@ export type PlaceContentInput = {
 // Place base type without relations
 type PlaceBase<D = Date | string> = {
 	id: number;
-	type: PlaceTypeEnum;
+	place_type: PlaceTypeEnum;
 	code: string | null; // Abbreviation
 
 	// Timestamps
@@ -48,7 +48,7 @@ export type PlaceModel<D = Date | string> = PlaceBase<D> & {
 
 // Form values type for creating/editing a place
 export type PlaceFormValuesType = {
-	type: PlaceTypeEnum;
+	place_type: PlaceTypeEnum;
 	code: string | null;
 	parent_id: number | null;
 
@@ -58,19 +58,19 @@ export type PlaceFormValuesType = {
 
 // Helper types for specific place types
 export type CountryModel<D = Date | string> = PlaceModel<D> & {
-	type: PlaceTypeEnum.COUNTRY;
+	place_type: PlaceTypeEnum.COUNTRY;
 	parent_id: null; // Countries have no parent
 	parent?: never; // Countries should not have a parent
 };
 
 export type RegionModel<D = Date | string> = PlaceModel<D> & {
-	type: PlaceTypeEnum.REGION;
+	place_type: PlaceTypeEnum.REGION;
 	parent_id: number; // Region must have a parent (country)
 	parent?: PlaceModel<D>; // Parent should be a country
 };
 
 export type CityModel<D = Date | string> = PlaceModel<D> & {
-	type: PlaceTypeEnum.CITY;
+	place_type: PlaceTypeEnum.CITY;
 	parent_id: number; // City must have a parent (region or country)
 	parent?: PlaceModel<D>; // Parent can be region or country
 };
@@ -84,20 +84,20 @@ export type TypedPlaceModel<D = Date | string> =
 // Type guards
 export const isCountry = <D = Date | string>(
 	place: PlaceModel<D>,
-): place is CountryModel<D> => place.type === PlaceTypeEnum.COUNTRY;
+): place is CountryModel<D> => place.place_type === PlaceTypeEnum.COUNTRY;
 
 export const isRegion = <D = Date | string>(
 	place: PlaceModel<D>,
-): place is RegionModel<D> => place.type === PlaceTypeEnum.REGION;
+): place is RegionModel<D> => place.place_type === PlaceTypeEnum.REGION;
 
 export const isCity = <D = Date | string>(
 	place: PlaceModel<D>,
-): place is CityModel<D> => place.type === PlaceTypeEnum.CITY;
+): place is CityModel<D> => place.place_type === PlaceTypeEnum.CITY;
 
 // Simplified types for lists/tree views
 export type PlaceListItem = Pick<
 	PlaceModel,
-	'id' | 'type' | 'code' | 'created_at'
+	'id' | 'place_type' | 'code' | 'created_at'
 > & {
 	name?: string;
 };

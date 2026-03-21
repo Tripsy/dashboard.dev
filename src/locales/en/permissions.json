@@ -3,8 +3,8 @@
 		"title": "Permissions - Dashboard | {{app_name}}"
 	},
 	"validation": {
-		"entity_invalid": "Select an entity",
-		"operation_invalid": "Select an operation"
+		"invalid_entity": "Select an entity",
+		"invalid_operation": "Select an operation"
 	},
 	"action": {
 		"create": {

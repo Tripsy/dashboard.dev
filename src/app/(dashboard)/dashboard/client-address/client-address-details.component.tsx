@@ -47,13 +47,13 @@ export function ClientAddressDetails({
 				<div className="ml-4 space-y-1 text-sm">
 					<div>
 						<span className="font-semibold">Address - Info</span>{' '}
-						{entry.address_info}
+						{entry.details}
 					</div>
 					<div>
 						<span className="font-semibold">
 							Address - Postal Code
 						</span>{' '}
-						{entry.address_postal_code}
+						{entry.postal_code}
 					</div>
 				</div>
 			</div>

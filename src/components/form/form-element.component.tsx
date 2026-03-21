@@ -33,8 +33,8 @@ import { cn } from '@/helpers/css.helper';
 import { formatDate, toDateInstance } from '@/helpers/date.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 
-export type InputValueType = string | null;
-export type OptionValueType = string | null;
+export type InputValueType = string | null | undefined;
+export type OptionValueType = string | null | undefined;
 export type CheckboxValueType = boolean;
 export type OptionsType = {
 	label: string;
@@ -446,9 +446,11 @@ export const FormComponentCalendarWithoutFormElement = <Fields,>({
 	minDate?: Date | string;
 	maxDate?: Date | string;
 }) => {
-	const fieldValueAsDate = toDateInstance(fieldValue) || undefined;
-	const minDateAsDate = (minDate && toDateInstance(minDate)) || undefined;
-	const maxDateAsDate = (maxDate && toDateInstance(maxDate)) || undefined;
+	const fieldValueAsDate = fieldValue
+		? toDateInstance(fieldValue)
+		: undefined;
+	const minDateAsDate = minDate ? toDateInstance(minDate) : undefined;
+	const maxDateAsDate = maxDate ? toDateInstance(maxDate) : undefined;
 
 	return (
 		<>
@@ -483,7 +485,7 @@ export const FormComponentCalendarWithoutFormElement = <Fields,>({
 					<Calendar
 						mode="single"
 						required={false}
-						selected={fieldValueAsDate}
+						selected={fieldValueAsDate || undefined}
 						onSelect={(date: Date | undefined) => {
 							const value = date
 								? (formatDate(date, 'default') as string)

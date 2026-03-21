@@ -5,7 +5,6 @@ import {
 } from '@/app/(dashboard)/_components/data-table-value';
 import type { FormStateType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
-import { validateEnum, validateString } from '@/helpers/form.helper';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
 import {
 	type BrandFormValuesType,
@@ -22,30 +21,30 @@ import {
 } from '@/services/brands.service';
 
 const translations = await translateBatch([
-	'brands.validation.name_invalid',
+	'brands.validation.invalid_name',
 	'brands.validation.slug_invalid',
 	'brands.validation.status_invalid',
 	'brands.validation.type_invalid',
 ]);
 
-const ValidateSchemaBrands = z.object({
-	name: validateString(translations['brands.validation.name_invalid']),
-	slug: validateString(translations['brands.validation.slug_invalid']),
-	type: validateEnum(
-		BrandTypeEnum,
-		translations['brands.validation.type_invalid'],
-	),
-	details: z
-		.record(z.union([z.string(), z.number(), z.boolean()]))
-		.nullable(),
-	contents: z.array(
-		z.object({
-			language: z.string(),
-			description: z.string().nullable().optional(),
-			meta: z.any().nullable().optional(),
-		}),
-	),
-});
+// const ValidateSchemaBrands = z.object({
+// 	name: validateString(translations['brands.validation.invalid_name']),
+// 	slug: validateString(translations['brands.validation.slug_invalid']),
+// 	type: validateEnum(
+// 		BrandTypeEnum,
+// 		translations['brands.validation.type_invalid'],
+// 	),
+// 	details: z
+// 		.record(z.union([z.string(), z.number(), z.boolean()]))
+// 		.nullable(),
+// 	contents: z.array(
+// 		z.object({
+// 			language: z.string(),
+// 			description: z.string().nullable().optional(),
+// 			meta: z.any().nullable().optional(),
+// 		}),
+// 	),
+// });
 
 export function getFormValuesBrand(formData: FormData): BrandFormValuesType {
 	const statusRaw = formData.get('status') as BrandStatusEnum | null;
@@ -192,7 +191,7 @@ export const dataSourceConfigBrands = {
 		find: findBrands,
 		getFormValues: getFormValuesBrand,
 		validateForm: (values: BrandFormValuesType) => {
-			return ValidateSchemaBrands.safeParse(values);
+			// return ValidateSchemaBrands.safeParse(values);
 		},
 		syncFormState: (
 			state: FormStateType<'brands', BrandModel, BrandFormValuesType>,

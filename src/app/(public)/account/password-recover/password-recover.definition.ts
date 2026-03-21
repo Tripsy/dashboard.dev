@@ -1,9 +1,10 @@
 import { z } from 'zod';
 import { translateBatch } from '@/config/translate.setup';
+import { BaseValidator } from '@/helpers/validator.helper';
 import type { FormSituationType } from '@/types/form.type';
 
 export type PasswordRecoverFormFieldsType = {
-	email: string;
+	email?: string;
 };
 
 export type PasswordRecoverSituationType = FormSituationType | 'csrf_error';
@@ -24,12 +25,23 @@ export const PasswordRecoverState: PasswordRecoverStateType = {
 	situation: null,
 };
 
-const translations = await translateBatch([
-	'password-recover.validation.email_invalid',
-]);
+const translationValidation = await translateBatch(
+	['password-recover.validation.invalid_email'],
+	'password-recover.validation.',
+);
 
-export const PasswordRecoverSchema = z.object({
-	email: z.email({
-		message: translations['password-recover.validation.email_invalid'],
-	}),
-});
+class PasswordRecoverValidator extends BaseValidator {
+	constructor(private readonly message: Record<string, string>) {
+		super();
+	}
+
+	passwordRecover() {
+		return z.object({
+			email: this.validateEmail(this.message.invalid_email),
+		});
+	}
+}
+
+export const PasswordRecoverSchema = new PasswordRecoverValidator(
+	translationValidation,
+).passwordRecover();

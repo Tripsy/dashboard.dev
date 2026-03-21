@@ -37,9 +37,6 @@ export function FormManageClient({
 		'notes',
 	]);
 
-	console.log(formValues);
-	console.log(errors);
-
 	return (
 		<>
 			<FormComponentRadio<ClientFormValuesType>
@@ -115,14 +112,19 @@ export function FormManageClient({
 					<FormComponentInput<ClientFormValuesType>
 						labelText="Person - CNP"
 						id={elementIds.personCnp}
-						fieldName="person_cnp"
-						fieldValue={formValues.person_cnp ?? ''}
+						fieldName="person_identification_number"
+						fieldValue={
+							formValues.person_identification_number ?? ''
+						}
 						isRequired={false}
 						disabled={pending}
 						onChange={(e) =>
-							handleChange('person_cnp', e.target.value)
+							handleChange(
+								'person_identification_number',
+								e.target.value,
+							)
 						}
-						error={errors.person_cnp}
+						error={errors.person_identification_number}
 					/>
 				</>
 			)}

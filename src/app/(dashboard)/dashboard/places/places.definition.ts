@@ -5,18 +5,13 @@ import {
 } from '@/app/(dashboard)/_components/data-table-value';
 import type { FormStateType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
-import {
-	validateEnum,
-	validateId,
-	validateString,
-} from '@/helpers/form.helper';
 import { toTitleCase } from '@/helpers/string.helper';
+import { BaseValidator } from '@/helpers/validator.helper';
 import {
 	type PlaceFormValuesType,
 	type PlaceModel,
 	PlaceTypeEnum,
 } from '@/models/place.model';
-import { LanguageEnum } from '@/models/user.model';
 import {
 	createPlace,
 	deletePlace,
@@ -24,48 +19,80 @@ import {
 	updatePlace,
 } from '@/services/places.service';
 
-const translations = await translateBatch([
-	'places.validation.type_invalid',
-	'places.validation.code_invalid',
-	'places.validation.name_invalid',
-	'places.validation.contents_invalid',
-]);
+const translationValidation = await translateBatch(
+	[
+		'places.validation.place_type_invalid',
+		'places.validation.code_invalid',
+		'places.validation.invalid_name',
+		'places.validation.contents_invalid',
+	],
+	'places.validation.',
+);
 
-const ValidateSchemaPlaceBase = z.object({
-	type: validateEnum(
-		PlaceTypeEnum,
-		translations['places.validation.type_invalid'],
-	),
-	code: validateString(translations['places.validation.type_invalid'])
-		.max(3, translations['places.validation.type_invalid'])
-		.nullable()
-		.optional(),
-	parent_id: validateId(
-		translations['places.validation.parent_id_invalid'],
-	).optional(),
-});
+class PlaceValidator extends BaseValidator {
+	constructor(private readonly message: Record<string, string>) {
+		super();
+	}
 
-const ValidateSchemaContent = z.object({
-	language: validateEnum(
-		LanguageEnum,
-		translations['places.validation.language_valid'],
-	),
-	name: validateString(translations['places.validation.name_invalid']),
-	type_label: validateString(
-		translations['places.validation.type_label_invalid'],
-	),
-});
+	manage() {
+		return z.object({
+			place_type: this.validateEnum(
+				PlaceTypeEnum,
+				this.message.invalid_place_type,
+			),
+			client_id: this.validateId(this.message.invalid_client_id),
+			city_id: this.validateId(this.message.invalid_city_id, false),
+			details: this.validateString(this.message.invalid_details),
+			postal_code: this.validatePostalCode(
+				this.message.invalid_postal_code,
+				{
+					required: false,
+				},
+			),
+			notes: this.validateString(this.message.invalid_notes, {
+				required: false,
+			}),
+		});
+	}
+}
 
-const ValidateSchemaPlace = ValidateSchemaPlaceBase.extend({
-	contents: z.array(ValidateSchemaContent).min(1, {
-		message: translations['places.validation.contents_invalid'],
-	}),
-});
+// const ValidateSchemaPlaceBase = z.object({
+// 	type: validateEnum(
+// 		PlaceTypeEnum,
+// 		translations['places.validation.type_invalid'],
+// 	),
+// 	code: validateString(translations['places.validation.type_invalid'])
+// 		.max(3, translations['places.validation.type_invalid'])
+// 		.nullable()
+// 		.optional(),
+// 	parent_id: validateId(
+// 		translations['places.validation.parent_id_invalid'],
+// 	).optional(),
+// });
+//
+// const ValidateSchemaContent = z.object({
+// 	language: validateEnum(
+// 		LanguageEnum,
+// 		translations['places.validation.language_valid'],
+// 	),
+// 	name: validateString(translations['places.validation.invalid_name']),
+// 	type_label: validateString(
+// 		translations['places.validation.type_label_invalid'],
+// 	),
+// });
+//
+// const ValidateSchemaPlace = ValidateSchemaPlaceBase.extend({
+// 	contents: z.array(ValidateSchemaContent).min(1, {
+// 		message: translations['places.validation.contents_invalid'],
+// 	}),
+// });
 
 export function getFormValuesPlace(formData: FormData): PlaceFormValuesType {
-	const typeRaw = formData.get('type') as PlaceTypeEnum | null;
-	const type = Object.values(PlaceTypeEnum).includes(typeRaw as PlaceTypeEnum)
-		? (typeRaw as PlaceTypeEnum)
+	const placeTypeRaw = formData.get('place_type') as PlaceTypeEnum | null;
+	const place_type = Object.values(PlaceTypeEnum).includes(
+		placeTypeRaw as PlaceTypeEnum,
+	)
+		? (placeTypeRaw as PlaceTypeEnum)
 		: PlaceTypeEnum.COUNTRY;
 
 	const parentIdRaw = formData.get('parent_id');
@@ -92,7 +119,7 @@ export function getFormValuesPlace(formData: FormData): PlaceFormValuesType {
 	}
 
 	return {
-		type,
+		place_type,
 		code: (formData.get('code') as string) || null,
 		parent_id: parentIdRaw ? Number(parentIdRaw) : null,
 		contents,
@@ -101,14 +128,14 @@ export function getFormValuesPlace(formData: FormData): PlaceFormValuesType {
 
 export type PlacesDataTableFiltersType = {
 	global: { value: string | null; matchMode: 'contains' };
-	type: { value: PlaceTypeEnum | null; matchMode: 'equals' };
+	place_type: { value: PlaceTypeEnum | null; matchMode: 'equals' };
 	create_date_start: { value: string | null; matchMode: 'equals' };
 	create_date_end: { value: string | null; matchMode: 'equals' };
 };
 
 export const placesDataTableFilters: PlacesDataTableFiltersType = {
 	global: { value: null, matchMode: 'contains' },
-	type: { value: null, matchMode: 'equals' },
+	place_type: { value: null, matchMode: 'equals' },
 	create_date_start: { value: null, matchMode: 'equals' },
 	create_date_end: { value: null, matchMode: 'equals' },
 };
@@ -142,7 +169,7 @@ export const dataSourceConfigPlaces = {
 				}),
 		},
 		{
-			field: 'type',
+			field: 'place_type',
 			header: 'Type',
 			sortable: true,
 			body: (
@@ -150,7 +177,7 @@ export const dataSourceConfigPlaces = {
 				column: DataTableColumnType<PlaceModel>,
 			) =>
 				DataTableValue(entry, column, {
-					customValue: toTitleCase(entry.type),
+					customValue: toTitleCase(entry.place_type),
 				}),
 		},
 		{
@@ -186,7 +213,7 @@ export const dataSourceConfigPlaces = {
 		dataSource: 'places' as const,
 		id: undefined,
 		values: {
-			type: PlaceTypeEnum.COUNTRY,
+			place_type: PlaceTypeEnum.COUNTRY,
 			code: null,
 			parent_id: null,
 			contents: [],
@@ -199,7 +226,9 @@ export const dataSourceConfigPlaces = {
 		find: findPlaces,
 		getFormValues: getFormValuesPlace,
 		validateForm: (values: PlaceFormValuesType) => {
-			return ValidateSchemaPlace.safeParse(values);
+			const validator = new PlaceValidator(translationValidation);
+
+			return validator.manage().safeParse(values);
 		},
 		syncFormState: (
 			state: FormStateType<'places', PlaceModel, PlaceFormValuesType>,
@@ -210,7 +239,7 @@ export const dataSourceConfigPlaces = {
 				id: model.id,
 				values: {
 					...state.values,
-					type: model.type,
+					place_type: model.place_type,
 					code: model.code,
 					parent_id: model.parent_id,
 					contents:

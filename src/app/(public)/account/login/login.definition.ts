@@ -1,12 +1,12 @@
 import { z } from 'zod';
 import { translateBatch } from '@/config/translate.setup';
-import { validateString } from '@/helpers/form.helper';
+import { BaseValidator } from '@/helpers/validator.helper';
 import type { AuthTokenListType } from '@/types/auth.type';
 import type { FormSituationType } from '@/types/form.type';
 
 export type LoginFormFieldsType = {
-	email: string;
-	password: string;
+	email?: string;
+	password?: string;
 };
 
 export type LoginSituationType =
@@ -33,12 +33,22 @@ export const LoginState: LoginStateType = {
 	situation: null,
 };
 
-const translations = await translateBatch([
-	'login.validation.email_invalid',
-	'login.validation.password',
-]);
+const translationValidation = await translateBatch(
+	['login.validation.invalid_email', 'login.validation.invalid_password'],
+	'login.validation.',
+);
 
-export const LoginSchema = z.object({
-	email: z.email({ message: translations['login.validation.email_invalid'] }),
-	password: validateString(translations['login.validation.password']),
-});
+class LoginValidator extends BaseValidator {
+	constructor(private readonly message: Record<string, string>) {
+		super();
+	}
+
+	login() {
+		return z.object({
+			email: this.validateEmail(this.message.invalid_email),
+			password: this.validateString(this.message.invalid_password),
+		});
+	}
+}
+
+export const LoginSchema = new LoginValidator(translationValidation).login();

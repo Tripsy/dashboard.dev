@@ -30,7 +30,12 @@ export function FormManagePlace({
 	handleChange,
 	pending,
 }: FormManageType<PlaceFormValuesType>) {
-	const elementIds = useElementIds(['type', 'code', 'parentId', 'contents']);
+	const elementIds = useElementIds([
+		'placeType',
+		'code',
+		'parentId',
+		'contents',
+	]);
 
 	const [contents, setContents] = useState<PlaceContentInput[]>(
 		formValues.contents.length > 0
@@ -87,13 +92,13 @@ export function FormManagePlace({
 		<>
 			<FormComponentRadio<PlaceFormValuesType>
 				labelText={translations['places.form_manage.label_type']}
-				id={elementIds.type}
-				fieldName="type"
-				fieldValue={formValues.type}
+				id={elementIds.placeType}
+				fieldName="place_type"
+				fieldValue={formValues.place_type}
 				options={placeTypes}
 				disabled={pending}
-				onValueChange={(value) => handleChange('type', value)}
-				error={errors.type}
+				onValueChange={(value) => handleChange('place_type', value)}
+				error={errors.place_type}
 			/>
 
 			<FormComponentInput<PlaceFormValuesType>

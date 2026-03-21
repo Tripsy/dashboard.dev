@@ -31,7 +31,7 @@ function loadSettings(): Settings {
 			inputName: 'x-csrf-token',
 		},
 		user: {
-			nameMinLength: 3,
+			nameMinChars: 3,
 			passwordMinLength: 8,
 			// loginMaxFailedAttemptsForIp: 5,
 			// loginMaxFailedAttemptsForEmail: 3,

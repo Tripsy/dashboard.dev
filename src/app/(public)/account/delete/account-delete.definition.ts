@@ -1,10 +1,10 @@
 import { z } from 'zod';
 import { translateBatch } from '@/config/translate.setup';
-import { validateString } from '@/helpers/form.helper';
+import { BaseValidator } from '@/helpers/validator.helper';
 import type { FormSituationType } from '@/types/form.type';
 
 export type AccountDeleteFormFieldsType = {
-	password_current: string;
+	password_current?: string;
 };
 
 export type AccountDeleteSituationType = FormSituationType | 'csrf_error';
@@ -25,12 +25,25 @@ export const AccountDeleteState: AccountDeleteStateType = {
 	situation: null,
 };
 
-const translations = await translateBatch([
-	'account-delete.validation.password_current_invalid',
-]);
+const translationValidation = await translateBatch(
+	['account-delete.validation.invalid_password'],
+	'account-delete.validation.',
+);
 
-export const AccountDeleteSchema = z.object({
-	password_current: validateString(
-		translations['account-delete.validation.password_current_invalid'],
-	),
-});
+class AccountDeleteValidator extends BaseValidator {
+	constructor(private readonly message: Record<string, string>) {
+		super();
+	}
+
+	accountDelete() {
+		return z.object({
+			password_current: this.validateString(
+				this.message.invalid_password_current,
+			),
+		});
+	}
+}
+
+export const AccountDeleteSchema = new AccountDeleteValidator(
+	translationValidation,
+).accountDelete();

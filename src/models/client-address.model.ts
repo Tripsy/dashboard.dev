@@ -10,9 +10,9 @@ export type ClientAddressModel<D = Date | string> = {
 	id: number;
 	client_id: number;
 	address_type: ClientAddressTypeEnum;
-	address_city_id: number | null;
-	address_info: string;
-	address_postal_code: string | null;
+	city_id: number | null;
+	details: string;
+	postal_code: string | null;
 	notes: string | null;
 	city: PlaceModel<D> | null;
 	client: ClientModel<D>;

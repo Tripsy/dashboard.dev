@@ -1,9 +1,10 @@
 import { z } from 'zod';
 import { translateBatch } from '@/config/translate.setup';
+import { BaseValidator } from '@/helpers/validator.helper';
 import type { FormSituationType } from '@/types/form.type';
 
 export type EmailUpdateFormFieldsType = {
-	email_new: string;
+	email_new?: string;
 };
 
 export type EmailUpdateSituationType = FormSituationType | 'csrf_error';
@@ -24,12 +25,23 @@ export const EmailUpdateState: EmailUpdateStateType = {
 	situation: null,
 };
 
-const translations = await translateBatch([
-	'account-email-update.validation.email_invalid',
-]);
+const translationValidation = await translateBatch(
+	['account-email-update.validation.invalid_email'],
+	'account-email-update.validation.',
+);
 
-export const EmailUpdateSchema = z.object({
-	email_new: z.email({
-		message: translations['account-email-update.validation.email_invalid'],
-	}),
-});
+class EmailUpdateValidator extends BaseValidator {
+	constructor(private readonly message: Record<string, string>) {
+		super();
+	}
+
+	emailUpdate() {
+		return z.object({
+			email_new: this.validateEmail(this.message.invalid_email),
+		});
+	}
+}
+
+export const EmailUpdateSchema = new EmailUpdateValidator(
+	translationValidation,
+).emailUpdate();

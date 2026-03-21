@@ -124,6 +124,7 @@ export const translateBatch = async (
 				vars?: Record<string, string>;
 		  }
 	)[],
+	stripKey?: string,
 ): Promise<Record<string, string>> => {
 	const language = await getLanguage();
 	const resource = await loadLanguageResource(language);
@@ -132,14 +133,19 @@ export const translateBatch = async (
 
 	for (const request of requests) {
 		if (typeof request === 'string') {
-			result[request] = getTranslatedString(resource, request);
+			const key = stripKey ? request.replace(stripKey, '') : request;
+
+			result[key] = getTranslatedString(resource, request);
 		} else {
 			const value = getTranslatedString(resource, request.key);
+			const key = stripKey
+				? request.key.replace(stripKey, '')
+				: request.key;
 
 			if (request.vars) {
-				result[request.key] = replaceVars(value, request.vars);
+				result[key] = replaceVars(value, request.vars);
 			} else {
-				result[request.key] = value;
+				result[key] = value;
 			}
 		}
 	}

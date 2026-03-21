@@ -77,7 +77,7 @@ export async function accountDeleteAction(
 			switch (error.status) {
 				case 401:
 					message = await translate(
-						'account-delete.validation.password_current_incorrect',
+						'account-delete.error.password_current_incorrect',
 					);
 					break;
 			}

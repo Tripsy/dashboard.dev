@@ -6,11 +6,6 @@ import {
 import type { FormStateType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import { DisplayAmount } from '@/helpers/display.helper';
-import {
-	validateEnum,
-	validateNumber,
-	validateString,
-} from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import {
 	CashFlowCategoryEnum,
@@ -39,39 +34,39 @@ const translations = await translateBatch([
 	'cash-flow.validation.notes_invalid',
 ]);
 
-const ValidateSchemaCashFlow = z.object({
-	address_type: validateEnum(
-		CashFlowCategoryEnum,
-		translations['cash-flow.validation.category_invalid'],
-	),
-	method: validateEnum(
-		CashFlowMethodEnum,
-		translations['cash-flow.validation.method_invalid'],
-	),
-	amount: validateNumber(translations['cash-flow.validation.amount_invalid']),
-	vat_rate: validateNumber(
-		translations['cash-flow.validation.vat_rate_invalid'],
-		true,
-		true,
-	)
-		.min(0, translations['cash-flow.validation.vat_rate_invalid'])
-		.max(100, translations['cash-flow.validation.vat_rate_invalid']),
-	currency: validateEnum(
-		CurrencyEnum,
-		translations['cash-flow.validation.currency_invalid'],
-	),
-	exchange_rate: validateNumber(
-		translations['cash-flow.validation.exchange_rate_invalid'],
-		true,
-		true,
-	),
-	external_reference: validateString(
-		translations['cash-flow.validation.external_reference_invalid'],
-	).optional(),
-	notes: validateString(
-		translations['cash-flow.validation.notes_invalid'],
-	).optional(),
-});
+// const ValidateSchemaCashFlow = z.object({
+// 	address_type: validateEnum(
+// 		CashFlowCategoryEnum,
+// 		translations['cash-flow.validation.category_invalid'],
+// 	),
+// 	method: validateEnum(
+// 		CashFlowMethodEnum,
+// 		translations['cash-flow.validation.method_invalid'],
+// 	),
+// 	amount: validateNumber(translations['cash-flow.validation.amount_invalid']),
+// 	vat_rate: validateNumber(
+// 		translations['cash-flow.validation.vat_rate_invalid'],
+// 		true,
+// 		true,
+// 	)
+// 		.min(0, translations['cash-flow.validation.vat_rate_invalid'])
+// 		.max(100, translations['cash-flow.validation.vat_rate_invalid']),
+// 	currency: validateEnum(
+// 		CurrencyEnum,
+// 		translations['cash-flow.validation.currency_invalid'],
+// 	),
+// 	exchange_rate: validateNumber(
+// 		translations['cash-flow.validation.exchange_rate_invalid'],
+// 		true,
+// 		true,
+// 	),
+// 	external_reference: validateString(
+// 		translations['cash-flow.validation.external_reference_invalid'],
+// 	).optional(),
+// 	notes: validateString(
+// 		translations['cash-flow.validation.notes_invalid'],
+// 	).optional(),
+// });
 
 export function getFormValuesCashFlow(
 	formData: FormData,
@@ -257,7 +252,7 @@ export const dataSourceConfigCashFlow = {
 		find: findCashFlows,
 		getFormValues: getFormValuesCashFlow,
 		validateForm: (values: CashFlowFormValuesType) => {
-			return ValidateSchemaCashFlow.safeParse(values);
+			// return ValidateSchemaCashFlow.safeParse(values);
 		},
 		syncFormState: (
 			state: FormStateType<

@@ -3,7 +3,9 @@
 		"title": "My account - Delete request | {{app_name}}"
 	},
 	"validation": {
-		"password_current_invalid": "Please enter your current password",
+		"invalid_password_current": "Please enter your current password"
+	},
+	"error": {
 		"password_current_incorrect": "The current password you entered is incorrect"
 	}
 }

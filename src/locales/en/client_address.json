@@ -3,12 +3,12 @@
 		"title": "Client addresses - Dashboard | {{app_name}}"
 	},
 	"validation": {
-		"address_client_id_invalid": "Invalid client ID",
-		"address_type_invalid": "Address type is required",
-		"address_city_id_invalid": "Invalid city ID",
-		"address_info_invalid": "Invalid address info",
-		"address_postal_code_invalid": "Invalid postal code",
-		"notes_invalid": "Invalid notes"
+		"invalid_client_id": "Invalid client ID",
+		"invalid_address_type": "Address type is required",
+		"invalid_city_id": "Invalid city ID",
+		"invalid_details": "Invalid address info",
+		"invalid_postal_code": "Invalid postal code",
+		"invalid_notes": "Invalid notes"
 	},
 	"action": {
 		"create": {

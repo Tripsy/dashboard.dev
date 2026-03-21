@@ -3,9 +3,9 @@
 		"title": "My account - Edit | {{app_name}}"
 	},
 	"validation": {
-		"name_invalid": "Please enter your name",
+		"invalid_name": "Please enter your name",
 		"name_min": "Name must be at least {{min}} characters long",
-		"language_invalid": "Please select a valid language"
+		"invalid_language": "Please select a valid language"
 	},
 	"message": {
 		"success": "Account details updated with success"

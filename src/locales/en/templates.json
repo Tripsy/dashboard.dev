@@ -3,15 +3,15 @@
 		"title": "Templates - Dashboard | {{app_name}}"
 	},
 	"validation": {
-		"label_invalid": "Set label",
-		"language_invalid": "Select a valid language",
-		"type_invalid": "Select a valid type",
-		"email_subject_invalid": "Set email subject",
-		"email_html_invalid": "Set email html",
-		"email_layout_invalid": "Set email layout",
-		"page_title_invalid": "Set page title",
-		"page_html_invalid": "Set page body",
-		"page_layout_invalid": "Set page layout"
+		"invalid_label": "Set label",
+		"invalid_language": "Select a valid language",
+		"invalid_email_subject": "Set email subject",
+		"invalid_email_text": "Invalid email text",
+		"invalid_email_html": "Set email html",
+		"invalid_email_layout": "Set email layout",
+		"invalid_page_title": "Set page title",
+		"invalid_page_html": "Set page body",
+		"invalid_page_layout": "Set page layout"
 	},
 	"action": {
 		"create": {

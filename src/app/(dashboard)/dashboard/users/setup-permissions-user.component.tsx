@@ -23,7 +23,7 @@ export function SetupPermissionsUser() {
 				'app.text.loading',
 				'app.text.error_title',
 				'app.text.success_title',
-				'users.validation.no_permissions_defined',
+				'users.error.no_permissions_defined',
 			] as const,
 		[],
 	);
@@ -235,7 +235,7 @@ export function SetupPermissionsUser() {
 	if (!permissions.length) {
 		return (
 			<div className="min-h-48 flex items-center justify-center">
-				{translations['users.validation.no_permissions_defined']}
+				{translations['users.error.no_permissions_defined']}
 			</div>
 		);
 	}

@@ -333,7 +333,7 @@ export const AuthTokenList = ({
 					<p className="text-sm semi-bold">
 						Are you sure you want to destroy the session?
 					</p>
-					<p className="font-mono text-xs break-words mt-2">
+					<p className="font-mono text-xs wrap-break-word mt-2">
 						{selectedTokenData?.label}
 					</p>
 				</Modal>

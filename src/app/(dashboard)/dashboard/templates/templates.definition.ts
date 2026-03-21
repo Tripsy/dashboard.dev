@@ -5,8 +5,8 @@ import {
 } from '@/app/(dashboard)/_components/data-table-value';
 import type { FormStateType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
-import { safeHtml, validateEnum, validateString } from '@/helpers/form.helper';
 import { parseJson } from '@/helpers/string.helper';
+import { BaseValidator } from '@/helpers/validator.helper';
 import {
 	type TemplateFormValuesType,
 	TemplateLayoutEmailEnum,
@@ -23,65 +23,71 @@ import {
 	updateTemplate,
 } from '@/services/templates.service';
 
-const translations = await translateBatch([
-	'templates.validation.label_invalid',
-	'templates.validation.language_invalid',
-	'templates.validation.type_invalid',
-	'templates.validation.email_subject_invalid',
-	'templates.validation.email_html_invalid',
-	'templates.validation.email_layout_invalid',
-	'templates.validation.page_title_invalid',
-	'templates.validation.page_body_invalid',
-	'templates.validation.page_layout_invalid',
-]);
+const translationValidation = await translateBatch(
+	[
+		'templates.validation.invalid_label',
+		'templates.validation.invalid_language',
+		'templates.validation.invalid_email_subject',
+		'templates.validation.invalid_email_text',
+		'templates.validation.invalid_email_html',
+		'templates.validation.invalid_email_layout',
+		'templates.validation.invalid_page_title',
+		'templates.validation.invalid_page_html',
+		'templates.validation.invalid_page_layout',
+	],
+	'templates.validation.',
+);
 
-const ValidateSchemaBaseTemplate = z.object({
-	label: validateString(translations['templates.validation.label_invalid']),
-	language: validateEnum(
-		LanguageEnum,
-		translations['templates.validation.language_invalid'],
-	),
-	type: validateEnum(
-		TemplateTypeEnum,
-		translations['templates.validation.type_invalid'],
-	),
-});
+class TemplateValidator extends BaseValidator {
+	constructor(private readonly message: Record<string, string>) {
+		super();
+	}
 
-const ValidateSchemaEmailTemplate = ValidateSchemaBaseTemplate.extend({
-	type: z.literal(TemplateTypeEnum.EMAIL),
-	subject: validateString(
-		translations['templates.validation.email_subject_invalid'],
-	),
-	text: validateString(
-		translations['templates.validation.email_text_invalid'],
-	).optional(),
-	html: validateString(
-		translations['templates.validation.email_html_invalid'],
-	).transform((val) => safeHtml(val)),
-	layout: validateEnum(
-		TemplateLayoutEmailEnum,
-		translations['templates.validation.email_layout_invalid'],
-	).optional(),
-});
+	baseSchema() {
+		return {
+			label: this.validateString(this.message.invalid_label),
+			language: this.validateEnum(
+				LanguageEnum,
+				this.message.invalid_language,
+			),
+		};
+	}
 
-const ValidateSchemaPageTemplate = ValidateSchemaBaseTemplate.extend({
-	type: z.literal(TemplateTypeEnum.PAGE),
-	title: validateString(
-		translations['templates.validation.page_title_invalid'],
-	),
-	html: validateString(
-		translations['templates.validation.page_html_invalid'],
-	).transform((val) => safeHtml(val)),
-	layout: validateEnum(
-		TemplateLayoutPageEnum,
-		translations['templates.validation.page_layout_invalid'],
-	).optional(),
-});
+	manage() {
+		return z.discriminatedUnion('type', [
+			// Email schema
+			z
+				.object({
+					type: z.literal(TemplateTypeEnum.EMAIL),
+					subject: this.validateString(
+						this.message.invalid_email_subject,
+					),
+					text: this.validateString(this.message.invalid_email_text, {
+						required: false,
+					}),
+					html: this.validateString(this.message.invalid_email_html),
+					layout: this.validateEnum(
+						TemplateLayoutEmailEnum,
+						this.message.invalid_email_layout,
+					),
+				})
+				.extend(this.baseSchema()),
 
-export const ValidateSchemaTemplate = z.discriminatedUnion('type', [
-	ValidateSchemaEmailTemplate,
-	ValidateSchemaPageTemplate,
-]);
+			// Page schema
+			z
+				.object({
+					type: z.literal(TemplateTypeEnum.PAGE),
+					title: this.validateString(this.message.invalid_page_title),
+					html: this.validateString(this.message.invalid_page_html),
+					layout: this.validateEnum(
+						TemplateLayoutPageEnum,
+						this.message.invalid_page_layout,
+					),
+				})
+				.extend(this.baseSchema()),
+		]);
+	}
+}
 
 export function getFormValuesTemplates(
 	formData: FormData,
@@ -121,7 +127,7 @@ export function getFormValuesTemplates(
 		title: (formData.get('title') as string) ?? '',
 		html: (formData.get('html') as string) ?? '',
 		layout:
-			(formData.get('content[layout]') as TemplateLayoutPageEnum) ??
+			(formData.get('layout') as TemplateLayoutPageEnum) ??
 			TemplateLayoutPageEnum.DEFAULT,
 	};
 }
@@ -218,7 +224,9 @@ export const dataSourceConfigTemplates = {
 		find: findTemplates,
 		getFormValues: getFormValuesTemplates,
 		validateForm: (values: TemplateFormValuesType) => {
-			return ValidateSchemaTemplate.safeParse(values);
+			const validator = new TemplateValidator(translationValidation);
+
+			return validator.manage().safeParse(values);
 		},
 		syncFormState: (
 			state: FormStateType<

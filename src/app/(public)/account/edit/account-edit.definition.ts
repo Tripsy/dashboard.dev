@@ -1,13 +1,13 @@
 import { z } from 'zod';
 import { Configuration } from '@/config/settings.config';
 import { translateBatch } from '@/config/translate.setup';
-import { validateEnum, validateString } from '@/helpers/form.helper';
+import { BaseValidator } from '@/helpers/validator.helper';
 import { LanguageEnum } from '@/models/user.model';
 import type { FormSituationType } from '@/types/form.type';
 
 export type AccountEditFormFieldsType = {
-	name: string;
-	language: LanguageEnum;
+	name?: string;
+	language?: LanguageEnum;
 };
 
 export type AccountEditSituationType = FormSituationType | 'csrf_error';
@@ -29,25 +29,44 @@ export const AccountEditState: AccountEditStateType = {
 	situation: null,
 };
 
-const translations = await translateBatch([
-	'account-edit.validation.name_invalid',
-	{
-		key: 'account-edit.validation.name_min',
-		vars: {
-			min: Configuration.get('user.nameMinLength') as string,
+const translationValidation = await translateBatch(
+	[
+		'account-edit.validation.invalid_name',
+		{
+			key: 'account-edit.validation.name_min',
+			vars: {
+				min: Configuration.get('user.nameMinChars') as string,
+			},
 		},
-	},
-	'account-edit.validation.language_invalid',
-]);
+		'account-edit.validation.invalid_language',
+	],
+	'account-edit.validation.',
+);
 
-export const AccountEditSchema = z.object({
-	name: validateString(
-		translations['account-edit.validation.name_invalid'],
-	).min(Configuration.get('user.nameMinLength') as number, {
-		message: translations['account-edit.validation.name_min'],
-	}),
-	language: validateEnum(
-		LanguageEnum,
-		translations['account-edit.validation.language_valid'],
-	),
-});
+class AccountEditValidator extends BaseValidator {
+	constructor(private readonly message: Record<string, string>) {
+		super();
+	}
+
+	accountEdit() {
+		return z.object({
+			name: this.validateString(
+				{
+					invalid: this.message.invalid_name,
+					min_chars: this.message.name_min,
+				},
+				{
+					minChars: Configuration.get('user.nameMinChars') as number,
+				},
+			),
+			language: this.validateEnum(
+				LanguageEnum,
+				this.message.invalid_language,
+			),
+		});
+	}
+}
+
+export const AccountEditSchema = new AccountEditValidator(
+	translationValidation,
+).accountEdit();

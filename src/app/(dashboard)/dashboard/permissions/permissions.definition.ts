@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import type { FormStateType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
-import { validateString } from '@/helpers/form.helper';
+import { BaseValidator } from '@/helpers/validator.helper';
 import type {
 	PermissionFormValuesType,
 	PermissionModel,
@@ -14,19 +14,26 @@ import {
 	updatePermissions,
 } from '@/services/permissions.service';
 
-const translations = await translateBatch([
-	'permissions.validation.entity_invalid',
-	'permissions.validation.operation_invalid',
-]);
+const translationValidation = await translateBatch(
+	[
+		'permissions.validation.invalid_entity',
+		'permissions.validation.invalid_operation',
+	],
+	'permissions.validation.',
+);
 
-const ValidateSchemaBasePermissions = z.object({
-	entity: validateString(
-		translations['permissions.validation.entity_invalid'],
-	),
-	operation: validateString(
-		translations['permissions.validation.operation_invalid'],
-	),
-});
+class PermissionValidator extends BaseValidator {
+	constructor(private readonly message: Record<string, string>) {
+		super();
+	}
+
+	manage() {
+		return z.object({
+			entity: this.validateString(this.message.invalid_entity),
+			operation: this.validateString(this.message.invalid_operation),
+		});
+	}
+}
 
 function getFormValuesPermission(formData: FormData): PermissionFormValuesType {
 	return {
@@ -86,7 +93,9 @@ export const dataSourceConfigPermissions = {
 		find: findPermissions,
 		getFormValues: getFormValuesPermission,
 		validateForm: (values: PermissionFormValuesType) => {
-			return ValidateSchemaBasePermissions.safeParse(values);
+			const validator = new PermissionValidator(translationValidation);
+
+			return validator.manage().safeParse(values);
 		},
 		syncFormState: (
 			state: FormStateType<

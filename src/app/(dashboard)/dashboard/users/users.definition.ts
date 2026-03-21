@@ -6,11 +6,7 @@ import {
 import type { FormStateType } from '@/config/data-source.config';
 import { Configuration } from '@/config/settings.config';
 import { translateBatch } from '@/config/translate.setup';
-import {
-	validateEnum,
-	validatePassword,
-	validateString,
-} from '@/helpers/form.helper';
+import { BaseValidator } from '@/helpers/validator.helper';
 import {
 	LanguageEnum,
 	type UserFormValuesType,
@@ -29,185 +25,168 @@ import {
 	updateUser,
 } from '@/services/users.service';
 
-const translations = await translateBatch([
-	'users.validation.name_invalid',
-	{
-		key: 'users.validation.name_min',
-		vars: {
-			min: Configuration.get('user.nameMinLength') as string,
-		},
-	},
-	'users.validation.email_invalid',
-	'users.validation.language_invalid',
-	'users.validation.role_invalid',
-	{
-		key: 'users.validation.password_invalid',
-		vars: {
-			min: Configuration.get('user.passwordMinLength') as string,
-		},
-	},
-	{
-		key: 'users.validation.password_min',
-		vars: {
-			min: Configuration.get('user.passwordMinLength') as string,
-		},
-	},
-	'users.validation.password_condition_capital_letter',
-	'users.validation.password_condition_number',
-	'users.validation.password_condition_special_character',
-	'users.validation.password_confirm_required',
-	'users.validation.password_confirm_mismatch',
-	'users.validation.operator_type_invalid',
-]);
-
-const ValidateSchemaBaseUsers = z.object({
-	name: validateString(translations['users.validation.name_invalid']).min(
-		Configuration.get('user.nameMinLength') as number,
+const translationValidation = await translateBatch(
+	[
+		'users.validation.invalid_name',
 		{
-			message: translations['users.validation.name_min'],
+			key: 'users.validation.name_min',
+			vars: {
+				min: Configuration.get('user.nameMinChars') as string,
+			},
 		},
-	),
-	email: z.email({
-		message: translations['users.validation.email_invalid'],
-	}),
-	language: validateEnum(
-		LanguageEnum,
-		translations['users.validation.language_valid'],
-	),
-	role: validateEnum(
-		UserRoleEnum,
-		translations['users.validation.role_invalid'],
-	),
-	operator_type: validateEnum(
-		UserOperatorTypeEnum,
-		translations['users.validation.operator_type_invalid'],
-	).nullable(),
-});
-
-const ValidateSchemaCreateUsers = ValidateSchemaBaseUsers.extend({
-	password: validatePassword(
+		'users.validation.invalid_email',
+		'users.validation.invalid_language',
+		'users.validation.invalid_role',
 		{
-			password_invalid: translations['users.validation.password_invalid'],
-			password_min: translations['users.validation.password_min'],
-			password_condition_capital_letter:
-				translations[
-					'users.validation.password_condition_capital_letter'
-				],
-			password_condition_number:
-				translations['users.validation.password_condition_number'],
-			password_condition_special_character:
-				translations[
-					'users.validation.password_condition_special_character'
-				],
+			key: 'users.validation.invalid_password',
+			vars: {
+				min: Configuration.get('user.passwordMinLength') as string,
+			},
 		},
 		{
-			minLength: Configuration.get('user.passwordMinLength') as number,
+			key: 'users.validation.password_min',
+			vars: {
+				min: Configuration.get('user.passwordMinLength') as string,
+			},
 		},
-	),
-	password_confirm: validateString(
-		translations['users.validation.password_confirm_required'],
-	),
-})
-	.superRefine(({ password, password_confirm }, ctx) => {
-		if (password !== password_confirm) {
-			ctx.addIssue({
-				code: 'custom',
-				path: ['password_confirm'],
-				message:
-					translations['users.validation.password_confirm_mismatch'],
-			});
-		}
-	})
-	.superRefine(({ role, operator_type }, ctx) => {
-		if (role === UserRoleEnum.OPERATOR && !operator_type) {
-			ctx.addIssue({
-				code: 'custom',
-				path: ['operator_type'],
-				message: translations['users.validation.operator_type_invalid'],
-			});
-		}
-	});
+		'users.validation.password_condition_capital_letter',
+		'users.validation.password_condition_number',
+		'users.validation.password_condition_special_character',
+		'users.validation.password_confirm_required',
+		'users.validation.password_confirm_mismatch',
+		'users.validation.invalid_operator_type',
+	],
+	'users.validation.',
+);
 
-const ValidateSchemaUpdateUsers = ValidateSchemaBaseUsers.extend({
-	password: z
-		.string()
-		.nullable()
-		.optional()
-		.refine(
-			(val) => {
-				if (!val) {
-					return true;
-				}
+class UserValidator extends BaseValidator {
+	constructor(private readonly message: Record<string, string>) {
+		super();
+	}
 
-				return validatePassword(
+	baseSchema() {
+		return z.object({
+			name: this.validateString(
+				{
+					invalid: this.message.invalid_name,
+					min_chars: this.message.name_min,
+				},
+				{
+					minChars: Configuration.get('user.nameMinChars') as number,
+				},
+			),
+			email: this.validateEmail(this.message.invalid_email),
+			language: this.validateEnum(
+				LanguageEnum,
+				this.message.invalid_language,
+			),
+			role: this.validateEnum(UserRoleEnum, this.message.invalid_role),
+			operator_type: this.validateEnum(
+				UserOperatorTypeEnum,
+				this.message.invalid_operator_type,
+				{ required: false },
+			),
+		});
+	}
+
+	create() {
+		return this.baseSchema()
+			.extend({
+				password: this.validatePassword(
 					{
-						password_invalid:
-							translations['users.validation.password_invalid'],
-						password_min:
-							translations['users.validation.password_min'],
+						password_invalid: this.message.invalid_password,
+						password_min: this.message.password_min,
 						password_condition_capital_letter:
-							translations[
-								'users.validation.password_condition_capital_letter'
-							],
+							this.message.password_condition_capital_letter,
 						password_condition_number:
-							translations[
-								'users.validation.password_condition_number'
-							],
+							this.message.password_condition_number,
 						password_condition_special_character:
-							translations[
-								'users.validation.password_condition_special_character'
-							],
+							this.message.password_condition_special_character,
 					},
 					{
 						minLength: Configuration.get(
 							'user.passwordMinLength',
 						) as number,
 					},
-				).safeParse(val).success;
-			},
-			{
-				message: translations['users.validation.password_invalid'],
-			},
-		),
-	password_confirm: z
-		.string({
-			message: translations['users.validation.password_confirm_required'],
-		})
-		.nullable()
-		.optional(),
-})
-	.superRefine(({ password, password_confirm }, ctx) => {
-		if (password || password_confirm) {
-			if (!password_confirm) {
-				ctx.addIssue({
-					code: 'custom',
-					path: ['password_confirm'],
-					message:
-						translations[
-							'users.validation.password_confirm_required'
-						],
-				});
-			} else if (password !== password_confirm) {
-				ctx.addIssue({
-					code: 'custom',
-					path: ['password_confirm'],
-					message:
-						translations[
-							'users.validation.password_confirm_mismatch'
-						],
-				});
-			}
-		}
-	})
-	.superRefine(({ role, operator_type }, ctx) => {
-		if (role === UserRoleEnum.OPERATOR && !operator_type) {
-			ctx.addIssue({
-				code: 'custom',
-				path: ['operator_type'],
-				message: translations['users.validation.operator_type_invalid'],
+				),
+				password_confirm: this.validateString(
+					this.message.password_confirm_required,
+				),
+			})
+			.superRefine(({ password, password_confirm }, ctx) => {
+				if (password !== password_confirm) {
+					ctx.addIssue({
+						code: 'custom',
+						path: ['password_confirm'],
+						message: this.message.password_confirm_mismatch,
+					});
+				}
+			})
+			.superRefine(({ role, operator_type }, ctx) => {
+				if (role === UserRoleEnum.OPERATOR && !operator_type) {
+					ctx.addIssue({
+						code: 'custom',
+						path: ['operator_type'],
+						message: this.message.invalid_operator_type,
+					});
+				}
 			});
-		}
-	});
+	}
+
+	update() {
+		return this.baseSchema()
+			.extend({
+				password: this.validatePassword(
+					{
+						password_invalid: this.message.invalid_password,
+						password_min: this.message.password_min,
+						password_condition_capital_letter:
+							this.message.password_condition_capital_letter,
+						password_condition_number:
+							this.message.password_condition_number,
+						password_condition_special_character:
+							this.message.password_condition_special_character,
+					},
+					{
+						required: false,
+						minLength: Configuration.get(
+							'user.passwordMinLength',
+						) as number,
+					},
+				),
+				password_confirm: this.validateString(
+					this.message.password_confirm_required,
+					{ required: false },
+				),
+			})
+			.superRefine(({ password, password_confirm }, ctx) => {
+				if (password || password_confirm) {
+					if (!password_confirm) {
+						ctx.addIssue({
+							code: 'custom',
+							path: ['password_confirm'],
+							message: this.message.password_confirm_required,
+						});
+					} else if (password !== password_confirm) {
+						ctx.addIssue({
+							code: 'custom',
+							path: ['password_confirm'],
+							message: this.message.password_confirm_mismatch,
+						});
+					}
+				}
+			})
+			.superRefine(({ role, operator_type }, ctx) => {
+				if (role === UserRoleEnum.OPERATOR && !operator_type) {
+					ctx.addIssue({
+						code: 'custom',
+						path: ['operator_type'],
+						message: this.message.invalid_operator_type,
+					});
+				}
+			});
+	}
+}
 
 function getFormValuesUser(formData: FormData): UserFormValuesType {
 	const language = formData.get('language');
@@ -358,12 +337,14 @@ export const dataSourceConfigUsers = {
 		// onRowSelect: (entry: UserModel) => console.log('selected', entry),
 		// onRowUnselect: (entry: UserModel) => console.log('unselected', entry),
 		getFormValues: getFormValuesUser,
-		validateForm: (values: UserFormValuesType, id?: number) => {
+		validateForm: (values: UserFormValuesType, id: number) => {
+			const validator = new UserValidator(translationValidation);
+
 			if (id) {
-				return ValidateSchemaUpdateUsers.safeParse(values);
+				return validator.update().safeParse(values);
 			}
 
-			return ValidateSchemaCreateUsers.safeParse(values);
+			return validator.create().safeParse(values);
 		},
 		syncFormState: (
 			state: FormStateType<'users', UserModel, UserFormValuesType>,

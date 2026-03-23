@@ -12,7 +12,6 @@ import {
 	BrandStatusEnum,
 	BrandTypeEnum,
 } from '@/models/brand.model';
-import { ClientAddressTypeEnum } from '@/models/client-address.model';
 import {
 	createBrand,
 	deleteBrand,

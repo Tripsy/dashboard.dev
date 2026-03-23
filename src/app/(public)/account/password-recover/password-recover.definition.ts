@@ -4,7 +4,7 @@ import { BaseValidator } from '@/helpers/validator.helper';
 import type { FormSituationType } from '@/types/form.type';
 
 export type PasswordRecoverFormFieldsType = {
-	email?: string;
+	email: string;
 };
 
 export type PasswordRecoverSituationType = FormSituationType | 'csrf_error';
@@ -25,23 +25,21 @@ export const PasswordRecoverState: PasswordRecoverStateType = {
 	situation: null,
 };
 
-const translationValidation = await translateBatch(
-	['password-recover.validation.invalid_email'],
-	'password-recover.validation.',
+const validatorMessages = await BaseValidator.getValidatorMessages(
+	[
+		'invalid_email',
+	] as const,
+	'password-recover.validation',
 );
 
-class PasswordRecoverValidator extends BaseValidator {
-	constructor(private readonly message: Record<string, string>) {
-		super();
-	}
-
+class PasswordRecoverValidator extends BaseValidator<typeof validatorMessages> {
 	passwordRecover() {
 		return z.object({
-			email: this.validateEmail(this.message.invalid_email),
+			email: this.validateEmail(this.getMessage('invalid_email')),
 		});
 	}
 }
 
 export const PasswordRecoverSchema = new PasswordRecoverValidator(
-	translationValidation,
+	validatorMessages,
 ).passwordRecover();

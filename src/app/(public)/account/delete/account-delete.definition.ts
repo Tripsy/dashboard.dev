@@ -4,7 +4,7 @@ import { BaseValidator } from '@/helpers/validator.helper';
 import type { FormSituationType } from '@/types/form.type';
 
 export type AccountDeleteFormFieldsType = {
-	password_current?: string;
+	password_current: string;
 };
 
 export type AccountDeleteSituationType = FormSituationType | 'csrf_error';
@@ -25,25 +25,23 @@ export const AccountDeleteState: AccountDeleteStateType = {
 	situation: null,
 };
 
-const translationValidation = await translateBatch(
+const validatorMessages = await translateBatch(
 	['account-delete.validation.invalid_password'],
 	'account-delete.validation.',
 );
 
-class AccountDeleteValidator extends BaseValidator {
-	constructor(private readonly message: Record<string, string>) {
-		super();
-	}
+type ValidatorMessages = typeof validatorMessages;
 
+class AccountDeleteValidator extends BaseValidator<typeof validatorMessages> {
 	accountDelete() {
 		return z.object({
 			password_current: this.validateString(
-				this.message.invalid_password_current,
+				this.getMessage('invalid_password_current'),
 			),
 		});
 	}
 }
 
 export const AccountDeleteSchema = new AccountDeleteValidator(
-	translationValidation,
+	validatorMessages,
 ).accountDelete();

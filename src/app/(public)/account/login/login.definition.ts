@@ -5,8 +5,8 @@ import type { AuthTokenListType } from '@/types/auth.type';
 import type { FormSituationType } from '@/types/form.type';
 
 export type LoginFormFieldsType = {
-	email?: string;
-	password?: string;
+	email: string;
+	password: string;
 };
 
 export type LoginSituationType =
@@ -33,22 +33,18 @@ export const LoginState: LoginStateType = {
 	situation: null,
 };
 
-const translationValidation = await translateBatch(
-	['login.validation.invalid_email', 'login.validation.invalid_password'],
-	'login.validation.',
+const validatorMessages = await BaseValidator.getValidatorMessages(
+	['invalid_email', 'invalid_password'] as const,
+	'login.validation',
 );
 
-class LoginValidator extends BaseValidator {
-	constructor(private readonly message: Record<string, string>) {
-		super();
-	}
-
+class LoginValidator extends BaseValidator<typeof validatorMessages> {
 	login() {
 		return z.object({
-			email: this.validateEmail(this.message.invalid_email),
-			password: this.validateString(this.message.invalid_password),
+			email: this.validateEmail(this.getMessage('invalid_email')),
+			password: this.validateString(this.getMessage('invalid_password')),
 		});
 	}
 }
 
-export const LoginSchema = new LoginValidator(translationValidation).login();
+export const LoginSchema = new LoginValidator(validatorMessages).login();

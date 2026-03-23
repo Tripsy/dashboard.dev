@@ -19,37 +19,35 @@ import {
 	updatePlace,
 } from '@/services/places.service';
 
-const translationValidation = await translateBatch(
+const validatorMessages = await BaseValidator.getValidatorMessages(
 	[
-		'places.validation.place_type_invalid',
-		'places.validation.code_invalid',
-		'places.validation.invalid_name',
-		'places.validation.contents_invalid',
-	],
-	'places.validation.',
+		'invalid_place_type',
+		'invalid_client_id',
+		'invalid_city_id',
+		'invalid_details',
+		'invalid_postal_code',
+		'invalid_notes',
+	] as const,
+	'places.validation',
 );
 
-class PlaceValidator extends BaseValidator {
-	constructor(private readonly message: Record<string, string>) {
-		super();
-	}
-
+class PlaceValidator extends BaseValidator<typeof validatorMessages> {
 	manage() {
 		return z.object({
 			place_type: this.validateEnum(
 				PlaceTypeEnum,
-				this.message.invalid_place_type,
+				this.getMessage('invalid_place_type'),
 			),
-			client_id: this.validateId(this.message.invalid_client_id),
-			city_id: this.validateId(this.message.invalid_city_id, false),
-			details: this.validateString(this.message.invalid_details),
+			client_id: this.validateId(this.getMessage('invalid_client_id')),
+			city_id: this.validateId(this.getMessage('invalid_city_id'), false),
+			details: this.validateString(this.getMessage('invalid_details')),
 			postal_code: this.validatePostalCode(
-				this.message.invalid_postal_code,
+				this.getMessage('invalid_postal_code'),
 				{
 					required: false,
 				},
 			),
-			notes: this.validateString(this.message.invalid_notes, {
+			notes: this.validateString(this.getMessage('invalid_notes'), {
 				required: false,
 			}),
 		});
@@ -226,7 +224,7 @@ export const dataSourceConfigPlaces = {
 		find: findPlaces,
 		getFormValues: getFormValuesPlace,
 		validateForm: (values: PlaceFormValuesType) => {
-			const validator = new PlaceValidator(translationValidation);
+			const validator = new PlaceValidator(validatorMessages);
 
 			return validator.manage().safeParse(values);
 		},

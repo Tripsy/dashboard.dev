@@ -5,8 +5,8 @@ import { BaseValidator } from '@/helpers/validator.helper';
 import type { FormSituationType } from '@/types/form.type';
 
 export type PasswordRecoverChangeFormFieldsType = {
-	password?: string;
-	password_confirm?: string;
+	password: string;
+	password_confirm: string;
 };
 
 export type PasswordRecoverChangeSituationType =
@@ -34,13 +34,13 @@ export const PasswordRecoverChangeState: PasswordRecoverChangeStateType = {
 	situation: null,
 };
 
-const translationValidation = await translateBatch(
+const validatorMessages = await translateBatch(
 	[
 		'password-recover-change.validation.invalid_password',
 		{
 			key: 'password-recover-change.validation.password_min',
 			vars: {
-				min: Configuration.get('user.passwordMinLength') as string,
+				min: Configuration.get('user.passwordMinChars') as string,
 			},
 		},
 		'password-recover-change.validation.password_condition_capital_letter',
@@ -52,40 +52,43 @@ const translationValidation = await translateBatch(
 	'password-recover-change.validation.',
 );
 
-class PasswordRecoverChangeValidator extends BaseValidator {
-	constructor(private readonly message: Record<string, string>) {
-		super();
-	}
-
+class PasswordRecoverChangeValidator extends BaseValidator<
+	typeof validatorMessages
+> {
 	passwordRecoverChange() {
 		return z
 			.object({
 				password: this.validatePassword(
 					{
-						password_invalid: this.message.invalid_password,
-						password_min: this.message.password_min,
-						password_condition_capital_letter:
-							this.message.password_condition_capital_letter,
-						password_condition_number:
-							this.message.password_condition_number,
-						password_condition_special_character:
-							this.message.password_condition_special_character,
+						invalid_password: this.getMessage('invalid_password'),
+						password_min: this.getMessage('password_min', {
+							min: Configuration.get('user.passwordMinChars') as string,
+						}),
+						password_condition_capital_letter: this.getMessage(
+							'password_condition_capital_letter',
+						),
+						password_condition_number: this.getMessage(
+							'password_condition_number',
+						),
+						password_condition_special_character: this.getMessage(
+							'password_condition_special_character',
+						),
 					},
 					{
 						minLength: Configuration.get(
-							'user.passwordMinLength',
+							'user.passwordMinChars',
 						) as number,
 					},
 				),
 				password_confirm: this.validateString(
-					this.message.password_confirm_required,
+					this.getMessage('password_confirm_required'),
 				),
 			})
 			.superRefine(({ password, password_confirm }, ctx) => {
 				if (password !== password_confirm) {
 					ctx.addIssue({
 						path: ['password_confirm'],
-						message: this.message.password_confirm_mismatch,
+						message: this.getMessage('password_confirm_mismatch'),
 						code: 'custom',
 					});
 				}
@@ -94,5 +97,5 @@ class PasswordRecoverChangeValidator extends BaseValidator {
 }
 
 export const PasswordRecoverChangeSchema = new PasswordRecoverChangeValidator(
-	translationValidation,
+	validatorMessages,
 ).passwordRecoverChange();

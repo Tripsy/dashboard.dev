@@ -4,7 +4,6 @@ import {
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
 import type { FormStateType } from '@/config/data-source.config';
-import { translateBatch } from '@/config/translate.setup';
 import { BaseValidator } from '@/helpers/validator.helper';
 import { getClientDisplayName } from '@/models/client.model';
 import {
@@ -20,43 +19,39 @@ import {
 	updateClientAddress,
 } from '@/services/client-address.service';
 
-const translationValidation = await translateBatch(
+const validatorMessages = await BaseValidator.getValidatorMessages(
 	[
-		'client-address.validation.invalid_client_id',
-		'client-address.validation.invalid_address_type',
-		'client-address.validation.invalid_city_id',
-		'client-address.validation.invalid_details',
-		'client-address.validation.invalid_postal_code',
-		'client-address.validation.invalid_notes',
-	],
-	'client-address.validation.',
+		'invalid_client_id',
+		'invalid_address_type',
+		'invalid_city_id',
+		'invalid_details',
+		'invalid_postal_code',
+		'invalid_notes',
+	] as const,
+	'client-address.validation',
 );
 
-class ClientAddressValidator extends BaseValidator {
-	constructor(private readonly message: Record<string, string>) {
-		super();
-	}
-
-	manage() {
-		return z.object({
-			client_id: this.validateId(this.message.invalid_client_id),
-			address_type: this.validateEnum(
-				ClientAddressTypeEnum,
-				this.message.invalid_address_type,
-			),
-			city_id: this.validateId(this.message.invalid_city_id, false),
-			details: this.validateString(this.message.invalid_details),
-			postal_code: this.validatePostalCode(
-				this.message.invalid_postal_code,
-				{
-					required: false,
-				},
-			),
-			notes: this.validateString(this.message.invalid_notes, {
+export class ClientAddressValidator extends BaseValidator<
+	typeof validatorMessages
+> {
+	manage = z.object({
+		client_id: this.validateId(this.getMessage('invalid_client_id')),
+		address_type: this.validateEnum(
+			ClientAddressTypeEnum,
+			this.getMessage('invalid_address_type'),
+		),
+		city_id: this.validateId(this.getMessage('invalid_city_id'), false),
+		details: this.validateString(this.getMessage('invalid_details')),
+		postal_code: this.validatePostalCode(
+			this.getMessage('invalid_postal_code'),
+			{
 				required: false,
-			}),
-		});
-	}
+			},
+		),
+		notes: this.validateString(this.getMessage('invalid_notes'), {
+			required: false,
+		}),
+	});
 }
 
 function getFormValuesClientAddress(
@@ -179,9 +174,9 @@ export const dataSourceConfigClientAddress = {
 		find: findClientAddress,
 		getFormValues: getFormValuesClientAddress,
 		validateForm: (values: ClientAddressFormValuesType) => {
-			const validator = new ClientAddressValidator(translationValidation);
+			const validator = new ClientAddressValidator(validatorMessages);
 
-			return validator.manage().safeParse(values);
+			return validator.manage.safeParse(values);
 		},
 		syncFormState: (
 			state: FormStateType<

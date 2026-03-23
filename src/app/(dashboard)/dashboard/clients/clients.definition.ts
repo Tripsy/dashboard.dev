@@ -4,7 +4,6 @@ import {
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
 import type { FormStateType } from '@/config/data-source.config';
-import { translateBatch } from '@/config/translate.setup';
 import { BaseValidator } from '@/helpers/validator.helper';
 import {
 	type ClientFormValuesType,
@@ -23,105 +22,102 @@ import {
 	updateClient,
 } from '@/services/clients.service';
 
-const translationValidation = await translateBatch(
+const validatorMessages = await BaseValidator.getValidatorMessages(
 	[
-		'clients.validation.invalid_client_type',
-		'clients.validation.invalid_iban',
-		'clients.validation.invalid_bank_name',
-		'clients.validation.invalid_contact_name',
-		'clients.validation.invalid_contact_email',
-		'clients.validation.invalid_contact_phone',
-		'clients.validation.invalid_notes',
-		'clients.validation.invalid_company_name',
-		'clients.validation.invalid_company_cui',
-		'clients.validation.invalid_company_reg_com',
-		'clients.validation.invalid_person_name',
-		'clients.validation.invalid_person_identification_number',
+		'invalid_client_type',
+		'invalid_iban',
+		'invalid_bank_name',
+		'invalid_contact_name',
+		'invalid_contact_email',
+		'invalid_contact_phone',
+		'invalid_notes',
+		'invalid_company_name',
+		'invalid_company_cui',
+		'invalid_company_reg_com',
+		'invalid_person_name',
+		'invalid_person_identification_number',
 	],
-	'clients.validation.',
+	'clients.validation',
 );
 
-class ClientValidator extends BaseValidator {
-	constructor(private readonly message: Record<string, string>) {
-		super();
-	}
+class ClientValidator extends BaseValidator<typeof validatorMessages> {
+	baseSchema = {
+		iban: this.validateIBAN(this.getMessage('invalid_iban'), {
+			required: false,
+		}),
+		bank_name: this.validateString(
+			this.getMessage('invalid_bank_name'),
+			{
+				required: false,
+			},
+		),
+		contact_name: this.validateString(
+			this.getMessage('invalid_contact_name'),
+			{
+				required: false,
+			},
+		),
+		contact_email: this.validateEmail(
+			this.getMessage('invalid_contact_email'),
+			{
+				required: false,
+			},
+		),
+		contact_phone: this.validatePhone(
+			this.getMessage('invalid_contact_phone'),
+			{
+				required: false,
+			},
+		),
+		notes: this.validateString(this.getMessage('invalid_notes'), {
+			required: false,
+		}),
+	};
 
-	baseSchema() {
-		return {
-			iban: this.validateIBAN(this.message.invalid_iban, {
-				required: false,
-			}),
-			bank_name: this.validateString(this.message.invalid_bank_name, {
-				required: false,
-			}),
-			contact_name: this.validateString(
-				this.message.invalid_contact_name,
-				{
-					required: false,
-				},
-			),
-			contact_email: this.validateEmail(
-				this.message.invalid_contact_email,
-				{
-					required: false,
-				},
-			),
-			contact_phone: this.validatePhone(
-				this.message.invalid_contact_phone,
-				{
-					required: false,
-				},
-			),
-			notes: this.validateString(this.message.invalid_notes, {
-				required: false,
-			}),
-		};
-	}
+	manage = z.discriminatedUnion('client_type', [
+		// Company schema
+		z
+			.object({
+				client_type: z.literal(ClientTypeEnum.COMPANY),
+				company_name: this.validateString(
+					this.getMessage('invalid_company_name'),
+				),
+				company_cui: this.validateString(
+					this.getMessage('invalid_company_cui'),
+				),
+				company_reg_com: this.validateString(
+					this.getMessage('invalid_company_reg_com'),
+					{
+						required: false,
+					},
+				),
+				person_name: z.never().optional(),
+				person_identification_number: z.never().optional(),
+			})
+			.extend(this.baseSchema),
 
-	manage() {
-		return z.discriminatedUnion('client_type', [
-			// Company schema
-			z
-				.object({
-					client_type: z.literal(ClientTypeEnum.COMPANY),
-					company_name: this.validateString(
-						this.message.invalid_company_name,
-					),
-					company_cui: this.validateString(
-						this.message.invalid_company_cui,
-					),
-					company_reg_com: this.validateString(
-						this.message.invalid_company_reg_com,
+		// Person schema
+		z
+			.object({
+				client_type: z.literal(ClientTypeEnum.PERSON),
+				company_name: z.never().optional(),
+				company_cui: z.never().optional(),
+				company_reg_com: z.never().optional(),
+				person_name: this.validateString(
+					this.getMessage('invalid_person_name'),
+				),
+				person_identification_number:
+					this.validatePersonalIdentificationNumber(
+						this.getMessage(
+							'invalid_person_identification_number',
+						),
 						{
 							required: false,
 						},
 					),
-					person_name: z.never().optional(),
-					person_identification_number: z.never().optional(),
-				})
-				.extend(this.baseSchema()),
-
-			// Person schema
-			z
-				.object({
-					client_type: z.literal(ClientTypeEnum.PERSON),
-					company_name: z.never().optional(),
-					company_cui: z.never().optional(),
-					company_reg_com: z.never().optional(),
-					person_name: this.validateString(
-						this.message.invalid_person_name,
-					),
-					person_identification_number:
-						this.validatePersonalIdentificationNumber(
-							this.message.invalid_person_identification_number,
-							{
-								required: false,
-							},
-						),
-				})
-				.extend(this.baseSchema()),
-		]);
-	}
+			})
+			.extend(this.baseSchema),
+	]);
 }
 
 export function getFormValuesClient(formData: FormData): ClientFormValuesType {
@@ -295,9 +291,9 @@ export const dataSourceConfigClients = {
 		find: findClients,
 		getFormValues: getFormValuesClient,
 		validateForm: (values: ClientFormValuesType) => {
-			const validator = new ClientValidator(translationValidation);
+			const validator = new ClientValidator(validatorMessages);
 
-			return validator.manage().safeParse(values);
+			return validator.manage.safeParse(values);
 		},
 		syncFormState: (
 			state: FormStateType<'clients', ClientModel, ClientFormValuesType>,

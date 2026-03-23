@@ -6,8 +6,8 @@ import { LanguageEnum } from '@/models/user.model';
 import type { FormSituationType } from '@/types/form.type';
 
 export type AccountEditFormFieldsType = {
-	name?: string;
-	language?: LanguageEnum;
+	name: string;
+	language: LanguageEnum;
 };
 
 export type AccountEditSituationType = FormSituationType | 'csrf_error';
@@ -29,7 +29,7 @@ export const AccountEditState: AccountEditStateType = {
 	situation: null,
 };
 
-const translationValidation = await translateBatch(
+const validatorMessages = await translateBatch(
 	[
 		'account-edit.validation.invalid_name',
 		{
@@ -43,17 +43,15 @@ const translationValidation = await translateBatch(
 	'account-edit.validation.',
 );
 
-class AccountEditValidator extends BaseValidator {
-	constructor(private readonly message: Record<string, string>) {
-		super();
-	}
-
+class AccountEditValidator extends BaseValidator<typeof validatorMessages> {
 	accountEdit() {
 		return z.object({
 			name: this.validateString(
 				{
-					invalid: this.message.invalid_name,
-					min_chars: this.message.name_min,
+					invalid: this.getMessage('invalid_name'),
+					min_chars: this.getMessage('name_min', {
+						min: Configuration.get('user.nameMinChars') as string,
+					}),
 				},
 				{
 					minChars: Configuration.get('user.nameMinChars') as number,
@@ -61,12 +59,12 @@ class AccountEditValidator extends BaseValidator {
 			),
 			language: this.validateEnum(
 				LanguageEnum,
-				this.message.invalid_language,
+				this.getMessage('invalid_language'),
 			),
 		});
 	}
 }
 
 export const AccountEditSchema = new AccountEditValidator(
-	translationValidation,
+	validatorMessages,
 ).accountEdit();

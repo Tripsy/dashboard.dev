@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import dayjs from '@/config/dayjs.config';
+import { translateBatch } from '@/config/translate.setup';
 import { isValidDate } from '@/helpers/date.helper';
+import {replaceVars} from "@/helpers/string.helper";
 
 export abstract class IsValidator {
 	/**
@@ -63,7 +65,33 @@ export abstract class IsValidator {
 	}
 }
 
-export abstract class BaseValidator extends IsValidator {
+export abstract class BaseValidator<
+	TMessages extends Record<string, string>,
+> extends IsValidator {
+	constructor(protected readonly message: TMessages) {
+		super();
+	}
+
+	static async getValidatorMessages<T extends readonly string[]>(
+		keys: T,
+		prefix: string,
+	): Promise<Record<T[number], string>> {
+		return await translateBatch(keys, prefix);
+	}
+
+	protected getMessage<K extends keyof TMessages>(
+		key: K,
+		vars?: Record<string, string>
+	): string {
+		const message = this.message[key];
+
+		if (!vars) {
+			return message;
+		}
+
+		return replaceVars(message, vars);
+	}
+
 	/**
 	 * Transforms null values to undefined before passing to the schema
 	 * Useful for handling form data where null and undefined might both represent "empty"
@@ -133,14 +161,26 @@ export abstract class BaseValidator extends IsValidator {
 	 * // With min length only
 	 * validateString('Password is required', { minChars: 8 })
 	 */
+	// Overload signatures
 	protected validateString(
 		messageData?:
 			| string
-			| {
-					invalid?: string;
-					min_chars?: string;
-					max_chars?: string;
-			  },
+			| { invalid?: string; min_chars?: string; max_chars?: string },
+		optionsData?: { required?: true; minChars?: number; maxChars?: number },
+	): z.ZodType<string>;
+
+	protected validateString(
+		messageData?:
+			| string
+			| { invalid?: string; min_chars?: string; max_chars?: string },
+		optionsData?: { required: false; minChars?: number; maxChars?: number },
+	): z.ZodType<string | undefined>;
+
+	// Implementation signature
+	protected validateString(
+		messageData?:
+			| string
+			| { invalid?: string; min_chars?: string; max_chars?: string },
 		optionsData?: {
 			required?: boolean;
 			minChars?: number;
@@ -274,13 +314,27 @@ export abstract class BaseValidator extends IsValidator {
 	/**
 	 * Validate enum value
 	 */
+	// Overload signatures
+	protected validateEnum<T extends Record<string, string>>(
+		enumObj: T,
+		message: string,
+		optionsData?: { required?: true },
+	): z.ZodType<T[keyof T]>;
+
+	protected validateEnum<T extends Record<string, string>>(
+		enumObj: T,
+		message: string,
+		optionsData: { required: false },
+	): z.ZodType<T[keyof T] | undefined>;
+
+	// Implementation signature
 	protected validateEnum<T extends Record<string, string>>(
 		enumObj: T,
 		message: string,
 		optionsData?: {
 			required?: boolean;
 		},
-	) {
+	): z.ZodType<T[keyof T] | undefined> {
 		const options = {
 			required: true,
 			...optionsData,
@@ -613,13 +667,61 @@ export abstract class BaseValidator extends IsValidator {
 		});
 	}
 
-	protected validateLanguage(message = 'Invalid language') {
-		return z.string().length(2, { message });
+	protected validateLanguage(
+		message = 'Invalid language',
+		optionsData?: { required?: boolean },
+	) {
+		const options = {
+			required: true,
+			...optionsData,
+		};
+
+		if (options.required) {
+			return z.string().length(2, { message });
+		}
+
+		return z.string().length(2, { message }).optional();
 	}
 
+	// Overload signatures
 	protected validatePassword(
-		messages: {
-			password_invalid: string;
+		message: {
+			invalid_password: string;
+			password_min: string;
+			password_condition_capital_letter: string;
+			password_condition_number: string;
+			password_condition_special_character: string;
+		},
+		optionsData: {
+			required?: true;
+			minLength: number;
+			requireUppercase?: boolean;
+			requireNumber?: boolean;
+			requireSpecial?: boolean;
+		},
+	): z.ZodType<string>;
+
+	protected validatePassword(
+		message: {
+			invalid_password: string;
+			password_min: string;
+			password_condition_capital_letter: string;
+			password_condition_number: string;
+			password_condition_special_character: string;
+		},
+		optionsData: {
+			required: false;
+			minLength: number;
+			requireUppercase?: boolean;
+			requireNumber?: boolean;
+			requireSpecial?: boolean;
+		},
+	): z.ZodType<string | undefined>;
+
+	// Implementation signature
+	protected validatePassword(
+		message: {
+			invalid_password: string;
 			password_min: string;
 			password_condition_capital_letter: string;
 			password_condition_number: string;
@@ -632,7 +734,7 @@ export abstract class BaseValidator extends IsValidator {
 			requireNumber?: boolean;
 			requireSpecial?: boolean;
 		},
-	) {
+	): z.ZodType<string | undefined> {
 		const options = {
 			required: true,
 			minLength: 8,
@@ -643,21 +745,21 @@ export abstract class BaseValidator extends IsValidator {
 		};
 
 		let baseSchema = z
-			.string(messages.password_invalid)
+			.string(message.invalid_password)
 			.min(options.minLength, {
-				message: messages.password_min,
+				message: message.password_min,
 			});
 
 		// Add refinements based on requirements
 		if (options.requireUppercase) {
 			baseSchema = baseSchema.refine((value) => /[A-Z]/.test(value), {
-				message: messages.password_condition_capital_letter,
+				message: message.password_condition_capital_letter,
 			});
 		}
 
 		if (options.requireNumber) {
 			baseSchema = baseSchema.refine((value) => /[0-9]/.test(value), {
-				message: messages.password_condition_number,
+				message: message.password_condition_number,
 			});
 		}
 
@@ -665,7 +767,7 @@ export abstract class BaseValidator extends IsValidator {
 			baseSchema = baseSchema.refine(
 				(value) => /[!@#$%^&*()_+{}[\]:;<>,.?~\\/-]/.test(value),
 				{
-					message: messages.password_condition_special_character,
+					message: message.password_condition_special_character,
 				},
 			);
 		}
@@ -677,12 +779,22 @@ export abstract class BaseValidator extends IsValidator {
 		return this.preprocessOptional(baseSchema);
 	}
 
+	// Overload signatures
+	protected validateEmail(
+		message: string,
+		optionsData?: { required?: true },
+	): z.ZodType<string>;
+
+	protected validateEmail(
+		message: string,
+		optionsData?: { required: false },
+	): z.ZodType<string | undefined>;
+
+	// Implementation signature
 	protected validateEmail(
 		message: string = 'Invalid email address',
-		optionsData?: {
-			required?: boolean;
-		},
-	): z.ZodType<string | undefined> {
+		optionsData?: { required?: boolean },
+	): z.ZodType<string> | z.ZodType<string | undefined> {
 		const options = {
 			required: true,
 			...optionsData,

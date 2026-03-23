@@ -3,11 +3,11 @@
 		"title": "Cash Flow - Dashboard | {{app_name}}"
 	},
 	"validation": {
-		"category_invalid": "Select a valid category",
-		"method_invalid": "Select a valid payment method",
-		"amount_invalid": "Enter a valid amount",
-		"vat_rate_invalid": "VAT rate must be between 0 and 100",
-		"currency_invalid": "Select a valid currency",
-		"exchange_rate_invalid": "Enter a positive exchange rate"
+		"invalid_category": "Select a valid category",
+		"invalid_method": "Select a valid payment method",
+		"invalid_amount": "Enter a valid amount",
+		"invalid_vat_rate": "VAT rate must be between 0 and 100",
+		"invalid_currency": "Select a valid currency",
+		"invalid_exchange_rate": "Enter a positive exchange rate"
 	}
 }

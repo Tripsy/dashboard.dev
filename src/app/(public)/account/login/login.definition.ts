@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { translateBatch } from '@/config/translate.setup';
 import { BaseValidator } from '@/helpers/validator.helper';
 import type { AuthTokenListType } from '@/types/auth.type';
 import type { FormSituationType } from '@/types/form.type';
@@ -39,12 +38,10 @@ const validatorMessages = await BaseValidator.getValidatorMessages(
 );
 
 class LoginValidator extends BaseValidator<typeof validatorMessages> {
-	login() {
-		return z.object({
-			email: this.validateEmail(this.getMessage('invalid_email')),
-			password: this.validateString(this.getMessage('invalid_password')),
-		});
-	}
+	login = z.object({
+		email: this.validateEmail(this.getMessage('invalid_email')),
+		password: this.validateString(this.getMessage('invalid_password')),
+	});
 }
 
-export const LoginSchema = new LoginValidator(validatorMessages).login();
+export const LoginSchema = new LoginValidator(validatorMessages).login;

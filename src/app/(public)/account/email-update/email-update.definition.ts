@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { translateBatch } from '@/config/translate.setup';
 import { BaseValidator } from '@/helpers/validator.helper';
 import type { FormSituationType } from '@/types/form.type';
 
@@ -25,19 +24,17 @@ export const EmailUpdateState: EmailUpdateStateType = {
 	situation: null,
 };
 
-const validatorMessages = await translateBatch(
-	['account-email-update.validation.invalid_email'],
-	'account-email-update.validation.',
+const validatorMessages = await BaseValidator.getValidatorMessages(
+	['invalid_email'] as const,
+	'account-email-update.validation',
 );
 
 class EmailUpdateValidator extends BaseValidator<typeof validatorMessages> {
-	emailUpdate() {
-		return z.object({
-			email_new: this.validateEmail(this.getMessage('invalid_email')),
-		});
-	}
+	emailUpdate = z.object({
+		email_new: this.validateEmail(this.getMessage('invalid_email')),
+	});
 }
 
 export const EmailUpdateSchema = new EmailUpdateValidator(
 	validatorMessages,
-).emailUpdate();
+).emailUpdate;

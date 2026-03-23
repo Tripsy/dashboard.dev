@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { Configuration } from '@/config/settings.config';
-import { translateBatch } from '@/config/translate.setup';
 import { BaseValidator } from '@/helpers/validator.helper';
 import { LanguageEnum } from '@/models/user.model';
 import type { FormSituationType } from '@/types/form.type';
@@ -29,42 +28,35 @@ export const AccountEditState: AccountEditStateType = {
 	situation: null,
 };
 
-const validatorMessages = await translateBatch(
+const validatorMessages = await BaseValidator.getValidatorMessages(
 	[
-		'account-edit.validation.invalid_name',
-		{
-			key: 'account-edit.validation.name_min',
-			vars: {
-				min: Configuration.get('user.nameMinChars') as string,
-			},
-		},
-		'account-edit.validation.invalid_language',
-	],
-	'account-edit.validation.',
+		'invalid_name',
+		'name_min',
+		'invalid_language',
+	] as const,
+	'account-edit.validation',
 );
 
 class AccountEditValidator extends BaseValidator<typeof validatorMessages> {
-	accountEdit() {
-		return z.object({
-			name: this.validateString(
-				{
-					invalid: this.getMessage('invalid_name'),
-					min_chars: this.getMessage('name_min', {
-						min: Configuration.get('user.nameMinChars') as string,
-					}),
-				},
-				{
-					minChars: Configuration.get('user.nameMinChars') as number,
-				},
-			),
-			language: this.validateEnum(
-				LanguageEnum,
-				this.getMessage('invalid_language'),
-			),
-		});
-	}
+	accountEdit = z.object({
+		name: this.validateString(
+			{
+				invalid: this.getMessage('invalid_name'),
+				min_chars: this.getMessage('name_min', {
+					min: Configuration.get('user.nameMinChars') as string,
+				}),
+			},
+			{
+				minChars: Configuration.get('user.nameMinChars') as number,
+			},
+		),
+		language: this.validateEnum(
+			LanguageEnum,
+			this.getMessage('invalid_language'),
+		),
+	});
 }
 
 export const AccountEditSchema = new AccountEditValidator(
 	validatorMessages,
-).accountEdit();
+).accountEdit;

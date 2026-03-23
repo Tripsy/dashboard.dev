@@ -4,7 +4,6 @@ import {
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
 import type { FormStateType } from '@/config/data-source.config';
-import { translateBatch } from '@/config/translate.setup';
 import { parseJson } from '@/helpers/string.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import {
@@ -23,7 +22,7 @@ import {
 	updateTemplate,
 } from '@/services/templates.service';
 
-const validatorMessages = await translateBatch(
+const validatorMessages = await BaseValidator.getValidatorMessages(
 	[
 		'invalid_label',
 		'invalid_language',
@@ -34,7 +33,7 @@ const validatorMessages = await translateBatch(
 		'invalid_page_title',
 		'invalid_page_html',
 		'invalid_page_layout',
-	],
+	] as const,
 	'templates.validation',
 );
 

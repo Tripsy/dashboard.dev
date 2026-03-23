@@ -4,7 +4,6 @@ import {
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
 import type { FormStateType } from '@/config/data-source.config';
-import { translateBatch } from '@/config/translate.setup';
 import { DisplayAmount } from '@/helpers/display.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import {
@@ -22,49 +21,53 @@ import {
 	findCashFlows,
 	updateCashFlow,
 } from '@/services/cash-flow.service';
+import {BaseValidator} from "@/helpers/validator.helper";
 
-const translations = await translateBatch([
-	'cash-flow.validation.category_invalid',
-	'cash-flow.validation.method_invalid',
-	'cash-flow.validation.amount_invalid',
-	'cash-flow.validation.vat_rate_invalid',
-	'cash-flow.validation.currency_invalid',
-	'cash-flow.validation.exchange_rate_invalid',
-	'cash-flow.validation.external_reference_invalid',
-	'cash-flow.validation.notes_invalid',
-]);
+const validatorMessages = await BaseValidator.getValidatorMessages(
+	[
+		'invalid_category',
+		'invalid_method',
+		'invalid_amount',
+		'invalid_vat_rate',
+		'invalid_currency',
+		'invalid_exchange_rate',
+		'invalid_external_reference',
+		'invalid_notes',
+	] as const,
+	'cash-flow.validation',
+);
 
 // const ValidateSchemaCashFlow = z.object({
 // 	address_type: validateEnum(
 // 		CashFlowCategoryEnum,
-// 		translations['cash-flow.validation.category_invalid'],
+// 		translations['cash-flow.validation.invalid_category'],
 // 	),
 // 	method: validateEnum(
 // 		CashFlowMethodEnum,
-// 		translations['cash-flow.validation.method_invalid'],
+// 		translations['cash-flow.validation.invalid_method'],
 // 	),
-// 	amount: validateNumber(translations['cash-flow.validation.amount_invalid']),
+// 	amount: validateNumber(translations['cash-flow.validation.invalid_amount']),
 // 	vat_rate: validateNumber(
-// 		translations['cash-flow.validation.vat_rate_invalid'],
+// 		translations['cash-flow.validation.invalid_vat_rate'],
 // 		true,
 // 		true,
 // 	)
-// 		.min(0, translations['cash-flow.validation.vat_rate_invalid'])
-// 		.max(100, translations['cash-flow.validation.vat_rate_invalid']),
+// 		.min(0, translations['cash-flow.validation.invalid_vat_rate'])
+// 		.max(100, translations['cash-flow.validation.invalid_vat_rate']),
 // 	currency: validateEnum(
 // 		CurrencyEnum,
-// 		translations['cash-flow.validation.currency_invalid'],
+// 		translations['cash-flow.validation.invalid_currency'],
 // 	),
 // 	exchange_rate: validateNumber(
-// 		translations['cash-flow.validation.exchange_rate_invalid'],
+// 		translations['cash-flow.validation.invalid_exchange_rate'],
 // 		true,
 // 		true,
 // 	),
 // 	external_reference: validateString(
-// 		translations['cash-flow.validation.external_reference_invalid'],
+// 		translations['cash-flow.validation.invalid_external_reference'],
 // 	).optional(),
 // 	notes: validateString(
-// 		translations['cash-flow.validation.notes_invalid'],
+// 		translations['cash-flow.validation.invalid_notes'],
 // 	).optional(),
 // });
 

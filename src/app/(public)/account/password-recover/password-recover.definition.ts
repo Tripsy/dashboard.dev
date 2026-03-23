@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { translateBatch } from '@/config/translate.setup';
 import { BaseValidator } from '@/helpers/validator.helper';
 import type { FormSituationType } from '@/types/form.type';
 
@@ -33,13 +32,11 @@ const validatorMessages = await BaseValidator.getValidatorMessages(
 );
 
 class PasswordRecoverValidator extends BaseValidator<typeof validatorMessages> {
-	passwordRecover() {
-		return z.object({
-			email: this.validateEmail(this.getMessage('invalid_email')),
-		});
-	}
+	passwordRecover = z.object({
+		email: this.validateEmail(this.getMessage('invalid_email')),
+	});
 }
 
 export const PasswordRecoverSchema = new PasswordRecoverValidator(
 	validatorMessages,
-).passwordRecover();
+).passwordRecover;

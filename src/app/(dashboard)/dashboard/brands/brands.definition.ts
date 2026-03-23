@@ -4,7 +4,6 @@ import {
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
 import type { FormStateType } from '@/config/data-source.config';
-import { translateBatch } from '@/config/translate.setup';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
 import {
 	type BrandFormValuesType,

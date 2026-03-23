@@ -31,7 +31,7 @@ const validatorMessages = await BaseValidator.getValidatorMessages(
 	'client-address.validation',
 );
 
-export class ClientAddressValidator extends BaseValidator<
+class ClientAddressValidator extends BaseValidator<
 	typeof validatorMessages
 > {
 	manage = z.object({

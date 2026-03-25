@@ -1,5 +1,6 @@
 import {
 	FormComponentInput,
+	FormComponentRadio,
 	FormComponentSelect,
 	FormComponentTextarea,
 } from '@/components/form/form-element.component';
@@ -8,6 +9,7 @@ import { formatEnumLabel } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import {
 	CashFlowCategoryEnum,
+	CashFlowCategoryTypeEnum,
 	type CashFlowFormValuesType,
 	CashFlowMethodEnum,
 	CurrencyEnum,
@@ -17,6 +19,39 @@ const categories = Object.values(CashFlowCategoryEnum).map((v) => ({
 	label: formatEnumLabel(v),
 	value: v,
 }));
+
+const groupedCategories = [
+	{
+		label: formatEnumLabel(CashFlowCategoryTypeEnum.REVENUE),
+		options: [{ label: 'Customer', value: CashFlowCategoryEnum.CUSTOMER }],
+	},
+	{
+		label: formatEnumLabel(CashFlowCategoryTypeEnum.EXPENSE),
+		options: [
+			{ label: 'Fuel', value: CashFlowCategoryEnum.FUEL },
+			{ label: 'Maintenance', value: CashFlowCategoryEnum.MAINTENANCE },
+			{ label: 'Tolls', value: CashFlowCategoryEnum.TOLLS },
+			{
+				label: 'Employee Salary',
+				value: CashFlowCategoryEnum.EMPLOYEE_SALARY,
+			},
+			{ label: 'Vendor', value: CashFlowCategoryEnum.VENDOR },
+			{ label: 'Insurance', value: CashFlowCategoryEnum.INSURANCE },
+			{ label: 'Taxes', value: CashFlowCategoryEnum.TAXES },
+		],
+	},
+	{
+		label: formatEnumLabel(CashFlowCategoryTypeEnum.CORRECTION),
+		options: [
+			{ label: 'Correction', value: CashFlowCategoryEnum.CORRECTION },
+			{ label: 'Refund', value: CashFlowCategoryEnum.REFUND },
+			{
+				label: 'Employee Reimbursement',
+				value: CashFlowCategoryEnum.EMPLOYEE_REIMBURSEMENT,
+			},
+		],
+	},
+];
 
 const methods = Object.values(CashFlowMethodEnum).map((v) => ({
 	label: formatEnumLabel(v),
@@ -40,7 +75,6 @@ export function FormManageCashFlow({
 		'amount',
 		'vatRate',
 		'currency',
-		'exchangeRate',
 		'externalReference',
 		'notes',
 	]);
@@ -52,7 +86,7 @@ export function FormManageCashFlow({
 				id={elementIds.category}
 				fieldName="category"
 				fieldValue={formValues.category}
-				options={categories}
+				options={groupedCategories}
 				disabled={pending}
 				onValueChange={(value) =>
 					handleChange('category', value as CashFlowCategoryEnum)
@@ -73,41 +107,42 @@ export function FormManageCashFlow({
 				error={errors.method}
 			/>
 
-			<FormComponentInput<CashFlowFormValuesType>
-				labelText="Amount"
-				id={elementIds.amount}
-				fieldName="amount"
-				fieldValue={String(formValues.amount)}
-				fieldType="number"
-				isRequired={true}
-				disabled={pending}
-				onChange={(e) =>
-					handleChange(
-						'amount',
-						e.target.value ? Number(e.target.value) : 0,
-					)
-				}
-				error={errors.amount}
-			/>
+			<div className="grid sm:grid-cols-2 gap-4">
+				<FormComponentInput<CashFlowFormValuesType>
+					labelText="Amount"
+					id={elementIds.amount}
+					fieldName="amount"
+					fieldValue={String(formValues.amount)}
+					fieldType="number"
+					isRequired={true}
+					disabled={pending}
+					onChange={(e) =>
+						handleChange(
+							'amount',
+							e.target.value ? Number(e.target.value) : 0,
+						)
+					}
+					error={errors.amount}
+				/>
+				<FormComponentInput<CashFlowFormValuesType>
+					labelText="VAT Rate (%)"
+					id={elementIds.vatRate}
+					fieldName="vat_rate"
+					fieldValue={String(formValues.vat_rate)}
+					fieldType="number"
+					isRequired={false}
+					disabled={pending}
+					onChange={(e) =>
+						handleChange(
+							'vat_rate',
+							e.target.value ? Number(e.target.value) : 0,
+						)
+					}
+					error={errors.vat_rate}
+				/>
+			</div>
 
-			<FormComponentInput<CashFlowFormValuesType>
-				labelText="VAT Rate (%)"
-				id={elementIds.vatRate}
-				fieldName="vat_rate"
-				fieldValue={String(formValues.vat_rate)}
-				fieldType="number"
-				isRequired={false}
-				disabled={pending}
-				onChange={(e) =>
-					handleChange(
-						'vat_rate',
-						e.target.value ? Number(e.target.value) : 0,
-					)
-				}
-				error={errors.vat_rate}
-			/>
-
-			<FormComponentSelect<CashFlowFormValuesType>
+			<FormComponentRadio<CashFlowFormValuesType>
 				labelText="Currency"
 				id={elementIds.currency}
 				fieldName="currency"
@@ -118,23 +153,6 @@ export function FormManageCashFlow({
 					handleChange('currency', value as CurrencyEnum)
 				}
 				error={errors.currency}
-			/>
-
-			<FormComponentInput<CashFlowFormValuesType>
-				labelText="Exchange Rate"
-				id={elementIds.exchangeRate}
-				fieldName="exchange_rate"
-				fieldValue={String(formValues.exchange_rate)}
-				fieldType="number"
-				isRequired={false}
-				disabled={pending}
-				onChange={(e) =>
-					handleChange(
-						'exchange_rate',
-						e.target.value ? Number(e.target.value) : 1,
-					)
-				}
-				error={errors.exchange_rate}
 			/>
 
 			<FormComponentInput<CashFlowFormValuesType>

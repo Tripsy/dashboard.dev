@@ -21,15 +21,10 @@ export type ClientAddressModel<D = Date | string> = {
 	deleted_at: D | null;
 };
 
-export type ClientAddressFormValuesType = Omit<
+export type ClientAddressFormValuesType = Pick<
 	ClientAddressModel,
-	| 'id'
-	| 'city'
-	| 'client'
-	| 'created_at'
-	| 'updated_at'
-	| 'deleted_at'
-	| 'client_id'
+	'address_type' | 'city_id' | 'postal_code' | 'notes'
 > & {
 	client_id: number | null;
+	details: string | null;
 };

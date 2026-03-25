@@ -5,10 +5,10 @@ import { LanguageEnum } from '@/models/user.model';
 import type { FormSituationType } from '@/types/form.type';
 
 export type RegisterFormFieldsType = {
-	name: string;
-	email: string;
-	password: string;
-	password_confirm: string;
+	name: string | null;
+	email: string | null;
+	password: string | null;
+	password_confirm: string | null;
 	language: LanguageEnum;
 	terms: boolean;
 };
@@ -58,63 +58,62 @@ const validatorMessages = await BaseValidator.getValidatorMessages(
 );
 
 class RegisterValidator extends BaseValidator<typeof validatorMessages> {
-	register = z.object({
-		name: this.validateString(
-			{
-				invalid: this.getMessage('invalid_name'),
-				min_chars: this.getMessage('name_min', {
-					min: Configuration.get('user.nameMinChars') as string,
-				}),
-			},
-			{
-				minChars: Configuration.get(
-					'user.nameMinChars',
-				) as number,
-			},
-		),
-		email: this.validateEmail(this.getMessage('invalid_email')),
-		password: this.validatePassword(
-			{
-				invalid_password: this.getMessage('invalid_password'),
-				password_min: this.getMessage('password_min', {
-					min: Configuration.get('user.passwordMinChars') as string,
-				}),
-				password_condition_capital_letter: this.getMessage(
-					'password_condition_capital_letter',
-				),
-				password_condition_number: this.getMessage(
-					'password_condition_number',
-				),
-				password_condition_special_character: this.getMessage(
-					'password_condition_special_character',
-				),
-			},
-			{
-				minLength: Configuration.get(
-					'user.passwordMinChars',
-				) as number,
-			},
-		),
-		password_confirm: this.validateString(
-			this.getMessage('password_confirm_required'),
-		),
-		language: this.validateEnum(
-			LanguageEnum,
-			this.getMessage('invalid_language'),
-		),
-		terms: this.validateBoolean(this.getMessage('terms_required')),
-	})
-	.superRefine(({ password, password_confirm }, ctx) => {
-		if (password !== password_confirm) {
-			ctx.addIssue({
-				path: ['password_confirm'],
-				message: this.getMessage('password_confirm_mismatch'),
-				code: 'custom',
-			});
-		}
-	});
+	register = z
+		.object({
+			name: this.validateString(
+				{
+					invalid: this.getMessage('invalid_name'),
+					min_chars: this.getMessage('name_min', {
+						min: Configuration.get('user.nameMinChars') as string,
+					}),
+				},
+				{
+					minChars: Configuration.get('user.nameMinChars') as number,
+				},
+			),
+			email: this.validateEmail(this.getMessage('invalid_email')),
+			password: this.validatePassword(
+				{
+					invalid_password: this.getMessage('invalid_password'),
+					password_min: this.getMessage('password_min', {
+						min: Configuration.get(
+							'user.passwordMinChars',
+						) as string,
+					}),
+					password_condition_capital_letter: this.getMessage(
+						'password_condition_capital_letter',
+					),
+					password_condition_number: this.getMessage(
+						'password_condition_number',
+					),
+					password_condition_special_character: this.getMessage(
+						'password_condition_special_character',
+					),
+				},
+				{
+					minLength: Configuration.get(
+						'user.passwordMinChars',
+					) as number,
+				},
+			),
+			password_confirm: this.validateString(
+				this.getMessage('password_confirm_required'),
+			),
+			language: this.validateEnum(
+				LanguageEnum,
+				this.getMessage('invalid_language'),
+			),
+			terms: this.validateBoolean(this.getMessage('terms_required')),
+		})
+		.superRefine(({ password, password_confirm }, ctx) => {
+			if (password !== password_confirm) {
+				ctx.addIssue({
+					path: ['password_confirm'],
+					message: this.getMessage('password_confirm_mismatch'),
+					code: 'custom',
+				});
+			}
+		});
 }
 
-export const RegisterSchema = new RegisterValidator(
-	validatorMessages,
-).register;
+export const RegisterSchema = new RegisterValidator(validatorMessages).register;

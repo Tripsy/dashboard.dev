@@ -4,6 +4,7 @@ import {
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
 import type { FormStateType } from '@/config/data-source.config';
+import { getFormDataAsEnum, getFormDataAsString } from '@/helpers/form.helper';
 import { parseJson } from '@/helpers/string.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import {
@@ -13,7 +14,7 @@ import {
 	type TemplateModel,
 	TemplateTypeEnum,
 } from '@/models/template.model';
-import { LanguageEnum } from '@/models/user.model';
+import { LANGUAGE_DEFAULT, LanguageEnum } from '@/models/user.model';
 import {
 	createTemplate,
 	deleteTemplate,
@@ -77,9 +78,7 @@ class TemplateValidator extends BaseValidator<typeof validatorMessages> {
 				title: this.validateString(
 					this.getMessage('invalid_page_title'),
 				),
-				html: this.validateString(
-					this.getMessage('invalid_page_html'),
-				),
+				html: this.validateString(this.getMessage('invalid_page_html')),
 				layout: this.validateEnum(
 					TemplateLayoutPageEnum,
 					this.getMessage('invalid_page_layout'),
@@ -92,42 +91,39 @@ class TemplateValidator extends BaseValidator<typeof validatorMessages> {
 export function getFormValuesTemplates(
 	formData: FormData,
 ): TemplateFormValuesType {
-	const language = formData.get('language');
-	const validLanguages = Object.values(LanguageEnum);
+	const type =
+		getFormDataAsEnum(formData, 'type', TemplateTypeEnum) ||
+		TemplateTypeEnum.EMAIL;
 
-	const type = formData.get('type');
-	const validTypes = Object.values(TemplateTypeEnum);
+	const base = {
+		label: getFormDataAsString(formData, 'label'),
+		language:
+			getFormDataAsEnum(formData, 'language', LanguageEnum) ||
+			LANGUAGE_DEFAULT,
+		html: getFormDataAsString(formData, 'html'),
+	};
 
-	// Fallback-safe values
-	const selectedLanguage = validLanguages.includes(language as LanguageEnum)
-		? (language as LanguageEnum)
-		: LanguageEnum.EN;
-
-	const selectedType = validTypes.includes(type as TemplateTypeEnum)
-		? (type as TemplateTypeEnum)
-		: TemplateTypeEnum.EMAIL;
-
-	if (selectedType === TemplateTypeEnum.EMAIL) {
+	if (type === TemplateTypeEnum.EMAIL) {
 		return {
-			label: (formData.get('label') as string) ?? '',
-			language: selectedLanguage,
+			...base,
 			type: TemplateTypeEnum.EMAIL,
-			subject: (formData.get('subject') as string) ?? '',
-			html: (formData.get('html') as string) ?? '',
+			subject: getFormDataAsString(formData, 'subject'),
+			html: getFormDataAsString(formData, 'html'),
 			layout:
-				(formData.get('layout') as TemplateLayoutEmailEnum) ??
-				TemplateLayoutEmailEnum.DEFAULT,
+				getFormDataAsEnum(
+					formData,
+					'layout',
+					TemplateLayoutEmailEnum,
+				) || TemplateLayoutEmailEnum.DEFAULT,
 		};
 	}
 
 	return {
-		label: (formData.get('label') as string) ?? '',
-		language: selectedLanguage,
+		...base,
 		type: TemplateTypeEnum.PAGE,
-		title: (formData.get('title') as string) ?? '',
-		html: (formData.get('html') as string) ?? '',
+		title: getFormDataAsString(formData, 'title'),
 		layout:
-			(formData.get('layout') as TemplateLayoutPageEnum) ??
+			getFormDataAsEnum(formData, 'layout', TemplateLayoutPageEnum) ||
 			TemplateLayoutPageEnum.DEFAULT,
 	};
 }

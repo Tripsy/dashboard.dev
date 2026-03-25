@@ -5,7 +5,7 @@ import { LanguageEnum } from '@/models/user.model';
 import type { FormSituationType } from '@/types/form.type';
 
 export type AccountEditFormFieldsType = {
-	name: string;
+	name: string | null;
 	language: LanguageEnum;
 };
 
@@ -29,11 +29,7 @@ export const AccountEditState: AccountEditStateType = {
 };
 
 const validatorMessages = await BaseValidator.getValidatorMessages(
-	[
-		'invalid_name',
-		'name_min',
-		'invalid_language',
-	] as const,
+	['invalid_name', 'name_min', 'invalid_language'] as const,
 	'account-edit.validation',
 );
 
@@ -57,6 +53,5 @@ class AccountEditValidator extends BaseValidator<typeof validatorMessages> {
 	});
 }
 
-export const AccountEditSchema = new AccountEditValidator(
-	validatorMessages,
-).accountEdit;
+export const AccountEditSchema = new AccountEditValidator(validatorMessages)
+	.accountEdit;

@@ -24,7 +24,9 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
 	Select,
 	SelectContent,
+	SelectGroup,
 	SelectItem,
+	SelectLabel,
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
@@ -39,6 +41,10 @@ export type CheckboxValueType = boolean;
 export type OptionsType = {
 	label: string;
 	value: string;
+}[];
+type GroupedOptionsType = {
+	label: string;
+	options: OptionsType;
 }[];
 
 export const FormElement = ({
@@ -277,10 +283,12 @@ export const FormComponentSelect = <Fields,>({
 	FormComponentProps<Fields, OptionValueType>,
 	'autoComplete' | 'icons' | 'onChange'
 > & {
-	options: OptionsType;
+	options: OptionsType | GroupedOptionsType;
 	onValueChange: (value: string) => void;
 }) => {
 	const { borderClass } = useFieldState({ value: fieldValue, error });
+
+	const isGrouped = 'options' in options[0];
 
 	return (
 		<FormElement
@@ -307,16 +315,43 @@ export const FormComponentSelect = <Fields,>({
 						<SelectValue placeholder={placeholderText} />
 					</SelectTrigger>
 					<SelectContent>
-						{options.map(({ label, value }) => {
-							const key = `${id}-${value}`;
+						{isGrouped
+							? (options as GroupedOptionsType).map((group) => (
+									<SelectGroup key={group.label}>
+										<SelectLabel>{group.label}</SelectLabel>
 
-							return (
-								<SelectItem key={key} value={value}>
-									{label}
-								</SelectItem>
-							);
-						})}
+										{group.options.map(
+											({ label, value }) => (
+												<SelectItem
+													key={value}
+													value={value}
+													className="pl-12"
+												>
+													{label}
+												</SelectItem>
+											),
+										)}
+									</SelectGroup>
+								))
+							: (options as OptionsType).map(
+									({ label, value }) => (
+										<SelectItem key={value} value={value}>
+											{label}
+										</SelectItem>
+									),
+								)}
 					</SelectContent>
+					{/*<SelectContent>*/}
+					{/*	{options.map(({ label, value }) => {*/}
+					{/*		const key = `${id}-${value}`;*/}
+
+					{/*		return (*/}
+					{/*			<SelectItem key={key} value={value}>*/}
+					{/*				{label}*/}
+					{/*			</SelectItem>*/}
+					{/*		);*/}
+					{/*	})}*/}
+					{/*</SelectContent>*/}
 				</Select>
 			</div>
 		</FormElement>

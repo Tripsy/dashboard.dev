@@ -7,7 +7,10 @@ import {
 import { Configuration } from '@/config/settings.config';
 import { translate } from '@/config/translate.setup';
 import { ApiError } from '@/exceptions/api.error';
-import { accumulateZodErrors } from '@/helpers/form.helper';
+import {
+	accumulateZodErrors,
+	getFormDataAsString,
+} from '@/helpers/form.helper';
 import { isValidCsrfToken } from '@/helpers/session.helper';
 import { passwordUpdateAccount } from '@/services/account.service';
 import { createAuth } from '@/services/auth.service';
@@ -16,9 +19,9 @@ export function passwordUpdateFormValues(
 	formData: FormData,
 ): PasswordUpdateFormFieldsType {
 	return {
-		password_current: formData.get('password_current') as string,
-		password_new: formData.get('password_new') as string,
-		password_confirm: formData.get('password_confirm') as string,
+		password_current: getFormDataAsString(formData, 'password_current'),
+		password_new: getFormDataAsString(formData, 'password_new'),
+		password_confirm: getFormDataAsString(formData, 'password_confirm'),
 	};
 }
 
@@ -40,10 +43,10 @@ export async function passwordUpdateAction(
 		situation: null,
 	};
 
-	// Check CSRF token
-	const csrfToken = formData.get(
+	const csrfToken = getFormDataAsString(
+		formData,
 		Configuration.get('csrf.inputName') as string,
-	) as string;
+	);
 
 	if (!(await isValidCsrfToken(csrfToken))) {
 		return {

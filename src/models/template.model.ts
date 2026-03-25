@@ -42,10 +42,11 @@ export type TemplateModel<D = Date | string> = {
 
 export type TemplateFormValuesType = Pick<
 	TemplateModel,
-	'label' | 'language' | 'type'
+	'language' | 'type'
 > & {
-	subject?: string; // Email specific
-	title?: string; // Page specific
+	label: string | null; // Email specific
+	subject?: string | null; // Email specific
+	title?: string | null; // Page specific
 	layout: TemplateLayoutEmailEnum | TemplateLayoutPageEnum;
-	html: string;
+	html: string | null;
 };

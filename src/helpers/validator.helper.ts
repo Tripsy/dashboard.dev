@@ -1,8 +1,10 @@
 import { z } from 'zod';
 import dayjs from '@/config/dayjs.config';
+import { Configuration } from '@/config/settings.config';
 import { translateBatch } from '@/config/translate.setup';
 import { isValidDate } from '@/helpers/date.helper';
-import {replaceVars} from "@/helpers/string.helper";
+import { replaceVars } from '@/helpers/string.helper';
+import { LanguageEnum } from '@/models/user.model';
 
 export abstract class IsValidator {
 	/**
@@ -66,9 +68,9 @@ export abstract class IsValidator {
 }
 
 export abstract class BaseValidator<
-	TMessages extends Record<string, string>,
+	TMessage extends Record<string, string>,
 > extends IsValidator {
-	constructor(protected readonly message: TMessages) {
+	constructor(private readonly message: TMessage) {
 		super();
 	}
 
@@ -79,9 +81,9 @@ export abstract class BaseValidator<
 		return await translateBatch(keys, prefix);
 	}
 
-	protected getMessage<K extends keyof TMessages>(
+	protected getMessage<K extends keyof TMessage>(
 		key: K,
-		vars?: Record<string, string>
+		vars?: Record<string, string>,
 	): string {
 		const message = this.message[key];
 
@@ -257,6 +259,38 @@ export abstract class BaseValidator<
 	 *   allowDecimals: false
 	 * })
 	 */
+	// Overload signatures
+	protected validateNumber(
+		messageData?:
+			| string
+			| {
+					invalid?: string;
+					only_positive?: string;
+					no_decimals?: string;
+			  },
+		optionsData?: {
+			required?: true;
+			onlyPositive?: boolean;
+			allowDecimals?: boolean;
+		},
+	): z.ZodType<number>;
+
+	protected validateNumber(
+		messageData?:
+			| string
+			| {
+					invalid?: string;
+					only_positive?: string;
+					no_decimals?: string;
+			  },
+		optionsData?: {
+			required: false;
+			onlyPositive?: boolean;
+			allowDecimals?: boolean;
+		},
+	): z.ZodType<number | undefined>;
+
+	// Implementation signature
 	protected validateNumber(
 		messageData?:
 			| string
@@ -270,7 +304,7 @@ export abstract class BaseValidator<
 			onlyPositive?: boolean;
 			allowDecimals?: boolean;
 		},
-	) {
+	): z.ZodType<number | undefined> {
 		const options = {
 			required: true,
 			onlyPositive: true,
@@ -292,7 +326,7 @@ export abstract class BaseValidator<
 
 		const message = this.buildMessage(defaultMessages, messageData);
 
-		let baseSchema = z.number({ message: message.invalid });
+		let baseSchema = z.coerce.number({ message: message.invalid });
 
 		if (options.onlyPositive) {
 			baseSchema = baseSchema.positive({
@@ -305,10 +339,12 @@ export abstract class BaseValidator<
 		}
 
 		if (options.required) {
-			return this.nullToUndefined(baseSchema);
+			return this.nullToUndefined(baseSchema) as z.ZodType<number>;
 		}
 
-		return this.preprocessOptional(baseSchema);
+		return this.preprocessOptional(baseSchema) as z.ZodType<
+			number | undefined
+		>;
 	}
 
 	/**
@@ -352,6 +388,18 @@ export abstract class BaseValidator<
 	/**
 	 * Convert string to boolean and validate - rejects false values if options.required = true
 	 */
+	// Overload signatures
+	protected validateBoolean(
+		message?: string,
+		optionsData?: { required?: true },
+	): z.ZodType<boolean>;
+
+	protected validateBoolean(
+		message: string,
+		optionsData: { required: false },
+	): z.ZodType<boolean | undefined>;
+
+	// Implementation signature
 	protected validateBoolean(
 		message: string = 'This field must be true',
 		optionsData?: {
@@ -385,9 +433,25 @@ export abstract class BaseValidator<
 	/**
 	 * Validate ID
 	 */
-	protected validateId(message: string = 'Invalid ID', required = true) {
+	protected validateId(
+		message: string = 'Invalid ID',
+		optionsData?: { required?: boolean },
+	): z.ZodType<number> | z.ZodType<number | undefined> {
+		const options = {
+			required: true,
+			...optionsData,
+		};
+
+		if (options.required) {
+			return this.validateNumber(message, {
+				required: true,
+				onlyPositive: true,
+				allowDecimals: false,
+			});
+		}
+
 		return this.validateNumber(message, {
-			required,
+			required: false,
 			onlyPositive: true,
 			allowDecimals: false,
 		});
@@ -411,8 +475,8 @@ export abstract class BaseValidator<
 	 * @example
 	 * // Client-side with time requirement and 1-hour future limit
 	 * const appointmentSchema = validateDate({
-	 *   invalid: 'Invalid appointment date',
-	 *   invalid_format: 'Please use format: YYYY-MM-DD HH:MM',
+	 *   invalid_date: 'Invalid appointment date',
+	 *   invalid_date_format: 'Please use format: YYYY-MM-DD HH:MM',
 	 *   invalid_future_date: 'Appointments cannot be more than 1 hour in the future'
 	 * }, {
 	 *   requireTime: true,
@@ -422,7 +486,7 @@ export abstract class BaseValidator<
 	 * @example
 	 * // Server-side with Romania timezone and 24-hour past limit
 	 * const serverSchema = validateDate({
-	 *   invalid: 'Invalid date',
+	 *   invalid_date: 'Invalid date',
 	 *   invalid_past_date: 'Not older than 24h',
 	 *   invalid_future_date: 'Cannot set a future date'
 	 * }, {
@@ -435,8 +499,8 @@ export abstract class BaseValidator<
 	 * @example
 	 * // Custom date format (European format)
 	 * const europeanSchema = validateDate({
-	 *   invalid: 'Invalid date',
-	 *   invalid_format: 'Use format: DD.MM.YYYY'
+	 *   invalid_date: 'Invalid date',
+	 *   invalid_date_format: 'Use format: DD.MM.YYYY'
 	 * }, {
 	 *   dateFormat: /^\d{2}\.\d{2}\.\d{4}$/,
 	 *   requireTime: false
@@ -445,8 +509,8 @@ export abstract class BaseValidator<
 	 * @example
 	 * // Complete example with all options
 	 * const fullSchema = validateDate({
-	 *   invalid: 'Invalid date',
-	 *   invalid_format: 'Format must be YYYY-MM-DD HH:MM',
+	 *   invalid_date: 'Invalid date',
+	 *   invalid_date_format: 'Format must be YYYY-MM-DD HH:MM',
 	 *   invalid_past_date: 'Cannot be more than 1 hour in the past',
 	 *   invalid_future_date: 'Cannot be more than 2 hours in the future'
 	 * }, {
@@ -460,16 +524,59 @@ export abstract class BaseValidator<
 	 *
 	 * @throws {Error} If runtime is 'server' and no timezone is provided
 	 */
+	// Overload signatures
 	protected validateDate(
 		messageData?:
 			| string
 			| {
-					invalid: string;
-					invalid_format: string;
+					invalid_date: string;
+					invalid_date_format: string;
 					invalid_past_date: string;
 					invalid_future_date: string;
 			  },
 		optionsData?: {
+			required?: true;
+			runtime?: 'client' | 'server';
+			timezone?: string;
+			dateFormat?: RegExp;
+			requireTime?: boolean;
+			maxPastSeconds?: number;
+			maxFutureSeconds?: number;
+		},
+	): z.ZodType<Date>;
+
+	protected validateDate(
+		messageData:
+			| string
+			| {
+					invalid_date: string;
+					invalid_date_format: string;
+					invalid_past_date: string;
+					invalid_future_date: string;
+			  },
+		optionsData: {
+			required: false;
+			runtime?: 'client' | 'server';
+			timezone?: string;
+			dateFormat?: RegExp;
+			requireTime?: boolean;
+			maxPastSeconds?: number;
+			maxFutureSeconds?: number;
+		},
+	): z.ZodType<Date | undefined>;
+
+	// Implementation signature
+	protected validateDate(
+		messageData?:
+			| string
+			| {
+					invalid_date: string;
+					invalid_date_format: string;
+					invalid_past_date: string;
+					invalid_future_date: string;
+			  },
+		optionsData?: {
+			required?: boolean;
 			runtime?: 'client' | 'server';
 			timezone?: string; // IANA timezone, e.g., 'Europe/Bucharest'
 			dateFormat?: RegExp;
@@ -479,14 +586,16 @@ export abstract class BaseValidator<
 		},
 	) {
 		const options = {
+			required: true,
 			runtime: typeof window === 'undefined' ? 'server' : 'client', // Auto-detect
+			timezone: Configuration.get('app.timezone') as string,
 			dateFormat: /^\d{4}-\d{2}-\d{2}/,
 			requireTime: false,
 			...optionsData,
 		};
 
 		const defaultMessages: Record<string, string> = {
-			invalid: 'Invalid date',
+			invalid_date: 'Invalid date',
 		};
 
 		// Validate timezone for server runtime
@@ -500,7 +609,7 @@ export abstract class BaseValidator<
 			options.dateFormat =
 				optionsData?.dateFormat ??
 				/^\d{4}-\d{2}-\d{2}[T\s](?:[01]\d|2[0-3]):[0-5]\d/;
-			defaultMessages.invalid_format =
+			defaultMessages.invalid_date_format =
 				'Date must include time (e.g., 2024-01-15 14:30 or 2024-01-15T14:30:00)';
 		}
 
@@ -514,14 +623,17 @@ export abstract class BaseValidator<
 
 		const message = this.buildMessage(defaultMessages, messageData);
 
-		let schema = z.string();
+		let stringSchema = z.string();
 
-		schema = schema.refine((val) => options.dateFormat.test(val), {
-			message: message.invalid_format,
-		});
+		stringSchema = stringSchema.refine(
+			(val) => options.dateFormat.test(val),
+			{
+				message: message.invalid_date_format,
+			},
+		);
 
-		schema = schema.refine((val) => isValidDate(val), {
-			message: message.invalid,
+		stringSchema = stringSchema.refine((val) => isValidDate(val), {
+			message: message.invalid_date,
 		});
 
 		const getSecondsDiff = (val: string): number => {
@@ -537,7 +649,7 @@ export abstract class BaseValidator<
 			}
 		};
 
-		schema = schema.refine(
+		stringSchema = stringSchema.refine(
 			(val) => {
 				if (options.maxPastSeconds === undefined) {
 					return true;
@@ -556,7 +668,7 @@ export abstract class BaseValidator<
 			},
 		);
 
-		schema = schema.refine(
+		stringSchema = stringSchema.refine(
 			(val) => {
 				if (options.maxFutureSeconds === undefined) {
 					return true;
@@ -575,8 +687,7 @@ export abstract class BaseValidator<
 			},
 		);
 
-		// Transform based on runtime
-		return schema.transform((val) => {
+		const dateSchema = stringSchema.transform((val) => {
 			if (options.runtime === 'server') {
 				// Server: Convert to UTC Date object
 				return dayjs.tz(val, options.timezone).utc().toDate();
@@ -585,102 +696,66 @@ export abstract class BaseValidator<
 				return dayjs(val).toDate();
 			}
 		});
-	}
 
-	/**
-	 * @description Build a find validator
-	 */
-	protected validateFind<
-		TOrderBy extends Record<string, string>,
-		TDirection extends Record<string, string>,
-		TFilter extends z.ZodRawShape,
-	>(
-		options: {
-			orderByEnum: TOrderBy;
-			defaultOrderBy: TOrderBy[keyof TOrderBy];
-			directionEnum: TDirection;
-			defaultDirection: TDirection[keyof TDirection];
-			defaultLimit: number;
-			defaultPage: number;
-			filterShape: TFilter;
-		},
-		messageData?: {
-			invalid_limit: string;
-			invalid_page: string;
-		},
-	) {
-		const {
-			orderByEnum,
-			defaultOrderBy,
-			directionEnum,
-			defaultDirection,
-			defaultLimit,
-			defaultPage,
-			filterShape,
-		} = options;
+		if (options.required) {
+			return this.nullToUndefined(dateSchema) as z.ZodType<Date>;
+		}
 
-		const message = this.buildMessage(
-			{
-				invalid_limit: 'Invalid limit',
-				invalid_page: 'Invalid page',
-			},
-			messageData,
-		);
-
-		return z.object({
-			order_by: z.enum(orderByEnum).optional().default(defaultOrderBy),
-
-			direction: z
-				.enum(directionEnum)
-				.optional()
-				.default(defaultDirection),
-
-			limit: z.coerce
-				.number({ message: message.invalid_limit })
-				.min(1)
-				.optional()
-				.default(defaultLimit),
-
-			page: z.coerce
-				.number({ message: message.invalid_number })
-				.min(1)
-				.optional()
-				.default(defaultPage),
-
-			filter: z.object(filterShape).partial(),
-		});
+		return this.preprocessOptional(dateSchema) as z.ZodType<
+			Date | undefined
+		>;
 	}
 
 	protected validateMeta(
 		message = {
-			invalid_title: 'Invalid title',
-			invalid_description: 'Invalid description',
-			invalid_keywords: 'Invalid keywords',
+			invalid_meta_title: 'Invalid title',
+			invalid_meta_description: 'Invalid description',
+			invalid_meta_keywords: 'Invalid keywords',
 		},
 	) {
 		return z.object({
-			title: this.validateString(message.invalid_title),
-			description: this.validateString(
-				message.invalid_description,
-			).optional(),
-			keywords: this.validateString(message.invalid_keywords).optional(),
+			title: this.validateString(message.invalid_meta_title, {
+				required: false,
+			}),
+			description: this.validateString(message.invalid_meta_description, {
+				required: false,
+			}),
+			keywords: this.validateString(message.invalid_meta_keywords, {
+				required: false,
+			}),
 		});
 	}
 
+	// Overload signatures
+	protected validateLanguage(
+		message?: string,
+		optionsData?: {
+			required?: true;
+		},
+	): z.ZodType<string>;
+
+	protected validateLanguage(
+		message: string,
+		optionsData: {
+			required: false;
+		},
+	): z.ZodType<string | undefined>;
+
+	// Implementation signature
 	protected validateLanguage(
 		message = 'Invalid language',
 		optionsData?: { required?: boolean },
-	) {
+	): z.ZodType<string | undefined> {
 		const options = {
 			required: true,
 			...optionsData,
 		};
 
 		if (options.required) {
-			return z.string().length(2, { message });
+			return this.validateEnum(LanguageEnum, message, { required: true });
 		}
 
-		return z.string().length(2, { message }).optional();
+		return this.validateEnum(LanguageEnum, message, { required: false });
 	}
 
 	// Overload signatures
@@ -794,7 +869,7 @@ export abstract class BaseValidator<
 	protected validateEmail(
 		message: string = 'Invalid email address',
 		optionsData?: { required?: boolean },
-	): z.ZodType<string> | z.ZodType<string | undefined> {
+	): z.ZodType<string | undefined> {
 		const options = {
 			required: true,
 			...optionsData,
@@ -815,12 +890,24 @@ export abstract class BaseValidator<
 		>;
 	}
 
+	// Overload signatures
+	protected validateIBAN(
+		message: string,
+		optionsData?: { required?: true },
+	): z.ZodType<string>;
+
+	protected validateIBAN(
+		message: string,
+		optionsData?: { required: false },
+	): z.ZodType<string | undefined>;
+
+	// Implementation signature
 	protected validateIBAN(
 		message: string = 'Invalid IBAN',
 		optionsData?: {
 			required?: boolean;
 		},
-	) {
+	): z.ZodType<string | undefined> {
 		const options = {
 			required: true,
 			...optionsData,
@@ -832,22 +919,36 @@ export abstract class BaseValidator<
 			.refine((val) => this.isValidIBAN(val), { message });
 
 		if (options.required) {
-			return this.nullToUndefined(baseSchema);
+			return this.nullToUndefined(baseSchema) as z.ZodType<string>;
 		}
 
 		const optionalSchema = baseSchema
 			.transform((val) => (val === '' ? undefined : val))
 			.optional();
 
-		return this.nullToUndefined(optionalSchema);
+		return this.nullToUndefined(optionalSchema) as z.ZodType<
+			string | undefined
+		>;
 	}
 
+	// Overload signatures
+	protected validatePersonalIdentificationNumber(
+		message: string,
+		optionsData?: { required?: true },
+	): z.ZodType<string>;
+
+	protected validatePersonalIdentificationNumber(
+		message: string,
+		optionsData?: { required: false },
+	): z.ZodType<string | undefined>;
+
+	// Implementation signature
 	protected validatePersonalIdentificationNumber(
 		message: string = 'Invalid CNP',
 		optionsData?: {
 			required?: boolean;
 		},
-	) {
+	): z.ZodType<string | undefined> {
 		const options = {
 			required: true,
 			...optionsData,
@@ -859,22 +960,36 @@ export abstract class BaseValidator<
 			.refine((val) => this.isValidCNP(val), { message });
 
 		if (options.required) {
-			return this.nullToUndefined(baseSchema);
+			return this.nullToUndefined(baseSchema) as z.ZodType<string>;
 		}
 
 		const optionalSchema = baseSchema
 			.transform((val) => (val === '' ? undefined : val))
 			.optional();
 
-		return this.nullToUndefined(optionalSchema);
+		return this.nullToUndefined(optionalSchema) as z.ZodType<
+			string | undefined
+		>;
 	}
 
+	// Overload signatures
+	protected validatePostalCode(
+		message: string,
+		optionsData?: { required?: true },
+	): z.ZodType<string>;
+
+	protected validatePostalCode(
+		message: string,
+		optionsData?: { required: false },
+	): z.ZodType<string | undefined>;
+
+	// Implementation signature
 	protected validatePostalCode(
 		message: string = 'Invalid postal code',
 		optionsData?: {
 			required?: boolean;
 		},
-	) {
+	): z.ZodType<string | undefined> {
 		const options = {
 			required: true,
 			...optionsData,
@@ -886,22 +1001,36 @@ export abstract class BaseValidator<
 			.refine((val) => this.isValidPostalCode(val), { message });
 
 		if (options.required) {
-			return this.nullToUndefined(baseSchema);
+			return this.nullToUndefined(baseSchema) as z.ZodType<string>;
 		}
 
 		const optionalSchema = baseSchema
 			.transform((val) => (val === '' ? undefined : val))
 			.optional();
 
-		return this.nullToUndefined(optionalSchema);
+		return this.nullToUndefined(optionalSchema) as z.ZodType<
+			string | undefined
+		>;
 	}
 
+	// Overload signatures
+	protected validatePhone(
+		message: string,
+		optionsData?: { required?: true },
+	): z.ZodType<string>;
+
+	protected validatePhone(
+		message: string,
+		optionsData?: { required: false },
+	): z.ZodType<string | undefined>;
+
+	// Implementation signature
 	protected validatePhone(
 		message: string = 'Invalid phone number',
 		optionsData?: {
 			required?: boolean;
 		},
-	) {
+	): z.ZodType<string | undefined> {
 		const options = {
 			required: true,
 			...optionsData,
@@ -913,13 +1042,15 @@ export abstract class BaseValidator<
 			.refine((val) => this.isValidPhoneNumber(val), { message });
 
 		if (options.required) {
-			return this.nullToUndefined(baseSchema);
+			return this.nullToUndefined(baseSchema) as z.ZodType<string>;
 		}
 
 		const optionalSchema = baseSchema
 			.transform((val) => (val === '' ? undefined : val))
 			.optional();
 
-		return this.nullToUndefined(optionalSchema);
+		return this.nullToUndefined(optionalSchema) as z.ZodType<
+			string | undefined
+		>;
 	}
 }

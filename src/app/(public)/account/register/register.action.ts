@@ -7,24 +7,26 @@ import {
 import { Configuration } from '@/config/settings.config';
 import { translate } from '@/config/translate.setup';
 import { ApiError } from '@/exceptions/api.error';
-import { accumulateZodErrors } from '@/helpers/form.helper';
+import {
+	accumulateZodErrors,
+	getFormDataAsBoolean,
+	getFormDataAsEnum,
+	getFormDataAsString,
+} from '@/helpers/form.helper';
 import { isValidCsrfToken } from '@/helpers/session.helper';
-import { LanguageEnum } from '@/models/user.model';
+import { LANGUAGE_DEFAULT, LanguageEnum } from '@/models/user.model';
 import { registerAccount } from '@/services/account.service';
 
 export function registerFormValues(formData: FormData): RegisterFormFieldsType {
-	const language = formData.get('language');
-	const validLanguages = Object.values(LanguageEnum);
-
 	return {
-		name: formData.get('name') as string,
-		email: formData.get('email') as string,
-		password: formData.get('password') as string,
-		password_confirm: formData.get('password_confirm') as string,
-		language: validLanguages.includes(language as LanguageEnum)
-			? (language as LanguageEnum)
-			: LanguageEnum.EN,
-		terms: formData.get('terms') === 'on',
+		name: getFormDataAsString(formData, 'name'),
+		email: getFormDataAsString(formData, 'email'),
+		password: getFormDataAsString(formData, 'password'),
+		password_confirm: getFormDataAsString(formData, 'password_confirm'),
+		language:
+			getFormDataAsEnum(formData, 'language', LanguageEnum) ||
+			LANGUAGE_DEFAULT,
+		terms: getFormDataAsBoolean(formData, 'terms'),
 	};
 }
 
@@ -46,10 +48,10 @@ export async function registerAction(
 		situation: null,
 	};
 
-	// Check CSRF token
-	const csrfToken = formData.get(
+	const csrfToken = getFormDataAsString(
+		formData,
 		Configuration.get('csrf.inputName') as string,
-	) as string;
+	);
 
 	if (!(await isValidCsrfToken(csrfToken))) {
 		return {

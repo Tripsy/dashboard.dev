@@ -28,7 +28,7 @@ export type PermissionModel<D = Date | string> = {
 	deleted_at: D | undefined;
 };
 
-export type PermissionFormValuesType = Pick<
-	PermissionModel,
-	'entity' | 'operation'
->;
+export type PermissionFormValuesType = {
+	entity: string | null;
+	operation: string | null;
+};

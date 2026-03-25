@@ -4,7 +4,9 @@ import {
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
 import type { FormStateType } from '@/config/data-source.config';
+import { getFormDataAsEnum, getFormDataAsString } from '@/helpers/form.helper';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
+import { BaseValidator } from '@/helpers/validator.helper';
 import {
 	type BrandFormValuesType,
 	type BrandModel,
@@ -12,90 +14,94 @@ import {
 	BrandTypeEnum,
 } from '@/models/brand.model';
 import {
+	CashFlowCategoryEnum,
+	CashFlowMethodEnum,
+	CurrencyEnum,
+} from '@/models/cash-flow.model';
+import {
 	createBrand,
 	deleteBrand,
 	findBrands,
 	updateBrand,
 } from '@/services/brands.service';
 
-const translations = await translateBatch([
-	'brands.validation.invalid_name',
-	'brands.validation.slug_invalid',
-	'brands.validation.status_invalid',
-	'brands.validation.type_invalid',
-]);
+const validatorMessages = await BaseValidator.getValidatorMessages(
+	[
+		'invalid_language',
+		'invalid_description',
+		'invalid_meta_title',
+		'invalid_meta_description',
+		'invalid_meta_keywords',
+		'invalid_name',
+		'invalid_slug',
+		'invalid_status',
+		'invalid_type',
+	] as const,
+	'brands.validation',
+);
 
-// const ValidateSchemaBrands = z.object({
-// 	name: validateString(translations['brands.validation.invalid_name']),
-// 	slug: validateString(translations['brands.validation.slug_invalid']),
-// 	type: validateEnum(
-// 		BrandTypeEnum,
-// 		translations['brands.validation.type_invalid'],
-// 	),
-// 	details: z
-// 		.record(z.union([z.string(), z.number(), z.boolean()]))
-// 		.nullable(),
-// 	contents: z.array(
-// 		z.object({
-// 			language: z.string(),
-// 			description: z.string().nullable().optional(),
-// 			meta: z.any().nullable().optional(),
-// 		}),
-// 	),
-// });
+class CashFlowValidator extends BaseValidator<typeof validatorMessages> {
+	readonly contentSchema = z.object({
+		language: this.validateLanguage(this.getMessage('invalid_language')),
+		description: this.validateString(
+			this.getMessage('invalid_description'),
+			{ required: false },
+		),
+		meta: this.validateMeta({
+			invalid_meta_title: this.getMessage('invalid_meta_title'),
+			invalid_meta_description: this.getMessage(
+				'invalid_meta_description',
+			),
+			invalid_meta_keywords: this.getMessage('invalid_meta_keywords'),
+		}),
+	});
+
+	manage = z.object({
+		name: this.validateString(this.getMessage('invalid_name')),
+		slug: this.validateString(this.getMessage('invalid_slug')).transform(
+			(val) => val.trim().toLowerCase(),
+		),
+		type: this.validateEnum(BrandTypeEnum, this.getMessage('invalid_type')),
+		content: this.contentSchema.array(),
+	});
+}
 
 export function getFormValuesBrand(formData: FormData): BrandFormValuesType {
-	const statusRaw = formData.get('status') as BrandStatusEnum | null;
-	const status = Object.values(BrandStatusEnum).includes(
-		statusRaw as BrandStatusEnum,
-	)
-		? (statusRaw as BrandStatusEnum)
-		: BrandStatusEnum.ACTIVE;
-
-	const typeRaw = formData.get('type') as BrandTypeEnum | null;
-	const type = Object.values(BrandTypeEnum).includes(typeRaw as BrandTypeEnum)
-		? (typeRaw as BrandTypeEnum)
-		: BrandTypeEnum.PRODUCT;
-
-	const sortRaw = formData.get('sort_order');
-
-	const detailsJson = formData.get('details') as string | null;
-	let details: BrandFormValuesType['details'] = null;
-
-	if (detailsJson) {
-		try {
-			details = JSON.parse(detailsJson) as BrandFormValuesType['details'];
-		} catch {
-			details = null;
-		}
-	}
-
-	const contentsJson = formData.get('contents') as string | null;
-	let contents: BrandFormValuesType['contents'] = [];
-
-	if (contentsJson) {
-		try {
-			const parsed = JSON.parse(contentsJson) as Array<{
-				language: string;
-				description?: string | null;
-			}>;
-
-			contents = parsed.map((c) => ({
-				language: c.language,
-				description: c.description ?? null,
-				meta: null,
-			}));
-		} catch {
-			contents = [];
-		}
-	}
+	// const detailsJson = getFormDataAsString(formData, 'details');
+	// let details: BrandFormValuesType['details'] = null;
+	//
+	// if (detailsJson) {
+	// 	try {
+	// 		details = JSON.parse(detailsJson) as BrandFormValuesType['details'];
+	// 	} catch {
+	// 		details = null;
+	// 	}
+	// }
+	//
+	// const contentsJson = getFormDataAsString(formData, 'contents')
+	// let contents: BrandFormValuesType['contents'] = [];
+	//
+	// if (contentsJson) {
+	// 	try {
+	// 		const parsed = JSON.parse(contentsJson) as Array<{
+	// 			language: string;
+	// 			description?: string | null;
+	// 		}>;
+	//
+	// 		contents = parsed.map((c) => ({
+	// 			language: c.language,
+	// 			description: c.description ?? null,
+	// 			meta: null,
+	// 		}));
+	// 	} catch {
+	// 		contents = [];
+	// 	}
+	// }
 
 	return {
-		name: (formData.get('name') as string) || '',
-		slug: (formData.get('slug') as string) || '',
-		status,
-		type,
-		sort_order: sortRaw ? Number(sortRaw) : 0,
+		name: getFormDataAsString(formData, 'name'),
+		slug: getFormDataAsString(formData, 'slug'),
+		type: getFormDataAsEnum(formData, 'type', BrandTypeEnum),
 		details,
 		contents,
 	};

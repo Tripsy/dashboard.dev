@@ -4,6 +4,11 @@ import {
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
 import type { FormStateType } from '@/config/data-source.config';
+import {
+	getFormDataAsEnum,
+	getFormDataAsNumber,
+	getFormDataAsString,
+} from '@/helpers/form.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import { getClientDisplayName } from '@/models/client.model';
 import {
@@ -31,16 +36,16 @@ const validatorMessages = await BaseValidator.getValidatorMessages(
 	'client-address.validation',
 );
 
-class ClientAddressValidator extends BaseValidator<
-	typeof validatorMessages
-> {
+class ClientAddressValidator extends BaseValidator<typeof validatorMessages> {
 	manage = z.object({
 		client_id: this.validateId(this.getMessage('invalid_client_id')),
 		address_type: this.validateEnum(
 			ClientAddressTypeEnum,
 			this.getMessage('invalid_address_type'),
 		),
-		city_id: this.validateId(this.getMessage('invalid_city_id'), false),
+		city_id: this.validateId(this.getMessage('invalid_city_id'), {
+			required: false,
+		}),
 		details: this.validateString(this.getMessage('invalid_details')),
 		postal_code: this.validatePostalCode(
 			this.getMessage('invalid_postal_code'),
@@ -57,23 +62,18 @@ class ClientAddressValidator extends BaseValidator<
 function getFormValuesClientAddress(
 	formData: FormData,
 ): ClientAddressFormValuesType {
-	const address_type = formData.get(
-		'address_type',
-	) as ClientAddressTypeEnum | null;
-
 	return {
-		client_id: Number(formData.get('client_id')),
+		client_id: getFormDataAsNumber(formData, 'client_id'),
 		address_type:
-			address_type &&
-			Object.values(ClientAddressTypeEnum).includes(address_type)
-				? address_type
-				: ClientAddressTypeEnum.DELIVERY,
-		city_id: formData.get('city_id')
-			? Number(formData.get('city_id'))
-			: null,
-		details: formData.get('details') as string,
-		postal_code: formData.get('postal_code') as string | null,
-		notes: formData.get('notes') as string | null,
+			getFormDataAsEnum(
+				formData,
+				'address_type',
+				ClientAddressTypeEnum,
+			) || ClientAddressTypeEnum.DELIVERY,
+		city_id: getFormDataAsNumber(formData, 'city_id'),
+		details: getFormDataAsString(formData, 'details'),
+		postal_code: getFormDataAsString(formData, 'postal_code'),
+		notes: getFormDataAsString(formData, 'notes'),
 	};
 }
 

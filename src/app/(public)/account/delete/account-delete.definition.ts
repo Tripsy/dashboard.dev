@@ -3,7 +3,7 @@ import { BaseValidator } from '@/helpers/validator.helper';
 import type { FormSituationType } from '@/types/form.type';
 
 export type AccountDeleteFormFieldsType = {
-	password_current: string;
+	password_current: string | null;
 };
 
 export type AccountDeleteSituationType = FormSituationType | 'csrf_error';
@@ -37,6 +37,5 @@ class AccountDeleteValidator extends BaseValidator<typeof validatorMessages> {
 	});
 }
 
-export const AccountDeleteSchema = new AccountDeleteValidator(
-	validatorMessages,
-).accountDelete;
+export const AccountDeleteSchema = new AccountDeleteValidator(validatorMessages)
+	.accountDelete;

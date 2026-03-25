@@ -7,7 +7,10 @@ import {
 import { Configuration } from '@/config/settings.config';
 import { translate } from '@/config/translate.setup';
 import { ApiError } from '@/exceptions/api.error';
-import { accumulateZodErrors } from '@/helpers/form.helper';
+import {
+	accumulateZodErrors,
+	getFormDataAsString,
+} from '@/helpers/form.helper';
 import { isValidCsrfToken } from '@/helpers/session.helper';
 import { loginAccount } from '@/services/account.service';
 import { createAuth } from '@/services/auth.service';
@@ -15,8 +18,8 @@ import type { AuthTokenListType } from '@/types/auth.type';
 
 export function loginFormValues(formData: FormData): LoginFormFieldsType {
 	return {
-		email: formData.get('email') as string,
-		password: formData.get('password') as string,
+		email: getFormDataAsString(formData, 'email'),
+		password: getFormDataAsString(formData, 'password'),
 	};
 }
 
@@ -38,10 +41,10 @@ export async function loginAction(
 		situation: null,
 	};
 
-	// Check CSRF token
-	const csrfToken = formData.get(
+	const csrfToken = getFormDataAsString(
+		formData,
 		Configuration.get('csrf.inputName') as string,
-	) as string;
+	);
 
 	if (!(await isValidCsrfToken(csrfToken))) {
 		return {

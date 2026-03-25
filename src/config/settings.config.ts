@@ -19,6 +19,7 @@ function loadSettings(): Settings {
 			environment: process.env.NEXT_PUBLIC_NODE_ENV || 'production',
 			url: process.env.NEXT_PUBLIC_APP_URL,
 			name: process.env.NEXT_PUBLIC_APP_NAME,
+			timezone: process.env.NEXT_PUBLIC_TIMEZONE || 'UTC',
 		},
 		security: {
 			allowedOrigins: process.env.ALLOWED_ORIGINS?.split(',').map((v) =>

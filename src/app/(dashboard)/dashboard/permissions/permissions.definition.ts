@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { FormStateType } from '@/config/data-source.config';
+import { getFormDataAsString } from '@/helpers/form.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import type {
 	PermissionFormValuesType,
@@ -14,26 +15,21 @@ import {
 } from '@/services/permissions.service';
 
 const validatorMessages = await BaseValidator.getValidatorMessages(
-	[
-		'invalid_entity',
-		'invalid_operation',
-	] as const,
+	['invalid_entity', 'invalid_operation'] as const,
 	'permissions.validation',
 );
 
 class PermissionValidator extends BaseValidator<typeof validatorMessages> {
 	manage = z.object({
 		entity: this.validateString(this.getMessage('invalid_entity')),
-		operation: this.validateString(
-			this.getMessage('invalid_operation'),
-		),
+		operation: this.validateString(this.getMessage('invalid_operation')),
 	});
 }
 
 function getFormValuesPermission(formData: FormData): PermissionFormValuesType {
 	return {
-		entity: formData.get('entity') as string,
-		operation: formData.get('operation') as string,
+		entity: getFormDataAsString(formData, 'entity'),
+		operation: getFormDataAsString(formData, 'operation'),
 	};
 }
 

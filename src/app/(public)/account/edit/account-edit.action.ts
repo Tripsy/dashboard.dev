@@ -5,22 +5,23 @@ import {
 } from '@/app/(public)/account/edit/account-edit.definition';
 import { Configuration } from '@/config/settings.config';
 import { translate } from '@/config/translate.setup';
-import { accumulateZodErrors } from '@/helpers/form.helper';
+import {
+	accumulateZodErrors,
+	getFormDataAsEnum,
+	getFormDataAsString,
+} from '@/helpers/form.helper';
 import { isValidCsrfToken } from '@/helpers/session.helper';
-import { LanguageEnum } from '@/models/user.model';
+import { LANGUAGE_DEFAULT, LanguageEnum } from '@/models/user.model';
 import { editAccount } from '@/services/account.service';
 
 export function accountEditFormValues(
 	formData: FormData,
 ): AccountEditFormFieldsType {
-	const language = formData.get('language');
-	const validLanguages = Object.values(LanguageEnum);
-
 	return {
-		name: formData.get('name') as string,
-		language: validLanguages.includes(language as LanguageEnum)
-			? (language as LanguageEnum)
-			: LanguageEnum.EN,
+		name: getFormDataAsString(formData, 'name'),
+		language:
+			getFormDataAsEnum(formData, 'language', LanguageEnum) ||
+			LANGUAGE_DEFAULT,
 	};
 }
 
@@ -42,10 +43,10 @@ export async function accountEditAction(
 		situation: null,
 	};
 
-	// Check CSRF token
-	const csrfToken = formData.get(
+	const csrfToken = getFormDataAsString(
+		formData,
 		Configuration.get('csrf.inputName') as string,
-	) as string;
+	);
 
 	if (!(await isValidCsrfToken(csrfToken))) {
 		return {

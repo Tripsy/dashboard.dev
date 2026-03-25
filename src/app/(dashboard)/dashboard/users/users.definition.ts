@@ -5,8 +5,10 @@ import {
 } from '@/app/(dashboard)/_components/data-table-value';
 import type { FormStateType } from '@/config/data-source.config';
 import { Configuration } from '@/config/settings.config';
+import { getFormDataAsEnum, getFormDataAsString } from '@/helpers/form.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import {
+	LANGUAGE_DEFAULT,
 	LanguageEnum,
 	type UserFormValuesType,
 	type UserModel,
@@ -61,10 +63,7 @@ class UserValidator extends BaseValidator<typeof validatorMessages> {
 			LanguageEnum,
 			this.getMessage('invalid_language'),
 		),
-		role: this.validateEnum(
-			UserRoleEnum,
-			this.getMessage('invalid_role'),
-		),
+		role: this.validateEnum(UserRoleEnum, this.getMessage('invalid_role')),
 		operator_type: this.validateEnum(
 			UserOperatorTypeEnum,
 			this.getMessage('invalid_operator_type'),
@@ -72,139 +71,132 @@ class UserValidator extends BaseValidator<typeof validatorMessages> {
 		),
 	});
 
-	create = this.baseSchema.extend({
-		password: this.validatePassword(
-			{
-				invalid_password: this.getMessage('invalid_password'),
-				password_min: this.getMessage('password_min', {
-					min: Configuration.get('user.passwordMinChars') as string,
-				}),
-				password_condition_capital_letter: this.getMessage(
-					'password_condition_capital_letter',
-				),
-				password_condition_number: this.getMessage(
-					'password_condition_number',
-				),
-				password_condition_special_character: this.getMessage(
-					'password_condition_special_character',
-				),
-			},
-			{
-				minLength: Configuration.get(
-					'user.passwordMinChars',
-				) as number,
-			},
-		),
-		password_confirm: this.validateString(
-			this.getMessage('password_confirm_required'),
-		),
-	})
-	.superRefine(({ password, password_confirm }, ctx) => {
-		if (password !== password_confirm) {
-			ctx.addIssue({
-				code: 'custom',
-				path: ['password_confirm'],
-				message: this.getMessage('password_confirm_mismatch'),
-			});
-		}
-	})
-	.superRefine(({ role, operator_type }, ctx) => {
-		if (role === UserRoleEnum.OPERATOR && !operator_type) {
-			ctx.addIssue({
-				code: 'custom',
-				path: ['operator_type'],
-				message: this.getMessage('invalid_operator_type'),
-			});
-		}
-	});
-
-	update = this.baseSchema.extend({
-		password: this.validatePassword(
-			{
-				invalid_password: this.getMessage('invalid_password'),
-				password_min: this.getMessage('password_min', {
-					min: Configuration.get('user.passwordMinChars') as string,
-				}),
-				password_condition_capital_letter: this.getMessage(
-					'password_condition_capital_letter',
-				),
-				password_condition_number: this.getMessage(
-					'password_condition_number',
-				),
-				password_condition_special_character: this.getMessage(
-					'password_condition_special_character',
-				),
-			},
-			{
-				required: false,
-				minLength: Configuration.get(
-					'user.passwordMinChars',
-				) as number,
-			},
-		),
-		password_confirm: this.validateString(
-			this.getMessage('password_confirm_required'),
-			{ required: false },
-		),
-	})
-	.superRefine(({ password, password_confirm }, ctx) => {
-		if (password || password_confirm) {
-			if (!password_confirm) {
+	create = this.baseSchema
+		.extend({
+			password: this.validatePassword(
+				{
+					invalid_password: this.getMessage('invalid_password'),
+					password_min: this.getMessage('password_min', {
+						min: Configuration.get(
+							'user.passwordMinChars',
+						) as string,
+					}),
+					password_condition_capital_letter: this.getMessage(
+						'password_condition_capital_letter',
+					),
+					password_condition_number: this.getMessage(
+						'password_condition_number',
+					),
+					password_condition_special_character: this.getMessage(
+						'password_condition_special_character',
+					),
+				},
+				{
+					minLength: Configuration.get(
+						'user.passwordMinChars',
+					) as number,
+				},
+			),
+			password_confirm: this.validateString(
+				this.getMessage('password_confirm_required'),
+			),
+		})
+		.superRefine(({ password, password_confirm }, ctx) => {
+			if (password !== password_confirm) {
 				ctx.addIssue({
 					code: 'custom',
 					path: ['password_confirm'],
-					message: this.getMessage(
-						'password_confirm_required',
-					),
-				});
-			} else if (password !== password_confirm) {
-				ctx.addIssue({
-					code: 'custom',
-					path: ['password_confirm'],
-					message: this.getMessage(
-						'password_confirm_mismatch',
-					),
+					message: this.getMessage('password_confirm_mismatch'),
 				});
 			}
-		}
-	})
-	.superRefine(({ role, operator_type }, ctx) => {
-		if (role === UserRoleEnum.OPERATOR && !operator_type) {
-			ctx.addIssue({
-				code: 'custom',
-				path: ['operator_type'],
-				message: this.getMessage('invalid_operator_type'),
-			});
-		}
-	});
+		})
+		.superRefine(({ role, operator_type }, ctx) => {
+			if (role === UserRoleEnum.OPERATOR && !operator_type) {
+				ctx.addIssue({
+					code: 'custom',
+					path: ['operator_type'],
+					message: this.getMessage('invalid_operator_type'),
+				});
+			}
+		});
+
+	update = this.baseSchema
+		.extend({
+			password: this.validatePassword(
+				{
+					invalid_password: this.getMessage('invalid_password'),
+					password_min: this.getMessage('password_min', {
+						min: Configuration.get(
+							'user.passwordMinChars',
+						) as string,
+					}),
+					password_condition_capital_letter: this.getMessage(
+						'password_condition_capital_letter',
+					),
+					password_condition_number: this.getMessage(
+						'password_condition_number',
+					),
+					password_condition_special_character: this.getMessage(
+						'password_condition_special_character',
+					),
+				},
+				{
+					required: false,
+					minLength: Configuration.get(
+						'user.passwordMinChars',
+					) as number,
+				},
+			),
+			password_confirm: this.validateString(
+				this.getMessage('password_confirm_required'),
+				{ required: false },
+			),
+		})
+		.superRefine(({ password, password_confirm }, ctx) => {
+			if (password || password_confirm) {
+				if (!password_confirm) {
+					ctx.addIssue({
+						code: 'custom',
+						path: ['password_confirm'],
+						message: this.getMessage('password_confirm_required'),
+					});
+				} else if (password !== password_confirm) {
+					ctx.addIssue({
+						code: 'custom',
+						path: ['password_confirm'],
+						message: this.getMessage('password_confirm_mismatch'),
+					});
+				}
+			}
+		})
+		.superRefine(({ role, operator_type }, ctx) => {
+			if (role === UserRoleEnum.OPERATOR && !operator_type) {
+				ctx.addIssue({
+					code: 'custom',
+					path: ['operator_type'],
+					message: this.getMessage('invalid_operator_type'),
+				});
+			}
+		});
 }
 
 function getFormValuesUser(formData: FormData): UserFormValuesType {
-	const language = formData.get('language');
-	const validLanguages = Object.values(LanguageEnum);
-
-	const role = formData.get('role');
-	const validRoles = Object.values(UserRoleEnum);
-
-	const operator_type = formData.get('operator_type');
-	const validOperatorTypes = Object.values(UserOperatorTypeEnum);
-
 	return {
-		name: formData.get('name') as string,
-		email: formData.get('email') as string,
-		password: formData.get('password') as string,
-		password_confirm: formData.get('password_confirm') as string,
-		language: validLanguages.includes(language as LanguageEnum)
-			? (language as LanguageEnum)
-			: LanguageEnum.EN,
-		role: validRoles.includes(role as UserRoleEnum)
-			? (role as UserRoleEnum)
-			: UserRoleEnum.MEMBER,
-		operator_type:
-			operator_type &&
-			validOperatorTypes.includes(operator_type as UserOperatorTypeEnum)
-				? (operator_type as UserOperatorTypeEnum)
-				: null,
+		name: getFormDataAsString(formData, 'name'),
+		email: getFormDataAsString(formData, 'email'),
+		password: getFormDataAsString(formData, 'password'),
+		password_confirm: getFormDataAsString(formData, 'password_confirm'),
+		language:
+			getFormDataAsEnum(formData, 'language', LanguageEnum) ||
+			LANGUAGE_DEFAULT,
+		role:
+			getFormDataAsEnum(formData, 'role', UserRoleEnum) ||
+			UserRoleEnum.MEMBER,
+		operator_type: getFormDataAsEnum(
+			formData,
+			'operator_type',
+			UserOperatorTypeEnum,
+		),
 	};
 }
 

@@ -3,7 +3,7 @@ import { BaseValidator } from '@/helpers/validator.helper';
 import type { FormSituationType } from '@/types/form.type';
 
 export type PasswordRecoverFormFieldsType = {
-	email: string;
+	email: string | null;
 };
 
 export type PasswordRecoverSituationType = FormSituationType | 'csrf_error';
@@ -25,9 +25,7 @@ export const PasswordRecoverState: PasswordRecoverStateType = {
 };
 
 const validatorMessages = await BaseValidator.getValidatorMessages(
-	[
-		'invalid_email',
-	] as const,
+	['invalid_email'] as const,
 	'password-recover.validation',
 );
 

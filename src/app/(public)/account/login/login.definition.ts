@@ -4,8 +4,8 @@ import type { AuthTokenListType } from '@/types/auth.type';
 import type { FormSituationType } from '@/types/form.type';
 
 export type LoginFormFieldsType = {
-	email: string;
-	password: string;
+	email: string | null;
+	password: string | null;
 };
 
 export type LoginSituationType =

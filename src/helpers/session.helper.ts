@@ -105,7 +105,7 @@ export async function setupTrackedCookie(
 	);
 }
 
-export async function isValidCsrfToken(inputValue: string) {
+export async function isValidCsrfToken(inputValue: string | null) {
 	if (!inputValue) {
 		return false;
 	}

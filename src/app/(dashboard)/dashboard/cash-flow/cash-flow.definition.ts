@@ -5,15 +5,25 @@ import {
 } from '@/app/(dashboard)/_components/data-table-value';
 import type { FormStateType } from '@/config/data-source.config';
 import { DisplayAmount } from '@/helpers/display.helper';
+import {
+	getFormDataAsEnum,
+	getFormDataAsNumber,
+	getFormDataAsString,
+} from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
+import { BaseValidator } from '@/helpers/validator.helper';
 import {
 	CashFlowCategoryEnum,
+	// CashFlowCategoryTypeEnum,
 	CashFlowDirectionEnum,
 	type CashFlowFormValuesType,
+	// CashFlowGatewayEnum,
 	CashFlowMethodEnum,
 	type CashFlowModel,
 	type CashFlowStatusEnum,
+	CURRENCY_DEFAULT,
 	CurrencyEnum,
+	VAT_RATE_DEFAULT,
 } from '@/models/cash-flow.model';
 import {
 	createCashFlow,
@@ -21,94 +31,87 @@ import {
 	findCashFlows,
 	updateCashFlow,
 } from '@/services/cash-flow.service';
-import {BaseValidator} from "@/helpers/validator.helper";
 
 const validatorMessages = await BaseValidator.getValidatorMessages(
 	[
+		// 'invalid_direction',
+		// 'invalid_category_type',
 		'invalid_category',
+		// 'invalid_gateway',
 		'invalid_method',
 		'invalid_amount',
 		'invalid_vat_rate',
 		'invalid_currency',
 		'invalid_exchange_rate',
 		'invalid_external_reference',
+		'invalid_parent_id',
 		'invalid_notes',
 	] as const,
 	'cash-flow.validation',
 );
 
-// const ValidateSchemaCashFlow = z.object({
-// 	address_type: validateEnum(
-// 		CashFlowCategoryEnum,
-// 		translations['cash-flow.validation.invalid_category'],
-// 	),
-// 	method: validateEnum(
-// 		CashFlowMethodEnum,
-// 		translations['cash-flow.validation.invalid_method'],
-// 	),
-// 	amount: validateNumber(translations['cash-flow.validation.invalid_amount']),
-// 	vat_rate: validateNumber(
-// 		translations['cash-flow.validation.invalid_vat_rate'],
-// 		true,
-// 		true,
-// 	)
-// 		.min(0, translations['cash-flow.validation.invalid_vat_rate'])
-// 		.max(100, translations['cash-flow.validation.invalid_vat_rate']),
-// 	currency: validateEnum(
-// 		CurrencyEnum,
-// 		translations['cash-flow.validation.invalid_currency'],
-// 	),
-// 	exchange_rate: validateNumber(
-// 		translations['cash-flow.validation.invalid_exchange_rate'],
-// 		true,
-// 		true,
-// 	),
-// 	external_reference: validateString(
-// 		translations['cash-flow.validation.invalid_external_reference'],
-// 	).optional(),
-// 	notes: validateString(
-// 		translations['cash-flow.validation.invalid_notes'],
-// 	).optional(),
-// });
+class CashFlowValidator extends BaseValidator<typeof validatorMessages> {
+	manage = z.object({
+		// direction: this.validateEnum(
+		// 	CashFlowDirectionEnum,
+		// 	this.getMessage('invalid_direction'),
+		// ),
+		// category_type: this.validateEnum(
+		// 	CashFlowCategoryTypeEnum,
+		// 	this.getMessage('invalid_category_type'),
+		// ),
+		category: this.validateEnum(
+			CashFlowCategoryEnum,
+			this.getMessage('invalid_category'),
+		),
+		// gateway: this.validateEnum(
+		// 	CashFlowGatewayEnum,
+		// 	this.getMessage('invalid_gateway'),
+		// ),
+		method: this.validateEnum(
+			CashFlowMethodEnum,
+			this.getMessage('invalid_method'),
+		),
+		amount: this.validateNumber(this.getMessage('invalid_amount')),
+		vat_rate: this.validateNumber(this.getMessage('invalid_vat_rate'), {
+			required: true,
+			onlyPositive: true,
+			allowDecimals: true,
+		}),
+		currency: this.validateEnum(
+			CurrencyEnum,
+			this.getMessage('invalid_currency'),
+		),
+		external_reference: this.validateString(
+			this.getMessage('invalid_external_reference'),
+			{ required: false },
+		),
+		parent_id: this.validateId(this.getMessage('invalid_parent_id'), {
+			required: false,
+		}),
+		notes: this.validateString(this.getMessage('invalid_notes'), {
+			required: false,
+		}),
+	});
+}
 
 export function getFormValuesCashFlow(
 	formData: FormData,
 ): CashFlowFormValuesType {
-	const categoryRaw = formData.get('category') as CashFlowCategoryEnum | null;
-	const category = Object.values(CashFlowCategoryEnum).includes(
-		categoryRaw as CashFlowCategoryEnum,
-	)
-		? (categoryRaw as CashFlowCategoryEnum)
-		: CashFlowCategoryEnum.CUSTOMER;
-
-	const methodRaw = formData.get('method') as CashFlowMethodEnum | null;
-	const method = Object.values(CashFlowMethodEnum).includes(
-		methodRaw as CashFlowMethodEnum,
-	)
-		? (methodRaw as CashFlowMethodEnum)
-		: CashFlowMethodEnum.BANK_TRANSFER;
-
-	const currencyRaw = formData.get('currency') as CurrencyEnum | null;
-	const currency = Object.values(CurrencyEnum).includes(
-		currencyRaw as CurrencyEnum,
-	)
-		? (currencyRaw as CurrencyEnum)
-		: CurrencyEnum.RON;
-
-	const amountRaw = formData.get('amount');
-	const vatRateRaw = formData.get('vat_rate');
-	const exchangeRateRaw = formData.get('exchange_rate');
-
 	return {
-		category,
-		method,
-		amount: amountRaw ? Number(amountRaw) : 0,
-		vat_rate: vatRateRaw ? Number(vatRateRaw) : 0,
-		currency,
-		exchange_rate: exchangeRateRaw ? Number(exchangeRateRaw) : 1,
-		external_reference:
-			(formData.get('external_reference') as string) || null,
-		notes: (formData.get('notes') as string) || null,
+		category:
+			getFormDataAsEnum(formData, 'category', CashFlowCategoryEnum) ||
+			CashFlowCategoryEnum.CUSTOMER,
+		method:
+			getFormDataAsEnum(formData, 'method', CashFlowMethodEnum) ||
+			CashFlowMethodEnum.CASH,
+		amount: getFormDataAsNumber(formData, 'amount'),
+		vat_rate: getFormDataAsNumber(formData, 'vat_rate'),
+		currency:
+			getFormDataAsEnum(formData, 'currency', CurrencyEnum) ||
+			CURRENCY_DEFAULT,
+		external_reference: getFormDataAsString(formData, 'external_reference'),
+		notes: getFormDataAsString(formData, 'notes'),
 	};
 }
 
@@ -239,11 +242,10 @@ export const dataSourceConfigCashFlow = {
 		id: undefined,
 		values: {
 			category: CashFlowCategoryEnum.CUSTOMER,
-			method: CashFlowMethodEnum.BANK_TRANSFER,
+			method: CashFlowMethodEnum.CASH,
 			amount: 0,
-			vat_rate: 0,
-			currency: CurrencyEnum.RON,
-			exchange_rate: 1,
+			vat_rate: VAT_RATE_DEFAULT,
+			currency: CURRENCY_DEFAULT,
 			external_reference: null,
 			notes: null,
 		} as CashFlowFormValuesType,
@@ -255,7 +257,9 @@ export const dataSourceConfigCashFlow = {
 		find: findCashFlows,
 		getFormValues: getFormValuesCashFlow,
 		validateForm: (values: CashFlowFormValuesType) => {
-			// return ValidateSchemaCashFlow.safeParse(values);
+			return new CashFlowValidator(validatorMessages).manage.safeParse(
+				values,
+			);
 		},
 		syncFormState: (
 			state: FormStateType<
@@ -279,7 +283,6 @@ export const dataSourceConfigCashFlow = {
 					amount: model.amount,
 					vat_rate: model.vat_rate,
 					currency: model.currency,
-					exchange_rate: model.exchange_rate,
 					external_reference: model.external_reference ?? null,
 					notes: model.notes,
 				},

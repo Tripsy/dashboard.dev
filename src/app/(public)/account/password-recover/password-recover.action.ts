@@ -7,7 +7,10 @@ import {
 import { Configuration } from '@/config/settings.config';
 import { translate } from '@/config/translate.setup';
 import { ApiError } from '@/exceptions/api.error';
-import { accumulateZodErrors } from '@/helpers/form.helper';
+import {
+	accumulateZodErrors,
+	getFormDataAsString,
+} from '@/helpers/form.helper';
 import { isValidCsrfToken } from '@/helpers/session.helper';
 import { passwordRecoverAccount } from '@/services/account.service';
 
@@ -15,7 +18,7 @@ export function passwordRecoverFormValues(
 	formData: FormData,
 ): PasswordRecoverFormFieldsType {
 	return {
-		email: formData.get('email') as string,
+		email: getFormDataAsString(formData, 'email'),
 	};
 }
 
@@ -37,10 +40,10 @@ export async function passwordRecoverAction(
 		situation: null,
 	};
 
-	// Check CSRF token
-	const csrfToken = formData.get(
+	const csrfToken = getFormDataAsString(
+		formData,
 		Configuration.get('csrf.inputName') as string,
-	) as string;
+	);
 
 	if (!(await isValidCsrfToken(csrfToken))) {
 		return {

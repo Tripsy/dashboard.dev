@@ -15,6 +15,8 @@ export enum LanguageEnum {
 	RO = 'ro',
 }
 
+export const LANGUAGE_DEFAULT = LanguageEnum.EN;
+
 export enum UserOperatorTypeEnum {
 	SELLER = 'seller',
 	PRODUCT_MANAGER = 'product_manager',
@@ -38,8 +40,10 @@ export type UserModel<D = Date | string> = {
 
 export type UserFormValuesType = Pick<
 	UserModel,
-	'name' | 'email' | 'language' | 'role' | 'operator_type'
+	'language' | 'role' | 'operator_type'
 > & {
-	password?: string;
-	password_confirm?: string;
+	name: string | null;
+	email: string | null;
+	password: string | null;
+	password_confirm: string | null;
 };

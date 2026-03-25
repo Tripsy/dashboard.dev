@@ -4,6 +4,7 @@ import {
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
 import type { FormStateType } from '@/config/data-source.config';
+import { getFormDataAsEnum, getFormDataAsString } from '@/helpers/form.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import {
 	type ClientFormValuesType,
@@ -45,12 +46,9 @@ class ClientValidator extends BaseValidator<typeof validatorMessages> {
 		iban: this.validateIBAN(this.getMessage('invalid_iban'), {
 			required: false,
 		}),
-		bank_name: this.validateString(
-			this.getMessage('invalid_bank_name'),
-			{
-				required: false,
-			},
-		),
+		bank_name: this.validateString(this.getMessage('invalid_bank_name'), {
+			required: false,
+		}),
 		contact_name: this.validateString(
 			this.getMessage('invalid_contact_name'),
 			{
@@ -108,9 +106,7 @@ class ClientValidator extends BaseValidator<typeof validatorMessages> {
 				),
 				person_identification_number:
 					this.validatePersonalIdentificationNumber(
-						this.getMessage(
-							'invalid_person_identification_number',
-						),
+						this.getMessage('invalid_person_identification_number'),
 						{
 							required: false,
 						},
@@ -121,17 +117,19 @@ class ClientValidator extends BaseValidator<typeof validatorMessages> {
 }
 
 export function getFormValuesClient(formData: FormData): ClientFormValuesType {
-	const client_type = formData.get('client_type') as ClientTypeEnum;
+	const client_type =
+		getFormDataAsEnum(formData, 'client_type', ClientTypeEnum) ||
+		ClientTypeEnum.COMPANY;
 
 	const base = {
-		notes: (formData.get('notes') as string) || null,
+		notes: getFormDataAsString(formData, 'notes'),
 
-		iban: (formData.get('iban') as string) || null,
-		bank_name: (formData.get('bank_name') as string) || null,
+		iban: getFormDataAsString(formData, 'iban'),
+		bank_name: getFormDataAsString(formData, 'bank_name'),
 
-		contact_name: (formData.get('contact_name') as string) || null,
-		contact_email: (formData.get('contact_email') as string) || null,
-		contact_phone: (formData.get('contact_phone') as string) || null,
+		contact_name: getFormDataAsString(formData, 'contact_name'),
+		contact_email: getFormDataAsString(formData, 'contact_email'),
+		contact_phone: getFormDataAsString(formData, 'contact_phone'),
 	};
 
 	if (client_type === ClientTypeEnum.COMPANY) {
@@ -139,10 +137,9 @@ export function getFormValuesClient(formData: FormData): ClientFormValuesType {
 			...base,
 			client_type: ClientTypeEnum.COMPANY,
 
-			company_name: (formData.get('company_name') as string) || null,
-			company_cui: (formData.get('company_cui') as string) || null,
-			company_reg_com:
-				(formData.get('company_reg_com') as string) || null,
+			company_name: getFormDataAsString(formData, 'company_name'),
+			company_cui: getFormDataAsString(formData, 'company_cui'),
+			company_reg_com: getFormDataAsString(formData, 'company_reg_com'),
 		};
 	}
 
@@ -150,9 +147,11 @@ export function getFormValuesClient(formData: FormData): ClientFormValuesType {
 		...base,
 		client_type: ClientTypeEnum.PERSON,
 
-		person_name: (formData.get('person_name') as string) || null,
-		person_identification_number:
-			(formData.get('person_identification_number') as string) || null,
+		person_name: getFormDataAsString(formData, 'person_name'),
+		person_identification_number: getFormDataAsString(
+			formData,
+			'person_identification_number',
+		),
 	};
 }
 

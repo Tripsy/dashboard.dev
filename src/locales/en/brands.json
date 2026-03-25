@@ -4,8 +4,8 @@
 	},
 	"validation": {
 		"invalid_name": "Enter a brand name",
-		"slug_invalid": "Enter a valid slug",
-		"status_invalid": "Select a valid status",
-		"type_invalid": "Select a valid brand type"
+		"invalid_slug": "Enter a valid slug",
+		"invalid_status": "Select a valid status",
+		"invalid_type": "Select a valid brand type"
 	}
 }

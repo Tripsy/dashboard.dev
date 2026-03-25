@@ -4,6 +4,11 @@ import {
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
 import type { FormStateType } from '@/config/data-source.config';
+import {
+	getFormDataAsEnum,
+	getFormDataAsNumber,
+	getFormDataAsString,
+} from '@/helpers/form.helper';
 import { toTitleCase } from '@/helpers/string.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import {
@@ -38,7 +43,9 @@ class PlaceValidator extends BaseValidator<typeof validatorMessages> {
 				this.getMessage('invalid_place_type'),
 			),
 			client_id: this.validateId(this.getMessage('invalid_client_id')),
-			city_id: this.validateId(this.getMessage('invalid_city_id'), false),
+			city_id: this.validateId(this.getMessage('invalid_city_id'), {
+				required: false,
+			}),
 			details: this.validateString(this.getMessage('invalid_details')),
 			postal_code: this.validatePostalCode(
 				this.getMessage('invalid_postal_code'),
@@ -56,10 +63,10 @@ class PlaceValidator extends BaseValidator<typeof validatorMessages> {
 // const ValidateSchemaPlaceBase = z.object({
 // 	type: validateEnum(
 // 		PlaceTypeEnum,
-// 		translations['places.validation.type_invalid'],
+// 		translations['places.validation.invalid_type'],
 // 	),
-// 	code: validateString(translations['places.validation.type_invalid'])
-// 		.max(3, translations['places.validation.type_invalid'])
+// 	code: validateString(translations['places.validation.invalid_type'])
+// 		.max(3, translations['places.validation.invalid_type'])
 // 		.nullable()
 // 		.optional(),
 // 	parent_id: validateId(
@@ -85,40 +92,33 @@ class PlaceValidator extends BaseValidator<typeof validatorMessages> {
 // });
 
 export function getFormValuesPlace(formData: FormData): PlaceFormValuesType {
-	const placeTypeRaw = formData.get('place_type') as PlaceTypeEnum | null;
-	const place_type = Object.values(PlaceTypeEnum).includes(
-		placeTypeRaw as PlaceTypeEnum,
-	)
-		? (placeTypeRaw as PlaceTypeEnum)
-		: PlaceTypeEnum.COUNTRY;
-
-	const parentIdRaw = formData.get('parent_id');
-
-	const contentsJson = formData.get('contents') as string | null;
-	let contents: PlaceFormValuesType['contents'] = [];
-
-	if (contentsJson) {
-		try {
-			const parsed = JSON.parse(contentsJson) as Array<{
-				language: string;
-				name: string;
-				type_label: string;
-			}>;
-
-			contents = parsed.map((c) => ({
-				language: c.language,
-				name: c.name,
-				type_label: c.type_label,
-			}));
-		} catch {
-			contents = [];
-		}
-	}
+	// const contentsJson = getFormDataAsString(formData, 'contents');
+	// let contents: PlaceFormValuesType['contents'] = [];
+	//
+	// if (contentsJson) {
+	// 	try {
+	// 		const parsed = JSON.parse(contentsJson) as Array<{
+	// 			language: string;
+	// 			name: string;
+	// 			type_label: string;
+	// 		}>;
+	//
+	// 		contents = parsed.map((c) => ({
+	// 			language: c.language,
+	// 			name: c.name,
+	// 			type_label: c.type_label,
+	// 		}));
+	// 	} catch {
+	// 		contents = [];
+	// 	}
+	// }
 
 	return {
-		place_type,
-		code: (formData.get('code') as string) || null,
-		parent_id: parentIdRaw ? Number(parentIdRaw) : null,
+		place_type:
+			getFormDataAsEnum(formData, 'type', PlaceTypeEnum) ||
+			PlaceTypeEnum.CITY,
+		code: getFormDataAsString(formData, 'code'),
+		parent_id: getFormDataAsNumber(formData, 'parent_id'),
 		contents,
 	};
 }

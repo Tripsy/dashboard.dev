@@ -5,6 +5,7 @@ export enum CurrencyEnum {
 }
 
 export const CURRENCY_DEFAULT = CurrencyEnum.RON;
+export const VAT_RATE_DEFAULT = 24;
 
 export enum CashFlowDirectionEnum { // relative to company
 	IN = 'in', // money received
@@ -52,27 +53,75 @@ export enum CashFlowStatusEnum {
 
 export enum CashFlowGatewayEnum {
 	DIRECT = 'direct',
-	STRIPE = 'stripe',
-	PAYPAL = 'paypal',
+	// STRIPE = 'stripe',
+	// PAYPAL = 'paypal',
 }
 
 export enum CashFlowMethodEnum {
-	// Card methods
-	CREDIT_CARD = 'credit_card',
-	DEBIT_CARD = 'debit_card',
-
-	// Digital wallets
-	PAYPAL = 'paypal',
+	// // Card methods
+	// CREDIT_CARD = 'credit_card',
+	// DEBIT_CARD = 'debit_card',
+	//
+	// // Digital wallets
+	// PAYPAL = 'paypal',
 
 	// Traditional
 	CASH = 'cash',
 	BANK_TRANSFER = 'bank_transfer',
-	CHECK = 'check',
+	// CHECK = 'check',
 
-	// Other
-	CRYPTO = 'crypto',
-	GIFT_CARD = 'gift_card',
+	// // Other
+	// CRYPTO = 'crypto',
+	// GIFT_CARD = 'gift_card',
 }
+
+export const getExpectedCategoryType = (
+	category: CashFlowCategoryEnum,
+): CashFlowCategoryTypeEnum => {
+	const revenueCategories = [CashFlowCategoryEnum.CUSTOMER];
+	const expenseCategories = [
+		CashFlowCategoryEnum.FUEL,
+		CashFlowCategoryEnum.MAINTENANCE,
+		CashFlowCategoryEnum.TOLLS,
+		CashFlowCategoryEnum.EMPLOYEE_SALARY,
+		CashFlowCategoryEnum.VENDOR,
+		CashFlowCategoryEnum.INSURANCE,
+		CashFlowCategoryEnum.TAXES,
+	];
+	const correctionCategories = [
+		CashFlowCategoryEnum.CORRECTION,
+		CashFlowCategoryEnum.REFUND,
+		CashFlowCategoryEnum.EMPLOYEE_REIMBURSEMENT,
+	];
+
+	if (revenueCategories.includes(category)) {
+		return CashFlowCategoryTypeEnum.REVENUE;
+	}
+
+	if (expenseCategories.includes(category)) {
+		return CashFlowCategoryTypeEnum.EXPENSE;
+	}
+
+	if (correctionCategories.includes(category)) {
+		return CashFlowCategoryTypeEnum.CORRECTION;
+	}
+
+	throw new Error(`Unknown category: ${category}`);
+};
+
+export const getExpectedDirection = (
+	categoryType: CashFlowCategoryTypeEnum,
+): CashFlowDirectionEnum | null => {
+	switch (categoryType) {
+		case CashFlowCategoryTypeEnum.REVENUE:
+			return CashFlowDirectionEnum.IN;
+		case CashFlowCategoryTypeEnum.EXPENSE:
+			return CashFlowDirectionEnum.OUT;
+		case CashFlowCategoryTypeEnum.CORRECTION:
+			// Correction can be both, so no specific direction
+			return null;
+	}
+};
 
 export type CashFlowTracking = {
 	external_reference: string | null;
@@ -125,11 +174,10 @@ export type CashFlowFormValuesType = {
 	category: CashFlowCategoryEnum;
 	method: CashFlowMethodEnum;
 
-	amount: number;
-	vat_rate: number;
+	amount: number | null;
+	vat_rate: number | null;
 
 	currency: CurrencyEnum;
-	exchange_rate: number;
 
 	external_reference: string | null;
 

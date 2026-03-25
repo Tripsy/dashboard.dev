@@ -7,7 +7,10 @@ import {
 import { Configuration } from '@/config/settings.config';
 import { translate } from '@/config/translate.setup';
 import { ApiError } from '@/exceptions/api.error';
-import { accumulateZodErrors } from '@/helpers/form.helper';
+import {
+	accumulateZodErrors,
+	getFormDataAsString,
+} from '@/helpers/form.helper';
 import { isValidCsrfToken } from '@/helpers/session.helper';
 import { deleteAccount } from '@/services/account.service';
 
@@ -15,7 +18,7 @@ export function accountDeleteFormValues(
 	formData: FormData,
 ): AccountDeleteFormFieldsType {
 	return {
-		password_current: formData.get('password_current') as string,
+		password_current: getFormDataAsString(formData, 'password_current'),
 	};
 }
 
@@ -37,10 +40,10 @@ export async function accountDeleteAction(
 		situation: null,
 	};
 
-	// Check CSRF token
-	const csrfToken = formData.get(
+	const csrfToken = getFormDataAsString(
+		formData,
 		Configuration.get('csrf.inputName') as string,
-	) as string;
+	);
 
 	if (!(await isValidCsrfToken(csrfToken))) {
 		return {

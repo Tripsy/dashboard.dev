@@ -3,7 +3,7 @@ import { BaseValidator } from '@/helpers/validator.helper';
 import type { FormSituationType } from '@/types/form.type';
 
 export type EmailUpdateFormFieldsType = {
-	email_new: string;
+	email_new: string | null;
 };
 
 export type EmailUpdateSituationType = FormSituationType | 'csrf_error';
@@ -35,6 +35,5 @@ class EmailUpdateValidator extends BaseValidator<typeof validatorMessages> {
 	});
 }
 
-export const EmailUpdateSchema = new EmailUpdateValidator(
-	validatorMessages,
-).emailUpdate;
+export const EmailUpdateSchema = new EmailUpdateValidator(validatorMessages)
+	.emailUpdate;

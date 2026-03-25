@@ -3,7 +3,7 @@ import { BaseValidator } from '@/helpers/validator.helper';
 import type { FormSituationType } from '@/types/form.type';
 
 export type EmailConfirmSendFormFieldsType = {
-	email: string;
+	email: string | null;
 };
 
 export type EmailConfirmSendSituationType = FormSituationType | 'csrf_error';

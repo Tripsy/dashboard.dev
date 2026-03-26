@@ -5,7 +5,7 @@ import type {
 	ButtonVariant,
 } from '@/components/ui/button';
 import type { ValidateFormFunctionType } from '@/hooks/use-form-validation.hook';
-import type { ApiResponseFetch } from '@/types/api.type';
+import type {ApiResponseFetch, QueryValue} from '@/types/api.type';
 import type { FormSituationType } from '@/types/form.type';
 
 // ============================================================================
@@ -17,7 +17,7 @@ export type FindFunctionParamsType = {
 	direction?: 'ASC' | 'DESC';
 	limit?: number;
 	page?: number;
-	filter?: string;
+	filter?: DataTableFiltersType;
 };
 
 export type FindFunctionResponseType<Model> = {
@@ -126,13 +126,11 @@ export type DataTableSelectionModeType = 'checkbox' | 'multiple' | null;
 
 export type FilterValueType = string | number | boolean | Date | null;
 
-type DataTableBaseFilterType = {
-	value: FilterValueType;
-	matchMode?: 'contains' | 'equals' | 'startsWith' | 'endsWith' | 'gt' | 'lt';
-};
-
 export type DataTableFiltersType = {
-	[key: string]: DataTableBaseFilterType;
+	[key: string]: {
+		value: FilterValueType;
+		matchMode?: 'contains' | 'equals' | 'startsWith' | 'endsWith' | 'gt' | 'lt';
+	};
 };
 
 export type DataTableStateType = {

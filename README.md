@@ -227,6 +227,7 @@ $ pnpm run madge
 - [zod](https://zod.dev) — TypeScript-first schema validation with static type inference
 - [ioredis](https://github.com/luin/ioredis) — Robust Redis client for Node.js
 - [dayjs](https://day.js.org/) — Parses, validates, manipulates, and displays dates and times
+- [TanStack  Query](https://tanstack.com/query/latest) — Powerful asynchronous state management, server-state utilities and data fetching
 
 Dev only:
 

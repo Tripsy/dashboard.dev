@@ -1,3 +1,5 @@
+import {DataTableFiltersType} from "@/config/data-source.config";
+
 export type ApiRequestMode =
 	| 'same-site'
 	| 'use-proxy'
@@ -11,3 +13,12 @@ export type ApiResponseFetch<T> =
 			success: boolean;
 	  }
 	| undefined;
+
+export type QueryValue =
+	| string
+	| number
+	| boolean
+	| null
+	| undefined
+	| Array<string | number | boolean>
+	| DataTableFiltersType;

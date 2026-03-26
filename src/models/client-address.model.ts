@@ -1,5 +1,5 @@
 import type { ClientModel } from '@/models/client.model';
-import type { PlaceModel } from '@/models/place.model';
+import type {CityModel, PlaceModel} from '@/models/place.model';
 
 export enum ClientAddressTypeEnum {
 	BILLING = 'billing',
@@ -23,8 +23,10 @@ export type ClientAddressModel<D = Date | string> = {
 
 export type ClientAddressFormValuesType = Pick<
 	ClientAddressModel,
-	'address_type' | 'city_id' | 'postal_code' | 'notes'
+	'address_type' | 'postal_code' | 'notes'
 > & {
 	client_id: number | null;
+	city_id: number | null;
+	city: string;
 	details: string | null;
 };

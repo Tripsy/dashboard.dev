@@ -1,4 +1,4 @@
-import type { LanguageEnum } from '@/models/user.model';
+import {LANGUAGE_DEFAULT, LanguageEnum} from '@/models/user.model';
 
 export enum PlaceTypeEnum {
 	COUNTRY = 'country',
@@ -21,20 +21,12 @@ export type PlaceContentInput = {
 	type_label: string;
 };
 
-// Place base type without relations
-type PlaceBase<D = Date | string> = {
+// Full place model with relations
+export type PlaceModel<D = Date | string> = {
 	id: number;
 	place_type: PlaceTypeEnum;
-	code: string | null; // Abbreviation
+	code: string | null;
 
-	// Timestamps
-	created_at: D;
-	updated_at: D;
-	deleted_at: D;
-};
-
-// Full place model with relations
-export type PlaceModel<D = Date | string> = PlaceBase<D> & {
 	// Parent relationship
 	parent_id: number | null;
 	parent?: PlaceModel<D> | null;
@@ -44,9 +36,13 @@ export type PlaceModel<D = Date | string> = PlaceBase<D> & {
 
 	// Content translations
 	contents?: PlaceContent[];
+
+	// Timestamps
+	created_at: D;
+	updated_at: D;
+	deleted_at: D;
 };
 
-// Form values type for creating/editing a place
 export type PlaceFormValuesType = {
 	place_type: PlaceTypeEnum;
 	code: string | null;
@@ -75,11 +71,12 @@ export type CityModel<D = Date | string> = PlaceModel<D> & {
 	parent?: PlaceModel<D>; // Parent can be region or country
 };
 
-// Discriminated union for place types (if you need strict type checking)
-export type TypedPlaceModel<D = Date | string> =
-	| CountryModel<D>
-	| RegionModel<D>
-	| CityModel<D>;
+//
+// // Discriminated union for place types (if you need strict type checking)
+// export type TypedPlaceModel<D = Date | string> =
+// 	| CountryModel<D>
+// 	| RegionModel<D>
+// 	| CityModel<D>;
 
 // Type guards
 export const isCountry = <D = Date | string>(
@@ -94,28 +91,51 @@ export const isCity = <D = Date | string>(
 	place: PlaceModel<D>,
 ): place is CityModel<D> => place.place_type === PlaceTypeEnum.CITY;
 
-// Simplified types for lists/tree views
-export type PlaceListItem = Pick<
-	PlaceModel,
-	'id' | 'place_type' | 'code' | 'created_at'
-> & {
-	name?: string;
-};
+// Helpers
+export function getPlaceContentProp(place: PlaceModel, language: LanguageEnum | string, prop: keyof Pick<PlaceContent, 'name' | 'type_label'> = 'name'): string {
+	if (!place.contents)  {
+		return '[unnamed city]';
+	}
 
-// Tree node type for hierarchical selects/tree views
-export type PlaceTreeNode = PlaceListItem & {
-	children?: PlaceTreeNode[];
-	parent_id: number | null;
-};
+	const contentSelected = place.contents.find(c => c.language === language);
 
-// For forms, you might want a type that ensures at least one content
-export type PlaceFormValuesWithContent = PlaceFormValuesType & {
-	contents: [PlaceContentInput, ...PlaceContentInput[]]; // At least one content
-};
+	if (contentSelected) {
+		return contentSelected[prop];
+	}
 
-// Place type display names (for UI)
-export const PLACE_TYPE_LABELS: Record<PlaceTypeEnum, string> = {
-	[PlaceTypeEnum.COUNTRY]: 'Country',
-	[PlaceTypeEnum.REGION]: 'Region',
-	[PlaceTypeEnum.CITY]: 'City',
-};
+	const contentDefault = place.contents.find(c => c.language === LANGUAGE_DEFAULT);
+
+	if (contentDefault) {
+		return contentDefault[prop];
+	}
+
+	const contentFirst = place.contents[0];
+
+	return contentFirst[prop];
+}
+
+// // Simplified types for lists/tree views
+// export type PlaceListItem = Pick<
+// 	PlaceModel,
+// 	'id' | 'place_type' | 'code' | 'created_at'
+// > & {
+// 	name?: string;
+// };
+
+// // Tree node type for hierarchical selects/tree views
+// export type PlaceTreeNode = PlaceListItem & {
+// 	children?: PlaceTreeNode[];
+// 	parent_id: number | null;
+// };
+//
+// // For forms, you might want a type that ensures at least one content
+// export type PlaceFormValuesWithContent = PlaceFormValuesType & {
+// 	contents: [PlaceContentInput, ...PlaceContentInput[]]; // At least one content
+// };
+//
+// // Place type display names (for UI)
+// export const PLACE_TYPE_LABELS: Record<PlaceTypeEnum, string> = {
+// 	[PlaceTypeEnum.COUNTRY]: 'Country',
+// 	[PlaceTypeEnum.REGION]: 'Region',
+// 	[PlaceTypeEnum.CITY]: 'City',
+// };

@@ -579,7 +579,7 @@ export const FormComponentCalendar = <Fields,>({
 	);
 };
 
-export const FormComponentAutoComplete = <Fields,>({
+export const FormComponentAutoComplete = <Fields, T,>({
 	labelText,
 	id,
 	fieldName,
@@ -590,17 +590,22 @@ export const FormComponentAutoComplete = <Fields,>({
 	disabled,
 	error,
 	icons,
-	onChange,
+	onInputChange,
 	autoCompleteProps,
 }: Omit<
 	FormComponentProps<Fields, InputValueType>,
 	'fieldType' | 'autoComplete' | 'onChange' | 'icons'
 > & {
 	icons?: { left?: JSX.Element };
-	onChange?: (value: string) => void;
+	onInputChange?: (value: string) => void;
 	autoCompleteProps: {
-		suggestions: string[];
+		suggestions: T[];
 		onSearch: (query: string) => void;
+		onSelect?: (item: T) => void;
+
+		getOptionLabel: (item: T) => string;
+		getOptionKey?: (item: T) => string | number;
+
 		debounceMs?: number;
 		minQueryLength: number;
 		maxSuggestions?: number;
@@ -610,16 +615,17 @@ export const FormComponentAutoComplete = <Fields,>({
 	const [isOpen, setIsOpen] = useState(false);
 	const [inputValue, setInputValue] = useState(fieldValue ?? '');
 	const [highlightedIndex, setHighlightedIndex] = useState(-1);
+
 	const wrapperRef = useRef<HTMLDivElement>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
 	const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-	// Update input value when prop changes
+	// Sync external value
 	useEffect(() => {
 		setInputValue(fieldValue ?? '');
 	}, [fieldValue]);
 
-	// Handle click outside
+	// Click outside
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
 			if (
@@ -631,7 +637,6 @@ export const FormComponentAutoComplete = <Fields,>({
 		};
 
 		document.addEventListener('mousedown', handleClickOutside);
-
 		return () =>
 			document.removeEventListener('mousedown', handleClickOutside);
 	}, []);
@@ -654,22 +659,21 @@ export const FormComponentAutoComplete = <Fields,>({
 
 	const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const newValue = e.target.value;
-		setInputValue(newValue);
 
-		if (onChange) {
-			onChange(newValue);
-		}
+		setInputValue(newValue);
+		onInputChange?.(newValue);
 
 		setIsOpen(true);
 		setHighlightedIndex(-1);
 		debouncedSearch(newValue);
 	};
 
-	const handleSuggestionClick = (suggestion: string) => {
-		setInputValue(suggestion);
-		if (onChange) {
-			onChange(suggestion);
-		}
+	const handleSuggestionClick = (item: T) => {
+		const label = autoCompleteProps.getOptionLabel(item);
+
+		setInputValue(label);
+		autoCompleteProps.onSelect?.(item);
+
 		setIsOpen(false);
 		setHighlightedIndex(-1);
 	};
@@ -694,23 +698,25 @@ export const FormComponentAutoComplete = <Fields,>({
 					prev < suggestionsList.length - 1 ? prev + 1 : prev,
 				);
 				break;
+
 			case 'ArrowUp':
 				e.preventDefault();
 				setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : -1));
 				break;
+
 			case 'Enter':
 				e.preventDefault();
 				if (
 					highlightedIndex >= 0 &&
 					highlightedIndex < suggestionsList.length
 				) {
-					handleSuggestionClick(suggestionsList[highlightedIndex]);
+					handleSuggestionClick(
+						suggestionsList[highlightedIndex],
+					);
 				}
 				break;
+
 			case 'Escape':
-				setIsOpen(false);
-				setHighlightedIndex(-1);
-				break;
 			case 'Tab':
 				setIsOpen(false);
 				setHighlightedIndex(-1);
@@ -720,16 +726,15 @@ export const FormComponentAutoComplete = <Fields,>({
 
 	const handleClear = () => {
 		setInputValue('');
-
-		if (onChange) {
-			onChange('');
-		}
-
+		onInputChange?.('');
 		inputRef.current?.focus();
 	};
 
 	const shouldShowDropdown =
-		isOpen && autoCompleteProps.suggestions.length > 0 && !disabled;
+		isOpen &&
+		autoCompleteProps.suggestions.length > 0 &&
+		!disabled;
+
 	const displayedSuggestions = autoCompleteProps.suggestions.slice(
 		0,
 		autoCompleteProps.maxSuggestions || 99,
@@ -768,13 +773,12 @@ export const FormComponentAutoComplete = <Fields,>({
 							}
 						/>
 
-						{/* Clear button */}
 						{inputValue && !disabled && (
 							<FormElementIcon position="right">
 								<button
 									type="button"
 									onClick={handleClear}
-									className="cursor-pointer focus:outline-none hover:opacity-100 transition-opacity"
+									className="cursor-pointer"
 								>
 									<Icons.Clear className="h-4.5 w-4.5 text-muted-foreground hover:text-foreground" />
 								</button>
@@ -783,37 +787,41 @@ export const FormComponentAutoComplete = <Fields,>({
 					</div>
 				</FormElementWrapper>
 
-				{/* Dropdown */}
 				{shouldShowDropdown && (
 					<ul className="absolute z-50 w-full mt-1 max-h-60 overflow-auto bg-popover border border-border rounded-md shadow-lg">
-						{displayedSuggestions.map((suggestion) => (
-							<li key={suggestion} className="list-none">
-								<button
-									type="button"
-									onClick={() =>
-										handleSuggestionClick(suggestion)
-									}
-									onMouseEnter={() =>
-										setHighlightedIndex(
-											displayedSuggestions.indexOf(
-												suggestion,
-											),
-										)
-									}
-									className={cn(
-										'w-full px-3 py-2 text-sm text-left cursor-pointer',
-										'hover:bg-accent hover:text-accent-foreground',
-										'focus:bg-accent focus:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-inset',
-										displayedSuggestions.indexOf(
-											suggestion,
-										) === highlightedIndex &&
+						{displayedSuggestions.map((item, index) => {
+							const label =
+								autoCompleteProps.getOptionLabel(item);
+							const key =
+								autoCompleteProps.getOptionKey?.(item) ??
+								label;
+
+							const isHighlighted =
+								index === highlightedIndex;
+
+							return (
+								<li key={key} className="list-none">
+									<button
+										type="button"
+										onClick={() =>
+											handleSuggestionClick(item)
+										}
+										onMouseEnter={() =>
+											setHighlightedIndex(index)
+										}
+										className={cn(
+											'w-full px-3 py-2 text-sm text-left',
+											'hover:bg-accent hover:text-accent-foreground',
+											'focus:bg-accent focus:text-accent-foreground',
+											isHighlighted &&
 											'bg-accent text-accent-foreground',
-									)}
-								>
-									{suggestion}
-								</button>
-							</li>
-						))}
+										)}
+									>
+										{label}
+									</button>
+								</li>
+							);
+						})}
 					</ul>
 				)}
 			</div>

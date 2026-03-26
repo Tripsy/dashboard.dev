@@ -159,12 +159,12 @@ export const dataSourceConfigClientAddress = {
 		dataSource: 'client-address' as const,
 		id: undefined,
 		values: {
-			client_id: null,
-			address_type: ClientAddressTypeEnum.BILLING,
-			city_id: null,
-			details: '',
-			postal_code: '',
-			notes: '',
+			client_id: null, // TODO
+			address_type: ClientAddressTypeEnum.DELIVERY,
+			city_id: null, // TODO
+			details: null,
+			postal_code: null,
+			notes: null,
 		},
 		errors: {},
 		message: null,

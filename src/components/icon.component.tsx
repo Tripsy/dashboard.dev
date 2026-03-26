@@ -2,7 +2,7 @@ import {
 	ArchiveRestore,
 	Ban,
 	Banknote,
-	BookText,
+	BookText, Building2,
 	Calendar,
 	CircleAlert,
 	CircleCheck,
@@ -92,6 +92,7 @@ export const Icons = {
 	Plus: (props: IconProps) => <Plus {...props} />,
 	Minus: (props: IconProps) => <Minus {...props} />,
 	TextSearch: (props: IconProps) => <TextSearch {...props} />,
+	City: (props: IconProps) => <Building2 {...props} />,
 
 	Status: {
 		Active: (props: IconProps) => <CircleCheck {...props} />,

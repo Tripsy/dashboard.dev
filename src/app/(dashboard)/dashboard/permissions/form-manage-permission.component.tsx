@@ -32,7 +32,7 @@ export function FormManagePermission({
 
 	return (
 		<>
-			<FormComponentAutoComplete<PermissionFormValuesType>
+			<FormComponentAutoComplete<PermissionFormValuesType, string>
 				labelText="Entity"
 				id={elementIds.entity}
 				fieldName="entity"
@@ -41,12 +41,13 @@ export function FormManagePermission({
 				isRequired={true}
 				disabled={pending}
 				error={errors.entity}
-				onChange={(value) => handleChange('entity', value)}
+				onInputChange={(value: string | null) => handleChange('entity', value)}
 				autoCompleteProps={{
 					suggestions: entityAutocomplete.suggestions,
 					onSearch: entityAutocomplete.onSearch,
 					minQueryLength: 2,
 					dropdown: false,
+					getOptionLabel: (item) => item,
 				}}
 				icons={{
 					left: (
@@ -55,7 +56,7 @@ export function FormManagePermission({
 				}}
 			/>
 
-			<FormComponentAutoComplete<PermissionFormValuesType>
+			<FormComponentAutoComplete<PermissionFormValuesType, string>
 				labelText="Operation"
 				id={elementIds.operation}
 				fieldName="operation"
@@ -64,12 +65,13 @@ export function FormManagePermission({
 				isRequired={true}
 				disabled={pending}
 				error={errors.operation}
-				onChange={(value) => handleChange('operation', value)}
+				onInputChange={(value: string | null) => handleChange('operation', value)}
 				autoCompleteProps={{
 					suggestions: operationAutocomplete.suggestions,
 					onSearch: operationAutocomplete.onSearch,
 					minQueryLength: 2,
 					dropdown: false,
+					getOptionLabel: (item) => item,
 				}}
 				icons={{
 					left: (

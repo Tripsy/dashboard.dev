@@ -17,7 +17,6 @@ import {
 	type FindFunctionResponseType,
 	getDataSourceConfig,
 } from '@/config/data-source.config';
-import { toDateInstanceCustom } from '@/helpers/date.helper';
 import { replaceVars } from '@/helpers/string.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 
@@ -101,65 +100,65 @@ export default function DataTableList<Model extends DataTableValue>(props: {
 		});
 	}, [clearSelectedEntries, updateTableState, tableState.filters]);
 
-	const findFunctionFilter = useMemo(() => {
-		// Type guard to ensure filters is a proper object
-		if (
-			!tableState.filters ||
-			typeof tableState.filters !== 'object' ||
-			Array.isArray(tableState.filters)
-		) {
-			return JSON.stringify({});
-		}
-
-		const params = Object.entries(
-			tableState.filters as Record<string, unknown>,
-		).reduce(
-			(acc, [key, filterObj]) => {
-				// Additional type check for filterObj
-				if (
-					!filterObj ||
-					typeof filterObj !== 'object' ||
-					Array.isArray(filterObj)
-				) {
-					return acc;
-				}
-
-				const value = (filterObj as { value?: unknown }).value;
-
-				// Skip empty or null values
-				if (value == null || value === '') {
-					return acc;
-				}
-
-				// Handle date filters
-				if (/_date_start$/.test(key)) {
-					const date = toDateInstanceCustom(value as string);
-
-					if (!date) {
-						throw new Error(`Invalid start date: ${value}`);
-					}
-
-					acc[key] = date.startOf('day').toISOString();
-				} else if (/_date_end$/.test(key)) {
-					const date = toDateInstanceCustom(value as string);
-
-					if (!date) {
-						throw new Error(`Invalid start date: ${value}`);
-					}
-
-					acc[key] = date.endOf('day').toISOString();
-				} else {
-					acc[key === 'global' ? 'term' : String(key)] =
-						String(value);
-				}
-
-				return acc;
-			},
-			{} as Record<string, string>,
-		);
-
-		return JSON.stringify(params);
-	}, [tableState.filters]);
+	// const findFunctionFilter = useMemo(() => {
+	// 	// Type guard to ensure filters is a proper object
+	// 	if (
+	// 		!tableState.filters ||
+	// 		typeof tableState.filters !== 'object' ||
+	// 		Array.isArray(tableState.filters)
+	// 	) {
+	// 		return JSON.stringify({});
+	// 	}
+	//
+	// 	const params = Object.entries(
+	// 		tableState.filters as Record<string, unknown>,
+	// 	).reduce(
+	// 		(acc, [key, filterObj]) => {
+	// 			// Additional type check for filterObj
+	// 			if (
+	// 				!filterObj ||
+	// 				typeof filterObj !== 'object' ||
+	// 				Array.isArray(filterObj)
+	// 			) {
+	// 				return acc;
+	// 			}
+	//
+	// 			const value = (filterObj as { value?: unknown }).value;
+	//
+	// 			// Skip empty or null values
+	// 			if (value == null || value === '') {
+	// 				return acc;
+	// 			}
+	//
+	// 			// Handle date filters
+	// 			if (/_date_start$/.test(key)) {
+	// 				const date = toDateInstanceCustom(value as string);
+	//
+	// 				if (!date) {
+	// 					throw new Error(`Invalid start date: ${value}`);
+	// 				}
+	//
+	// 				acc[key] = date.startOf('day').toISOString();
+	// 			} else if (/_date_end$/.test(key)) {
+	// 				const date = toDateInstanceCustom(value as string);
+	//
+	// 				if (!date) {
+	// 					throw new Error(`Invalid start date: ${value}`);
+	// 				}
+	//
+	// 				acc[key] = date.endOf('day').toISOString();
+	// 			} else {
+	// 				acc[key === 'global' ? 'term' : String(key)] =
+	// 					String(value);
+	// 			}
+	//
+	// 			return acc;
+	// 		},
+	// 		{} as Record<string, string>,
+	// 	);
+	//
+	// 	return JSON.stringify(params);
+	// }, [tableState.filters]);
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: `tableState.reloadTrigger` is actually required as part of functionality
 	useEffect(() => {
@@ -196,7 +195,8 @@ export default function DataTableList<Model extends DataTableValue>(props: {
 										tableState.first / tableState.rows,
 									) + 1
 								: 1,
-						filter: findFunctionFilter,
+						filter: tableState.filters,
+						// filter: findFunctionFilter,
 					})) as FindFunctionResponseType<Model>;
 
 					if (signal?.aborted) {
@@ -238,7 +238,7 @@ export default function DataTableList<Model extends DataTableValue>(props: {
 		tableState.sortOrder,
 		tableState.rows,
 		tableState.first,
-		findFunctionFilter,
+		// findFunctionFilter,
 		setLoading,
 		tableState.reloadTrigger,
 	]);

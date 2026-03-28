@@ -1,20 +1,34 @@
+import { useMutation } from '@tanstack/react-query';
+import { useState } from 'react';
 import {
 	FormComponentAutoComplete,
 	FormComponentInput,
-	FormComponentRadio
+	FormComponentRadio,
 } from '@/components/form/form-element.component';
+import { Icons } from '@/components/icon.component';
 import type { FormManageType } from '@/config/data-source.config';
+import { getLanguage } from '@/config/translate.setup';
+import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
+import { useRemoteAutocomplete } from '@/hooks/use-remote-autocomplete';
+import {
+	type ClientModel,
+	ClientTypeEnum,
+	getClientDisplayName,
+} from '@/models/client.model';
 import {
 	type ClientAddressFormValuesType,
 	ClientAddressTypeEnum,
 } from '@/models/client-address.model';
-import {toOptionsFromEnum} from "@/helpers/form.helper";
-import {Icons} from "@/components/icon.component";
-import {CityModel, getPlaceContentProp} from "@/models/place.model";
-import {getLanguage} from "@/config/translate.setup";
-import {useState} from "react";
+import {
+	CITY_DEFAULT,
+	getPlaceContentProp,
+	type PlaceModel,
+	PlaceTypeEnum,
+} from '@/models/place.model';
+import { createClient, findClients } from '@/services/clients.service';
+import { createPlace, findPlaces } from '@/services/places.service';
 
 const language = await getLanguage();
 const addressTypes = toOptionsFromEnum(ClientAddressTypeEnum, {
@@ -29,14 +43,80 @@ export function FormManageClientAddress({
 }: FormManageType<ClientAddressFormValuesType>) {
 	const elementIds = useElementIds([
 		'address_type',
+		'client',
 		'city',
 		'details',
 		'postal_code',
 		'notes',
 	] as const);
 
-	const [cities, setCities] = useState<CityModel[]>([])
-	const fetchCities = async (query: string) => { ... }
+	const [searchCity, setSearchCity] = useState('');
+
+	const { suggestions: cities, isFetching: isCityLoading } =
+		useRemoteAutocomplete<PlaceModel>({
+			query: searchCity,
+			queryKey: ['cities'],
+			queryFn: async (q) => {
+				const res = await findPlaces({
+					filter: { term: q, place_type: PlaceTypeEnum.CITY },
+					limit: 10,
+				});
+
+				return res?.entries ?? [];
+			},
+			minLength: 3,
+		});
+
+	const createCityMutation = useMutation({
+		mutationFn: async (name: string) => {
+			const res = await createPlace({
+				...CITY_DEFAULT,
+				contents: [
+					{
+						...CITY_DEFAULT.contents[0],
+						language,
+						name,
+					},
+				],
+			});
+
+			return res?.data;
+		},
+	});
+
+	const [searchClient, setSearchClient] = useState('');
+
+	const { suggestions: clients, isFetching: isClientLoading } =
+		useRemoteAutocomplete<ClientModel>({
+			query: searchClient,
+			queryKey: ['clients'],
+			queryFn: async (q) => {
+				const res = await findClients({
+					filter: { term: q },
+					limit: 10,
+				});
+
+				return res?.entries ?? [];
+			},
+			minLength: 3,
+		});
+
+	// const createClientMutation = useMutation({
+	// 	mutationFn: async (name: string) => {
+	// 		const res = await createClient({
+	// 			client_type: ClientTypeEnum.COMPANY,
+	// 			company_name: name,
+	// 			bank_name: null,
+	// 			contact_email: null,
+	// 			contact_name: null,
+	// 			contact_phone: null,
+	// 			iban: null,
+	// 			notes: 'Added via client-address',
+	// 		});
+	//
+	// 		return res?.data;
+	// 	},
+	// });
 
 	return (
 		<>
@@ -53,33 +133,65 @@ export function FormManageClientAddress({
 				error={errors.address_type}
 			/>
 
-			{/*<FormComponentAutoComplete<ClientAddressFormValuesType>*/}
-			{/*	labelText="Client"*/}
-			{/*	id={elementIds.client}*/}
-			{/*	fieldName="client"*/}
-			{/*	fieldValue={formValues.client ?? ''}*/}
-			{/*	className="pl-8"*/}
-			{/*	isRequired={true}*/}
-			{/*	disabled={pending}*/}
-			{/*	onChange={(value) => handleChange('client', value)}*/}
-			{/*	error={errors.client}*/}
-			{/*	autoCompleteProps={{*/}
-			{/*		suggestions: [],*/}
-			{/*		onSearch: function (query: string): void {*/}
-			{/*			throw new Error("Function not implemented.");*/}
-			{/*		},*/}
-			{/*		minQueryLength: 3,*/}
-			{/*		maxSuggestions: 10,*/}
-			{/*		dropdown: false*/}
-			{/*	}}*/}
-			{/*	icons={{*/}
-			{/*		left: (*/}
-			{/*			<Icons.TextSearch className="opacity-40 h-4.5 w-4.5" />*/}
-			{/*		),*/}
-			{/*	}}*/}
-			{/*/>*/}
+			<FormComponentAutoComplete<ClientAddressFormValuesType, ClientModel>
+				labelText="Client"
+				id={elementIds.client}
+				fieldName="client"
+				fieldValue={formValues.client ?? ''}
+				className="pl-8"
+				isRequired={true}
+				disabled={pending}
+				error={errors.client}
+				onInputChange={(value) => {
+					handleChange('client', value);
+					handleChange('client_id', null);
+					setSearchClient(value);
+				}}
+				autoCompleteProps={{
+					suggestions: clients,
+					isLoading: isClientLoading,
+					onSelect: (c) => {
+						handleChange('client', getClientDisplayName(c));
+						handleChange('client_id', c.id);
+					},
+					getOptionLabel: (c) => getClientDisplayName(c),
+					getOptionKey: (c) => c.id,
 
-			<FormComponentAutoComplete<ClientAddressFormValuesType, CityModel>
+					allowCreate: true,
+
+					onCreate: async (value) => {
+						const event = new CustomEvent('useDataTableAction', {
+							detail: {
+								source: 'something',
+								actionName: 'createClient',
+								entry: {
+									client_type: ClientTypeEnum.COMPANY,
+									company_name: value,
+									person_name: value,
+								},
+							},
+						});
+
+						window.dispatchEvent(event);
+
+						// const newClient = await createClientMutation.mutateAsync(value);
+						//
+						// if (!newClient) {
+						// 	return;
+						// }
+						//
+						// handleChange('client', value);
+						// handleChange('client_id', newClient.id as number);
+					},
+
+					createLabel: (value) => `Create client "${value}"`,
+				}}
+				icons={{
+					left: <Icons.Client className="opacity-40 h-4.5 w-4.5" />,
+				}}
+			/>
+
+			<FormComponentAutoComplete<ClientAddressFormValuesType, PlaceModel>
 				labelText="City"
 				id={elementIds.city}
 				fieldName="city"
@@ -87,28 +199,40 @@ export function FormManageClientAddress({
 				className="pl-8"
 				isRequired={false}
 				disabled={pending}
+				error={errors.city}
 				onInputChange={(value) => {
 					handleChange('city', value);
 					handleChange('city_id', null);
+					setSearchCity(value);
 				}}
-				error={errors.city}
 				autoCompleteProps={{
 					suggestions: cities,
-					onSearch: fetchCities,
+					isLoading: isCityLoading,
 					onSelect: (c) => {
 						handleChange('city', getPlaceContentProp(c, language));
 						handleChange('city_id', c.id);
 					},
 					getOptionLabel: (c) => getPlaceContentProp(c, language),
 					getOptionKey: (c) => c.id,
-					minQueryLength: 3,
-					maxSuggestions: 10,
-					dropdown: false
+
+					allowCreate: true,
+
+					onCreate: async (value) => {
+						const newCity =
+							await createCityMutation.mutateAsync(value);
+
+						if (!newCity) {
+							return;
+						}
+
+						handleChange('city', value);
+						handleChange('city_id', newCity.id as number);
+					},
+
+					createLabel: (value) => `Create city "${value}"`,
 				}}
 				icons={{
-					left: (
-						<Icons.City className="opacity-40 h-4.5 w-4.5" />
-					),
+					left: <Icons.City className="opacity-40 h-4.5 w-4.5" />,
 				}}
 			/>
 

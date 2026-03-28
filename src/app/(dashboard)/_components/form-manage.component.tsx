@@ -188,7 +188,10 @@ export function FormManage<
 		successMessageKey,
 	]);
 
-	const ActionButtonIcon = getActionIcon(actionName);
+	const ActionButtonIcon = getActionIcon(
+		actions[actionName as keyof typeof actions]?.buttonProps?.icon ||
+			actionName,
+	);
 
 	const injectedChild = isValidElement(children)
 		? cloneElement(children, {

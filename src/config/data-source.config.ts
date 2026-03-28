@@ -5,7 +5,7 @@ import type {
 	ButtonVariant,
 } from '@/components/ui/button';
 import type { ValidateFormFunctionType } from '@/hooks/use-form-validation.hook';
-import type {ApiResponseFetch, QueryValue} from '@/types/api.type';
+import type { ApiResponseFetch, QueryFiltersType } from '@/types/api.type';
 import type { FormSituationType } from '@/types/form.type';
 
 // ============================================================================
@@ -17,7 +17,7 @@ export type FindFunctionParamsType = {
 	direction?: 'ASC' | 'DESC';
 	limit?: number;
 	page?: number;
-	filter?: DataTableFiltersType;
+	filter?: QueryFiltersType;
 };
 
 export type FindFunctionResponseType<Model> = {
@@ -105,6 +105,7 @@ export type DataTableActionButtonPropsType = {
 	variant?: ButtonVariant;
 	size?: ButtonSize;
 	hover?: ButtonHover;
+	icon?: string;
 };
 
 export type DataTableActionConfigType<Model, Function> = {
@@ -124,12 +125,16 @@ export type DataTableActionConfigType<Model, Function> = {
 
 export type DataTableSelectionModeType = 'checkbox' | 'multiple' | null;
 
-export type FilterValueType = string | number | boolean | Date | null;
-
 export type DataTableFiltersType = {
 	[key: string]: {
-		value: FilterValueType;
-		matchMode?: 'contains' | 'equals' | 'startsWith' | 'endsWith' | 'gt' | 'lt';
+		value: string | number | boolean | Date | null;
+		matchMode:
+			| 'contains'
+			| 'equals'
+			| 'startsWith'
+			| 'endsWith'
+			| 'gt'
+			| 'lt';
 	};
 };
 

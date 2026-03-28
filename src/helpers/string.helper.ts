@@ -1,7 +1,3 @@
-import {toDateInstanceCustom} from "@/helpers/date.helper";
-import {QueryValue} from "@/types/api.type";
-import {DataTableFiltersType} from "@/config/data-source.config";
-
 export function capitalizeFirstLetter(str: string): string {
 	return str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
 }
@@ -84,83 +80,6 @@ export function replaceVars(
 		key in vars ? vars[key] : `{{${key}}}`,
 	);
 }
-
-
-const prepareQueryFilter = (filter: DataTableFiltersType): Record<string, QueryValue> => {
-	return Object.entries(filter).reduce(
-		(acc, [key, entry]) => {
-			if (entry.value === null || entry.value === '' || entry.value === undefined) {
-				return acc;
-			}
-
-			// Handle date filters
-			if (/_date_start$/.test(key)) {
-				const date = toDateInstanceCustom(entry.value as string);
-
-				if (!date) {
-					throw new Error(`Invalid start date: ${entry.value}`);
-				}
-
-				acc[key] = date.startOf('day').toISOString();
-			} else if (/_date_end$/.test(key)) {
-				const date = toDateInstanceCustom(entry.value as string);
-
-				if (!date) {
-					throw new Error(`Invalid start date: ${entry.value}`);
-				}
-
-				acc[key] = date.endOf('day').toISOString();
-			} else {
-				acc[key === 'global' ? 'term' : key] = String(entry.value);
-			}
-
-			return acc;
-		},
-		{} as Record<string, QueryValue>,
-	);
-}
-
-/**
- * Build a query string from an object
- *
- * @param {Record<string, string | number | boolean | undefined | null>} params - The object to build the query string from
- * @returns {string} - The query string
- */
-export const buildQueryString = (
-	params: Record<string, QueryValue>,
-): string => {
-	const query = new URLSearchParams();
-
-	Object.entries(params).forEach(([key, value]) => {
-		if (value === undefined || value === null) {
-			return;
-		}
-
-		if (Array.isArray(value)) {
-			value.forEach((v) => {
-				query.append(key, String(v));
-			});
-			return;
-		}
-
-		if (typeof value === 'object') {
-			if (key === 'filter') {
-				const queryFilter = prepareQueryFilter(value);
-
-				Object.entries(queryFilter).forEach(([filterKey, filterValue]) => {
-					query.append(`filter[${filterKey}]`, String(filterValue));
-				});
-			}
-
-			console.warn(`Skipping object param "${key}" in query`);
-			return;
-		}
-
-		query.append(key, String(value));
-	});
-
-	return query.toString();
-};
 
 export function parseJson(val: unknown) {
 	if (typeof val === 'string') {

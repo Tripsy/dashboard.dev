@@ -1,4 +1,4 @@
-import {LANGUAGE_DEFAULT, LanguageEnum} from '@/models/user.model';
+import { LANGUAGE_DEFAULT, type LanguageEnum } from '@/models/user.model';
 
 export enum PlaceTypeEnum {
 	COUNTRY = 'country',
@@ -78,32 +78,38 @@ export type CityModel<D = Date | string> = PlaceModel<D> & {
 // 	| RegionModel<D>
 // 	| CityModel<D>;
 
-// Type guards
-export const isCountry = <D = Date | string>(
-	place: PlaceModel<D>,
-): place is CountryModel<D> => place.place_type === PlaceTypeEnum.COUNTRY;
-
-export const isRegion = <D = Date | string>(
-	place: PlaceModel<D>,
-): place is RegionModel<D> => place.place_type === PlaceTypeEnum.REGION;
-
-export const isCity = <D = Date | string>(
-	place: PlaceModel<D>,
-): place is CityModel<D> => place.place_type === PlaceTypeEnum.CITY;
+// // Type guards
+// export const isCountry = <D = Date | string>(
+// 	place: PlaceModel<D>,
+// ): place is CountryModel<D> => place.place_type === PlaceTypeEnum.COUNTRY;
+//
+// export const isRegion = <D = Date | string>(
+// 	place: PlaceModel<D>,
+// ): place is RegionModel<D> => place.place_type === PlaceTypeEnum.REGION;
+//
+// export const isCity = <D = Date | string>(
+// 	place: PlaceModel<D>,
+// ): place is CityModel<D> => place.place_type === PlaceTypeEnum.CITY;
 
 // Helpers
-export function getPlaceContentProp(place: PlaceModel, language: LanguageEnum | string, prop: keyof Pick<PlaceContent, 'name' | 'type_label'> = 'name'): string {
-	if (!place.contents)  {
+export function getPlaceContentProp(
+	place: PlaceModel,
+	language: LanguageEnum | string,
+	prop: keyof Pick<PlaceContent, 'name' | 'type_label'> = 'name',
+): string {
+	if (!place.contents) {
 		return '[unnamed city]';
 	}
 
-	const contentSelected = place.contents.find(c => c.language === language);
+	const contentSelected = place.contents.find((c) => c.language === language);
 
 	if (contentSelected) {
 		return contentSelected[prop];
 	}
 
-	const contentDefault = place.contents.find(c => c.language === LANGUAGE_DEFAULT);
+	const contentDefault = place.contents.find(
+		(c) => c.language === LANGUAGE_DEFAULT,
+	);
 
 	if (contentDefault) {
 		return contentDefault[prop];
@@ -113,6 +119,18 @@ export function getPlaceContentProp(place: PlaceModel, language: LanguageEnum | 
 
 	return contentFirst[prop];
 }
+
+export const CITY_DEFAULT = {
+	code: null,
+	parent_id: null,
+	place_type: PlaceTypeEnum.CITY,
+	contents: [
+		{
+			language: LANGUAGE_DEFAULT,
+			type_label: PlaceTypeEnum.CITY.toLowerCase(),
+		},
+	],
+};
 
 // // Simplified types for lists/tree views
 // export type PlaceListItem = Pick<

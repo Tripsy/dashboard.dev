@@ -579,7 +579,7 @@ export const FormComponentCalendar = <Fields,>({
 	);
 };
 
-export const FormComponentAutoComplete = <Fields, T,>({
+export const FormComponentAutoComplete = <Fields, T>({
 	labelText,
 	id,
 	fieldName,
@@ -600,16 +600,20 @@ export const FormComponentAutoComplete = <Fields, T,>({
 	onInputChange?: (value: string) => void;
 	autoCompleteProps: {
 		suggestions: T[];
-		onSearch: (query: string) => void;
 		onSelect?: (item: T) => void;
 
 		getOptionLabel: (item: T) => string;
 		getOptionKey?: (item: T) => string | number;
 
-		debounceMs?: number;
-		minQueryLength: number;
 		maxSuggestions?: number;
-		dropdown?: boolean;
+
+		isLoading?: boolean;
+		emptyMessage?: string;
+		loadingMessage?: string;
+
+		allowCreate?: boolean;
+		onCreate?: (value: string) => void;
+		createLabel?: (value: string) => string;
 	};
 }) => {
 	const [isOpen, setIsOpen] = useState(false);
@@ -618,7 +622,6 @@ export const FormComponentAutoComplete = <Fields, T,>({
 
 	const wrapperRef = useRef<HTMLDivElement>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
-	const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
 	// Sync external value
 	useEffect(() => {
@@ -641,22 +644,6 @@ export const FormComponentAutoComplete = <Fields, T,>({
 			document.removeEventListener('mousedown', handleClickOutside);
 	}, []);
 
-	// Debounced search
-	const debouncedSearch = useCallback(
-		(query: string) => {
-			if (debounceTimerRef.current) {
-				clearTimeout(debounceTimerRef.current);
-			}
-
-			debounceTimerRef.current = setTimeout(() => {
-				if (query.length >= autoCompleteProps.minQueryLength) {
-					autoCompleteProps.onSearch(query);
-				}
-			}, autoCompleteProps.debounceMs || 300);
-		},
-		[autoCompleteProps],
-	);
-
 	const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const newValue = e.target.value;
 
@@ -665,7 +652,6 @@ export const FormComponentAutoComplete = <Fields, T,>({
 
 		setIsOpen(true);
 		setHighlightedIndex(-1);
-		debouncedSearch(newValue);
 	};
 
 	const handleSuggestionClick = (item: T) => {
@@ -710,9 +696,7 @@ export const FormComponentAutoComplete = <Fields, T,>({
 					highlightedIndex >= 0 &&
 					highlightedIndex < suggestionsList.length
 				) {
-					handleSuggestionClick(
-						suggestionsList[highlightedIndex],
-					);
+					handleSuggestionClick(suggestionsList[highlightedIndex]);
 				}
 				break;
 
@@ -730,10 +714,7 @@ export const FormComponentAutoComplete = <Fields, T,>({
 		inputRef.current?.focus();
 	};
 
-	const shouldShowDropdown =
-		isOpen &&
-		autoCompleteProps.suggestions.length > 0 &&
-		!disabled;
+	const shouldShowDropdown = isOpen && !disabled && inputValue.length > 0;
 
 	const displayedSuggestions = autoCompleteProps.suggestions.slice(
 		0,
@@ -741,6 +722,18 @@ export const FormComponentAutoComplete = <Fields, T,>({
 	);
 
 	const { borderClass } = useFieldState({ value: fieldValue, error });
+
+	const isLoading = autoCompleteProps.isLoading;
+	const isEmpty =
+		!isLoading &&
+		displayedSuggestions.length === 0 &&
+		!autoCompleteProps.allowCreate;
+
+	const canCreate =
+		autoCompleteProps.allowCreate &&
+		!isLoading &&
+		inputValue.trim().length > 0 &&
+		displayedSuggestions.length === 0;
 
 	return (
 		<FormElement
@@ -768,9 +761,6 @@ export const FormComponentAutoComplete = <Fields, T,>({
 							aria-invalid={!!error}
 							onChange={handleOnChange}
 							onKeyDown={handleKeyDown}
-							onFocus={() =>
-								setIsOpen(autoCompleteProps.dropdown ?? false)
-							}
 						/>
 
 						{inputValue && !disabled && (
@@ -789,39 +779,75 @@ export const FormComponentAutoComplete = <Fields, T,>({
 
 				{shouldShowDropdown && (
 					<ul className="absolute z-50 w-full mt-1 max-h-60 overflow-auto bg-popover border border-border rounded-md shadow-lg">
-						{displayedSuggestions.map((item, index) => {
-							const label =
-								autoCompleteProps.getOptionLabel(item);
-							const key =
-								autoCompleteProps.getOptionKey?.(item) ??
-								label;
+						{/* Loading */}
+						{isLoading && (
+							<li className="px-3 py-2 text-sm text-muted-foreground">
+								{autoCompleteProps.loadingMessage ??
+									'Searching...'}
+							</li>
+						)}
 
-							const isHighlighted =
-								index === highlightedIndex;
+						{/* Empty */}
+						{isEmpty && (
+							<li className="px-3 py-2 text-sm text-muted-foreground">
+								{autoCompleteProps.emptyMessage ?? 'No results'}
+							</li>
+						)}
 
-							return (
-								<li key={key} className="list-none">
-									<button
-										type="button"
-										onClick={() =>
-											handleSuggestionClick(item)
-										}
-										onMouseEnter={() =>
-											setHighlightedIndex(index)
-										}
-										className={cn(
-											'w-full px-3 py-2 text-sm text-left',
-											'hover:bg-accent hover:text-accent-foreground',
-											'focus:bg-accent focus:text-accent-foreground',
-											isHighlighted &&
-											'bg-accent text-accent-foreground',
-										)}
-									>
-										{label}
-									</button>
-								</li>
-							);
-						})}
+						{canCreate && (
+							<li className="list-none">
+								<button
+									type="button"
+									onClick={() => {
+										autoCompleteProps.onCreate?.(
+											inputValue,
+										);
+										setIsOpen(false);
+									}}
+									className="w-full px-3 py-2 text-sm text-left text-primary hover:bg-accent"
+								>
+									{autoCompleteProps.createLabel?.(
+										inputValue,
+									) ?? `Create "${inputValue}"`}
+								</button>
+							</li>
+						)}
+
+						{/* Results */}
+						{!isLoading &&
+							displayedSuggestions.map((item, index) => {
+								const label =
+									autoCompleteProps.getOptionLabel(item);
+								const key =
+									autoCompleteProps.getOptionKey?.(item) ??
+									label;
+
+								const isHighlighted =
+									index === highlightedIndex;
+
+								return (
+									<li key={key} className="list-none">
+										<button
+											type="button"
+											onClick={() =>
+												handleSuggestionClick(item)
+											}
+											onMouseEnter={() =>
+												setHighlightedIndex(index)
+											}
+											className={cn(
+												'w-full px-3 py-2 text-sm text-left',
+												'hover:bg-accent hover:text-accent-foreground',
+												'focus:bg-accent focus:text-accent-foreground',
+												isHighlighted &&
+													'bg-accent text-accent-foreground',
+											)}
+										>
+											{label}
+										</button>
+									</li>
+								);
+							})}
 					</ul>
 				)}
 			</div>

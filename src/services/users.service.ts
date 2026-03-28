@@ -6,16 +6,19 @@ import type {
 	FindFunctionType,
 	UpdateFunctionType,
 } from '@/config/data-source.config';
-import { ApiRequest, getResponseData } from '@/helpers/api.helper';
-import { buildQueryString } from '@/helpers/string.helper';
+import {
+	ApiRequest,
+	buildQueryString,
+	getResponseData,
+} from '@/helpers/api.helper';
 import type { UserFormValuesType, UserModel } from '@/models/user.model';
 import type { UserPermissionModel } from '@/models/user-permission.model';
-import type { ApiResponseFetch } from '@/types/api.type';
+import type { ApiResponseFetch, QueryFiltersType } from '@/types/api.type';
 
 export const findUsers: FindFunctionType<UserModel> = async (
 	params: FindFunctionParamsType,
 ) => {
-	const query = buildQueryString(params);
+	const query = buildQueryString(params as QueryFiltersType);
 
 	const response: ApiResponseFetch<FindFunctionResponseType<UserModel>> =
 		await new ApiRequest().doFetch(`/users?${query}`);
@@ -101,7 +104,7 @@ export const getUserPermissions = async (
 	user_id: number,
 	params: FindFunctionParamsType,
 ) => {
-	const query = buildQueryString(params);
+	const query = buildQueryString(params as QueryFiltersType);
 
 	const response: ApiResponseFetch<GetUserPermissionsType> =
 		await new ApiRequest().doFetch(

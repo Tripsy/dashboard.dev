@@ -101,7 +101,7 @@ export function DataTableActionManage<
 
 	if (!actionProps) {
 		throw new ValueError(
-			`'actionProps' action props are not defined for '${actionName}'`,
+			`'actionProps' action props are not defined for '${actionName}' (hint: manage)`,
 		);
 	}
 

@@ -1,8 +1,8 @@
 import type React from 'react';
 import sanitizeHtml from 'sanitize-html';
 import type { z } from 'zod';
-import {ClientAddressTypeEnum} from "@/models/client-address.model";
-import {formatEnumLabel} from "@/helpers/string.helper";
+import { formatEnumLabel } from '@/helpers/string.helper';
+import { ClientAddressTypeEnum } from '@/models/client-address.model';
 
 export function accumulateZodErrors<T>(
 	zodError: z.ZodError,
@@ -131,15 +131,12 @@ export function toOptionsFromEnum(
 	enumObj: Record<string, string>,
 	options?: {
 		formatter?: (value: string) => string;
-	}
+	},
 ): Array<{ label: string; value: string }> {
-	let values = Object.values(enumObj);
+	const values = Object.values(enumObj);
 
 	return values.map((value) => ({
 		label: options?.formatter ? options.formatter(value) : value,
 		value,
 	}));
 }
-
-
-

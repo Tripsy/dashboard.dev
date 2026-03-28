@@ -6,15 +6,18 @@ import type {
 	FindFunctionType,
 	UpdateFunctionType,
 } from '@/config/data-source.config';
-import { ApiRequest, getResponseData } from '@/helpers/api.helper';
-import { buildQueryString } from '@/helpers/string.helper';
+import {
+	ApiRequest,
+	buildQueryString,
+	getResponseData,
+} from '@/helpers/api.helper';
 import type { BrandFormValuesType, BrandModel } from '@/models/brand.model';
-import type { ApiResponseFetch } from '@/types/api.type';
+import type { ApiResponseFetch, QueryFiltersType } from '@/types/api.type';
 
 export const findBrands: FindFunctionType<BrandModel> = async (
 	params: FindFunctionParamsType,
 ) => {
-	const query = buildQueryString(params);
+	const query = buildQueryString(params as QueryFiltersType);
 
 	const response: ApiResponseFetch<FindFunctionResponseType<BrandModel>> =
 		await new ApiRequest().doFetch(`/brands?${query}`);

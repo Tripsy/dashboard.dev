@@ -1,8 +1,8 @@
 import { FormComponentAutoComplete } from '@/components/form/form-element.component';
 import { Icons } from '@/components/icon.component';
 import type { FormManageType } from '@/config/data-source.config';
-import { useAutocomplete } from '@/hooks/use-autocomplete';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
+import { useLocalAutocomplete } from '@/hooks/use-local-autocomplete';
 import {
 	PermissionEntitiesSuggestions,
 	type PermissionFormValuesType,
@@ -15,20 +15,21 @@ export function FormManagePermission({
 	handleChange,
 	pending,
 }: FormManageType<PermissionFormValuesType>) {
-	const entityAutocomplete = useAutocomplete(PermissionEntitiesSuggestions, {
-		filterMode: 'includes',
-		caseSensitive: false,
+	const elementIds = useElementIds(['entity', 'operation']);
+
+	const entityAutocomplete = useLocalAutocomplete({
+		source: PermissionEntitiesSuggestions,
+		filter: (item, query) =>
+			item.toLowerCase().startsWith(query.toLowerCase()),
+		minLength: 1,
 	});
 
-	const operationAutocomplete = useAutocomplete(
-		PermissionOperationSuggestions,
-		{
-			filterMode: 'includes',
-			caseSensitive: false,
-		},
-	);
-
-	const elementIds = useElementIds(['entity', 'operation']);
+	const operationAutocomplete = useLocalAutocomplete({
+		source: PermissionOperationSuggestions,
+		filter: (item, query) =>
+			item.toLowerCase().startsWith(query.toLowerCase()),
+		minLength: 1,
+	});
 
 	return (
 		<>
@@ -41,12 +42,12 @@ export function FormManagePermission({
 				isRequired={true}
 				disabled={pending}
 				error={errors.entity}
-				onInputChange={(value: string | null) => handleChange('entity', value)}
+				onInputChange={(value) => {
+					handleChange('entity', value);
+					entityAutocomplete.setQuery(value);
+				}}
 				autoCompleteProps={{
 					suggestions: entityAutocomplete.suggestions,
-					onSearch: entityAutocomplete.onSearch,
-					minQueryLength: 2,
-					dropdown: false,
 					getOptionLabel: (item) => item,
 				}}
 				icons={{
@@ -65,12 +66,12 @@ export function FormManagePermission({
 				isRequired={true}
 				disabled={pending}
 				error={errors.operation}
-				onInputChange={(value: string | null) => handleChange('operation', value)}
+				onInputChange={(value) => {
+					handleChange('operation', value);
+					operationAutocomplete.setQuery(value);
+				}}
 				autoCompleteProps={{
 					suggestions: operationAutocomplete.suggestions,
-					onSearch: operationAutocomplete.onSearch,
-					minQueryLength: 2,
-					dropdown: false,
 					getOptionLabel: (item) => item,
 				}}
 				icons={{

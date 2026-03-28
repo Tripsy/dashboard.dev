@@ -7,6 +7,7 @@ import {
 	FormComponentSelect,
 	type InputValueType,
 	type OptionsType,
+	type OptionValueType,
 } from '@/components/form/form-element.component';
 import { Icons } from '@/components/icon.component';
 import { Button } from '@/components/ui/button';
@@ -60,7 +61,7 @@ export function FormFiltersSelect<Fields>({
 }: {
 	labelText: string;
 	fieldName: keyof Fields & string;
-	fieldValue: string | null;
+	fieldValue: OptionValueType;
 	placeholderText?: string;
 	options: OptionsType;
 	onValueChange: (value: string) => void;

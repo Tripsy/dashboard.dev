@@ -1,5 +1,3 @@
-import {DataTableFiltersType} from "@/config/data-source.config";
-
 export type ApiRequestMode =
 	| 'same-site'
 	| 'use-proxy'
@@ -14,11 +12,13 @@ export type ApiResponseFetch<T> =
 	  }
 	| undefined;
 
-export type QueryValue =
+export type QueryValueType =
 	| string
 	| number
 	| boolean
+	| Date
 	| null
 	| undefined
-	| Array<string | number | boolean>
-	| DataTableFiltersType;
+	| Array<string | number | boolean>;
+
+export type QueryFiltersType = Record<string, QueryValueType>;

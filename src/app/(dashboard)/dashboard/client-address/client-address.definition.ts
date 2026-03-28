@@ -27,8 +27,10 @@ import {
 const validatorMessages = await BaseValidator.getValidatorMessages(
 	[
 		'invalid_client_id',
+		'invalid_client',
 		'invalid_address_type',
 		'invalid_city_id',
+		'invalid_city',
 		'invalid_details',
 		'invalid_postal_code',
 		'invalid_notes',
@@ -37,26 +39,40 @@ const validatorMessages = await BaseValidator.getValidatorMessages(
 );
 
 class ClientAddressValidator extends BaseValidator<typeof validatorMessages> {
-	manage = z.object({
-		client_id: this.validateId(this.getMessage('invalid_client_id')),
-		address_type: this.validateEnum(
-			ClientAddressTypeEnum,
-			this.getMessage('invalid_address_type'),
-		),
-		city_id: this.validateId(this.getMessage('invalid_city_id'), {
-			required: false,
-		}),
-		details: this.validateString(this.getMessage('invalid_details')),
-		postal_code: this.validatePostalCode(
-			this.getMessage('invalid_postal_code'),
-			{
+	manage = z
+		.object({
+			client_id: this.validateId(this.getMessage('invalid_client_id')),
+			client: this.validateString(this.getMessage('invalid_client')),
+			address_type: this.validateEnum(
+				ClientAddressTypeEnum,
+				this.getMessage('invalid_address_type'),
+			),
+			city_id: this.validateId(this.getMessage('invalid_city_id'), {
 				required: false,
-			},
-		),
-		notes: this.validateString(this.getMessage('invalid_notes'), {
-			required: false,
-		}),
-	});
+			}),
+			city: this.validateString(this.getMessage('invalid_city'), {
+				required: false,
+			}),
+			details: this.validateString(this.getMessage('invalid_details')),
+			postal_code: this.validatePostalCode(
+				this.getMessage('invalid_postal_code'),
+				{
+					required: false,
+				},
+			),
+			notes: this.validateString(this.getMessage('invalid_notes'), {
+				required: false,
+			}),
+		})
+		.superRefine((data, ctx) => {
+			if (data.city && !data.city_id) {
+				ctx.addIssue({
+					path: ['city'],
+					message: this.getMessage('invalid_city'),
+					code: 'custom',
+				});
+			}
+		});
 }
 
 function getFormValuesClientAddress(
@@ -64,6 +80,7 @@ function getFormValuesClientAddress(
 ): ClientAddressFormValuesType {
 	return {
 		client_id: getFormDataAsNumber(formData, 'client_id'),
+		client: getFormDataAsString(formData, 'client'),
 		address_type:
 			getFormDataAsEnum(
 				formData,
@@ -71,6 +88,7 @@ function getFormValuesClientAddress(
 				ClientAddressTypeEnum,
 			) || ClientAddressTypeEnum.DELIVERY,
 		city_id: getFormDataAsNumber(formData, 'city_id'),
+		city: getFormDataAsString(formData, 'city'),
 		details: getFormDataAsString(formData, 'details'),
 		postal_code: getFormDataAsString(formData, 'postal_code'),
 		notes: getFormDataAsString(formData, 'notes'),
@@ -159,9 +177,11 @@ export const dataSourceConfigClientAddress = {
 		dataSource: 'client-address' as const,
 		id: undefined,
 		values: {
-			client_id: null, // TODO
+			client_id: null,
+			client: null,
 			address_type: ClientAddressTypeEnum.DELIVERY,
-			city_id: null, // TODO
+			city_id: null,
+			city: null,
 			details: null,
 			postal_code: null,
 			notes: null,
@@ -262,6 +282,15 @@ export const dataSourceConfigClientAddress = {
 			permission: 'client-address.read',
 			allowedEntries: 'single' as const,
 			position: 'hidden' as const,
+		},
+		createClient: {
+			mode: 'other' as const,
+			permission: 'client.create',
+			allowedEntries: 'free' as const,
+			position: 'hidden' as const,
+			buttonProps: {
+				icon: 'create',
+			},
 		},
 	},
 };

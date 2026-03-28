@@ -8,6 +8,7 @@ import { DataTableProvider } from '@/app/(dashboard)/_providers/data-table-provi
 import { createDataTableStore } from '@/app/(dashboard)/_stores/model.store';
 import { DataTableClientAddressFilters } from '@/app/(dashboard)/dashboard/client-address/data-table-client-address-filters.component';
 import { FormManageClientAddress } from '@/app/(dashboard)/dashboard/client-address/form-manage-client-address.component';
+import { FormManageClientAddressClientComponent } from '@/app/(dashboard)/dashboard/client-address/form-manage-client-address-client.component';
 import { ViewClientAddress } from '@/app/(dashboard)/dashboard/client-address/view-client-address.component';
 import { LoadingComponent } from '@/components/status.component';
 import { useMounted } from '@/hooks/use-mounted.hook';
@@ -46,9 +47,11 @@ export const DataTableClientAddress = (): JSX.Element => {
 					// @ts-expect-error FormManageClientAddress props are injected at runtime via FormManage
 					update: <FormManageClientAddress />,
 					view: <ViewClientAddress />,
+					createClient: <FormManageClientAddressClientComponent />,
 				}}
 				modalsProps={{
 					view: { size: 'xl' },
+					createClient: { size: 'x2l' },
 				}}
 			/>
 		</DataTableProvider>

@@ -1,7 +1,50 @@
 import Routes from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
 import { ApiError } from '@/exceptions/api.error';
-import type { ApiRequestMode, ApiResponseFetch } from '@/types/api.type';
+import type {
+	ApiRequestMode,
+	ApiResponseFetch,
+	QueryFiltersType,
+} from '@/types/api.type';
+
+/**
+ * Build a query string from an object
+ *
+ * @param {Record<string, string | number | boolean | undefined | null>} params - The object to build the query string from
+ * @returns {string} - The query string
+ */
+export const buildQueryString = (params: QueryFiltersType): string => {
+	const query = new URLSearchParams();
+
+	Object.entries(params).forEach(([key, value]) => {
+		if (value === undefined || value === null || value === '') {
+			return;
+		}
+
+		if (Array.isArray(value)) {
+			value.forEach((v) => {
+				query.append(key, String(v));
+			});
+			return;
+		}
+
+		if (typeof value === 'object') {
+			if (key === 'filter') {
+				Object.entries(value).forEach(([filterKey, filterValue]) => {
+					query.append(`filter[${filterKey}]`, String(filterValue));
+				});
+			} else {
+				console.warn(`Skipping object param "${key}" in query`);
+			}
+
+			return;
+		}
+
+		query.append(key, String(value));
+	});
+
+	return query.toString();
+};
 
 export function getRemoteApiUrl(path: string): string {
 	path = path.replace(/^\//, ''); // Remove the first ` / ` if exist

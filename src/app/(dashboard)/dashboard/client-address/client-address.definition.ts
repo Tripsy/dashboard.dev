@@ -284,7 +284,7 @@ export const dataSourceConfigClientAddress = {
 			position: 'hidden' as const,
 		},
 		createClient: {
-			mode: 'other' as const,
+			mode: 'form' as const,
 			permission: 'client.create',
 			allowedEntries: 'free' as const,
 			position: 'hidden' as const,

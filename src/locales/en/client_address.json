@@ -38,6 +38,11 @@
 		"view": {
 			"title": "Address details",
 			"label": "View details"
+		},
+		"createClient": {
+			"title": "New client",
+			"label": "Add",
+			"success": "Client created successfully"
 		}
 	}
 }

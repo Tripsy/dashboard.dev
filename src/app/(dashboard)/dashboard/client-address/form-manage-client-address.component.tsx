@@ -27,7 +27,7 @@ import {
 	type PlaceModel,
 	PlaceTypeEnum,
 } from '@/models/place.model';
-import { createClient, findClients } from '@/services/clients.service';
+import { findClients } from '@/services/clients.service';
 import { createPlace, findPlaces } from '@/services/places.service';
 
 const language = await getLanguage();
@@ -101,22 +101,39 @@ export function FormManageClientAddress({
 			minLength: 3,
 		});
 
-	// const createClientMutation = useMutation({
-	// 	mutationFn: async (name: string) => {
-	// 		const res = await createClient({
-	// 			client_type: ClientTypeEnum.COMPANY,
-	// 			company_name: name,
-	// 			bank_name: null,
-	// 			contact_email: null,
-	// 			contact_name: null,
-	// 			contact_phone: null,
-	// 			iban: null,
-	// 			notes: 'Added via client-address',
-	// 		});
+	// useEffect(() => {
+	// 	const onNewClient = (ev: Event) => {
+	// 		const { client } = (ev as CustomEvent<ClientAddressNewClientCreatedDetail>)
+	// 			.detail;
+	// 		const id = client?.id;
 	//
-	// 		return res?.data;
-	// 	},
-	// });
+	// 		if (id == null) {
+	// 			return;
+	// 		}
+	//
+	// 		const label =
+	// 			client.client_type === ClientTypeEnum.COMPANY ||
+	// 			client.client_type === ClientTypeEnum.PERSON
+	// 				? getClientDisplayName(client as ClientModel)
+	// 				: (client.company_name ?? client.person_name ?? '').trim();
+	//
+	// 		handleChange('client', label);
+	// 		handleChange('client_id', id);
+	// 		setSearchClient(label);
+	// 	};
+	//
+	// 	window.addEventListener(
+	// 		CLIENT_ADDRESS_NEW_CLIENT_CREATED_EVENT,
+	// 		onNewClient,
+	// 	);
+	//
+	// 	return () => {
+	// 		window.removeEventListener(
+	// 			CLIENT_ADDRESS_NEW_CLIENT_CREATED_EVENT,
+	// 			onNewClient,
+	// 		);
+	// 	};
+	// }, [handleChange]);
 
 	return (
 		<>
@@ -159,10 +176,10 @@ export function FormManageClientAddress({
 
 					allowCreate: true,
 
-					onCreate: async (value) => {
+					onCreate: (value) => {
 						const event = new CustomEvent('useDataTableAction', {
 							detail: {
-								source: 'something',
+								source: 'client-address',
 								actionName: 'createClient',
 								entry: {
 									client_type: ClientTypeEnum.COMPANY,

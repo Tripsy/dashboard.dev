@@ -3,12 +3,9 @@
 import { type JSX, useMemo } from 'react';
 import { DataTableActions } from '@/app/(dashboard)/_components/data-table-actions.component';
 import DataTableList from '@/app/(dashboard)/_components/data-table-list.component';
-import { DataTableModal } from '@/app/(dashboard)/_components/data-table-modal.component';
 import { DataTableProvider } from '@/app/(dashboard)/_providers/data-table-provider';
 import { createDataTableStore } from '@/app/(dashboard)/_stores/model.store';
 import { DataTableLogHistoryFilters } from '@/app/(dashboard)/dashboard/log-history/data-table-log-history-filters.component';
-import { ViewLogHistory } from '@/app/(dashboard)/dashboard/log-history/view-log-history.component';
-import { ViewLogHistoryUser } from '@/app/(dashboard)/dashboard/log-history/view-log-history-user.component';
 import { LoadingComponent } from '@/components/status.component';
 import { useMounted } from '@/hooks/use-mounted.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
@@ -38,17 +35,6 @@ export const DataTableLogHistory = (): JSX.Element => {
 				<DataTableActions />
 				<DataTableList dataKey="id" />
 			</div>
-
-			<DataTableModal
-				modals={{
-					view: <ViewLogHistory />,
-					viewUser: <ViewLogHistoryUser />,
-				}}
-				modalsProps={{
-					view: { size: 'x2l' },
-					viewUser: { size: 'x2l' },
-				}}
-			/>
 		</DataTableProvider>
 	);
 };

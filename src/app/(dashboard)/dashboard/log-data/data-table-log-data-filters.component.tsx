@@ -139,7 +139,7 @@ export const DataTableLogDataFilters = (): JSX.Element => {
 				}}
 			/>
 
-			<FormFiltersReset source="DataTableLogDataFilters" />
+			<FormFiltersReset dataSource="log-data" />
 		</div>
 	);
 };

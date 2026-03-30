@@ -1,7 +1,6 @@
 import React, {
 	type ComponentType,
 	type JSX,
-	useCallback,
 	useEffect,
 	useMemo,
 	useRef,

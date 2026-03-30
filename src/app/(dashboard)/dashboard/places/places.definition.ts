@@ -3,6 +3,7 @@ import {
 	type DataTableColumnType,
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
+import { FormManagePlace } from '@/app/(dashboard)/dashboard/places/form-manage-place.component';
 import type { FormStateType } from '@/config/data-source.config';
 import {
 	getFormDataAsEnum,
@@ -252,6 +253,7 @@ export const dataSourceConfigPlaces = {
 	actions: {
 		create: {
 			mode: 'form' as const,
+			component: FormManagePlace,
 			permission: 'place.create',
 			allowedEntries: 'free' as const,
 			position: 'right' as const,
@@ -262,6 +264,7 @@ export const dataSourceConfigPlaces = {
 		},
 		update: {
 			mode: 'form' as const,
+			component: FormManagePlace,
 			permission: 'place.update',
 			allowedEntries: 'single' as const,
 			position: 'left' as const,

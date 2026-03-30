@@ -137,7 +137,7 @@ export const DataTableUsersFilters = (): JSX.Element => {
 				onCheckedChange={(value) => setFilterValue('is_deleted', value)}
 			/>
 
-			<FormFiltersReset source="DataTableUsersFilters" />
+			<FormFiltersReset dataSource="users" />
 		</div>
 	);
 };

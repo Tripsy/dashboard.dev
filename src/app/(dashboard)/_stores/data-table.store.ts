@@ -9,62 +9,9 @@ import {
 	getDataSourceConfig,
 } from '@/config/data-source.config';
 
-// TODO - remove this
-export interface DataTableModalSlice<Model> {
-	isOpen: boolean;
-	actionName: string | null;
-	actionEntry: Model | null;
-	setActionEntry: (entry: Model) => void;
-	openCreate: () => void;
-	openUpdate: () => void;
-	openAction: (name: string) => void;
-	closeOut: () => void;
-}
-
-export const createDataTableModalSlice =
-	<Model>(): StateCreator<
-		DataTableStore<Model>,
-		[['zustand/immer', never]],
-		[],
-		DataTableModalSlice<Model>
-	> =>
-	(set) => ({
-		isOpen: false,
-		actionName: null,
-		actionEntry: null,
-
-		openCreate: () =>
-			set((state: Draft<DataTableModalSlice<Model>>) => {
-				state.isOpen = true;
-				state.actionName = 'create';
-			}),
-
-		openUpdate: () =>
-			set((state: Draft<DataTableModalSlice<Model>>) => {
-				state.isOpen = true;
-				state.actionName = 'update';
-			}),
-
-		openAction: (name: string) =>
-			set((state: Draft<DataTableModalSlice<Model>>) => {
-				state.isOpen = true;
-				state.actionName = name;
-			}),
-
-		setActionEntry: (entry) =>
-			set((state: Draft<DataTableModalSlice<Model>>) => {
-				// biome-ignore lint/suspicious/noExplicitAny: This cast is safe because Immer handles drafting at runtime.
-				state.actionEntry = entry as any;
-			}),
-
-		closeOut: () =>
-			set((state: Draft<DataTableModalSlice<Model>>) => {
-				state.isOpen = false;
-				state.actionName = null;
-				// biome-ignore lint/suspicious/noExplicitAny: This cast is safe because Immer handles drafting at runtime.
-				state.actionEntry = null as any;
-			}),
-	});
+// ============================================================================
+// TABLE SLICE
+// ============================================================================
 
 export interface DataTableSlice {
 	tableState: DataTableStateType;
@@ -73,10 +20,10 @@ export interface DataTableSlice {
 }
 
 export const createDataTableSlice =
-	<K extends DataSourceKey, Model>(
+	<K extends DataSourceKey>(
 		dataSource: K,
 	): StateCreator<
-		DataTableStore<Model>,
+		DataTableStore,
 		[['zustand/immer', never]],
 		[],
 		DataTableSlice
@@ -102,6 +49,10 @@ export const createDataTableSlice =
 			});
 		},
 	});
+
+// ============================================================================
+// SELECTION SLICE
+// ============================================================================
 
 export interface DataTableSelectionSlice<Model> {
 	selectedEntries: Model[];
@@ -130,8 +81,11 @@ export const createDataTableSelectionSlice =
 			}),
 	});
 
-export type DataTableStore<Model> = DataTableModalSlice<Model> &
-	DataTableSlice &
+// ============================================================================
+// STORE
+// ============================================================================
+
+export type DataTableStore<Model = any> = DataTableSlice &
 	DataTableSelectionSlice<Model> & {
 		isLoading: boolean;
 		setLoading: (loading: boolean) => void;
@@ -144,22 +98,18 @@ export const createDataTableStore = <K extends DataSourceKey, Model>(
 		devtools(
 			persist(
 				immer((set, get, store) => ({
-					...createDataTableModalSlice<Model>()(set, get, store),
-					...createDataTableSlice<K, Model>(dataSource)(
-						set,
-						get,
-						store,
-					),
+					...createDataTableSlice<K>(dataSource)(set, get, store),
 					...createDataTableSelectionSlice<Model>()(set, get, store),
+
 					isLoading: false,
 					setLoading: (loading: boolean) => {
 						set((state) => {
-							state.isLoading = loading; // mutable style thanks to immer
+							state.isLoading = loading;
 						});
 					},
 				})),
 				{
-					name: `model-store-${String(dataSource)}`,
+					name: `datatable-store-${String(dataSource)}`,
 					partialize: (state) => ({
 						tableState: state.tableState,
 						selectedEntries: state.selectedEntries,

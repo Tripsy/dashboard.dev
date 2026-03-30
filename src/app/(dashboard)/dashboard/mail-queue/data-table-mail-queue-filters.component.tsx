@@ -152,7 +152,7 @@ export const DataTableMailQueueFilters = (): JSX.Element => {
 				search={searchTo}
 			/>
 
-			<FormFiltersReset source="DataTableMailQueueFilters" />
+			<FormFiltersReset dataSource="mail-queue" />
 		</div>
 	);
 };

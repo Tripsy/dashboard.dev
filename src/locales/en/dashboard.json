@@ -32,7 +32,6 @@
 		"selected_entries_one": "{{count}} entry selected",
 		"selected_entries_many": "{{count}} entries selected",
 		"no_entries": "No entries found",
-		"select_one": "Please select at least one entry",
 		"no_entry_selected": "No entry selected",
 		"placeholder_select_default": "Select...",
 		"placeholder_start_date": "Start Date",

@@ -16,6 +16,7 @@ import {
 	getUserPermissions,
 } from '@/services/users.service';
 
+// TODO this doesn't work
 export function SetupPermissionsUser() {
 	const translationsKeys = useMemo(
 		() =>

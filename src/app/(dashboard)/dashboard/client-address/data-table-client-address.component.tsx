@@ -3,13 +3,9 @@
 import { type JSX, useMemo } from 'react';
 import { DataTableActions } from '@/app/(dashboard)/_components/data-table-actions.component';
 import DataTableList from '@/app/(dashboard)/_components/data-table-list.component';
-import { DataTableModal } from '@/app/(dashboard)/_components/data-table-modal.component';
 import { DataTableProvider } from '@/app/(dashboard)/_providers/data-table-provider';
 import { createDataTableStore } from '@/app/(dashboard)/_stores/model.store';
 import { DataTableClientAddressFilters } from '@/app/(dashboard)/dashboard/client-address/data-table-client-address-filters.component';
-import { FormManageClientAddress } from '@/app/(dashboard)/dashboard/client-address/form-manage-client-address.component';
-import { FormManageClientAddressClientComponent } from '@/app/(dashboard)/dashboard/client-address/form-manage-client-address-client.component';
-import { ViewClientAddress } from '@/app/(dashboard)/dashboard/client-address/view-client-address.component';
 import { LoadingComponent } from '@/components/status.component';
 import { useMounted } from '@/hooks/use-mounted.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
@@ -39,21 +35,6 @@ export const DataTableClientAddress = (): JSX.Element => {
 				<DataTableActions />
 				<DataTableList dataKey="id" />
 			</div>
-
-			<DataTableModal
-				modals={{
-					// @ts-expect-error FormManageClientAddress props are injected at runtime via FormManage
-					create: <FormManageClientAddress />,
-					// @ts-expect-error FormManageClientAddress props are injected at runtime via FormManage
-					update: <FormManageClientAddress />,
-					view: <ViewClientAddress />,
-					createClient: <FormManageClientAddressClientComponent />,
-				}}
-				modalsProps={{
-					view: { size: 'xl' },
-					createClient: { size: 'x2l' },
-				}}
-			/>
 		</DataTableProvider>
 	);
 };

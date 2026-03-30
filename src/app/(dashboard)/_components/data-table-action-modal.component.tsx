@@ -39,7 +39,7 @@ function displayActionEntries<K extends DataSourceKey, Model>(
 	)(entries);
 }
 
-export function DataTableActionManage<
+export function DataTableActionModal<
 	K extends DataSourceKey,
 	Model extends BaseModelType,
 >() {

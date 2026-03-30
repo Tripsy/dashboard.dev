@@ -1,31 +1,9 @@
-import { useMemo } from 'react';
-import { useStore } from 'zustand/react';
 import { DisplayStatus } from '@/app/(dashboard)/_components/data-table-value';
-import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import { formatDate } from '@/helpers/date.helper';
 import { parseJson } from '@/helpers/string.helper';
-import { useTranslation } from '@/hooks/use-translation.hook';
 import type { CronHistoryModel } from '@/models/cron-history.model';
 
-export function ViewCronHistory() {
-	const { dataTableStore } = useDataTable<'cron-history', CronHistoryModel>();
-	const entry = useStore(dataTableStore, (state) => state.actionEntry);
-
-	const translationsKeys = useMemo(
-		() => ['dashboard.text.no_entry_selected'] as const,
-		[],
-	);
-
-	const { translations } = useTranslation(translationsKeys);
-
-	if (!entry) {
-		return (
-			<div className="min-h-48 flex items-center justify-center">
-				{translations['dashboard.text.no_entry_selected']}
-			</div>
-		);
-	}
-
+export function ViewCronHistory({ entry }: { entry: CronHistoryModel }) {
 	const parsedContent = parseJson(entry.content);
 
 	return (

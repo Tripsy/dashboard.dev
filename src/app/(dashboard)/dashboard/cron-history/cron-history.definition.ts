@@ -2,6 +2,7 @@ import {
 	type DataTableColumnType,
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
+import { ViewCronHistory } from '@/app/(dashboard)/dashboard/cron-history/view-cron-history.component';
 import type {
 	CronHistoryModel,
 	CronHistoryStatusEnum,
@@ -110,7 +111,11 @@ export const dataSourceConfigCronHistory = {
 			},
 		},
 		view: {
-			mode: 'other' as const,
+			mode: 'view' as const,
+			component: ViewCronHistory,
+			modalProps: {
+				size: 'x2l' as const,
+			},
 			permission: 'cron-history.read',
 			allowedEntries: 'single' as const,
 			position: 'hidden' as const,

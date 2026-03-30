@@ -119,7 +119,7 @@ export const DataTableTemplatesFilters = (): React.JSX.Element => {
 				onCheckedChange={(value) => setFilterValue('is_deleted', value)}
 			/>
 
-			<FormFiltersReset source="DataTableTemplatesFilters" />
+			<FormFiltersReset dataSource="templates" />
 		</div>
 	);
 };

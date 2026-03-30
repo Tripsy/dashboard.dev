@@ -2,12 +2,15 @@ import {
 	type DataTableColumnType,
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
+import { ViewMailQueue } from '@/app/(dashboard)/dashboard/mail-queue/view-mail-queue.component';
+import { ViewTemplate } from '@/app/(dashboard)/dashboard/templates/view-template.component';
 import { formatDate } from '@/helpers/date.helper';
 import type {
 	MailQueueModel,
 	MailQueueStatusEnum,
 } from '@/models/mail-queue.model';
 import { deleteMailQueue, findMailQueue } from '@/services/mail-queue.service';
+import { getTemplate } from '@/services/templates.service';
 
 export type MailQueueDataTableFiltersType = {
 	status: { value: MailQueueStatusEnum | null; matchMode: 'equals' };
@@ -129,14 +132,28 @@ export const dataSourceConfigMailQueue = {
 			},
 		},
 		view: {
-			mode: 'other' as const,
+			mode: 'view' as const,
+			component: ViewMailQueue,
+			modalProps: {
+				size: 'x4l' as const,
+			},
 			permission: 'mail-queue.read',
 			allowedEntries: 'single' as const,
 			position: 'hidden' as const,
 		},
 		viewTemplate: {
-			type: 'view' as const,
-			mode: 'other' as const,
+			mode: 'view' as const,
+			component: ViewTemplate,
+			modalProps: {
+				size: 'x4l' as const,
+			},
+			customEntrySelected: async (entry: MailQueueModel) => {
+				if (entry.template) {
+					return (await getTemplate(entry.template.id)) || null;
+				}
+
+				return null;
+			},
 			permission: 'template.read',
 			allowedEntries: 'single' as const,
 			position: 'hidden' as const,

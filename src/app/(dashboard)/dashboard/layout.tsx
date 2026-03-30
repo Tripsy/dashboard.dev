@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { JSX } from 'react';
 import { Breadcrumb } from '@/app/(dashboard)/_components/breadcrumb.component';
 import DashboardMain from '@/app/(dashboard)/_components/dashboard-main.component';
+import { DataTableModal } from '@/app/(dashboard)/_components/data-table-modal.component';
 import { SideMenu } from '@/app/(dashboard)/_components/side-menu.component';
 import { SideMenuToggle } from '@/app/(dashboard)/_components/side-menu-toggle.component';
 import { DashboardProvider } from '@/app/(dashboard)/_providers/dashboard.provider';
@@ -52,6 +53,7 @@ export default async function Layout({ children }: { children: JSX.Element }) {
 						<SideMenu />
 						<div className="container-dashboard">
 							<Breadcrumb />
+							<DataTableModal />
 							{children}
 						</div>
 					</DashboardMain>

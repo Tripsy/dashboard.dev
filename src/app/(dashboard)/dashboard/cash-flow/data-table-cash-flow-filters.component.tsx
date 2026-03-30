@@ -166,7 +166,7 @@ export const DataTableCashFlowFilters = (): JSX.Element => {
 				}}
 			/>
 
-			<FormFiltersReset source="DataTableCashFlowFilters" />
+			<FormFiltersReset dataSource="cash-flow" />
 		</div>
 	);
 };

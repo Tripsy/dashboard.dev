@@ -3,6 +3,9 @@ import {
 	type DataTableColumnType,
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
+import { FormManageUser } from '@/app/(dashboard)/dashboard/users/form-manage-user.component';
+import { SetupPermissionsUser } from '@/app/(dashboard)/dashboard/users/setup-permissions-user.component';
+import { ViewUser } from '@/app/(dashboard)/dashboard/users/view-user.component';
 import type { FormStateType } from '@/config/data-source.config';
 import { Configuration } from '@/config/settings.config';
 import { getFormDataAsEnum, getFormDataAsString } from '@/helpers/form.helper';
@@ -356,6 +359,7 @@ export const dataSourceConfigUsers = {
 	actions: {
 		create: {
 			mode: 'form' as const,
+			component: FormManageUser,
 			permission: 'user.create',
 			allowedEntries: 'free' as const,
 			position: 'right' as const,
@@ -366,6 +370,7 @@ export const dataSourceConfigUsers = {
 		},
 		update: {
 			mode: 'form' as const,
+			component: FormManageUser,
 			permission: 'user.update',
 			allowedEntries: 'single' as const,
 			position: 'left' as const,
@@ -433,6 +438,10 @@ export const dataSourceConfigUsers = {
 		},
 		permissions: {
 			mode: 'other' as const,
+			component: SetupPermissionsUser,
+			modalProps: {
+				size: 'lg' as const,
+			},
 			permission: 'permission.update',
 			allowedEntries: 'single' as const,
 			customEntryCheck: (entry: UserModel) =>
@@ -444,7 +453,11 @@ export const dataSourceConfigUsers = {
 			},
 		},
 		view: {
-			mode: 'other' as const,
+			mode: 'view' as const,
+			component: ViewUser,
+			modalProps: {
+				size: 'xl' as const,
+			},
 			permission: 'user.read',
 			allowedEntries: 'single' as const,
 			position: 'hidden' as const,

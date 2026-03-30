@@ -3,11 +3,9 @@
 import { type JSX, useMemo } from 'react';
 import { DataTableActions } from '@/app/(dashboard)/_components/data-table-actions.component';
 import DataTableList from '@/app/(dashboard)/_components/data-table-list.component';
-import { DataTableModal } from '@/app/(dashboard)/_components/data-table-modal.component';
 import { DataTableProvider } from '@/app/(dashboard)/_providers/data-table-provider';
 import { createDataTableStore } from '@/app/(dashboard)/_stores/model.store';
 import { DataTableCronHistoryFilters } from '@/app/(dashboard)/dashboard/cron-history/data-table-cron-history-filters.component';
-import { ViewCronHistory } from '@/app/(dashboard)/dashboard/cron-history/view-cron-history.component';
 import { LoadingComponent } from '@/components/status.component';
 import { useMounted } from '@/hooks/use-mounted.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
@@ -37,15 +35,6 @@ export const DataTableCronHistory = (): JSX.Element => {
 				<DataTableActions />
 				<DataTableList dataKey="id" />
 			</div>
-
-			<DataTableModal
-				modals={{
-					view: <ViewCronHistory />,
-				}}
-				modalsProps={{
-					view: { size: 'x2l' },
-				}}
-			/>
 		</DataTableProvider>
 	);
 };

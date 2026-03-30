@@ -2,6 +2,8 @@ import {
 	type DataTableColumnType,
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
+import { ViewLogHistory } from '@/app/(dashboard)/dashboard/log-history/view-log-history.component';
+import { ViewUser } from '@/app/(dashboard)/dashboard/users/view-user.component';
 import { toTitleCase } from '@/helpers/string.helper';
 import type {
 	LogHistoryModel,
@@ -11,6 +13,7 @@ import {
 	deleteLogHistory,
 	findLogHistory,
 } from '@/services/log-history.service';
+import { getUser } from '@/services/users.service';
 
 export type LogHistoryDataTableFiltersType = {
 	request_id: { value: string | null; matchMode: 'contains' };
@@ -137,14 +140,28 @@ export const dataSourceConfigLogHistory = {
 			},
 		},
 		view: {
-			mode: 'other' as const,
+			mode: 'view' as const,
+			component: ViewLogHistory,
+			modalProps: {
+				size: 'x2l' as const,
+			},
 			permission: 'log-history.read',
 			allowedEntries: 'single' as const,
 			position: 'hidden' as const,
 		},
 		viewUser: {
-			type: 'view' as const,
-			mode: 'other' as const,
+			component: ViewUser,
+			modalProps: {
+				size: 'x2l' as const,
+			},
+			customEntrySelected: async (entry: LogHistoryModel) => {
+				if (entry.auth_id) {
+					return (await getUser(entry.auth_id)) || null;
+				}
+
+				return null;
+			},
+			mode: 'view' as const,
 			permission: 'user.read',
 			allowedEntries: 'single' as const,
 			position: 'hidden' as const,

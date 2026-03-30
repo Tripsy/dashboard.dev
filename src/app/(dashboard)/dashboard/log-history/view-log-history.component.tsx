@@ -1,30 +1,8 @@
-import { useMemo } from 'react';
-import { useStore } from 'zustand/react';
-import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import { formatDate } from '@/helpers/date.helper';
 import { parseJson } from '@/helpers/string.helper';
-import { useTranslation } from '@/hooks/use-translation.hook';
 import type { LogHistoryModel } from '@/models/log-history.model';
 
-export function ViewLogHistory() {
-	const { dataTableStore } = useDataTable<'log-history', LogHistoryModel>();
-	const entry = useStore(dataTableStore, (state) => state.actionEntry);
-
-	const translationsKeys = useMemo(
-		() => ['dashboard.text.no_entry_selected'] as const,
-		[],
-	);
-
-	const { translations } = useTranslation(translationsKeys);
-
-	if (!entry) {
-		return (
-			<div className="min-h-48 flex items-center justify-center">
-				{translations['dashboard.text.no_entry_selected']}
-			</div>
-		);
-	}
-
+export function ViewLogHistory({ entry }: { entry: LogHistoryModel }) {
 	const parsedDetails = parseJson(entry.details);
 
 	return (

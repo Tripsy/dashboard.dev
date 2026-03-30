@@ -1,5 +1,5 @@
 import type { ClientModel } from '@/models/client.model';
-import type { CityModel, PlaceModel } from '@/models/place.model';
+import type { PlaceModel } from '@/models/place.model';
 
 export enum ClientAddressTypeEnum {
 	BILLING = 'billing',

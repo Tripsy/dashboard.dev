@@ -1,9 +1,23 @@
+import type React from 'react';
 import type { DataTableColumnType } from '@/app/(dashboard)/_components/data-table-value';
+import { dataSourceConfigBrands } from '@/app/(dashboard)/dashboard/brands/brands.definition';
+import { dataSourceConfigCashFlow } from '@/app/(dashboard)/dashboard/cash-flow/cash-flow.definition';
+import { dataSourceConfigClientAddress } from '@/app/(dashboard)/dashboard/client-address/client-address.definition';
+import { dataSourceConfigClients } from '@/app/(dashboard)/dashboard/clients/clients.definition';
+import { dataSourceConfigCronHistory } from '@/app/(dashboard)/dashboard/cron-history/cron-history.definition';
+import { dataSourceConfigLogData } from '@/app/(dashboard)/dashboard/log-data/log-data.definition';
+import { dataSourceConfigLogHistory } from '@/app/(dashboard)/dashboard/log-history/log-history.definition';
+import { dataSourceConfigMailQueue } from '@/app/(dashboard)/dashboard/mail-queue/mail-queue.definition';
+import { dataSourceConfigPermissions } from '@/app/(dashboard)/dashboard/permissions/permissions.definition';
+import { dataSourceConfigPlaces } from '@/app/(dashboard)/dashboard/places/places.definition';
+import { dataSourceConfigTemplates } from '@/app/(dashboard)/dashboard/templates/templates.definition';
+import { dataSourceConfigUsers } from '@/app/(dashboard)/dashboard/users/users.definition';
 import type {
 	ButtonHover,
 	ButtonSize,
 	ButtonVariant,
 } from '@/components/ui/button';
+import type { ModalSizeType } from '@/components/ui/modal';
 import type { ValidateFormFunctionType } from '@/hooks/use-form-validation.hook';
 import type { ApiResponseFetch, QueryFiltersType } from '@/types/api.type';
 import type { FormSituationType } from '@/types/form.type';
@@ -96,10 +110,11 @@ export type ValidateSyncFormStateFunctionType<
 // Action Types
 // ============================================================================
 
-type DataTableActionType = 'view' | 'create' | 'update' | 'delete';
-type DataTableActionMode = 'form' | 'action' | 'other';
+// type DataTableActionType = 'view' | 'create' | 'update' | 'delete';
+type DataTableActionMode = 'form' | 'action' | 'view' | 'other';
 type DataTableEntryRequirement = 'free' | 'single' | 'multiple';
 type DataTableActionPosition = 'left' | 'right' | 'hidden';
+
 export type DataTableActionButtonPropsType = {
 	className?: string;
 	variant?: ButtonVariant;
@@ -108,12 +123,22 @@ export type DataTableActionButtonPropsType = {
 	icon?: string;
 };
 
+export type DataTableCustomEntrySelectedType<Model> = (
+	entry: Model,
+) => Promise<BaseModelType | null>;
+
 export type DataTableActionConfigType<Model, Function> = {
-	type?: DataTableActionType;
+	component?: React.ComponentType<any>;
+	modalProps?: {
+		size?: ModalSizeType;
+		className?: string;
+	};
+	// type?: DataTableActionType;
 	mode: DataTableActionMode;
 	permission: string;
 	allowedEntries: DataTableEntryRequirement;
 	customEntryCheck?: (entry: Model) => boolean;
+	customEntrySelected?: DataTableCustomEntrySelectedType<Model>;
 	position: DataTableActionPosition;
 	function?: Function;
 	buttonProps?: DataTableActionButtonPropsType;
@@ -177,23 +202,18 @@ export type BaseModelType = {
 };
 
 export type DataSourceKey =
+	| 'brands'
+	| 'cash-flow'
+	| 'client-address'
+	| 'clients'
 	| 'cron-history'
 	| 'log-data'
 	| 'log-history'
 	| 'mail-queue'
 	| 'permissions'
-	| 'templates'
-	| 'users'
-	| 'clients'
-	| 'client-address'
 	| 'places'
-	| 'brands'
-	| 'cash-flow';
-
-const dataSourceConfig: Partial<
-	// biome-ignore lint/suspicious/noExplicitAny: Concrete types are enforced at the public API boundary (register/get),
-	Record<DataSourceKey, DataSourceConfigType<any, any, any>>
-> = {};
+	| 'templates'
+	| 'users';
 
 export type DataSourceConfigType<
 	K extends DataSourceKey,
@@ -222,24 +242,29 @@ export type DataSourceConfigType<
 	actions?: DataTableActionsType<Entity, FormValues>;
 };
 
-export function registerDataSource<
-	K extends DataSourceKey,
-	Entity,
-	FormValues extends FormStateValuesType = EmptyFormValues,
->(key: K, config: DataSourceConfigType<K, Entity, FormValues>) {
-	if (hasDataSourceConfig(key)) {
-		return;
-	}
+export const dataSourceConfig: {
+	[K in DataSourceKey]: DataSourceConfigType<K, any, any>;
+} = {
+	brands: dataSourceConfigBrands,
+	'cash-flow': dataSourceConfigCashFlow,
+	'client-address': dataSourceConfigClientAddress,
+	clients: dataSourceConfigClients,
+	'cron-history': dataSourceConfigCronHistory,
+	'log-data': dataSourceConfigLogData,
+	'log-history': dataSourceConfigLogHistory,
+	'mail-queue': dataSourceConfigMailQueue,
+	permissions: dataSourceConfigPermissions,
+	places: dataSourceConfigPlaces,
+	templates: dataSourceConfigTemplates,
+	users: dataSourceConfigUsers,
+};
 
-	dataSourceConfig[key] = config;
-}
+export type DataSourceRegistry = typeof dataSourceConfig;
 
 export function getDataSourceConfig<
 	K extends DataSourceKey,
-	Entity,
-	FormValues extends FormStateValuesType,
-	P extends keyof DataSourceConfigType<K, Entity, FormValues>,
->(key: K, prop: P): DataSourceConfigType<K, Entity, FormValues>[P] {
+	P extends keyof DataSourceRegistry[K],
+>(key: K, prop: P): DataSourceRegistry[K][P] {
 	const config = dataSourceConfig[key];
 
 	if (!config) {
@@ -247,8 +272,4 @@ export function getDataSourceConfig<
 	}
 
 	return config[prop];
-}
-
-export function hasDataSourceConfig<K extends DataSourceKey>(key: K): boolean {
-	return !!dataSourceConfig[key];
 }

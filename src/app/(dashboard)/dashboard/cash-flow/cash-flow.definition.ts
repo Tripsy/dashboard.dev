@@ -3,6 +3,7 @@ import {
 	type DataTableColumnType,
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
+import { FormManageCashFlow } from '@/app/(dashboard)/dashboard/cash-flow/form-manage-cash-flow.component';
 import type { FormStateType } from '@/config/data-source.config';
 import { DisplayAmount } from '@/helpers/display.helper';
 import {
@@ -303,6 +304,7 @@ export const dataSourceConfigCashFlow = {
 	actions: {
 		create: {
 			mode: 'form' as const,
+			component: FormManageCashFlow,
 			permission: 'cash_flow.create',
 			allowedEntries: 'free' as const,
 			position: 'right' as const,
@@ -313,6 +315,7 @@ export const dataSourceConfigCashFlow = {
 		},
 		update: {
 			mode: 'form' as const,
+			component: FormManageCashFlow,
 			permission: 'cash_flow.update',
 			allowedEntries: 'single' as const,
 			position: 'left' as const,

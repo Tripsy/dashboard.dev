@@ -112,7 +112,7 @@ export const DataTableClientAddressFilters = (): JSX.Element => {
 				onCheckedChange={(value) => setFilterValue('is_deleted', value)}
 			/>
 
-			<FormFiltersReset source="DataTableClientAddressFilters" />
+			<FormFiltersReset dataSource="client-address" />
 		</div>
 	);
 };

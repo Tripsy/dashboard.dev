@@ -175,17 +175,16 @@ $ pnpm run madge
     - form-manage-cars.component.tsx
     - data-table-cars-filters.component.tsx
 3. Update `src/config/data-source.config.ts`
-    - export type DataSourceKey
-4. Update `src/config/data-source.register.ts`
-    - add `registerDataSource('cars', dataSourceConfigCars)`
-5. Add `cars.json` to `src/locales/[language]` & update src/locales/en/index.ts
-6. Update `Routes.group('dashboard')` in `src/config/routes.setup.ts`
-7. Create `src/services/cars.service.ts` from `src/services/users.service.ts`
-8. Update `src/app/(dashboard)/_components/side-menu.component.tsx`
-9. Update `src/models/permission.model.ts`
+    - export type DataSourceKey 
+    - export const dataSourceConfig: {
+4. Add `cars.json` to `src/locales/[language]` & update src/locales/en/index.ts
+5. Update `Routes.group('dashboard')` in `src/config/routes.setup.ts`
+6. Create `src/services/cars.service.ts` from `src/services/users.service.ts`
+7. Update `src/app/(dashboard)/_components/side-menu.component.tsx`
+8. Update `src/models/permission.model.ts`
     - PermissionEntitiesSuggestions
-10. Update `src/models/log-history.model.ts`
-     - LogHistoryEntities
+9. Update `src/models/log-history.model.ts`
+    - LogHistoryEntities
 
 # TODO
 

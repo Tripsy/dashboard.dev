@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { FormManagePermission } from '@/app/(dashboard)/dashboard/permissions/form-manage-permission.component';
 import type { FormStateType } from '@/config/data-source.config';
 import { getFormDataAsString } from '@/helpers/form.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
@@ -120,6 +121,10 @@ export const dataSourceConfigPermissions = {
 	actions: {
 		create: {
 			mode: 'form' as const,
+			component: FormManagePermission,
+			modalProps: {
+				size: 'xl' as const,
+			},
 			permission: 'permission.create',
 			allowedEntries: 'free' as const,
 			position: 'right' as const,
@@ -130,6 +135,10 @@ export const dataSourceConfigPermissions = {
 		},
 		update: {
 			mode: 'form' as const,
+			component: FormManagePermission,
+			modalProps: {
+				size: 'xl' as const,
+			},
 			permission: 'permission.update',
 			allowedEntries: 'single' as const,
 			position: 'left' as const,

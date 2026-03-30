@@ -117,7 +117,7 @@ export const DataTableBrandsFilters = (): JSX.Element => {
 				}
 			/>
 
-			<FormFiltersReset source="DataTableBrandsFilters" />
+			<FormFiltersReset dataSource="brands" />
 		</div>
 	);
 };

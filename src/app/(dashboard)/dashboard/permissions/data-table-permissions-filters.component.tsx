@@ -87,7 +87,7 @@ export const DataTablePermissionsFilters = (): JSX.Element => {
 				onCheckedChange={(value) => setFilterValue('is_deleted', value)}
 			/>
 
-			<FormFiltersReset source="DataTablePermissionsFilters" />
+			<FormFiltersReset dataSource="permissions" />
 		</div>
 	);
 };

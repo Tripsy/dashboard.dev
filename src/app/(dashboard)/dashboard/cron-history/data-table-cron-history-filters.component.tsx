@@ -124,7 +124,7 @@ export const DataTableCronHistoryFilters = (): JSX.Element => {
 				}}
 			/>
 
-			<FormFiltersReset source="DataTableCronHistoryFilters" />
+			<FormFiltersReset dataSource="cron-history" />
 		</div>
 	);
 };

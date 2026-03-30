@@ -2,6 +2,7 @@ import {
 	type DataTableColumnType,
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
+import { ViewLogData } from '@/app/(dashboard)/dashboard/log-data/view-log-data.component';
 import type {
 	LogCategoryEnum,
 	LogDataModel,
@@ -114,7 +115,11 @@ export const dataSourceConfigLogData = {
 			},
 		},
 		view: {
-			mode: 'other' as const,
+			mode: 'view' as const,
+			component: ViewLogData,
+			modalProps: {
+				size: 'x3l' as const,
+			},
 			permission: 'log-data.read',
 			allowedEntries: 'single' as const,
 			position: 'hidden' as const,

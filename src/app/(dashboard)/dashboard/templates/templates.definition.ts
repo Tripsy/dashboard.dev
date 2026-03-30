@@ -3,6 +3,8 @@ import {
 	type DataTableColumnType,
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
+import { FormManageTemplate } from '@/app/(dashboard)/dashboard/templates/form-manage-template.component';
+import { ViewTemplate } from '@/app/(dashboard)/dashboard/templates/view-template.component';
 import type { FormStateType } from '@/config/data-source.config';
 import { getFormDataAsEnum, getFormDataAsString } from '@/helpers/form.helper';
 import { parseJson } from '@/helpers/string.helper';
@@ -277,6 +279,10 @@ export const dataSourceConfigTemplates = {
 	actions: {
 		create: {
 			mode: 'form' as const,
+			component: FormManageTemplate,
+			modalProps: {
+				size: 'x4l' as const,
+			},
 			permission: 'template.create',
 			allowedEntries: 'free' as const,
 			position: 'right' as const,
@@ -287,6 +293,10 @@ export const dataSourceConfigTemplates = {
 		},
 		update: {
 			mode: 'form' as const,
+			component: FormManageTemplate,
+			modalProps: {
+				size: 'x4l' as const,
+			},
 			permission: 'template.update',
 			allowedEntries: 'single' as const,
 			position: 'left' as const,
@@ -321,7 +331,11 @@ export const dataSourceConfigTemplates = {
 			},
 		},
 		view: {
-			mode: 'other' as const,
+			mode: 'view' as const,
+			component: ViewTemplate,
+			modalProps: {
+				size: 'x4l' as const,
+			},
 			permission: 'template.read',
 			allowedEntries: 'single' as const,
 			position: 'hidden' as const,

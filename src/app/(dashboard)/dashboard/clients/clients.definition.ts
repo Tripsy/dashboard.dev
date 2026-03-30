@@ -3,6 +3,8 @@ import {
 	type DataTableColumnType,
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
+import { FormManageClient } from '@/app/(dashboard)/dashboard/clients/form-manage-client.component';
+import { ViewClient } from '@/app/(dashboard)/dashboard/clients/view-client.component';
 import type { FormStateType } from '@/config/data-source.config';
 import { getFormDataAsEnum, getFormDataAsString } from '@/helpers/form.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
@@ -341,6 +343,10 @@ export const dataSourceConfigClients = {
 	actions: {
 		create: {
 			mode: 'form' as const,
+			component: FormManageClient,
+			modalProps: {
+				size: 'x2l' as const,
+			},
 			permission: 'client.create',
 			allowedEntries: 'free' as const,
 			position: 'right' as const,
@@ -351,6 +357,10 @@ export const dataSourceConfigClients = {
 		},
 		update: {
 			mode: 'form' as const,
+			component: FormManageClient,
+			modalProps: {
+				size: 'x2l' as const,
+			},
 			permission: 'client.update',
 			allowedEntries: 'single' as const,
 			position: 'left' as const,
@@ -417,7 +427,11 @@ export const dataSourceConfigClients = {
 			},
 		},
 		view: {
-			mode: 'other' as const,
+			mode: 'view' as const,
+			component: ViewClient,
+			modalProps: {
+				size: 'x4l' as const,
+			},
 			permission: 'client.read',
 			allowedEntries: 'single' as const,
 			position: 'hidden' as const,

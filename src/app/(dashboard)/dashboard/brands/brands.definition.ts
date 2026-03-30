@@ -3,6 +3,7 @@ import {
 	type DataTableColumnType,
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
+import { FormManageBrand } from '@/app/(dashboard)/dashboard/brands/form-manage-brand.component';
 import type { FormStateType } from '@/config/data-source.config';
 import { getFormDataAsEnum, getFormDataAsString } from '@/helpers/form.helper';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
@@ -13,11 +14,6 @@ import {
 	BrandStatusEnum,
 	BrandTypeEnum,
 } from '@/models/brand.model';
-import {
-	CashFlowCategoryEnum,
-	CashFlowMethodEnum,
-	CurrencyEnum,
-} from '@/models/cash-flow.model';
 import {
 	createBrand,
 	deleteBrand,
@@ -225,6 +221,7 @@ export const dataSourceConfigBrands = {
 	actions: {
 		create: {
 			mode: 'form' as const,
+			component: FormManageBrand,
 			permission: 'brand.create',
 			allowedEntries: 'free' as const,
 			position: 'right' as const,
@@ -235,6 +232,7 @@ export const dataSourceConfigBrands = {
 		},
 		update: {
 			mode: 'form' as const,
+			component: FormManageBrand,
 			permission: 'brand.update',
 			allowedEntries: 'single' as const,
 			position: 'left' as const,

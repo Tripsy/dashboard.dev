@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { handleReset } from '@/app/(dashboard)/_components/data-table-actions.component';
 import {
 	FormComponentCalendarWithoutFormElement,
 	FormComponentCheckbox,
@@ -12,10 +11,21 @@ import {
 import { Icons } from '@/components/icon.component';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import type { DataSourceKey } from '@/config/data-source.config';
 import { cn } from '@/helpers/css.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import type { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
+
+export const handleReset = (dataSource: DataSourceKey) => {
+	const event = new CustomEvent('filterReset', {
+		detail: {
+			source: dataSource,
+		},
+	});
+
+	window.dispatchEvent(event);
+};
 
 export function FormFiltersSearch<Fields>({
 	labelText,
@@ -178,7 +188,11 @@ export function FormFiltersShowDeleted({
 	);
 }
 
-export function FormFiltersReset({ source }: { source: string }) {
+export function FormFiltersReset({
+	dataSource,
+}: {
+	dataSource: DataSourceKey;
+}) {
 	const translationsKeys = useMemo(
 		() => ['dashboard.text.label_reset'] as const,
 		[],
@@ -192,7 +206,7 @@ export function FormFiltersReset({ source }: { source: string }) {
 				type="reset"
 				variant="outline"
 				hover="warning"
-				onClick={() => handleReset(source)}
+				onClick={() => handleReset(dataSource)}
 				title="Reset filters"
 			>
 				<Icons.Action.Reset />

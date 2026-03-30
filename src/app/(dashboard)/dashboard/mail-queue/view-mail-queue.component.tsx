@@ -1,30 +1,8 @@
-import { useMemo } from 'react';
-import { useStore } from 'zustand/react';
 import { DisplayStatus } from '@/app/(dashboard)/_components/data-table-value';
-import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import { formatDate } from '@/helpers/date.helper';
-import { useTranslation } from '@/hooks/use-translation.hook';
 import type { MailQueueModel } from '@/models/mail-queue.model';
 
-export function ViewMailQueue() {
-	const { dataTableStore } = useDataTable<'mail-queue', MailQueueModel>();
-	const entry = useStore(dataTableStore, (state) => state.actionEntry);
-
-	const translationsKeys = useMemo(
-		() => ['dashboard.text.no_entry_selected'] as const,
-		[],
-	);
-
-	const { translations } = useTranslation(translationsKeys);
-
-	if (!entry) {
-		return (
-			<div className="min-h-48 flex items-center justify-center">
-				{translations['dashboard.text.no_entry_selected']}
-			</div>
-		);
-	}
-
+export function ViewMailQueue({ entry }: { entry: MailQueueModel }) {
 	return (
 		<div className="space-y-6">
 			<div className="space-y-1">

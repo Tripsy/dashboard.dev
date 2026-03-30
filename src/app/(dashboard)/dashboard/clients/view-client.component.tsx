@@ -1,30 +1,80 @@
 'use client';
 
-import { useMemo } from 'react';
-import { useStore } from 'zustand/react';
-import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
-import { ClientDetails } from '@/app/(dashboard)/dashboard/clients/client-details.component';
-import { useTranslation } from '@/hooks/use-translation.hook';
+import { formatDate } from '@/helpers/date.helper';
+import { formatEnumLabel } from '@/helpers/string.helper';
 import type { ClientModel } from '@/models/client.model';
 
-export function ViewClient() {
-	const { dataTableStore } = useDataTable<'clients', ClientModel>();
-	const actionEntry = useStore(dataTableStore, (state) => state.actionEntry);
-
-	const translationsKeys = useMemo(
-		() => ['dashboard.text.no_entry_selected'] as const,
-		[],
-	);
-
-	const { translations } = useTranslation(translationsKeys);
-
-	if (!actionEntry) {
-		return (
-			<div className="min-h-48 flex items-center justify-center">
-				{translations['dashboard.text.no_entry_selected']}
+export function ViewClient({ entry }: { entry: ClientModel }) {
+	return (
+		<div className="space-y-6">
+			<div className="space-y-1 text-sm">
+				<div>
+					<span className="font-semibold">ID</span> {entry.id}
+				</div>
+				<div>
+					<span className="font-semibold">Type</span>{' '}
+					{formatEnumLabel(entry.client_type)}
+				</div>
 			</div>
-		);
-	}
 
-	return <ClientDetails entry={actionEntry} />;
+			<div>
+				<h3 className="font-bold border-b border-line pb-2 mb-3">
+					Contact Details
+				</h3>
+				<div className="ml-4 space-y-1 text-sm">
+					<div>
+						<span className="font-semibold">Name</span>{' '}
+						{entry.contact_name}
+					</div>
+					<div>
+						<span className="font-semibold">Email</span>{' '}
+						{entry.contact_email}
+					</div>
+					<div>
+						<span className="font-semibold">Phone</span>{' '}
+						{entry.contact_phone}
+					</div>
+				</div>
+			</div>
+
+			<div>
+				<h3 className="font-bold border-b border-line pb-2 mb-3">
+					Financial Details
+				</h3>
+				<div className="ml-4 space-y-1 text-sm">
+					<div>
+						<span className="font-semibold">IBAN</span> {entry.iban}
+					</div>
+					<div>
+						<span className="font-semibold">Bank Name</span>{' '}
+						{entry.bank_name}
+					</div>
+				</div>
+			</div>
+
+			<div>
+				<h3 className="font-bold border-b border-line pb-2 mb-3">
+					Timestamps
+				</h3>
+				<div className="ml-4 space-y-1 text-sm">
+					<div>
+						<span className="font-semibold">Created At</span>{' '}
+						{formatDate(entry.created_at, 'date-time')}
+					</div>
+					<div>
+						<span className="font-semibold">Updated At</span>{' '}
+						{formatDate(entry.updated_at, 'date-time')}
+					</div>
+					{entry.deleted_at && (
+						<div>
+							<span className="font-semibold">Deleted At</span>{' '}
+							<span className="text-red-500">
+								{formatDate(entry.deleted_at, 'date-time')}
+							</span>
+						</div>
+					)}
+				</div>
+			</div>
+		</div>
+	);
 }

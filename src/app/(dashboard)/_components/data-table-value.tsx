@@ -165,7 +165,6 @@ export const DataTableValue = <Model extends Record<string, unknown>>(
 	column: DataTableColumnType<Model>,
 	options: DataTableValueOptionsType<Model>,
 ) => {
-	// TODO: console.log(entry);
 	let outputValue: string | JSX.Element;
 
 	if (options.customValue) {

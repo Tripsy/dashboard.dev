@@ -98,7 +98,7 @@ export const DataTablePlacesFilters = (): JSX.Element => {
 				}
 			/>
 
-			<FormFiltersReset source="DataTablePlacesFilters" />
+			<FormFiltersReset dataSource="places" />
 		</div>
 	);
 };

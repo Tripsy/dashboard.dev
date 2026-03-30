@@ -168,7 +168,7 @@ export const DataTableLogHistoryFilters = (): JSX.Element => {
 				}}
 			/>
 
-			<FormFiltersReset source="DataTableLogHistoryFilters" />
+			<FormFiltersReset dataSource="log-history" />
 		</div>
 	);
 };

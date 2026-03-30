@@ -3,6 +3,8 @@ import {
 	type DataTableColumnType,
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
+import { FormManageClientAddress } from '@/app/(dashboard)/dashboard/client-address/form-manage-client-address.component';
+import { ViewClientAddress } from '@/app/(dashboard)/dashboard/client-address/view-client-address.component';
 import type { FormStateType } from '@/config/data-source.config';
 import {
 	getFormDataAsEnum,
@@ -233,6 +235,7 @@ export const dataSourceConfigClientAddress = {
 	},
 	actions: {
 		create: {
+			component: FormManageClientAddress,
 			mode: 'form' as const,
 			permission: 'client-address.create',
 			allowedEntries: 'free' as const,
@@ -243,6 +246,7 @@ export const dataSourceConfigClientAddress = {
 			},
 		},
 		update: {
+			component: FormManageClientAddress,
 			mode: 'form' as const,
 			permission: 'client-address.update',
 			allowedEntries: 'single' as const,
@@ -278,19 +282,20 @@ export const dataSourceConfigClientAddress = {
 			},
 		},
 		view: {
-			mode: 'other' as const,
+			mode: 'view' as const,
+			component: ViewClientAddress,
 			permission: 'client-address.read',
 			allowedEntries: 'single' as const,
 			position: 'hidden' as const,
 		},
-		createClient: {
-			mode: 'form' as const,
-			permission: 'client.create',
-			allowedEntries: 'free' as const,
-			position: 'hidden' as const,
-			buttonProps: {
-				icon: 'create',
-			},
-		},
+		// createClient: {
+		// 	mode: 'form' as const,
+		// 	permission: 'client.create',
+		// 	allowedEntries: 'free' as const,
+		// 	position: 'hidden' as const,
+		// 	buttonProps: {
+		// 		icon: 'create',
+		// 	},
+		// },
 	},
 };

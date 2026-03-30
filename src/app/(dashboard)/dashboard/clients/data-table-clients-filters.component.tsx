@@ -134,7 +134,7 @@ export const DataTableClientsFilters = (): JSX.Element => {
 				}}
 			/>
 
-			<FormFiltersReset source="DataTableClientsFilters" />
+			<FormFiltersReset dataSource="clients" />
 		</div>
 	);
 };

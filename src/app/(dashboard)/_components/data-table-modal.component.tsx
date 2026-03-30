@@ -1,120 +1,106 @@
 'use client';
 
 import type React from 'react';
-import { useEffect, useMemo } from 'react';
-import { useStore } from 'zustand/react';
-import { DataTableActionManage } from '@/app/(dashboard)/_components/data-table-action-manage.component';
+import { useMemo } from 'react';
+import { DataTableActionModal } from '@/app/(dashboard)/_components/data-table-action-modal.component';
 import { FormManage } from '@/app/(dashboard)/_components/form-manage.component';
-import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
-import { Modal, type ModalSizeType } from '@/components/ui/modal';
-import {
-	type BaseModelType,
-	type DataSourceKey,
-	getDataSourceConfig,
-} from '@/config/data-source.config';
+import { ViewEntry } from '@/app/(dashboard)/_components/view-entry.component';
+import { useModalStore } from '@/app/(dashboard)/_stores/modal.store';
+import { Modal } from '@/components/ui/modal';
+import { getDataSourceConfig } from '@/config/data-source.config';
 import { useTranslation } from '@/hooks/use-translation.hook';
-import { useToast } from '@/providers/toast.provider';
 
-type ModalsMap = {
-	[key: string]: React.ReactNode;
-};
+export function DataTableModal() {
+	const { isOpen, close, current } = useModalStore();
 
-export function DataTableModal<
-	K extends DataSourceKey,
-	Model extends BaseModelType,
->({
-	modals,
-	modalsProps,
-}: {
-	modals?: ModalsMap;
-	modalsProps?: {
-		[key: string]: {
-			size: ModalSizeType;
-			className?: string;
-		};
-	};
-}) {
-	const { dataSource, dataTableStore } = useDataTable<K, Model>();
-	const { showToast } = useToast();
+	const dataSource = current?.dataSource;
+	const actionName = current?.actionName;
+	const actionEntry = current?.actionEntry;
+	const onSuccessAction = current?.onSuccess;
+	const props = current?.props;
 
-	const isOpen = useStore(dataTableStore, (state) => state.isOpen);
-	const actionName = useStore(dataTableStore, (state) => state.actionName);
-	const actionEntry = useStore(dataTableStore, (state) => state.actionEntry);
-	const closeOut = useStore(dataTableStore, (state) => state.closeOut);
-	const actions = getDataSourceConfig(dataSource, 'actions');
+	const actions = useMemo(() => {
+		if (!dataSource) {
+			return null;
+		}
 
-	if (!actions) {
-		throw new Error(`Actions must be defined for ${dataSource}`);
-	}
+		return getDataSourceConfig(dataSource, 'actions');
+	}, [dataSource]);
 
-	const actionMode = actionName ? actions[actionName]?.mode : null;
-	const actionType =
-		(actionName && actions[actionName]?.type) || actionName || 'undefined';
-
+	const action = actionName ? actions?.[actionName] : null;
+	const ActionComponent = action?.component ?? null;
+	const actionMode = action?.mode ?? null;
 	const actionTitleKey = `${dataSource}.action.${actionName}.title`;
 
 	const translationsKeys = useMemo(
-		() =>
-			[
-				actionTitleKey,
-				'app.text.error_title',
-				'dashboard.text.select_one',
-			] as const,
+		() => [actionTitleKey] as const,
 		[actionTitleKey],
 	);
 
 	const { translations } = useTranslation(translationsKeys);
 
-	useEffect(() => {
-		if (
-			isOpen &&
-			actionName &&
-			['update', 'view'].includes(actionType) &&
-			!actionEntry
-		) {
-			showToast({
-				severity: 'error',
-				summary: translations['app.text.error_title'],
-				detail: translations['dashboard.text.select_one'],
-			});
-
-			return;
-		}
-	}, [actionEntry, actionName, actionType, isOpen, showToast, translations]);
-
 	const handleClose = () => {
-		closeOut();
+		close();
 	};
 
-	if (!isOpen || !actionName) {
+	if (!isOpen || !dataSource) {
 		return null;
 	}
 
-	const ModalComponent = modals?.[actionName] ?? null;
+	if (!actions) {
+		throw new Error(`Actions must be defined for ${dataSource}`);
+	}
+
+	if (!actionName) {
+		throw new Error(`Action name must be defined`);
+	}
+
+	if (!ActionComponent) {
+		throw new Error(
+			`Component not defined for ${dataSource} / ${actionName}`,
+		);
+	}
+
+	if (actionMode === 'form' && !['create', 'update'].includes(actionName)) {
+		throw new Error(
+			`Invalid action name (eg: ${actionName}) for form mode`,
+		);
+	}
 
 	return (
 		<Modal
-			size={modalsProps?.[actionName]?.size || 'md'}
-			className={modalsProps?.[actionName]?.className}
+			size={props?.size || 'md'}
+			className={props?.className}
 			isOpen={isOpen}
 			title={translations[actionTitleKey]}
 			onClose={handleClose}
 		>
-			{actionMode === 'other' && ModalComponent}
+			{actionMode === 'other' && <ActionComponent />}
+
+			{actionMode === 'view' && (
+				<ViewEntry actionEntry={actionEntry ?? null}>
+					{ActionComponent}
+				</ViewEntry>
+			)}
+
 			{actionMode === 'form' && (
 				<FormManage
 					key={
-						'form-' +
-						(actionEntry?.id
+						actionEntry?.id
 							? `${actionName}-${actionEntry.id}`
-							: actionName)
+							: actionName
 					}
+					dataSource={dataSource}
+					actionName={actionName as 'create' | 'update'}
+					actionEntry={actionEntry ?? null}
+					onSuccessAction={onSuccessAction}
 				>
-					{ModalComponent}
+					<ActionComponent />
 				</FormManage>
 			)}
+
 			{actionMode === 'action' && (
-				<DataTableActionManage key={`action-${actionName}`} />
+				<DataTableActionModal key={`action-${actionName}`} />
 			)}
 		</Modal>
 	);

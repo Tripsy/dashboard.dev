@@ -8,6 +8,9 @@ import {
 	type DataTableStateType,
 	getDataSourceConfig,
 } from '@/config/data-source.config';
+import { registerDashboardDataSource } from '@/config/data-source.register';
+
+registerDashboardDataSource();
 
 // ============================================================================
 // TABLE SLICE
@@ -77,6 +80,7 @@ export const createDataTableSelectionSlice =
 // STORE
 // ============================================================================
 
+// biome-ignore lint/suspicious/noExplicitAny: It's fine
 export type DataTableStore<Model = any> = DataTableSlice &
 	DataTableSelectionSlice<Model> & {
 		isLoading: boolean;

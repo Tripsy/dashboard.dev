@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { DataTableActionButton } from '@/app/(dashboard)/_components/data-table-action-button.component';
 import type { ModalOnSuccess } from '@/app/(dashboard)/_stores/modal.store';
 import { Icons } from '@/components/icon.component';
@@ -184,7 +184,6 @@ export function DataTableActionModal<K extends DataSourceKey>({
 					<Icons.Action.Cancel />
 					Cancel
 				</Button>
-				{/*TODO enhance loading*/}
 				<DataTableActionButton
 					key={`button-modal-${actionName}`}
 					dataSource={dataSource}

@@ -1,6 +1,5 @@
 'use client';
 
-import type React from 'react';
 import { useMemo } from 'react';
 import { DataTableActionModal } from '@/app/(dashboard)/_components/data-table-action-modal.component';
 import { FormManage } from '@/app/(dashboard)/_components/form-manage.component';

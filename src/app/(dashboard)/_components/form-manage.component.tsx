@@ -22,10 +22,15 @@ import {
 	type DataSourceKey,
 	type FormManageType,
 	getDataSourceConfig,
+	hasSyncFormState,
+	hasValidateForm,
 } from '@/config/data-source.config';
 import ValueError from '@/exceptions/value.error';
 import { createHandleChange } from '@/helpers/form.helper';
-import { useFormValidation } from '@/hooks/use-form-validation.hook';
+import {
+	useFormValidation,
+	type ValidationReturnType,
+} from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
 import { useRefreshDataTable } from '@/hooks/use-refresh-data-table.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
@@ -64,22 +69,21 @@ export function FormManage<K extends DataSourceKey>({
 
 	const initState = useMemo(() => {
 		if (!formState) {
-			return null;
+			throw new ValueError(
+				`'formState' is not defined for ${dataSource}`,
+			);
 		}
 
 		if (
 			actionName === 'update' &&
 			actionEntry &&
-			'syncFormState' in functions
+			hasSyncFormState(functions)
 		) {
-			return (functions.syncFormState as Function)(
-				formState,
-				actionEntry,
-			);
+			return functions.syncFormState(formState, actionEntry);
 		}
 
 		return formState;
-	}, [formState, functions, actionName, actionEntry]);
+	}, [formState, functions, actionName, actionEntry, dataSource]);
 
 	type FormStateType = Awaited<typeof initState>;
 	type FormValues = typeof initState.values;
@@ -92,9 +96,12 @@ export function FormManage<K extends DataSourceKey>({
 	const [formValues, setFormValues] = useFormValues<FormValues>(state.values);
 
 	const validate = useCallback(
-		(values: FormValues) => {
-			if (!('validateForm' in functions)) return {};
-			return (functions.validateForm as Function)(values, state?.id);
+		(values: FormValues): ValidationReturnType<FormValues> => {
+			if (!hasValidateForm<FormValues>(functions)) {
+				return {} as ValidationReturnType<FormValues>;
+			}
+
+			return functions.validateForm(values, state?.id);
 		},
 		[state?.id, functions],
 	);

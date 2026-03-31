@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 export type UseLocalAutocompleteOptions<T> = {
 	source: T[];
@@ -34,11 +34,6 @@ export function useLocalAutocomplete<T>({
 
 		return source.filter((item) => activeFilter(item, query));
 	}, [source, query, minLength, activeFilter]);
-
-	// Keep suggestions in sync if source changes
-	useEffect(() => {
-		// no-op but ensures recompute if source updates
-	}, [source]);
 
 	return {
 		query,

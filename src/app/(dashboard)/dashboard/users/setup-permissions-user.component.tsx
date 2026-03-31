@@ -1,10 +1,11 @@
 'use client';
 
-import { Checkbox } from 'primereact/checkbox';
+import { useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useStore } from 'zustand/react';
-import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
+import { useModalStore } from '@/app/(dashboard)/_stores/modal.store';
 import { LoadingComponent } from '@/components/status.component';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import type { PermissionModel } from '@/models/permission.model';
 import type { UserModel } from '@/models/user.model';
@@ -16,8 +17,12 @@ import {
 	getUserPermissions,
 } from '@/services/users.service';
 
-// TODO this doesn't work
 export function SetupPermissionsUser() {
+	const { current } = useModalStore();
+
+	const actionEntries = current?.actionEntries;
+	const user = (actionEntries?.[0] as UserModel) ?? null;
+
 	const translationsKeys = useMemo(
 		() =>
 			[
@@ -30,108 +35,92 @@ export function SetupPermissionsUser() {
 	);
 
 	const { translations } = useTranslation(translationsKeys);
-
 	const { showToast } = useToast();
 
-	const { dataTableStore } = useDataTable<'users', UserModel>();
-	const actionEntry = useStore(dataTableStore, (state) => state.actionEntry);
+	const {
+		data: permissionsData,
+		isLoading: isLoadingPermissions,
+		error: permissionsError,
+	} = useQuery({
+		queryKey: [
+			'permissions',
+			{ order_by: 'id', direction: 'ASC', limit: 999 },
+		],
+		queryFn: () =>
+			findPermissions({ order_by: 'id', direction: 'ASC', limit: 999 }),
+	});
 
-	const user_id = actionEntry?.id;
+	const {
+		data: userPermissionsData,
+		isLoading: isLoadingUserPermissions,
+		error: userPermissionsError,
+	} = useQuery({
+		queryKey: ['user-permissions', user.id],
+		queryFn: () =>
+			getUserPermissions(user.id, {
+				order_by: 'permission_id',
+				direction: 'ASC',
+				limit: 999,
+			}),
+		enabled: !!user.id,
+	});
 
-	const [permissions, setPermissions] = useState<PermissionModel[]>([]);
+	const isLoading = isLoadingPermissions || isLoadingUserPermissions;
+	const permissions = permissionsData?.entries ?? [];
+
 	const [userPermissions, setUserPermissions] = useState<number[]>([]);
-	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
-		if (!user_id) {
-			return;
-		}
-
-		const abortController = new AbortController();
-
-		(async () => {
-			try {
-				setLoading(true);
-
-				const [permissionsResp, userPermissionsResp] =
-					await Promise.all([
-						findPermissions({
-							order_by: 'id',
-							direction: 'ASC',
-							limit: 999,
-						}),
-						getUserPermissions(user_id, {
-							order_by: 'permission_id',
-							direction: 'ASC',
-							limit: 999,
-						}),
-					]);
-
-				if (abortController.signal.aborted) {
-					return;
-				}
-
-				setPermissions(permissionsResp?.entries ?? []);
-
-				// Normalize permission IDs as numbers and remove duplicates
-				const normalizedUserPerms = [
-					...new Set(
-						userPermissionsResp?.entries.map((p) =>
-							Number(p.permission_id),
-						) ?? [],
+		if (userPermissionsData?.entries) {
+			setUserPermissions([
+				...new Set(
+					userPermissionsData.entries.map((p) =>
+						Number(p.permission_id),
 					),
-				];
+				),
+			]);
+		}
+	}, [userPermissionsData]);
 
-				setUserPermissions(normalizedUserPerms);
-			} catch (error) {
-				if (!abortController.signal.aborted) {
-					console.error(error);
+	useEffect(() => {
+		const error = permissionsError ?? userPermissionsError;
 
-					showToast({
-						severity: 'error',
-						summary: translations['app.text.error_title'],
-						detail: (error as Error).message,
-					});
-				}
-			} finally {
-				if (!abortController.signal.aborted) {
-					setLoading(false);
-				}
-			}
-		})();
+		if (error) {
+			showToast({
+				severity: 'error',
+				summary: translations['app.text.error_title'],
+				detail: (error as Error).message,
+			});
+		}
+	}, [permissionsError, userPermissionsError, showToast, translations]);
 
-		return () => {
-			abortController.abort();
-		};
-	}, [user_id, showToast, translations]);
-
-	// Group by entity
-	const listPermissions = useMemo(() => {
-		return permissions.reduce<Record<string, PermissionModel[]>>(
-			(acc, p) => {
+	const listPermissions = useMemo(
+		() =>
+			permissions.reduce<Record<string, PermissionModel[]>>((acc, p) => {
 				if (!acc[p.entity]) acc[p.entity] = [];
 				acc[p.entity].push(p);
 				return acc;
-			},
-			{},
-		);
-	}, [permissions]);
-
-	const sortedPermissions = Object.entries(listPermissions).sort(([a], [b]) =>
-		a.localeCompare(b),
+			}, {}),
+		[permissions],
 	);
 
-	// Toggle all permissions under an entity
+	const sortedPermissions = useMemo(
+		() =>
+			Object.entries(listPermissions).sort(([a], [b]) =>
+				a.localeCompare(b),
+			),
+		[listPermissions],
+	);
+
 	const handleToggleEntity = useCallback(
 		async (entity: string, checked: boolean) => {
-			if (!user_id) {
+			if (!user.id) {
 				return;
 			}
 
 			const entityPerms = listPermissions[entity];
 			const entityPermIds = entityPerms.map((p) => Number(p.id));
 
-			// Optimistic UI update
 			setUserPermissions((prev) =>
 				checked
 					? [...new Set([...prev, ...entityPermIds])]
@@ -140,7 +129,7 @@ export function SetupPermissionsUser() {
 
 			try {
 				if (checked) {
-					await createUserPermissions(user_id, entityPermIds);
+					await createUserPermissions(user.id, entityPermIds);
 
 					showToast({
 						severity: 'success',
@@ -150,10 +139,9 @@ export function SetupPermissionsUser() {
 				} else {
 					await Promise.all(
 						entityPermIds.map((id) =>
-							deleteUserPermission(user_id, id),
+							deleteUserPermission(user.id, id),
 						),
 					);
-
 					showToast({
 						severity: 'info',
 						summary: translations['app.text.success_title'],
@@ -161,13 +149,11 @@ export function SetupPermissionsUser() {
 					});
 				}
 			} catch (err) {
-				// Rollback
 				setUserPermissions((prev) =>
 					checked
 						? prev.filter((id) => !entityPermIds.includes(id))
 						: [...new Set([...prev, ...entityPermIds])],
 				);
-
 				showToast({
 					severity: 'error',
 					summary: translations['app.text.error_title'],
@@ -175,13 +161,14 @@ export function SetupPermissionsUser() {
 				});
 			}
 		},
-		[user_id, listPermissions, showToast, translations],
+		[user.id, listPermissions, showToast, translations],
 	);
 
-	// Toggle a single permission
 	const handleTogglePermission = useCallback(
 		async (permission_id: number, checked: boolean, label: string) => {
-			if (!user_id) return;
+			if (!user.id) {
+				return;
+			}
 
 			const numericId = Number(permission_id);
 
@@ -193,7 +180,7 @@ export function SetupPermissionsUser() {
 
 			try {
 				if (checked) {
-					await createUserPermissions(user_id, [numericId]);
+					await createUserPermissions(user.id, [numericId]);
 
 					showToast({
 						severity: 'success',
@@ -201,7 +188,7 @@ export function SetupPermissionsUser() {
 						detail: `'${label}' granted`,
 					});
 				} else {
-					await deleteUserPermission(user_id, numericId);
+					await deleteUserPermission(user.id, numericId);
 
 					showToast({
 						severity: 'info',
@@ -210,13 +197,11 @@ export function SetupPermissionsUser() {
 					});
 				}
 			} catch (err) {
-				// Rollback on failure
 				setUserPermissions((prev) =>
 					checked
 						? prev.filter((id) => id !== numericId)
 						: [...new Set([...prev, numericId])],
 				);
-
 				showToast({
 					severity: 'error',
 					summary: translations['app.text.error_title'],
@@ -224,10 +209,10 @@ export function SetupPermissionsUser() {
 				});
 			}
 		},
-		[user_id, showToast, translations],
+		[user.id, showToast, translations],
 	);
 
-	if (loading) {
+	if (isLoading) {
 		return (
 			<LoadingComponent description={translations['app.text.loading']} />
 		);
@@ -283,18 +268,18 @@ export function SetupPermissionsUser() {
 								);
 
 								return (
-									<label
+									<Label
 										key={perm.id}
-										className="flex items-center gap-2 cursor-pointer p-2 hover:rounded-md hover:bg-base-300/30"
 										htmlFor={`permission-${perm.id}`}
+										className="flex items-center gap-2 cursor-pointer p-2 hover:rounded-md hover:bg-base-300"
 									>
 										<Checkbox
-											inputId={`permission-${perm.id}`}
+											id={`permission-${perm.id}`}
 											checked={checked}
-											onChange={(e) =>
+											onCheckedChange={(checked) =>
 												handleTogglePermission(
 													Number(perm.id),
-													e.checked ?? false,
+													checked === true,
 													`${entity}.${perm.operation}`,
 												)
 											}
@@ -302,7 +287,7 @@ export function SetupPermissionsUser() {
 										<span className="capitalize">
 											{perm.operation}
 										</span>
-									</label>
+									</Label>
 								);
 							})}
 						</div>

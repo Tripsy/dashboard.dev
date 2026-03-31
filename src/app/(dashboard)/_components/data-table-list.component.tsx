@@ -14,7 +14,6 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { useStore } from 'zustand/react';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import {
-	DataSourceKey,
 	type DataTableFiltersType,
 	getDataSourceConfig,
 } from '@/config/data-source.config';

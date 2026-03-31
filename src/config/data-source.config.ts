@@ -1,17 +1,5 @@
 import type React from 'react';
 import type { DataTableColumnType } from '@/app/(dashboard)/_components/data-table-value';
-import { dataSourceConfigBrands } from '@/app/(dashboard)/dashboard/brands/brands.definition';
-import { dataSourceConfigCashFlow } from '@/app/(dashboard)/dashboard/cash-flow/cash-flow.definition';
-import { dataSourceConfigClientAddress } from '@/app/(dashboard)/dashboard/client-address/client-address.definition';
-import { dataSourceConfigClients } from '@/app/(dashboard)/dashboard/clients/clients.definition';
-import { dataSourceConfigCronHistory } from '@/app/(dashboard)/dashboard/cron-history/cron-history.definition';
-import { dataSourceConfigLogData } from '@/app/(dashboard)/dashboard/log-data/log-data.definition';
-import { dataSourceConfigLogHistory } from '@/app/(dashboard)/dashboard/log-history/log-history.definition';
-import { dataSourceConfigMailQueue } from '@/app/(dashboard)/dashboard/mail-queue/mail-queue.definition';
-import { dataSourceConfigPermissions } from '@/app/(dashboard)/dashboard/permissions/permissions.definition';
-import { dataSourceConfigPlaces } from '@/app/(dashboard)/dashboard/places/places.definition';
-import { dataSourceConfigTemplates } from '@/app/(dashboard)/dashboard/templates/templates.definition';
-import { dataSourceConfigUsers } from '@/app/(dashboard)/dashboard/users/users.definition';
 import type {
 	ButtonHover,
 	ButtonSize,
@@ -128,6 +116,7 @@ export type DataTableCustomEntrySelectedType<Model> = (
 ) => Promise<BaseModelType | null>;
 
 export type DataTableActionConfigType<Model, Function> = {
+	// biome-ignore lint/suspicious/noExplicitAny: It's fine
 	component?: React.ComponentType<any>;
 	modalProps?: {
 		size?: ModalSizeType;
@@ -241,34 +230,67 @@ export type DataSourceConfigType<
 	actions?: DataTableActionsType<Entity, FormValues>;
 };
 
-export const dataSourceConfig: {
-	[K in DataSourceKey]: DataSourceConfigType<K, any, any>;
-} = {
-	brands: dataSourceConfigBrands,
-	'cash-flow': dataSourceConfigCashFlow,
-	'client-address': dataSourceConfigClientAddress,
-	clients: dataSourceConfigClients,
-	'cron-history': dataSourceConfigCronHistory,
-	'log-data': dataSourceConfigLogData,
-	'log-history': dataSourceConfigLogHistory,
-	'mail-queue': dataSourceConfigMailQueue,
-	permissions: dataSourceConfigPermissions,
-	places: dataSourceConfigPlaces,
-	templates: dataSourceConfigTemplates,
-	users: dataSourceConfigUsers,
-};
+const registry: Partial<
+	// biome-ignore lint/suspicious/noExplicitAny: It's fine
+	Record<DataSourceKey, DataSourceConfigType<any, any, any>>
+> = {};
 
-export type DataSourceRegistry = typeof dataSourceConfig;
+export function registerDataSource<
+	K extends DataSourceKey,
+	Entity,
+	FormValues extends FormStateValuesType = EmptyFormValues,
+>(key: K, config: DataSourceConfigType<K, Entity, FormValues>) {
+	if (hasDataSourceConfig(key)) {
+		return;
+	}
+
+	registry[key] = config;
+}
+
+export function hasDataSourceConfig<K extends DataSourceKey>(key: K): boolean {
+	return !!registry[key];
+}
 
 export function getDataSourceConfig<
 	K extends DataSourceKey,
-	P extends keyof DataSourceRegistry[K],
->(key: K, prop: P): DataSourceRegistry[K][P] {
-	const config = dataSourceConfig[key];
+	// biome-ignore lint/suspicious/noExplicitAny: It's fine
+	P extends keyof DataSourceConfigType<K, any, any>,
+	// biome-ignore lint/suspicious/noExplicitAny: It's fine
+>(key: K, prop: P): DataSourceConfigType<K, any, any>[P] {
+	const config = registry[key];
 
 	if (!config) {
 		throw new Error(`DataSource "${key}" is not registered`);
 	}
 
 	return config[prop];
+}
+
+export function hasValidateForm<FormValues>(functions: unknown): functions is {
+	validateForm: ValidateFormFunctionType<FormValues>;
+} {
+	return (
+		typeof functions === 'object' &&
+		functions !== null &&
+		'validateForm' in functions &&
+		// biome-ignore lint/suspicious/noExplicitAny: It's fine
+		typeof (functions as any).validateForm === 'function'
+	);
+}
+
+export function hasSyncFormState<
+	K extends DataSourceKey,
+	Entity,
+	FormValues extends FormStateValuesType,
+>(
+	functions: unknown,
+): functions is {
+	syncFormState: ValidateSyncFormStateFunctionType<K, Entity, FormValues>;
+} {
+	return (
+		typeof functions === 'object' &&
+		functions !== null &&
+		'syncFormState' in functions &&
+		typeof functions.syncFormState === 'function'
+	);
 }

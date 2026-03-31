@@ -37,7 +37,6 @@ const logHistoryDataTableFilters: LogHistoryDataTableFiltersType = {
 
 export const dataSourceConfigLogHistory = {
 	dataTableState: {
-		reloadTrigger: 0,
 		first: 0,
 		rows: 10,
 		sortField: 'id',

@@ -32,7 +32,6 @@ const mailQueueDataTableFilters: MailQueueDataTableFiltersType = {
 
 export const dataSourceConfigMailQueue = {
 	dataTableState: {
-		reloadTrigger: 0,
 		first: 0,
 		rows: 10,
 		sortField: 'id',

@@ -33,7 +33,7 @@ export function DataTableModal() {
 	const actionTitleKey = `${dataSource}.action.${actionName}.title`;
 
 	const translationsKeys = useMemo(
-		() => [actionTitleKey],
+		() => [actionTitleKey] as const,
 		[actionTitleKey],
 	);
 
@@ -51,19 +51,13 @@ export function DataTableModal() {
 		throw new Error(`Action name must be defined`);
 	}
 
-	if (actionMode === 'action') {
-		if (!actionEntries) {
-			throw new Error(`No entries selected`);
-		}
+	const modalContent = () => {
+		if (actionMode === 'action') {
+			if (!actionEntries) {
+				throw new Error(`No entries selected`);
+			}
 
-		return (
-			<Modal
-				size={props?.size || 'md'}
-				className={props?.className}
-				isOpen={isOpen}
-				title={translations[actionTitleKey]}
-				onClose={close}
-			>
+			return (
 				<DataTableActionModal
 					key={`action-${actionName}`}
 					dataSource={dataSource}
@@ -72,23 +66,52 @@ export function DataTableModal() {
 					onSuccessAction={onSuccessAction}
 					onCloseAction={close}
 				/>
-			</Modal>
-		);
-	}
+			);
+		}
 
-	if (!ActionComponent) {
-		throw new Error(
-			`Component not defined for ${dataSource} / ${actionName}`,
-		);
-	}
+		if (!ActionComponent) {
+			throw new Error(
+				`Component not defined for ${dataSource} / ${actionName}`,
+			);
+		}
 
-	if (actionMode === 'form' && !['create', 'update'].includes(actionName)) {
-		throw new Error(
-			`Invalid action name (eg: ${actionName}) for form mode`,
-		);
-	}
+		if (
+			actionMode === 'form' &&
+			!['create', 'update'].includes(actionName)
+		) {
+			throw new Error(
+				`Invalid action name (eg: ${actionName}) for form mode`,
+			);
+		}
 
-	const actionEntry = actionEntries ? actionEntries[0] : null;
+		const actionEntry = actionEntries?.[0] ?? null;
+
+		return (
+			<>
+				{actionMode === 'other' && <ActionComponent />}
+				{actionMode === 'view' && (
+					<ViewEntry actionEntry={actionEntry}>
+						{ActionComponent}
+					</ViewEntry>
+				)}
+				{actionMode === 'form' && (
+					<FormManage
+						key={
+							actionEntry?.id
+								? `${actionName}-${actionEntry.id}`
+								: actionName
+						}
+						dataSource={dataSource}
+						actionName={actionName as 'create' | 'update'}
+						actionEntry={actionEntry}
+						onSuccessAction={onSuccessAction}
+					>
+						<ActionComponent />
+					</FormManage>
+				)}
+			</>
+		);
+	};
 
 	return (
 		<Modal
@@ -98,29 +121,7 @@ export function DataTableModal() {
 			title={translations[actionTitleKey]}
 			onClose={close}
 		>
-			{actionMode === 'other' && <ActionComponent />}
-
-			{actionMode === 'view' && (
-				<ViewEntry actionEntry={actionEntry ?? null}>
-					{ActionComponent}
-				</ViewEntry>
-			)}
-
-			{actionMode === 'form' && (
-				<FormManage
-					key={
-						actionEntry?.id
-							? `${actionName}-${actionEntry.id}`
-							: actionName
-					}
-					dataSource={dataSource}
-					actionName={actionName as 'create' | 'update'}
-					actionEntry={actionEntry ?? null}
-					onSuccessAction={onSuccessAction}
-				>
-					<ActionComponent />
-				</FormManage>
-			)}
+			{modalContent()}
 		</Modal>
 	);
 }

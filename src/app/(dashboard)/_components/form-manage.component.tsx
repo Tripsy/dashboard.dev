@@ -27,6 +27,7 @@ import ValueError from '@/exceptions/value.error';
 import { createHandleChange } from '@/helpers/form.helper';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
+import { useRefreshDataTable } from '@/hooks/use-refresh-data-table.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { useToast } from '@/providers/toast.provider';
 
@@ -44,22 +45,126 @@ export function FormManage<K extends DataSourceKey>({
 	children: React.ReactElement<unknown>;
 }) {
 	const { showToast } = useToast();
-
 	const { close } = useModalStore();
+	const refreshDataTable = useRefreshDataTable();
 
-	// const closeOut = useStore(dataTableStore, (state) => state.closeOut);
-	// const refreshTableState = useStore(
-	// 	dataTableStore,
-	// 	(state) => state.refreshTableState,
-	// );
+	// Derive data via hooks/memos — no guards yet
+	const formState = useMemo(
+		() => getDataSourceConfig(dataSource, 'formState'),
+		[dataSource],
+	);
+	const functions = useMemo(
+		() => getDataSourceConfig(dataSource, 'functions'),
+		[dataSource],
+	);
+	const actions = useMemo(
+		() => getDataSourceConfig(dataSource, 'actions'),
+		[dataSource],
+	);
 
-	const formState = getDataSourceConfig(dataSource, 'formState');
+	const initState = useMemo(() => {
+		if (!formState) {
+			return null;
+		}
 
+		if (
+			actionName === 'update' &&
+			actionEntry &&
+			'syncFormState' in functions
+		) {
+			return (functions.syncFormState as Function)(
+				formState,
+				actionEntry,
+			);
+		}
+
+		return formState;
+	}, [formState, functions, actionName, actionEntry]);
+
+	type FormStateType = Awaited<typeof initState>;
+	type FormValues = typeof initState.values;
+
+	const [state, action, pending] = useActionState<FormStateType, FormData>(
+		async (state, formData) => formAction(state, formData),
+		initState ?? ({} as FormStateType),
+	);
+
+	const [formValues, setFormValues] = useFormValues<FormValues>(state.values);
+
+	const validate = useCallback(
+		(values: FormValues) => {
+			if (!('validateForm' in functions)) return {};
+			return (functions.validateForm as Function)(values, state?.id);
+		},
+		[state?.id, functions],
+	);
+
+	const { errors, submitted, markSubmit, markFieldAsTouched } =
+		useFormValidation({ formValues, validate, debounceDelay: 800 });
+
+	const actionLabelKey = `${dataSource}.action.${actionName}.label`;
+	const successMessageKey = `${dataSource}.action.${actionName}.success`;
+
+	const translationsKeys = useMemo(
+		() =>
+			[
+				successMessageKey,
+				actionLabelKey,
+				'app.text.success_title',
+				'app.text.saving',
+			] as const,
+		[actionLabelKey, successMessageKey],
+	);
+
+	const { translations } = useTranslation(translationsKeys);
+
+	const onSuccess = useCallback(
+		async (actionName: string) => {
+			if (onSuccessAction) {
+				onSuccessAction(actionName);
+			} else {
+				if (actionName === 'create') {
+					handleReset(dataSource); // Reset data-table filters form
+				}
+
+				await refreshDataTable(dataSource);
+
+				showToast({
+					severity: 'success',
+					summary: translations['app.text.success_title'],
+					detail: translations[successMessageKey],
+				});
+
+				close();
+			}
+		},
+		[
+			onSuccessAction,
+			dataSource,
+			refreshDataTable,
+			showToast,
+			close,
+			translations,
+			successMessageKey,
+		],
+	);
+
+	useEffect(() => {
+		if (state.situation === 'success') {
+			onSuccess(actionName).catch((error) => {
+				showToast({
+					severity: 'error',
+					summary: 'Error',
+					detail: error.message,
+				});
+			});
+		}
+	}, [state.situation, onSuccess, actionName, showToast]);
+
+	// Guards
 	if (!formState) {
 		throw new ValueError(`'formState' is not defined for ${dataSource}`);
 	}
-
-	const functions = getDataSourceConfig(dataSource, 'functions');
 
 	if (
 		!('syncFormState' in functions) ||
@@ -79,98 +184,14 @@ export function FormManage<K extends DataSourceKey>({
 		);
 	}
 
-	const actions = useMemo(
-		() => getDataSourceConfig(dataSource, 'actions'),
-		[dataSource],
-	);
-
 	if (!actions) {
-		throw new Error(`Actions must be defined for ${dataSource}`);
+		throw new ValueError(`Actions must be defined for ${dataSource}`);
 	}
-
-	const initState =
-		actionName === 'update' && actionEntry
-			? functions.syncFormState(formState, actionEntry)
-			: formState;
-
-	type FormStateType = Awaited<typeof initState>;
-	type FormValues = typeof initState.values;
-
-	const [state, action, pending] = useActionState<FormStateType, FormData>(
-		async (state: FormStateType, formData: FormData) =>
-			formAction(state, formData),
-		initState,
-	);
-
-	const [formValues, setFormValues] = useFormValues<FormValues>(state.values);
-
-	const validate = useCallback(
-		(values: FormValues) => {
-			return functions.validateForm(values, state.id);
-		},
-		[state.id, functions],
-	);
-
-	const { errors, submitted, markSubmit, markFieldAsTouched } =
-		useFormValidation<FormValues>({
-			formValues,
-			validate,
-			debounceDelay: 800,
-		});
 
 	const handleChange = createHandleChange<FormValues>(
 		setFormValues,
 		markFieldAsTouched,
 	);
-
-	const actionLabelKey = `${dataSource}.action.${actionName}.label`;
-	const successMessageKey = `${dataSource}.action.${actionName}.success`;
-
-	const translationsKeys = useMemo(
-		() =>
-			[
-				successMessageKey,
-				actionLabelKey,
-				'app.text.success_title',
-				'app.text.saving',
-			] as const,
-		[actionLabelKey, successMessageKey],
-	);
-
-	const { translations } = useTranslation(translationsKeys);
-
-	const onSuccess = (actionName: string) => {
-		if (onSuccessAction) {
-			onSuccessAction(actionName);
-		} else {
-			// Default success action
-			if (actionName === 'create') {
-				// Reset filters form
-				handleReset(dataSource);
-				// TODO
-				// refreshTableState(); // Force data reload to show the new item
-			} else {
-				// TODO
-				// refreshTableState();
-			}
-
-			showToast({
-				severity: 'success',
-				summary: translations['app.text.success_title'],
-				detail: translations[successMessageKey],
-			});
-
-			close();
-		}
-	};
-
-	// Handle success state
-	useEffect(() => {
-		if (state.situation === 'success') {
-			onSuccess(actionName);
-		}
-	}, [state.situation, onSuccess, actionName]);
-
 	const ActionButtonIcon = getActionIcon(
 		actions[actionName]?.buttonProps?.icon || actionName,
 	);

@@ -1,7 +1,8 @@
 'use client';
 
-import React, {useMemo, useState} from 'react';
+import React, { useMemo, useState } from 'react';
 import { DataTableActionButton } from '@/app/(dashboard)/_components/data-table-action-button.component';
+import type { ModalOnSuccess } from '@/app/(dashboard)/_stores/modal.store';
 import { Icons } from '@/components/icon.component';
 import { LoadingComponent } from '@/components/status.component';
 import { Button } from '@/components/ui/button';
@@ -14,9 +15,9 @@ import {
 import { ApiError } from '@/exceptions/api.error';
 import ValueError from '@/exceptions/value.error';
 import { replaceVars } from '@/helpers/string.helper';
+import { useRefreshDataTable } from '@/hooks/use-refresh-data-table.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { useToast } from '@/providers/toast.provider';
-import type {ModalOnSuccess} from "@/app/(dashboard)/_stores/modal.store";
 
 function displayActionEntries<K extends DataSourceKey, Model>(
 	dataSource: K,
@@ -43,7 +44,7 @@ export function DataTableActionModal<K extends DataSourceKey>({
 	actionName,
 	actionEntries,
 	onSuccessAction,
-	onCloseAction
+	onCloseAction,
 }: {
 	dataSource: K;
 	actionName: string;
@@ -53,6 +54,8 @@ export function DataTableActionModal<K extends DataSourceKey>({
 }) {
 	const [loading, setLoading] = useState(false);
 	const { showToast } = useToast();
+
+	const refreshDataTable = useRefreshDataTable();
 
 	const confirmTextKey = `${dataSource}.action.${actionName}.confirmText`;
 
@@ -70,12 +73,6 @@ export function DataTableActionModal<K extends DataSourceKey>({
 
 	const { translations, isTranslationLoading } =
 		useTranslation(translationsKeys);
-
-	if (isTranslationLoading) {
-		return (
-			<LoadingComponent description={translations['app.text.loading']} />
-		);
-	}
 
 	const actions = getDataSourceConfig(dataSource, 'actions');
 
@@ -95,34 +92,34 @@ export function DataTableActionModal<K extends DataSourceKey>({
 		throw new ValueError(`Multiple entries provided for single action`);
 	}
 
-	async function executeFetch(ids: number[]) {
-		const actionFunction = actionProps.function;
+	const actionFunction = actionProps.function;
 
-		if (!actionFunction || typeof actionFunction !== 'function') {
-			throw new ValueError(`Function is not defined for ${actionName}`);
-		}
-
-		return actionFunction(ids);
+	if (!actionFunction || typeof actionFunction !== 'function') {
+		throw new ValueError(`Function is not defined for ${actionName}`);
 	}
 
 	const handleAction = async () => {
 		setLoading(true);
 
 		try {
-			const ids: number[] = actionEntries.map((entry) => entry.id);
-
-			const fetchResponse = await executeFetch(ids);
+			const fetchResponse = await actionFunction(
+				actionEntries.map((e) => e.id),
+			);
 
 			if (onSuccessAction) {
 				onSuccessAction(actionName);
 			} else {
-				refreshTableState();
+				await refreshDataTable(dataSource);
 
 				showToast({
 					severity: fetchResponse?.success ? 'success' : 'error',
 					summary: fetchResponse?.success ? 'Success' : 'Error',
-					detail: fetchResponse?.message || translations['error.form'],
+					detail:
+						fetchResponse?.message ||
+						translations['app.error.form'],
 				});
+
+				onCloseAction();
 			}
 		} catch (error) {
 			showToast({
@@ -131,18 +128,25 @@ export function DataTableActionModal<K extends DataSourceKey>({
 				detail:
 					error instanceof ValueError || error instanceof ApiError
 						? error.message
-						: translations['error.form'],
+						: translations['app.error.form'],
 			});
-		}
 
-		setLoading(false);
-		onCloseAction();
+			onCloseAction();
+		} finally {
+			setLoading(false);
+		}
 	};
 
 	const actionContentEntries = displayActionEntries(
 		dataSource,
-		actionEntries
+		actionEntries,
 	);
+
+	if (isTranslationLoading) {
+		return (
+			<LoadingComponent description={translations['app.text.loading']} />
+		);
+	}
 
 	return (
 		<>

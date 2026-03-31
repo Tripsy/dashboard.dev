@@ -16,7 +16,6 @@ import {
 export interface DataTableSlice {
 	tableState: DataTableStateType;
 	updateTableState: (newState: Partial<DataTableStateType>) => void;
-	refreshTableState: () => void;
 }
 
 export const createDataTableSlice =
@@ -41,13 +40,6 @@ export const createDataTableSlice =
 						state.tableState.filters,
 				};
 			}),
-
-		refreshTableState: () => {
-			set((state: Draft<DataTableSlice>) => {
-				state.tableState.reloadTrigger =
-					(state.tableState.reloadTrigger || 0) + 1;
-			});
-		},
 	});
 
 // ============================================================================

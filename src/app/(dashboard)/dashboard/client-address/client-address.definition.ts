@@ -112,7 +112,6 @@ export const clientAddressDataTableFilters: ClientAddressDataTableFiltersType =
 
 export const dataSourceConfigClientAddress = {
 	dataTableState: {
-		reloadTrigger: 0,
 		first: 0,
 		rows: 10,
 		sortField: 'id',

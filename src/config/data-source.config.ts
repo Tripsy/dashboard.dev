@@ -164,7 +164,6 @@ export type DataTableFiltersType = {
 };
 
 export type DataTableStateType = {
-	reloadTrigger: number; // Flag used to reload the data table entries
 	first: number;
 	rows: number;
 	sortField: string;

@@ -1,5 +1,6 @@
 'use client';
 
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { Column } from 'primereact/column';
 import {
 	DataTable,
@@ -9,18 +10,54 @@ import {
 } from 'primereact/datatable';
 import type { PaginatorCurrentPageReportOptions } from 'primereact/paginator';
 import type React from 'react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useStore } from 'zustand/react';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import {
+	DataSourceKey,
 	type DataTableFiltersType,
-	type FindFunctionResponseType,
 	getDataSourceConfig,
 } from '@/config/data-source.config';
 import { toDateInstanceCustom } from '@/helpers/date.helper';
 import { replaceVars } from '@/helpers/string.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import type { QueryFiltersType } from '@/types/api.type';
+
+function findFunctionFilter(filters: DataTableFiltersType): QueryFiltersType {
+	return Object.entries(filters).reduce((acc, [key, filter]) => {
+		const { value } = filter;
+
+		// Skip empty values
+		if (value === null || value === undefined || value === '') {
+			return acc;
+		}
+
+		// Handle date filters
+		if (/_date_start$/.test(key)) {
+			const date = toDateInstanceCustom(value as string);
+
+			if (!date) {
+				throw new Error(`Invalid start date: ${value}`);
+			}
+
+			acc[key] = date.startOf('day').toISOString();
+		} else if (/_date_end$/.test(key)) {
+			const date = toDateInstanceCustom(value as string);
+
+			if (!date) {
+				throw new Error(`Invalid end date: ${value}`);
+			}
+
+			acc[key] = date.endOf('day').toISOString();
+		} else {
+			// Convert key 'global' to 'term' for search
+			const newKey = key === 'global' ? 'term' : key;
+			acc[newKey] = String(value);
+		}
+
+		return acc;
+	}, {} as QueryFiltersType);
+}
 
 type SelectionChangeEvent<T> = {
 	originalEvent: React.SyntheticEvent;
@@ -80,11 +117,6 @@ export default function DataTableList<Model extends DataTableValue>(props: {
 		dataTableStore,
 		(state) => state.clearSelectedEntries,
 	);
-	const isLoading = useStore(dataTableStore, (state) => state.isLoading);
-	const setLoading = useStore(dataTableStore, (state) => state.setLoading);
-
-	const [data, setData] = useState<Model[]>([]);
-	const [totalRecords, setTotalRecords] = useState(0);
 
 	const translationsKeys = useMemo(
 		() => ['dashboard.text.no_entries'] as const,
@@ -102,125 +134,49 @@ export default function DataTableList<Model extends DataTableValue>(props: {
 		});
 	}, [clearSelectedEntries, updateTableState, tableState.filters]);
 
-	function findFunctionFilter(
-		filters: DataTableFiltersType,
-	): QueryFiltersType {
-		return Object.entries(filters).reduce((acc, [key, filter]) => {
-			const { value } = filter;
-
-			// Skip empty values
-			if (value === null || value === undefined || value === '') {
-				return acc;
-			}
-
-			// Handle date filters
-			if (/_date_start$/.test(key)) {
-				const date = toDateInstanceCustom(value as string);
-
-				if (!date) {
-					throw new Error(`Invalid start date: ${value}`);
-				}
-
-				acc[key] = date.startOf('day').toISOString();
-			} else if (/_date_end$/.test(key)) {
-				const date = toDateInstanceCustom(value as string);
-
-				if (!date) {
-					throw new Error(`Invalid end date: ${value}`);
-				}
-
-				acc[key] = date.endOf('day').toISOString();
-			} else {
-				// Convert key 'global' to 'term' for search
-				const newKey = key === 'global' ? 'term' : key;
-				acc[newKey] = String(value);
-			}
-
-			return acc;
-		}, {} as QueryFiltersType);
-	}
-
-	// biome-ignore lint/correctness/useExhaustiveDependencies: `tableState.reloadTrigger` is actually required as part of functionality
-	useEffect(() => {
-		const abortController = new AbortController();
-
-		(async () => {
-			try {
-				setLoading(true);
-
-				const loadLazyData = async (signal?: AbortSignal) => {
-					if (signal?.aborted) {
-						return;
-					} // Don't proceed if already aborted
-
-					const functions = getDataSourceConfig(
-						dataSource,
-						'functions',
-					);
-					const findFunction = functions?.find;
-
-					if (!findFunction) {
-						throw new Error(
-							`No fetch function found for ${dataSource}`,
-						);
-					}
-
-					const data = (await findFunction({
-						order_by: tableState.sortField,
-						direction: tableState.sortOrder === 1 ? 'ASC' : 'DESC',
-						limit: tableState.rows,
-						page:
-							tableState.rows > 0
-								? Math.floor(
-										tableState.first / tableState.rows,
-									) + 1
-								: 1,
-						filter: findFunctionFilter(tableState.filters),
-					})) as FindFunctionResponseType<Model>;
-
-					if (signal?.aborted) {
-						return;
-					} // Don't proceed if already aborted
-
-					if (!data) {
-						throw new Error(
-							`Could not retrieve ${dataSource} data`,
-						);
-					}
-
-					return data;
-				};
-
-				const response = await loadLazyData(abortController.signal);
-
-				if (response && !abortController.signal.aborted) {
-					setData(response.entries);
-					setTotalRecords(response.pagination.total);
-				}
-			} catch (error) {
-				if (!abortController.signal.aborted) {
-					throw error;
-				}
-			} finally {
-				if (!abortController.signal.aborted) {
-					setLoading(false);
-				}
-			}
-		})();
-
-		return () => {
-			abortController.abort();
-		};
-	}, [
+	const queryKey = [
+		'dataTable',
 		dataSource,
+		tableState.first,
+		tableState.rows,
 		tableState.sortField,
 		tableState.sortOrder,
-		tableState.rows,
-		tableState.first,
 		tableState.filters,
-		setLoading,
-		tableState.reloadTrigger,
-	]);
+	];
+
+	const { data, isLoading } = useQuery({
+		queryKey,
+		queryFn: async () => {
+			const functions = getDataSourceConfig(dataSource, 'functions');
+
+			const findFunction = functions?.find;
+
+			if (!findFunction) {
+				throw new Error(`No fetch function found for ${dataSource}`);
+			}
+
+			const response = await findFunction({
+				order_by: tableState.sortField,
+				direction: tableState.sortOrder === 1 ? 'ASC' : 'DESC',
+				limit: tableState.rows,
+				page:
+					tableState.rows > 0
+						? Math.floor(tableState.first / tableState.rows) + 1
+						: 1,
+				filter: findFunctionFilter(tableState.filters),
+			});
+
+			if (!response) {
+				throw new Error(`Could not retrieve ${dataSource} data`);
+			}
+
+			return response;
+		},
+		placeholderData: keepPreviousData,
+	});
+
+	const entries = data?.entries ?? [];
+	const totalRecords = data?.pagination.total ?? 0;
 
 	const onPage = useCallback(
 		(event: DataTablePageEvent) => {
@@ -286,7 +242,7 @@ export default function DataTableList<Model extends DataTableValue>(props: {
 	return (
 		<DataTable
 			emptyMessage={translations['dashboard.text.no_entries']}
-			value={data}
+			value={entries}
 			lazy
 			dataKey={props.dataKey}
 			selectionMode={selectionMode}

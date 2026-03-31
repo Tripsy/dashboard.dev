@@ -121,7 +121,6 @@ export const brandsDataTableFilters: BrandsDataTableFiltersType = {
 
 export const dataSourceConfigBrands = {
 	dataTableState: {
-		reloadTrigger: 0,
 		first: 0,
 		rows: 10,
 		sortField: 'id',

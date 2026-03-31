@@ -177,7 +177,6 @@ export const clientsDataTableFilters: ClientsDataTableFiltersType = {
 
 export const dataSourceConfigClients = {
 	dataTableState: {
-		reloadTrigger: 0,
 		first: 0,
 		rows: 10,
 		sortField: 'id',

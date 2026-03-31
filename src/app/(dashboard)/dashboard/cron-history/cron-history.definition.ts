@@ -28,7 +28,6 @@ export const cronHistoryDataTableFilters: CronHistoryDataTableFiltersType = {
 
 export const dataSourceConfigCronHistory = {
 	dataTableState: {
-		reloadTrigger: 0,
 		first: 0,
 		rows: 10,
 		sortField: 'id',

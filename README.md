@@ -192,29 +192,32 @@ $ pnpm run madge
 
 # Bugs & Issues & Ideas
 
-1. Strange interaction on login after existing session is removed
-2. App reload on tab switch - maybe a Zustand configuration issue
-3. Clients > Client Address > Brands > Places > Cash Flow
+1. Check TODOs
+2. Resolve madge
+3. Fix biome
+4. Strange interaction on login after existing session is removed
+5. App reload on tab switch - maybe a Zustand configuration issue
+6. Clients > Client Address > Brands > Places > Cash Flow
     - address details
     - address manage
     - cash flow status update 
     - cash flow manage
     - cash flow details
     - add places  icons region > area, city > building, country -> map
-4. Review security
-5. Add section "documentation"
-6. login with google / facebook
-7. Replace all console.error with logging
-8. Implement kill all sessions except current
-      // // This will actually remove all sessions - keep it for further implementation
-      // await AccountTokenRepository.createQuery()
-      //     .filterBy('user_id', policy.getUserId())
-      //     .delete(false, true);
-9. For template section
-    - would be a nice idea to keep track of the last changes (maybe add a new column - prev version id and a button to restore to that version)
-    - view presentation could be enhanced
-10. https://nextjs.org/docs/app/getting-started/partial-prerendering
-11. https://react.dev/learn/react-compiler/introduction
+7. Review security
+8. Add section "documentation"
+9. login with google / facebook
+10. Replace all console.error with logging
+11. Implement kill all sessions except current
+       // // This will actually remove all sessions - keep it for further implementation
+       // await AccountTokenRepository.createQuery()
+       //     .filterBy('user_id', policy.getUserId())
+       //     .delete(false, true);
+12. For template section
+     - would be a nice idea to keep track of the last changes (maybe add a new column - prev version id and a button to restore to that version)
+     - view presentation could be enhanced
+13. https://nextjs.org/docs/app/getting-started/partial-prerendering
+14. https://react.dev/learn/react-compiler/introduction
 
 # Dependencies
 

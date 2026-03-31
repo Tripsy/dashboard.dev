@@ -223,7 +223,6 @@ export const usersDataTableFilters: UsersDataTableFiltersType = {
 
 export const dataSourceConfigUsers = {
 	dataTableState: {
-		reloadTrigger: 0,
 		first: 0,
 		rows: 10,
 		sortField: 'id',

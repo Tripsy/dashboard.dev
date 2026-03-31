@@ -19,7 +19,7 @@ import { useToast } from '@/providers/toast.provider';
 
 export function DataTableActions<
 	K extends DataSourceKey,
-	Model extends BaseModelType | null,
+	Model extends BaseModelType,
 >() {
 	const [error, setError] = useState<string | null>(null);
 
@@ -83,8 +83,10 @@ export function DataTableActions<
 			entries: Model[],
 			allowedEntries: 'free' | 'single' | 'multiple',
 			customEntrySelected?: DataTableCustomEntrySelectedType<Model>,
-		): Promise<BaseModelType[]> => {
-			if (allowedEntries === 'free') return [];
+		) => {
+			if (allowedEntries === 'free') {
+				return [];
+			}
 
 			if (allowedEntries === 'single') {
 				if (customEntrySelected) {
@@ -93,10 +95,16 @@ export function DataTableActions<
 
 						return resolved ? [resolved] : [];
 					} catch (error) {
-						showToast({ severity: 'error', summary: translations['app.text.error_title'], detail: (error as Error).message });
-						return [];
+						showToast({
+							severity: 'error',
+							summary: translations['app.text.error_title'],
+							detail: (error as Error).message,
+						});
+
+						return null;
 					}
 				}
+
 				return entries[0] ? [entries[0] as BaseModelType] : [];
 			}
 
@@ -105,22 +113,13 @@ export function DataTableActions<
 		[showToast, translations],
 	);
 
-	const castActionProps = useCallback(
-		(actionProps: DataTableActionConfigType<Model, unknown>) => ({
-			customEntryCheck: actionProps.customEntryCheck,
-			customEntrySelected: actionProps.customEntrySelected,
-		}),
-		[],
-	);
-
 	const handleAction = useCallback(
 		async (
 			actionName: string,
 			entries: Model[],
 			actionProps: DataTableActionConfigType<Model, unknown>,
 		) => {
-			const { customEntryCheck, customEntrySelected } =
-				castActionProps(actionProps);
+			const { customEntryCheck, customEntrySelected } = actionProps;
 
 			if (
 				!allowAction(
@@ -140,20 +139,17 @@ export function DataTableActions<
 				customEntrySelected,
 			);
 
+			if (actionEntries === null) {
+				return;
+			}
+
 			open({
 				dataSource,
 				actionName,
 				actionEntries,
 			});
 		},
-		[
-			allowAction,
-			castActionProps,
-			dataSource,
-			open,
-			resolveActionEntries,
-			translations,
-		],
+		[allowAction, dataSource, open, resolveActionEntries, translations],
 	);
 
 	useEffect(() => {
@@ -216,7 +212,7 @@ export function DataTableActions<
 				return null;
 			}
 
-			const { customEntryCheck } = castActionProps(actionProps);
+			const { customEntryCheck } = actionProps;
 
 			if (
 				!allowAction(
@@ -242,10 +238,6 @@ export function DataTableActions<
 			);
 		});
 	};
-
-	if (error) {
-		return null;
-	}
 
 	return (
 		<div className="flex flex-wrap gap-4 justify-between min-h-18.5 py-4">

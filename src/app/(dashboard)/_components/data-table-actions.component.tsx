@@ -16,7 +16,6 @@ import { useTranslation } from '@/hooks/use-translation.hook';
 import { hasPermission } from '@/models/auth.model';
 import { useAuth } from '@/providers/auth.provider';
 import { useToast } from '@/providers/toast.provider';
-import { getUser } from '@/services/users.service';
 
 export function DataTableActions<
 	K extends DataSourceKey,
@@ -79,29 +78,29 @@ export function DataTableActions<
 		[auth],
 	);
 
-	const resolveActionEntry = useCallback(
+	const resolveActionEntries = useCallback(
 		async (
 			entries: Model[],
 			allowedEntries: 'free' | 'single' | 'multiple',
 			customEntrySelected?: DataTableCustomEntrySelectedType<Model>,
-		): Promise<BaseModelType | null> => {
-			if (allowedEntries !== 'single') {
-				return null;
-			}
+		): Promise<BaseModelType[]> => {
+			if (allowedEntries === 'free') return [];
 
-			if (customEntrySelected) {
-				try {
-					return await customEntrySelected(entries[0]);
-				} catch (error) {
-					showToast({
-						severity: 'error',
-						summary: translations['app.text.error_title'],
-						detail: (error as Error).message,
-					});
+			if (allowedEntries === 'single') {
+				if (customEntrySelected) {
+					try {
+						const resolved = await customEntrySelected(entries[0]);
+
+						return resolved ? [resolved] : [];
+					} catch (error) {
+						showToast({ severity: 'error', summary: translations['app.text.error_title'], detail: (error as Error).message });
+						return [];
+					}
 				}
+				return entries[0] ? [entries[0] as BaseModelType] : [];
 			}
 
-			return entries[0] ?? null;
+			return entries as BaseModelType[];
 		},
 		[showToast, translations],
 	);
@@ -135,7 +134,7 @@ export function DataTableActions<
 				return;
 			}
 
-			const actionEntry = await resolveActionEntry(
+			const actionEntries = await resolveActionEntries(
 				entries,
 				actionProps.allowedEntries,
 				customEntrySelected,
@@ -144,7 +143,7 @@ export function DataTableActions<
 			open({
 				dataSource,
 				actionName,
-				actionEntry,
+				actionEntries,
 			});
 		},
 		[
@@ -152,7 +151,7 @@ export function DataTableActions<
 			castActionProps,
 			dataSource,
 			open,
-			resolveActionEntry,
+			resolveActionEntries,
 			translations,
 		],
 	);

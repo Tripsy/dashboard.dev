@@ -15,7 +15,7 @@ export function DataTableModal() {
 
 	const dataSource = current?.dataSource;
 	const actionName = current?.actionName;
-	const actionEntry = current?.actionEntry;
+	const actionEntries = current?.actionEntries;
 	const onSuccessAction = current?.onSuccess;
 	const props = current?.props;
 
@@ -28,20 +28,16 @@ export function DataTableModal() {
 	}, [dataSource]);
 
 	const action = actionName ? actions?.[actionName] : null;
-	const ActionComponent = action?.component ?? null;
 	const actionMode = action?.mode ?? null;
+	const ActionComponent = action?.component ?? null;
 	const actionTitleKey = `${dataSource}.action.${actionName}.title`;
 
 	const translationsKeys = useMemo(
-		() => [actionTitleKey] as const,
+		() => [actionTitleKey],
 		[actionTitleKey],
 	);
 
 	const { translations } = useTranslation(translationsKeys);
-
-	const handleClose = () => {
-		close();
-	};
 
 	if (!isOpen || !dataSource) {
 		return null;
@@ -53,6 +49,31 @@ export function DataTableModal() {
 
 	if (!actionName) {
 		throw new Error(`Action name must be defined`);
+	}
+
+	if (actionMode === 'action') {
+		if (!actionEntries) {
+			throw new Error(`No entries selected`);
+		}
+
+		return (
+			<Modal
+				size={props?.size || 'md'}
+				className={props?.className}
+				isOpen={isOpen}
+				title={translations[actionTitleKey]}
+				onClose={close}
+			>
+				<DataTableActionModal
+					key={`action-${actionName}`}
+					dataSource={dataSource}
+					actionName={actionName}
+					actionEntries={actionEntries}
+					onSuccessAction={onSuccessAction}
+					onCloseAction={close}
+				/>
+			</Modal>
+		);
 	}
 
 	if (!ActionComponent) {
@@ -67,13 +88,15 @@ export function DataTableModal() {
 		);
 	}
 
+	const actionEntry = actionEntries ? actionEntries[0] : null;
+
 	return (
 		<Modal
 			size={props?.size || 'md'}
 			className={props?.className}
 			isOpen={isOpen}
 			title={translations[actionTitleKey]}
-			onClose={handleClose}
+			onClose={close}
 		>
 			{actionMode === 'other' && <ActionComponent />}
 
@@ -97,10 +120,6 @@ export function DataTableModal() {
 				>
 					<ActionComponent />
 				</FormManage>
-			)}
-
-			{actionMode === 'action' && (
-				<DataTableActionModal key={`action-${actionName}`} />
 			)}
 		</Modal>
 	);

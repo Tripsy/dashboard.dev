@@ -1,9 +1,7 @@
 'use client';
 
-import { useMemo } from 'react';
-import { useStore } from 'zustand/react';
+import React, {useMemo, useState} from 'react';
 import { DataTableActionButton } from '@/app/(dashboard)/_components/data-table-action-button.component';
-import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
 import { Icons } from '@/components/icon.component';
 import { LoadingComponent } from '@/components/status.component';
 import { Button } from '@/components/ui/button';
@@ -18,6 +16,7 @@ import ValueError from '@/exceptions/value.error';
 import { replaceVars } from '@/helpers/string.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { useToast } from '@/providers/toast.provider';
+import type {ModalOnSuccess} from "@/app/(dashboard)/_stores/modal.store";
 
 function displayActionEntries<K extends DataSourceKey, Model>(
 	dataSource: K,
@@ -39,30 +38,21 @@ function displayActionEntries<K extends DataSourceKey, Model>(
 	)(entries);
 }
 
-export function DataTableActionModal<
-	K extends DataSourceKey,
-	Model extends BaseModelType,
->() {
-	const { dataSource, dataTableStore } = useDataTable<K, Model>();
+export function DataTableActionModal<K extends DataSourceKey>({
+	dataSource,
+	actionName,
+	actionEntries,
+	onSuccessAction,
+	onCloseAction
+}: {
+	dataSource: K;
+	actionName: string;
+	actionEntries: BaseModelType[];
+	onSuccessAction?: ModalOnSuccess;
+	onCloseAction: () => void;
+}) {
+	const [loading, setLoading] = useState(false);
 	const { showToast } = useToast();
-
-	const isOpen = useStore(dataTableStore, (state) => state.isOpen);
-	const actionName = useStore(
-		dataTableStore,
-		(state) => state.actionName,
-	) as string;
-	const actionEntry = useStore(dataTableStore, (state) => state.actionEntry);
-	const closeOut = useStore(dataTableStore, (state) => state.closeOut);
-	const isLoading = useStore(dataTableStore, (state) => state.isLoading);
-	const setLoading = useStore(dataTableStore, (state) => state.setLoading);
-	const refreshTableState = useStore(
-		dataTableStore,
-		(state) => state.refreshTableState,
-	);
-	const selectedEntries = useStore(
-		dataTableStore,
-		(state) => state.selectedEntries,
-	);
 
 	const confirmTextKey = `${dataSource}.action.${actionName}.confirmText`;
 
@@ -80,10 +70,6 @@ export function DataTableActionModal<
 
 	const { translations, isTranslationLoading } =
 		useTranslation(translationsKeys);
-
-	if (!isOpen || !actionName) {
-		return null;
-	}
 
 	if (isTranslationLoading) {
 		return (
@@ -105,8 +91,8 @@ export function DataTableActionModal<
 		);
 	}
 
-	if (actionProps.allowedEntries === 'single' && !actionEntry) {
-		throw new ValueError(`'actionEntry' was not provided`);
+	if (actionProps.allowedEntries === 'single' && actionEntries.length > 1) {
+		throw new ValueError(`Multiple entries provided for single action`);
 	}
 
 	async function executeFetch(ids: number[]) {
@@ -119,32 +105,25 @@ export function DataTableActionModal<
 		return actionFunction(ids);
 	}
 
-	const handleClose = () => {
-		closeOut();
-	};
-
 	const handleAction = async () => {
 		setLoading(true);
 
 		try {
-			// When allowedEntries is 'single', actionEntry is used; otherwise selectedEntries is used to map through entries
-			const ids: number[] = (
-				actionProps.allowedEntries === 'single'
-					? actionEntry
-						? [actionEntry]
-						: []
-					: selectedEntries
-			).map((entry) => entry.id);
+			const ids: number[] = actionEntries.map((entry) => entry.id);
 
 			const fetchResponse = await executeFetch(ids);
 
-			refreshTableState();
+			if (onSuccessAction) {
+				onSuccessAction(actionName);
+			} else {
+				refreshTableState();
 
-			showToast({
-				severity: fetchResponse?.success ? 'success' : 'error',
-				summary: fetchResponse?.success ? 'Success' : 'Error',
-				detail: fetchResponse?.message || translations['error.form'],
-			});
+				showToast({
+					severity: fetchResponse?.success ? 'success' : 'error',
+					summary: fetchResponse?.success ? 'Success' : 'Error',
+					detail: fetchResponse?.message || translations['error.form'],
+				});
+			}
 		} catch (error) {
 			showToast({
 				severity: 'error',
@@ -157,14 +136,12 @@ export function DataTableActionModal<
 		}
 
 		setLoading(false);
-		closeOut();
+		onCloseAction();
 	};
 
 	const actionContentEntries = displayActionEntries(
 		dataSource,
-		actionProps.allowedEntries === 'single'
-			? [actionEntry]
-			: selectedEntries,
+		actionEntries
 	);
 
 	return (
@@ -196,20 +173,21 @@ export function DataTableActionModal<
 				<Button
 					variant="outline"
 					hover="warning"
-					onClick={handleClose}
+					onClick={onCloseAction}
 					title="Cancel"
-					disabled={isLoading}
+					disabled={loading}
 				>
 					<Icons.Action.Cancel />
 					Cancel
 				</Button>
+				{/*TODO enhance loading*/}
 				<DataTableActionButton
 					key={`button-modal-${actionName}`}
 					dataSource={dataSource}
 					actionName={actionName}
 					buttonProps={actionProps.buttonProps}
 					handleClick={handleAction}
-					disabled={isLoading}
+					disabled={loading}
 				/>
 			</div>
 		</>

@@ -8,7 +8,7 @@ export type ModalOnSuccess = (action: string) => void;
 export type ModalConfig = {
 	dataSource: DataSourceKey;
 	actionName: string;
-	actionEntry: BaseModelType | null;
+	actionEntries: BaseModelType[];
 	onSuccess?: ModalOnSuccess;
 	props?: {
 		size: ModalSizeType;

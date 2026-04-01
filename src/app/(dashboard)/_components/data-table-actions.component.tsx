@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useStore } from 'zustand/react';
 import { DataTableActionButton } from '@/app/(dashboard)/_components/data-table-action-button.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
-import { useModalStore } from '@/app/(dashboard)/_stores/modal.store';
+import { useModalStore } from '@/stores/window.store';
 import {
 	type BaseModelType,
 	type DataSourceKey,

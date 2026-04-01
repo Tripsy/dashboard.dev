@@ -11,16 +11,16 @@ import React, {
 import { formAction } from '@/app/(dashboard)/_actions';
 import { handleReset } from '@/app/(dashboard)/_components/form-filters.component';
 import {
-	type ModalOnSuccess,
+	type OnSuccessActionType,
 	useModalStore,
-} from '@/app/(dashboard)/_stores/modal.store';
+} from '@/stores/window.store';
 import { FormComponentSubmit } from '@/components/form/form-element.component';
 import { FormError } from '@/components/form/form-error.component';
 import { getActionIcon, Icons } from '@/components/icon.component';
 import {
 	type BaseModelType,
 	type DataSourceKey,
-	type FormManageType,
+	type FormManageType, FormStateType, FormValuesType,
 	getDataSourceConfig,
 	hasSyncFormState,
 	hasValidateForm,
@@ -36,17 +36,23 @@ import { useRefreshDataTable } from '@/hooks/use-refresh-data-table.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { useToast } from '@/providers/toast.provider';
 
-export function FormManage<K extends DataSourceKey>({
+export function FormManage<
+	K extends DataSourceKey,
+	Model extends BaseModelType,
+	FormValues extends FormValuesType,
+>({
 	dataSource,
 	actionName,
 	actionEntry,
+	prefillEntry,
 	onSuccessAction,
 	children,
 }: {
 	dataSource: K;
 	actionName: 'create' | 'update';
-	actionEntry: BaseModelType | null;
-	onSuccessAction?: ModalOnSuccess;
+	actionEntry: Model | null;
+	prefillEntry?: Record<string, unknown>;
+	onSuccessAction?: OnSuccessActionType;
 	children: React.ReactElement<unknown>;
 }) {
 	const { showToast } = useToast();
@@ -74,23 +80,20 @@ export function FormManage<K extends DataSourceKey>({
 			);
 		}
 
-		if (
-			actionName === 'update' &&
-			actionEntry &&
-			hasSyncFormState(functions)
-		) {
+		if (actionName === 'update' && actionEntry && hasSyncFormState(functions)) {
 			return functions.syncFormState(formState, actionEntry);
 		}
 
+		if (actionName === 'create' && prefillEntry && hasSyncFormState(functions)) {
+			return functions.syncFormState(formState, prefillEntry as BaseModelType);
+		}
+
 		return formState;
-	}, [formState, functions, actionName, actionEntry, dataSource]);
+	}, [formState, functions, actionName, actionEntry, dataSource, prefillEntry]);
 
-	type FormStateType = Awaited<typeof initState>;
-	type FormValues = typeof initState.values;
-
-	const [state, action, pending] = useActionState<FormStateType, FormData>(
+	const [state, action, pending] = useActionState<FormStateType<K, Model, FormValues>, FormData>(
 		async (state, formData) => formAction(state, formData),
-		initState ?? ({} as FormStateType),
+		initState as unknown as FormStateType<K, Model, FormValues>,
 	);
 
 	const [formValues, setFormValues] = useFormValues<FormValues>(state.values);
@@ -126,23 +129,23 @@ export function FormManage<K extends DataSourceKey>({
 	const { translations } = useTranslation(translationsKeys);
 
 	const onSuccess = useCallback(
-		async (actionName: string) => {
+		async (actionName: string, resultData?: unknown) => {
+			if (actionName === 'create') {
+				handleReset(dataSource); // Reset data-table filters form
+			}
+
+			await refreshDataTable(dataSource);
+
+			showToast({
+				severity: 'success',
+				summary: translations['app.text.success_title'],
+				detail: translations[successMessageKey],
+			});
+
+			close();
+
 			if (onSuccessAction) {
-				onSuccessAction(actionName);
-			} else {
-				if (actionName === 'create') {
-					handleReset(dataSource); // Reset data-table filters form
-				}
-
-				await refreshDataTable(dataSource);
-
-				showToast({
-					severity: 'success',
-					summary: translations['app.text.success_title'],
-					detail: translations[successMessageKey],
-				});
-
-				close();
+				onSuccessAction(resultData);
 			}
 		},
 		[
@@ -158,7 +161,7 @@ export function FormManage<K extends DataSourceKey>({
 
 	useEffect(() => {
 		if (state.situation === 'success') {
-			onSuccess(actionName).catch((error) => {
+			onSuccess(actionName, state.resultData).catch((error) => {
 				showToast({
 					severity: 'error',
 					summary: 'Error',

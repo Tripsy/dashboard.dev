@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { DataTableActionModal } from '@/app/(dashboard)/_components/data-table-action-modal.component';
 import { FormManage } from '@/app/(dashboard)/_components/form-manage.component';
 import { ViewEntry } from '@/app/(dashboard)/_components/view-entry.component';
-import { useModalStore } from '@/app/(dashboard)/_stores/modal.store';
+import { useModalStore } from '@/stores/window.store';
 import { Modal } from '@/components/ui/modal';
 import { getDataSourceConfig } from '@/config/data-source.config';
 import { useTranslation } from '@/hooks/use-translation.hook';
@@ -15,8 +15,9 @@ export function DataTableModal() {
 	const dataSource = current?.dataSource;
 	const actionName = current?.actionName;
 	const actionEntries = current?.actionEntries;
-	const onSuccessAction = current?.onSuccess;
 	const props = current?.props;
+	const onSuccessAction = current?.onSuccess;
+	const uid = props?.uid || Date.now();
 
 	const actions = useMemo(() => {
 		if (!dataSource) {
@@ -62,7 +63,6 @@ export function DataTableModal() {
 					dataSource={dataSource}
 					actionName={actionName}
 					actionEntries={actionEntries}
-					onSuccessAction={onSuccessAction}
 					onCloseAction={close}
 				/>
 			);
@@ -95,14 +95,11 @@ export function DataTableModal() {
 				)}
 				{actionMode === 'form' && (
 					<FormManage
-						key={
-							actionEntry?.id
-								? `${actionName}-${actionEntry.id}`
-								: actionName
-						}
+						key={`${dataSource}-${actionName}-${uid}`}
 						dataSource={dataSource}
 						actionName={actionName as 'create' | 'update'}
 						actionEntry={actionEntry}
+						prefillEntry={current?.prefillEntry}
 						onSuccessAction={onSuccessAction}
 					>
 						<ActionComponent />

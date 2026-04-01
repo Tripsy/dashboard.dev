@@ -8,7 +8,7 @@ import {
 	useRef,
 } from 'react';
 import { useStore } from 'zustand/react';
-import type { DataTableStoreType } from '@/app/(dashboard)/_stores/data-table.store';
+import type { DataTableStoreType } from '@/stores/data-table.store';
 import {
 	type DataSourceKey,
 	type DataTableSelectionModeType,

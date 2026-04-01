@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { DataTableActionButton } from '@/app/(dashboard)/_components/data-table-action-button.component';
-import type { ModalOnSuccess } from '@/app/(dashboard)/_stores/modal.store';
+import type { OnSuccessActionType } from '@/stores/window.store';
 import { Icons } from '@/components/icon.component';
 import { LoadingComponent } from '@/components/status.component';
 import { Button } from '@/components/ui/button';
@@ -43,13 +43,13 @@ export function DataTableActionModal<K extends DataSourceKey>({
 	dataSource,
 	actionName,
 	actionEntries,
-	onSuccessAction,
+	// onSuccessAction,
 	onCloseAction,
 }: {
 	dataSource: K;
 	actionName: string;
 	actionEntries: BaseModelType[];
-	onSuccessAction?: ModalOnSuccess;
+	// onSuccessAction?: OnSuccessActionType;
 	onCloseAction: () => void;
 }) {
 	const [loading, setLoading] = useState(false);
@@ -106,21 +106,21 @@ export function DataTableActionModal<K extends DataSourceKey>({
 				actionEntries.map((e) => e.id),
 			);
 
-			if (onSuccessAction) {
-				onSuccessAction(actionName);
-			} else {
-				await refreshDataTable(dataSource);
+			await refreshDataTable(dataSource);
 
-				showToast({
-					severity: fetchResponse?.success ? 'success' : 'error',
-					summary: fetchResponse?.success ? 'Success' : 'Error',
-					detail:
-						fetchResponse?.message ||
-						translations['app.error.form'],
-				});
+			showToast({
+				severity: fetchResponse?.success ? 'success' : 'error',
+				summary: fetchResponse?.success ? 'Success' : 'Error',
+				detail:
+					fetchResponse?.message ||
+					translations['app.error.form'],
+			});
 
-				onCloseAction();
-			}
+			onCloseAction();
+
+			// if (onSuccessAction) {
+			// 	onSuccessAction(actionName);
+			// }
 		} catch (error) {
 			showToast({
 				severity: 'error',

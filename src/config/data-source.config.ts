@@ -5,10 +5,10 @@ import type {
 	ButtonSize,
 	ButtonVariant,
 } from '@/components/ui/button';
-import type { ModalSizeType } from '@/components/ui/modal';
 import type { ValidateFormFunctionType } from '@/hooks/use-form-validation.hook';
 import type { ApiResponseFetch, QueryFiltersType } from '@/types/api.type';
 import type { FormSituationType } from '@/types/form.type';
+import {WindowConfigPropsType, WindowInstanceType} from "@/stores/window.store";
 
 // ============================================================================
 // API Function Types
@@ -37,12 +37,12 @@ export type FindFunctionType<Model> = (
 
 export type CreateFunctionType<
 	Model,
-	FormValues extends FormStateValuesType,
+	FormValues extends FormValuesType,
 > = (data: FormValues) => Promise<ApiResponseFetch<Partial<Model>>>;
 
 export type UpdateFunctionType<
 	Model,
-	FormValues extends FormStateValuesType,
+	FormValues extends FormValuesType,
 > = (data: FormValues, id: number) => Promise<ApiResponseFetch<Partial<Model>>>;
 
 export type DeleteFunctionType = (
@@ -53,13 +53,13 @@ export type DeleteFunctionType = (
 // Form Types
 // ============================================================================
 
-export type FormStateValuesType = Record<string, unknown>;
+export type FormValuesType = Record<string, string | number | boolean | Date | null | undefined>;
 type EmptyFormValues = Record<never, never>;
 
 export type FormStateType<
 	K extends DataSourceKey,
 	Model,
-	FormValues extends FormStateValuesType,
+	FormValues extends FormValuesType,
 > = {
 	dataSource: K;
 	id?: number;
@@ -70,13 +70,13 @@ export type FormStateType<
 	resultData?: Partial<Model>;
 };
 
-export type FormManageType<FormValues extends FormStateValuesType> = {
+export type FormManageType<FormValues extends FormValuesType> = {
 	actionName: 'create' | 'update';
 	formValues: FormValues;
 	errors: Partial<Record<keyof FormValues, string[]>>;
 	handleChange: (
 		field: keyof FormValues,
-		value: string | boolean | number | Date | null,
+		value: string | number | boolean | Date | null,
 	) => void;
 	pending: boolean;
 };
@@ -88,7 +88,7 @@ export type ValidateGetFormValuesFunctionType<FormValues> = (
 export type ValidateSyncFormStateFunctionType<
 	K extends DataSourceKey,
 	Entity,
-	FormValues extends FormStateValuesType,
+	FormValues extends FormValuesType,
 > = (
 	state: FormStateType<K, Entity, FormValues>,
 	model: Entity,
@@ -98,12 +98,11 @@ export type ValidateSyncFormStateFunctionType<
 // Action Types
 // ============================================================================
 
-// type DataTableActionType = 'view' | 'create' | 'update' | 'delete';
-type DataTableActionMode = 'form' | 'action' | 'view' | 'other';
 type DataTableEntryRequirement = 'free' | 'single' | 'multiple';
 type DataTableActionPosition = 'left' | 'right' | 'hidden';
 
 export type DataTableActionButtonPropsType = {
+	position: DataTableActionPosition; // Describe where the button should be placed
 	className?: string;
 	variant?: ButtonVariant;
 	size?: ButtonSize;
@@ -116,21 +115,16 @@ export type DataTableCustomEntrySelectedType<Model> = (
 ) => Promise<BaseModelType | null>;
 
 export type DataTableActionConfigType<Model, Function> = {
-	// biome-ignore lint/suspicious/noExplicitAny: It's fine
-	component?: React.ComponentType<any>;
-	modalProps?: {
-		size?: ModalSizeType;
-		className?: string;
-	};
-	// type?: DataTableActionType;
-	mode: DataTableActionMode;
-	permission: string;
-	allowedEntries: DataTableEntryRequirement;
+
+	windowComponent?: React.ComponentType<any>;
+	windowType: WindowInstanceType;
+	windowConfigProps?: WindowConfigPropsType;
+	permission: string; // Policy related
+	allowedEntries: DataTableEntryRequirement; // TODO: add comment
 	customEntryCheck?: (entry: Model) => boolean;
-	customEntrySelected?: DataTableCustomEntrySelectedType<Model>;
-	position: DataTableActionPosition;
-	function?: Function;
-	buttonProps?: DataTableActionButtonPropsType;
+	customEntrySelected?: DataTableCustomEntrySelectedType<Model>; // TODO maybe windowEntries
+	actionFunction: Function; // Should be present only if windowType is `action` (e.g.: `deleteUser`)
+	button: DataTableActionButtonPropsType;
 };
 
 // ============================================================================
@@ -166,7 +160,7 @@ export type DisplayActionEntriesFunctionType<Entity> = (
 
 export type DataTableActionsType<
 	Model,
-	FormValues extends FormStateValuesType,
+	FormValues extends FormValuesType,
 > = {
 	[key: string]: DataTableActionConfigType<Model, unknown>;
 } & {
@@ -206,7 +200,7 @@ export type DataSourceKey =
 export type DataSourceConfigType<
 	K extends DataSourceKey,
 	Entity,
-	FormValues extends FormStateValuesType = EmptyFormValues,
+	FormValues extends FormValuesType = EmptyFormValues,
 > = {
 	dataTableState: DataTableStateType;
 	dataTableColumns: DataTableColumnType<Entity>[];
@@ -238,7 +232,7 @@ const registry: Partial<
 export function registerDataSource<
 	K extends DataSourceKey,
 	Entity,
-	FormValues extends FormStateValuesType = EmptyFormValues,
+	FormValues extends FormValuesType = EmptyFormValues,
 >(key: K, config: DataSourceConfigType<K, Entity, FormValues>) {
 	if (hasDataSourceConfig(key)) {
 		return;
@@ -281,7 +275,7 @@ export function hasValidateForm<FormValues>(functions: unknown): functions is {
 export function hasSyncFormState<
 	K extends DataSourceKey,
 	Entity,
-	FormValues extends FormStateValuesType,
+	FormValues extends FormValuesType,
 >(
 	functions: unknown,
 ): functions is {

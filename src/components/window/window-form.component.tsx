@@ -10,10 +10,6 @@ import React, {
 } from 'react';
 import { formAction } from '@/app/(dashboard)/_actions';
 import { handleReset } from '@/app/(dashboard)/_components/form-filters.component';
-import {
-	type OnSuccessActionType,
-	useModalStore,
-} from '@/stores/window.store';
 import { FormComponentSubmit } from '@/components/form/form-element.component';
 import { FormError } from '@/components/form/form-error.component';
 import { getActionIcon, Icons } from '@/components/icon.component';
@@ -36,27 +32,26 @@ import { useRefreshDataTable } from '@/hooks/use-refresh-data-table.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { useToast } from '@/providers/toast.provider';
 
-export function FormManage<
+type WindowFormType = {
+	uid: string;
+	formType: 'create' | 'update';
+	// dataSource: K;
+	// actionName: 'create' | 'update';
+	// actionEntry: Model | null;
+	// prefillEntry?: Record<string, unknown>;
+	children: React.ReactElement<unknown>;
+}
+
+export function WindowForm<
 	K extends DataSourceKey,
 	Model extends BaseModelType,
 	FormValues extends FormValuesType,
 >({
-	dataSource,
-	actionName,
-	actionEntry,
-	prefillEntry,
-	onSuccessAction,
+	uid,
+	formType,
 	children,
-}: {
-	dataSource: K;
-	actionName: 'create' | 'update';
-	actionEntry: Model | null;
-	prefillEntry?: Record<string, unknown>;
-	onSuccessAction?: OnSuccessActionType;
-	children: React.ReactElement<unknown>;
-}) {
+}: WindowFormType) {
 	const { showToast } = useToast();
-	const { close } = useModalStore();
 	const refreshDataTable = useRefreshDataTable();
 
 	// Derive data via hooks/memos — no guards yet
@@ -80,16 +75,16 @@ export function FormManage<
 			);
 		}
 
-		if (actionName === 'update' && actionEntry && hasSyncFormState(functions)) {
+		if (formType === 'update' && actionEntry && hasSyncFormState(functions)) {
 			return functions.syncFormState(formState, actionEntry);
 		}
 
-		if (actionName === 'create' && prefillEntry && hasSyncFormState(functions)) {
+		if (formType === 'create' && prefillEntry && hasSyncFormState(functions)) {
 			return functions.syncFormState(formState, prefillEntry as BaseModelType);
 		}
 
 		return formState;
-	}, [formState, functions, actionName, actionEntry, dataSource, prefillEntry]);
+	}, [formState, functions, formType, actionEntry, dataSource, prefillEntry]);
 
 	const [state, action, pending] = useActionState<FormStateType<K, Model, FormValues>, FormData>(
 		async (state, formData) => formAction(state, formData),
@@ -112,8 +107,8 @@ export function FormManage<
 	const { errors, submitted, markSubmit, markFieldAsTouched } =
 		useFormValidation({ formValues, validate, debounceDelay: 800 });
 
-	const actionLabelKey = `${dataSource}.action.${actionName}.label`;
-	const successMessageKey = `${dataSource}.action.${actionName}.success`;
+	const actionLabelKey = `${dataSource}.action.${formType}.label`;
+	const successMessageKey = `${dataSource}.action.${formType}.success`;
 
 	const translationsKeys = useMemo(
 		() =>
@@ -202,9 +197,6 @@ export function FormManage<
 		setFormValues,
 		markFieldAsTouched,
 	);
-	const ActionButtonIcon = getActionIcon(
-		actions[actionName]?.buttonProps?.icon || actionName,
-	);
 
 	const injectedChild = isValidElement(children)
 		? cloneElement(
@@ -221,7 +213,7 @@ export function FormManage<
 
 	return (
 		<form
-			key={`form-${actionName}`}
+			key={`form-${uid}`}
 			action={action}
 			onSubmit={markSubmit}
 			className="form-section"
@@ -232,12 +224,14 @@ export function FormManage<
 				<FormComponentSubmit
 					pending={pending}
 					submitted={submitted}
-					errors={errors as Record<string, string[]>}
+					errors={errors as Record<string, string[]>} // remove `as`
 					button={{
 						variant:
 							actions[actionName]?.buttonProps?.variant || 'info',
 						label: translations[actionLabelKey],
-						icon: ActionButtonIcon,
+						icon: getActionIcon(
+							actions[actionName]?.buttonProps?.icon || actionName,
+						),
 					}}
 				/>
 			</div>

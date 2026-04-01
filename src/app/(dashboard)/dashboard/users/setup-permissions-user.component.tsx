@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useModalStore } from '@/app/(dashboard)/_stores/modal.store';
+import {useModalStore, WindowEntryType} from '@/stores/window.store';
 import { LoadingComponent } from '@/components/status.component';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
@@ -17,11 +17,8 @@ import {
 	getUserPermissions,
 } from '@/services/users.service';
 
-export function SetupPermissionsUser() {
-	const { current } = useModalStore();
-
-	const actionEntries = current?.actionEntries;
-	const user = (actionEntries?.[0] as UserModel) ?? null;
+export function SetupPermissionsUser({ entries }: { entries: WindowEntryType[] }) {
+	const user = entries[0] as UserModel;
 
 	const translationsKeys = useMemo(
 		() =>

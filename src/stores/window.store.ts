@@ -1,27 +1,45 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import type { ModalSizeType } from '@/components/ui/modal';
-import type { BaseModelType, DataSourceKey } from '@/config/data-source.config';
+import type React from "react";
 
-export type OnSuccessActionType = (data: unknown) => void;
+export type OnCreateSuccessType = (data: unknown) => void;
+export type WindowEntryType = Record<string, unknown>;
+export type WindowConfigPropsType = {
+	title: string;
+	size: ModalSizeType;
+	className?: string;
+};
+export type WindowInterfaceType = 'dashboard' | 'public';
+export type WindowModuleType = {
+	interface: WindowInterfaceType;
+	key: string; // Note: for interface `dashboard`, this is the DataSourceKey
+	action: string;
+};
+export type WindowInstanceType = 'create' | 'update' | 'action' | 'view' | 'other';
+
+// biome-ignore lint/suspicious/noExplicitAny: It's fine
+export type WindowComponent = React.ComponentType<any>;
 
 export type WindowConfig = {
 	uid: string;
-	dataSource: DataSourceKey; // TODO this has to be dropped
-	actionName: string; // TODO rename to type
-	actionEntries: BaseModelType[]; // TODO rename to entries
-	prefillEntry?: Record<string, unknown>;
-	onSuccess?: OnSuccessActionType; // TODO rename to onCreateSuccess -> and move to events
-	props?: {
-		size: ModalSizeType;
-		minimized?: boolean;
-		className?: string;
-
+	minimized?: boolean;
+	module: WindowModuleType;
+	data?: {
+		entries?: WindowEntryType[];
+		prefillEntry?: WindowEntryType; // TODO: maybe drop this
+		type: WindowInstanceType;
+		component: WindowComponent; // Component to render in window
+	}
+	events?: {
+		onCreateSuccess?: OnCreateSuccessType;
 	};
+	props: WindowConfigPropsType;
 };
 
 type WindowStore = {
 	stack: WindowConfig[];
+	definition: (module: WindowModuleType) => void; // Extract definitions // TODO maybe push them WindowConfig.data or WindowConfig.definition
 	create: (config: WindowConfig) => void; // Adds to stack, visible, top
 	close: (uid?: string) => void; // Removes from stack
 	minimize: (uid: string) => void; // Still in stack, hidden
@@ -30,17 +48,17 @@ type WindowStore = {
 	closeAll: () => void; // Clear stack
 };
 
-
 export const useModalStore = create<WindowStore>()(
 	devtools((set) => ({
-		isOpen: false,
-		current: null,
+		definition: (module: WindowModuleType) => {
+
+		},
 
 		create: (config) =>
 			set((state) => ({
 				stack: [...state.stack, {
 					...config,
-					minimized: config?.props.minimized ?? false // Use provided value or default to false
+					minimized: config.minimized ?? false // Use provided value or default to false
 				}],
 			})),
 
@@ -74,6 +92,7 @@ export const useModalStore = create<WindowStore>()(
 				};
 			}),
 
+		// On restore should also get focus
 		restore: (uid) =>
 			set((state) => ({
 				stack: state.stack.map((m) =>
@@ -84,11 +103,3 @@ export const useModalStore = create<WindowStore>()(
 		closeAll: () => set({ stack: [] })
 	})),
 );
-
-const createWindow = (config: WindowConfig): Window => ({
-	...config,
-	props: {
-		...config.props,
-		minimized: config.props?.minimized ?? false,
-	},
-});

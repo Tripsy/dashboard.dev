@@ -4,7 +4,7 @@ import { type JSX, useMemo } from 'react';
 import { DataTableActions } from '@/app/(dashboard)/_components/data-table-actions.component';
 import DataTableList from '@/app/(dashboard)/_components/data-table-list.component';
 import { DataTableProvider } from '@/app/(dashboard)/_providers/data-table-provider';
-import { createDataTableStore } from '@/app/(dashboard)/_stores/data-table.store';
+import { createDataTableStore } from '@/stores/data-table.store';
 import { DataTableTemplatesFilters } from '@/app/(dashboard)/dashboard/templates/data-table-templates-filters.component';
 import { LoadingComponent } from '@/components/status.component';
 import { useMounted } from '@/hooks/use-mounted.hook';

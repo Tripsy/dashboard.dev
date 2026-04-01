@@ -2,7 +2,6 @@ import Link from 'next/link';
 import type { JSX } from 'react';
 import { Breadcrumb } from '@/app/(dashboard)/_components/breadcrumb.component';
 import DashboardMain from '@/app/(dashboard)/_components/dashboard-main.component';
-import { DataTableModal } from '@/app/(dashboard)/_components/data-table-modal.component';
 import { SideMenu } from '@/app/(dashboard)/_components/side-menu.component';
 import { SideMenuToggle } from '@/app/(dashboard)/_components/side-menu-toggle.component';
 import { DashboardProvider } from '@/app/(dashboard)/_providers/dashboard.provider';
@@ -12,10 +11,11 @@ import { UserMenu } from '@/components/layout/user-menu.component';
 import ProtectedRoute from '@/components/protected-route.component';
 import Routes, { RouteAuth } from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
+import {WindowContainer} from "@/components/window/window-container.component";
 
 function Header() {
 	return (
-		<header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+		<header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
 			<div className="container-dashboard mx-4">
 				<div className="flex items-center h-16 gap-2">
 					<SideMenuToggle />
@@ -53,7 +53,7 @@ export default async function Layout({ children }: { children: JSX.Element }) {
 						<SideMenu />
 						<div className="container-dashboard">
 							<Breadcrumb />
-							<DataTableModal />
+							<WindowContainer />
 							{children}
 						</div>
 					</DashboardMain>

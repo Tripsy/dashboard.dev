@@ -1,6 +1,7 @@
 import type React from 'react';
 import sanitizeHtml from 'sanitize-html';
 import type { z } from 'zod';
+import {type FormManageType, FormValuesType} from "@/config/data-source.config";
 
 export function accumulateZodErrors<T>(
 	zodError: z.ZodError,
@@ -63,16 +64,13 @@ export function safeHtml(dirtyHtml: string): string {
 	});
 }
 
-export function createHandleChange<Fields>(
-	setFormValues: React.Dispatch<React.SetStateAction<Fields>>,
-	markFieldAsTouched: (name: keyof Fields) => void,
-) {
-	return <K extends keyof Fields>(name: K, value: Fields[K]) => {
-		setFormValues((prev) => ({
-			...prev,
-			[name]: value,
-		}));
-		markFieldAsTouched(name);
+export function createHandleChange<FormValues extends FormValuesType>(
+	setFormValues: (updater: (prev: FormValues) => FormValues) => void,
+	markFieldAsTouched: (field: keyof FormValues) => void,
+): FormManageType<FormValues>['handleChange'] {
+	return (field, value) => {
+		setFormValues((prev) => ({ ...prev, [field]: value }));
+		markFieldAsTouched(field);
 	};
 }
 

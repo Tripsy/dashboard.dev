@@ -6,7 +6,7 @@ import {
 	FormComponentRadio,
 } from '@/components/form/form-element.component';
 import { Icons } from '@/components/icon.component';
-import type { FormManageType } from '@/config/data-source.config';
+import type {BaseModelType, FormManageType} from '@/config/data-source.config';
 import { getLanguage } from '@/config/translate.setup';
 import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
@@ -28,7 +28,8 @@ import {
 	PlaceTypeEnum,
 } from '@/models/place.model';
 import { findClients } from '@/services/clients.service';
-import { createPlace, findPlaces } from '@/services/places.service';
+import {useModalStore} from "@/stores/window.store";
+import {createPlace, findPlaces} from "@/services/places.service";
 
 const language = await getLanguage();
 const addressTypes = toOptionsFromEnum(ClientAddressTypeEnum, {
@@ -41,6 +42,7 @@ export function FormManageClientAddress({
 	handleChange,
 	pending,
 }: FormManageType<ClientAddressFormValuesType>) {
+	const { open } = useModalStore();
 	const elementIds = useElementIds([
 		'address_type',
 		'client',
@@ -101,40 +103,6 @@ export function FormManageClientAddress({
 			minLength: 3,
 		});
 
-	// useEffect(() => {
-	// 	const onNewClient = (ev: Event) => {
-	// 		const { client } = (ev as CustomEvent<ClientAddressNewClientCreatedDetail>)
-	// 			.detail;
-	// 		const id = client?.id;
-	//
-	// 		if (id == null) {
-	// 			return;
-	// 		}
-	//
-	// 		const label =
-	// 			client.client_type === ClientTypeEnum.COMPANY ||
-	// 			client.client_type === ClientTypeEnum.PERSON
-	// 				? getClientDisplayName(client as ClientModel)
-	// 				: (client.company_name ?? client.person_name ?? '').trim();
-	//
-	// 		handleChange('client', label);
-	// 		handleChange('client_id', id);
-	// 		setSearchClient(label);
-	// 	};
-	//
-	// 	window.addEventListener(
-	// 		CLIENT_ADDRESS_NEW_CLIENT_CREATED_EVENT,
-	// 		onNewClient,
-	// 	);
-	//
-	// 	return () => {
-	// 		window.removeEventListener(
-	// 			CLIENT_ADDRESS_NEW_CLIENT_CREATED_EVENT,
-	// 			onNewClient,
-	// 		);
-	// 	};
-	// }, [handleChange]);
-
 	return (
 		<>
 			<FormComponentRadio<ClientAddressFormValuesType>
@@ -177,30 +145,32 @@ export function FormManageClientAddress({
 					allowCreate: true,
 
 					onCreate: (value) => {
-						const event = new CustomEvent('useDataTableAction', {
-							detail: {
-								source: 'client-address',
-								actionName: 'createClient',
-								entry: {
-									client_type: ClientTypeEnum.COMPANY,
-									company_name: value,
-									person_name: value,
-								},
+						open({
+							dataSource: 'clients',
+							actionName: 'create',
+							actionEntries: [],
+							prefillEntry: {
+								client_type: ClientTypeEnum.COMPANY,
+								company_name: value,
+								person_name: value,
 							},
-						});
+							onSuccess: (resultData) => {
+								if (!resultData) {
+									return;
+								}
 
-						window.dispatchEvent(event);
+								const client = resultData as ClientModel;
 
-						// const newClient = await createClientMutation.mutateAsync(value);
-						//
-						// if (!newClient) {
-						// 	return;
-						// }
-						//
-						// handleChange('client', value);
-						// handleChange('client_id', newClient.id as number);
+								console.log(client)
+
+								handleChange('client', getClientDisplayName(client));
+								handleChange('client_id', client.id);
+							},
+							props: {
+								size: 'x2l' as const,
+							},
+						})
 					},
-
 					createLabel: (value) => `Create client "${value}"`,
 				}}
 				icons={{

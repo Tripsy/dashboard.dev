@@ -2,7 +2,7 @@ import {
 	type CreateFunctionType,
 	type DataSourceKey,
 	type FormStateType,
-	type FormStateValuesType,
+	type FormValuesType,
 	getDataSourceConfig,
 	type UpdateFunctionType,
 	type ValidateGetFormValuesFunctionType,
@@ -61,7 +61,7 @@ export function handleValidate<K extends DataSourceKey, FormValues>(
 export async function formAction<
 	K extends DataSourceKey,
 	Model,
-	FormValues extends FormStateValuesType,
+	FormValues extends FormValuesType,
 	FormState extends FormStateType<K, Model, FormValues>,
 >(state: FormState, formData: FormData): Promise<FormState> {
 	async function executeFetch(data: FormValues, id?: number) {

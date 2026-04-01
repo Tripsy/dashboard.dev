@@ -16,9 +16,9 @@ export function useRemoteAutocomplete<T>({
 
 	const { data = [], isFetching } = useQuery({
 		queryKey: [...queryKey, debouncedQuery],
-		queryFn: () => queryFn(debouncedQuery),
+		queryFn: ({ queryKey }) => queryFn(queryKey[queryKey.length - 1] as string),
 		enabled: debouncedQuery.length >= minLength,
-		staleTime: 1000 * 60 * 5, // 5 min cache
+		staleTime: 1000 * 60 * 5,
 	});
 
 	return {

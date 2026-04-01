@@ -1,10 +1,10 @@
-import { X } from 'lucide-react';
+import {Minus, X} from 'lucide-react';
 import type React from 'react';
 import { useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/helpers/css.helper';
 
-const sizeClasses = {
+const SizeClasses = {
 	sm: 'max-w-sm',
 	md: 'max-w-md',
 	lg: 'max-w-lg',
@@ -14,11 +14,12 @@ const sizeClasses = {
 	x4l: 'max-w-4xl',
 };
 
-export type ModalSizeType = keyof typeof sizeClasses;
+export type ModalSizeType = keyof typeof SizeClasses;
 
 interface ModalProps {
 	isOpen: boolean;
 	onClose: () => void;
+	onMinimize?: () => void;
 	title?: string;
 	description?: string;
 	children: React.ReactNode;
@@ -32,6 +33,7 @@ interface ModalProps {
 export function Modal({
 	isOpen,
 	onClose,
+	onMinimize,
 	title,
 	description,
 	children,
@@ -83,12 +85,12 @@ export function Modal({
 					'relative w-full bg-card rounded-xl shadow-xl border border-border animate-scale-in flex flex-col',
 					'max-h-[90vh]', // Limit height to 90% of viewport
 					className,
-					sizeClasses[size],
+					SizeClasses[size],
 				)}
 			>
 				{/* Header - Fixed */}
 				{(title || description) && (
-					<div className="px-6 pt-6 pb-4 flex-shrink-0">
+					<div className="px-6 pt-6 pb-4 shrink-0">
 						{title && (
 							<h2
 								id="modal-title"
@@ -108,10 +110,18 @@ export function Modal({
 					</div>
 				)}
 
-				{/* Close button - Fixed */}
+				{/* Control buttons - Fixed */}
 				<Button
 					variant="ghost"
-					className="absolute right-4 top-4 h-8 w-8 rounded-full flex-shrink-0 z-10"
+					className="absolute right-8 top-4 h-8 w-8 rounded-full shrink-0 z-10"
+					onClick={onMinimize}
+					aria-label="Minimize modal"
+				>
+					<Minus className="h-4 w-4" />
+				</Button>
+				<Button
+					variant="ghost"
+					className="absolute right-4 top-4 h-8 w-8 rounded-full shrink-0 z-10"
 					onClick={onClose}
 					aria-label="Close modal"
 				>
@@ -125,7 +135,7 @@ export function Modal({
 
 				{/* Footer - Fixed */}
 				{footer && (
-					<div className="px-6 pb-6 pt-4 flex justify-end gap-3 flex-shrink-0 border-t border-border mt-2">
+					<div className="px-6 pb-6 pt-4 flex justify-end gap-3 shrink-0 border-t border-border mt-2">
 						{footer}
 					</div>
 				)}

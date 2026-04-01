@@ -34,7 +34,7 @@ Meanwhile, we're open to suggestions / feedback, and if you find this project us
 - [x] Security: rate limiting, input validation
 - [x] Request validation (powered by Zod)
 - [x] Language files
-- [x] Providers included: Auth, Theme, Toast
+- [x] Providers included: Auth, Theme, Toast, QueryClient
 - [x] Development environment available (Docker)
 
 # Features
@@ -45,6 +45,7 @@ Meanwhile, we're open to suggestions / feedback, and if you find this project us
     - Auth system: login, register, logout, forgot password, reset password, email confirmation, etc.
 - [x] (Dashboard) 
     - cron-history, log-data, log-history, mail-queue, permissions, templates, users
+    - // TODO 
 
 # Setup
 
@@ -115,17 +116,18 @@ $ pnpm run madge
 │   │   │   ├── csrf/ 
 │   │   │   ├── language/ 
 │   │   │   ├── proxy/ 
-│   │   │   ├── error.tsx 
-│   │   │   ├── global.css
-│   │   │   ├── layout.css  # Base layout
-│   │   │   ├── providers.tsx # Base providers
+│   │   ├── error.tsx 
+│   │   ├── favicon.ico
+│   │   ├── global.css
+│   │   ├── layout.css  # Base layout
+│   │   ├── providers.tsx # Base providers
 │   ├── components/        # Common components
 │   │   ├── form/          # Form related components
 │   │   ├── layout/        # Layout components
-│   │   │   ├── footer-default.component.tsx
-│   │   │   ├── header-default.component.tsx
-│   │   │   ├── logo-default.component.tsx
-│   │   │   ├── toggle-theme.component.tsx
+│   │   │   ├── footer.default.tsx
+│   │   │   ├── header.default.tsx
+│   │   │   ├── logo.default.tsx
+│   │   │   ├── toggle-theme.tsx
 │   │   │   ├── user-menu.component.tsx
 │   │   ├── ui/            # UI related components
 │   │   ├── icon.component.tsx
@@ -136,6 +138,7 @@ $ pnpm run madge
 │   │   ├── data-source.register.ts
 │   │   ├── daysjs.config.ts 
 │   │   ├── init-redis.config.ts 
+│   │   ├── nunjucks.config.ts 
 │   │   ├── routes.setup.ts
 │   │   ├── settings.config.ts 
 │   │   ├── translate.setup.ts 
@@ -144,9 +147,10 @@ $ pnpm run madge
 │   ├── hooks/             # Custom hooks
 │   ├── locales/           # Language files
 │   ├── models/            # Models (entities) related to (dashboard)
-│   ├── provider/           
+│   ├── providers/           
 │   │   ├── auth.provider.tsx 
 │   │   ├── prime.provider.tsx 
+│   │   ├── query-client.provider.tsx 
 │   │   ├── theme.provider.tsx 
 │   │   ├── toast.provider.tsx 
 │   ├── services/          # Back-end (eg: NReady) services
@@ -176,45 +180,50 @@ $ pnpm run madge
     - data-table-cars-filters.component.tsx
 3. Update `src/config/data-source.config.ts`
     - export type DataSourceKey 
-    - export const dataSourceConfig: {
-4. Add `cars.json` to `src/locales/[language]` & update src/locales/en/index.ts
-5. Update `Routes.group('dashboard')` in `src/config/routes.setup.ts`
-6. Create `src/services/cars.service.ts` from `src/services/users.service.ts`
-7. Update `src/app/(dashboard)/_components/side-menu.component.tsx`
-8. Update `src/models/permission.model.ts`
+4. Update `src/config/data-source.register.ts`
+5. Add `cars.json` to `src/locales/[language]` & update src/locales/en/index.ts
+6. Update `Routes.group('dashboard')` in `src/config/routes.setup.ts`
+7. Create `src/services/cars.service.ts` from `src/services/users.service.ts`
+8. Update `src/app/(dashboard)/_components/side-menu.component.tsx`
+9. Update `src/models/permission.model.ts`
     - PermissionEntitiesSuggestions
-9. Update `src/models/log-history.model.ts`
-    - LogHistoryEntities
+10. Update `src/models/log-history.model.ts`
+     - LogHistoryEntities
 
 # TODO
 
-1. Displayed dates should be converted to local TZ
-
-# Bugs & Issues & Ideas
-
-1. Strange interaction on login after existing session is removed
-2. App reload on tab switch - maybe a Zustand configuration issue
-3. Clients > Client Address > Brands > Places > Cash Flow
+1. modal
+    - make it agnostic - types more relaxed
+    - tables as modal 
+    - rename modal to window
+    - implement minimize / restore 
+    - close by uid  
+    - build TaskBar 
+    - make modal resizable & movable   
+2. Displayed dates should be converted to local TZ
+3. Strange interaction on login after existing session is removed
+4. App reload on tab switch - maybe a Zustand configuration issue
+5. Clients > Client Address > Brands > Places > Cash Flow
     - address details
     - address manage
     - cash flow status update 
     - cash flow manage
     - cash flow details
     - add places  icons region > area, city > building, country -> map
-4. Review security
-5. Add section "documentation"
-6. login with google / facebook
-7. Replace all console.error with logging
-8. Implement kill all sessions except current
-      // // This will actually remove all sessions - keep it for further implementation
-      // await AccountTokenRepository.createQuery()
-      //     .filterBy('user_id', policy.getUserId())
-      //     .delete(false, true);
-9. For template section
-    - would be a nice idea to keep track of the last changes (maybe add a new column - prev version id and a button to restore to that version)
-    - view presentation could be enhanced
-10. https://nextjs.org/docs/app/getting-started/partial-prerendering
-11. https://react.dev/learn/react-compiler/introduction
+6. Review security
+7. Add section "documentation"
+8. login with google / facebook
+9. Replace all console.error with logging
+10. Implement kill all sessions except current
+       // // This will actually remove all sessions - keep it for further implementation
+       // await AccountTokenRepository.createQuery()
+       //     .filterBy('user_id', policy.getUserId())
+       //     .delete(false, true);
+11. For template section
+     - would be a nice idea to keep track of the last changes (maybe add a new column - prev version id and a button to restore to that version)
+     - view presentation could be enhanced
+12. https://nextjs.org/docs/app/getting-started/partial-prerendering
+13. https://react.dev/learn/react-compiler/introduction
 
 # Dependencies
 

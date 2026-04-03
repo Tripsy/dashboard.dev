@@ -1,7 +1,65 @@
-import type React from 'react';
 import sanitizeHtml from 'sanitize-html';
 import type { z } from 'zod';
-import {type FormManageType, FormValuesType} from "@/config/data-source.config";
+import { translate } from '@/config/translate.setup';
+import { ApiError } from '@/exceptions/api.error';
+import type { ApiResponseFetch } from '@/types/api.type';
+import type {
+	FormComponentType,
+	FormStateType,
+	FormValuesType,
+	ValidateFormFnType,
+} from '@/types/form.type';
+
+export async function processForm<FormValues>(
+	formState: FormStateType<FormValues>,
+	formData: FormData,
+	getFormValues: (formData: FormData) => FormValues,
+	validateForm: ValidateFormFnType<FormValues>,
+	fetchFunction: (data: FormValues) => Promise<ApiResponseFetch<unknown>>,
+): Promise<FormStateType<FormValues>> {
+	try {
+		const formValues = getFormValues(formData);
+		const validated = validateForm(formValues);
+
+		if (!validated.success) {
+			const errors = accumulateZodErrors<FormValues>(validated.error);
+
+			return {
+				...formState,
+				values: formValues,
+				situation: 'error',
+				message: await translate('app.error.validation'),
+				errors,
+			};
+		}
+
+		const result = {
+			...formState,
+			values: validated.data,
+		};
+
+		const fetchResponse = await fetchFunction(validated.data);
+
+		return {
+			...result,
+			errors: {},
+			message: fetchResponse?.message || null,
+			situation: fetchResponse?.success ? 'success' : 'error',
+			resultData: fetchResponse?.data,
+		};
+	} catch (error) {
+		const message =
+			error instanceof ApiError
+				? error.message
+				: await translate('app.error.form');
+
+		return {
+			...formState,
+			message: message,
+			situation: 'error',
+		};
+	}
+}
 
 export function accumulateZodErrors<T>(
 	zodError: z.ZodError,
@@ -67,7 +125,7 @@ export function safeHtml(dirtyHtml: string): string {
 export function createHandleChange<FormValues extends FormValuesType>(
 	setFormValues: (updater: (prev: FormValues) => FormValues) => void,
 	markFieldAsTouched: (field: keyof FormValues) => void,
-): FormManageType<FormValues>['handleChange'] {
+): FormComponentType<FormValues>['handleChange'] {
 	return (field, value) => {
 		setFormValues((prev) => ({ ...prev, [field]: value }));
 		markFieldAsTouched(field);

@@ -277,67 +277,67 @@ export const dataSourceConfigTemplates = {
 	},
 	actions: {
 		create: {
-			mode: 'form' as const,
+			windowType: 'form' as const,
 			component: FormManageTemplate,
 			modalProps: {
 				size: 'x4l' as const,
 			},
 			permission: 'template.create',
-			allowedEntries: 'free' as const,
-			position: 'right' as const,
-			function: createTemplate,
-			buttonProps: {
+			entriesSelection: 'free' as const,
+			actionPosition: 'right' as const,
+			operationFunction: createTemplate,
+			button: {
 				variant: 'info' as const,
 			},
 		},
 		update: {
-			mode: 'form' as const,
+			windowType: 'form' as const,
 			component: FormManageTemplate,
 			modalProps: {
 				size: 'x4l' as const,
 			},
 			permission: 'template.update',
-			allowedEntries: 'single' as const,
-			position: 'left' as const,
-			function: updateTemplate,
-			buttonProps: {
+			entriesSelection: 'single' as const,
+			actionPosition: 'left' as const,
+			operationFunction: updateTemplate,
+			button: {
 				variant: 'outline' as const,
 				hover: 'success' as const,
 			},
 		},
 		delete: {
-			mode: 'action' as const,
+			windowType: 'action' as const,
 			permission: 'template.delete',
-			allowedEntries: 'single' as const,
+			entriesSelection: 'single' as const,
 			customEntryCheck: (entry: TemplateModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			position: 'left' as const,
-			function: deleteTemplate,
-			buttonProps: {
+			actionPosition: 'left' as const,
+			operationFunction: deleteTemplate,
+			button: {
 				variant: 'outline' as const,
 				hover: 'error' as const,
 			},
 		},
 		restore: {
-			mode: 'action' as const,
+			windowType: 'action' as const,
 			permission: 'template.delete',
-			allowedEntries: 'single' as const,
+			entriesSelection: 'single' as const,
 			customEntryCheck: (entry: TemplateModel) => !!entry.deleted_at, // Return true if the entry is deleted
-			position: 'left' as const,
-			function: restoreTemplate,
-			buttonProps: {
+			actionPosition: 'left' as const,
+			operationFunction: restoreTemplate,
+			button: {
 				variant: 'outline' as const,
 				hover: 'info' as const,
 			},
 		},
 		view: {
-			mode: 'view' as const,
+			windowType: 'view' as const,
 			component: ViewTemplate,
 			modalProps: {
 				size: 'x4l' as const,
 			},
 			permission: 'template.read',
-			allowedEntries: 'single' as const,
-			position: 'hidden' as const,
+			entriesSelection: 'single' as const,
+			actionPosition: 'hidden' as const,
 		},
 	},
 };

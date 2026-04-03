@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from 'react';
 import { DataTableActionButton } from '@/app/(dashboard)/_components/data-table-action-button.component';
-import type { OnSuccessActionType } from '@/stores/window.store';
 import { Icons } from '@/components/icon.component';
 import { LoadingComponent } from '@/components/status.component';
 import { Button } from '@/components/ui/button';
@@ -88,7 +87,7 @@ export function DataTableActionModal<K extends DataSourceKey>({
 		);
 	}
 
-	if (actionProps.allowedEntries === 'single' && actionEntries.length > 1) {
+	if (actionProps.entriesSelection === 'single' && actionEntries.length > 1) {
 		throw new ValueError(`Multiple entries provided for single action`);
 	}
 
@@ -112,8 +111,7 @@ export function DataTableActionModal<K extends DataSourceKey>({
 				severity: fetchResponse?.success ? 'success' : 'error',
 				summary: fetchResponse?.success ? 'Success' : 'Error',
 				detail:
-					fetchResponse?.message ||
-					translations['app.error.form'],
+					fetchResponse?.message || translations['app.error.form'],
 			});
 
 			onCloseAction();

@@ -99,25 +99,25 @@ export const dataSourceConfigCronHistory = {
 	},
 	actions: {
 		delete: {
-			mode: 'action' as const,
+			windowType: 'action' as const,
 			permission: 'cron-history.delete',
-			allowedEntries: 'multiple' as const,
-			position: 'left' as const,
-			function: deleteCronHistory,
-			buttonProps: {
+			entriesSelection: 'multiple' as const,
+			actionPosition: 'left' as const,
+			operationFunction: deleteCronHistory,
+			button: {
 				variant: 'outline' as const,
 				hover: 'error' as const,
 			},
 		},
 		view: {
-			mode: 'view' as const,
+			windowType: 'view' as const,
 			component: ViewCronHistory,
 			modalProps: {
 				size: 'x2l' as const,
 			},
 			permission: 'cron-history.read',
-			allowedEntries: 'single' as const,
-			position: 'hidden' as const,
+			entriesSelection: 'single' as const,
+			actionPosition: 'hidden' as const,
 		},
 	},
 };

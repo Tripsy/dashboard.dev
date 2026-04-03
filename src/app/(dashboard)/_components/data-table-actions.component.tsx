@@ -4,11 +4,10 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useStore } from 'zustand/react';
 import { DataTableActionButton } from '@/app/(dashboard)/_components/data-table-action-button.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
-import { useModalStore } from '@/stores/window.store';
 import {
+	type ActionConfigType,
 	type BaseModelType,
 	type DataSourceKey,
-	type DataTableActionConfigType,
 	type DataTableCustomEntrySelectedType,
 	getDataSourceConfig,
 } from '@/config/data-source.config';
@@ -16,6 +15,7 @@ import { useTranslation } from '@/hooks/use-translation.hook';
 import { hasPermission } from '@/models/auth.model';
 import { useAuth } from '@/providers/auth.provider';
 import { useToast } from '@/providers/toast.provider';
+import { useModalStore } from '@/stores/window.store';
 
 export function DataTableActions<
 	K extends DataSourceKey,
@@ -56,10 +56,10 @@ export function DataTableActions<
 		(
 			entries: Model[],
 			permission: string,
-			allowedEntries: 'free' | 'single' | 'multiple',
+			entriesSelection: 'free' | 'single' | 'multiple',
 			customEntryCheck?: (entry: Model) => boolean,
 		) => {
-			if (allowedEntries === 'single') {
+			if (entriesSelection === 'single') {
 				if (entries.length !== 1) {
 					return false;
 				}
@@ -69,7 +69,7 @@ export function DataTableActions<
 				}
 			}
 
-			if (allowedEntries === 'multiple' && entries.length === 0) {
+			if (entriesSelection === 'multiple' && entries.length === 0) {
 				return false;
 			}
 
@@ -81,14 +81,14 @@ export function DataTableActions<
 	const resolveActionEntries = useCallback(
 		async (
 			entries: Model[],
-			allowedEntries: 'free' | 'single' | 'multiple',
+			entriesSelection: 'free' | 'single' | 'multiple',
 			customEntrySelected?: DataTableCustomEntrySelectedType<Model>,
 		) => {
-			if (allowedEntries === 'free') {
+			if (entriesSelection === 'free') {
 				return [];
 			}
 
-			if (allowedEntries === 'single') {
+			if (entriesSelection === 'single') {
 				if (customEntrySelected) {
 					try {
 						const resolved = await customEntrySelected(entries[0]);
@@ -117,7 +117,7 @@ export function DataTableActions<
 		async (
 			actionName: string,
 			entries: Model[],
-			actionProps: DataTableActionConfigType<Model, unknown>,
+			actionProps: ActionConfigType<Model, unknown>,
 		) => {
 			const { customEntryCheck, customEntrySelected } = actionProps;
 
@@ -125,7 +125,7 @@ export function DataTableActions<
 				!allowAction(
 					entries,
 					actionProps.permission,
-					actionProps.allowedEntries,
+					actionProps.entriesSelection,
 					customEntryCheck,
 				)
 			) {
@@ -135,7 +135,7 @@ export function DataTableActions<
 
 			const actionEntries = await resolveActionEntries(
 				entries,
-				actionProps.allowedEntries,
+				actionProps.entriesSelection,
 				customEntrySelected,
 			);
 
@@ -195,7 +195,7 @@ export function DataTableActions<
 		}
 	}, [error, showToast, translations]);
 
-	const renderActions = (position: 'left' | 'right') => {
+	const renderActions = (actionPosition: 'left' | 'right') => {
 		if (!actions) {
 			return null;
 		}
@@ -203,7 +203,7 @@ export function DataTableActions<
 		return Object.entries(actions).map(([actionName, actionProps]) => {
 			if (
 				selectedEntries.length === 0 &&
-				actionProps.allowedEntries !== 'free'
+				actionProps.entriesSelection !== 'free'
 			) {
 				return null;
 			}
@@ -218,7 +218,7 @@ export function DataTableActions<
 				!allowAction(
 					selectedEntries,
 					actionProps.permission,
-					actionProps.allowedEntries,
+					actionProps.entriesSelection,
 					customEntryCheck,
 				)
 			) {

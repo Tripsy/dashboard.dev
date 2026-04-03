@@ -3,7 +3,7 @@ import {
 	FormComponentRadio,
 	FormComponentTextarea,
 } from '@/components/form/form-element.component';
-import type { FormManageType } from '@/config/data-source.config';
+import type { FormComponentType } from '@/config/data-source.config';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import {
@@ -21,7 +21,7 @@ export function FormManageClient({
 	errors,
 	handleChange,
 	pending,
-}: FormManageType<ClientFormValuesType>) {
+}: FormComponentType<ClientFormValuesType>) {
 	const elementIds = useElementIds([
 		'clientType',
 		'companyName',

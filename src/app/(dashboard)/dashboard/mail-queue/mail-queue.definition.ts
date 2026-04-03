@@ -120,28 +120,28 @@ export const dataSourceConfigMailQueue = {
 	},
 	actions: {
 		delete: {
-			mode: 'action' as const,
+			windowType: 'action' as const,
 			permission: 'mail-queue.delete',
-			allowedEntries: 'multiple' as const,
-			position: 'left' as const,
-			function: deleteMailQueue,
-			buttonProps: {
+			entriesSelection: 'multiple' as const,
+			actionPosition: 'left' as const,
+			operationFunction: deleteMailQueue,
+			button: {
 				variant: 'outline' as const,
 				hover: 'error' as const,
 			},
 		},
 		view: {
-			mode: 'view' as const,
+			windowType: 'view' as const,
 			component: ViewMailQueue,
 			modalProps: {
 				size: 'x4l' as const,
 			},
 			permission: 'mail-queue.read',
-			allowedEntries: 'single' as const,
-			position: 'hidden' as const,
+			entriesSelection: 'single' as const,
+			actionPosition: 'hidden' as const,
 		},
 		viewTemplate: {
-			mode: 'view' as const,
+			windowType: 'view' as const,
 			component: ViewTemplate,
 			modalProps: {
 				size: 'x4l' as const,
@@ -154,8 +154,8 @@ export const dataSourceConfigMailQueue = {
 				return null;
 			},
 			permission: 'template.read',
-			allowedEntries: 'single' as const,
-			position: 'hidden' as const,
+			entriesSelection: 'single' as const,
+			actionPosition: 'hidden' as const,
 		},
 	},
 };

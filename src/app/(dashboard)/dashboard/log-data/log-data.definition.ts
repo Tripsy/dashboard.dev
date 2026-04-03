@@ -103,25 +103,25 @@ export const dataSourceConfigLogData = {
 	},
 	actions: {
 		delete: {
-			mode: 'action' as const,
+			windowType: 'action' as const,
 			permission: 'log-data.delete',
-			allowedEntries: 'multiple' as const,
-			position: 'left' as const,
-			function: deleteLogData,
-			buttonProps: {
+			entriesSelection: 'multiple' as const,
+			actionPosition: 'left' as const,
+			operationFunction: deleteLogData,
+			button: {
 				variant: 'outline' as const,
 				hover: 'error' as const,
 			},
 		},
 		view: {
-			mode: 'view' as const,
+			windowType: 'view' as const,
 			component: ViewLogData,
 			modalProps: {
 				size: 'x3l' as const,
 			},
 			permission: 'log-data.read',
-			allowedEntries: 'single' as const,
-			position: 'hidden' as const,
+			entriesSelection: 'single' as const,
+			actionPosition: 'hidden' as const,
 		},
 	},
 };

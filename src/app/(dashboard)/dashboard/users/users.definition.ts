@@ -6,7 +6,7 @@ import {
 import { FormManageUser } from '@/app/(dashboard)/dashboard/users/form-manage-user.component';
 import { SetupPermissionsUser } from '@/app/(dashboard)/dashboard/users/setup-permissions-user.component';
 import { ViewUser } from '@/app/(dashboard)/dashboard/users/view-user.component';
-import type { FormStateType } from '@/config/data-source.config';
+import type { DataSourceConfigType } from '@/config/data-source.config';
 import { Configuration } from '@/config/settings.config';
 import { getFormDataAsEnum, getFormDataAsString } from '@/helpers/form.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
@@ -28,6 +28,7 @@ import {
 	restoreUser,
 	updateUser,
 } from '@/services/users.service';
+import type { FormStateType } from '@/types/form.type';
 
 const validatorMessages = await BaseValidator.getValidatorMessages(
 	[
@@ -183,7 +184,7 @@ class UserValidator extends BaseValidator<typeof validatorMessages> {
 		});
 }
 
-function getFormValuesUser(formData: FormData): UserFormValuesType {
+function getFormValues(formData: FormData): UserFormValuesType {
 	return {
 		name: getFormDataAsString(formData, 'name'),
 		email: getFormDataAsString(formData, 'email'),
@@ -201,6 +202,35 @@ function getFormValuesUser(formData: FormData): UserFormValuesType {
 			UserOperatorTypeEnum,
 		),
 	};
+}
+
+function syncFormState(
+	state: FormStateType<UserFormValuesType>,
+	model: UserModel,
+): FormStateType<UserFormValuesType> {
+	return {
+		...state,
+		values: {
+			...state.values,
+			name: model.name,
+			email: model.email,
+			language: model.language,
+			role: model.role,
+			operator_type: model.operator_type,
+		},
+	};
+}
+
+function validateFormCreate(values: UserFormValuesType) {
+	const validator = new UserValidator(validatorMessages);
+
+	return validator.create.safeParse(values);
+}
+
+function validateFormUpdate(values: UserFormValuesType) {
+	const validator = new UserValidator(validatorMessages);
+
+	return validator.create.safeParse(values);
 }
 
 export type UsersDataTableFiltersType = {
@@ -221,245 +251,238 @@ export const usersDataTableFilters: UsersDataTableFiltersType = {
 	is_deleted: { value: false, matchMode: 'equals' },
 };
 
-export const dataSourceConfigUsers = {
-	dataTableState: {
-		first: 0,
-		rows: 10,
-		sortField: 'id',
-		sortOrder: -1 as const,
-		filters: usersDataTableFilters,
-	},
-	dataTableColumns: [
-		{
-			field: 'id',
-			header: 'ID',
-			sortable: true,
-			body: (entry: UserModel, column: DataTableColumnType<UserModel>) =>
-				DataTableValue(entry, column, {
-					markDeleted: true,
-					action: {
-						name: 'view',
-						source: 'users',
-					},
-				}),
+export const dataSourceConfigUsers: DataSourceConfigType<
+	UserModel,
+	any,
+	UserFormValuesType
+> = {
+	dataTable: {
+		state: {
+			first: 0,
+			rows: 10,
+			sortField: 'id',
+			sortOrder: -1 as const,
+			filters: usersDataTableFilters,
 		},
-		{
-			field: 'name',
-			header: 'Name',
-			sortable: true,
-		},
-		{
-			field: 'email',
-			header: 'Email',
-		},
-		{
-			field: 'role',
-			header: 'Role',
-			body: (entry: UserModel, column: DataTableColumnType<UserModel>) =>
-				DataTableValue(entry, column, {
-					capitalize: true,
-					action: {
-						name: (entry: UserModel) => {
-							return entry.role === UserRoleEnum.OPERATOR
-								? 'permissions'
-								: null;
+		columns: [
+			{
+				field: 'id',
+				header: 'ID',
+				sortable: true,
+				body: (
+					entry: UserModel,
+					column: DataTableColumnType<UserModel>,
+				) =>
+					DataTableValue(entry, column, {
+						markDeleted: true,
+						action: {
+							name: 'view',
+							source: 'users',
 						},
-						source: 'users',
-					},
-				}),
-		},
-		{
-			field: 'status',
-			header: 'Status',
-			body: (entry: UserModel, column: DataTableColumnType<UserModel>) =>
-				DataTableValue(entry, column, {
-					isStatus: true,
-					markDeleted: true,
-					action: {
-						name: (entry: UserModel) => {
-							return entry.deleted_at
-								? 'restore'
-								: entry.status === UserStatusEnum.ACTIVE
-									? 'disable'
-									: 'enable';
-						},
-						source: 'users',
-					},
-				}),
-			style: {
-				minWidth: '8rem',
-				maxWidth: '8rem',
+					}),
 			},
-		},
-		{
-			field: 'created_at',
-			header: 'Created At',
-			sortable: true,
-			body: (entry: UserModel, column: DataTableColumnType<UserModel>) =>
-				DataTableValue(entry, column, {
-					displayDate: true,
-				}),
-		},
-	],
-	formState: {
-		dataSource: 'users' as const,
-		id: undefined,
-		values: {
-			name: '',
-			email: '',
-			password: '',
-			password_confirm: '',
-			language: LanguageEnum.EN,
-			role: UserRoleEnum.MEMBER,
-			operator_type: null,
-		},
-		errors: {},
-		message: null,
-		situation: null,
-	},
-	functions: {
-		find: findUsers,
-		// onRowSelect: (entry: UserModel) => console.log('selected', entry),
-		// onRowUnselect: (entry: UserModel) => console.log('unselected', entry),
-		getFormValues: getFormValuesUser,
-		validateForm: (values: UserFormValuesType, id: number) => {
-			const validator = new UserValidator(validatorMessages);
-
-			if (id) {
-				return validator.update.safeParse(values);
-			}
-
-			return validator.create.safeParse(values);
-		},
-		syncFormState: (
-			state: FormStateType<'users', UserModel, UserFormValuesType>,
-			model: UserModel,
-		): FormStateType<'users', UserModel, UserFormValuesType> => {
-			return {
-				...state,
-				id: model.id,
-				values: {
-					...state.values,
-					name: model.name,
-					email: model.email,
-					language: model.language,
-					role: model.role,
-					operator_type: model.operator_type,
+			{
+				field: 'name',
+				header: 'Name',
+				sortable: true,
+			},
+			{
+				field: 'email',
+				header: 'Email',
+			},
+			{
+				field: 'role',
+				header: 'Role',
+				body: (
+					entry: UserModel,
+					column: DataTableColumnType<UserModel>,
+				) =>
+					DataTableValue(entry, column, {
+						capitalize: true,
+						action: {
+							name: (entry: UserModel) => {
+								return entry.role === UserRoleEnum.OPERATOR
+									? 'permissions'
+									: null;
+							},
+							source: 'users',
+						},
+					}),
+			},
+			{
+				field: 'status',
+				header: 'Status',
+				body: (
+					entry: UserModel,
+					column: DataTableColumnType<UserModel>,
+				) =>
+					DataTableValue(entry, column, {
+						isStatus: true,
+						markDeleted: true,
+						action: {
+							name: (entry: UserModel) => {
+								return entry.deleted_at
+									? 'restore'
+									: entry.status === UserStatusEnum.ACTIVE
+										? 'disable'
+										: 'enable';
+							},
+							source: 'users',
+						},
+					}),
+				style: {
+					minWidth: '8rem',
+					maxWidth: '8rem',
 				},
-			};
-		},
+			},
+			{
+				field: 'created_at',
+				header: 'Created At',
+				sortable: true,
+				body: (
+					entry: UserModel,
+					column: DataTableColumnType<UserModel>,
+				) =>
+					DataTableValue(entry, column, {
+						displayDate: true,
+					}),
+			},
+		],
+		find: findUsers,
 		displayActionEntries: (entries: UserModel[]) => {
 			return entries.map((entry) => ({
 				id: entry.id,
 				label: entry.name,
 			}));
 		},
+		// onRowSelect: (entry: UserModel) => console.log('selected', entry),
+		// onRowUnselect: (entry: UserModel) => console.log('unselected', entry),
 	},
+	// formState: {
+	// 	values: {
+	// 		name: '',
+	// 		email: '',
+	// 		password: '',
+	// 		password_confirm: '',
+	// 		language: LanguageEnum.EN,
+	// 		role: UserRoleEnum.MEMBER,
+	// 		operator_type: null,
+	// 	},
+	// 	errors: {},
+	// 	message: null,
+	// 	situation: null,
+	// },
 	actions: {
 		create: {
-			mode: 'form' as const,
-			component: FormManageUser,
+			windowType: 'form' as const,
+			windowComponent: FormManageUser,
 			permission: 'user.create',
-			allowedEntries: 'free' as const,
-			position: 'right' as const,
-			function: createUser,
-			buttonProps: {
+			entriesSelection: 'free' as const,
+			actionPosition: 'right' as const,
+			operationFunction: createUser,
+			button: {
 				variant: 'info' as const,
 			},
+			getFormValues: getFormValues,
+			validateForm: validateFormCreate,
+			syncFormState: syncFormState,
 		},
 		update: {
-			mode: 'form' as const,
-			component: FormManageUser,
+			windowType: 'form' as const,
+			windowComponent: FormManageUser,
 			permission: 'user.update',
-			allowedEntries: 'single' as const,
-			position: 'left' as const,
-			function: updateUser,
-			buttonProps: {
+			entriesSelection: 'single' as const,
+			actionPosition: 'left' as const,
+			operationFunction: updateUser,
+			button: {
 				variant: 'outline' as const,
 				hover: 'success' as const,
 			},
+			getFormValues: getFormValues,
+			validateForm: validateFormUpdate,
+			syncFormState: syncFormState,
 		},
 		delete: {
-			mode: 'action' as const,
+			windowType: 'action' as const,
 			permission: 'user.delete',
-			allowedEntries: 'single' as const,
+			entriesSelection: 'single' as const,
 			customEntryCheck: (entry: UserModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			position: 'left' as const,
-			function: deleteUser,
-			buttonProps: {
+			actionPosition: 'left' as const,
+			operationFunction: deleteUser,
+			button: {
 				variant: 'outline' as const,
 				hover: 'error' as const,
 			},
 		},
 		enable: {
-			mode: 'action' as const,
+			windowType: 'action' as const,
 			permission: 'user.update',
-			allowedEntries: 'single' as const,
+			entriesSelection: 'single' as const,
 			customEntryCheck: (entry: UserModel) =>
 				!entry.deleted_at &&
 				[UserStatusEnum.PENDING, UserStatusEnum.INACTIVE].includes(
 					entry.status,
 				),
-			position: 'left' as const,
-			function: enableUser,
-			buttonProps: {
+			actionPosition: 'left' as const,
+			operationFunction: enableUser,
+			button: {
 				variant: 'outline' as const,
 				hover: 'info' as const,
 			},
 		},
 		disable: {
-			mode: 'action' as const,
+			windowType: 'action' as const,
 			permission: 'user.update',
-			allowedEntries: 'single' as const,
+			entriesSelection: 'single' as const,
 			customEntryCheck: (entry: UserModel) =>
 				!entry.deleted_at &&
 				[UserStatusEnum.PENDING, UserStatusEnum.ACTIVE].includes(
 					entry.status,
 				),
-			position: 'left' as const,
-			function: disableUser,
-			buttonProps: {
+			actionPosition: 'left' as const,
+			operationFunction: disableUser,
+			button: {
 				variant: 'outline' as const,
 				hover: 'error' as const,
 			},
 		},
 		restore: {
-			mode: 'action' as const,
+			windowType: 'action' as const,
 			permission: 'user.delete',
-			allowedEntries: 'single' as const,
+			entriesSelection: 'single' as const,
 			customEntryCheck: (entry: UserModel) => !!entry.deleted_at, // Return true if the entry is deleted
-			position: 'left' as const,
-			function: restoreUser,
-			buttonProps: {
+			actionPosition: 'left' as const,
+			operationFunction: restoreUser,
+			button: {
 				variant: 'outline' as const,
 				hover: 'info' as const,
 			},
 		},
 		permissions: {
-			mode: 'other' as const,
-			component: SetupPermissionsUser,
-			modalProps: {
+			windowType: 'other' as const,
+			windowComponent: SetupPermissionsUser,
+			windowConfigProps: {
 				size: 'lg' as const,
 			},
 			permission: 'permission.update',
-			allowedEntries: 'single' as const,
+			entriesSelection: 'single' as const,
 			customEntryCheck: (entry: UserModel) =>
 				entry.role === UserRoleEnum.OPERATOR,
-			position: 'left' as const,
-			buttonProps: {
+			actionPosition: 'left' as const,
+			button: {
 				variant: 'outline' as const,
 				hover: 'success' as const,
 			},
 		},
 		view: {
-			mode: 'view' as const,
-			component: ViewUser,
-			modalProps: {
+			windowType: 'view' as const,
+			windowComponent: ViewUser,
+			windowConfigProps: {
 				size: 'xl' as const,
 			},
 			permission: 'user.read',
-			allowedEntries: 'single' as const,
-			position: 'hidden' as const,
+			entriesSelection: 'single' as const,
+			actionPosition: 'hidden' as const,
 		},
 	},
 };

@@ -1,8 +1,12 @@
 'use client';
 
-import {useModalStore, WindowConfig} from '@/stores/window.store';
+import { useModalStore, type WindowConfig } from '@/stores/window.store';
 
-export function WindowMinimizedInstance({ current, }: { current: WindowConfig; }) {
+export function WindowMinimizedInstance({
+	current,
+}: {
+	current: WindowConfig;
+}) {
 	const { close, restore } = useModalStore();
 
 	const handleClose = () => close(current.uid);

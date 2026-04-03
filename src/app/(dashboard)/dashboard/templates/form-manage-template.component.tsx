@@ -4,7 +4,7 @@ import {
 	FormComponentTextarea,
 } from '@/components/form/form-element.component';
 import { Icons } from '@/components/icon.component';
-import type { FormManageType } from '@/config/data-source.config';
+import type { FormComponentType } from '@/config/data-source.config';
 import { capitalizeFirstLetter, toKebabCase } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import {
@@ -34,7 +34,7 @@ export function FormManageTemplate({
 	errors,
 	handleChange,
 	pending,
-}: FormManageType<TemplateFormValuesType>) {
+}: FormComponentType<TemplateFormValuesType>) {
 	const elementIds = useElementIds(['label', 'language', 'type', 'content']);
 
 	return (

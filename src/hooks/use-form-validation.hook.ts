@@ -1,22 +1,13 @@
 import { useCallback, useState } from 'react';
-import type { ZodSafeParseError, ZodSafeParseSuccess } from 'zod';
 import { accumulateZodErrors } from '@/helpers/form.helper';
 import { useDebouncedEffect } from '@/hooks/use-debounced-effect.hook';
-
-export type ValidationReturnType<FormValues> =
-	| ZodSafeParseSuccess<FormValues>
-	| ZodSafeParseError<FormValues>;
+import type { ValidateFormFnType } from '@/types/form.type';
 
 type UseFormValidationProps<FormValues> = {
 	formValues: FormValues;
-	validate: (values: FormValues) => ValidationReturnType<FormValues>;
+	validate: ValidateFormFnType<FormValues>;
 	debounceDelay?: number;
 };
-
-export type ValidateFormFunctionType<FormValues> = (
-	values: FormValues,
-	id?: number,
-) => ValidationReturnType<FormValues>;
 
 export function useFormValidation<FormValues>({
 	formValues,

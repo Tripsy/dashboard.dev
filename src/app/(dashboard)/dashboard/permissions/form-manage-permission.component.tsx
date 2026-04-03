@@ -1,6 +1,6 @@
 import { FormComponentAutoComplete } from '@/components/form/form-element.component';
 import { Icons } from '@/components/icon.component';
-import type { FormManageType } from '@/config/data-source.config';
+import type { FormComponentType } from '@/config/data-source.config';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useLocalAutocomplete } from '@/hooks/use-local-autocomplete';
 import {
@@ -14,7 +14,7 @@ export function FormManagePermission({
 	errors,
 	handleChange,
 	pending,
-}: FormManageType<PermissionFormValuesType>) {
+}: FormComponentType<PermissionFormValuesType>) {
 	const elementIds = useElementIds(['entity', 'operation']);
 
 	const entityAutocomplete = useLocalAutocomplete({

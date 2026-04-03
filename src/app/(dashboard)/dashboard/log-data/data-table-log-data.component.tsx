@@ -4,11 +4,11 @@ import { type JSX, useMemo } from 'react';
 import { DataTableActions } from '@/app/(dashboard)/_components/data-table-actions.component';
 import DataTableList from '@/app/(dashboard)/_components/data-table-list.component';
 import { DataTableProvider } from '@/app/(dashboard)/_providers/data-table-provider';
-import { createDataTableStore } from '@/stores/data-table.store';
 import { DataTableLogDataFilters } from '@/app/(dashboard)/dashboard/log-data/data-table-log-data-filters.component';
 import { LoadingComponent } from '@/components/status.component';
 import { useMounted } from '@/hooks/use-mounted.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
+import { createDataTableStore } from '@/stores/data-table.store';
 
 const dataTableStore = createDataTableStore('log-data');
 

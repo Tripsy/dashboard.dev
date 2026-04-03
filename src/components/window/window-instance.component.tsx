@@ -1,21 +1,30 @@
 'use client';
 
-import { WindowForm } from '@/components/window/window-form.component';
-import {useModalStore, WindowConfig} from '@/stores/window.store';
+import { dataSourceConfigUsers } from '@/app/(dashboard)/dashboard/users/users.definition';
 import { Modal } from '@/components/ui/modal';
-import {DataTableActionModal} from "@/components/window/window-action.component";
+import { WindowForm } from '@/components/window/window-form.component';
+import { useModalStore, type WindowConfig } from '@/stores/window.store';
+import type { ActionButtonPropsType } from '@/types/html.type';
 
-export function WindowInstance({ current, }: { current: WindowConfig; }) {
-	const { close, minimize, definition } = useModalStore();
+export function WindowInstance({ current }: { current: WindowConfig }) {
+	const { close, minimize } = useModalStore();
 
 	const handleClose = () => close(current.uid);
 	const handleMinimize = () => minimize(current.uid);
 
 	const uid = current.uid;
-	const data = current?.data;
-	const configProps = current.props;
+	const definition = current.definition;
+	// const data = current?.data;
 
-	// const defintions = definition(current?.module);
+	// // TODO probably a spread with definition `windowConfigProps`
+	// const windowProps = current.props;
+	//
+	// // TODO this should take in consideration the value from definition `windowConfigProps`
+	// const configPropsSize = windowProps?.size || 'md';
+	//
+	// // TODO this should take in consideration the value from definition `windowConfigProps`
+	// const configPropsTitle = windowProps?.title || `${definition.key}.action.${definition.action}.title`;
+
 
 	// const actions = useMemo(() => {
 	// 	if (!dataSource) {
@@ -34,32 +43,38 @@ export function WindowInstance({ current, }: { current: WindowConfig; }) {
 	// 	throw new Error(`Actions must be defined for ${dataSource}`);
 	// }
 
-	const instanceType = data?.type || 'other';
-	const InstanceComponent = data?.component;
+	const instanceType = definition?.windowType || 'other';
+	const WindowComponent = definition?.windowComponent;
 
-	if (!InstanceComponent) {
+	if (!WindowComponent) {
 		throw new Error(`Component not defined for ${instanceType}`);
 	}
 
-	const modalContentForm = ({
-		formType,
+	const modalContentForm = <FormOperation extends string>({
+		formOperation,
+		formSubmitButton,
 	}: {
-		formType: 'create' | 'update';
+		formOperation: FormOperation;
+		formSubmitButton?: ActionButtonPropsType;
 	}) => {
-
 		return (
 			<WindowForm
 				uid={uid}
-				formType={formType}
+				formOperation={formOperation}
+				formSubmitButton={formSubmitButton}
+				getFormValues={
+					dataSourceConfigUsers.actions.create.getFormValues
+				}
+				validateForm={dataSourceConfigUsers.actions.create.validateForm}
 				// dataSource={dataSource}
 				// actionEntry={actionEntry}
 				// prefillEntry={current?.prefillEntry}
 				// onSuccessAction={onSuccessAction}
 			>
-				<InstanceComponent />
+				<WindowComponent />
 			</WindowForm>
-		)
-	}
+		);
+	};
 
 	const modalContent = () => {
 		if (instanceType === 'view') {
@@ -69,9 +84,7 @@ export function WindowInstance({ current, }: { current: WindowConfig; }) {
 				throw new Error(`Entry not defined for ${instanceType}`);
 			}
 
-			return (
-				<InstanceComponent entry={entry} />
-			);
+			return <WindowComponent entry={entry} />;
 		}
 
 		if (instanceType === 'other') {
@@ -81,9 +94,7 @@ export function WindowInstance({ current, }: { current: WindowConfig; }) {
 				throw new Error(`Entries not defined for ${instanceType}`);
 			}
 
-			return (
-				<InstanceComponent entries={entries} />
-			);
+			return <WindowComponent entries={entries} />;
 		}
 
 		// TODO
@@ -105,26 +116,27 @@ export function WindowInstance({ current, }: { current: WindowConfig; }) {
 		// 	);
 		// }
 
-		if (instanceType === 'update') {
-			const entry = data?.entries?.[0] ?? null;
-
-			if (!entry) {
-				throw new Error(`Entry not defined for ${instanceType}`);
-			}
-
-			return modalContentForm({
-				formType: 'update',
-			});
-		}
+		// if (instanceType === 'update') {
+		// 	const entry = data?.entries?.[0] ?? null;
+		//
+		// 	if (!entry) {
+		// 		throw new Error(`Entry not defined for ${instanceType}`);
+		// 	}
+		//
+		// 	return modalContentForm({
+		// 		formOperation: 'update' as any,
+		// 		formSubmitButton: data.formSubmitButton,
+		// 	});
+		// }
 	};
 
 	return (
 		<Modal
 			key={`modal-${uid}`}
-			size={configProps.size}
+			size={configPropsSize}
 			className={configProps.className}
 			isOpen={true}
-			title={configProps.title}
+			// title={configPropsTitle}
 			onClose={handleClose}
 			onMinimize={handleMinimize}
 		>

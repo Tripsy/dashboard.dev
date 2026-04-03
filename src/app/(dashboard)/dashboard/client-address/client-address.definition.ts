@@ -235,64 +235,64 @@ export const dataSourceConfigClientAddress = {
 	actions: {
 		create: {
 			component: FormManageClientAddress,
-			mode: 'form' as const,
+			windowType: 'form' as const,
 			permission: 'client-address.create',
-			allowedEntries: 'free' as const,
-			position: 'right' as const,
-			function: createClientAddress,
-			buttonProps: {
+			entriesSelection: 'free' as const,
+			actionPosition: 'right' as const,
+			operationFunction: createClientAddress,
+			button: {
 				variant: 'info' as const,
 			},
 		},
 		update: {
 			component: FormManageClientAddress,
-			mode: 'form' as const,
+			windowType: 'form' as const,
 			permission: 'client-address.update',
-			allowedEntries: 'single' as const,
-			position: 'left' as const,
-			function: updateClientAddress,
-			buttonProps: {
+			entriesSelection: 'single' as const,
+			actionPosition: 'left' as const,
+			operationFunction: updateClientAddress,
+			button: {
 				variant: 'outline' as const,
 				hover: 'success' as const,
 			},
 		},
 		delete: {
-			mode: 'action' as const,
+			windowType: 'action' as const,
 			permission: 'client-address.delete',
-			allowedEntries: 'single' as const,
+			entriesSelection: 'single' as const,
 			customEntryCheck: (entry: ClientAddressModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			position: 'left' as const,
-			function: deleteClientAddress,
-			buttonProps: {
+			actionPosition: 'left' as const,
+			operationFunction: deleteClientAddress,
+			button: {
 				variant: 'outline' as const,
 				hover: 'error' as const,
 			},
 		},
 		restore: {
-			mode: 'action' as const,
+			windowType: 'action' as const,
 			permission: 'client-address.delete',
-			allowedEntries: 'single' as const,
+			entriesSelection: 'single' as const,
 			customEntryCheck: (entry: ClientAddressModel) => !!entry.deleted_at, // Return true if the entry is deleted
-			position: 'left' as const,
-			function: restoreClientAddress,
-			buttonProps: {
+			actionPosition: 'left' as const,
+			operationFunction: restoreClientAddress,
+			button: {
 				variant: 'outline' as const,
 				hover: 'info' as const,
 			},
 		},
 		view: {
-			mode: 'view' as const,
+			windowType: 'view' as const,
 			component: ViewClientAddress,
 			permission: 'client-address.read',
-			allowedEntries: 'single' as const,
-			position: 'hidden' as const,
+			entriesSelection: 'single' as const,
+			actionPosition: 'hidden' as const,
 		},
 		// createClient: {
-		// 	mode: 'form' as const,
+		// 	windowType: 'form' as const,
 		// 	permission: 'client.create',
-		// 	allowedEntries: 'free' as const,
-		// 	position: 'hidden' as const,
-		// 	buttonProps: {
+		// 	entriesSelection: 'free' as const,
+		// 	actionPosition: 'hidden' as const,
+		// 	button: {
 		// 		icon: 'create',
 		// 	},
 		// },

@@ -6,7 +6,7 @@ import {
 	FormComponentRadio,
 	FormComponentSelect,
 } from '@/components/form/form-element.component';
-import type { FormManageType } from '@/config/data-source.config';
+import type { FormComponentType } from '@/config/data-source.config';
 import {
 	capitalizeFirstLetter,
 	formatEnumLabel,
@@ -39,7 +39,7 @@ export function FormManageUser({
 	errors,
 	handleChange,
 	pending,
-}: FormManageType<UserFormValuesType>) {
+}: FormComponentType<UserFormValuesType>) {
 	const [showPassword, setShowPassword] = useState(false);
 
 	const prevRoleRef = useRef(formValues.role);

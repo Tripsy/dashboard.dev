@@ -1,4 +1,4 @@
-import {Minus, X} from 'lucide-react';
+import { Minus, X } from 'lucide-react';
 import type React from 'react';
 import { useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';

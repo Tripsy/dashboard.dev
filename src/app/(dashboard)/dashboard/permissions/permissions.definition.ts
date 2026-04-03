@@ -119,54 +119,54 @@ export const dataSourceConfigPermissions = {
 	},
 	actions: {
 		create: {
-			mode: 'form' as const,
+			windowType: 'form' as const,
 			component: FormManagePermission,
 			modalProps: {
 				size: 'xl' as const,
 			},
 			permission: 'permission.create',
-			allowedEntries: 'free' as const,
-			position: 'right' as const,
-			function: createPermissions,
-			buttonProps: {
+			entriesSelection: 'free' as const,
+			actionPosition: 'right' as const,
+			operationFunction: createPermissions,
+			button: {
 				variant: 'info' as const,
 			},
 		},
 		update: {
-			mode: 'form' as const,
+			windowType: 'form' as const,
 			component: FormManagePermission,
 			modalProps: {
 				size: 'xl' as const,
 			},
 			permission: 'permission.update',
-			allowedEntries: 'single' as const,
-			position: 'left' as const,
-			function: updatePermissions,
-			buttonProps: {
+			entriesSelection: 'single' as const,
+			actionPosition: 'left' as const,
+			operationFunction: updatePermissions,
+			button: {
 				variant: 'outline' as const,
 				hover: 'success' as const,
 			},
 		},
 		delete: {
-			mode: 'action' as const,
+			windowType: 'action' as const,
 			permission: 'permission.delete',
-			allowedEntries: 'single' as const,
-			position: 'left' as const,
+			entriesSelection: 'single' as const,
+			actionPosition: 'left' as const,
 			customEntryCheck: (entry: PermissionModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			function: deletePermissions,
-			buttonProps: {
+			operationFunction: deletePermissions,
+			button: {
 				variant: 'outline' as const,
 				hover: 'error' as const,
 			},
 		},
 		restore: {
-			mode: 'action' as const,
+			windowType: 'action' as const,
 			permission: 'permission.delete',
-			allowedEntries: 'single' as const,
-			position: 'left' as const,
+			entriesSelection: 'single' as const,
+			actionPosition: 'left' as const,
 			customEntryCheck: (entry: PermissionModel) => !!entry.deleted_at, // Return true if the entry is deleted
-			function: restorePermissions,
-			buttonProps: {
+			operationFunction: restorePermissions,
+			button: {
 				variant: 'outline' as const,
 				hover: 'info' as const,
 			},

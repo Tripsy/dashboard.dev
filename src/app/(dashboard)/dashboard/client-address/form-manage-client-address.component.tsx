@@ -6,7 +6,10 @@ import {
 	FormComponentRadio,
 } from '@/components/form/form-element.component';
 import { Icons } from '@/components/icon.component';
-import type {BaseModelType, FormManageType} from '@/config/data-source.config';
+import type {
+	BaseModelType,
+	FormComponentType,
+} from '@/config/data-source.config';
 import { getLanguage } from '@/config/translate.setup';
 import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
@@ -28,8 +31,8 @@ import {
 	PlaceTypeEnum,
 } from '@/models/place.model';
 import { findClients } from '@/services/clients.service';
-import {useModalStore} from "@/stores/window.store";
-import {createPlace, findPlaces} from "@/services/places.service";
+import { createPlace, findPlaces } from '@/services/places.service';
+import { useModalStore } from '@/stores/window.store';
 
 const language = await getLanguage();
 const addressTypes = toOptionsFromEnum(ClientAddressTypeEnum, {
@@ -41,7 +44,7 @@ export function FormManageClientAddress({
 	errors,
 	handleChange,
 	pending,
-}: FormManageType<ClientAddressFormValuesType>) {
+}: FormComponentType<ClientAddressFormValuesType>) {
 	const { open } = useModalStore();
 	const elementIds = useElementIds([
 		'address_type',
@@ -161,15 +164,18 @@ export function FormManageClientAddress({
 
 								const client = resultData as ClientModel;
 
-								console.log(client)
+								console.log(client);
 
-								handleChange('client', getClientDisplayName(client));
+								handleChange(
+									'client',
+									getClientDisplayName(client),
+								);
 								handleChange('client_id', client.id);
 							},
 							props: {
 								size: 'x2l' as const,
 							},
-						})
+						});
 					},
 					createLabel: (value) => `Create client "${value}"`,
 				}}

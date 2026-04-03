@@ -341,99 +341,99 @@ export const dataSourceConfigClients = {
 	},
 	actions: {
 		create: {
-			mode: 'form' as const,
+			windowType: 'form' as const,
 			component: FormManageClient,
 			modalProps: {
 				size: 'x2l' as const,
 			},
 			permission: 'client.create',
-			allowedEntries: 'free' as const,
-			position: 'right' as const,
-			function: createClient,
-			buttonProps: {
+			entriesSelection: 'free' as const,
+			actionPosition: 'right' as const,
+			operationFunction: createClient,
+			button: {
 				variant: 'info' as const,
 			},
 		},
 		update: {
-			mode: 'form' as const,
+			windowType: 'form' as const,
 			component: FormManageClient,
 			modalProps: {
 				size: 'x2l' as const,
 			},
 			permission: 'client.update',
-			allowedEntries: 'single' as const,
-			position: 'left' as const,
-			function: updateClient,
-			buttonProps: {
+			entriesSelection: 'single' as const,
+			actionPosition: 'left' as const,
+			operationFunction: updateClient,
+			button: {
 				variant: 'outline' as const,
 				hover: 'success' as const,
 			},
 		},
 		delete: {
-			mode: 'action' as const,
+			windowType: 'action' as const,
 			permission: 'client.delete',
-			allowedEntries: 'single' as const,
+			entriesSelection: 'single' as const,
 			customEntryCheck: (entry: ClientModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			position: 'left' as const,
-			function: deleteClient,
-			buttonProps: {
+			actionPosition: 'left' as const,
+			operationFunction: deleteClient,
+			button: {
 				variant: 'outline' as const,
 				hover: 'error' as const,
 			},
 		},
 		enable: {
-			mode: 'action' as const,
+			windowType: 'action' as const,
 			permission: 'client.update',
-			allowedEntries: 'single' as const,
+			entriesSelection: 'single' as const,
 			customEntryCheck: (entry: ClientModel) =>
 				!entry.deleted_at &&
 				[ClientStatusEnum.PENDING, ClientStatusEnum.INACTIVE].includes(
 					entry.status,
 				),
-			position: 'left' as const,
-			function: enableClient,
-			buttonProps: {
+			actionPosition: 'left' as const,
+			operationFunction: enableClient,
+			button: {
 				variant: 'outline' as const,
 				hover: 'info' as const,
 			},
 		},
 		disable: {
-			mode: 'action' as const,
+			windowType: 'action' as const,
 			permission: 'client.update',
-			allowedEntries: 'single' as const,
+			entriesSelection: 'single' as const,
 			customEntryCheck: (entry: ClientModel) =>
 				!entry.deleted_at &&
 				[ClientStatusEnum.PENDING, ClientStatusEnum.ACTIVE].includes(
 					entry.status,
 				),
-			position: 'left' as const,
-			function: disableClient,
-			buttonProps: {
+			actionPosition: 'left' as const,
+			operationFunction: disableClient,
+			button: {
 				variant: 'outline' as const,
 				hover: 'error' as const,
 			},
 		},
 		restore: {
-			mode: 'action' as const,
+			windowType: 'action' as const,
 			permission: 'client.delete',
-			allowedEntries: 'single' as const,
+			entriesSelection: 'single' as const,
 			customEntryCheck: (entry: ClientModel) => !!entry.deleted_at, // Return true if the entry is deleted
-			position: 'left' as const,
-			function: restoreClient,
-			buttonProps: {
+			actionPosition: 'left' as const,
+			operationFunction: restoreClient,
+			button: {
 				variant: 'outline' as const,
 				hover: 'info' as const,
 			},
 		},
 		view: {
-			mode: 'view' as const,
+			windowType: 'view' as const,
 			component: ViewClient,
 			modalProps: {
 				size: 'x4l' as const,
 			},
 			permission: 'client.read',
-			allowedEntries: 'single' as const,
-			position: 'hidden' as const,
+			entriesSelection: 'single' as const,
+			actionPosition: 'hidden' as const,
 		},
 	},
 };

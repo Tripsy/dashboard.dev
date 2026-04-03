@@ -108,8 +108,8 @@ export const Icons = {
 		Loading: (props: IconProps) => <Loader {...props} />,
 	},
 	Action: {
+		Submit: (props: IconProps) => <Play {...props} />,
 		Login: (props: IconProps) => <LogIn {...props} />,
-		Go: (props: IconProps) => <Play {...props} />,
 		Create: (props: IconProps) => <Plus {...props} />,
 		Update: (props: IconProps) => <SquarePen {...props} />,
 		Delete: (props: IconProps) => <Trash2 {...props} />,

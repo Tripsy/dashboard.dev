@@ -8,7 +8,6 @@ import {
 	useRef,
 } from 'react';
 import { useStore } from 'zustand/react';
-import type { DataTableStoreType } from '@/stores/data-table.store';
 import {
 	type DataSourceKey,
 	type DataTableSelectionModeType,
@@ -16,6 +15,7 @@ import {
 	getDataSourceConfig,
 } from '@/config/data-source.config';
 import { useDebouncedEffect } from '@/hooks/use-debounced-effect.hook';
+import type { DataTableStoreType } from '@/stores/data-table.store';
 
 type DataTableContextType<K extends DataSourceKey, Model> = {
 	dataSource: K;

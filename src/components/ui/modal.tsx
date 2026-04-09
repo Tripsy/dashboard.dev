@@ -111,22 +111,24 @@ export function Modal({
 				)}
 
 				{/* Control buttons - Fixed */}
-				<Button
-					variant="ghost"
-					className="absolute right-8 top-4 h-8 w-8 rounded-full shrink-0 z-10"
-					onClick={onMinimize}
-					aria-label="Minimize modal"
-				>
-					<Minus className="h-4 w-4" />
-				</Button>
-				<Button
-					variant="ghost"
-					className="absolute right-4 top-4 h-8 w-8 rounded-full shrink-0 z-10"
-					onClick={onClose}
-					aria-label="Close modal"
-				>
-					<X className="h-4 w-4" />
-				</Button>
+				<div className="absolute right-4 top-4 z-10">
+					<Button
+						variant="ghost"
+						className="h-8 w-8 rounded-full shrink-0"
+						onClick={onMinimize}
+						aria-label="Minimize modal"
+					>
+						<Minus className="h-4 w-4" />
+					</Button>
+					<Button
+						variant="ghost"
+						className="h-8 w-8 rounded-full shrink-0"
+						onClick={onClose}
+						aria-label="Close modal"
+					>
+						<X className="h-4 w-4" />
+					</Button>
+				</div>
 
 				{/* Body - Scrollable */}
 				<div className="px-6 py-2 overflow-y-auto flex-1">

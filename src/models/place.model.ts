@@ -14,13 +14,6 @@ export type PlaceContent = {
 	details?: Record<string, string | number | boolean> | null;
 };
 
-// Form input for place content (when creating/editing)
-export type PlaceContentInput = {
-	language: LanguageEnum | string;
-	name: string;
-	type_label: string;
-};
-
 // Full place model with relations
 export type PlaceModel<D = Date | string> = {
 	id: number;
@@ -48,8 +41,8 @@ export type PlaceFormValuesType = {
 	code: string | null;
 	parent_id: number | null;
 
-	// Content translations (at least one required)
-	contents: PlaceContentInput[];
+	name: string;
+	type_label: string;
 };
 
 // Helper types for specific place types

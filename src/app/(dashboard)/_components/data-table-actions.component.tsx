@@ -29,7 +29,7 @@ export function DataTableActions<
 	>();
 	const { auth } = useAuth();
 	const { showToast } = useToast();
-	const { open } = useModalStore();
+	const { create } = useModalStore();
 
 	const selectedEntries = useStore(
 		dataTableStore,
@@ -143,13 +143,17 @@ export function DataTableActions<
 				return;
 			}
 
-			open({
-				dataSource,
-				actionName,
-				actionEntries,
+			create({
+				uid: `${dataSource}-${actionName}`, // TODO should I create uid in window.store
+				section: 'dashboard',
+				key: dataSource,
+				action: actionName,
+				data: {
+					entries: actionEntries,
+				},
 			});
 		},
-		[allowAction, dataSource, open, resolveActionEntries, translations],
+		[allowAction, dataSource, resolveActionEntries, translations, create],
 	);
 
 	useEffect(() => {
@@ -177,6 +181,7 @@ export function DataTableActions<
 			'useDataTableAction',
 			handleUseDataTableAction as EventListener,
 		);
+
 		return () =>
 			window.removeEventListener(
 				'useDataTableAction',
@@ -208,7 +213,7 @@ export function DataTableActions<
 				return null;
 			}
 
-			if (actionProps.position !== position) {
+			if (actionProps.actionPosition !== actionPosition) {
 				return null;
 			}
 
@@ -230,7 +235,7 @@ export function DataTableActions<
 					key={`button-${actionName}`}
 					dataSource={dataSource}
 					actionName={actionName}
-					buttonProps={actionProps.buttonProps}
+					buttonProps={actionProps.button}
 					handleClick={() =>
 						handleAction(actionName, selectedEntries, actionProps)
 					}

@@ -18,11 +18,18 @@ export function useSearchFilter(options: UseSearchFilterOptions = {}) {
 	} = options;
 
 	const [value, setValue] = useState(initialValue);
+	const [isSearching, setIsSearching] = useState(false);
+
 	const initialValueRef = useRef(initialValue);
 	const currentValueRef = useRef(initialValue);
 	const debouncedValueRef = useRef('');
 	const triggerSearchRef = useRef(false);
+	const onSearchRef = useRef(onSearch);
 	const isSyncRef = useRef(true);
+
+	useEffect(() => {
+		onSearchRef.current = onSearch;
+	}, [onSearch]);
 
 	// Sync when initialValue changes from outside (like `reset`)
 	useEffect(() => {
@@ -45,10 +52,13 @@ export function useSearchFilter(options: UseSearchFilterOptions = {}) {
 			currentValueRef.current = value;
 
 			// Determine if we should trigger search
-			triggerSearchRef.current =
+			const shouldTrigger =
 				value.length >= minLength ||
 				(initialValueRef.current.length >= minLength &&
 					value.length < minLength);
+
+			setIsSearching(shouldTrigger);
+			triggerSearchRef.current = shouldTrigger;
 
 			// Determine if we should disable value sync
 			isSyncRef.current = !(
@@ -64,29 +74,31 @@ export function useSearchFilter(options: UseSearchFilterOptions = {}) {
 	// Handle the debounced search
 	useDebouncedEffect(
 		() => {
-			if (triggerSearchRef.current && onSearch) {
-				onSearch(debouncedValueRef.current);
-
+			if (triggerSearchRef.current && onSearchRef.current) {
+				onSearchRef.current(debouncedValueRef.current);
+				setIsSearching(false);
 				initialValueRef.current = currentValueRef.current;
 				triggerSearchRef.current = false;
 			}
 		},
-		[value],
+		[value], // only value drives the debounce timer
 		debounceDelay,
 	);
 
 	const onReset = useCallback(() => {
 		setValue('');
+		setIsSearching(false);
 		isSyncRef.current = true;
 		currentValueRef.current = '';
 		initialValueRef.current = '';
 		debouncedValueRef.current = '';
+		onSearchRef.current?.('');
 	}, []);
 
 	return {
 		value,
 		handler,
-		isSearching: triggerSearchRef.current,
+		isSearching,
 		onReset: onReset,
 	};
 }

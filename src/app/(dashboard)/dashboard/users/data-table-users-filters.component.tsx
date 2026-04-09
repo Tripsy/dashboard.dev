@@ -1,6 +1,6 @@
 'use client';
 
-import { type JSX, useCallback, useEffect } from 'react';
+import { type JSX, useCallback, useMemo } from 'react';
 import { useStore } from 'zustand/react';
 import {
 	FormFiltersDateRange,
@@ -9,11 +9,11 @@ import {
 	FormFiltersSelect,
 	FormFiltersShowDeleted,
 } from '@/app/(dashboard)/_components/form-filters.component';
-import { addFilterResetListener } from '@/app/(dashboard)/_events/data-table-filter-reset.event';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
 import type { UsersDataTableFiltersType } from '@/app/(dashboard)/dashboard/users/users.definition';
-import { capitalizeFirstLetter } from '@/helpers/string.helper';
-import { useRefreshDataTable } from '@/hooks/use-refresh-data-table.hook';
+import { toOptionsFromEnum } from '@/helpers/form.helper';
+import { formatEnumLabel } from '@/helpers/string.helper';
+import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import {
 	type UserModel,
@@ -21,18 +21,16 @@ import {
 	UserStatusEnum,
 } from '@/models/user.model';
 
-const statuses = Object.values(UserStatusEnum).map((v) => ({
-	label: capitalizeFirstLetter(v),
-	value: v,
-}));
+const statuses = toOptionsFromEnum(UserStatusEnum, {
+	formatter: formatEnumLabel,
+});
 
-const roles = Object.values(UserRoleEnum).map((v) => ({
-	label: capitalizeFirstLetter(v),
-	value: v,
-}));
+const roles = toOptionsFromEnum(UserRoleEnum, {
+	formatter: formatEnumLabel,
+});
 
 export const DataTableUsersFilters = (): JSX.Element => {
-	const { dataSource, stateDefault, dataTableStore } = useDataTable<
+	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
 		'users',
 		UserModel
 	>();
@@ -66,33 +64,23 @@ export const DataTableUsersFilters = (): JSX.Element => {
 	);
 
 	const searchGlobal = useSearchFilter({
-		initialValue: filters.global?.value ?? '',
+		initialValue: filters.global.value ?? '',
 		debounceDelay: 1000,
 		minLength: 3,
 		onSearch: (value) => setFilterValue('global', value),
 	});
 
-	const refreshDataTable = useRefreshDataTable();
+	const resetCallbacks = useMemo(
+		() => [searchGlobal.onReset],
+		[searchGlobal.onReset],
+	);
 
-	useEffect(() => {
-		return addFilterResetListener(async ({ source }) => {
-			if (source !== dataSource) {
-				return;
-			}
-
-			updateTableState({ filters: stateDefault.filters });
-
-			searchGlobal.onReset();
-
-			await refreshDataTable(dataSource);
-		});
-	}, [
+	useDataTableFilterReset({
 		dataSource,
-		searchGlobal,
-		stateDefault.filters,
+		defaultFilters: dataTableStateDefault.filters,
 		updateTableState,
-		refreshDataTable,
-	]);
+		onReset: resetCallbacks,
+	});
 
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
@@ -138,7 +126,7 @@ export const DataTableUsersFilters = (): JSX.Element => {
 			/>
 
 			<FormFiltersShowDeleted
-				checked={filters.is_deleted?.value || false}
+				checked={filters.is_deleted.value ?? false}
 				onCheckedChange={(value) => setFilterValue('is_deleted', value)}
 			/>
 

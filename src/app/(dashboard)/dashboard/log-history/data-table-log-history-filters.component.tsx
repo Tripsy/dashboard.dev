@@ -1,6 +1,6 @@
 'use client';
 
-import { type JSX, useCallback, useEffect } from 'react';
+import { type JSX, useCallback, useMemo } from 'react';
 import { useStore } from 'zustand/react';
 import {
 	FormFiltersDateRange,
@@ -10,7 +10,13 @@ import {
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
 import type { LogHistoryDataTableFiltersType } from '@/app/(dashboard)/dashboard/log-history/log-history.definition';
-import { capitalizeFirstLetter, toTitleCase } from '@/helpers/string.helper';
+import { toOptionsFromEnum } from '@/helpers/form.helper';
+import {
+	capitalizeFirstLetter,
+	formatEnumLabel,
+	toTitleCase,
+} from '@/helpers/string.helper';
+import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import {
 	LogHistoryActions,
@@ -29,13 +35,12 @@ const actions = LogHistoryActions.map((v) => ({
 	value: v,
 }));
 
-const sources = Object.values(LogHistorySource).map((v) => ({
-	label: capitalizeFirstLetter(v),
-	value: v,
-}));
+const sources = toOptionsFromEnum(LogHistorySource, {
+	formatter: formatEnumLabel,
+});
 
 export const DataTableLogHistoryFilters = (): JSX.Element => {
-	const { stateDefault, dataTableStore } = useDataTable<
+	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
 		'log-history',
 		LogHistoryModel
 	>();
@@ -69,48 +74,30 @@ export const DataTableLogHistoryFilters = (): JSX.Element => {
 	);
 
 	const searchRequestId = useSearchFilter({
-		initialValue: filters.request_id?.value ?? '',
+		initialValue: filters.request_id.value ?? '',
 		debounceDelay: 1000,
 		minLength: 36,
 		onSearch: (value) => setFilterValue('request_id', value),
 	});
 
 	const searchEntityId = useSearchFilter({
-		initialValue: filters.entity_id?.value ?? '',
+		initialValue: filters.entity_id.value ?? '',
 		debounceDelay: 1000,
 		minLength: 2,
 		onSearch: (value) => setFilterValue('entity_id', value),
 	});
 
-	useEffect(() => {
-		const handleFilterReset = () => {
-			updateTableState({
-				filters: stateDefault.filters,
-			});
+	const resetCallbacks = useMemo(
+		() => [searchRequestId.onReset, searchEntityId.onReset],
+		[searchRequestId.onReset, searchEntityId.onReset],
+	);
 
-			searchRequestId.onReset();
-			searchEntityId.onReset();
-		};
-
-		window.addEventListener(
-			'filterReset',
-			handleFilterReset as EventListener,
-		);
-
-		return () => {
-			window.removeEventListener(
-				'filterReset',
-				handleFilterReset as EventListener,
-			);
-		};
-	}, [
-		searchRequestId,
-		searchRequestId.onReset,
-		searchEntityId,
-		searchEntityId.onReset,
-		stateDefault.filters,
+	useDataTableFilterReset({
+		dataSource,
+		defaultFilters: dataTableStateDefault.filters,
 		updateTableState,
-	]);
+		onReset: resetCallbacks,
+	});
 
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">

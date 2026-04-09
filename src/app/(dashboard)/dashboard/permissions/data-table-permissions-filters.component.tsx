@@ -1,6 +1,6 @@
 'use client';
 
-import { type JSX, useCallback, useEffect } from 'react';
+import { type JSX, useCallback, useMemo } from 'react';
 import { useStore } from 'zustand/react';
 import {
 	FormFiltersReset,
@@ -9,11 +9,12 @@ import {
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
 import type { PermissionDataTableFiltersType } from '@/app/(dashboard)/dashboard/permissions/permissions.definition';
+import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import type { PermissionModel } from '@/models/permission.model';
 
 export const DataTablePermissionsFilters = (): JSX.Element => {
-	const { stateDefault, dataTableStore } = useDataTable<
+	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
 		'permissions',
 		PermissionModel
 	>();
@@ -47,33 +48,23 @@ export const DataTablePermissionsFilters = (): JSX.Element => {
 	);
 
 	const searchGlobal = useSearchFilter({
-		initialValue: filters.global?.value ?? '',
+		initialValue: filters.global.value ?? '',
 		debounceDelay: 1000,
 		minLength: 3,
 		onSearch: (value) => setFilterValue('global', value),
 	});
 
-	useEffect(() => {
-		const handleFilterReset = () => {
-			updateTableState({
-				filters: stateDefault.filters,
-			});
+	const resetCallbacks = useMemo(
+		() => [searchGlobal.onReset],
+		[searchGlobal.onReset],
+	);
 
-			searchGlobal.onReset();
-		};
-
-		window.addEventListener(
-			'filterReset',
-			handleFilterReset as EventListener,
-		);
-
-		return () => {
-			window.removeEventListener(
-				'filterReset',
-				handleFilterReset as EventListener,
-			);
-		};
-	}, [searchGlobal, stateDefault.filters, updateTableState]);
+	useDataTableFilterReset({
+		dataSource,
+		defaultFilters: dataTableStateDefault.filters,
+		updateTableState,
+		onReset: resetCallbacks,
+	});
 
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
@@ -83,7 +74,7 @@ export const DataTablePermissionsFilters = (): JSX.Element => {
 			/>
 
 			<FormFiltersShowDeleted
-				checked={filters.is_deleted?.value || false}
+				checked={filters.is_deleted.value ?? false}
 				onCheckedChange={(value) => setFilterValue('is_deleted', value)}
 			/>
 

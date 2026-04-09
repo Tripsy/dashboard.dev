@@ -6,10 +6,8 @@ import {
 	FormComponentRadio,
 	FormComponentSelect,
 } from '@/components/form/form-element.component';
-import {
-	capitalizeFirstLetter,
-	formatEnumLabel,
-} from '@/helpers/string.helper';
+import { toOptionsFromEnum } from '@/helpers/form.helper';
+import { formatEnumLabel } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import {
 	LanguageEnum,
@@ -19,20 +17,17 @@ import {
 } from '@/models/user.model';
 import { useWindowForm } from '@/providers/window-form.provider';
 
-const roles = Object.values(UserRoleEnum).map((v) => ({
-	label: capitalizeFirstLetter(v),
-	value: v,
-}));
+const roles = toOptionsFromEnum(UserRoleEnum, {
+	formatter: formatEnumLabel,
+});
 
-const languages = Object.values(LanguageEnum).map((v) => ({
-	label: capitalizeFirstLetter(v),
-	value: v,
-}));
+const languages = toOptionsFromEnum(LanguageEnum, {
+	formatter: formatEnumLabel,
+});
 
-const operatorTypes = Object.values(UserOperatorTypeEnum).map((v) => ({
-	label: formatEnumLabel(v),
-	value: v,
-}));
+const operatorTypes = toOptionsFromEnum(UserOperatorTypeEnum, {
+	formatter: formatEnumLabel,
+});
 
 export function FormManageUser() {
 	const { formValues, errors, handleChange, pending } =

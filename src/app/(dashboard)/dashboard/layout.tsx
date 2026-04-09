@@ -53,8 +53,8 @@ export default async function Layout({ children }: { children: JSX.Element }) {
 						<SideMenu />
 						<div className="container-dashboard">
 							<Breadcrumb />
-							<WindowContainer />
 							{children}
+							<WindowContainer />
 						</div>
 					</DashboardMain>
 				</ProtectedRoute>

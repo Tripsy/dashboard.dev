@@ -1,6 +1,6 @@
 'use client';
 
-import { type JSX, useCallback, useEffect } from 'react';
+import { type JSX, useCallback, useMemo } from 'react';
 import { useStore } from 'zustand/react';
 import {
 	FormFiltersDateRange,
@@ -10,20 +10,21 @@ import {
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
 import type { CronHistoryDataTableFiltersType } from '@/app/(dashboard)/dashboard/cron-history/cron-history.definition';
-import { capitalizeFirstLetter } from '@/helpers/string.helper';
+import { toOptionsFromEnum } from '@/helpers/form.helper';
+import { formatEnumLabel } from '@/helpers/string.helper';
+import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import {
 	type CronHistoryModel,
 	CronHistoryStatusEnum,
 } from '@/models/cron-history.model';
 
-const statuses = Object.values(CronHistoryStatusEnum).map((v) => ({
-	label: capitalizeFirstLetter(v),
-	value: v,
-}));
+const statuses = toOptionsFromEnum(CronHistoryStatusEnum, {
+	formatter: formatEnumLabel,
+});
 
 export const DataTableCronHistoryFilters = (): JSX.Element => {
-	const { stateDefault, dataTableStore } = useDataTable<
+	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
 		'cron-history',
 		CronHistoryModel
 	>();
@@ -57,38 +58,23 @@ export const DataTableCronHistoryFilters = (): JSX.Element => {
 	);
 
 	const searchGlobal = useSearchFilter({
-		initialValue: filters.global?.value ?? '',
+		initialValue: filters.global.value ?? '',
 		debounceDelay: 1000,
 		minLength: 3,
 		onSearch: (value) => setFilterValue('global', value),
 	});
 
-	useEffect(() => {
-		const handleFilterReset = () => {
-			updateTableState({
-				filters: stateDefault.filters,
-			});
+	const resetCallbacks = useMemo(
+		() => [searchGlobal.onReset],
+		[searchGlobal.onReset],
+	);
 
-			searchGlobal.onReset();
-		};
-
-		window.addEventListener(
-			'filterReset',
-			handleFilterReset as EventListener,
-		);
-
-		return () => {
-			window.removeEventListener(
-				'filterReset',
-				handleFilterReset as EventListener,
-			);
-		};
-	}, [
-		searchGlobal,
-		searchGlobal.onReset,
-		stateDefault.filters,
+	useDataTableFilterReset({
+		dataSource,
+		defaultFilters: dataTableStateDefault.filters,
 		updateTableState,
-	]);
+		onReset: resetCallbacks,
+	});
 
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">

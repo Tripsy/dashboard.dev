@@ -63,6 +63,7 @@ export type DisplayActionEntriesFunctionType<Model> = (
 
 export type ActionConfigType<Entry, FormValues extends FormValuesType> = {
 	windowType: WindowInstanceType;
+	// biome-ignore lint/suspicious/noExplicitAny: It's fine
 	windowComponent?: React.ComponentType<any>;
 	windowConfigProps?: WindowConfigPropsType;
 	permission: string; // Policy related

@@ -74,13 +74,12 @@ export function useWindowFormProcessed<
 		],
 	);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: Fire on situation transitions, not when handleFormProcessed re-creates due to translation reloads or config changes.
 	useEffect(() => {
 		if (state.situation === 'success' || state.situation === 'error') {
 			handleFormProcessed(state.situation, state.resultData).catch(
 				console.error,
 			);
 		}
-	}, [state.situation]); // eslint-disable-line react-hooks/exhaustive-deps
-	// Intentional: we only want this to fire on situation transitions, not when
-	// handleFormProcessed re-creates due to translation reloads or config changes.
+	}, [state.situation]);
 }

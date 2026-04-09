@@ -1,6 +1,6 @@
 'use client';
 
-import { type JSX, useCallback, useEffect } from 'react';
+import { type JSX, useCallback, useMemo } from 'react';
 import { useStore } from 'zustand/react';
 import {
 	FormFiltersDateRange,
@@ -10,7 +10,9 @@ import {
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
 import type { LogDataDataTableFiltersType } from '@/app/(dashboard)/dashboard/log-data/log-data.definition';
-import { capitalizeFirstLetter } from '@/helpers/string.helper';
+import { toOptionsFromEnum } from '@/helpers/form.helper';
+import { formatEnumLabel } from '@/helpers/string.helper';
+import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import {
 	LogCategoryEnum,
@@ -18,18 +20,16 @@ import {
 	LogLevelEnum,
 } from '@/models/log-data.model';
 
-const logLevels = Object.values(LogLevelEnum).map((v) => ({
-	label: capitalizeFirstLetter(v),
-	value: v,
-}));
+const logLevels = toOptionsFromEnum(LogLevelEnum, {
+	formatter: formatEnumLabel,
+});
 
-const logCategories = Object.values(LogCategoryEnum).map((v) => ({
-	label: capitalizeFirstLetter(v),
-	value: v,
-}));
+const logCategories = toOptionsFromEnum(LogCategoryEnum, {
+	formatter: formatEnumLabel,
+});
 
 export const DataTableLogDataFilters = (): JSX.Element => {
-	const { stateDefault, dataTableStore } = useDataTable<
+	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
 		'log-data',
 		LogDataModel
 	>();
@@ -63,38 +63,23 @@ export const DataTableLogDataFilters = (): JSX.Element => {
 	);
 
 	const searchGlobal = useSearchFilter({
-		initialValue: filters.global?.value ?? '',
+		initialValue: filters.global.value ?? '',
 		debounceDelay: 1000,
 		minLength: 3,
 		onSearch: (value) => setFilterValue('global', value),
 	});
 
-	useEffect(() => {
-		const handleFilterReset = () => {
-			updateTableState({
-				filters: stateDefault.filters,
-			});
+	const resetCallbacks = useMemo(
+		() => [searchGlobal.onReset],
+		[searchGlobal.onReset],
+	);
 
-			searchGlobal.onReset();
-		};
-
-		window.addEventListener(
-			'filterReset',
-			handleFilterReset as EventListener,
-		);
-
-		return () => {
-			window.removeEventListener(
-				'filterReset',
-				handleFilterReset as EventListener,
-			);
-		};
-	}, [
-		searchGlobal,
-		searchGlobal.onReset,
-		stateDefault.filters,
+	useDataTableFilterReset({
+		dataSource,
+		defaultFilters: dataTableStateDefault.filters,
 		updateTableState,
-	]);
+		onReset: resetCallbacks,
+	});
 
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">

@@ -27,7 +27,6 @@ export function SetupPermissionsUser({
 	const translationsKeys = useMemo(
 		() =>
 			[
-				'app.text.loading',
 				'app.text.error_title',
 				'app.text.success_title',
 				'users.error.no_permissions_defined',
@@ -35,7 +34,8 @@ export function SetupPermissionsUser({
 		[],
 	);
 
-	const { translations } = useTranslation(translationsKeys);
+	const { isTranslationLoading, translations } =
+		useTranslation(translationsKeys);
 	const { showToast } = useToast();
 
 	const {
@@ -66,7 +66,10 @@ export function SetupPermissionsUser({
 		enabled: !!user.id,
 	});
 
-	const isLoading = isLoadingPermissions || isLoadingUserPermissions;
+	const isLoading =
+		isTranslationLoading ||
+		isLoadingPermissions ||
+		isLoadingUserPermissions;
 	const permissions = permissionsData?.entries ?? [];
 
 	const [userPermissions, setUserPermissions] = useState<number[]>([]);
@@ -214,9 +217,7 @@ export function SetupPermissionsUser({
 	);
 
 	if (isLoading) {
-		return (
-			<LoadingComponent description={translations['app.text.loading']} />
-		);
+		return <LoadingComponent />;
 	}
 
 	if (!permissions.length) {

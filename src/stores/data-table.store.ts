@@ -31,7 +31,7 @@ export const createDataTableSlice =
 		DataTableSlice
 	> =>
 	(set) => ({
-		tableState: getDataSourceConfig(dataSource, 'dataTable')['state'],
+		tableState: getDataSourceConfig(dataSource, 'dataTable').state,
 
 		updateTableState: (newState) =>
 			set((state: Draft<DataTableSlice>) => {

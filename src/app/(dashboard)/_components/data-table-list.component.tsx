@@ -13,6 +13,7 @@ import type React from 'react';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useStore } from 'zustand/react';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
+import { LoadingComponent } from '@/components/status.component';
 import {
 	type DataTableFiltersType,
 	getDataSourceConfig,
@@ -87,7 +88,8 @@ export default function DataTableList<Model extends DataTableValue>(props: {
 		[],
 	);
 
-	const { translations } = useTranslation(translationsKeys);
+	const { isTranslationLoading, translations } =
+		useTranslation(translationsKeys);
 
 	const dataTable = useMemo(
 		() => getDataSourceConfig(dataSource, 'dataTable'),
@@ -211,6 +213,10 @@ export default function DataTableList<Model extends DataTableValue>(props: {
 		}),
 		[translations],
 	);
+
+	if (isTranslationLoading) {
+		return <LoadingComponent />;
+	}
 
 	return (
 		<DataTable

@@ -4,7 +4,8 @@ import {
 	FormComponentTextarea,
 } from '@/components/form/form-element.component';
 import { Icons } from '@/components/icon.component';
-import { capitalizeFirstLetter, toKebabCase } from '@/helpers/string.helper';
+import { toOptionsFromEnum } from '@/helpers/form.helper';
+import { formatEnumLabel, toKebabCase } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import {
 	type TemplateFormValuesType,
@@ -13,20 +14,17 @@ import {
 } from '@/models/template.model';
 import { LanguageEnum } from '@/models/user.model';
 
-const languages = Object.values(LanguageEnum).map((v) => ({
-	label: capitalizeFirstLetter(v),
-	value: v,
-}));
+const languages = toOptionsFromEnum(LanguageEnum, {
+	formatter: formatEnumLabel,
+});
 
-const types = Object.values(TemplateTypeEnum).map((v) => ({
-	label: capitalizeFirstLetter(v),
-	value: v,
-}));
+const types = toOptionsFromEnum(TemplateTypeEnum, {
+	formatter: formatEnumLabel,
+});
 
-const emailLayouts = Object.values(TemplateLayoutEmailEnum).map((v) => ({
-	label: capitalizeFirstLetter(v),
-	value: v,
-}));
+const emailLayouts = toOptionsFromEnum(TemplateLayoutEmailEnum, {
+	formatter: formatEnumLabel,
+});
 
 export function FormManageTemplate() {
 	const elementIds = useElementIds(['label', 'language', 'type', 'content']);

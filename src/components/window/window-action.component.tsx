@@ -63,7 +63,6 @@ export function DataTableActionModal<K extends DataSourceKey>({
 			[
 				confirmTextKey,
 				'app.error.form',
-				'app.text.loading',
 				'dashboard.text.selected_entries_one',
 				'dashboard.text.selected_entries_many',
 			] as const,
@@ -141,9 +140,7 @@ export function DataTableActionModal<K extends DataSourceKey>({
 	);
 
 	if (isTranslationLoading) {
-		return (
-			<LoadingComponent description={translations['app.text.loading']} />
-		);
+		return <LoadingComponent />;
 	}
 
 	return (

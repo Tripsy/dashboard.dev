@@ -28,17 +28,16 @@ import {
 } from '@/components/status.component';
 import { Label } from '@/components/ui/label';
 import Routes from '@/config/routes.setup';
-import { createHandleChange } from '@/helpers/form.helper';
-import { capitalizeFirstLetter } from '@/helpers/string.helper';
+import { createHandleChange, toOptionsFromEnum } from '@/helpers/form.helper';
+import { formatEnumLabel } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
 import { LanguageEnum } from '@/models/user.model';
 
-const languages = Object.values(LanguageEnum).map((language) => ({
-	label: capitalizeFirstLetter(language),
-	value: language,
-}));
+const languages = toOptionsFromEnum(LanguageEnum, {
+	formatter: formatEnumLabel,
+});
 
 export default function Register() {
 	const [state, action, pending] = useActionState(

@@ -1,9 +1,10 @@
 'use client';
 
+import { useMemo } from 'react';
 import { Modal } from '@/components/ui/modal';
 import { WindowForm } from '@/components/window/window-form.component';
+import { useTranslation } from '@/hooks/use-translation.hook';
 import { useModalStore } from '@/stores/window.store';
-import type { ActionButtonPropsType } from '@/types/html.type';
 import type { WindowConfig } from '@/types/window.type';
 
 export function WindowInstance({ current }: { current: WindowConfig }) {
@@ -12,31 +13,23 @@ export function WindowInstance({ current }: { current: WindowConfig }) {
 	const handleClose = () => close(current.uid);
 	const handleMinimize = () => minimize(current.uid);
 
+	const windowTitleKey = `${current.key}.action.${current.action}.title`;
+
+	const translationsKeys = useMemo(
+		() => [windowTitleKey] as const,
+		[windowTitleKey],
+	);
+
+	const { translations } = useTranslation(translationsKeys);
+
 	const uid = current.uid;
 	const definition = current.definition;
 	const data = current?.data;
 
 	const windowProps = current.props;
 	const configPropsSize = windowProps?.size || 'md';
-	const configPropsTitle =
-		windowProps?.title || `${current.key}.action.${current.action}.title`;
-
-	// const actions = useMemo(() => {
-	// 	if (!dataSource) {
-	// 		return null;
-	// 	}
-	//
-	// 	return getDataSourceConfig(dataSource, 'actions');
-	// }, [dataSource]);
-	//
-	// const action = actionName ? actions?.[actionName] : null;
-	// const actionMode = action?.mode ?? null;
-	// const ActionComponent = action?.component ?? null;
-	// const actionTitleKey = `${dataSource}.action.${actionName}.title`;
-
-	// if (!actions) {
-	// 	throw new Error(`Actions must be defined for ${dataSource}`);
-	// }
+	const configPropsTitle = windowProps?.title || translations[windowTitleKey];
+	const configPropsClassName = windowProps?.className;
 
 	const instanceType = definition?.windowType || 'other';
 	const WindowComponent = definition?.windowComponent;
@@ -72,15 +65,15 @@ export function WindowInstance({ current }: { current: WindowConfig }) {
 	// };
 
 	const modalContent = () => {
-		// if (instanceType === 'view') {
-		// 	const entry = data?.entries?.[0] ?? null;
-		//
-		// 	if (!entry) {
-		// 		throw new Error(`Entry not defined for ${instanceType}`);
-		// 	}
-		//
-		// 	return <WindowComponent entry={entry} />;
-		// }
+		if (instanceType === 'view') {
+			const entry = data?.entries?.[0] ?? null;
+
+			if (!entry) {
+				throw new Error(`Entry not defined for ${instanceType}`);
+			}
+
+			return <WindowComponent entry={entry} />;
+		}
 
 		// TODO
 		// if (instanceType === 'action') {
@@ -126,7 +119,7 @@ export function WindowInstance({ current }: { current: WindowConfig }) {
 		<Modal
 			key={`modal-${uid}`}
 			size={configPropsSize}
-			className={windowProps.className}
+			className={configPropsClassName}
 			isOpen={true}
 			title={configPropsTitle}
 			onClose={handleClose}

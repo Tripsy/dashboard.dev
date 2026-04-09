@@ -86,9 +86,7 @@ export default function ProtectedRoute({
 
 	// Loading
 	if (isTranslationLoading) {
-		return (
-			<LoadingComponent description={translations['app.text.loading']} />
-		);
+		return <LoadingComponent />;
 	}
 
 	// Is a public route so return content

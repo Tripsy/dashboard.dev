@@ -50,7 +50,7 @@ export type WindowConfig<
 		prefillEntry?: Entry; // TODO: maybe drop this
 	};
 	events?: Record<string, FormEventType<unknown>>;
-	props: WindowConfigPropsType;
+	props?: WindowConfigPropsType;
 };
 
 export type WindowCreateConfig = Omit<WindowConfig, 'minimized' | 'definition'>;

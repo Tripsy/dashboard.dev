@@ -90,6 +90,10 @@ export const useModalStore = create<WindowStore>()(
 							...actionConfig.windowConfigProps,
 							...enrichedConfig.props,
 						},
+						events: {
+							...actionConfig.events,
+							...enrichedConfig.events,
+						},
 						minimized: false,
 					};
 				}

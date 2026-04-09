@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useStore } from 'zustand/react';
 import {
 	FormFiltersReset,
@@ -11,23 +11,23 @@ import {
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
 import type { TemplateDataTableFiltersType } from '@/app/(dashboard)/dashboard/templates/templates.definition';
-import { capitalizeFirstLetter } from '@/helpers/string.helper';
+import { toOptionsFromEnum } from '@/helpers/form.helper';
+import { formatEnumLabel } from '@/helpers/string.helper';
+import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import { type TemplateModel, TemplateTypeEnum } from '@/models/template.model';
 import { LanguageEnum } from '@/models/user.model';
 
-const languages = Object.values(LanguageEnum).map((language) => ({
-	label: capitalizeFirstLetter(language),
-	value: language,
-}));
+const languages = toOptionsFromEnum(LanguageEnum, {
+	formatter: formatEnumLabel,
+});
 
-const types = Object.values(TemplateTypeEnum).map((v) => ({
-	label: capitalizeFirstLetter(v),
-	value: v,
-}));
+const types = toOptionsFromEnum(TemplateTypeEnum, {
+	formatter: formatEnumLabel,
+});
 
 export const DataTableTemplatesFilters = (): React.JSX.Element => {
-	const { stateDefault, dataTableStore } = useDataTable<
+	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
 		'templates',
 		TemplateModel
 	>();
@@ -61,33 +61,23 @@ export const DataTableTemplatesFilters = (): React.JSX.Element => {
 	);
 
 	const searchGlobal = useSearchFilter({
-		initialValue: filters.global?.value ?? '',
+		initialValue: filters.global.value ?? '',
 		debounceDelay: 1000,
 		minLength: 3,
 		onSearch: (value) => setFilterValue('global', value),
 	});
 
-	useEffect(() => {
-		const handleFilterReset = () => {
-			updateTableState({
-				filters: stateDefault.filters,
-			});
+	const resetCallbacks = useMemo(
+		() => [searchGlobal.onReset],
+		[searchGlobal.onReset],
+	);
 
-			searchGlobal.onReset();
-		};
-
-		window.addEventListener(
-			'filterReset',
-			handleFilterReset as EventListener,
-		);
-
-		return () => {
-			window.removeEventListener(
-				'filterReset',
-				handleFilterReset as EventListener,
-			);
-		};
-	}, [searchGlobal, stateDefault.filters, updateTableState]);
+	useDataTableFilterReset({
+		dataSource,
+		defaultFilters: dataTableStateDefault.filters,
+		updateTableState,
+		onReset: resetCallbacks,
+	});
 
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
@@ -115,7 +105,7 @@ export const DataTableTemplatesFilters = (): React.JSX.Element => {
 			/>
 
 			<FormFiltersShowDeleted
-				checked={filters.is_deleted?.value || false}
+				checked={filters.is_deleted.value ?? false}
 				onCheckedChange={(value) => setFilterValue('is_deleted', value)}
 			/>
 

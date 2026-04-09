@@ -6,10 +6,6 @@ import {
 	FormComponentRadio,
 } from '@/components/form/form-element.component';
 import { Icons } from '@/components/icon.component';
-import type {
-	BaseModelType,
-	FormComponentType,
-} from '@/config/data-source.config';
 import { getLanguage } from '@/config/translate.setup';
 import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
@@ -39,12 +35,7 @@ const addressTypes = toOptionsFromEnum(ClientAddressTypeEnum, {
 	formatter: formatEnumLabel,
 });
 
-export function FormManageClientAddress({
-	formValues,
-	errors,
-	handleChange,
-	pending,
-}: FormComponentType<ClientAddressFormValuesType>) {
+export function FormManageClientAddress() {
 	const { open } = useModalStore();
 	const elementIds = useElementIds([
 		'address_type',

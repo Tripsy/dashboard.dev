@@ -8,7 +8,7 @@ import {
 	FormFiltersSearch,
 	FormFiltersSelect,
 } from '@/app/(dashboard)/_components/form-filters.component';
-import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
+import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
 import type { MailQueueDataTableFiltersType } from '@/app/(dashboard)/dashboard/mail-queue/mail-queue.definition';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';

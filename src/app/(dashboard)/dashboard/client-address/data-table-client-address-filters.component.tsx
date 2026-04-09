@@ -8,7 +8,7 @@ import {
 	FormFiltersSelect,
 	FormFiltersShowDeleted,
 } from '@/app/(dashboard)/_components/form-filters.component';
-import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
+import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
 import type { ClientAddressDataTableFiltersType } from '@/app/(dashboard)/dashboard/client-address/client-address.definition';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';

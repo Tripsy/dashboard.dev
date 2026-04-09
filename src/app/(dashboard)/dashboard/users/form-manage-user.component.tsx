@@ -6,7 +6,6 @@ import {
 	FormComponentRadio,
 	FormComponentSelect,
 } from '@/components/form/form-element.component';
-import type { FormComponentType } from '@/config/data-source.config';
 import {
 	capitalizeFirstLetter,
 	formatEnumLabel,
@@ -18,6 +17,7 @@ import {
 	UserOperatorTypeEnum,
 	UserRoleEnum,
 } from '@/models/user.model';
+import { useWindowForm } from '@/providers/window-form.provider';
 
 const roles = Object.values(UserRoleEnum).map((v) => ({
 	label: capitalizeFirstLetter(v),
@@ -34,12 +34,10 @@ const operatorTypes = Object.values(UserOperatorTypeEnum).map((v) => ({
 	value: v,
 }));
 
-export function FormManageUser({
-	formValues,
-	errors,
-	handleChange,
-	pending,
-}: FormComponentType<UserFormValuesType>) {
+export function FormManageUser() {
+	const { formValues, errors, handleChange, pending } =
+		useWindowForm<UserFormValuesType>();
+
 	const [showPassword, setShowPassword] = useState(false);
 
 	const prevRoleRef = useRef(formValues.role);

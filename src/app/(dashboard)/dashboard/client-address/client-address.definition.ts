@@ -199,7 +199,7 @@ export const dataSourceConfigClientAddress = {
 
 			return validator.manage.safeParse(values);
 		},
-		syncFormState: (
+		getFormState: (
 			state: FormStateType<
 				'client-address',
 				ClientAddressModel,

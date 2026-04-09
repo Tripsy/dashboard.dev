@@ -4,7 +4,6 @@ import {
 	FormComponentTextarea,
 } from '@/components/form/form-element.component';
 import { Icons } from '@/components/icon.component';
-import type { FormComponentType } from '@/config/data-source.config';
 import { capitalizeFirstLetter, toKebabCase } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import {
@@ -29,12 +28,7 @@ const emailLayouts = Object.values(TemplateLayoutEmailEnum).map((v) => ({
 	value: v,
 }));
 
-export function FormManageTemplate({
-	formValues,
-	errors,
-	handleChange,
-	pending,
-}: FormComponentType<TemplateFormValuesType>) {
+export function FormManageTemplate() {
 	const elementIds = useElementIds(['label', 'language', 'type', 'content']);
 
 	return (

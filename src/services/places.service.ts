@@ -1,3 +1,9 @@
+import {
+	ApiRequest,
+	buildQueryString,
+	getResponseData,
+} from '@/helpers/api.helper';
+import type { PlaceFormValuesType, PlaceModel } from '@/models/place.model';
 import type {
 	CreateFunctionType,
 	DeleteFunctionType,
@@ -5,13 +11,7 @@ import type {
 	FindFunctionResponseType,
 	FindFunctionType,
 	UpdateFunctionType,
-} from '@/config/data-source.config';
-import {
-	ApiRequest,
-	buildQueryString,
-	getResponseData,
-} from '@/helpers/api.helper';
-import type { PlaceFormValuesType, PlaceModel } from '@/models/place.model';
+} from '@/types/action-function.type';
 import type { ApiResponseFetch, QueryFiltersType } from '@/types/api.type';
 
 export const findPlaces: FindFunctionType<PlaceModel> = async (

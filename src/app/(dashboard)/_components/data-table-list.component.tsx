@@ -12,7 +12,7 @@ import type { PaginatorCurrentPageReportOptions } from 'primereact/paginator';
 import type React from 'react';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useStore } from 'zustand/react';
-import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
+import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
 import {
 	type DataTableFiltersType,
 	getDataSourceConfig,
@@ -63,35 +63,6 @@ type SelectionChangeEvent<T> = {
 	value: T[];
 };
 
-const CurrentPageReport = (options: PaginatorCurrentPageReportOptions) => {
-	const translationsKeys = useMemo(
-		() => ['dashboard.text.showing_entries'] as const,
-		[],
-	);
-
-	const { translations, isTranslationLoading } =
-		useTranslation(translationsKeys);
-
-	if (isTranslationLoading) {
-		return (
-			<div className="data-table-paginator-showing">
-				Showing {options.first} to {options.last} of{' '}
-				{options.totalRecords} entries
-			</div>
-		);
-	}
-
-	return (
-		<div className="data-table-paginator-showing">
-			{replaceVars(translations['dashboard.text.showing_entries'], {
-				first: options.first.toString(),
-				last: options.last.toString(),
-				total: options.totalRecords.toString(),
-			})}
-		</div>
-	);
-};
-
 export default function DataTableList<Model extends DataTableValue>(props: {
 	dataKey: string;
 	scrollHeight?: string;
@@ -99,30 +70,29 @@ export default function DataTableList<Model extends DataTableValue>(props: {
 	const { dataSource, dataStorageKey, selectionMode, dataTableStore } =
 		useDataTable();
 
-	const tableState = useStore(dataTableStore, (state) => state.tableState);
-	const updateTableState = useStore(
-		dataTableStore,
-		(state) => state.updateTableState,
-	);
-	const selectedEntries = useStore(
-		dataTableStore,
-		(state) => state.selectedEntries,
-	) as Model[];
-	const setSelectedEntries = useStore(
-		dataTableStore,
-		(state) => state.setSelectedEntries,
-	);
-	const clearSelectedEntries = useStore(
-		dataTableStore,
-		(state) => state.clearSelectedEntries,
-	);
+	const {
+		tableState,
+		updateTableState,
+		selectedEntries,
+		setSelectedEntries,
+		clearSelectedEntries,
+	} = useStore(dataTableStore, (state) => state);
 
 	const translationsKeys = useMemo(
-		() => ['dashboard.text.no_entries'] as const,
+		() =>
+			[
+				'dashboard.text.no_entries',
+				'dashboard.text.showing_entries',
+			] as const,
 		[],
 	);
 
 	const { translations } = useTranslation(translationsKeys);
+
+	const dataTable = useMemo(
+		() => getDataSourceConfig(dataSource, 'dataTable'),
+		[dataSource],
+	);
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: Reset to first page when filters change
 	useEffect(() => {
@@ -133,28 +103,23 @@ export default function DataTableList<Model extends DataTableValue>(props: {
 		});
 	}, [clearSelectedEntries, updateTableState, tableState.filters]);
 
-	const queryKey = [
-		'dataTable',
-		dataSource,
-		tableState.first,
-		tableState.rows,
-		tableState.sortField,
-		tableState.sortOrder,
-		tableState.filters,
-	];
+	const queryKey = useMemo(
+		() => [
+			'dataTable',
+			dataSource,
+			tableState.first,
+			tableState.rows,
+			tableState.sortField,
+			tableState.sortOrder,
+			tableState.filters,
+		],
+		[dataSource, tableState],
+	);
 
 	const { data, isLoading } = useQuery({
 		queryKey,
 		queryFn: async () => {
-			const functions = getDataSourceConfig(dataSource, 'functions');
-
-			const findFunction = functions?.find;
-
-			if (!findFunction) {
-				throw new Error(`No fetch function found for ${dataSource}`);
-			}
-
-			const response = await findFunction({
+			const response = await dataTable.find({
 				order_by: tableState.sortField,
 				direction: tableState.sortOrder === 1 ? 'ASC' : 'DESC',
 				limit: tableState.rows,
@@ -209,11 +174,9 @@ export default function DataTableList<Model extends DataTableValue>(props: {
 		[setSelectedEntries],
 	);
 
-	const columns = getDataSourceConfig(dataSource, 'dataTableColumns');
-
 	const tableColumns = useMemo(
 		() =>
-			columns.map((column) => (
+			dataTable.columns.map((column) => (
 				<Column
 					key={column.field}
 					field={column.field}
@@ -227,15 +190,26 @@ export default function DataTableList<Model extends DataTableValue>(props: {
 					}
 				/>
 			)),
-		[columns],
+		[dataTable.columns],
 	);
 
 	const paginatorTemplate = useMemo(
 		() => ({
 			layout: 'CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown',
-			CurrentPageReport,
+			CurrentPageReport: (options: PaginatorCurrentPageReportOptions) => (
+				<div className="data-table-paginator-showing">
+					{replaceVars(
+						translations['dashboard.text.showing_entries'],
+						{
+							first: options.first.toString(),
+							last: options.last.toString(),
+							total: options.totalRecords.toString(),
+						},
+					)}
+				</div>
+			),
 		}),
-		[],
+		[translations],
 	);
 
 	return (

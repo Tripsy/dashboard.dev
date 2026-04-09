@@ -1,15 +1,15 @@
-import type {
-	DeleteFunctionType,
-	FindFunctionParamsType,
-	FindFunctionResponseType,
-	FindFunctionType,
-} from '@/config/data-source.config';
 import {
 	ApiRequest,
 	buildQueryString,
 	getResponseData,
 } from '@/helpers/api.helper';
 import type { LogHistoryModel } from '@/models/log-history.model';
+import type {
+	DeleteFunctionType,
+	FindFunctionParamsType,
+	FindFunctionResponseType,
+	FindFunctionType,
+} from '@/types/action-function.type';
 import type { ApiResponseFetch, QueryFiltersType } from '@/types/api.type';
 
 export const findLogHistory: FindFunctionType<LogHistoryModel> = async (

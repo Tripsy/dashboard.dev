@@ -3,14 +3,11 @@
 import { type JSX, useMemo } from 'react';
 import { DataTableActions } from '@/app/(dashboard)/_components/data-table-actions.component';
 import DataTableList from '@/app/(dashboard)/_components/data-table-list.component';
-import { DataTableProvider } from '@/app/(dashboard)/_providers/data-table-provider';
+import { DataTableProvider } from '@/app/(dashboard)/_providers/data-table.provider';
 import { DataTableLogHistoryFilters } from '@/app/(dashboard)/dashboard/log-history/data-table-log-history-filters.component';
 import { LoadingComponent } from '@/components/status.component';
 import { useMounted } from '@/hooks/use-mounted.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
-import { createDataTableStore } from '@/stores/data-table.store';
-
-const dataTableStore = createDataTableStore('log-history');
 
 export const DataTableLogHistory = (): JSX.Element => {
 	const translationsKeys = useMemo(() => ['app.text.loading'] as const, []);
@@ -25,11 +22,7 @@ export const DataTableLogHistory = (): JSX.Element => {
 	}
 
 	return (
-		<DataTableProvider
-			dataSource="log-history"
-			selectionMode="multiple"
-			dataTableStore={dataTableStore}
-		>
+		<DataTableProvider dataSource="log-history" selectionMode="multiple">
 			<div className="table-container">
 				<DataTableLogHistoryFilters />
 				<DataTableActions />

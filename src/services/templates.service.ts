@@ -1,11 +1,3 @@
-import type {
-	CreateFunctionType,
-	DeleteFunctionType,
-	FindFunctionParamsType,
-	FindFunctionResponseType,
-	FindFunctionType,
-	UpdateFunctionType,
-} from '@/config/data-source.config';
 import {
 	ApiRequest,
 	buildQueryString,
@@ -15,6 +7,14 @@ import type {
 	TemplateFormValuesType,
 	TemplateModel,
 } from '@/models/template.model';
+import type {
+	CreateFunctionType,
+	DeleteFunctionType,
+	FindFunctionParamsType,
+	FindFunctionResponseType,
+	FindFunctionType,
+	UpdateFunctionType,
+} from '@/types/action-function.type';
 import type { ApiResponseFetch, QueryFiltersType } from '@/types/api.type';
 
 export const findTemplates: FindFunctionType<TemplateModel> = async (

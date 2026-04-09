@@ -26,9 +26,8 @@ export type FormStateType<FormValues> = {
 	resultData?: unknown;
 };
 
-export type SyncFormStateFnType<FormValues, Model> = (
-	state: FormStateType<FormValues>,
-	data: Model,
+export type GetFormStateFnType<FormValues, Data> = (
+	data?: Data,
 ) => FormStateType<FormValues>;
 
 export type FormComponentType<FormValues> = {
@@ -41,3 +40,5 @@ export type FormComponentType<FormValues> = {
 	) => void;
 	pending: boolean;
 };
+
+export type FormEventType<Data> = (data: Data) => void;

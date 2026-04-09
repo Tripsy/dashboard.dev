@@ -15,7 +15,7 @@ import {
 	deleteUserPermission,
 	getUserPermissions,
 } from '@/services/users.service';
-import { useModalStore, type WindowEntryType } from '@/stores/window.store';
+import type { WindowEntryType } from '@/types/window.type';
 
 export function SetupPermissionsUser({
 	entries,

@@ -1,3 +1,9 @@
+import {
+	ApiRequest,
+	buildQueryString,
+	getResponseData,
+} from '@/helpers/api.helper';
+import type { ClientFormValuesType, ClientModel } from '@/models/client.model';
 import type {
 	CreateFunctionType,
 	DeleteFunctionType,
@@ -5,13 +11,7 @@ import type {
 	FindFunctionResponseType,
 	FindFunctionType,
 	UpdateFunctionType,
-} from '@/config/data-source.config';
-import {
-	ApiRequest,
-	buildQueryString,
-	getResponseData,
-} from '@/helpers/api.helper';
-import type { ClientFormValuesType, ClientModel } from '@/models/client.model';
+} from '@/types/action-function.type';
 import type { ApiResponseFetch, QueryFiltersType } from '@/types/api.type';
 
 export const findClients: FindFunctionType<ClientModel> = async (

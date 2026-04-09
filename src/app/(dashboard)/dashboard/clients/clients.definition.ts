@@ -289,7 +289,7 @@ export const dataSourceConfigClients = {
 
 			return validator.manage.safeParse(values);
 		},
-		syncFormState: (
+		getFormState: (
 			state: FormStateType<'clients', ClientModel, ClientFormValuesType>,
 			model: ClientModel,
 		): FormStateType<'clients', ClientModel, ClientFormValuesType> => {

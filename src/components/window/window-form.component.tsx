@@ -1,90 +1,81 @@
 'use client';
 
-import React, {
-	cloneElement,
-	isValidElement,
-	useActionState,
-	useCallback,
-	useEffect,
-	useMemo,
-} from 'react';
+import React, { useActionState } from 'react';
 import { FormComponentSubmit } from '@/components/form/form-element.component';
 import { FormError } from '@/components/form/form-error.component';
 import { getActionIcon, Icons } from '@/components/icon.component';
-import {
-	type BaseModelType,
-	type DataSourceKey,
-	hasSyncFormState,
-	hasValidateForm,
-} from '@/config/data-source.config';
 import { createHandleChange, processForm } from '@/helpers/form.helper';
+import { useWindowFormProcessed } from '@/hooks/use-form-processed.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
-import type { ApiResponseFetch } from '@/types/api.type';
-import type {
-	FormStateType,
-	FormValuesType,
-	ValidateFormFnType,
-	ValidateFormReturnType,
-} from '@/types/form.type';
-import type { ActionButtonPropsType } from '@/types/html.type';
+import { WindowFormProvider } from '@/providers/window-form.provider';
+import { useModalStore } from '@/stores/window.store';
+import type { FormOperationFunctionType } from '@/types/action-function.type';
+import type { FormStateType, FormValuesType } from '@/types/form.type';
+import type { WindowConfig, WindowEntryType } from '@/types/window.type';
 
-type WindowFormType<FormValues extends FormValuesType, FormOperation> = {
+type WindowFormType = {
 	uid: string;
-	formOperation: FormOperation;
-	formSubmitButton?: ActionButtonPropsType;
-	getFormValues: (formData: FormData) => FormValues;
-	validateForm: ValidateFormFnType<FormValues>;
-	fetchFunction: (data: FormValues) => Promise<ApiResponseFetch<unknown>>;
-	// dataSource: K;
-	// actionEntry: Model | null;
-	// prefillEntry?: Record<string, unknown>;
+	formOperation: string;
 	children: React.ReactElement<unknown>;
 };
 
-export function WindowForm<FormValues extends FormValuesType>({
-	uid,
-	formOperation,
-	formSubmitButton,
-	// getFormValues,
-	// validateForm,
-	// fetchFunction,
-	children,
-}: WindowFormType<FormValues, string>) {
-	// const { showToast } = useToast();
-	// const refreshDataTable = useRefreshDataTable();
+export function WindowForm<
+	FormValues extends FormValuesType,
+	WindowEntry extends WindowEntryType,
+>({ uid, formOperation, children }: WindowFormType) {
+	const { getWindow } = useModalStore();
 
-	// // Derive data via hooks/memos — no guards yet
-	// const formState = useMemo(
-	// 	() => getDataSourceConfig(dataSource, 'formState'),
-	// 	[dataSource],
-	// );
-	// const functions = useMemo(
-	// 	() => getDataSourceConfig(dataSource, 'functions'),
-	// 	[dataSource],
-	// );
-	// const actions = useMemo(
-	// 	() => getDataSourceConfig(dataSource, 'actions'),
-	// 	[dataSource],
-	// );
+	const windowConfig = getWindow(uid) as
+		| WindowConfig<FormValues, WindowEntry>
+		| undefined;
+	const windowDefinition = windowConfig?.definition;
 
-	// const initState = useMemo(() => {
-	// 	if (!formState) {
-	// 		throw new ValueError(
-	// 			`'formState' is not defined for ${dataSource}`,
-	// 		);
-	// 	}
-	//
-	// 	if (formAction === 'update' && actionEntry && hasSyncFormState(functions)) {
-	// 		return functions.syncFormState(formState, actionEntry);
-	// 	}
-	//
-	// 	if (formAction === 'create' && prefillEntry && hasSyncFormState(functions)) {
-	// 		return functions.syncFormState(formState, prefillEntry as BaseModelType);
-	// 	}
-	//
-	// 	return formState;
-	// }, [formState, functions, formAction, actionEntry, dataSource, prefillEntry]);
+	// Guards
+	if (!windowConfig) {
+		throw new Error(`Window config not found for uid: ${uid}`);
+	}
+
+	if (!windowDefinition) {
+		throw new Error(`Window definition not found for uid: ${uid}`);
+	}
+
+	const {
+		getFormState,
+		getFormValues,
+		validateForm,
+		operationFunction,
+		button: buttonSubmit,
+	} = windowDefinition;
+
+	const eventsOnFormProcess = windowConfig.events;
+
+	// + Guards
+	if (!getFormState) {
+		throw new Error(`getFormState not found for uid: ${uid}`);
+	}
+
+	if (!getFormValues) {
+		throw new Error(`getFormValues not found for uid: ${uid}`);
+	}
+
+	if (!validateForm) {
+		throw new Error(`validateForm not found for uid: ${uid}`);
+	}
+
+	if (!operationFunction) {
+		throw new Error(`operationFunction not defined for window: ${uid}`);
+	}
+
+	// WindowForm only handles form operations.
+	const formOperationFunction =
+		operationFunction as FormOperationFunctionType<unknown, FormValues>;
+
+	const entry =
+		windowConfig.data?.entries?.[0] || windowConfig.data?.prefillEntry;
+	const entryId = entry && 'id' in entry ? (entry.id as number) : undefined;
+
+	const initState = getFormState(entry);
 
 	const [state, action, pending] = useActionState<
 		FormStateType<FormValues>,
@@ -96,161 +87,67 @@ export function WindowForm<FormValues extends FormValuesType>({
 				formData,
 				getFormValues,
 				validateForm,
-				fetchFunction,
+				formOperationFunction,
+				entryId, // Present for update, undefined for create
 			),
-		initState as unknown as FormStateType<FormValues>,
+		initState,
 	);
 
 	const [formValues, setFormValues] = useFormValues<FormValues>(state.values);
 
-	const validate = useCallback(
-		(values: FormValues): ValidateFormReturnType<FormValues> => {
-			if (!hasValidateForm<FormValues>(functions)) {
-				return {} as ValidateFormReturnType<FormValues>;
-			}
-
-			return functions.validateForm(values, state?.id);
-		},
-		[state?.id, functions],
-	);
-
 	const { errors, submitted, markSubmit, markFieldAsTouched } =
-		useFormValidation({ formValues, validate, debounceDelay: 800 });
+		useFormValidation({ formValues, validateForm, debounceDelay: 800 });
 
-	// const actionLabelKey = `${dataSource}.action.${formAction}.label`;
-	// const successMessageKey = `${dataSource}.action.${formAction}.success`;
-	//
-	// const translationsKeys = useMemo(
-	// 	() =>
-	// 		[
-	// 			successMessageKey,
-	// 			actionLabelKey,
-	// 			'app.text.success_title',
-	// 			'app.text.saving',
-	// 		] as const,
-	// 	[actionLabelKey, successMessageKey],
-	// );
-	//
-	// const { translations } = useTranslation(translationsKeys);
-
-	// const onSuccess = useCallback(
-	// 	async (actionName: string, resultData?: unknown) => {
-	// 		if (actionName === 'create') {
-	// 			handleReset(dataSource); // Reset data-table filters form
-	// 		}
-	//
-	// 		await refreshDataTable(dataSource);
-	//
-	// 		showToast({
-	// 			severity: 'success',
-	// 			summary: translations['app.text.success_title'],
-	// 			detail: translations[successMessageKey],
-	// 		});
-	//
-	// 		close();
-	//
-	// 		if (onSuccessAction) {
-	// 			onSuccessAction(resultData);
-	// 		}
-	// 	},
-	// 	[
-	// 		onSuccessAction,
-	// 		dataSource,
-	// 		refreshDataTable,
-	// 		showToast,
-	// 		close,
-	// 		translations,
-	// 		successMessageKey,
-	// 	],
-	// );
-	//
-	// useEffect(() => {
-	// 	if (state.situation === 'success') {
-	// 		onSuccess(actionName, state.resultData).catch((error) => {
-	// 			showToast({
-	// 				severity: 'error',
-	// 				summary: 'Error',
-	// 				detail: error.message,
-	// 			});
-	// 		});
-	// 	}
-	// }, [state.situation, onSuccess, actionName, showToast]);
-
-	// // Guards
-	// if (!formState) {
-	// 	throw new ValueError(`'formState' is not defined for ${dataSource}`);
-	// }
-	//
-	// if (
-	// 	!('syncFormState' in functions) ||
-	// 	typeof functions.syncFormState !== 'function'
-	// ) {
-	// 	throw new ValueError(
-	// 		`'syncFormState' function is not defined for ${dataSource}`,
-	// 	);
-	// }
-	//
-	// if (
-	// 	!('validateForm' in functions) ||
-	// 	typeof functions.validateForm !== 'function'
-	// ) {
-	// 	throw new ValueError(
-	// 		`'validateForm' function is not defined for ${dataSource}`,
-	// 	);
-	// }
-	//
-	// if (!actions) {
-	// 	throw new ValueError(`Actions must be defined for ${dataSource}`);
-	// }
+	useWindowFormProcessed({
+		state,
+		windowConfig,
+		eventsOnFormProcess,
+	});
 
 	const handleChange = createHandleChange<FormValues>(
 		setFormValues,
 		markFieldAsTouched,
 	);
 
-	const injectedChild = isValidElement(children)
-		? cloneElement(
-				children as React.ReactElement<FormComponentType<FormValues>>,
-				{
-					formOperation,
-					formValues,
-					errors,
-					handleChange,
-					pending,
-				},
-			)
-		: children;
-
 	return (
-		<form
-			key={`form-${uid}`}
-			action={action}
-			onSubmit={markSubmit}
-			className="form-section"
+		<WindowFormProvider
+			value={{
+				formOperation,
+				formValues,
+				errors,
+				handleChange,
+				pending,
+			}}
 		>
-			{injectedChild}
+			<form
+				action={action}
+				onSubmit={markSubmit}
+				className="form-section"
+			>
+				{children}
 
-			<div className="flex justify-end gap-3">
-				<FormComponentSubmit
-					pending={pending}
-					submitted={submitted}
-					errors={errors as Record<string, string[]>} // remove `as`
-					button={{
-						variant: formSubmitButton?.variant || 'info',
-						label: formSubmitButton?.label || 'Submit',
-						icon: getActionIcon(formSubmitButton?.icon || 'submit'),
-					}}
-				/>
-			</div>
+				<div className="flex justify-end gap-3">
+					<FormComponentSubmit
+						pending={pending}
+						submitted={submitted}
+						errors={errors as Record<string, string[]>} // remove `as`
+						button={{
+							variant: buttonSubmit?.variant || 'info',
+							label: buttonSubmit?.label || 'Submit',
+							icon: getActionIcon(buttonSubmit?.icon || 'submit'),
+						}}
+					/>
+				</div>
 
-			{state.situation === 'error' && state.message && (
-				<FormError>
-					<React.Fragment key="error-content">
-						<Icons.Status.Error />
-						<div>{state.message}</div>
-					</React.Fragment>
-				</FormError>
-			)}
-		</form>
+				{state.situation === 'error' && state.message && (
+					<FormError>
+						<React.Fragment key="form-error-content">
+							<Icons.Status.Error />
+							<div>{state.message}</div>
+						</React.Fragment>
+					</FormError>
+				)}
+			</form>
+		</WindowFormProvider>
 	);
 }

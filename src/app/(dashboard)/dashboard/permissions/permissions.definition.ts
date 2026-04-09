@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { FormManagePermission } from '@/app/(dashboard)/dashboard/permissions/form-manage-permission.component';
-import type { FormStateType } from '@/config/data-source.config';
 import { getFormDataAsString } from '@/helpers/form.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import type {
@@ -88,7 +87,7 @@ export const dataSourceConfigPermissions = {
 
 			return validator.manage.safeParse(values);
 		},
-		syncFormState: (
+		getFormState: (
 			state: FormStateType<
 				'permissions',
 				PermissionModel,

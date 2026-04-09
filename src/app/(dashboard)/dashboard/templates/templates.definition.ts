@@ -5,7 +5,6 @@ import {
 } from '@/app/(dashboard)/_components/data-table-value';
 import { FormManageTemplate } from '@/app/(dashboard)/dashboard/templates/form-manage-template.component';
 import { ViewTemplate } from '@/app/(dashboard)/dashboard/templates/view-template.component';
-import type { FormStateType } from '@/config/data-source.config';
 import { getFormDataAsEnum, getFormDataAsString } from '@/helpers/form.helper';
 import { parseJson } from '@/helpers/string.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
@@ -225,7 +224,7 @@ export const dataSourceConfigTemplates = {
 
 			return validator.manage.safeParse(values);
 		},
-		syncFormState: (
+		getFormState: (
 			state: FormStateType<
 				'templates',
 				TemplateModel,

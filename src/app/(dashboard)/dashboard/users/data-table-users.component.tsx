@@ -3,14 +3,11 @@
 import { type JSX, useMemo } from 'react';
 import { DataTableActions } from '@/app/(dashboard)/_components/data-table-actions.component';
 import DataTableList from '@/app/(dashboard)/_components/data-table-list.component';
-import { DataTableProvider } from '@/app/(dashboard)/_providers/data-table-provider';
+import { DataTableProvider } from '@/app/(dashboard)/_providers/data-table.provider';
 import { DataTableUsersFilters } from '@/app/(dashboard)/dashboard/users/data-table-users-filters.component';
 import { LoadingComponent } from '@/components/status.component';
 import { useMounted } from '@/hooks/use-mounted.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
-import { createDataTableStore } from '@/stores/data-table.store';
-
-const dataTableStore = createDataTableStore('users');
 
 export const DataTableUsers = (): JSX.Element => {
 	const translationsKeys = useMemo(() => ['app.text.loading'] as const, []);
@@ -25,11 +22,7 @@ export const DataTableUsers = (): JSX.Element => {
 	}
 
 	return (
-		<DataTableProvider
-			dataSource="users"
-			selectionMode="checkbox"
-			dataTableStore={dataTableStore}
-		>
+		<DataTableProvider dataSource="users" selectionMode="checkbox">
 			<div className="table-container">
 				<DataTableUsersFilters />
 				<DataTableActions />

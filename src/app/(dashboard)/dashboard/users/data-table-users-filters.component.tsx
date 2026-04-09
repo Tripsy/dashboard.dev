@@ -9,9 +9,11 @@ import {
 	FormFiltersSelect,
 	FormFiltersShowDeleted,
 } from '@/app/(dashboard)/_components/form-filters.component';
-import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
+import { addFilterResetListener } from '@/app/(dashboard)/_events/data-table-filter-reset.event';
+import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
 import type { UsersDataTableFiltersType } from '@/app/(dashboard)/dashboard/users/users.definition';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
+import { useRefreshDataTable } from '@/hooks/use-refresh-data-table.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import {
 	type UserModel,
@@ -30,7 +32,10 @@ const roles = Object.values(UserRoleEnum).map((v) => ({
 }));
 
 export const DataTableUsersFilters = (): JSX.Element => {
-	const { stateDefault, dataTableStore } = useDataTable<'users', UserModel>();
+	const { dataSource, stateDefault, dataTableStore } = useDataTable<
+		'users',
+		UserModel
+	>();
 
 	const filters = useStore(
 		dataTableStore,
@@ -67,27 +72,27 @@ export const DataTableUsersFilters = (): JSX.Element => {
 		onSearch: (value) => setFilterValue('global', value),
 	});
 
+	const refreshDataTable = useRefreshDataTable();
+
 	useEffect(() => {
-		const handleFilterReset = () => {
-			updateTableState({
-				filters: stateDefault.filters,
-			});
+		return addFilterResetListener(async ({ source }) => {
+			if (source !== dataSource) {
+				return;
+			}
+
+			updateTableState({ filters: stateDefault.filters });
 
 			searchGlobal.onReset();
-		};
 
-		window.addEventListener(
-			'filterReset',
-			handleFilterReset as EventListener,
-		);
-
-		return () => {
-			window.removeEventListener(
-				'filterReset',
-				handleFilterReset as EventListener,
-			);
-		};
-	}, [searchGlobal, stateDefault.filters, updateTableState]);
+			await refreshDataTable(dataSource);
+		});
+	}, [
+		dataSource,
+		searchGlobal,
+		stateDefault.filters,
+		updateTableState,
+		refreshDataTable,
+	]);
 
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">

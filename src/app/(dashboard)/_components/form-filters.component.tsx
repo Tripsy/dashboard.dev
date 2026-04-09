@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { dispatchFilterReset } from '@/app/(dashboard)/_events/data-table-filter-reset.event';
 import {
 	FormComponentCalendarWithoutFormElement,
 	FormComponentCheckbox,
@@ -16,16 +17,6 @@ import { cn } from '@/helpers/css.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import type { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
-
-export const handleReset = (dataSource: DataSourceKey) => {
-	const event = new CustomEvent('filterReset', {
-		detail: {
-			source: dataSource,
-		},
-	});
-
-	window.dispatchEvent(event);
-};
 
 export function FormFiltersSearch<Fields>({
 	labelText,
@@ -206,7 +197,7 @@ export function FormFiltersReset({
 				type="reset"
 				variant="outline"
 				hover="warning"
-				onClick={() => handleReset(dataSource)}
+				onClick={() => dispatchFilterReset(dataSource)}
 				title="Reset filters"
 			>
 				<Icons.Action.Reset />

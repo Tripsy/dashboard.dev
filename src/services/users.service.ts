@@ -1,11 +1,3 @@
-import type {
-	CreateFunctionType,
-	DeleteFunctionType,
-	FindFunctionParamsType,
-	FindFunctionResponseType,
-	FindFunctionType,
-	UpdateFunctionType,
-} from '@/config/data-source.config';
 import {
 	ApiRequest,
 	buildQueryString,
@@ -13,6 +5,14 @@ import {
 } from '@/helpers/api.helper';
 import type { UserFormValuesType, UserModel } from '@/models/user.model';
 import type { UserPermissionModel } from '@/models/user-permission.model';
+import type {
+	CreateFunctionType,
+	DeleteFunctionType,
+	FindFunctionParamsType,
+	FindFunctionResponseType,
+	FindFunctionType,
+	UpdateFunctionType,
+} from '@/types/action-function.type';
 import type { ApiResponseFetch, QueryFiltersType } from '@/types/api.type';
 
 export const findUsers: FindFunctionType<UserModel> = async (

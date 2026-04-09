@@ -1,15 +1,15 @@
-import type {
-	DeleteFunctionType,
-	FindFunctionParamsType,
-	FindFunctionResponseType,
-	FindFunctionType,
-} from '@/config/data-source.config';
 import {
 	ApiRequest,
 	buildQueryString,
 	getResponseData,
 } from '@/helpers/api.helper';
 import type { CronHistoryModel } from '@/models/cron-history.model';
+import type {
+	DeleteFunctionType,
+	FindFunctionParamsType,
+	FindFunctionResponseType,
+	FindFunctionType,
+} from '@/types/action-function.type';
 import type { ApiResponseFetch, QueryFiltersType } from '@/types/api.type';
 
 export const findCronHistory: FindFunctionType<CronHistoryModel> = async (

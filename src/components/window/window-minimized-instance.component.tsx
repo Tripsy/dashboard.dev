@@ -1,6 +1,7 @@
 'use client';
 
-import { useModalStore, type WindowConfig } from '@/stores/window.store';
+import { useModalStore } from '@/stores/window.store';
+import type { WindowConfig } from '@/types/window.type';
 
 export function WindowMinimizedInstance({
 	current,

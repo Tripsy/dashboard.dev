@@ -5,13 +5,13 @@ import type { ValidateFormFnType } from '@/types/form.type';
 
 type UseFormValidationProps<FormValues> = {
 	formValues: FormValues;
-	validate: ValidateFormFnType<FormValues>;
+	validateForm: ValidateFormFnType<FormValues>;
 	debounceDelay?: number;
 };
 
 export function useFormValidation<FormValues>({
 	formValues,
-	validate,
+	validateForm,
 	debounceDelay = 800,
 }: UseFormValidationProps<FormValues>) {
 	const [errors, setErrors] = useState<
@@ -41,7 +41,7 @@ export function useFormValidation<FormValues>({
 				return;
 			}
 
-			const result = validate(formValues);
+			const result = validateForm(formValues);
 
 			if (result.success) {
 				setErrors({});
@@ -68,7 +68,7 @@ export function useFormValidation<FormValues>({
 
 			setErrors(visibleErrors);
 		},
-		[formValues, touchedFields, submitted, validate],
+		[formValues, touchedFields, submitted, validateForm],
 		debounceDelay,
 	);
 

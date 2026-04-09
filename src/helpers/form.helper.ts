@@ -2,20 +2,26 @@ import sanitizeHtml from 'sanitize-html';
 import type { z } from 'zod';
 import { translate } from '@/config/translate.setup';
 import { ApiError } from '@/exceptions/api.error';
-import type { ApiResponseFetch } from '@/types/api.type';
+import type {
+	CreateFunctionType,
+	FormOperationFunctionType,
+	UpdateFunctionType,
+} from '@/types/action-function.type';
 import type {
 	FormComponentType,
 	FormStateType,
 	FormValuesType,
+	GetFormValuesFnType,
 	ValidateFormFnType,
 } from '@/types/form.type';
 
-export async function processForm<FormValues>(
+export async function processForm<Entry, FormValues extends FormValuesType>(
 	formState: FormStateType<FormValues>,
 	formData: FormData,
-	getFormValues: (formData: FormData) => FormValues,
+	getFormValues: GetFormValuesFnType<FormValues>,
 	validateForm: ValidateFormFnType<FormValues>,
-	fetchFunction: (data: FormValues) => Promise<ApiResponseFetch<unknown>>,
+	operationFunction: FormOperationFunctionType<Entry, FormValues>,
+	entryId?: number, // Only provided for update operations
 ): Promise<FormStateType<FormValues>> {
 	try {
 		const formValues = getFormValues(formData);
@@ -38,7 +44,21 @@ export async function processForm<FormValues>(
 			values: validated.data,
 		};
 
-		const fetchResponse = await fetchFunction(validated.data);
+		// If entryId is provided, it's an update operation — pass id as second argument.
+		const fetchResponse =
+			entryId !== undefined
+				? await (
+						operationFunction as UpdateFunctionType<
+							Entry,
+							FormValues
+						>
+					)(validated.data, entryId)
+				: await (
+						operationFunction as CreateFunctionType<
+							Entry,
+							FormValues
+						>
+					)(validated.data);
 
 		return {
 			...result,

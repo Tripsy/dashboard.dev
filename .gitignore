@@ -40,3 +40,6 @@ pnpm-debug.log*
 
 # turbo repo (optional)
 turbo/
+
+# other
+CLAUDE.md

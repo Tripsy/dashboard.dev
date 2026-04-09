@@ -6,6 +6,7 @@ import {
 	useContext,
 	useMemo,
 	useRef,
+	useState,
 } from 'react';
 import { useStore } from 'zustand/react';
 import {
@@ -15,13 +16,16 @@ import {
 	getDataSourceConfig,
 } from '@/config/data-source.config';
 import { useDebouncedEffect } from '@/hooks/use-debounced-effect.hook';
-import type { DataTableStoreType } from '@/stores/data-table.store';
+import {
+	createDataTableStore,
+	type DataTableStoreType,
+} from '@/stores/data-table.store';
 
 type DataTableContextType<K extends DataSourceKey, Model> = {
 	dataSource: K;
 	dataStorageKey: string;
 	selectionMode: DataTableSelectionModeType;
-	stateDefault: DataTableStateType;
+	dataTableStateDefault: DataTableStateType;
 	dataTableStore: DataTableStoreType<K, Model>;
 };
 
@@ -33,19 +37,25 @@ const DataTableContext = createContext<
 function DataTableProvider<K extends DataSourceKey, Model>({
 	dataSource,
 	selectionMode,
-	dataTableStore,
 	children,
 }: {
 	dataSource: K;
 	selectionMode: DataTableSelectionModeType;
-	dataTableStore: DataTableStoreType<K, Model>;
 	children: ReactNode;
 }) {
+	const [dataTableStore] = useState<DataTableStoreType<K, Model>>(
+		() => createDataTableStore(dataSource) as DataTableStoreType<K, Model>,
+	);
+
 	const dataStorageKey = useMemo(
 		() => `data-table-state-${dataSource}`,
 		[dataSource],
 	);
-	const stateDefault = getDataSourceConfig(dataSource, 'dataTableState');
+
+	const dataTable = useMemo(
+		() => getDataSourceConfig(dataSource, 'dataTable'),
+		[dataSource],
+	);
 
 	const selectedEntries = useStore(
 		dataTableStore,
@@ -56,29 +66,27 @@ function DataTableProvider<K extends DataSourceKey, Model>({
 
 	useDebouncedEffect(
 		() => {
-			const functions = getDataSourceConfig(dataSource, 'functions');
+			const prev = prevSelectedEntriesRef.current;
+			const { onRowSelect, onRowUnselect } = dataTable;
 
-			const onRowSelect = functions.onRowSelect;
-			const onRowUnselect = functions.onRowUnselect;
-
-			const prevSelected = prevSelectedEntriesRef.current;
-
-			if (onRowSelect && selectedEntries.length === 1) {
-				onRowSelect(selectedEntries[0]);
+			if (onRowSelect) {
+				const added = selectedEntries.filter(
+					(e) => !prev.some((p) => p === e),
+				);
+				added.forEach(onRowSelect);
 			}
 
-			if (
-				onRowUnselect &&
-				selectedEntries.length === 0 &&
-				prevSelected.length === 1
-			) {
-				onRowUnselect(prevSelected[0]);
+			if (onRowUnselect) {
+				const removed = prev.filter(
+					(e) => !selectedEntries.some((s) => s === e),
+				);
+				removed.forEach(onRowUnselect);
 			}
 
 			prevSelectedEntriesRef.current = selectedEntries;
 		},
-		[selectedEntries],
-		1000,
+		[dataTable, selectedEntries],
+		500,
 	);
 
 	return (
@@ -87,7 +95,7 @@ function DataTableProvider<K extends DataSourceKey, Model>({
 				dataSource,
 				dataStorageKey,
 				selectionMode,
-				stateDefault,
+				dataTableStateDefault: dataTable.state,
 				dataTableStore,
 			}}
 		>

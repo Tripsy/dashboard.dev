@@ -204,19 +204,19 @@ function getFormValues(formData: FormData): UserFormValuesType {
 	};
 }
 
-function syncFormState(
-	state: FormStateType<UserFormValuesType>,
-	model: UserModel,
-): FormStateType<UserFormValuesType> {
+function getFormState(data?: UserModel): FormStateType<UserFormValuesType> {
 	return {
-		...state,
+		errors: {},
+		message: null,
+		situation: null,
 		values: {
-			...state.values,
-			name: model.name,
-			email: model.email,
-			language: model.language,
-			role: model.role,
-			operator_type: model.operator_type,
+			name: data?.name ?? '',
+			email: data?.email ?? '',
+			password: '',
+			password_confirm: '',
+			language: data?.language ?? LanguageEnum.EN,
+			role: data?.role ?? UserRoleEnum.MEMBER,
+			operator_type: data?.operator_type ?? null,
 		},
 	};
 }
@@ -231,6 +231,10 @@ function validateFormUpdate(values: UserFormValuesType) {
 	const validator = new UserValidator(validatorMessages);
 
 	return validator.create.safeParse(values);
+}
+
+function onCreateSuccess(resultData: UserModel) {
+	console.log('onCreateSuccess', resultData);
 }
 
 export type UsersDataTableFiltersType = {
@@ -253,7 +257,6 @@ export const usersDataTableFilters: UsersDataTableFiltersType = {
 
 export const dataSourceConfigUsers: DataSourceConfigType<
 	UserModel,
-	any,
 	UserFormValuesType
 > = {
 	dataTable: {
@@ -358,20 +361,6 @@ export const dataSourceConfigUsers: DataSourceConfigType<
 		// onRowSelect: (entry: UserModel) => console.log('selected', entry),
 		// onRowUnselect: (entry: UserModel) => console.log('unselected', entry),
 	},
-	// formState: {
-	// 	values: {
-	// 		name: '',
-	// 		email: '',
-	// 		password: '',
-	// 		password_confirm: '',
-	// 		language: LanguageEnum.EN,
-	// 		role: UserRoleEnum.MEMBER,
-	// 		operator_type: null,
-	// 	},
-	// 	errors: {},
-	// 	message: null,
-	// 	situation: null,
-	// },
 	actions: {
 		create: {
 			windowType: 'form' as const,
@@ -385,7 +374,10 @@ export const dataSourceConfigUsers: DataSourceConfigType<
 			},
 			getFormValues: getFormValues,
 			validateForm: validateFormCreate,
-			syncFormState: syncFormState,
+			getFormState: getFormState,
+			events: {
+				success: onCreateSuccess,
+			},
 		},
 		update: {
 			windowType: 'form' as const,
@@ -400,7 +392,7 @@ export const dataSourceConfigUsers: DataSourceConfigType<
 			},
 			getFormValues: getFormValues,
 			validateForm: validateFormUpdate,
-			syncFormState: syncFormState,
+			getFormState: getFormState,
 		},
 		delete: {
 			windowType: 'action' as const,

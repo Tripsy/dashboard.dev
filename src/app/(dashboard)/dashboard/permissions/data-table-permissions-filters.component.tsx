@@ -7,7 +7,7 @@ import {
 	FormFiltersSearch,
 	FormFiltersShowDeleted,
 } from '@/app/(dashboard)/_components/form-filters.component';
-import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
+import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
 import type { PermissionDataTableFiltersType } from '@/app/(dashboard)/dashboard/permissions/permissions.definition';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import type { PermissionModel } from '@/models/permission.model';

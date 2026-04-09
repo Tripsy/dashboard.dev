@@ -1,53 +1,15 @@
-import type React from 'react';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import type { ModalSizeType } from '@/components/ui/modal';
-import {DataSourceKey, getDataSourceConfig} from "@/config/data-source.config";
-import ValueError from "@/exceptions/value.error";
-
-export type OnCreateSuccessType = (data: unknown) => void;
-export type WindowEntryType = Record<string, unknown>;
-export type WindowConfigPropsType = {
-	title?: string;
-	size?: ModalSizeType;
-	className?: string;
-};
-export type WindowSectionType = 'dashboard' | 'public';
-export type WindowInstanceType = 'form' | 'action' | 'view' | 'other';
-
-export type WindowDefinition = {
-	windowType?: WindowInstanceType;
-	windowComponent?: WindowComponent;
-	// permission?: string; // TODO do I need this
-	entriesSelection: 'free' | 'single' | 'multiple';
-	operationFunction?: unknown;
-	button?: unknown;
-	validateForm?: unknown;
-	getFormValues?: unknown;
-	syncFormState?: unknown;
-};
-
-// biome-ignore lint/suspicious/noExplicitAny: It's fine
-export type WindowComponent = React.ComponentType<any>;
-
-export type WindowConfig = {
-	uid: string;
-	section: WindowSectionType;
-	key: string; // Note: for section `dashboard`, this is the DataSourceKey
-	action: string;
-	definition: WindowDefinition; // Information will be injected on `create` based on `section`, `key`, and `action`
-	minimized: boolean;
-	data?: {
-		entries?: WindowEntryType[];
-		prefillEntry?: WindowEntryType; // TODO: maybe drop this
-	};
-	events?: {
-		onCreateSuccess?: OnCreateSuccessType;
-	};
-	props: WindowConfigPropsType;
-};
-
-export type WindowCreateConfig = Omit<WindowConfig, 'minimized' | 'definition'>;
+import {
+	type DataSourceKey,
+	getDataSourceConfig,
+} from '@/config/data-source.config';
+import ValueError from '@/exceptions/value.error';
+import type {
+	WindowConfig,
+	WindowCreateConfig,
+	WindowDefinition,
+} from '@/types/window.type';
 
 type WindowStore = {
 	stack: WindowConfig[];
@@ -83,23 +45,29 @@ export const useModalStore = create<WindowStore>()(
 
 		// Private helper to prepare config on create
 		const prepareConfigOnCreate = (
-			config: WindowCreateConfig
+			config: WindowCreateConfig,
 		): WindowConfig => {
-			// Create a copy to avoid mutating the input
 			const enrichedConfig = { ...config };
 
 			switch (enrichedConfig.section) {
 				case 'dashboard': {
-					const actions = getDataSourceConfig(enrichedConfig.key as DataSourceKey, 'actions');
+					const actions = getDataSourceConfig(
+						enrichedConfig.key as DataSourceKey,
+						'actions',
+					);
 
 					if (!actions) {
-						throw new ValueError(`Actions not defined for ${enrichedConfig.key}`);
+						throw new ValueError(
+							`Actions not defined for ${enrichedConfig.key}`,
+						);
 					}
 
 					const actionConfig = actions[enrichedConfig.action];
 
 					if (!actionConfig) {
-						throw new ValueError(`Action "${enrichedConfig.action}" not defined for ${enrichedConfig.key}`);
+						throw new ValueError(
+							`Action "${enrichedConfig.action}" not defined for ${enrichedConfig.key}`,
+						);
 					}
 
 					// Create definition object
@@ -111,7 +79,7 @@ export const useModalStore = create<WindowStore>()(
 						button: actionConfig.button,
 						validateForm: actionConfig.validateForm,
 						getFormValues: actionConfig.getFormValues,
-						syncFormState: actionConfig.syncFormState,
+						getFormState: actionConfig.getFormState,
 					};
 
 					// Return complete WindowConfig with definition
@@ -119,21 +87,25 @@ export const useModalStore = create<WindowStore>()(
 						...enrichedConfig,
 						definition,
 						props: {
+							...actionConfig.windowConfigProps,
 							...enrichedConfig.props,
-							...actionConfig.windowConfigProps
 						},
 						minimized: false,
 					};
 				}
 				default:
-					throw new Error(`Invalid section: ${enrichedConfig.section}`);
+					throw new Error(
+						`Invalid section: ${enrichedConfig.section}`,
+					);
 			}
 		};
 
 		const createWindow = (config: WindowCreateConfig): void => {
 			// Check if window with same UID already exists
 			if (windowExists(config.uid)) {
-				console.warn(`Window with uid "${config.uid}" already exists. Use update() or replace() instead.`);
+				console.warn(
+					`Window with uid "${config.uid}" already exists. Use update() or replace() instead.`,
+				);
 			}
 
 			const preparedConfig = prepareConfigOnCreate(config);
@@ -141,7 +113,7 @@ export const useModalStore = create<WindowStore>()(
 			set((state) => ({
 				stack: [...state.stack, preparedConfig],
 			}));
-		}
+		};
 
 		return {
 			stack: [],
@@ -218,7 +190,10 @@ export const useModalStore = create<WindowStore>()(
 					}
 
 					return {
-						stack: [...state.stack.filter((m) => m.uid !== uid), modal],
+						stack: [
+							...state.stack.filter((m) => m.uid !== uid),
+							modal,
+						],
 					};
 				}),
 

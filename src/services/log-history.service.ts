@@ -9,7 +9,7 @@ import type {
 	FindFunctionParamsType,
 	FindFunctionResponseType,
 	FindFunctionType,
-} from '@/types/action-function.type';
+} from '@/types/action.type';
 import type { ApiResponseFetch, QueryFiltersType } from '@/types/api.type';
 
 export const findLogHistory: FindFunctionType<LogHistoryModel> = async (

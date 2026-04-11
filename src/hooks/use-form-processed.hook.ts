@@ -4,11 +4,8 @@ import type { DataSourceKey } from '@/config/data-source.config';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { useToast } from '@/providers/toast.provider';
 import { useModalStore } from '@/stores/window.store';
-import type {
-	FormEventType,
-	FormStateType,
-	FormValuesType,
-} from '@/types/form.type';
+import type { ActionEventType } from '@/types/action.type';
+import type { FormStateType, FormValuesType } from '@/types/form.type';
 import type { WindowConfig, WindowEntryType } from '@/types/window.type';
 
 type UseWindowFormProcessedParams<
@@ -17,7 +14,7 @@ type UseWindowFormProcessedParams<
 > = {
 	state: FormStateType<FormValues>;
 	windowConfig: WindowConfig<FormValues, Entry>;
-	eventsOnFormProcess?: Record<string, FormEventType<unknown>>;
+	eventsOnFormProcess?: Record<string, ActionEventType<unknown>>;
 };
 
 export function useWindowFormProcessed<
@@ -31,8 +28,8 @@ export function useWindowFormProcessed<
 	const { close } = useModalStore();
 	const { showToast } = useToast();
 
-	const actionLabelKey = `${windowConfig.key}.action.${windowConfig.action}.label`;
-	const successMessageKey = `${windowConfig.key}.action.${windowConfig.action}.success`;
+	const actionLabelKey = `${windowConfig.dataSource}.action.${windowConfig.action}.label`;
+	const successMessageKey = `${windowConfig.dataSource}.action.${windowConfig.action}.success`;
 
 	const translationsKeys = useMemo(
 		() =>
@@ -56,7 +53,9 @@ export function useWindowFormProcessed<
 				});
 
 				if (windowConfig.section === 'dashboard') {
-					dispatchFilterReset(windowConfig.key as DataSourceKey);
+					dispatchFilterReset(
+						windowConfig.dataSource as DataSourceKey,
+					);
 				}
 
 				close(windowConfig.uid);

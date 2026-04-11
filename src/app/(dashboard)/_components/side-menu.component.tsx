@@ -348,9 +348,9 @@ function SideMenuOpenSection({
 				className="flex items-center text-left gap-2 px-3 py-2.5 w-full transition-all duration-200 text-sidebar-foreground hover:bg-sidebar-accent"
 			>
 				{sectionState === 'expanded' ? (
-					<ArrowDown className="h-4 w-4 flex-shrink-0" />
+					<ArrowDown className="h-4 w-4 shrink-0" />
 				) : (
-					<ArrowRight className="h-4 w-4 flex-shrink-0" />
+					<ArrowRight className="h-4 w-4 shrink-0" />
 				)}
 				<span className="flex-1 truncate">{text}</span>
 			</button>
@@ -374,7 +374,7 @@ function SideMenuOpenSection({
 										: 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground',
 								)}
 							>
-								<item.icon className="h-4 w-4 flex-shrink-0" />{' '}
+								<item.icon className="h-4 w-4 shrink-0" />{' '}
 								{item.text}
 							</Link>
 						</li>
@@ -437,7 +437,7 @@ function SideMenuClosedSection({
 										: 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground',
 								)}
 							>
-								<item.icon className="h-4 w-4 flex-shrink-0" />{' '}
+								<item.icon className="h-4 w-4 shrink-0" />{' '}
 								{item.text}
 							</Link>
 						</li>

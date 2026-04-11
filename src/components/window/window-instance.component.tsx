@@ -1,11 +1,63 @@
 'use client';
 
-import { useMemo } from 'react';
+import type { ReactNode } from 'react';
 import { Modal } from '@/components/ui/modal';
+import { WindowAction } from '@/components/window/window-action.component';
 import { WindowForm } from '@/components/window/window-form.component';
-import { useTranslation } from '@/hooks/use-translation.hook';
+import {
+	displayWindowTitle,
+	resolveWindowEntries,
+} from '@/helpers/window.helper';
 import { useModalStore } from '@/stores/window.store';
-import type { WindowConfig } from '@/types/window.type';
+import type { EntriesSelectionType } from '@/types/action.type';
+import type {
+	WindowComponent,
+	WindowConfig,
+	WindowEntryType,
+	WindowType,
+} from '@/types/window.type';
+
+type WindowRenderProps = {
+	uid: string;
+	type: WindowType<EntriesSelectionType>;
+	entry: WindowEntryType | undefined;
+	entries: WindowEntryType[];
+	WindowComponent: WindowComponent | undefined;
+};
+
+const WINDOW_RENDERERS: Partial<
+	Record<
+		WindowType<EntriesSelectionType>,
+		(props: WindowRenderProps) => ReactNode
+	>
+> = {
+	view: ({ WindowComponent, entry }) => {
+		if (!WindowComponent) {
+			throw new Error('Component not defined for view');
+		}
+
+		return <WindowComponent entry={entry} />;
+	},
+	action: ({ uid, entries }) => <WindowAction uid={uid} entries={entries} />,
+	form: ({ uid, entry, WindowComponent }) => {
+		if (!WindowComponent) {
+			throw new Error('Component not defined for form');
+		}
+
+		return (
+			<WindowForm uid={uid} entry={entry}>
+				<WindowComponent />
+			</WindowForm>
+		);
+	},
+	other: ({ WindowComponent }) => {
+		if (!WindowComponent) {
+			throw new Error('Component not defined for other');
+		}
+
+		return <WindowComponent />;
+	},
+};
 
 export function WindowInstance({ current }: { current: WindowConfig }) {
 	const { close, minimize } = useModalStore();
@@ -13,119 +65,48 @@ export function WindowInstance({ current }: { current: WindowConfig }) {
 	const handleClose = () => close(current.uid);
 	const handleMinimize = () => minimize(current.uid);
 
-	const windowTitleKey = `${current.key}.action.${current.action}.title`;
-
-	const translationsKeys = useMemo(
-		() => [windowTitleKey] as const,
-		[windowTitleKey],
-	);
-
-	const { translations } = useTranslation(translationsKeys);
-
 	const uid = current.uid;
 	const definition = current.definition;
-	const data = current?.data;
 
 	const windowProps = current.props;
-	const configPropsSize = windowProps?.size || 'md';
-	const configPropsTitle = windowProps?.title || translations[windowTitleKey];
-	const configPropsClassName = windowProps?.className;
+	const modalSize = windowProps?.size || 'md';
+	const modalClassName = windowProps?.className;
 
-	const instanceType = definition?.windowType || 'other';
+	const type = definition.windowType || 'other';
 	const WindowComponent = definition?.windowComponent;
 
-	if (!WindowComponent) {
-		throw new Error(`Component not defined for ${instanceType}`);
+	const { entry, entries } = resolveWindowEntries(current, type);
+
+	const modalTitle =
+		windowProps?.title ||
+		displayWindowTitle({
+			entriesSelection: definition.entriesSelection,
+			entriesCount: entries.length,
+			entryLabel:
+				definition.entriesSelection === 'single' &&
+				definition.displayEntryLabel &&
+				entry
+					? definition.displayEntryLabel(entry)
+					: undefined,
+			windowTitle: definition.windowTitle,
+		});
+
+	const renderer = WINDOW_RENDERERS[type];
+
+	if (!renderer) {
+		throw new Error(`No renderer defined for window type "${type}"`);
 	}
-
-	// const modalContentForm = <FormOperation extends string>({
-	// 	formOperation,
-	// 	formSubmitButton,
-	// }: {
-	// 	formOperation: FormOperation;
-	// 	formSubmitButton?: ActionButtonPropsType;
-	// }) => {
-	// 	return (
-	// 		<WindowForm
-	// 			uid={uid}
-	// 			formOperation={current.action}
-	// 			// formSubmitButton={formSubmitButton}
-	// 			// getFormValues={
-	// 			// 	dataSourceConfigUsers.actions.create.getFormValues
-	// 			// }
-	// 			// validateForm={dataSourceConfigUsers.actions.create.validateForm}
-	// 			// dataSource={dataSource}
-	// 			// actionEntry={actionEntry}
-	// 			// prefillEntry={current?.prefillEntry}
-	// 			// onSuccessAction={onSuccessAction}
-	// 		>
-	// 			<WindowComponent />
-	// 		</WindowForm>
-	// 	);
-	// };
-
-	const modalContent = () => {
-		if (instanceType === 'view') {
-			const entry = data?.entries?.[0] ?? null;
-
-			if (!entry) {
-				throw new Error(`Entry not defined for ${instanceType}`);
-			}
-
-			return <WindowComponent entry={entry} />;
-		}
-
-		// TODO
-		// if (instanceType === 'action') {
-		// 	const entries = data?.entries;
-		//
-		// 	if (!entries) {
-		// 		throw new Error(`Entries not defined for ${instanceType}`);
-		// 	}
-		//
-		// 	return (
-		// 		<DataTableActionModal
-		// 			key={`action-${actionName}`}
-		// 			dataSource={dataSource}
-		// 			actionName={actionName}
-		// 			actionEntries={actionEntries}
-		// 			onCloseAction={close}
-		// 		/>
-		// 	);
-		// }
-
-		if (instanceType === 'form') {
-			// if (action === 'update') {
-			//
-			// }
-			const entry = data?.entries?.[0] ?? null;
-
-			if (!entry) {
-				throw new Error(`Entry not defined for ${instanceType}`);
-			}
-
-			return (
-				<WindowForm uid={uid} formOperation={current.action}>
-					<WindowComponent />
-				</WindowForm>
-			);
-		}
-
-		// Other
-		return <WindowComponent />;
-	};
 
 	return (
 		<Modal
-			key={`modal-${uid}`}
-			size={configPropsSize}
-			className={configPropsClassName}
+			size={modalSize}
+			className={modalClassName}
 			isOpen={true}
-			title={configPropsTitle}
+			title={modalTitle}
 			onClose={handleClose}
 			onMinimize={handleMinimize}
 		>
-			{modalContent()}
+			{renderer({ uid, type, entry, entries, WindowComponent })}
 		</Modal>
 	);
 }

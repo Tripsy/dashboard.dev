@@ -1,16 +1,17 @@
 import type React from 'react';
 import type { DataTableColumnType } from '@/app/(dashboard)/_components/data-table-value';
 import type {
+	ActionEventType,
 	CreateFunctionType,
 	DeleteFunctionType,
+	DisplayEntryLabelFnType,
+	EntriesSelectionType,
 	FindFunctionType,
 	OperationFunctionType,
 	RestoreFunctionType,
 	UpdateFunctionType,
-} from '@/types/action-function.type';
+} from '@/types/action.type';
 import type {
-	FormEventType,
-	FormStateType,
 	FormValuesType,
 	GetFormStateFnType,
 	GetFormValuesFnType,
@@ -19,7 +20,7 @@ import type {
 import type { ActionButtonPropsType } from '@/types/html.type';
 import type {
 	WindowConfigPropsType,
-	WindowInstanceType,
+	WindowEntryType,
 } from '@/types/window.type';
 
 // ============================================================================
@@ -28,9 +29,9 @@ import type {
 
 export type DataTableSelectionModeType = 'checkbox' | 'multiple' | null;
 
-export type DataTableCustomEntrySelectedType<Model> = (
-	entry: Model,
-) => Promise<BaseModelType | null>;
+export type DataTableCustomEntrySelectedType<Entry> = (
+	entry: Entry,
+) => Promise<Entry | null>;
 
 export type DataTableFiltersType = {
 	[key: string]: {
@@ -53,41 +54,90 @@ export type DataTableStateType = {
 	filters: DataTableFiltersType;
 };
 
-export type DisplayActionEntriesFunctionType<Model> = (
-	entries: Model[],
-) => Array<{ id: number; label: string }>;
-
 // ============================================================================
 // Action Types
 // ============================================================================
 
-export type ActionConfigType<Entry, FormValues extends FormValuesType> = {
-	windowType: WindowInstanceType;
+type ActionConfigBase<
+	Entry extends WindowEntryType,
+	FormValues extends FormValuesType,
+> = {
+	windowTitle: string;
 	// biome-ignore lint/suspicious/noExplicitAny: It's fine
-	windowComponent?: React.ComponentType<any>;
+	windowComponent?: React.ComponentType<any>; // e.g: ViewUser, FormManageUser, SetupPermissionsUser, etc.
 	windowConfigProps?: WindowConfigPropsType;
-	permission: string; // Policy related
-	entriesSelection: 'free' | 'single' | 'multiple'; // Allowed entries selection (eg: `free` means no selection)
-	customEntryCheck?: (entry: Entry) => boolean;
-	customEntrySelected?: DataTableCustomEntrySelectedType<Entry>; // TODO maybe windowEntries
-	operationFunction?: OperationFunctionType<Entry, FormValues>;
-	actionPosition: 'left' | 'right' | 'hidden'; // Describe where the action button should be placed
-	button?: ActionButtonPropsType; // Describe the action button properties; When `windowType` is `form` The properties are also used for the form submit button
+
+	permission: string; // Related to auth policy (e.g.: 'users.create')
+	customEntryCheck?: (entry: Entry) => boolean; // Additional function to check if the action is available (hint: active users cannot have `active` action)
+	buttonPosition: 'left' | 'right' | 'hidden'; // Describe where the action button should be placed in data-table
+	button?: ActionButtonPropsType; // Action button configuration
+
+	operationFunction?: OperationFunctionType<Entry, FormValues>; // e.g: createUser, updateUser, etc.
+
+	// Form-related
 	validateForm?: ValidateFormFnType<FormValues>;
 	getFormValues?: GetFormValuesFnType<FormValues>;
 	getFormState?: GetFormStateFnType<FormValues, Entry>;
-	events?: Record<string, FormEventType<Entry>>;
+
+	events?: Record<string, ActionEventType<Entry>>;
+
+	customEntrySelected?: DataTableCustomEntrySelectedType<Entry>; // Custom function which allows to derive a new entry from the selected one (hint: viewUser)
 };
 
+// Each variant enforces the valid windowType <-> entriesSelection correlation
+type FormActionConfig<
+	Entry extends WindowEntryType,
+	FormValues extends FormValuesType,
+> = ActionConfigBase<Entry, FormValues> & {
+	windowType: 'form';
+	entriesSelection: 'free' | 'single'; // form can only be free (create) or single (update)
+};
+
+type ActionWindowConfig<
+	Entry extends WindowEntryType,
+	FormValues extends FormValuesType,
+> = ActionConfigBase<Entry, FormValues> & {
+	windowType: 'action';
+	entriesSelection: 'single' | 'multiple';
+};
+
+type ViewActionConfig<
+	Entry extends WindowEntryType,
+	FormValues extends FormValuesType,
+> = ActionConfigBase<Entry, FormValues> & {
+	windowType: 'view';
+	entriesSelection: 'single';
+};
+
+type OtherActionConfig<
+	Entry extends WindowEntryType,
+	FormValues extends FormValuesType,
+> = ActionConfigBase<Entry, FormValues> & {
+	windowType: 'other';
+	entriesSelection: EntriesSelectionType;
+};
+
+export type ActionConfigType<
+	Entry extends WindowEntryType = WindowEntryType,
+	FormValues extends FormValuesType = FormValuesType,
+> =
+	| FormActionConfig<Entry, FormValues>
+	| ActionWindowConfig<Entry, FormValues>
+	| ViewActionConfig<Entry, FormValues>
+	| OtherActionConfig<Entry, FormValues>;
+
 type TypedActionConfigType<
-	Entry,
+	Entry extends WindowEntryType,
 	FormValues extends FormValuesType,
 	Fn,
 > = ActionConfigType<Entry, FormValues> & {
 	operationFunction?: Fn;
 };
 
-type ActionsType<Entry, FormValues extends FormValuesType = FormValuesType> = {
+type ActionsType<
+	Entry extends WindowEntryType,
+	FormValues extends FormValuesType = FormValuesType,
+> = {
 	[key: string]: ActionConfigType<Entry, FormValues>;
 } & {
 	create?: TypedActionConfigType<
@@ -108,10 +158,6 @@ type ActionsType<Entry, FormValues extends FormValuesType = FormValuesType> = {
 // Data Source
 // ============================================================================
 
-export type BaseModelType = {
-	id: number;
-};
-
 export type DataSourceKey =
 	| 'brands'
 	| 'cash-flow'
@@ -126,17 +172,19 @@ export type DataSourceKey =
 	| 'templates'
 	| 'users';
 
-export type DataSourceConfigType<Entry, FormValues extends FormValuesType> = {
+export type DataSourceConfigType<
+	Entry extends WindowEntryType,
+	FormValues extends FormValuesType,
+> = {
 	dataTable: {
 		state: DataTableStateType;
 		columns: DataTableColumnType<Entry>[];
 		find: FindFunctionType<Entry>;
-		displayActionEntries?: DisplayActionEntriesFunctionType<Entry>;
 		onRowSelect?: (entry: Entry) => void;
 		onRowUnselect?: (entry: Entry) => void;
 	};
-
-	formState?: FormStateType<FormValues>;
+	displayEntryLabel?: DisplayEntryLabelFnType<Entry>;
+	// formState?: FormStateType<FormValues>;
 	actions?: ActionsType<Entry, FormValues>;
 };
 
@@ -147,9 +195,9 @@ const registry: Partial<
 
 export function registerDataSource<
 	K extends DataSourceKey,
-	Model,
+	Entry extends WindowEntryType,
 	FormValues extends FormValuesType,
->(key: K, config: DataSourceConfigType<Model, FormValues>) {
+>(key: K, config: DataSourceConfigType<Entry, FormValues>) {
 	if (hasDataSourceConfig(key)) {
 		return;
 	}

@@ -8,6 +8,7 @@ import { SetupPermissionsUser } from '@/app/(dashboard)/dashboard/users/setup-pe
 import { ViewUser } from '@/app/(dashboard)/dashboard/users/view-user.component';
 import type { DataSourceConfigType } from '@/config/data-source.config';
 import { Configuration } from '@/config/settings.config';
+import { translateBatch } from '@/config/translate.setup';
 import { getFormDataAsEnum, getFormDataAsString } from '@/helpers/form.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import {
@@ -29,6 +30,20 @@ import {
 	updateUser,
 } from '@/services/users.service';
 import type { FormStateType } from '@/types/form.type';
+
+const translations = await translateBatch(
+	[
+		'create.title',
+		'update.title',
+		'view.title',
+		'delete.title',
+		'restore.title',
+		'enable.title',
+		'disable.title',
+		'permissions.title',
+	],
+	'users.action',
+);
 
 const validatorMessages = await BaseValidator.getValidatorMessages(
 	[
@@ -352,25 +367,23 @@ export const dataSourceConfigUsers: DataSourceConfigType<
 			},
 		],
 		find: findUsers,
-		displayActionEntries: (entries: UserModel[]) => {
-			return entries.map((entry) => ({
-				id: entry.id,
-				label: entry.name,
-			}));
-		},
 		// onRowSelect: (entry: UserModel) => console.log('selected', entry),
 		// onRowUnselect: (entry: UserModel) => console.log('unselected', entry),
 	},
+	displayEntryLabel: (entry: UserModel) => {
+		return entry.name;
+	},
 	actions: {
 		create: {
-			windowType: 'form' as const,
+			windowType: 'form',
+			windowTitle: translations['create.title'],
 			windowComponent: FormManageUser,
 			permission: 'user.create',
-			entriesSelection: 'free' as const,
-			actionPosition: 'right' as const,
+			entriesSelection: 'free',
 			operationFunction: createUser,
+			buttonPosition: 'right',
 			button: {
-				variant: 'info' as const,
+				variant: 'info',
 			},
 			getFormValues: getFormValues,
 			validateForm: validateFormCreate,
@@ -380,101 +393,108 @@ export const dataSourceConfigUsers: DataSourceConfigType<
 			},
 		},
 		update: {
-			windowType: 'form' as const,
+			windowType: 'form',
+			windowTitle: translations['update.title'],
 			windowComponent: FormManageUser,
 			permission: 'user.update',
-			entriesSelection: 'single' as const,
-			actionPosition: 'left' as const,
+			entriesSelection: 'single',
 			operationFunction: updateUser,
+			buttonPosition: 'left',
 			button: {
-				variant: 'outline' as const,
-				hover: 'success' as const,
+				variant: 'outline',
+				hover: 'success',
 			},
 			getFormValues: getFormValues,
 			validateForm: validateFormUpdate,
 			getFormState: getFormState,
 		},
 		delete: {
-			windowType: 'action' as const,
+			windowType: 'action',
+			windowTitle: translations['delete.title'],
 			permission: 'user.delete',
-			entriesSelection: 'single' as const,
+			entriesSelection: 'single',
 			customEntryCheck: (entry: UserModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			actionPosition: 'left' as const,
 			operationFunction: deleteUser,
+			buttonPosition: 'left',
 			button: {
-				variant: 'outline' as const,
-				hover: 'error' as const,
+				variant: 'outline',
+				hover: 'error',
 			},
 		},
 		enable: {
-			windowType: 'action' as const,
+			windowType: 'action',
+			windowTitle: translations['enable.title'],
 			permission: 'user.update',
-			entriesSelection: 'single' as const,
+			entriesSelection: 'single',
 			customEntryCheck: (entry: UserModel) =>
 				!entry.deleted_at &&
 				[UserStatusEnum.PENDING, UserStatusEnum.INACTIVE].includes(
 					entry.status,
 				),
-			actionPosition: 'left' as const,
 			operationFunction: enableUser,
+			buttonPosition: 'left',
 			button: {
-				variant: 'outline' as const,
-				hover: 'info' as const,
+				variant: 'outline',
+				hover: 'info',
 			},
 		},
 		disable: {
-			windowType: 'action' as const,
+			windowType: 'action',
+			windowTitle: translations['disable.title'],
 			permission: 'user.update',
-			entriesSelection: 'single' as const,
+			entriesSelection: 'single',
 			customEntryCheck: (entry: UserModel) =>
 				!entry.deleted_at &&
 				[UserStatusEnum.PENDING, UserStatusEnum.ACTIVE].includes(
 					entry.status,
 				),
-			actionPosition: 'left' as const,
 			operationFunction: disableUser,
+			buttonPosition: 'left',
 			button: {
-				variant: 'outline' as const,
-				hover: 'error' as const,
+				variant: 'outline',
+				hover: 'error',
 			},
 		},
 		restore: {
-			windowType: 'action' as const,
+			windowType: 'action',
+			windowTitle: translations['restore.title'],
 			permission: 'user.delete',
-			entriesSelection: 'single' as const,
+			entriesSelection: 'single',
 			customEntryCheck: (entry: UserModel) => !!entry.deleted_at, // Return true if the entry is deleted
-			actionPosition: 'left' as const,
 			operationFunction: restoreUser,
+			buttonPosition: 'left',
 			button: {
-				variant: 'outline' as const,
-				hover: 'info' as const,
-			},
-		},
-		permissions: {
-			windowType: 'other' as const,
-			windowComponent: SetupPermissionsUser,
-			windowConfigProps: {
-				size: 'lg' as const,
-			},
-			permission: 'permission.update',
-			entriesSelection: 'single' as const,
-			customEntryCheck: (entry: UserModel) =>
-				entry.role === UserRoleEnum.OPERATOR,
-			actionPosition: 'left' as const,
-			button: {
-				variant: 'outline' as const,
-				hover: 'success' as const,
+				variant: 'outline',
+				hover: 'info',
 			},
 		},
 		view: {
-			windowType: 'view' as const,
+			windowType: 'view',
+			windowTitle: translations['view.title'],
 			windowComponent: ViewUser,
 			windowConfigProps: {
-				size: 'xl' as const,
+				size: 'xl',
 			},
 			permission: 'user.read',
-			entriesSelection: 'single' as const,
-			actionPosition: 'hidden' as const,
+			entriesSelection: 'single',
+			buttonPosition: 'hidden',
+		},
+		permissions: {
+			windowType: 'other',
+			windowTitle: translations['permissions.title'],
+			windowComponent: SetupPermissionsUser,
+			windowConfigProps: {
+				size: 'lg',
+			},
+			permission: 'permission.update',
+			entriesSelection: 'single',
+			customEntryCheck: (entry: UserModel) =>
+				entry.role === UserRoleEnum.OPERATOR,
+			buttonPosition: 'left',
+			button: {
+				variant: 'outline',
+				hover: 'success',
+			},
 		},
 	},
 };

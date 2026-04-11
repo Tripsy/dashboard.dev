@@ -131,7 +131,7 @@ export const dataSourceConfigLogHistory = {
 			windowType: 'action' as const,
 			permission: 'log-history.delete',
 			entriesSelection: 'multiple' as const,
-			actionPosition: 'left' as const,
+			buttonPosition: 'left' as const,
 			operationFunction: deleteLogHistory,
 			button: {
 				variant: 'outline' as const,
@@ -146,7 +146,7 @@ export const dataSourceConfigLogHistory = {
 			},
 			permission: 'log-history.read',
 			entriesSelection: 'single' as const,
-			actionPosition: 'hidden' as const,
+			buttonPosition: 'hidden' as const,
 		},
 		viewUser: {
 			component: ViewUser,
@@ -163,7 +163,7 @@ export const dataSourceConfigLogHistory = {
 			windowType: 'view' as const,
 			permission: 'user.read',
 			entriesSelection: 'single' as const,
-			actionPosition: 'hidden' as const,
+			buttonPosition: 'hidden' as const,
 		},
 	},
 };

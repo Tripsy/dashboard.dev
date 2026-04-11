@@ -283,7 +283,7 @@ export const dataSourceConfigTemplates = {
 			},
 			permission: 'template.create',
 			entriesSelection: 'free' as const,
-			actionPosition: 'right' as const,
+			buttonPosition: 'right' as const,
 			operationFunction: createTemplate,
 			button: {
 				variant: 'info' as const,
@@ -297,7 +297,7 @@ export const dataSourceConfigTemplates = {
 			},
 			permission: 'template.update',
 			entriesSelection: 'single' as const,
-			actionPosition: 'left' as const,
+			buttonPosition: 'left' as const,
 			operationFunction: updateTemplate,
 			button: {
 				variant: 'outline' as const,
@@ -309,7 +309,7 @@ export const dataSourceConfigTemplates = {
 			permission: 'template.delete',
 			entriesSelection: 'single' as const,
 			customEntryCheck: (entry: TemplateModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			actionPosition: 'left' as const,
+			buttonPosition: 'left' as const,
 			operationFunction: deleteTemplate,
 			button: {
 				variant: 'outline' as const,
@@ -321,7 +321,7 @@ export const dataSourceConfigTemplates = {
 			permission: 'template.delete',
 			entriesSelection: 'single' as const,
 			customEntryCheck: (entry: TemplateModel) => !!entry.deleted_at, // Return true if the entry is deleted
-			actionPosition: 'left' as const,
+			buttonPosition: 'left' as const,
 			operationFunction: restoreTemplate,
 			button: {
 				variant: 'outline' as const,
@@ -336,7 +336,7 @@ export const dataSourceConfigTemplates = {
 			},
 			permission: 'template.read',
 			entriesSelection: 'single' as const,
-			actionPosition: 'hidden' as const,
+			buttonPosition: 'hidden' as const,
 		},
 	},
 };

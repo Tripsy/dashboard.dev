@@ -10,20 +10,20 @@ import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
 import { WindowFormProvider } from '@/providers/window-form.provider';
 import { useModalStore } from '@/stores/window.store';
-import type { FormOperationFunctionType } from '@/types/action-function.type';
+import type { FormOperationFunctionType } from '@/types/action.type';
 import type { FormStateType, FormValuesType } from '@/types/form.type';
 import type { WindowConfig, WindowEntryType } from '@/types/window.type';
 
-type WindowFormType = {
+type WindowFormType<WindowEntry> = {
 	uid: string;
-	formOperation: string;
+	entry?: WindowEntry;
 	children: React.ReactElement<unknown>;
 };
 
 export function WindowForm<
 	FormValues extends FormValuesType,
 	WindowEntry extends WindowEntryType,
->({ uid, formOperation, children }: WindowFormType) {
+>({ uid, entry, children }: WindowFormType<WindowEntry>) {
 	const { getWindow } = useModalStore();
 
 	const windowConfig = getWindow(uid) as
@@ -44,7 +44,7 @@ export function WindowForm<
 		getFormState,
 		getFormValues,
 		validateForm,
-		operationFunction,
+		operationFunction: formOperationFunction,
 		button: buttonSubmit,
 	} = windowDefinition;
 
@@ -63,17 +63,13 @@ export function WindowForm<
 		throw new Error(`validateForm not found for uid: ${uid}`);
 	}
 
-	if (!operationFunction) {
+	if (!formOperationFunction) {
 		throw new Error(`operationFunction not defined for window: ${uid}`);
 	}
 
 	// WindowForm only handles form operations.
-	const formOperationFunction =
-		operationFunction as FormOperationFunctionType<unknown, FormValues>;
-
-	const entry =
-		windowConfig.data?.entries?.[0] || windowConfig.data?.prefillEntry;
-	const entryId = entry && 'id' in entry ? (entry.id as number) : undefined;
+	const operationFunction =
+		formOperationFunction as FormOperationFunctionType<unknown, FormValues>;
 
 	const initState = getFormState(entry);
 
@@ -87,8 +83,8 @@ export function WindowForm<
 				formData,
 				getFormValues,
 				validateForm,
-				formOperationFunction,
-				entryId, // Present for update, undefined for create
+				operationFunction,
+				entry && 'id' in entry ? (entry.id as number) : undefined, // Present for update, undefined for create
 			),
 		initState,
 	);
@@ -112,7 +108,7 @@ export function WindowForm<
 	return (
 		<WindowFormProvider
 			value={{
-				formOperation,
+				formOperation: windowConfig.action,
 				formValues,
 				errors,
 				handleChange,

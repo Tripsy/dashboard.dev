@@ -200,7 +200,7 @@ export function FormFiltersReset({
 				onClick={() => dispatchFilterReset(dataSource)}
 				title="Reset filters"
 			>
-				<Icons.Action.Reset />
+				<Icons.Action.Reset size={16} />
 				{translations['dashboard.text.label_reset']}
 			</Button>
 		</div>

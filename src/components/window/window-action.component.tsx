@@ -1,107 +1,97 @@
 'use client';
 
+import { current } from 'immer';
 import { useMemo, useState } from 'react';
-import { DataTableActionButton } from '@/app/(dashboard)/_components/data-table-action-button.component';
+import { ActionButton } from '@/components/action-button.component';
 import { Icons } from '@/components/icon.component';
 import { LoadingComponent } from '@/components/status.component';
 import { Button } from '@/components/ui/button';
-import {
-	type BaseModelType,
-	type DataSourceKey,
-	type DisplayActionEntriesFunctionType,
-	getDataSourceConfig,
-} from '@/config/data-source.config';
 import { ApiError } from '@/exceptions/api.error';
 import ValueError from '@/exceptions/value.error';
 import { replaceVars } from '@/helpers/string.helper';
-import { useRefreshDataTable } from '@/hooks/use-refresh-data-table.hook';
-import { useTranslation } from '@/hooks/use-translation.hook';
 import { useToast } from '@/providers/toast.provider';
+import { useModalStore } from '@/stores/window.store';
+import type { ActionOperationFunctionType } from '@/types/action.type';
+import type { FormValuesType } from '@/types/form.type';
+import type { WindowConfig, WindowEntryType } from '@/types/window.type';
 
-function displayActionEntries<K extends DataSourceKey, Model>(
-	dataSource: K,
-	entries: Model[],
-) {
-	const functions = getDataSourceConfig(dataSource, 'functions');
-
-	if (
-		!('displayActionEntries' in functions) ||
-		typeof functions.displayActionEntries !== 'function'
-	) {
-		throw new ValueError(
-			`'displayActionEntries' function is not defined for ${dataSource}`,
-		);
-	}
-
-	return (
-		functions.displayActionEntries as DisplayActionEntriesFunctionType<Model>
-	)(entries);
-}
-
-export function DataTableActionModal<K extends DataSourceKey>({
-	dataSource,
-	actionName,
-	actionEntries,
+export function WindowAction<WindowEntry extends WindowEntryType>({
+	uid,
+	// actionName,
+	entries,
 	// onSuccessAction,
-	onCloseAction,
+	// onCloseAction,
 }: {
-	dataSource: K;
-	actionName: string;
-	actionEntries: BaseModelType[];
+	uid: string;
+	// actionName: string;
+	entries: WindowEntry[];
 	// onSuccessAction?: OnSuccessActionType;
-	onCloseAction: () => void;
+	// onCloseAction: () => void;
 }) {
 	const [loading, setLoading] = useState(false);
 	const { showToast } = useToast();
 
-	const refreshDataTable = useRefreshDataTable();
+	const { getWindow } = useModalStore();
 
-	const confirmTextKey = `${dataSource}.action.${actionName}.confirmText`;
+	const windowConfig = getWindow(uid) as
+		| WindowConfig<FormValuesType, WindowEntry>
+		| undefined;
+	const windowDefinition = windowConfig?.definition;
 
-	const translationsKeys = useMemo(
-		() =>
-			[
-				confirmTextKey,
-				'app.error.form',
-				'dashboard.text.selected_entries_one',
-				'dashboard.text.selected_entries_many',
-			] as const,
-		[confirmTextKey],
-	);
-
-	const { translations, isTranslationLoading } =
-		useTranslation(translationsKeys);
-
-	const actions = getDataSourceConfig(dataSource, 'actions');
-
-	if (!actions) {
-		throw new ValueError(`'actions are not defined for ${dataSource}`);
+	// Guards
+	if (!windowConfig) {
+		throw new Error(`Window config not found for uid: ${uid}`);
 	}
 
-	const actionProps = actions[actionName];
+	if (!windowDefinition) {
+		throw new Error(`Window definition not found for uid: ${uid}`);
+	}
 
-	if (!actionProps) {
+	// WindowAction only handles action operations.
+	const operationFunction =
+		windowDefinition.operationFunction as ActionOperationFunctionType;
+
+	// + Guards
+	if (!operationFunction || typeof operationFunction !== 'function') {
 		throw new ValueError(
-			`'actionProps' action props are not defined for '${actionName}' (hint: manage)`,
+			`Operation function is not defined for uid: ${uid}`,
 		);
 	}
 
-	if (actionProps.entriesSelection === 'single' && actionEntries.length > 1) {
-		throw new ValueError(`Multiple entries provided for single action`);
+	const displayEntryLabel = windowDefinition.displayEntryLabel;
+
+	if (!displayEntryLabel || typeof operationFunction !== 'function') {
+		throw new ValueError(
+			`"displayEntryLabel" function is not defined for uid: ${uid}`,
+		);
 	}
 
-	const actionFunction = actionProps.function;
+	// const confirmTextKey = `${dataSource}.action.${actionName}.confirmText`;
+	//
+	// const translationsKeys = useMemo(
+	// 	() =>
+	// 		[
+	// 			confirmTextKey,
+	// 			'app.error.form',
+	// 			'dashboard.text.selected_entries_one',
+	// 			'dashboard.text.selected_entries_many',
+	// 		] as const,
+	// 	[confirmTextKey],
+	// );
+	//
+	// const { translations, isTranslationLoading } =
+	// 	useTranslation(translationsKeys);
 
-	if (!actionFunction || typeof actionFunction !== 'function') {
-		throw new ValueError(`Function is not defined for ${actionName}`);
+	if (windowDefinition.entriesSelection === 'single' && entries.length > 1) {
+		throw new ValueError(`Multiple entries provided for single action`);
 	}
 
 	const handleAction = async () => {
 		setLoading(true);
 
 		try {
-			const fetchResponse = await actionFunction(
-				actionEntries.map((e) => e.id),
+			const fetchResponse = await operationFunction(
+				entries.map((e) => e.id as number),
 			);
 
 			await refreshDataTable(dataSource);
@@ -139,9 +129,9 @@ export function DataTableActionModal<K extends DataSourceKey>({
 		actionEntries,
 	);
 
-	if (isTranslationLoading) {
-		return <LoadingComponent />;
-	}
+	// if (isTranslationLoading) {
+	// 	return <LoadingComponent />;
+	// }
 
 	return (
 		<>
@@ -156,9 +146,9 @@ export function DataTableActionModal<K extends DataSourceKey>({
 				)}
 			</p>
 			<ul className="pb-4 italic list-disc ml-4">
-				{actionContentEntries.map((entry) => (
+				{entries.map((entry) => (
 					<li key={`action-entry-${entry.id}`}>
-						{entry.label}{' '}
+						{displayEntryLabel(entry)}{' '}
 						<span className="text-md">({`#${entry.id}`})</span>
 					</li>
 				))}
@@ -179,10 +169,9 @@ export function DataTableActionModal<K extends DataSourceKey>({
 					<Icons.Action.Cancel />
 					Cancel
 				</Button>
-				<DataTableActionButton
-					key={`button-modal-${actionName}`}
-					dataSource={dataSource}
-					actionName={actionName}
+				<ActionButton
+					dataSource={windowConfig.key}
+					action={actionName}
 					buttonProps={actionProps.buttonProps}
 					handleClick={handleAction}
 					disabled={loading}

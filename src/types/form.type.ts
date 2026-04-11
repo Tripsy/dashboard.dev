@@ -40,5 +40,3 @@ export type FormComponentType<FormValues> = {
 	) => void;
 	pending: boolean;
 };
-
-export type FormEventType<Data> = (data: Data) => void;

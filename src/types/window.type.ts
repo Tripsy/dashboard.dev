@@ -1,7 +1,12 @@
+import type React from 'react';
 import type { ModalSizeType } from '@/components/ui/modal';
-import type { OperationFunctionType } from '@/types/action-function.type';
 import type {
-	FormEventType,
+	ActionEventType,
+	DisplayEntryLabelFnType,
+	EntriesSelectionType,
+	OperationFunctionType,
+} from '@/types/action.type';
+import type {
 	FormValuesType,
 	GetFormStateFnType,
 	GetFormValuesFnType,
@@ -16,20 +21,34 @@ export type WindowConfigPropsType = {
 	className?: string;
 };
 export type WindowSectionType = 'dashboard' | 'public';
-export type WindowInstanceType = 'form' | 'action' | 'view' | 'other';
+export type WindowType<T extends EntriesSelectionType> = T extends 'free'
+	? 'form' | 'other'
+	: T extends 'single'
+		? 'view' | 'action' | 'other'
+		: T extends 'multiple'
+			? 'view' | 'action' | 'other'
+			: never;
+
+type AllowedDisplayEntryLabel<
+	T extends EntriesSelectionType,
+	Entry,
+> = T extends 'single' ? DisplayEntryLabelFnType<Entry> : never;
 
 export type WindowDefinition<
 	FormValues extends FormValuesType = FormValuesType,
 	Entry extends WindowEntryType = WindowEntryType,
+	T extends EntriesSelectionType = EntriesSelectionType,
 > = {
-	windowType?: WindowInstanceType;
+	entriesSelection: T;
+	windowType?: WindowType<T>;
+	windowTitle?: string;
 	windowComponent?: WindowComponent;
-	entriesSelection: 'free' | 'single' | 'multiple';
 	operationFunction?: OperationFunctionType<Entry, FormValues>;
 	button?: ActionButtonPropsType;
 	validateForm?: ValidateFormFnType<FormValues>;
 	getFormValues?: GetFormValuesFnType<FormValues>;
 	getFormState?: GetFormStateFnType<FormValues, Entry>;
+	displayEntryLabel?: AllowedDisplayEntryLabel<T, Entry>;
 };
 
 // biome-ignore lint/suspicious/noExplicitAny: It's fine
@@ -41,16 +60,16 @@ export type WindowConfig<
 > = {
 	uid: string;
 	section: WindowSectionType;
-	key: string;
+	dataSource: string;
 	action: string;
-	definition: WindowDefinition<FormValues, Entry>;
 	minimized: boolean;
+	definition: WindowDefinition<FormValues, Entry>;
 	data?: {
 		entries?: Entry[];
-		prefillEntry?: Entry; // TODO: maybe drop this
+		prefillEntry?: Entry;
 	};
-	events?: Record<string, FormEventType<unknown>>;
+	events?: Record<string, ActionEventType<unknown>>;
 	props?: WindowConfigPropsType;
 };
 
-export type WindowCreateConfig = Omit<WindowConfig, 'minimized' | 'definition'>;
+export type WindowCreateConfig = Omit<WindowConfig, 'definition'>;

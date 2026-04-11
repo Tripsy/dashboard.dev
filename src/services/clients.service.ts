@@ -11,7 +11,7 @@ import type {
 	FindFunctionResponseType,
 	FindFunctionType,
 	UpdateFunctionType,
-} from '@/types/action-function.type';
+} from '@/types/action.type';
 import type { ApiResponseFetch, QueryFiltersType } from '@/types/api.type';
 
 export const findClients: FindFunctionType<ClientModel> = async (

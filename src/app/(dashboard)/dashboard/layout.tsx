@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { JSX } from 'react';
 import { Breadcrumb } from '@/app/(dashboard)/_components/breadcrumb.component';
 import DashboardMain from '@/app/(dashboard)/_components/dashboard-main.component';
+import { DataSourceRegistrar } from '@/app/(dashboard)/_components/data-source-registrar.component';
 import { SideMenu } from '@/app/(dashboard)/_components/side-menu.component';
 import { SideMenuToggle } from '@/app/(dashboard)/_components/side-menu-toggle.component';
 import { DashboardProvider } from '@/app/(dashboard)/_providers/dashboard.provider';
@@ -46,6 +47,7 @@ function Header() {
 export default async function Layout({ children }: { children: JSX.Element }) {
 	return (
 		<DashboardProvider>
+			<DataSourceRegistrar />
 			<div className="dashboard-layout min-h-screen bg-background">
 				<Header />
 				<ProtectedRoute routeAuth={RouteAuth.PROTECTED}>

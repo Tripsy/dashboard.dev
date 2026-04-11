@@ -6,7 +6,7 @@ type FilterResetDetail = { source: DataSourceKey };
 
 export function dispatchFilterReset(source: DataSourceKey): void {
 	window.dispatchEvent(
-		new CustomEvent<FilterResetDetail>(FILTER_RESET_EVENT, {
+		new CustomEvent(FILTER_RESET_EVENT, {
 			detail: { source },
 		}),
 	);

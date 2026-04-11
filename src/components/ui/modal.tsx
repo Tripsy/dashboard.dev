@@ -1,6 +1,6 @@
-import { Minus, X } from 'lucide-react';
 import type React from 'react';
 import { useCallback, useEffect } from 'react';
+import { Icons } from '@/components/icon.component';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/helpers/css.helper';
 
@@ -114,19 +114,23 @@ export function Modal({
 				<div className="absolute right-4 top-4 z-10">
 					<Button
 						variant="ghost"
-						className="h-8 w-8 rounded-full shrink-0"
+						size="xs"
+						className="rounded-full"
+						hover="warning"
 						onClick={onMinimize}
 						aria-label="Minimize modal"
 					>
-						<Minus className="h-4 w-4" />
+						<Icons.Minimize size={12} />
 					</Button>
 					<Button
 						variant="ghost"
-						className="h-8 w-8 rounded-full shrink-0"
+						size="xs"
+						className="rounded-full"
+						hover="error"
 						onClick={onClose}
 						aria-label="Close modal"
 					>
-						<X className="h-4 w-4" />
+						<Icons.Close size={12} />
 					</Button>
 				</div>
 

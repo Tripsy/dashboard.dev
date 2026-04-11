@@ -2,6 +2,7 @@
 
 import clsx from 'clsx';
 import React, { type ComponentType, type JSX, useMemo } from 'react';
+import { dispatchDataTableAction } from '@/app/(dashboard)/_events/data-table-action.event';
 import { Icons } from '@/components/icon.component';
 import { Badge, type BadgeVariant } from '@/components/ui/badge';
 import { formatDate } from '@/helpers/date.helper';
@@ -136,22 +137,16 @@ export const DisplayAction = <Model extends Record<string, unknown>>({
 		return value;
 	}
 
-	const triggerAction = () => {
-		const event = new CustomEvent('useDataTableAction', {
-			detail: {
-				source: action.source,
-				actionName: actionName,
-				entry,
-			},
-		});
-
-		window.dispatchEvent(event);
-	};
-
 	return (
 		<button
 			type="button"
-			onClick={triggerAction}
+			onClick={() =>
+				dispatchDataTableAction({
+					source: action.source,
+					actionName: actionName,
+					entry,
+				})
+			}
 			title={translations[actionTitleKey]}
 			className="cursor-pointer hover:underline"
 		>

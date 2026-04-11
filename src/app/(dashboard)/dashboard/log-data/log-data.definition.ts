@@ -106,7 +106,7 @@ export const dataSourceConfigLogData = {
 			windowType: 'action' as const,
 			permission: 'log-data.delete',
 			entriesSelection: 'multiple' as const,
-			actionPosition: 'left' as const,
+			buttonPosition: 'left' as const,
 			operationFunction: deleteLogData,
 			button: {
 				variant: 'outline' as const,
@@ -121,7 +121,7 @@ export const dataSourceConfigLogData = {
 			},
 			permission: 'log-data.read',
 			entriesSelection: 'single' as const,
-			actionPosition: 'hidden' as const,
+			buttonPosition: 'hidden' as const,
 		},
 	},
 };

@@ -348,7 +348,7 @@ export const dataSourceConfigClients = {
 			},
 			permission: 'client.create',
 			entriesSelection: 'free' as const,
-			actionPosition: 'right' as const,
+			buttonPosition: 'right' as const,
 			operationFunction: createClient,
 			button: {
 				variant: 'info' as const,
@@ -362,7 +362,7 @@ export const dataSourceConfigClients = {
 			},
 			permission: 'client.update',
 			entriesSelection: 'single' as const,
-			actionPosition: 'left' as const,
+			buttonPosition: 'left' as const,
 			operationFunction: updateClient,
 			button: {
 				variant: 'outline' as const,
@@ -374,7 +374,7 @@ export const dataSourceConfigClients = {
 			permission: 'client.delete',
 			entriesSelection: 'single' as const,
 			customEntryCheck: (entry: ClientModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			actionPosition: 'left' as const,
+			buttonPosition: 'left' as const,
 			operationFunction: deleteClient,
 			button: {
 				variant: 'outline' as const,
@@ -390,7 +390,7 @@ export const dataSourceConfigClients = {
 				[ClientStatusEnum.PENDING, ClientStatusEnum.INACTIVE].includes(
 					entry.status,
 				),
-			actionPosition: 'left' as const,
+			buttonPosition: 'left' as const,
 			operationFunction: enableClient,
 			button: {
 				variant: 'outline' as const,
@@ -406,7 +406,7 @@ export const dataSourceConfigClients = {
 				[ClientStatusEnum.PENDING, ClientStatusEnum.ACTIVE].includes(
 					entry.status,
 				),
-			actionPosition: 'left' as const,
+			buttonPosition: 'left' as const,
 			operationFunction: disableClient,
 			button: {
 				variant: 'outline' as const,
@@ -418,7 +418,7 @@ export const dataSourceConfigClients = {
 			permission: 'client.delete',
 			entriesSelection: 'single' as const,
 			customEntryCheck: (entry: ClientModel) => !!entry.deleted_at, // Return true if the entry is deleted
-			actionPosition: 'left' as const,
+			buttonPosition: 'left' as const,
 			operationFunction: restoreClient,
 			button: {
 				variant: 'outline' as const,
@@ -433,7 +433,7 @@ export const dataSourceConfigClients = {
 			},
 			permission: 'client.read',
 			entriesSelection: 'single' as const,
-			actionPosition: 'hidden' as const,
+			buttonPosition: 'hidden' as const,
 		},
 	},
 };

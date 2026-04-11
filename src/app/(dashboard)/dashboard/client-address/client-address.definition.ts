@@ -238,7 +238,7 @@ export const dataSourceConfigClientAddress = {
 			windowType: 'form' as const,
 			permission: 'client-address.create',
 			entriesSelection: 'free' as const,
-			actionPosition: 'right' as const,
+			buttonPosition: 'right' as const,
 			operationFunction: createClientAddress,
 			button: {
 				variant: 'info' as const,
@@ -249,7 +249,7 @@ export const dataSourceConfigClientAddress = {
 			windowType: 'form' as const,
 			permission: 'client-address.update',
 			entriesSelection: 'single' as const,
-			actionPosition: 'left' as const,
+			buttonPosition: 'left' as const,
 			operationFunction: updateClientAddress,
 			button: {
 				variant: 'outline' as const,
@@ -261,7 +261,7 @@ export const dataSourceConfigClientAddress = {
 			permission: 'client-address.delete',
 			entriesSelection: 'single' as const,
 			customEntryCheck: (entry: ClientAddressModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			actionPosition: 'left' as const,
+			buttonPosition: 'left' as const,
 			operationFunction: deleteClientAddress,
 			button: {
 				variant: 'outline' as const,
@@ -273,7 +273,7 @@ export const dataSourceConfigClientAddress = {
 			permission: 'client-address.delete',
 			entriesSelection: 'single' as const,
 			customEntryCheck: (entry: ClientAddressModel) => !!entry.deleted_at, // Return true if the entry is deleted
-			actionPosition: 'left' as const,
+			buttonPosition: 'left' as const,
 			operationFunction: restoreClientAddress,
 			button: {
 				variant: 'outline' as const,
@@ -285,13 +285,13 @@ export const dataSourceConfigClientAddress = {
 			component: ViewClientAddress,
 			permission: 'client-address.read',
 			entriesSelection: 'single' as const,
-			actionPosition: 'hidden' as const,
+			buttonPosition: 'hidden' as const,
 		},
 		// createClient: {
 		// 	windowType: 'form' as const,
 		// 	permission: 'client.create',
 		// 	entriesSelection: 'free' as const,
-		// 	actionPosition: 'hidden' as const,
+		// 	buttonPosition: 'hidden' as const,
 		// 	button: {
 		// 		icon: 'create',
 		// 	},

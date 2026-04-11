@@ -2,25 +2,24 @@ import { useMemo } from 'react';
 import { getActionIcon } from '@/components/icon.component';
 import { LoadingIcon } from '@/components/status.component';
 import { Button } from '@/components/ui/button';
-import type { DataSourceKey } from '@/config/data-source.config';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import type { ActionButtonPropsType } from '@/types/html.type';
 
-export function DataTableActionButton<K extends DataSourceKey>({
+export function ActionButton({
 	dataSource,
-	actionName,
+	action,
 	buttonProps,
 	handleClick,
 	disabled = false,
 }: {
-	dataSource: K;
-	actionName: string;
+	dataSource: string;
+	action: string;
 	buttonProps?: ActionButtonPropsType;
 	handleClick: () => void;
 	disabled?: boolean;
 }) {
-	const actionTitleKey = `${dataSource}.action.${actionName}.title`;
-	const actionLabelKey = `${dataSource}.action.${actionName}.label`;
+	const actionTitleKey = `${dataSource}.action.${action}.title`;
+	const actionLabelKey = `${dataSource}.action.${action}.label`;
 
 	const translationsKeys = useMemo(
 		() => [actionTitleKey, actionLabelKey, 'app.text.please_wait'] as const,
@@ -29,7 +28,7 @@ export function DataTableActionButton<K extends DataSourceKey>({
 
 	const { translations } = useTranslation(translationsKeys);
 
-	const ActionIcon = getActionIcon(actionName);
+	const ActionIcon = getActionIcon(action);
 
 	return (
 		<Button
@@ -49,7 +48,7 @@ export function DataTableActionButton<K extends DataSourceKey>({
 				</>
 			) : (
 				<>
-					<ActionIcon />
+					<ActionIcon size={16} />
 					{translations[actionLabelKey]}
 				</>
 			)}

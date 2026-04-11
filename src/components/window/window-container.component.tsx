@@ -7,15 +7,17 @@ import { useModalStore } from '@/stores/window.store';
 export function WindowContainer() {
 	const { stack } = useModalStore();
 
-	const minimized = stack.filter((m) => m.minimized);
-	const visible = stack.filter((m) => !m.minimized);
+	const activeWindow = stack.find((m) => !m.minimized);
 
 	return (
 		<>
-			{visible.map((current) => (
-				<WindowInstance key={current.uid} current={current} />
-			))}
-			{minimized.length > 0 && <WindowDock modals={minimized} />}
+			{activeWindow && (
+				<WindowInstance key={activeWindow.uid} current={activeWindow} />
+			)}
+
+			{stack.length > 0 && (
+				<WindowDock modals={stack} active={activeWindow?.uid} />
+			)}
 		</>
 	);
 }

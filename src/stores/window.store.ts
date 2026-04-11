@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { devtools } from 'zustand/middleware';
+import { devtools, persist } from 'zustand/middleware';
 import {
 	type DataSourceKey,
 	getDataSourceConfig,
@@ -13,211 +13,202 @@ import type {
 
 type WindowStore = {
 	stack: WindowConfig[];
-	create: (config: WindowCreateConfig) => string; // Adds to stack, visible, top
-	replace: (config: WindowCreateConfig, uid?: string) => string; // Replace existing window
+	open: (config: WindowCreateConfig, uid?: string) => string; // Replace existing window; create if not found
 	close: (uid?: string) => void; // Removes from stack
 	closeAll: () => void; // Clear stack
 	minimize: (uid: string) => void; // Still in stack, hidden
-	focus: (uid: string) => void; // Still in stack, visible, top
 	restore: (uid: string) => void; // Still in stack, visible again
 	getWindow: (uid: string) => WindowConfig | undefined; // Get window by uid
 	getCurrentWindow: () => WindowConfig | undefined; // Get top window
 };
 
-export const useModalStore = create<WindowStore>()(
-	devtools((set, get) => {
-		// Private helper to check if window exists
-		const windowExists = (uid: string): boolean => {
-			return get().stack.some((window) => window.uid === uid);
-		};
+// Helper to prepare config on create
+const prepareConfigOnCreate = (config: WindowCreateConfig): WindowConfig => {
+	const enrichedConfig = { ...config };
 
-		// Private helper to get focused (top) window
-		const getFocusedWindow = (): WindowConfig | undefined => {
-			const stack = get().stack;
+	switch (enrichedConfig.section) {
+		case 'dashboard': {
+			const actions = getDataSourceConfig(
+				enrichedConfig.dataSource as DataSourceKey,
+				'actions',
+			);
 
-			return stack[stack.length - 1];
-		};
-
-		// Private helper to find window index
-		const findWindowIndex = (uid: string): number => {
-			return get().stack.findIndex((window) => window.uid === uid);
-		};
-
-		// Private helper to prepare config on create
-		const prepareConfigOnCreate = (
-			config: WindowCreateConfig,
-		): WindowConfig => {
-			const enrichedConfig = { ...config };
-
-			switch (enrichedConfig.section) {
-				case 'dashboard': {
-					const actions = getDataSourceConfig(
-						enrichedConfig.key as DataSourceKey,
-						'actions',
-					);
-
-					if (!actions) {
-						throw new ValueError(
-							`Actions not defined for ${enrichedConfig.key}`,
-						);
-					}
-
-					const actionConfig = actions[enrichedConfig.action];
-
-					if (!actionConfig) {
-						throw new ValueError(
-							`Action "${enrichedConfig.action}" not defined for ${enrichedConfig.key}`,
-						);
-					}
-
-					// Create definition object
-					const definition: WindowDefinition = {
-						windowType: actionConfig.windowType,
-						windowComponent: actionConfig.windowComponent,
-						entriesSelection: actionConfig.entriesSelection,
-						operationFunction: actionConfig.operationFunction,
-						button: actionConfig.button,
-						validateForm: actionConfig.validateForm,
-						getFormValues: actionConfig.getFormValues,
-						getFormState: actionConfig.getFormState,
-					};
-
-					// Return complete WindowConfig with definition
-					return {
-						...enrichedConfig,
-						definition,
-						props: {
-							...actionConfig.windowConfigProps,
-							...enrichedConfig.props,
-						},
-						events: {
-							...actionConfig.events,
-							...enrichedConfig.events,
-						},
-						minimized: false,
-					};
-				}
-				default:
-					throw new Error(
-						`Invalid section: ${enrichedConfig.section}`,
-					);
-			}
-		};
-
-		const createWindow = (config: WindowCreateConfig): void => {
-			// Check if window with same UID already exists
-			if (windowExists(config.uid)) {
-				console.warn(
-					`Window with uid "${config.uid}" already exists. Use update() or replace() instead.`,
+			if (!actions) {
+				throw new ValueError(
+					`Actions not defined for ${enrichedConfig.dataSource}`,
 				);
 			}
 
-			const preparedConfig = prepareConfigOnCreate(config);
+			const actionConfig = actions[enrichedConfig.action];
 
-			set((state) => ({
-				stack: [...state.stack, preparedConfig],
-			}));
-		};
+			if (!actionConfig) {
+				throw new ValueError(
+					`Action "${enrichedConfig.action}" not defined for ${enrichedConfig.dataSource}`,
+				);
+			}
 
-		return {
-			stack: [],
+			// Create definition object
+			const definition: WindowDefinition = {
+				windowType: actionConfig.windowType,
+				windowTitle: actionConfig.windowTitle,
+				windowComponent: actionConfig.windowComponent,
+				entriesSelection: actionConfig.entriesSelection,
+				operationFunction: actionConfig.operationFunction,
+				button: actionConfig.button,
+				validateForm: actionConfig.validateForm,
+				getFormValues: actionConfig.getFormValues,
+				getFormState: actionConfig.getFormState,
+				displayEntryLabel: getDataSourceConfig(
+					enrichedConfig.dataSource as DataSourceKey,
+					'displayEntryLabel',
+				),
+			};
 
-			create: (config) => {
-				createWindow(config);
+			// Return complete WindowConfig
+			return {
+				...enrichedConfig,
+				definition,
+				props: {
+					...actionConfig.windowConfigProps,
+					...enrichedConfig.props,
+				},
+				events: {
+					...actionConfig.events,
+					...enrichedConfig.events,
+				},
+				minimized: enrichedConfig.minimized ?? false,
+			};
+		}
+		default:
+			throw new Error(`Invalid section: ${enrichedConfig.section}`);
+	}
+};
 
-				return config.uid;
+export const useModalStore = create<WindowStore>()(
+	devtools(
+		persist(
+			(set, get) => {
+				// Private helper to check if window exists
+				const windowExists = (uid: string): boolean => {
+					return get().stack.some((window) => window.uid === uid);
+				};
+
+				// Private helper to get focused (top) window
+				const getFocusedWindow = (): WindowConfig | undefined => {
+					return get().stack.find((m) => !m.minimized);
+				};
+
+				const minimizeAll = (stack: WindowConfig[]): WindowConfig[] =>
+					stack.map((m) =>
+						m.minimized ? m : { ...m, minimized: true },
+					);
+
+				return {
+					stack: [],
+
+					open: (config, uid) => {
+						const targetUid = uid ?? getFocusedWindow()?.uid;
+						const preparedConfig = prepareConfigOnCreate(config);
+
+						// No target found — treat as a new window
+						if (!targetUid || !windowExists(targetUid)) {
+							set((state) => ({
+								stack: [
+									...minimizeAll(state.stack),
+									preparedConfig,
+								],
+							}));
+
+							return config.uid;
+						}
+
+						set((state) => ({
+							stack: minimizeAll(state.stack).map((m) =>
+								m.uid === targetUid
+									? { ...preparedConfig, minimized: false }
+									: m,
+							),
+						}));
+
+						return preparedConfig.uid;
+					},
+
+					close: (uid) =>
+						set((state) => ({
+							stack: uid
+								? state.stack.filter((m) => m.uid !== uid)
+								: state.stack.filter((m) => m.minimized), // Close the visible one
+						})),
+
+					closeAll: () => set({ stack: [] }),
+
+					minimize: (uid) =>
+						set((state) => ({
+							stack: state.stack.map((m) =>
+								m.uid === uid ? { ...m, minimized: true } : m,
+							),
+						})),
+
+					restore: (uid) =>
+						set((state) => ({
+							stack: minimizeAll(state.stack).map((m) =>
+								m.uid === uid ? { ...m, minimized: false } : m,
+							),
+						})),
+
+					// Get window by uid
+					getWindow: (uid) => {
+						return get().stack.find((window) => window.uid === uid);
+					},
+
+					// Get current/top window
+					getCurrentWindow: () => {
+						const stack = get().stack;
+
+						return stack.find((m) => !m.minimized);
+					},
+				};
 			},
+			{
+				name: 'window-store',
 
-			replace: (config, uid) => {
-				// Determine which window to remove
-				let targetIndex: number;
-
-				if (uid) {
-					// Replace specific window by UID
-					targetIndex = findWindowIndex(uid);
-
-					if (targetIndex === -1) {
-						// console.warn(`Window with uid "${uid}" not found. Creating new window instead.`);
-						createWindow(config);
-
-						return config.uid;
-					}
-				} else {
-					// Replace focused (top) window
-					const focusedWindow = getFocusedWindow();
-					if (!focusedWindow) {
-						// console.warn('No focused window to replace. Creating new window instead.');
-						createWindow(config);
-
-						return config.uid;
-					}
-
-					targetIndex = get().stack.length - 1;
-				}
-
-				const preparedConfig = prepareConfigOnCreate(config);
-
-				set((state) => {
-					// Remove the old window and insert the new one at the same position
-					const updatedStack = [...state.stack];
-
-					updatedStack.splice(targetIndex, 1, preparedConfig);
-
-					return { stack: updatedStack };
-				});
-
-				return preparedConfig.uid;
-			},
-
-			close: (uid) =>
-				set((state) => ({
-					stack: uid
-						? state.stack.filter((m) => m.uid !== uid) // close specific
-						: state.stack.slice(0, -1), // close top
-				})),
-
-			closeAll: () => set({ stack: [] }),
-
-			minimize: (uid) =>
-				set((state) => ({
-					stack: state.stack.map((m) =>
-						m.uid === uid ? { ...m, minimized: true } : m,
-					),
-				})),
-
-			focus: (uid) =>
-				set((state) => {
-					const modal = state.stack.find((m) => m.uid === uid);
-
-					if (!modal) {
-						return state;
-					}
-
-					return {
-						stack: [
-							...state.stack.filter((m) => m.uid !== uid),
-							modal,
-						],
-					};
+				partialize: (state) => ({
+					stack: state.stack.map((window) => ({
+						uid: window.uid,
+						section: window.section,
+						dataSource: window.dataSource,
+						action: window.action,
+						minimized: window.minimized,
+						data: window.data,
+						props: window.props,
+						// Events intentionally omitted — functions are not serializable
+					})),
 				}),
 
-			// On restore should also get focus
-			restore: (uid) =>
-				set((state) => ({
-					stack: state.stack.map((m) =>
-						m.uid === uid ? { ...m, minimized: false } : m,
-					),
-				})),
+				// Re-derive complete WindowConfig after rehydration
+				onRehydrateStorage: () => (state) => {
+					if (!state) {
+						return;
+					}
 
-			// Get window by uid
-			getWindow: (uid) => {
-				return get().stack.find((window) => window.uid === uid);
-			},
+					const serializedStack =
+						state.stack as unknown as WindowCreateConfig[];
 
-			// Get current/top window
-			getCurrentWindow: () => {
-				return getFocusedWindow();
+					state.stack = serializedStack
+						.map((window) => {
+							try {
+								return prepareConfigOnCreate(window);
+							} catch (error) {
+								console.warn(
+									`[window-store] Failed to rehydrate window "${window.uid}":`,
+									error,
+								);
+								return null;
+							}
+						})
+						.filter((w): w is WindowConfig => w !== null);
+				},
 			},
-		};
-	}),
+		),
+	),
 );

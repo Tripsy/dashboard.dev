@@ -53,3 +53,9 @@ export type ActionOperationFunctionType =
 export type OperationFunctionType<Entry, FormValues extends FormValuesType> =
 	| FormOperationFunctionType<Entry, FormValues>
 	| ActionOperationFunctionType;
+
+export type ActionEventType<Data> = (data: Data) => void;
+
+export type DisplayEntryLabelFnType<Entry> = (entry: Entry) => string;
+
+export type EntriesSelectionType = 'free' | 'single' | 'multiple'; // Allowed entries selection for an action (eg: `free` means no selection)

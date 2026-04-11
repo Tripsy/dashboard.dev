@@ -123,7 +123,7 @@ export const dataSourceConfigMailQueue = {
 			windowType: 'action' as const,
 			permission: 'mail-queue.delete',
 			entriesSelection: 'multiple' as const,
-			actionPosition: 'left' as const,
+			buttonPosition: 'left' as const,
 			operationFunction: deleteMailQueue,
 			button: {
 				variant: 'outline' as const,
@@ -138,7 +138,7 @@ export const dataSourceConfigMailQueue = {
 			},
 			permission: 'mail-queue.read',
 			entriesSelection: 'single' as const,
-			actionPosition: 'hidden' as const,
+			buttonPosition: 'hidden' as const,
 		},
 		viewTemplate: {
 			windowType: 'view' as const,
@@ -155,7 +155,7 @@ export const dataSourceConfigMailQueue = {
 			},
 			permission: 'template.read',
 			entriesSelection: 'single' as const,
-			actionPosition: 'hidden' as const,
+			buttonPosition: 'hidden' as const,
 		},
 	},
 };

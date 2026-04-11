@@ -125,7 +125,7 @@ export const dataSourceConfigPermissions = {
 			},
 			permission: 'permission.create',
 			entriesSelection: 'free' as const,
-			actionPosition: 'right' as const,
+			buttonPosition: 'right' as const,
 			operationFunction: createPermissions,
 			button: {
 				variant: 'info' as const,
@@ -139,7 +139,7 @@ export const dataSourceConfigPermissions = {
 			},
 			permission: 'permission.update',
 			entriesSelection: 'single' as const,
-			actionPosition: 'left' as const,
+			buttonPosition: 'left' as const,
 			operationFunction: updatePermissions,
 			button: {
 				variant: 'outline' as const,
@@ -150,7 +150,7 @@ export const dataSourceConfigPermissions = {
 			windowType: 'action' as const,
 			permission: 'permission.delete',
 			entriesSelection: 'single' as const,
-			actionPosition: 'left' as const,
+			buttonPosition: 'left' as const,
 			customEntryCheck: (entry: PermissionModel) => !entry.deleted_at, // Return true if the entry is not deleted
 			operationFunction: deletePermissions,
 			button: {
@@ -162,7 +162,7 @@ export const dataSourceConfigPermissions = {
 			windowType: 'action' as const,
 			permission: 'permission.delete',
 			entriesSelection: 'single' as const,
-			actionPosition: 'left' as const,
+			buttonPosition: 'left' as const,
 			customEntryCheck: (entry: PermissionModel) => !!entry.deleted_at, // Return true if the entry is deleted
 			operationFunction: restorePermissions,
 			button: {

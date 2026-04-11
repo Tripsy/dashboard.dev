@@ -6,7 +6,7 @@ import type {
 	CreateFunctionType,
 	FormOperationFunctionType,
 	UpdateFunctionType,
-} from '@/types/action-function.type';
+} from '@/types/action.type';
 import type {
 	FormComponentType,
 	FormStateType,

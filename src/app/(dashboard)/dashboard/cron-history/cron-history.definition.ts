@@ -102,7 +102,7 @@ export const dataSourceConfigCronHistory = {
 			windowType: 'action' as const,
 			permission: 'cron-history.delete',
 			entriesSelection: 'multiple' as const,
-			actionPosition: 'left' as const,
+			buttonPosition: 'left' as const,
 			operationFunction: deleteCronHistory,
 			button: {
 				variant: 'outline' as const,
@@ -117,7 +117,7 @@ export const dataSourceConfigCronHistory = {
 			},
 			permission: 'cron-history.read',
 			entriesSelection: 'single' as const,
-			actionPosition: 'hidden' as const,
+			buttonPosition: 'hidden' as const,
 		},
 	},
 };

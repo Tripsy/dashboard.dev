@@ -27,41 +27,41 @@
 			"success": "New user added successfully"
 		},
 		"update": {
-			"title": "Edit user",
+			"title": "Update user - {{entry}}",
 			"label": "Update",
 			"success": "User updated successfully"
 		},
 		"permissions": {
-			"title": "Setup permissions",
+			"title": "Setup permissions - {{entry}}",
 			"label": "Permissions",
 			"success": "Permissions updated successfully"
 		},
 		"delete": {
-			"title": "Delete user",
+			"title": "Delete user - {{entry}}",
 			"label": "Delete",
 			"success": "User deleted successfully",
 			"confirmText": "Are you sure you want to delete this user?"
 		},
 		"enable": {
-			"title": "Enable user",
+			"title": "Enable user - {{entry}}",
 			"label": "Enable",
 			"success": "User status marked as active",
 			"confirmText": "Are you sure you want to activate this user?"
 		},
 		"disable": {
-			"title": "Disable user",
+			"title": "Disable user - {{entry}}",
 			"label": "Disable",
 			"success": "User status marked as inactive",
 			"confirmText": "Are you sure you want to mark this user as inactive?"
 		},
 		"restore": {
-			"title": "Restore user",
+			"title": "Restore user - {{entry}}",
 			"label": "Restore",
 			"success": "User restored successfully",
 			"confirmText": "Are you sure you want to restore this user?"
 		},
 		"view": {
-			"title": "User details",
+			"title": "User details - {{entry}}",
 			"label": "View details"
 		}
 	}

@@ -248,10 +248,6 @@ function validateFormUpdate(values: UserFormValuesType) {
 	return validator.create.safeParse(values);
 }
 
-function onCreateSuccess(resultData: UserModel) {
-	console.log('onCreateSuccess', resultData);
-}
-
 export type UsersDataTableFiltersType = {
 	global: { value: string | null; matchMode: 'contains' };
 	role: { value: UserRoleEnum | null; matchMode: 'equals' };
@@ -388,9 +384,11 @@ export const dataSourceConfigUsers: DataSourceConfigType<
 			getFormValues: getFormValues,
 			validateForm: validateFormCreate,
 			getFormState: getFormState,
-			events: {
-				success: onCreateSuccess,
-			},
+			// events: {
+			// 	success: (resultData: UserModel) => {
+			// 		console.log('onCreateSuccess', resultData);
+			// 	},
+			// },
 		},
 		update: {
 			windowType: 'form',

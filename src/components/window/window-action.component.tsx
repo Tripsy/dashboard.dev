@@ -1,14 +1,16 @@
 'use client';
 
-import { current } from 'immer';
 import { useMemo, useState } from 'react';
+import { dispatchFilterReset } from '@/app/(dashboard)/_events/data-table-filter-reset.event';
 import { ActionButton } from '@/components/action-button.component';
 import { Icons } from '@/components/icon.component';
 import { LoadingComponent } from '@/components/status.component';
 import { Button } from '@/components/ui/button';
+import type { DataSourceKey } from '@/config/data-source.config';
 import { ApiError } from '@/exceptions/api.error';
 import ValueError from '@/exceptions/value.error';
 import { replaceVars } from '@/helpers/string.helper';
+import { useTranslation } from '@/hooks/use-translation.hook';
 import { useToast } from '@/providers/toast.provider';
 import { useModalStore } from '@/stores/window.store';
 import type { ActionOperationFunctionType } from '@/types/action.type';
@@ -17,21 +19,15 @@ import type { WindowConfig, WindowEntryType } from '@/types/window.type';
 
 export function WindowAction<WindowEntry extends WindowEntryType>({
 	uid,
-	// actionName,
 	entries,
-	// onSuccessAction,
-	// onCloseAction,
 }: {
 	uid: string;
-	// actionName: string;
 	entries: WindowEntry[];
-	// onSuccessAction?: OnSuccessActionType;
-	// onCloseAction: () => void;
 }) {
 	const [loading, setLoading] = useState(false);
 	const { showToast } = useToast();
 
-	const { getWindow } = useModalStore();
+	const { getWindow, close } = useModalStore();
 
 	const windowConfig = getWindow(uid) as
 		| WindowConfig<FormValuesType, WindowEntry>
@@ -47,6 +43,10 @@ export function WindowAction<WindowEntry extends WindowEntryType>({
 		throw new Error(`Window definition not found for uid: ${uid}`);
 	}
 
+	if (windowDefinition.entriesSelection === 'single' && entries.length > 1) {
+		throw new ValueError(`Multiple entries provided for single action`);
+	}
+
 	// WindowAction only handles action operations.
 	const operationFunction =
 		windowDefinition.operationFunction as ActionOperationFunctionType;
@@ -60,54 +60,70 @@ export function WindowAction<WindowEntry extends WindowEntryType>({
 
 	const displayEntryLabel = windowDefinition.displayEntryLabel;
 
-	if (!displayEntryLabel || typeof operationFunction !== 'function') {
+	if (!displayEntryLabel || typeof displayEntryLabel !== 'function') {
 		throw new ValueError(
 			`"displayEntryLabel" function is not defined for uid: ${uid}`,
 		);
 	}
 
-	// const confirmTextKey = `${dataSource}.action.${actionName}.confirmText`;
-	//
-	// const translationsKeys = useMemo(
-	// 	() =>
-	// 		[
-	// 			confirmTextKey,
-	// 			'app.error.form',
-	// 			'dashboard.text.selected_entries_one',
-	// 			'dashboard.text.selected_entries_many',
-	// 		] as const,
-	// 	[confirmTextKey],
-	// );
-	//
-	// const { translations, isTranslationLoading } =
-	// 	useTranslation(translationsKeys);
+	const windowEvents = windowConfig.events;
 
-	if (windowDefinition.entriesSelection === 'single' && entries.length > 1) {
-		throw new ValueError(`Multiple entries provided for single action`);
-	}
+	const confirmTextKey = `${windowConfig.dataSource}.action.${windowConfig.action}.confirmText`;
+
+	const translationsKeys = useMemo(
+		() =>
+			[
+				confirmTextKey,
+				'app.error.generic',
+				'app.text.success_title',
+				'app.text.error_title',
+				'dashboard.text.selected_entries_one',
+				'dashboard.text.selected_entries_many',
+			] as const,
+		[confirmTextKey],
+	);
+
+	const { translations, isTranslationLoading } =
+		useTranslation(translationsKeys);
+
+	const handleClose = () => {
+		close(uid);
+	};
 
 	const handleAction = async () => {
 		setLoading(true);
 
 		try {
 			const fetchResponse = await operationFunction(
+				// We assume every entry has an `id` property
 				entries.map((e) => e.id as number),
 			);
 
-			await refreshDataTable(dataSource);
+			if (fetchResponse?.success) {
+				showToast({
+					severity: 'success',
+					summary: translations['app.text.success_title'],
+					detail: fetchResponse?.message,
+				});
 
-			showToast({
-				severity: fetchResponse?.success ? 'success' : 'error',
-				summary: fetchResponse?.success ? 'Success' : 'Error',
-				detail:
-					fetchResponse?.message || translations['app.error.form'],
-			});
+				if (windowConfig.section === 'dashboard') {
+					dispatchFilterReset(
+						windowConfig.dataSource as DataSourceKey,
+					);
+				}
 
-			onCloseAction();
+				windowEvents?.success?.({});
 
-			// if (onSuccessAction) {
-			// 	onSuccessAction(actionName);
-			// }
+				handleClose();
+			} else {
+				showToast({
+					severity: 'error',
+					summary: translations['app.text.error_title'],
+					detail: fetchResponse?.message,
+				});
+
+				windowEvents?.error?.({});
+			}
 		} catch (error) {
 			showToast({
 				severity: 'error',
@@ -115,33 +131,26 @@ export function WindowAction<WindowEntry extends WindowEntryType>({
 				detail:
 					error instanceof ValueError || error instanceof ApiError
 						? error.message
-						: translations['app.error.form'],
+						: translations['app.error.generic'],
 			});
-
-			onCloseAction();
 		} finally {
 			setLoading(false);
 		}
 	};
 
-	const actionContentEntries = displayActionEntries(
-		dataSource,
-		actionEntries,
-	);
-
-	// if (isTranslationLoading) {
-	// 	return <LoadingComponent />;
-	// }
+	if (isTranslationLoading) {
+		return <LoadingComponent />;
+	}
 
 	return (
 		<>
 			<p className="pb-4 font-semibold">
 				{replaceVars(
-					actionContentEntries.length === 1
+					entries.length === 1
 						? translations['dashboard.text.selected_entries_one']
 						: translations['dashboard.text.selected_entries_many'],
 					{
-						count: actionContentEntries.length.toString(),
+						count: entries.length.toString(),
 					},
 				)}
 			</p>
@@ -153,16 +162,13 @@ export function WindowAction<WindowEntry extends WindowEntryType>({
 					</li>
 				))}
 			</ul>
-			<p className="pb-4 font-semibold">
-				{translations[confirmTextKey] ||
-					`Are you sure you want to ${actionName.toLowerCase()} these entries?`}
-			</p>
+			<p className="pb-4 font-semibold">{translations[confirmTextKey]}</p>
 
 			<div className="flex justify-end gap-3">
 				<Button
 					variant="outline"
 					hover="warning"
-					onClick={onCloseAction}
+					onClick={handleClose}
 					title="Cancel"
 					disabled={loading}
 				>
@@ -170,9 +176,9 @@ export function WindowAction<WindowEntry extends WindowEntryType>({
 					Cancel
 				</Button>
 				<ActionButton
-					dataSource={windowConfig.key}
-					action={actionName}
-					buttonProps={actionProps.buttonProps}
+					dataSource={windowConfig.dataSource}
+					action={windowConfig.action}
+					buttonProps={windowDefinition.button}
 					handleClick={handleAction}
 					disabled={loading}
 				/>

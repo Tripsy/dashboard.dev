@@ -14,7 +14,7 @@ type UseWindowFormProcessedParams<
 > = {
 	state: FormStateType<FormValues>;
 	windowConfig: WindowConfig<FormValues, Entry>;
-	eventsOnFormProcess?: Record<string, ActionEventType<unknown>>;
+	windowEvents?: Record<string, ActionEventType<unknown>>;
 };
 
 export function useWindowFormProcessed<
@@ -23,7 +23,7 @@ export function useWindowFormProcessed<
 >({
 	state,
 	windowConfig,
-	eventsOnFormProcess,
+	windowEvents,
 }: UseWindowFormProcessedParams<FormValues, Entry>) {
 	const { close } = useModalStore();
 	const { showToast } = useToast();
@@ -61,10 +61,10 @@ export function useWindowFormProcessed<
 				close(windowConfig.uid);
 			}
 
-			eventsOnFormProcess?.[situation]?.(resultData);
+			windowEvents?.[situation]?.(resultData);
 		},
 		[
-			eventsOnFormProcess,
+			windowEvents,
 			showToast,
 			translations,
 			successMessageKey,

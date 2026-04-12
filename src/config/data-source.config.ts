@@ -79,7 +79,7 @@ type ActionConfigBase<
 	getFormValues?: GetFormValuesFnType<FormValues>;
 	getFormState?: GetFormStateFnType<FormValues, Entry>;
 
-	events?: Record<string, ActionEventType<Entry>>;
+	events?: Partial<Record<'success' | 'error', ActionEventType<Entry>>>;
 
 	customEntrySelected?: DataTableCustomEntrySelectedType<Entry>; // Custom function which allows to derive a new entry from the selected one (hint: viewUser)
 };

@@ -1,13 +1,6 @@
-import React, {
-	type ComponentType,
-	type JSX,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-} from 'react';
+import React, { type JSX, useEffect, useMemo, useRef, useState } from 'react';
 import { FormElementError } from '@/components/form/form-element-error.component';
-import { Icons } from '@/components/icon.component';
+import { getActionIcon, Icons } from '@/components/icon.component';
 import { LoadingIcon } from '@/components/status.component';
 import { Button, type ButtonVariant } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
@@ -859,7 +852,8 @@ export const FormComponentAutoComplete = <Fields, T>({
 type FormComponentSubmitButtonType = {
 	label: string;
 	variant?: ButtonVariant;
-	icon: ComponentType<{ className?: string }>;
+	iconLabel: string;
+	iconSize: number;
 	className?: string;
 };
 
@@ -880,6 +874,7 @@ export const FormComponentSubmit = ({
 	);
 
 	const { translations } = useTranslation(translationsKeys);
+	const IconButton = getActionIcon(button.iconLabel);
 
 	return (
 		<Button
@@ -901,7 +896,7 @@ export const FormComponentSubmit = ({
 				</span>
 			) : (
 				<span className="flex items-center gap-1.5">
-					<button.icon /> {button.label}
+					<IconButton size={button.iconSize || 16} /> {button.label}
 				</span>
 			)}
 		</Button>

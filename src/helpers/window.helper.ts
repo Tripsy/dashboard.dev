@@ -44,7 +44,7 @@ export function generateWindowUid<Entry>({
 	entries?: Entry[];
 }) {
 	if (entriesSelection === 'single') {
-		// We assume every entry should have an `id` property & entries exist
+		// We assume every entry has an `id` property & entries exist
 		const entryId = (entries?.[0] as { id: number }).id;
 
 		return `${dataSource}-${action}-${entryId}`;
@@ -59,6 +59,17 @@ export function resolveWindowEntries(
 ): { entry: WindowEntryType | undefined; entries: WindowEntryType[] } {
 	const data = current.data;
 	const { entriesSelection } = current.definition;
+
+	// Check entries are defined for multiple selection
+	if (entriesSelection === 'multiple') {
+		const entries = data?.entries ?? [];
+
+		if (entries.length === 0) {
+			throw new Error(`No entries defined for window type "${type}"`);
+		}
+
+		return { entry: undefined, entries };
+	}
 
 	// Declare entry for form create
 	if (entriesSelection === 'free') {
@@ -81,17 +92,6 @@ export function resolveWindowEntries(
 		}
 
 		return { entry, entries: [] };
-	}
-
-	// Check entries are defined for multiple selection
-	if (entriesSelection === 'multiple') {
-		const entries = data?.entries ?? [];
-
-		if (entries.length === 0) {
-			throw new Error(`No entries defined for window type "${type}"`);
-		}
-
-		return { entry: undefined, entries };
 	}
 
 	return { entry: undefined, entries: [] };

@@ -48,7 +48,7 @@ export function ActionButton({
 				</>
 			) : (
 				<>
-					<ActionIcon size={16} />
+					<ActionIcon />
 					{translations[actionLabelKey]}
 				</>
 			)}

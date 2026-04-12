@@ -3,7 +3,8 @@
 import React, { useActionState } from 'react';
 import { FormComponentSubmit } from '@/components/form/form-element.component';
 import { FormError } from '@/components/form/form-error.component';
-import { getActionIcon, Icons } from '@/components/icon.component';
+import { Icons } from '@/components/icon.component';
+import { Button } from '@/components/ui/button';
 import { createHandleChange, processForm } from '@/helpers/form.helper';
 import { useWindowFormProcessed } from '@/hooks/use-form-processed.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
@@ -24,7 +25,7 @@ export function WindowForm<
 	FormValues extends FormValuesType,
 	WindowEntry extends WindowEntryType,
 >({ uid, entry, children }: WindowFormType<WindowEntry>) {
-	const { getWindow } = useModalStore();
+	const { getWindow, close } = useModalStore();
 
 	const windowConfig = getWindow(uid) as
 		| WindowConfig<FormValues, WindowEntry>
@@ -48,7 +49,7 @@ export function WindowForm<
 		button: buttonSubmit,
 	} = windowDefinition;
 
-	const eventsOnFormProcess = windowConfig.events;
+	const windowEvents = windowConfig.events;
 
 	// + Guards
 	if (!getFormState) {
@@ -97,13 +98,17 @@ export function WindowForm<
 	useWindowFormProcessed({
 		state,
 		windowConfig,
-		eventsOnFormProcess,
+		windowEvents,
 	});
 
 	const handleChange = createHandleChange<FormValues>(
 		setFormValues,
 		markFieldAsTouched,
 	);
+
+	const handleClose = () => {
+		close(uid);
+	};
 
 	return (
 		<WindowFormProvider
@@ -123,6 +128,16 @@ export function WindowForm<
 				{children}
 
 				<div className="flex justify-end gap-3">
+					<Button
+						variant="outline"
+						hover="warning"
+						onClick={handleClose}
+						title="Cancel"
+						disabled={pending}
+					>
+						<Icons.Action.Cancel />
+						Cancel
+					</Button>
 					<FormComponentSubmit
 						pending={pending}
 						submitted={submitted}
@@ -130,7 +145,8 @@ export function WindowForm<
 						button={{
 							variant: buttonSubmit?.variant || 'info',
 							label: buttonSubmit?.label || 'Submit',
-							icon: getActionIcon(buttonSubmit?.icon || 'submit'),
+							iconLabel: buttonSubmit?.icon || 'submit',
+							iconSize: 16,
 						}}
 					/>
 				</div>

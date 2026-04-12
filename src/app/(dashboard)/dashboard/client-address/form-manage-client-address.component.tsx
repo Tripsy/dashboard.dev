@@ -155,8 +155,6 @@ export function FormManageClientAddress() {
 
 								const client = resultData as ClientModel;
 
-								console.log(client);
-
 								handleChange(
 									'client',
 									getClientDisplayName(client),

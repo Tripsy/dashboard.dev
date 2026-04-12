@@ -38,7 +38,16 @@ const WINDOW_RENDERERS: Partial<
 
 		return <WindowComponent entry={entry} />;
 	},
-	action: ({ uid, entries }) => <WindowAction uid={uid} entries={entries} />,
+	action: ({ uid, entry, entries }) => {
+		const actionEntries: WindowEntryType[] =
+			entries.length > 0 ? entries : entry ? [entry] : [];
+
+		if (actionEntries.length === 0) {
+			throw new Error('No entries defined for action');
+		}
+
+		return <WindowAction uid={uid} entries={actionEntries} />;
+	},
 	form: ({ uid, entry, WindowComponent }) => {
 		if (!WindowComponent) {
 			throw new Error('Component not defined for form');
@@ -59,7 +68,13 @@ const WINDOW_RENDERERS: Partial<
 	},
 };
 
-export function WindowInstance({ current }: { current: WindowConfig }) {
+export function WindowInstance({
+	current,
+	isHidden,
+}: {
+	current: WindowConfig;
+	isHidden: boolean;
+}) {
 	const { close, minimize } = useModalStore();
 
 	const handleClose = () => close(current.uid);
@@ -102,6 +117,7 @@ export function WindowInstance({ current }: { current: WindowConfig }) {
 			size={modalSize}
 			className={modalClassName}
 			isOpen={true}
+			isHidden={isHidden}
 			title={modalTitle}
 			onClose={handleClose}
 			onMinimize={handleMinimize}

@@ -18,6 +18,7 @@ export type ModalSizeType = keyof typeof SizeClasses;
 
 interface ModalProps {
 	isOpen: boolean;
+	isHidden: boolean;
 	onClose: () => void;
 	onMinimize?: () => void;
 	title?: string;
@@ -32,6 +33,7 @@ interface ModalProps {
 
 export function Modal({
 	isOpen,
+	isHidden,
 	onClose,
 	onMinimize,
 	title,
@@ -64,10 +66,18 @@ export function Modal({
 		};
 	}, [isOpen, handleEscape]);
 
-	if (!isOpen) return null;
+	if (!isOpen) {
+		return null;
+	}
 
 	return (
-		<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+		<div
+			role="dialog"
+			className={cn(
+				'fixed inset-0 z-50 flex items-center justify-center p-4',
+				isHidden && 'hidden',
+			)}
+		>
 			{/* Backdrop */}
 			<div
 				className="absolute inset-0 bg-foreground/20 backdrop-blur-sm animate-fade-in"

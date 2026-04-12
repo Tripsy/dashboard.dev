@@ -30,7 +30,7 @@ export function WindowDock({
 		<div className="fixed bottom-4 right-4 ml-4 z-40 md:z-50 flex flex-wrap gap-2">
 			{displayModals.map((current) => (
 				<WindowMinimizedInstance
-					key={current.uid}
+					key={`minimized-${current.uid}`}
 					current={current}
 					isActive={current.uid === active}
 				/>

@@ -92,7 +92,6 @@ export function useSearchFilter(options: UseSearchFilterOptions = {}) {
 		currentValueRef.current = '';
 		initialValueRef.current = '';
 		debouncedValueRef.current = '';
-		onSearchRef.current?.('');
 	}, []);
 
 	return {

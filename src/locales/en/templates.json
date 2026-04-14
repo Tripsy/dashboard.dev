@@ -20,24 +20,24 @@
 			"success": "New template added successfully"
 		},
 		"update": {
-			"title": "Edit template",
+			"title": "Edit template - {{entry}}",
 			"label": "Update",
 			"success": "Template updated successfully"
 		},
 		"delete": {
-			"title": "Delete template",
+			"title": "Delete template - {{entry}}",
 			"label": "Delete",
 			"success": "Template deleted successfully",
 			"confirmText": "Are you sure you want to delete this template?"
 		},
 		"restore": {
-			"title": "Restore template",
+			"title": "Restore template - {{entry}}",
 			"label": "Restore",
 			"success": "Template restored successfully",
 			"confirmText": "Are you sure you want to restore this template?"
 		},
 		"view": {
-			"title": "Template details",
+			"title": "Template - {{entry}}",
 			"label": "View details"
 		}
 	}

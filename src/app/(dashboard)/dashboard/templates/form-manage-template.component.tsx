@@ -13,6 +13,7 @@ import {
 	TemplateTypeEnum,
 } from '@/models/template.model';
 import { LanguageEnum } from '@/models/user.model';
+import { useWindowForm } from '@/providers/window-form.provider';
 
 const languages = toOptionsFromEnum(LanguageEnum, {
 	formatter: formatEnumLabel,
@@ -27,6 +28,9 @@ const emailLayouts = toOptionsFromEnum(TemplateLayoutEmailEnum, {
 });
 
 export function FormManageTemplate() {
+	const { formValues, errors, handleChange, pending } =
+		useWindowForm<TemplateFormValuesType>();
+
 	const elementIds = useElementIds(['label', 'language', 'type', 'content']);
 
 	return (

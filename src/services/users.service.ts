@@ -3,93 +3,9 @@ import {
 	buildQueryString,
 	getResponseData,
 } from '@/helpers/api.helper';
-import type { UserFormValuesType, UserModel } from '@/models/user.model';
 import type { UserPermissionModel } from '@/models/user-permission.model';
-import type {
-	CreateFunctionType,
-	DeleteFunctionType,
-	FindFunctionParamsType,
-	FindFunctionResponseType,
-	FindFunctionType,
-	UpdateFunctionType,
-} from '@/types/action.type';
+import type { FindFunctionParamsType } from '@/types/action.type';
 import type { ApiResponseFetch, QueryFiltersType } from '@/types/api.type';
-
-export const findUsers: FindFunctionType<UserModel> = async (
-	params: FindFunctionParamsType,
-) => {
-	const query = buildQueryString(params as QueryFiltersType);
-
-	const response: ApiResponseFetch<FindFunctionResponseType<UserModel>> =
-		await new ApiRequest().doFetch(`/users?${query}`);
-
-	return getResponseData<FindFunctionResponseType<UserModel>>(response);
-};
-
-export const createUser: CreateFunctionType<
-	UserModel,
-	UserFormValuesType
-> = async (params: UserFormValuesType) => {
-	return await new ApiRequest().doFetch('/users', {
-		method: 'POST',
-		body: JSON.stringify(params),
-	});
-};
-
-export const updateUser: UpdateFunctionType<
-	UserModel,
-	UserFormValuesType
-> = async (params: UserFormValuesType, id: number) => {
-	return await new ApiRequest().doFetch(`/users/${id}`, {
-		method: 'PUT',
-		body: JSON.stringify(params),
-	});
-};
-
-export const deleteUser: DeleteFunctionType = async (ids: number[]) => {
-	const id = ids[0];
-
-	return await new ApiRequest().doFetch(`/users/${id}`, {
-		method: 'DELETE',
-	});
-};
-
-export const enableUser = async (
-	ids: number[],
-): Promise<ApiResponseFetch<null>> => {
-	const id = ids[0];
-
-	return await new ApiRequest().doFetch(`/users/${id}/status/active`, {
-		method: 'PATCH',
-	});
-};
-
-export const disableUser = async (
-	ids: number[],
-): Promise<ApiResponseFetch<null>> => {
-	const id = ids[0];
-
-	return await new ApiRequest().doFetch(`/users/${id}/status/inactive`, {
-		method: 'PATCH',
-	});
-};
-
-export const restoreUser = async (
-	ids: number[],
-): Promise<ApiResponseFetch<null>> => {
-	const id = ids[0];
-
-	return await new ApiRequest().doFetch(`/users/${id}/restore`, {
-		method: 'PATCH',
-	});
-};
-
-export const getUser = async (id: number) => {
-	const response: ApiResponseFetch<UserModel> =
-		await new ApiRequest().doFetch(`/users/${id}`);
-
-	return getResponseData(response);
-};
 
 type GetUserPermissionsType = {
 	entries: UserPermissionModel[];

@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import type {
 	ButtonHover,
 	ButtonSize,
@@ -9,6 +10,7 @@ export type ActionButtonPropsType = {
 	variant?: ButtonVariant;
 	size?: ButtonSize;
 	hover?: ButtonHover;
-	icon?: string;
-	label?: string;
+	label?: string | JSX.Element; // Content text for the button
+	icon?: string; // Icon displayed in the button along with the label
+	title?: string; // Tooltip text for the button
 };

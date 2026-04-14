@@ -8,10 +8,6 @@ export function buildSrcPath(...args: string[]) {
 	return path.join(SRC_PATH, ...args);
 }
 
-export function getErrorMessage(error: unknown): string {
-	return error instanceof Error ? error.message : String(error);
-}
-
 export async function getClientIp(
 	headersProvided?: Headers,
 ): Promise<string | undefined> {

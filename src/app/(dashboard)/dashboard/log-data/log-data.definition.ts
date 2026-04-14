@@ -3,12 +3,20 @@ import {
 	DataTableValue,
 } from '@/app/(dashboard)/_components/data-table-value';
 import { ViewLogData } from '@/app/(dashboard)/dashboard/log-data/view-log-data.component';
+import type { DataSourceConfigType } from '@/config/data-source.config';
+import { translateBatch } from '@/config/translate.setup';
+import { requestDeleteMultiple, requestFind } from '@/helpers/services.helper';
 import type {
 	LogCategoryEnum,
 	LogDataModel,
 	LogLevelEnum,
 } from '@/models/log-data.model';
-import { deleteLogData, findLogData } from '@/services/log-data.service';
+import type { FindFunctionParamsType } from '@/types/action.type';
+
+const translations = await translateBatch(
+	['view.title', 'delete.title'],
+	'log-data.action',
+);
 
 export type LogDataDataTableFiltersType = {
 	global: { value: string | null; matchMode: 'contains' };
@@ -26,102 +34,103 @@ export const logDataDataTableFilters: LogDataDataTableFiltersType = {
 	create_date_end: { value: null, matchMode: 'equals' },
 };
 
-export const dataSourceConfigLogData = {
-	dataTableState: {
-		first: 0,
-		rows: 10,
-		sortField: 'id',
-		sortOrder: -1 as const,
-		filters: logDataDataTableFilters,
+export const dataSourceConfigLogData: DataSourceConfigType<LogDataModel> = {
+	dataTable: {
+		state: {
+			first: 0,
+			rows: 10,
+			sortField: 'id',
+			sortOrder: -1 as const,
+			filters: logDataDataTableFilters,
+		},
+		columns: [
+			{
+				field: 'id',
+				header: 'ID',
+				sortable: true,
+				body: (
+					entry: LogDataModel,
+					column: DataTableColumnType<LogDataModel>,
+				) =>
+					DataTableValue(entry, column, {
+						markDeleted: true,
+						displayButton: {
+							action: 'view',
+							dataSource: 'log-data',
+						},
+					}),
+			},
+			{
+				field: 'category',
+				header: 'Category',
+				sortable: true,
+				body: (
+					entry: LogDataModel,
+					column: DataTableColumnType<LogDataModel>,
+				) =>
+					DataTableValue(entry, column, {
+						capitalize: true,
+					}),
+			},
+			{
+				field: 'level',
+				header: 'Level',
+				sortable: true,
+				body: (
+					entry: LogDataModel,
+					column: DataTableColumnType<LogDataModel>,
+				) =>
+					DataTableValue(entry, column, {
+						capitalize: true,
+					}),
+			},
+			{
+				field: 'message',
+				header: 'Message',
+			},
+			{
+				field: 'created_at',
+				header: 'Created At',
+				sortable: true,
+				body: (
+					entry: LogDataModel,
+					column: DataTableColumnType<LogDataModel>,
+				) =>
+					DataTableValue(entry, column, {
+						displayDate: true,
+					}),
+			},
+		],
+		find: (params: FindFunctionParamsType) =>
+			requestFind<LogDataModel>('log-data', params),
 	},
-	dataTableColumns: [
-		{
-			field: 'id',
-			header: 'ID',
-			sortable: true,
-			body: (
-				entry: LogDataModel,
-				column: DataTableColumnType<LogDataModel>,
-			) =>
-				DataTableValue(entry, column, {
-					markDeleted: true,
-					action: {
-						name: 'view',
-						source: 'log-data',
-					},
-				}),
-		},
-		{
-			field: 'category',
-			header: 'Category',
-			sortable: true,
-			body: (
-				entry: LogDataModel,
-				column: DataTableColumnType<LogDataModel>,
-			) =>
-				DataTableValue(entry, column, {
-					capitalize: true,
-				}),
-		},
-		{
-			field: 'level',
-			header: 'Level',
-			sortable: true,
-			body: (
-				entry: LogDataModel,
-				column: DataTableColumnType<LogDataModel>,
-			) =>
-				DataTableValue(entry, column, {
-					capitalize: true,
-				}),
-		},
-		{
-			field: 'message',
-			header: 'Message',
-		},
-		{
-			field: 'created_at',
-			header: 'Created At',
-			sortable: true,
-			body: (
-				entry: LogDataModel,
-				column: DataTableColumnType<LogDataModel>,
-			) =>
-				DataTableValue(entry, column, {
-					displayDate: true,
-				}),
-		},
-	],
-	functions: {
-		find: findLogData,
-		displayActionEntries: (entries: LogDataModel[]) => {
-			return entries.map((entry) => ({
-				id: entry.id,
-				label: entry.pid,
-			}));
-		},
+	displayEntryLabel: (entry: LogDataModel) => {
+		return entry.pid;
 	},
 	actions: {
 		delete: {
-			windowType: 'action' as const,
+			windowType: 'action',
+			windowTitle: translations['delete.title'],
 			permission: 'log-data.delete',
-			entriesSelection: 'multiple' as const,
-			buttonPosition: 'left' as const,
-			operationFunction: deleteLogData,
+			entriesSelection: 'multiple',
+			operationFunction: (ids: number[]) =>
+				requestDeleteMultiple('log-data', ids),
+			buttonPosition: 'left',
 			button: {
-				variant: 'outline' as const,
-				hover: 'error' as const,
+				variant: 'outline',
+				hover: 'error',
 			},
 		},
 		view: {
-			windowType: 'view' as const,
-			component: ViewLogData,
-			modalProps: {
-				size: 'x3l' as const,
+			windowType: 'view',
+			windowTitle: translations['view.title'],
+			windowComponent: ViewLogData,
+			windowConfigProps: {
+				size: 'x3l',
 			},
 			permission: 'log-data.read',
-			entriesSelection: 'single' as const,
-			buttonPosition: 'hidden' as const,
+			entriesSelection: 'single',
+			buttonPosition: 'hidden',
 		},
 	},
 };

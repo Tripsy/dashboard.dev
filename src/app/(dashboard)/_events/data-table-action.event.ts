@@ -1,22 +1,24 @@
+import type { DataSourceKey } from '@/config/data-source.config';
+
 const DATA_TABLE_ACTION_EVENT = 'useDataTableAction' as const;
 
-type DataTableActionDetail<Entry> = {
-	source: string;
-	actionName: string;
-	entry: Entry;
+type DataTableActionType<Entry> = {
+	dataSource: DataSourceKey;
+	action: string;
+	entries: Entry[];
 };
 
 export function dispatchDataTableAction<Entry>(
-	detail: DataTableActionDetail<Entry>,
+	detail: DataTableActionType<Entry>,
 ): void {
 	window.dispatchEvent(new CustomEvent(DATA_TABLE_ACTION_EVENT, { detail }));
 }
 
 export function addDataTableActionListener<Entry>(
-	handler: (detail: DataTableActionDetail<Entry>) => void,
+	handler: (data: DataTableActionType<Entry>) => void,
 ): () => void {
 	const listener = (event: Event) => {
-		const { detail } = event as CustomEvent<DataTableActionDetail<Entry>>;
+		const { detail } = event as CustomEvent<DataTableActionType<Entry>>;
 
 		handler(detail);
 	};

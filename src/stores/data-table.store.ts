@@ -28,10 +28,16 @@ export const createDataTableSlice =
 		DataTableSlice
 	> =>
 	(set) => ({
-		tableState: getDataSourceConfig(dataSource, 'dataTable').state,
+		tableState: structuredClone(
+			getDataSourceConfig(dataSource, 'dataTable').state,
+		),
 
 		updateTableState: (newState) =>
 			set((state: Draft<DataTableSlice>) => {
+				console.log(
+					'[updateTableState] called with',
+					JSON.stringify(newState),
+				);
 				state.tableState = {
 					...state.tableState,
 					...newState,

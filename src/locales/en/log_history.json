@@ -10,11 +10,10 @@
 			"confirmText": "Are you sure you want to delete the selected log(s)?"
 		},
 		"view": {
-			"title": "Log details",
+			"title": "Log details - {{entry}}",
 			"label": "View"
 		},
 		"viewUser": {
-			"title": "User details",
 			"label": "View user"
 		}
 	}

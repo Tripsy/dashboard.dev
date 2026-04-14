@@ -10,7 +10,7 @@
 			"confirmText": "Are you sure you want to delete the selected cron record(s)?"
 		},
 		"view": {
-			"title": "Cron record details",
+			"title": "Cron record - {{entry}}",
 			"label": "View"
 		}
 	}

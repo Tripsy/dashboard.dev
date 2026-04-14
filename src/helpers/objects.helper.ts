@@ -97,3 +97,7 @@ export function hasAtLeastOneValue(obj: unknown): boolean {
 	// Check children
 	return values.some((v) => hasAtLeastOneValue(v));
 }
+
+export function getErrorMessage(error: unknown): string {
+	return error instanceof Error ? error.message : String(error);
+}

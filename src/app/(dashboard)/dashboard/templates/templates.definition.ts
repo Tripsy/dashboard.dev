@@ -5,7 +5,16 @@ import {
 } from '@/app/(dashboard)/_components/data-table-value';
 import { FormManageTemplate } from '@/app/(dashboard)/dashboard/templates/form-manage-template.component';
 import { ViewTemplate } from '@/app/(dashboard)/dashboard/templates/view-template.component';
+import type { DataSourceConfigType } from '@/config/data-source.config';
+import { translateBatch } from '@/config/translate.setup';
 import { getFormDataAsEnum, getFormDataAsString } from '@/helpers/form.helper';
+import {
+	requestCreate,
+	requestDelete,
+	requestFind,
+	requestRestore,
+	requestUpdate,
+} from '@/helpers/services.helper';
 import { parseJson } from '@/helpers/string.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import {
@@ -16,13 +25,20 @@ import {
 	TemplateTypeEnum,
 } from '@/models/template.model';
 import { LANGUAGE_DEFAULT, LanguageEnum } from '@/models/user.model';
-import {
-	createTemplate,
-	deleteTemplate,
-	findTemplates,
-	restoreTemplate,
-	updateTemplate,
-} from '@/services/templates.service';
+import type { FindFunctionParamsType } from '@/types/action.type';
+import type { FormStateType } from '@/types/form.type';
+
+const translations = await translateBatch(
+	[
+		'create.title',
+		'update.title',
+		'view.title',
+		'delete.title',
+		'restore.title',
+		'permissions.title',
+	],
+	'templates.action',
+);
 
 const validatorMessages = await BaseValidator.getValidatorMessages(
 	[
@@ -89,9 +105,13 @@ class TemplateValidator extends BaseValidator<typeof validatorMessages> {
 	]);
 }
 
-export function getFormValuesTemplates(
-	formData: FormData,
-): TemplateFormValuesType {
+function validateForm(values: TemplateFormValuesType) {
+	const validator = new TemplateValidator(validatorMessages);
+
+	return validator.manage.safeParse(values);
+}
+
+export function getFormValues(formData: FormData): TemplateFormValuesType {
 	const type =
 		getFormDataAsEnum(formData, 'type', TemplateTypeEnum) ||
 		TemplateTypeEnum.EMAIL;
@@ -129,6 +149,65 @@ export function getFormValuesTemplates(
 	};
 }
 
+function getFormState(
+	data?: TemplateModel,
+): FormStateType<TemplateFormValuesType> {
+	const type = data?.type ?? TemplateTypeEnum.EMAIL;
+
+	const state = {
+		errors: {},
+		message: null,
+		situation: null,
+		values: {
+			label: data?.label ?? '',
+			language: data?.language ?? LanguageEnum.EN,
+			type: type,
+		},
+	};
+
+	if (type === TemplateTypeEnum.EMAIL) {
+		const parsedContent = parseJson(data?.content);
+		const parsed =
+			parsedContent && typeof parsedContent === 'object'
+				? (parsedContent as {
+						subject?: string;
+						html?: string;
+						layout?: TemplateLayoutEmailEnum;
+					})
+				: {};
+
+		return {
+			...state,
+			values: {
+				...state.values,
+				subject: parsed.subject ?? '',
+				html: parsed.html ?? '',
+				layout: parsed.layout ?? TemplateLayoutEmailEnum.DEFAULT,
+			},
+		};
+	}
+
+	const parsedContent = parseJson(data?.content);
+	const parsed =
+		parsedContent && typeof parsedContent === 'object'
+			? (parsedContent as {
+					title?: string;
+					html?: string;
+					layout?: TemplateLayoutPageEnum;
+				})
+			: {};
+
+	return {
+		...state,
+		values: {
+			...state.values,
+			title: parsed.title ?? '',
+			html: parsed.html ?? '',
+			layout: parsed.layout ?? TemplateLayoutPageEnum.DEFAULT,
+		},
+	};
+}
+
 export type TemplateDataTableFiltersType = {
 	global: { value: string | null; matchMode: 'contains' };
 	language: { value: string | null; matchMode: 'equals' };
@@ -143,200 +222,161 @@ export const templatesDataTableFilters: TemplateDataTableFiltersType = {
 	is_deleted: { value: false, matchMode: 'equals' },
 };
 
-export const dataSourceConfigTemplates = {
-	dataTableState: {
-		first: 0,
-		rows: 10,
-		sortField: 'id',
-		sortOrder: -1 as const,
-		filters: templatesDataTableFilters,
+export const dataSourceConfigTemplates: DataSourceConfigType<
+	TemplateModel,
+	TemplateFormValuesType
+> = {
+	dataTable: {
+		state: {
+			first: 0,
+			rows: 10,
+			sortField: 'id',
+			sortOrder: -1 as const,
+			filters: templatesDataTableFilters,
+		},
+		columns: [
+			{
+				field: 'id',
+				header: 'ID',
+				sortable: true,
+				body: (
+					entry: TemplateModel,
+					column: DataTableColumnType<TemplateModel>,
+				) =>
+					DataTableValue(entry, column, {
+						markDeleted: true,
+						displayButton: {
+							action: 'view',
+							dataSource: 'templates',
+						},
+					}),
+			},
+			{
+				field: 'label',
+				header: 'Label',
+				sortable: true,
+			},
+			{
+				field: 'language',
+				header: 'Language',
+			},
+			{
+				field: 'type',
+				header: 'Type',
+				body: (
+					entry: TemplateModel,
+					column: DataTableColumnType<TemplateModel>,
+				) =>
+					DataTableValue(entry, column, {
+						capitalize: true,
+					}),
+			},
+			{
+				field: 'created_at',
+				header: 'Created At',
+				sortable: true,
+				body: (
+					entry: TemplateModel,
+					column: DataTableColumnType<TemplateModel>,
+				) =>
+					DataTableValue(entry, column, {
+						displayDate: true,
+					}),
+			},
+		],
+		find: (params: FindFunctionParamsType) =>
+			requestFind<TemplateModel>('templates', params),
 	},
-	dataTableColumns: [
-		{
-			field: 'id',
-			header: 'ID',
-			sortable: true,
-			body: (
-				entry: TemplateModel,
-				column: DataTableColumnType<TemplateModel>,
-			) =>
-				DataTableValue(entry, column, {
-					markDeleted: true,
-					action: {
-						name: 'view',
-						source: 'templates',
-					},
-				}),
-		},
-		{
-			field: 'label',
-			header: 'Label',
-			sortable: true,
-		},
-		{
-			field: 'language',
-			header: 'Language',
-		},
-		{
-			field: 'type',
-			header: 'Type',
-			body: (
-				entry: TemplateModel,
-				column: DataTableColumnType<TemplateModel>,
-			) =>
-				DataTableValue(entry, column, {
-					capitalize: true,
-				}),
-		},
-		{
-			field: 'created_at',
-			header: 'Created At',
-			sortable: true,
-			body: (
-				entry: TemplateModel,
-				column: DataTableColumnType<TemplateModel>,
-			) =>
-				DataTableValue(entry, column, {
-					displayDate: true,
-				}),
-		},
-	],
-	formState: {
-		dataSource: 'templates' as const,
-		id: undefined,
-		values: {
-			label: '',
-			language: LanguageEnum.EN,
-			type: TemplateTypeEnum.EMAIL,
-			subject: '',
-			html: '',
-			layout: TemplateLayoutEmailEnum.DEFAULT,
-		} as TemplateFormValuesType,
-		errors: {},
-		message: null,
-		situation: null,
-	},
-	functions: {
-		find: findTemplates,
-		getFormValues: getFormValuesTemplates,
-		validateForm: (values: TemplateFormValuesType) => {
-			const validator = new TemplateValidator(validatorMessages);
-
-			return validator.manage.safeParse(values);
-		},
-		getFormState: (
-			state: FormStateType<
-				'templates',
-				TemplateModel,
-				TemplateFormValuesType
-			>,
-			model: TemplateModel,
-		): FormStateType<
-			'templates',
-			TemplateModel,
-			TemplateFormValuesType
-		> => {
-			const parsed = parseJson(model.content);
-
-			if (model.type === TemplateTypeEnum.EMAIL) {
-				return {
-					...state,
-					id: model.id,
-					values: {
-						label: model.label,
-						language: model.language,
-						type: TemplateTypeEnum.EMAIL,
-						subject: parsed.subject ?? '',
-						html: parsed.html ?? '',
-						layout:
-							parsed.layout ?? TemplateLayoutEmailEnum.DEFAULT,
-					},
-				};
-			}
-
-			return {
-				...state,
-				id: model.id,
-				values: {
-					label: model.label,
-					language: model.language,
-					type: TemplateTypeEnum.PAGE,
-					title: parsed.title ?? '',
-					html: parsed.html ?? '',
-					layout: parsed.layout ?? TemplateLayoutPageEnum.DEFAULT,
-				},
-			};
-		},
-		displayActionEntries: (entries: TemplateModel[]) => {
-			return entries.map((entry) => ({
-				id: entry.id,
-				label: `(${entry.type}) ${entry.label}`,
-			}));
-		},
+	displayEntryLabel: (entry: TemplateModel) => {
+		return `[${entry.type}] ${entry.label}`;
 	},
 	actions: {
 		create: {
-			windowType: 'form' as const,
-			component: FormManageTemplate,
-			modalProps: {
-				size: 'x4l' as const,
+			windowType: 'form',
+			windowTitle: translations['create.title'],
+			windowComponent: FormManageTemplate,
+			windowConfigProps: {
+				size: 'x4l',
 			},
 			permission: 'template.create',
-			entriesSelection: 'free' as const,
-			buttonPosition: 'right' as const,
-			operationFunction: createTemplate,
+			entriesSelection: 'free',
+			operationFunction: (params: TemplateFormValuesType) =>
+				requestCreate<TemplateModel, TemplateFormValuesType>(
+					'templates',
+					params,
+				),
+			buttonPosition: 'right',
 			button: {
-				variant: 'info' as const,
+				variant: 'info',
 			},
+			getFormValues: getFormValues,
+			validateForm: validateForm,
+			getFormState: getFormState,
 		},
 		update: {
-			windowType: 'form' as const,
-			component: FormManageTemplate,
-			modalProps: {
-				size: 'x4l' as const,
+			windowType: 'form',
+			windowTitle: translations['update.title'],
+			windowComponent: FormManageTemplate,
+			windowConfigProps: {
+				size: 'x4l',
 			},
 			permission: 'template.update',
-			entriesSelection: 'single' as const,
-			buttonPosition: 'left' as const,
-			operationFunction: updateTemplate,
+			entriesSelection: 'single',
+			operationFunction: (params: TemplateFormValuesType, id: number) =>
+				requestUpdate<TemplateModel, TemplateFormValuesType>(
+					'templates',
+					params,
+					id,
+				),
+			buttonPosition: 'left',
 			button: {
-				variant: 'outline' as const,
-				hover: 'success' as const,
+				variant: 'outline',
+				hover: 'success',
 			},
+			getFormValues: getFormValues,
+			validateForm: validateForm,
+			getFormState: getFormState,
 		},
 		delete: {
-			windowType: 'action' as const,
+			windowType: 'action',
+			windowTitle: translations['delete.title'],
 			permission: 'template.delete',
-			entriesSelection: 'single' as const,
+			entriesSelection: 'single',
 			customEntryCheck: (entry: TemplateModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			buttonPosition: 'left' as const,
-			operationFunction: deleteTemplate,
+			operationFunction: (ids: number[]) =>
+				requestDelete('templates', ids),
+			buttonPosition: 'left',
 			button: {
-				variant: 'outline' as const,
-				hover: 'error' as const,
+				variant: 'outline',
+				hover: 'error',
 			},
 		},
 		restore: {
-			windowType: 'action' as const,
+			windowType: 'action',
+			windowTitle: translations['restore.title'],
 			permission: 'template.delete',
-			entriesSelection: 'single' as const,
+			entriesSelection: 'single',
 			customEntryCheck: (entry: TemplateModel) => !!entry.deleted_at, // Return true if the entry is deleted
-			buttonPosition: 'left' as const,
-			operationFunction: restoreTemplate,
+			operationFunction: (ids: number[]) =>
+				requestRestore('templates', ids),
+			buttonPosition: 'left',
 			button: {
-				variant: 'outline' as const,
-				hover: 'info' as const,
+				variant: 'outline',
+				hover: 'info',
 			},
 		},
 		view: {
-			windowType: 'view' as const,
-			component: ViewTemplate,
-			modalProps: {
-				size: 'x4l' as const,
+			windowType: 'view',
+			windowTitle: translations['view.title'],
+			windowComponent: ViewTemplate,
+			windowConfigProps: {
+				size: 'x4l',
 			},
 			permission: 'template.read',
-			entriesSelection: 'single' as const,
-			buttonPosition: 'hidden' as const,
+			entriesSelection: 'single',
+			buttonPosition: 'hidden',
 		},
 	},
 };
+
+// TODO test form & actions

@@ -10,11 +10,10 @@
 			"confirmText": "Are you sure you want to delete the selected mail queue record(s)?"
 		},
 		"view": {
-			"title": "Mail queue details",
+			"title": "Mail queue - {{entry}}",
 			"label": "View"
 		},
 		"viewTemplate": {
-			"title": "Template details",
 			"label": "View template"
 		}
 	}

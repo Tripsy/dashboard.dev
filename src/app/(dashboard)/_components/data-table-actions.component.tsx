@@ -8,9 +8,9 @@ import { ActionButton } from '@/components/action-button.component';
 import {
 	type ActionConfigType,
 	type DataSourceKey,
-	type DataTableCustomEntrySelectedType,
 	getDataSourceConfig,
 } from '@/config/data-source.config';
+import { getErrorMessage } from '@/helpers/objects.helper';
 import { generateWindowUid } from '@/helpers/window.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { hasPermission } from '@/models/auth.model';
@@ -20,47 +20,73 @@ import { useModalStore } from '@/stores/window.store';
 import type { EntriesSelectionType } from '@/types/action.type';
 import type { WindowEntryType } from '@/types/window.type';
 
-function buildActionButtons<Entry extends WindowEntryType>(
+type HandleActionType = (
+	action: string,
+	dataSource: DataSourceKey,
+	entries: WindowEntryType[],
+	actionConfig?: ActionConfigType,
+) => Promise<void>;
+
+type AllowActionType = (
+	entries: WindowEntryType[],
+	permission: string,
+	entriesSelection: EntriesSelectionType,
+	customEntryCheck?: (entry: WindowEntryType) => boolean,
+) => boolean;
+
+function buildActionButtons(
 	position: 'left' | 'right',
-	actions: Record<string, ActionConfigType<Entry>>,
-	dataSource: string,
-	selectedEntries: Entry[],
-	allowAction: (
-		entries: Entry[],
-		permission: string,
-		entriesSelection: EntriesSelectionType,
-		customEntryCheck?: (entry: Entry) => boolean,
-	) => boolean,
-	handleAction: (
-		actionName: string,
-		entries: Entry[],
-		actionConfig: ActionConfigType<Entry>,
-	) => void,
+	actions: Record<string, ActionConfigType>,
+	dataSource: DataSourceKey,
+	selectedEntries: WindowEntryType[],
+	allowAction: AllowActionType,
+	handleAction: HandleActionType,
+	handleActionError: (error: unknown) => void,
 ) {
 	return Object.entries(actions)
 		.filter(
-			([, actionProps]) =>
-				actionProps.buttonPosition === position &&
+			([, actionConfig]) =>
+				actionConfig.buttonPosition === position &&
 				(selectedEntries.length > 0 ||
-					actionProps.entriesSelection === 'free') &&
+					actionConfig.entriesSelection === 'free') &&
 				allowAction(
 					selectedEntries,
-					actionProps.permission,
-					actionProps.entriesSelection,
-					actionProps.customEntryCheck,
+					actionConfig.permission,
+					actionConfig.entriesSelection,
+					actionConfig.customEntryCheck,
 				),
 		)
-		.map(([actionName, actionProps]) => (
+		.map(([action, actionConfig]) => (
 			<ActionButton
-				key={`button-${dataSource}-${actionName}`}
+				key={`button-${dataSource}-${action}`}
 				dataSource={dataSource}
-				action={actionName}
-				buttonProps={actionProps.button}
+				action={action}
+				buttonProps={actionConfig.button}
 				handleClick={() =>
-					handleAction(actionName, selectedEntries, actionProps)
+					handleAction(
+						action,
+						dataSource,
+						selectedEntries,
+						actionConfig,
+					).catch(handleActionError)
 				}
 			/>
 		));
+}
+
+function resolveActionEntries(
+	entries: WindowEntryType[],
+	entriesSelection: EntriesSelectionType,
+): WindowEntryType[] {
+	if (entriesSelection === 'free') {
+		return [];
+	}
+
+	if (entriesSelection === 'single') {
+		return entries[0] ? [entries[0]] : [];
+	}
+
+	return entries;
 }
 
 export function DataTableActions<
@@ -96,12 +122,12 @@ export function DataTableActions<
 
 	const { translations } = useTranslation(translationsKeys);
 
-	const allowAction = useCallback(
+	const allowAction: AllowActionType = useCallback(
 		(
-			entries: Entry[],
+			entries: WindowEntryType[],
 			permission: string,
 			entriesSelection: EntriesSelectionType,
-			customEntryCheck?: (entry: Entry) => boolean,
+			customEntryCheck?: (entry: WindowEntryType) => boolean,
 		) => {
 			if (entriesSelection === 'single') {
 				if (entries.length !== 1) {
@@ -122,78 +148,38 @@ export function DataTableActions<
 		[auth],
 	);
 
-	const resolveActionEntries = useCallback(
-		async (
-			entries: Entry[],
-			entriesSelection: EntriesSelectionType,
-			customEntrySelected?: DataTableCustomEntrySelectedType<Entry>,
-		) => {
-			if (entriesSelection === 'free') {
-				return [];
+	const handleAction: HandleActionType = useCallback(
+		async (action, targetDataSource, entries, actionConfig) => {
+			const resolvedActionConfig: ActionConfigType | undefined =
+				actionConfig ??
+				getDataSourceConfig(targetDataSource, 'actions')?.[action];
+
+			if (!resolvedActionConfig) {
+				throw new Error(`Action "${action}" is not defined`);
 			}
 
-			if (entriesSelection === 'single') {
-				if (customEntrySelected) {
-					try {
-						const resolved = await customEntrySelected(entries[0]);
-
-						return resolved ? [resolved] : [];
-					} catch (error) {
-						showToast({
-							severity: 'error',
-							summary: translations['app.text.error_title'],
-							detail: (error as Error).message,
-						});
-
-						return null;
-					}
-				}
-
-				return entries[0] ? [entries[0]] : [];
-			}
-
-			return entries;
-		},
-		[showToast, translations],
-	);
-
-	const handleAction = useCallback(
-		async (
-			actionName: string,
-			entries: Entry[],
-			actionConfig: ActionConfigType<Entry>,
-		) => {
 			if (
 				!allowAction(
 					entries,
-					actionConfig.permission,
-					actionConfig.entriesSelection,
-					actionConfig.customEntryCheck,
+					resolvedActionConfig.permission,
+					resolvedActionConfig.entriesSelection,
+					resolvedActionConfig.customEntryCheck,
 				)
 			) {
-				showToast({
-					severity: 'error',
-					summary: translations['app.text.error_title'],
-					detail: translations['app.error.operation_not_allowed'],
-				});
-
-				return;
+				throw new Error(
+					translations['app.error.operation_not_allowed'],
+				);
 			}
 
-			const actionEntries = await resolveActionEntries(
+			const actionEntries = resolveActionEntries(
 				entries,
-				actionConfig.entriesSelection,
-				actionConfig.customEntrySelected,
+				resolvedActionConfig.entriesSelection,
 			);
 
-			if (actionEntries === null) {
-				return;
-			}
-
 			const uid = generateWindowUid({
-				dataSource,
-				action: actionName,
-				entriesSelection: actionConfig.entriesSelection,
+				dataSource: targetDataSource,
+				action,
+				entriesSelection: resolvedActionConfig.entriesSelection,
 				entries: actionEntries,
 			});
 
@@ -202,47 +188,38 @@ export function DataTableActions<
 					uid,
 					minimized: false,
 					section: 'dashboard',
-					dataSource: dataSource,
-					action: actionName,
+					dataSource: targetDataSource,
+					action: action,
 					data: {
 						entries: actionEntries,
 					},
 				},
-				uid,
+				uid, // `uid` is provided as second arg to replace an existing window with the same uid; a new window is created if it doesn't exist yet
 			);
 		},
-		[
-			allowAction,
-			dataSource,
-			resolveActionEntries,
-			translations,
-			open,
-			showToast,
-		],
+		[allowAction, open, translations],
+	);
+
+	const handleActionError = useCallback(
+		(error: unknown) => {
+			showToast({
+				severity: 'error',
+				summary: translations['app.text.error_title'],
+				detail: getErrorMessage(error),
+			});
+		},
+		[showToast, translations],
 	);
 
 	useEffect(() => {
-		return addDataTableActionListener<Entry>(({ actionName, entry }) => {
-			const actionProps = actions?.[actionName];
-
-			if (!actionProps) {
-				showToast({
-					severity: 'error',
-					summary: translations['app.text.error_title'],
-					detail: `Action "${actionName}" is not defined`,
-				});
-				return;
-			}
-
-			handleAction(actionName, [entry], actionProps).catch((error) => {
-				showToast({
-					severity: 'error',
-					summary: translations['app.text.error_title'],
-					detail: (error as Error).message,
-				});
-			});
-		});
-	}, [actions, handleAction, showToast, translations]);
+		return addDataTableActionListener<Entry>(
+			({ action, dataSource, entries }) => {
+				handleAction(action, dataSource, entries).catch(
+					handleActionError,
+				);
+			},
+		);
+	}, [handleAction, handleActionError]);
 
 	const leftActions = useMemo(
 		() =>
@@ -254,9 +231,17 @@ export function DataTableActions<
 						selectedEntries,
 						allowAction,
 						handleAction,
+						handleActionError,
 					)
 				: null,
-		[actions, dataSource, selectedEntries, allowAction, handleAction],
+		[
+			actions,
+			dataSource,
+			selectedEntries,
+			allowAction,
+			handleAction,
+			handleActionError,
+		],
 	);
 
 	const rightActions = useMemo(
@@ -269,9 +254,17 @@ export function DataTableActions<
 						selectedEntries,
 						allowAction,
 						handleAction,
+						handleActionError,
 					)
 				: null,
-		[actions, dataSource, selectedEntries, allowAction, handleAction],
+		[
+			actions,
+			dataSource,
+			selectedEntries,
+			allowAction,
+			handleAction,
+			handleActionError,
+		],
 	);
 
 	return (

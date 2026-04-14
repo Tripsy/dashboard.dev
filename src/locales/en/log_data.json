@@ -10,14 +10,8 @@
 			"confirmText": "Are you sure you want to delete the selected log(s)?"
 		},
 		"view": {
-			"title": "Log details",
+			"title": "Log - {{entry}}",
 			"label": "View"
 		}
-	},
-	"form_filters": {
-		"label_global": "",
-		"label_category": "Category",
-		"label_level": "Level",
-		"label_created_at": "Created At"
 	}
 }

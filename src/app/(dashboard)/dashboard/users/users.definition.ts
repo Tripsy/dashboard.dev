@@ -10,6 +10,14 @@ import type { DataSourceConfigType } from '@/config/data-source.config';
 import { Configuration } from '@/config/settings.config';
 import { translateBatch } from '@/config/translate.setup';
 import { getFormDataAsEnum, getFormDataAsString } from '@/helpers/form.helper';
+import {
+	requestCreate,
+	requestDelete,
+	requestFind,
+	requestRestore,
+	requestUpdate,
+	requestUpdateStatus,
+} from '@/helpers/services.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import {
 	LANGUAGE_DEFAULT,
@@ -20,15 +28,7 @@ import {
 	UserRoleEnum,
 	UserStatusEnum,
 } from '@/models/user.model';
-import {
-	createUser,
-	deleteUser,
-	disableUser,
-	enableUser,
-	findUsers,
-	restoreUser,
-	updateUser,
-} from '@/services/users.service';
+import type { FindFunctionParamsType } from '@/types/action.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(
@@ -199,6 +199,18 @@ class UserValidator extends BaseValidator<typeof validatorMessages> {
 		});
 }
 
+function validateFormCreate(values: UserFormValuesType) {
+	const validator = new UserValidator(validatorMessages);
+
+	return validator.create.safeParse(values);
+}
+
+function validateFormUpdate(values: UserFormValuesType) {
+	const validator = new UserValidator(validatorMessages);
+
+	return validator.update.safeParse(values);
+}
+
 function getFormValues(formData: FormData): UserFormValuesType {
 	return {
 		name: getFormDataAsString(formData, 'name'),
@@ -227,25 +239,13 @@ function getFormState(data?: UserModel): FormStateType<UserFormValuesType> {
 		values: {
 			name: data?.name ?? '',
 			email: data?.email ?? '',
-			password: '',
+			password: '', // TODO test this
 			password_confirm: '',
 			language: data?.language ?? LanguageEnum.EN,
 			role: data?.role ?? UserRoleEnum.MEMBER,
 			operator_type: data?.operator_type ?? null,
 		},
 	};
-}
-
-function validateFormCreate(values: UserFormValuesType) {
-	const validator = new UserValidator(validatorMessages);
-
-	return validator.create.safeParse(values);
-}
-
-function validateFormUpdate(values: UserFormValuesType) {
-	const validator = new UserValidator(validatorMessages);
-
-	return validator.create.safeParse(values);
 }
 
 export type UsersDataTableFiltersType = {
@@ -289,9 +289,9 @@ export const dataSourceConfigUsers: DataSourceConfigType<
 				) =>
 					DataTableValue(entry, column, {
 						markDeleted: true,
-						action: {
-							name: 'view',
-							source: 'users',
+						displayButton: {
+							action: 'view',
+							dataSource: 'users',
 						},
 					}),
 			},
@@ -313,13 +313,13 @@ export const dataSourceConfigUsers: DataSourceConfigType<
 				) =>
 					DataTableValue(entry, column, {
 						capitalize: true,
-						action: {
-							name: (entry: UserModel) => {
+						displayButton: {
+							action: (entry: UserModel) => {
 								return entry.role === UserRoleEnum.OPERATOR
 									? 'permissions'
-									: null;
+									: undefined;
 							},
-							source: 'users',
+							dataSource: 'users',
 						},
 					}),
 			},
@@ -333,15 +333,15 @@ export const dataSourceConfigUsers: DataSourceConfigType<
 					DataTableValue(entry, column, {
 						isStatus: true,
 						markDeleted: true,
-						action: {
-							name: (entry: UserModel) => {
+						displayButton: {
+							action: (entry: UserModel) => {
 								return entry.deleted_at
 									? 'restore'
 									: entry.status === UserStatusEnum.ACTIVE
 										? 'disable'
 										: 'enable';
 							},
-							source: 'users',
+							dataSource: 'users',
 						},
 					}),
 				style: {
@@ -362,7 +362,8 @@ export const dataSourceConfigUsers: DataSourceConfigType<
 					}),
 			},
 		],
-		find: findUsers,
+		find: (params: FindFunctionParamsType) =>
+			requestFind<UserModel>('users', params),
 		// onRowSelect: (entry: UserModel) => console.log('selected', entry),
 		// onRowUnselect: (entry: UserModel) => console.log('unselected', entry),
 	},
@@ -376,7 +377,8 @@ export const dataSourceConfigUsers: DataSourceConfigType<
 			windowComponent: FormManageUser,
 			permission: 'user.create',
 			entriesSelection: 'free',
-			operationFunction: createUser,
+			operationFunction: (params: UserFormValuesType) =>
+				requestCreate<UserModel, UserFormValuesType>('users', params),
 			buttonPosition: 'right',
 			button: {
 				variant: 'info',
@@ -396,7 +398,12 @@ export const dataSourceConfigUsers: DataSourceConfigType<
 			windowComponent: FormManageUser,
 			permission: 'user.update',
 			entriesSelection: 'single',
-			operationFunction: updateUser,
+			operationFunction: (params: UserFormValuesType, id: number) =>
+				requestUpdate<UserModel, UserFormValuesType>(
+					'users',
+					params,
+					id,
+				),
 			buttonPosition: 'left',
 			button: {
 				variant: 'outline',
@@ -412,7 +419,7 @@ export const dataSourceConfigUsers: DataSourceConfigType<
 			permission: 'user.delete',
 			entriesSelection: 'single',
 			customEntryCheck: (entry: UserModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			operationFunction: deleteUser,
+			operationFunction: (ids: number[]) => requestDelete('users', ids),
 			buttonPosition: 'left',
 			button: {
 				variant: 'outline',
@@ -429,7 +436,8 @@ export const dataSourceConfigUsers: DataSourceConfigType<
 				[UserStatusEnum.PENDING, UserStatusEnum.INACTIVE].includes(
 					entry.status,
 				),
-			operationFunction: enableUser,
+			operationFunction: (ids: number[]) =>
+				requestUpdateStatus('users', ids, 'active'),
 			buttonPosition: 'left',
 			button: {
 				variant: 'outline',
@@ -446,7 +454,8 @@ export const dataSourceConfigUsers: DataSourceConfigType<
 				[UserStatusEnum.PENDING, UserStatusEnum.ACTIVE].includes(
 					entry.status,
 				),
-			operationFunction: disableUser,
+			operationFunction: (ids: number[]) =>
+				requestUpdateStatus('users', ids, 'inactive'),
 			buttonPosition: 'left',
 			button: {
 				variant: 'outline',
@@ -459,7 +468,7 @@ export const dataSourceConfigUsers: DataSourceConfigType<
 			permission: 'user.delete',
 			entriesSelection: 'single',
 			customEntryCheck: (entry: UserModel) => !!entry.deleted_at, // Return true if the entry is deleted
-			operationFunction: restoreUser,
+			operationFunction: (ids: number[]) => requestRestore('users', ids),
 			buttonPosition: 'left',
 			button: {
 				variant: 'outline',

@@ -1,5 +1,5 @@
-import { DisplayStatus } from '@/app/(dashboard)/_components/data-table-value';
 import { formatDate } from '@/helpers/date.helper';
+import { DisplayStatus } from '@/helpers/display.helper';
 import type { MailQueueModel } from '@/models/mail-queue.model';
 
 export function ViewMailQueue({ entry }: { entry: MailQueueModel }) {

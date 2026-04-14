@@ -29,10 +29,6 @@ import type {
 
 export type DataTableSelectionModeType = 'checkbox' | 'multiple' | null;
 
-export type DataTableCustomEntrySelectedType<Entry> = (
-	entry: Entry,
-) => Promise<Entry | null>;
-
 export type DataTableFiltersType = {
 	[key: string]: {
 		value: string | number | boolean | Date | null;
@@ -80,8 +76,6 @@ type ActionConfigBase<
 	getFormState?: GetFormStateFnType<FormValues, Entry>;
 
 	events?: Partial<Record<'success' | 'error', ActionEventType<Entry>>>;
-
-	customEntrySelected?: DataTableCustomEntrySelectedType<Entry>; // Custom function which allows to derive a new entry from the selected one (hint: viewUser)
 };
 
 // Each variant enforces the valid windowType <-> entriesSelection correlation
@@ -174,7 +168,7 @@ export type DataSourceKey =
 
 export type DataSourceConfigType<
 	Entry extends WindowEntryType,
-	FormValues extends FormValuesType,
+	FormValues extends FormValuesType = FormValuesType,
 > = {
 	dataTable: {
 		state: DataTableStateType;
@@ -184,7 +178,6 @@ export type DataSourceConfigType<
 		onRowUnselect?: (entry: Entry) => void;
 	};
 	displayEntryLabel?: DisplayEntryLabelFnType<Entry>;
-	// formState?: FormStateType<FormValues>;
 	actions?: ActionsType<Entry, FormValues>;
 };
 

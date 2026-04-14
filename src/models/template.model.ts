@@ -15,18 +15,18 @@ export enum TemplateLayoutPageEnum {
 	ARTICLE = 'article',
 }
 
-export type TemplateContentPageType = {
-	title: string;
-	html: string;
-	layout: TemplateLayoutPageEnum;
-};
-
 export type TemplateContentEmailType = {
 	subject: string;
 	layout: TemplateLayoutEmailEnum;
 	html: string;
 	text?: string;
 	vars: Record<string, unknown>;
+};
+
+export type TemplateContentPageType = {
+	title: string;
+	html: string;
+	layout: TemplateLayoutPageEnum;
 };
 
 export type TemplateModel<D = Date | string> = {

@@ -1,16 +1,23 @@
 import {
 	type DataTableColumnType,
 	DataTableValue,
+	type DataTableValueOptionsType,
 } from '@/app/(dashboard)/_components/data-table-value';
 import { ViewMailQueue } from '@/app/(dashboard)/dashboard/mail-queue/view-mail-queue.component';
-import { ViewTemplate } from '@/app/(dashboard)/dashboard/templates/view-template.component';
+import type { DataSourceConfigType } from '@/config/data-source.config';
+import { translateBatch } from '@/config/translate.setup';
 import { formatDate } from '@/helpers/date.helper';
+import { requestDeleteMultiple, requestFind } from '@/helpers/services.helper';
 import type {
 	MailQueueModel,
 	MailQueueStatusEnum,
 } from '@/models/mail-queue.model';
-import { deleteMailQueue, findMailQueue } from '@/services/mail-queue.service';
-import { getTemplate } from '@/services/templates.service';
+import type { FindFunctionParamsType } from '@/types/action.type';
+
+const translations = await translateBatch(
+	['delete.title', 'view.title', 'viewTemplate.label'],
+	'mail-queue.action',
+);
 
 export type MailQueueDataTableFiltersType = {
 	status: { value: MailQueueStatusEnum | null; matchMode: 'equals' };
@@ -30,132 +37,128 @@ const mailQueueDataTableFilters: MailQueueDataTableFiltersType = {
 	sent_date_end: { value: null, matchMode: 'equals' },
 };
 
-export const dataSourceConfigMailQueue = {
-	dataTableState: {
-		first: 0,
-		rows: 10,
-		sortField: 'id',
-		sortOrder: -1 as const,
-		filters: mailQueueDataTableFilters,
-	},
-	dataTableColumns: [
-		{
-			field: 'id',
-			header: 'ID',
-			sortable: true,
-			body: (
-				entry: MailQueueModel,
-				column: DataTableColumnType<MailQueueModel>,
-			) =>
-				DataTableValue(entry, column, {
-					markDeleted: true,
-					action: {
-						name: 'view',
-						source: 'mail-queue',
-					},
-				}),
+function displayButtonViewTemplate(
+	entry: MailQueueModel,
+): DataTableValueOptionsType<MailQueueModel>['displayButton'] {
+	if (!entry.template) {
+		return undefined;
+	}
+
+	return {
+		action: 'view',
+		dataSource: 'templates',
+		altTitle: translations['viewTemplate.label'],
+		alternateEntryId: entry.template.id,
+	};
+}
+
+export const dataSourceConfigMailQueue: DataSourceConfigType<MailQueueModel> = {
+	dataTable: {
+		state: {
+			first: 0,
+			rows: 10,
+			sortField: 'id',
+			sortOrder: -1 as const,
+			filters: mailQueueDataTableFilters,
 		},
-		{
-			field: 'template',
-			header: 'Template',
-			body: (
-				entry: MailQueueModel,
-				column: DataTableColumnType<MailQueueModel>,
-			) =>
-				DataTableValue(entry, column, {
-					customValue: entry.template?.label || 'n/a',
-					action: {
-						name: 'viewTemplate',
-						source: 'mail-queue',
-					},
-				}),
-		},
-		{
-			field: 'to',
-			header: 'To',
-			body: (
-				entry: MailQueueModel,
-				column: DataTableColumnType<MailQueueModel>,
-			) =>
-				DataTableValue(entry, column, {
-					customValue: entry.to.address,
-				}),
-		},
-		{
-			field: 'status',
-			header: 'Status',
-			body: (
-				entry: MailQueueModel,
-				column: DataTableColumnType<MailQueueModel>,
-			) =>
-				DataTableValue(entry, column, {
-					isStatus: true,
-				}),
-			style: {
-				minWidth: '6rem',
-				maxWidth: '6rem',
+		columns: [
+			{
+				field: 'id',
+				header: 'ID',
+				sortable: true,
+				body: (
+					entry: MailQueueModel,
+					column: DataTableColumnType<MailQueueModel>,
+				) =>
+					DataTableValue(entry, column, {
+						markDeleted: true,
+						displayButton: {
+							action: 'view',
+							dataSource: 'mail-queue',
+						},
+					}),
 			},
-		},
-		{
-			field: 'sent_at',
-			header: 'Sent At',
-			sortable: true,
-			body: (
-				entry: MailQueueModel,
-				column: DataTableColumnType<MailQueueModel>,
-			) =>
-				DataTableValue(entry, column, {
-					displayDate: true,
-				}),
-		},
-	],
-	functions: {
-		find: findMailQueue,
-		displayActionEntries: (entries: MailQueueModel[]) => {
-			return entries.map((entry) => ({
-				id: entry.id,
-				label: formatDate(entry.sent_at) || '',
-			}));
-		},
+			{
+				field: 'template',
+				header: 'Template',
+				body: (
+					entry: MailQueueModel,
+					column: DataTableColumnType<MailQueueModel>,
+				) =>
+					DataTableValue(entry, column, {
+						customValue: entry.template?.label || 'n/a',
+						displayButton: displayButtonViewTemplate(entry),
+					}),
+			},
+			{
+				field: 'to',
+				header: 'To',
+				body: (
+					entry: MailQueueModel,
+					column: DataTableColumnType<MailQueueModel>,
+				) =>
+					DataTableValue(entry, column, {
+						customValue: entry.to.address,
+					}),
+			},
+			{
+				field: 'status',
+				header: 'Status',
+				body: (
+					entry: MailQueueModel,
+					column: DataTableColumnType<MailQueueModel>,
+				) =>
+					DataTableValue(entry, column, {
+						isStatus: true,
+					}),
+				style: {
+					minWidth: '6rem',
+					maxWidth: '6rem',
+				},
+			},
+			{
+				field: 'sent_at',
+				header: 'Sent At',
+				sortable: true,
+				body: (
+					entry: MailQueueModel,
+					column: DataTableColumnType<MailQueueModel>,
+				) =>
+					DataTableValue(entry, column, {
+						displayDate: true,
+					}),
+			},
+		],
+		find: (params: FindFunctionParamsType) =>
+			requestFind<MailQueueModel>('mail-queue', params),
+	},
+	displayEntryLabel: (entry: MailQueueModel) => {
+		return formatDate(entry.sent_at) || '';
 	},
 	actions: {
 		delete: {
-			windowType: 'action' as const,
+			windowType: 'action',
+			windowTitle: translations['delete.title'],
 			permission: 'mail-queue.delete',
-			entriesSelection: 'multiple' as const,
-			buttonPosition: 'left' as const,
-			operationFunction: deleteMailQueue,
+			entriesSelection: 'multiple',
+			operationFunction: (ids: number[]) =>
+				requestDeleteMultiple('mail-queue', ids),
+			buttonPosition: 'left',
 			button: {
-				variant: 'outline' as const,
-				hover: 'error' as const,
+				variant: 'outline',
+				hover: 'error',
 			},
 		},
 		view: {
-			windowType: 'view' as const,
-			component: ViewMailQueue,
-			modalProps: {
-				size: 'x4l' as const,
+			windowType: 'view',
+			windowTitle: translations['view.title'],
+			windowComponent: ViewMailQueue,
+			windowConfigProps: {
+				size: 'x4l',
 			},
 			permission: 'mail-queue.read',
-			entriesSelection: 'single' as const,
-			buttonPosition: 'hidden' as const,
-		},
-		viewTemplate: {
-			windowType: 'view' as const,
-			component: ViewTemplate,
-			modalProps: {
-				size: 'x4l' as const,
-			},
-			customEntrySelected: async (entry: MailQueueModel) => {
-				if (entry.template) {
-					return (await getTemplate(entry.template.id)) || null;
-				}
-
-				return null;
-			},
-			permission: 'template.read',
-			entriesSelection: 'single' as const,
-			buttonPosition: 'hidden' as const,
+			entriesSelection: 'single',
+			buttonPosition: 'hidden',
 		},
 	},
 };

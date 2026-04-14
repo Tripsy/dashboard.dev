@@ -144,7 +144,7 @@ export function WindowForm<
 						errors={errors as Record<string, string[]>} // remove `as`
 						button={{
 							variant: buttonSubmit?.variant || 'info',
-							label: buttonSubmit?.label || 'Submit',
+							label: (buttonSubmit?.label as string) || 'Submit',
 							iconLabel: buttonSubmit?.icon || 'submit',
 							iconSize: 16,
 						}}

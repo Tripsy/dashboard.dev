@@ -5,11 +5,11 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { LoadingComponent } from '@/components/status.component';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { requestFind } from '@/helpers/services.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import type { PermissionModel } from '@/models/permission.model';
 import type { UserModel } from '@/models/user.model';
 import { useToast } from '@/providers/toast.provider';
-import { findPermissions } from '@/services/permissions.service';
 import {
 	createUserPermissions,
 	deleteUserPermission,
@@ -48,7 +48,11 @@ export function SetupPermissionsUser({
 			{ order_by: 'id', direction: 'ASC', limit: 999 },
 		],
 		queryFn: () =>
-			findPermissions({ order_by: 'id', direction: 'ASC', limit: 999 }),
+			requestFind<PermissionModel>('permissions', {
+				order_by: 'id',
+				direction: 'ASC',
+				limit: 999,
+			}),
 	});
 
 	const {

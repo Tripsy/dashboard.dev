@@ -3,15 +3,21 @@
 import { WindowDock } from '@/components/window/window-dock.component';
 import { WindowInstance } from '@/components/window/window-instance.component';
 import { useModalStore } from '@/stores/window.store';
+import type { WindowConfig } from '@/types/window.type';
 
-export function WindowContainer() {
+export function WindowContainer({
+	section,
+}: {
+	section: WindowConfig['section'];
+}) {
 	const { stack } = useModalStore();
 
-	const activeWindow = stack.find((m) => !m.minimized);
+	const modals = stack.filter((m) => m.section === section);
+	const activeWindow = modals.find((m) => !m.minimized);
 
 	return (
 		<>
-			{stack.map((current) => {
+			{modals.map((current) => {
 				const isForm = current.definition.windowType === 'form';
 				const isMinimized = current.minimized;
 
@@ -29,8 +35,8 @@ export function WindowContainer() {
 				);
 			})}
 
-			{stack.length > 0 && (
-				<WindowDock modals={stack} active={activeWindow?.uid} />
+			{modals.length > 0 && (
+				<WindowDock modals={modals} active={activeWindow?.uid} />
 			)}
 		</>
 	);

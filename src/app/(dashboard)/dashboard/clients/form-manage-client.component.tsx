@@ -9,6 +9,7 @@ import {
 	type ClientFormValuesType,
 	ClientTypeEnum,
 } from '@/models/client.model';
+import { useWindowForm } from '@/providers/window-form.provider';
 
 const clientTypes = Object.values(ClientTypeEnum).map((v) => ({
 	label: formatEnumLabel(v),
@@ -16,6 +17,9 @@ const clientTypes = Object.values(ClientTypeEnum).map((v) => ({
 }));
 
 export function FormManageClient() {
+	const { formValues, errors, handleChange, pending } =
+		useWindowForm<ClientFormValuesType>();
+
 	const elementIds = useElementIds([
 		'clientType',
 		'companyName',

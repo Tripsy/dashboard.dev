@@ -237,10 +237,10 @@ function getFormState(data?: UserModel): FormStateType<UserFormValuesType> {
 		message: null,
 		situation: null,
 		values: {
-			name: data?.name ?? '',
-			email: data?.email ?? '',
-			password: '', // TODO test this
-			password_confirm: '',
+			name: data?.name ?? null,
+			email: data?.email ?? null,
+			password: null,
+			password_confirm: null,
 			language: data?.language ?? LanguageEnum.EN,
 			role: data?.role ?? UserRoleEnum.MEMBER,
 			operator_type: data?.operator_type ?? null,

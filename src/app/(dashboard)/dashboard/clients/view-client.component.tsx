@@ -1,8 +1,9 @@
 'use client';
 
 import { formatDate } from '@/helpers/date.helper';
+import { DisplayStatus } from '@/helpers/display.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
-import type { ClientModel } from '@/models/client.model';
+import { type ClientModel, ClientTypeEnum } from '@/models/client.model';
 
 export function ViewClient({ entry }: { entry: ClientModel }) {
 	return (
@@ -15,6 +16,44 @@ export function ViewClient({ entry }: { entry: ClientModel }) {
 					<span className="font-semibold">Type</span>{' '}
 					{formatEnumLabel(entry.client_type)}
 				</div>
+				<div className="flex items-center gap-2">
+					<span className="font-semibold">Status</span>{' '}
+					<div className="max-w-60">
+						<DisplayStatus status={entry.status} />
+					</div>
+				</div>
+				{entry.client_type === ClientTypeEnum.COMPANY && (
+					<>
+						<div>
+							<span className="font-semibold">Name</span>{' '}
+							{entry.company_name}
+						</div>
+						<div>
+							<span className="font-semibold">CUI</span>{' '}
+							{entry.company_cui}
+						</div>
+						<div>
+							<span className="font-semibold">Reg. Com</span>{' '}
+							{entry.company_reg_com}
+						</div>
+					</>
+				)}
+				{entry.client_type === ClientTypeEnum.PERSON && (
+					<>
+						<div>
+							<span className="font-semibold">Name</span>{' '}
+							{entry.person_name}
+						</div>
+						{entry.person_identification_number && (
+							<div>
+								<span className="font-semibold">
+									Personal ID
+								</span>{' '}
+								{entry.person_identification_number}
+							</div>
+						)}
+					</>
+				)}
 			</div>
 
 			<div>

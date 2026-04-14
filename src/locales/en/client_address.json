@@ -19,30 +19,25 @@
 			"success": "New client address added successfully"
 		},
 		"update": {
-			"title": "Edit address",
+			"title": "Edit address - {{entry}}",
 			"label": "Update",
 			"success": "Client address updated successfully"
 		},
 		"delete": {
-			"title": "Delete client address",
+			"title": "Delete address - {{entry}}",
 			"label": "Delete",
 			"success": "Client address deleted successfully",
 			"confirmText": "Are you sure you want to delete this client address?"
 		},
 		"restore": {
-			"title": "Restore client address",
+			"title": "Restore address - {{entry}}",
 			"label": "Restore",
 			"success": "Client address restored successfully",
 			"confirmText": "Are you sure you want to restore this client address?"
 		},
 		"view": {
-			"title": "Address details",
+			"title": "Address details  - {{entry}}",
 			"label": "View details"
-		},
-		"createClient": {
-			"title": "New client",
-			"label": "Add",
-			"success": "Client created successfully"
 		}
 	}
 }

@@ -159,7 +159,7 @@ function getFormState(
 		message: null,
 		situation: null,
 		values: {
-			label: data?.label ?? '',
+			label: data?.label ?? null,
 			language: data?.language ?? LanguageEnum.EN,
 			type: type,
 		},
@@ -180,8 +180,8 @@ function getFormState(
 			...state,
 			values: {
 				...state.values,
-				subject: parsed.subject ?? '',
-				html: parsed.html ?? '',
+				subject: parsed.subject ?? null,
+				html: parsed.html ?? null,
 				layout: parsed.layout ?? TemplateLayoutEmailEnum.DEFAULT,
 			},
 		};
@@ -201,8 +201,8 @@ function getFormState(
 		...state,
 		values: {
 			...state.values,
-			title: parsed.title ?? '',
-			html: parsed.html ?? '',
+			title: parsed.title ?? null,
+			html: parsed.html ?? null,
 			layout: parsed.layout ?? TemplateLayoutPageEnum.DEFAULT,
 		},
 	};

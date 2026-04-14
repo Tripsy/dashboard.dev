@@ -7,8 +7,12 @@ import {
 	type PermissionFormValuesType,
 	PermissionOperationSuggestions,
 } from '@/models/permission.model';
+import { useWindowForm } from '@/providers/window-form.provider';
 
 export function FormManagePermission() {
+	const { formValues, errors, handleChange, pending } =
+		useWindowForm<PermissionFormValuesType>();
+
 	const elementIds = useElementIds(['entity', 'operation']);
 
 	const entityAutocomplete = useLocalAutocomplete({

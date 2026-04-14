@@ -6,7 +6,7 @@ import {
 	FormFiltersDateRange,
 	FormFiltersReset,
 	FormFiltersSearch,
-	FormFiltersSelect,
+	FormFiltersSelect, FormFiltersShowDeleted,
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
 import type { ClientsDataTableFiltersType } from '@/app/(dashboard)/dashboard/clients/clients.definition';
@@ -122,6 +122,11 @@ export const DataTableClientsFilters = (): JSX.Element => {
 					onSelect: (value) =>
 						setFilterValue('create_date_end', value),
 				}}
+			/>
+
+			<FormFiltersShowDeleted
+				checked={filters.is_deleted.value ?? false}
+				onCheckedChange={(value) => setFilterValue('is_deleted', value)}
 			/>
 
 			<FormFiltersReset dataSource="clients" />

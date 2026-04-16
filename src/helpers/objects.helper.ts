@@ -74,6 +74,37 @@ export function setObjectValue(
 }
 
 /**
+ * Set the value of a key in an object
+ * ex: key = "user.create", value = "new value"
+ * Returns a new object with the value set at the dot-separated path (immutable)
+ *
+ * @param obj
+ * @param path
+ * @param value
+ */
+export function setNestedValue<T extends Record<string, unknown>>(
+	obj: T,
+	path: string,
+	value: unknown,
+): T {
+	const [head, ...rest] = path.split('.');
+
+	if (rest.length === 0) {
+		return { ...obj, [head]: value };
+	}
+
+	const nested =
+		obj[head] && typeof obj[head] === 'object'
+			? (obj[head] as Record<string, unknown>)
+			: {};
+
+	return {
+		...obj,
+		[head]: setNestedValue(nested, rest.join('.'), value),
+	};
+}
+
+/**
  * Check if an object has at least one value
  *
  * @param {unknown} obj - The object to check

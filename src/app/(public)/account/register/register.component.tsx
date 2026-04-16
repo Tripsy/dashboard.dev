@@ -189,7 +189,7 @@ export default function Register() {
 					fieldValue={formValues.language}
 					disabled={pending}
 					options={languages}
-					onValueChange={(value) =>
+					onChange={(value) =>
 						handleChange('language', value as LanguageEnum)
 					}
 					error={errors.language}

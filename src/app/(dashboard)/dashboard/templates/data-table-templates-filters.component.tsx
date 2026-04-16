@@ -91,7 +91,7 @@ export const DataTableTemplatesFilters = (): React.JSX.Element => {
 				fieldName="language"
 				fieldValue={filters.language.value}
 				options={languages}
-				onValueChange={(value) => setFilterValue('language', value)}
+				onChange={(value) => setFilterValue('language', value)}
 			/>
 
 			<FormFiltersSelect<TemplateDataTableFiltersType>
@@ -99,7 +99,7 @@ export const DataTableTemplatesFilters = (): React.JSX.Element => {
 				fieldName="type"
 				fieldValue={filters.type.value}
 				options={types}
-				onValueChange={(value) =>
+				onChange={(value) =>
 					setFilterValue('type', value as TemplateTypeEnum)
 				}
 			/>

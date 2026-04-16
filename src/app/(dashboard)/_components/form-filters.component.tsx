@@ -57,7 +57,7 @@ export function FormFiltersSelect<Fields>({
 	fieldValue,
 	placeholderText = 'Select...',
 	options,
-	onValueChange,
+	onChange,
 	className,
 }: {
 	labelText: string;
@@ -65,7 +65,7 @@ export function FormFiltersSelect<Fields>({
 	fieldValue: OptionValueType;
 	placeholderText?: string;
 	options: OptionsType;
-	onValueChange: (value: string) => void;
+	onChange: (value: string) => void;
 	className?: string;
 }) {
 	const elementKey = `search-${String(fieldName)}`;
@@ -81,7 +81,7 @@ export function FormFiltersSelect<Fields>({
 			disabled={false}
 			placeholderText={placeholderText}
 			options={options}
-			onValueChange={onValueChange}
+			onChange={onChange}
 		/>
 	);
 }

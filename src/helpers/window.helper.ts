@@ -35,7 +35,7 @@ export function displayWindowTitle({
 export function generateWindowUid<Entry>({
 	dataSource,
 	action,
-	entriesSelection,
+	entriesSelection = 'free',
 	entries,
 }: {
 	dataSource: string;
@@ -44,8 +44,14 @@ export function generateWindowUid<Entry>({
 	entries?: Entry[];
 }) {
 	if (entriesSelection === 'single') {
+		const entry = entries?.[0];
+
+		if (!entry) {
+			throw new Error(`Entry not defined for window type "${dataSource}-${action}"`);
+		}
+
 		// We assume every entry has an `id` property & entries exist
-		const entryId = (entries?.[0] as { id: number }).id;
+		const entryId = (entry as unknown as { id: number }).id;
 
 		return `${dataSource}-${action}-${entryId}`;
 	}

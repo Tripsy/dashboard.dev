@@ -6,7 +6,8 @@ import {
 	FormFiltersDateRange,
 	FormFiltersReset,
 	FormFiltersSearch,
-	FormFiltersSelect, FormFiltersShowDeleted,
+	FormFiltersSelect,
+	FormFiltersShowDeleted,
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
 import type { ClientsDataTableFiltersType } from '@/app/(dashboard)/dashboard/clients/clients.definition';
@@ -93,7 +94,7 @@ export const DataTableClientsFilters = (): JSX.Element => {
 				fieldName="status"
 				fieldValue={filters.status.value}
 				options={statuses}
-				onValueChange={(value) =>
+				onChange={(value) =>
 					setFilterValue('status', value as ClientStatusEnum)
 				}
 			/>
@@ -103,7 +104,7 @@ export const DataTableClientsFilters = (): JSX.Element => {
 				fieldName="client_type"
 				fieldValue={filters.client_type.value}
 				options={clientTypes}
-				onValueChange={(value) =>
+				onChange={(value) =>
 					setFilterValue('client_type', value as ClientTypeEnum)
 				}
 			/>

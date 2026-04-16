@@ -15,6 +15,8 @@ export function WindowContainer({
 	const modals = stack.filter((m) => m.section === section);
 	const activeWindow = modals.find((m) => !m.minimized);
 
+	console.log(section, modals)
+
 	return (
 		<>
 			{modals.map((current) => {

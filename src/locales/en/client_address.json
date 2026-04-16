@@ -36,8 +36,11 @@
 			"confirmText": "Are you sure you want to restore this client address?"
 		},
 		"view": {
-			"title": "Address details  - {{entry}}",
+			"title": "Address details - {{entry}}",
 			"label": "View details"
+		},
+		"viewClient": {
+			"label": "View client"
 		}
 	}
 }

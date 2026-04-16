@@ -176,26 +176,15 @@ export function DataTableActions<
 				resolvedActionConfig.entriesSelection,
 			);
 
-			const uid = generateWindowUid({
+			open({
+				minimized: false,
+				section: 'dashboard',
 				dataSource: targetDataSource,
-				action,
-				entriesSelection: resolvedActionConfig.entriesSelection,
-				entries: actionEntries,
-			});
-
-			open(
-				{
-					uid,
-					minimized: false,
-					section: 'dashboard',
-					dataSource: targetDataSource,
-					action: action,
-					data: {
-						entries: actionEntries,
-					},
+				action: action,
+				data: {
+					entries: actionEntries,
 				},
-				uid, // `uid` is provided as second arg to replace an existing window with the same uid; a new window is created if it doesn't exist yet
-			);
+			});
 		},
 		[allowAction, open, translations],
 	);

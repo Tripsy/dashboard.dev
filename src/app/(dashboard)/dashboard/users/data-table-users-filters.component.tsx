@@ -94,7 +94,7 @@ export const DataTableUsersFilters = (): JSX.Element => {
 				fieldName="status"
 				fieldValue={filters.status.value}
 				options={statuses}
-				onValueChange={(value) =>
+				onChange={(value) =>
 					setFilterValue('status', value as UserStatusEnum)
 				}
 			/>
@@ -104,7 +104,7 @@ export const DataTableUsersFilters = (): JSX.Element => {
 				fieldName="role"
 				fieldValue={filters.role.value}
 				options={roles}
-				onValueChange={(value) =>
+				onChange={(value) =>
 					setFilterValue('role', value as UserRoleEnum)
 				}
 			/>

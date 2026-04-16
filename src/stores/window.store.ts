@@ -10,10 +10,11 @@ import type {
 	WindowCreateConfig,
 	WindowDefinition,
 } from '@/types/window.type';
+import {generateWindowUid} from "@/helpers/window.helper";
 
 type WindowStore = {
 	stack: WindowConfig[];
-	open: (config: WindowCreateConfig, uid?: string) => string; // Replace existing window; create if not found
+	open: (config: WindowCreateConfig, replacedUid?: string) => string;  // If argument `replacedUid` is provided and a window exists it will be closed
 	close: (uid?: string) => void; // Removes from stack
 	closeAll: () => void; // Clear stack
 	minimize: (uid: string) => void; // Still in stack, hidden
@@ -67,6 +68,12 @@ const prepareConfigOnCreate = (config: WindowCreateConfig): WindowConfig => {
 			// Return complete WindowConfig
 			return {
 				...enrichedConfig,
+				uid: enrichedConfig.uid ?? generateWindowUid({
+					dataSource: enrichedConfig.dataSource,
+					action: enrichedConfig.action,
+					entriesSelection: actionConfig.entriesSelection,
+					entries: enrichedConfig.data?.entries,
+				}),
 				definition,
 				props: {
 					...actionConfig.windowConfigProps,
@@ -93,10 +100,10 @@ export const useModalStore = create<WindowStore>()(
 					return get().stack.some((window) => window.uid === uid);
 				};
 
-				// Private helper to get focused (top) window
-				const getFocusedWindow = (): WindowConfig | undefined => {
-					return get().stack.find((m) => !m.minimized);
-				};
+				// // Private helper to get focused (top) window
+				// const getFocusedWindow = (): WindowConfig | undefined => {
+				// 	return get().stack.find((m) => !m.minimized);
+				// };
 
 				const minimizeAll = (stack: WindowConfig[]): WindowConfig[] =>
 					stack.map((m) =>
@@ -106,29 +113,37 @@ export const useModalStore = create<WindowStore>()(
 				return {
 					stack: [],
 
-					open: (config, uid) => {
-						const targetUid = uid ?? getFocusedWindow()?.uid;
-						const preparedConfig = prepareConfigOnCreate(config);
-
-						// No target found — treat as a new window
-						if (!targetUid || !windowExists(targetUid)) {
-							set((state) => ({
-								stack: [
-									...minimizeAll(state.stack),
-									preparedConfig,
-								],
-							}));
-
-							return config.uid;
+					open: (config, replacedUid) => {
+						// Close a different window if explicitly requested (e.g. replacing a stale entry)
+						if (replacedUid) {
+							get().close(replacedUid);
 						}
 
-						set((state) => ({
-							stack: minimizeAll(state.stack).map((m) =>
-								m.uid === targetUid
-									? { ...preparedConfig, minimized: false }
-									: m,
-							),
-						}));
+						const preparedConfig = prepareConfigOnCreate(config);
+						const alreadyExists = windowExists(preparedConfig.uid);
+
+						set((state) => {
+							const minimizedStack = minimizeAll(state.stack);
+
+							if (!alreadyExists) {
+								// New window — push to top of stack
+								return {
+									stack: [...minimizedStack, preparedConfig],
+								};
+							}
+
+							// Existing window — update in-place and bring to front (un-minimize)
+							return {
+								stack: minimizedStack.map((w) =>
+									w.uid === preparedConfig.uid
+										? {
+											...preparedConfig,
+											minimized: false,
+										}
+										: w,
+								),
+							};
+						});
 
 						return preparedConfig.uid;
 					},
@@ -171,6 +186,8 @@ export const useModalStore = create<WindowStore>()(
 			},
 			{
 				name: 'window-store',
+
+				skipHydration: true, // hydration is handled via data-source-registrar.component
 
 				partialize: (state) => ({
 					stack: state.stack.map((window) => ({

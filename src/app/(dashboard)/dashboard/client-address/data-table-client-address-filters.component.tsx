@@ -90,7 +90,7 @@ export const DataTableClientAddressFilters = (): JSX.Element => {
 				fieldName="address_type"
 				fieldValue={filters.address_type.value}
 				options={addressTypes}
-				onValueChange={(value) =>
+				onChange={(value) =>
 					setFilterValue(
 						'address_type',
 						value as ClientAddressTypeEnum,

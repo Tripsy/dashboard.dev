@@ -1,4 +1,8 @@
 import { z } from 'zod';
+import {
+	type DataTableColumnType,
+	DataTableValue,
+} from '@/app/(dashboard)/_components/data-table-value';
 import { FormManagePermission } from '@/app/(dashboard)/dashboard/permissions/form-manage-permission.component';
 import type { DataSourceConfigType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
@@ -17,8 +21,6 @@ import type {
 } from '@/models/permission.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
 import type { FormStateType } from '@/types/form.type';
-import type {UserModel} from "@/models/user.model";
-import {DataTableColumnType, DataTableValue} from "@/app/(dashboard)/_components/data-table-value";
 
 const translations = await translateBatch(
 	['create.title', 'update.title', 'delete.title', 'restore.title'],

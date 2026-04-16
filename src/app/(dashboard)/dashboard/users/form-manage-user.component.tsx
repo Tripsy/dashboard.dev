@@ -116,7 +116,9 @@ export function FormManageUser() {
 				fieldValue={formValues.language}
 				disabled={pending}
 				options={languages}
-				onValueChange={(value) => handleChange('language', value)}
+				onChange={(value) =>
+					handleChange('language', value as LanguageEnum)
+				}
 				error={errors.language}
 			/>
 
@@ -127,7 +129,9 @@ export function FormManageUser() {
 				fieldValue={formValues.role}
 				options={roles}
 				disabled={pending}
-				onValueChange={(value) => handleChange('role', value)}
+				onChange={(value) =>
+					handleChange('role', value as UserRoleEnum)
+				}
 				error={errors.role}
 			/>
 
@@ -139,8 +143,11 @@ export function FormManageUser() {
 					fieldValue={formValues.operator_type ?? ''}
 					options={operatorTypes}
 					disabled={pending}
-					onValueChange={(value) =>
-						handleChange('operator_type', value)
+					onChange={(value) =>
+						handleChange(
+							'operator_type',
+							value as UserOperatorTypeEnum | null,
+						)
 					}
 					error={errors.operator_type}
 				/>

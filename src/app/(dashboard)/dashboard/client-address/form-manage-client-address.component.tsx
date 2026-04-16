@@ -8,6 +8,7 @@ import {
 import { Icons } from '@/components/icon.component';
 import { getLanguage } from '@/config/translate.setup';
 import { toOptionsFromEnum } from '@/helpers/form.helper';
+import { requestCreate, requestFind } from '@/helpers/services.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useRemoteAutocomplete } from '@/hooks/use-remote-autocomplete';
@@ -26,9 +27,10 @@ import {
 	type PlaceModel,
 	PlaceTypeEnum,
 } from '@/models/place.model';
-import { findClients } from '@/services/clients.service';
-import { createPlace, findPlaces } from '@/services/places.service';
+import { useWindowForm } from '@/providers/window-form.provider';
 import { useModalStore } from '@/stores/window.store';
+import type { FindFunctionResponseType } from '@/types/action.type';
+import {generateWindowUid} from "@/helpers/window.helper";
 
 const language = await getLanguage();
 const addressTypes = toOptionsFromEnum(ClientAddressTypeEnum, {
@@ -36,7 +38,11 @@ const addressTypes = toOptionsFromEnum(ClientAddressTypeEnum, {
 });
 
 export function FormManageClientAddress() {
+	const { formValues, errors, handleChange, pending } =
+		useWindowForm<ClientAddressFormValuesType>();
+
 	const { open } = useModalStore();
+
 	const elementIds = useElementIds([
 		'address_type',
 		'client',
@@ -53,10 +59,11 @@ export function FormManageClientAddress() {
 			query: searchCity,
 			queryKey: ['cities'],
 			queryFn: async (q) => {
-				const res = await findPlaces({
-					filter: { term: q, place_type: PlaceTypeEnum.CITY },
-					limit: 10,
-				});
+				const res: FindFunctionResponseType<PlaceModel> | undefined =
+					await requestFind('places', {
+						filter: { term: q, place_type: PlaceTypeEnum.CITY },
+						limit: 10,
+					});
 
 				return res?.entries ?? [];
 			},
@@ -65,7 +72,7 @@ export function FormManageClientAddress() {
 
 	const createCityMutation = useMutation({
 		mutationFn: async (name: string) => {
-			const res = await createPlace({
+			const res = await requestCreate('places', {
 				...CITY_DEFAULT,
 				contents: [
 					{
@@ -87,10 +94,11 @@ export function FormManageClientAddress() {
 			query: searchClient,
 			queryKey: ['clients'],
 			queryFn: async (q) => {
-				const res = await findClients({
-					filter: { term: q },
-					limit: 10,
-				});
+				const res: FindFunctionResponseType<ClientModel> | undefined =
+					await requestFind('clients', {
+						filter: { term: q },
+						limit: 10,
+					});
 
 				return res?.entries ?? [];
 			},
@@ -106,7 +114,7 @@ export function FormManageClientAddress() {
 				fieldValue={formValues.address_type}
 				options={addressTypes}
 				disabled={pending}
-				onValueChange={(value) =>
+				onChange={(value) =>
 					handleChange('address_type', value as ClientAddressTypeEnum)
 				}
 				error={errors.address_type}
@@ -148,12 +156,10 @@ export function FormManageClientAddress() {
 								company_name: value,
 								person_name: value,
 							},
-							onSuccess: (resultData) => {
-								if (!resultData) {
+							onSuccess: (client: ClientModel) => {
+								if (!client) {
 									return;
 								}
-
-								const client = resultData as ClientModel;
 
 								handleChange(
 									'client',

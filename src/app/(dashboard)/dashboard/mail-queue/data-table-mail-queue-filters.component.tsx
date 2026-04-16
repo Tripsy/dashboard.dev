@@ -112,7 +112,7 @@ export const DataTableMailQueueFilters = (): JSX.Element => {
 				fieldName="status"
 				fieldValue={filters.status.value}
 				options={statuses}
-				onValueChange={(value) =>
+				onChange={(value) =>
 					setFilterValue('status', value as MailQueueStatusEnum)
 				}
 			/>

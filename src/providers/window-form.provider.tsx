@@ -15,7 +15,9 @@ function WindowFormProvider<FormValues extends FormValuesType>({
 	children: ReactNode;
 }) {
 	return (
-		<WindowFormContext.Provider value={value}>
+		<WindowFormContext.Provider
+			value={value as unknown as WindowFormContextValue<FormValuesType>}
+		>
 			{children}
 		</WindowFormContext.Provider>
 	);
@@ -30,7 +32,7 @@ function useWindowForm<
 		throw new Error('useWindowForm must be used inside <WindowForm>');
 	}
 
-	return context as WindowFormContextValue<FormValues>;
+	return context as unknown as WindowFormContextValue<FormValues>;
 }
 
 export { WindowFormProvider, useWindowForm };

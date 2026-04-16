@@ -43,7 +43,9 @@ export function FormManageClient() {
 				fieldValue={formValues.client_type}
 				options={clientTypes}
 				disabled={pending}
-				onValueChange={(value) => handleChange('client_type', value)}
+				onChange={(value) =>
+					handleChange('client_type', value as ClientTypeEnum)
+				}
 				error={errors.client_type}
 			/>
 

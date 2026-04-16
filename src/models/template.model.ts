@@ -44,9 +44,12 @@ export type TemplateFormValuesType = Pick<
 	TemplateModel,
 	'language' | 'type'
 > & {
-	label: string | null; // Email specific
-	subject?: string | null; // Email specific
-	title?: string | null; // Page specific
-	layout: TemplateLayoutEmailEnum | TemplateLayoutPageEnum;
-	html: string | null;
+	label: string | null;
+	content: {
+		subject?: string | null; // Email specific
+		title?: string | null; // Page specific
+		layout: TemplateLayoutEmailEnum | TemplateLayoutPageEnum;
+		html: string | null;
+		text?: string | null;
+	};
 };

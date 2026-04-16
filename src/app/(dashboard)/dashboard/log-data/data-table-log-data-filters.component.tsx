@@ -93,7 +93,7 @@ export const DataTableLogDataFilters = (): JSX.Element => {
 				fieldName="category"
 				fieldValue={filters.category.value}
 				options={logCategories}
-				onValueChange={(value) =>
+				onChange={(value) =>
 					setFilterValue('category', value as LogCategoryEnum)
 				}
 			/>
@@ -103,7 +103,7 @@ export const DataTableLogDataFilters = (): JSX.Element => {
 				fieldName="level"
 				fieldValue={filters.level.value}
 				options={logLevels}
-				onValueChange={(value) =>
+				onChange={(value) =>
 					setFilterValue('level', value as LogLevelEnum)
 				}
 			/>

@@ -34,10 +34,6 @@ export const createDataTableSlice =
 
 		updateTableState: (newState) =>
 			set((state: Draft<DataTableSlice>) => {
-				console.log(
-					'[updateTableState] called with',
-					JSON.stringify(newState),
-				);
 				state.tableState = {
 					...state.tableState,
 					...newState,

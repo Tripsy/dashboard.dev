@@ -270,13 +270,13 @@ export const FormComponentSelect = <Fields,>({
 	disabled,
 	error,
 	options,
-	onValueChange,
+	onChange,
 }: Omit<
 	FormComponentProps<Fields, OptionValueType>,
 	'autoComplete' | 'icons' | 'onChange'
 > & {
 	options: OptionsType | GroupedOptionsType;
-	onValueChange: (value: string) => void;
+	onChange: (value: string) => void;
 }) => {
 	const { borderClass } = useFieldState({ value: fieldValue, error });
 
@@ -297,7 +297,7 @@ export const FormComponentSelect = <Fields,>({
 
 				<Select
 					value={fieldValue ?? ''}
-					onValueChange={onValueChange}
+					onValueChange={onChange}
 					disabled={disabled}
 				>
 					<SelectTrigger
@@ -404,13 +404,13 @@ export const FormComponentRadio = <Fields,>({
 	disabled,
 	error,
 	options,
-	onValueChange,
+	onChange,
 }: Omit<
 	FormComponentProps<Fields, OptionValueType>,
 	'fieldType' | 'onChange' | 'placeholderText' | 'autoComplete' | 'icons'
 > & {
 	options: OptionsType;
-	onValueChange: (value: string) => void;
+	onChange: (value: string) => void;
 }) => (
 	<FormElement
 		label={{ text: labelText, required: isRequired }}
@@ -426,7 +426,7 @@ export const FormComponentRadio = <Fields,>({
 
 			<RadioGroup
 				value={fieldValue}
-				onValueChange={onValueChange}
+				onValueChange={onChange}
 				className={className}
 				disabled={disabled}
 			>

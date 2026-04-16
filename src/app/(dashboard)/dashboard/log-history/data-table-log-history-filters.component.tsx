@@ -112,7 +112,7 @@ export const DataTableLogHistoryFilters = (): JSX.Element => {
 				fieldName="entity"
 				fieldValue={filters.entity.value}
 				options={entities}
-				onValueChange={(value) => setFilterValue('entity', value)}
+				onChange={(value) => setFilterValue('entity', value)}
 			/>
 
 			<FormFiltersSearch<LogHistoryDataTableFiltersType>
@@ -126,7 +126,7 @@ export const DataTableLogHistoryFilters = (): JSX.Element => {
 				fieldName="action"
 				fieldValue={filters.action.value}
 				options={actions}
-				onValueChange={(value) => setFilterValue('action', value)}
+				onChange={(value) => setFilterValue('action', value)}
 			/>
 
 			<FormFiltersSelect<LogHistoryDataTableFiltersType>
@@ -134,7 +134,7 @@ export const DataTableLogHistoryFilters = (): JSX.Element => {
 				fieldName="source"
 				fieldValue={filters.source.value}
 				options={sources}
-				onValueChange={(value) =>
+				onChange={(value) =>
 					setFilterValue('source', value as LogHistorySource)
 				}
 			/>

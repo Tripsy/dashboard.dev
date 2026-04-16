@@ -15,7 +15,7 @@ import {
 	requestRestore,
 	requestUpdate,
 } from '@/helpers/services.helper';
-import { parseJson } from '@/helpers/string.helper';
+import { parseJson, toKebabCase } from '@/helpers/string.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import {
 	type TemplateFormValuesType,
@@ -69,22 +69,24 @@ class TemplateValidator extends BaseValidator<typeof validatorMessages> {
 		z
 			.object({
 				type: z.literal(TemplateTypeEnum.EMAIL),
-				subject: this.validateString(
-					this.getMessage('invalid_email_subject'),
-				),
-				text: this.validateString(
-					this.getMessage('invalid_email_text'),
-					{
-						required: false,
-					},
-				),
-				html: this.validateString(
-					this.getMessage('invalid_email_html'),
-				),
-				layout: this.validateEnum(
-					TemplateLayoutEmailEnum,
-					this.getMessage('invalid_email_layout'),
-				),
+				content: z.object({
+					subject: this.validateString(
+						this.getMessage('invalid_email_subject'),
+					),
+					text: this.validateString(
+						this.getMessage('invalid_email_text'),
+						{
+							required: false,
+						},
+					),
+					html: this.validateString(
+						this.getMessage('invalid_email_html'),
+					),
+					layout: this.validateEnum(
+						TemplateLayoutEmailEnum,
+						this.getMessage('invalid_email_layout'),
+					),
+				}),
 			})
 			.extend(this.baseSchema),
 
@@ -92,14 +94,18 @@ class TemplateValidator extends BaseValidator<typeof validatorMessages> {
 		z
 			.object({
 				type: z.literal(TemplateTypeEnum.PAGE),
-				title: this.validateString(
-					this.getMessage('invalid_page_title'),
-				),
-				html: this.validateString(this.getMessage('invalid_page_html')),
-				layout: this.validateEnum(
-					TemplateLayoutPageEnum,
-					this.getMessage('invalid_page_layout'),
-				),
+				content: z.object({
+					title: this.validateString(
+						this.getMessage('invalid_page_title'),
+					),
+					html: this.validateString(
+						this.getMessage('invalid_page_html'),
+					),
+					layout: this.validateEnum(
+						TemplateLayoutPageEnum,
+						this.getMessage('invalid_page_layout'),
+					),
+				}),
 			})
 			.extend(this.baseSchema),
 	]);
@@ -107,6 +113,29 @@ class TemplateValidator extends BaseValidator<typeof validatorMessages> {
 
 function validateForm(values: TemplateFormValuesType) {
 	const validator = new TemplateValidator(validatorMessages);
+
+	// const payload = values.type === TemplateTypeEnum.EMAIL
+	// 	? {
+	// 		type: values.type,
+	// 		label: values.label,
+	// 		language: values.language,
+	// 		content: {
+	// 			subject: values.subject,
+	// 			text: values.text,
+	// 			html: values.html,
+	// 			layout: values.layout,
+	// 		},
+	// 	}
+	// 	: {
+	// 		type: values.type,
+	// 		label: values.label,
+	// 		language: values.language,
+	// 		content: {
+	// 			title: values.title,
+	// 			html: values.html,
+	// 			layout: values.layout,
+	// 		},
+	// 	};
 
 	return validator.manage.safeParse(values);
 }
@@ -116,36 +145,43 @@ export function getFormValues(formData: FormData): TemplateFormValuesType {
 		getFormDataAsEnum(formData, 'type', TemplateTypeEnum) ||
 		TemplateTypeEnum.EMAIL;
 
+	const label = getFormDataAsString(formData, 'label');
+
 	const base = {
-		label: getFormDataAsString(formData, 'label'),
+		label: label ? toKebabCase(label) : null,
 		language:
 			getFormDataAsEnum(formData, 'language', LanguageEnum) ||
 			LANGUAGE_DEFAULT,
-		html: getFormDataAsString(formData, 'html'),
 	};
 
 	if (type === TemplateTypeEnum.EMAIL) {
 		return {
 			...base,
 			type: TemplateTypeEnum.EMAIL,
-			subject: getFormDataAsString(formData, 'subject'),
-			html: getFormDataAsString(formData, 'html'),
-			layout:
-				getFormDataAsEnum(
-					formData,
-					'layout',
-					TemplateLayoutEmailEnum,
-				) || TemplateLayoutEmailEnum.DEFAULT,
+			content: {
+				subject: getFormDataAsString(formData, 'subject'),
+				html: getFormDataAsString(formData, 'html'),
+				text: getFormDataAsString(formData, 'text'),
+				layout:
+					getFormDataAsEnum(
+						formData,
+						'layout',
+						TemplateLayoutEmailEnum,
+					) || TemplateLayoutEmailEnum.DEFAULT,
+			},
 		};
 	}
 
 	return {
 		...base,
 		type: TemplateTypeEnum.PAGE,
-		title: getFormDataAsString(formData, 'title'),
-		layout:
-			getFormDataAsEnum(formData, 'layout', TemplateLayoutPageEnum) ||
-			TemplateLayoutPageEnum.DEFAULT,
+		content: {
+			title: getFormDataAsString(formData, 'title'),
+			html: getFormDataAsString(formData, 'html'),
+			layout:
+				getFormDataAsEnum(formData, 'layout', TemplateLayoutPageEnum) ||
+				TemplateLayoutPageEnum.DEFAULT,
+		},
 	};
 }
 
@@ -180,9 +216,11 @@ function getFormState(
 			...state,
 			values: {
 				...state.values,
-				subject: parsed.subject ?? null,
-				html: parsed.html ?? null,
-				layout: parsed.layout ?? TemplateLayoutEmailEnum.DEFAULT,
+				content: {
+					subject: parsed.subject ?? null,
+					html: parsed.html ?? null,
+					layout: parsed.layout ?? TemplateLayoutEmailEnum.DEFAULT,
+				},
 			},
 		};
 	}
@@ -201,9 +239,11 @@ function getFormState(
 		...state,
 		values: {
 			...state.values,
-			title: parsed.title ?? null,
-			html: parsed.html ?? null,
-			layout: parsed.layout ?? TemplateLayoutPageEnum.DEFAULT,
+			content: {
+				title: parsed.title ?? null,
+				html: parsed.html ?? null,
+				layout: parsed.layout ?? TemplateLayoutPageEnum.DEFAULT,
+			},
 		},
 	};
 }
@@ -378,5 +418,3 @@ export const dataSourceConfigTemplates: DataSourceConfigType<
 		},
 	},
 };
-
-// TODO test form & actions

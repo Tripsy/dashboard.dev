@@ -72,4 +72,4 @@ export type WindowConfig<
 	props?: WindowConfigPropsType;
 };
 
-export type WindowCreateConfig = Omit<WindowConfig, 'definition'>;
+export type WindowCreateConfig = Omit<WindowConfig, 'uid' | 'definition'> & { uid?: string};

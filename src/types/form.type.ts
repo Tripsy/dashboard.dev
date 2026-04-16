@@ -1,10 +1,10 @@
 import type { ZodSafeParseError, ZodSafeParseSuccess } from 'zod';
 
 export type FormSituationType = 'success' | 'error' | null;
-export type FormValuesType = Record<
-	string,
-	string | number | boolean | Date | null | undefined
->;
+type FormValueType = string | number | boolean | Date | null | undefined;
+export type FormValuesType = {
+	[key: string]: FormValueType | FormValuesType;
+};
 
 export type GetFormValuesFnType<FormValues> = (
 	formData: FormData,
@@ -18,25 +18,37 @@ export type ValidateFormFnType<FormValues> = (
 	values: FormValues,
 ) => ValidateFormReturnType<FormValues>;
 
-export type FormStateType<FormValues> = {
+export type FormErrorsType<FormValues extends FormValuesType> = {
+	[K in keyof FormValues]?: FormValues[K] extends FormValuesType
+		? FormErrorsType<FormValues[K]>
+		: string[];
+};
+
+export type TouchedFieldsType<T> = {
+	[K in keyof T]?: T[K] extends FormValuesType
+		? TouchedFieldsType<T[K]>
+		: boolean;
+};
+
+export type FormStateType<FormValues extends FormValuesType> = {
 	values: FormValues;
-	errors: Partial<Record<keyof FormValues, string[]>>;
+	errors: FormErrorsType<FormValues>;
 	message: string | null;
 	situation: FormSituationType;
 	resultData?: unknown;
 };
 
-export type GetFormStateFnType<FormValues, Data> = (
+export type GetFormStateFnType<FormValues extends FormValuesType, Data> = (
 	data?: Data,
 ) => FormStateType<FormValues>;
 
-export type FormComponentType<FormValues> = {
+export type FormComponentType<FormValues extends FormValuesType> = {
 	formOperation: string;
 	formValues: FormValues;
-	errors: Partial<Record<keyof FormValues, string[]>>;
-	handleChange: (
-		field: keyof FormValues,
-		value: string | number | boolean | Date | null,
+	errors: FormErrorsType<FormValues>;
+	handleChange: <K extends keyof FormValues>(
+		field: K,
+		value: FormValues[K],
 	) => void;
 	pending: boolean;
 };

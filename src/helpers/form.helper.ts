@@ -1,3 +1,4 @@
+import type { Dispatch, SetStateAction } from 'react';
 import sanitizeHtml from 'sanitize-html';
 import type { z } from 'zod';
 import { translate } from '@/config/translate.setup';
@@ -8,10 +9,11 @@ import type {
 	UpdateFunctionType,
 } from '@/types/action.type';
 import type {
-	FormComponentType,
+	FormErrorsType,
 	FormStateType,
 	FormValuesType,
 	GetFormValuesFnType,
+	TouchedFieldsType,
 	ValidateFormFnType,
 } from '@/types/form.type';
 
@@ -81,22 +83,72 @@ export async function processForm<Entry, FormValues extends FormValuesType>(
 	}
 }
 
-export function accumulateZodErrors<T>(
+export function accumulateZodErrors<T extends FormValuesType>(
 	zodError: z.ZodError,
-): Partial<Record<keyof T, string[]>> {
-	const fieldErrors: Partial<Record<keyof T, string[]>> = {};
+): FormErrorsType<T> {
+	const fieldErrors: FormErrorsType<T> = {};
 
 	for (const issue of zodError.issues) {
-		const fieldPath = issue.path.join('.') as keyof T;
+		if (issue.path.length === 0) continue;
 
-		if (!fieldErrors[fieldPath]) {
-			fieldErrors[fieldPath] = [];
+		// Walk the path and build nested objects as needed
+		let current = fieldErrors as Record<string, unknown>;
+
+		for (let i = 0; i < issue.path.length - 1; i++) {
+			const segment = issue.path[i] as string;
+
+			if (!current[segment] || typeof current[segment] !== 'object') {
+				current[segment] = {};
+			}
+
+			current = current[segment] as Record<string, unknown>;
 		}
 
-		fieldErrors[fieldPath].push(issue.message);
+		const lastSegment = issue.path[issue.path.length - 1] as string;
+
+		if (!Array.isArray(current[lastSegment])) {
+			current[lastSegment] = [];
+		}
+
+		(current[lastSegment] as string[]).push(issue.message);
 	}
 
 	return fieldErrors;
+}
+
+export function filterErrorsByTouched<FormValues extends FormValuesType>(
+	errors: FormErrorsType<FormValues>,
+	touched: TouchedFieldsType<FormValues>,
+): FormErrorsType<FormValues> {
+	const visible: FormErrorsType<FormValues> = {};
+
+	for (const key of Object.keys(touched) as (keyof FormValues)[]) {
+		const touchedValue = touched[key];
+		const errorValue = errors[key];
+
+		if (!errorValue) {
+			continue;
+		}
+
+		if (
+			typeof touchedValue === 'object' &&
+			typeof errorValue === 'object' &&
+			!Array.isArray(errorValue)
+		) {
+			// Recurse into nested touched / error objects
+			(visible as Record<string, unknown>)[key as string] =
+				filterErrorsByTouched(
+					errorValue as FormErrorsType<FormValuesType>,
+					touchedValue as TouchedFieldsType<FormValuesType>,
+				);
+		} else if (touchedValue === true) {
+			const k = key as keyof FormValues;
+
+			visible[k] = errorValue as FormErrorsType<FormValues>[typeof k];
+		}
+	}
+
+	return visible;
 }
 
 export function safeHtml(dirtyHtml: string): string {
@@ -142,13 +194,27 @@ export function safeHtml(dirtyHtml: string): string {
 	});
 }
 
+// export function createHandleChange<FormValues extends FormValuesType>(
+// 	setFormValues: (updater: (prev: FormValues) => FormValues) => void,
+// 	markFieldAsTouched: (field: keyof FormValues) => void,
+// ): FormComponentType<FormValues>['handleChange'] {
+// 	return (field, value) => {
+// 		setFormValues((prev) => ({ ...prev, [field]: value }));
+// 		markFieldAsTouched(field);
+// 	};
+// }
+
 export function createHandleChange<FormValues extends FormValuesType>(
-	setFormValues: (updater: (prev: FormValues) => FormValues) => void,
-	markFieldAsTouched: (field: keyof FormValues) => void,
-): FormComponentType<FormValues>['handleChange'] {
-	return (field, value) => {
+	setFormValues: Dispatch<SetStateAction<FormValues>>,
+	markFieldAsTouched: (path: string) => void, // now a string path, not keyof FormValues
+) {
+	return <K extends keyof FormValues>(
+		field: K,
+		value: FormValues[K],
+		touchPath?: string,
+	) => {
 		setFormValues((prev) => ({ ...prev, [field]: value }));
-		markFieldAsTouched(field);
+		markFieldAsTouched(touchPath ?? (field as string)); // use touchPath if provided
 	};
 }
 

@@ -5,11 +5,12 @@ import {
 } from '@/components/form/form-element.component';
 import { Icons } from '@/components/icon.component';
 import { toOptionsFromEnum } from '@/helpers/form.helper';
-import { formatEnumLabel, toKebabCase } from '@/helpers/string.helper';
+import { formatEnumLabel } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import {
 	type TemplateFormValuesType,
 	TemplateLayoutEmailEnum,
+	type TemplateLayoutPageEnum,
 	TemplateTypeEnum,
 } from '@/models/template.model';
 import { LanguageEnum } from '@/models/user.model';
@@ -44,11 +45,7 @@ export function FormManageTemplate() {
 				className="pl-8"
 				placeholderText="eg: password-recover"
 				disabled={pending}
-				onChange={(e) => {
-					const value = toKebabCase(e.target.value);
-
-					handleChange('label', value);
-				}}
+				onChange={(e) => handleChange('label', e.target.value)}
 				error={errors.label}
 				icons={{
 					left: <Icons.Tag className="opacity-40 h-4.5 w-4.5" />,
@@ -64,7 +61,9 @@ export function FormManageTemplate() {
 					className="min-w-32"
 					disabled={pending}
 					options={languages}
-					onValueChange={(value) => handleChange('language', value)}
+					onChange={(value) =>
+						handleChange('language', value as LanguageEnum)
+					}
 					error={errors.language}
 				/>
 				<FormComponentSelect<TemplateFormValuesType>
@@ -75,48 +74,63 @@ export function FormManageTemplate() {
 					className="min-w-32"
 					disabled={pending}
 					options={types}
-					onValueChange={(value) => handleChange('type', value)}
+					onChange={(value) =>
+						handleChange('type', value as TemplateTypeEnum)
+					}
 					error={errors.type}
 				/>
 			</div>
 
 			{formValues.type === TemplateTypeEnum.EMAIL && (
 				<>
-					<FormComponentInput<TemplateFormValuesType>
+					<FormComponentInput<typeof formValues.content>
 						id={`${elementIds.content}-subject`}
 						labelText="Subject"
 						fieldName="subject"
-						fieldValue={formValues.subject ?? ''}
+						fieldValue={formValues.content.subject ?? ''}
 						isRequired={true}
 						placeholderText="eg: Recover password"
 						disabled={pending}
 						onChange={(e) =>
-							handleChange('subject', e.target.value)
+							handleChange('content', {
+								...formValues.content,
+								subject: e.target.value,
+							})
 						}
-						error={errors.subject}
+						error={errors.content?.subject}
 					/>
 
-					<FormComponentSelect<TemplateFormValuesType>
+					<FormComponentSelect<typeof formValues.content>
 						labelText="layout"
 						id={`${elementIds.content}-layout`}
 						fieldName="layout"
-						fieldValue={formValues.layout}
+						fieldValue={formValues.content.layout}
 						className="max-w-64"
 						disabled={pending}
 						options={emailLayouts}
-						onValueChange={(value) => handleChange('layout', value)}
-						error={errors.layout}
+						onChange={(value) =>
+							handleChange('content', {
+								...formValues.content,
+								layout: value as TemplateLayoutEmailEnum,
+							})
+						}
+						error={errors.content?.layout}
 					/>
 
-					<FormComponentTextarea<TemplateFormValuesType>
+					<FormComponentTextarea<typeof formValues.content>
 						id={`${elementIds.content}-html`}
 						labelText="HTML Content"
 						fieldName="html"
-						fieldValue={formValues.html}
+						fieldValue={formValues.content.html}
 						isRequired={true}
 						disabled={pending}
-						onChange={(e) => handleChange('html', e.target.value)}
-						error={errors.html}
+						onChange={(e) =>
+							handleChange('content', {
+								...formValues.content,
+								html: e.target.value,
+							})
+						}
+						error={errors.content?.html}
 						rows={6}
 					/>
 				</>
@@ -124,39 +138,54 @@ export function FormManageTemplate() {
 
 			{formValues.type === TemplateTypeEnum.PAGE && (
 				<>
-					<FormComponentInput<TemplateFormValuesType>
+					<FormComponentInput<typeof formValues.content>
 						id={`${elementIds.content}-title`}
 						labelText="Title"
 						fieldName="title"
-						fieldValue={formValues.title ?? ''}
+						fieldValue={formValues.content.title ?? ''}
 						isRequired={true}
 						placeholderText="eg: Terms & Conditions"
 						disabled={pending}
-						onChange={(e) => handleChange('title', e.target.value)}
-						error={errors.title}
+						onChange={(e) =>
+							handleChange('content', {
+								...formValues.content,
+								title: e.target.value,
+							})
+						}
+						error={errors.content?.title}
 					/>
 
-					<FormComponentSelect<TemplateFormValuesType>
+					<FormComponentSelect<typeof formValues.content>
 						labelText="Layout"
 						id={`${elementIds.content}-layout`}
 						fieldName="layout"
-						fieldValue={formValues.layout}
+						fieldValue={formValues.content.layout}
 						className="max-w-64"
 						disabled={pending}
 						options={emailLayouts}
-						onValueChange={(value) => handleChange('layout', value)}
-						error={errors.layout}
+						onChange={(value) =>
+							handleChange('content', {
+								...formValues.content,
+								layout: value as TemplateLayoutPageEnum,
+							})
+						}
+						error={errors.content?.layout}
 					/>
 
-					<FormComponentTextarea<TemplateFormValuesType>
+					<FormComponentTextarea<typeof formValues.content>
 						id={`${elementIds.content}-html`}
 						labelText="HTML Content"
 						fieldName="html"
-						fieldValue={formValues.html}
+						fieldValue={formValues.content.html}
 						isRequired={true}
 						disabled={pending}
-						onChange={(e) => handleChange('html', e.target.value)}
-						error={errors.html}
+						onChange={(e) =>
+							handleChange('content', {
+								...formValues.content,
+								html: e.target.value,
+							})
+						}
+						error={errors.content?.html}
 						rows={11}
 					/>
 				</>

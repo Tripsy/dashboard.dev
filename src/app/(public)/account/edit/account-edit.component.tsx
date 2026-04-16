@@ -119,7 +119,7 @@ export default function AccountEdit() {
 					fieldValue={formValues.language}
 					disabled={pending}
 					options={languages}
-					onValueChange={(value) =>
+					onChange={(value) =>
 						handleChange('language', value as LanguageEnum)
 					}
 					error={errors.language}

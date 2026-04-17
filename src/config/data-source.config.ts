@@ -2,13 +2,13 @@ import type React from 'react';
 import type { DataTableColumnType } from '@/app/(dashboard)/_components/data-table-value';
 import type {
 	ActionEventType,
+	ActionOperationMultipleFunctionType,
+	ActionOperationSingleFunctionType,
 	CreateFunctionType,
-	DeleteFunctionType,
 	DisplayEntryLabelFnType,
 	EntriesSelectionType,
 	FindFunctionType,
 	OperationFunctionType,
-	RestoreFunctionType,
 	UpdateFunctionType,
 } from '@/types/action.type';
 import type {
@@ -79,20 +79,46 @@ type ActionConfigBase<
 };
 
 // Each variant enforces the valid windowType <-> entriesSelection correlation
-type FormActionConfig<
+type FormCreateActionConfig<
 	Entry extends WindowEntryType,
 	FormValues extends FormValuesType,
 > = ActionConfigBase<Entry, FormValues> & {
 	windowType: 'form';
-	entriesSelection: 'free' | 'single'; // form can only be free (create) or single (update)
+	entriesSelection: 'free';
+	operationFunction: CreateFunctionType<Entry, FormValues>;
+	validateForm: ValidateFormFnType<FormValues>;
+	getFormValues: GetFormValuesFnType<FormValues>;
+	getFormState: GetFormStateFnType<FormValues, Entry>;
 };
 
-type ActionWindowConfig<
+type FormUpdateActionConfig<
+	Entry extends WindowEntryType,
+	FormValues extends FormValuesType,
+> = ActionConfigBase<Entry, FormValues> & {
+	windowType: 'form';
+	entriesSelection: 'single';
+	operationFunction: UpdateFunctionType<Entry, FormValues>;
+	validateForm: ValidateFormFnType<FormValues>;
+	getFormValues: GetFormValuesFnType<FormValues>;
+	getFormState: GetFormStateFnType<FormValues, Entry>;
+};
+
+type SingleActionConfig<
 	Entry extends WindowEntryType,
 	FormValues extends FormValuesType,
 > = ActionConfigBase<Entry, FormValues> & {
 	windowType: 'action';
-	entriesSelection: 'single' | 'multiple';
+	entriesSelection: 'single';
+	operationFunction: ActionOperationSingleFunctionType<Entry>;
+};
+
+type MultipleActionConfig<
+	Entry extends WindowEntryType,
+	FormValues extends FormValuesType,
+> = ActionConfigBase<Entry, FormValues> & {
+	windowType: 'action';
+	entriesSelection: 'multiple';
+	operationFunction: ActionOperationMultipleFunctionType;
 };
 
 type ViewActionConfig<
@@ -101,6 +127,7 @@ type ViewActionConfig<
 > = ActionConfigBase<Entry, FormValues> & {
 	windowType: 'view';
 	entriesSelection: 'single';
+	operationFunction?: never;
 };
 
 type OtherActionConfig<
@@ -109,43 +136,34 @@ type OtherActionConfig<
 > = ActionConfigBase<Entry, FormValues> & {
 	windowType: 'other';
 	entriesSelection: EntriesSelectionType;
+	operationFunction?: never;
 };
 
 export type ActionConfigType<
 	Entry extends WindowEntryType = WindowEntryType,
 	FormValues extends FormValuesType = FormValuesType,
 > =
-	| FormActionConfig<Entry, FormValues>
-	| ActionWindowConfig<Entry, FormValues>
+	| FormCreateActionConfig<Entry, FormValues>
+	| FormUpdateActionConfig<Entry, FormValues>
+	| SingleActionConfig<Entry, FormValues>
+	| MultipleActionConfig<Entry, FormValues>
 	| ViewActionConfig<Entry, FormValues>
 	| OtherActionConfig<Entry, FormValues>;
 
-type TypedActionConfigType<
-	Entry extends WindowEntryType,
-	FormValues extends FormValuesType,
-	Fn,
-> = ActionConfigType<Entry, FormValues> & {
-	operationFunction?: Fn;
-};
-
-type ActionsType<
+export type ActionsType<
 	Entry extends WindowEntryType,
 	FormValues extends FormValuesType = FormValuesType,
 > = {
 	[key: string]: ActionConfigType<Entry, FormValues>;
 } & {
-	create?: TypedActionConfigType<
-		Entry,
-		FormValues,
-		CreateFunctionType<Entry, FormValues>
-	>;
-	update?: TypedActionConfigType<
-		Entry,
-		FormValues,
-		UpdateFunctionType<Entry, FormValues>
-	>;
-	delete?: TypedActionConfigType<Entry, FormValues, DeleteFunctionType>;
-	restore?: TypedActionConfigType<Entry, FormValues, RestoreFunctionType>;
+	create?: FormCreateActionConfig<Entry, FormValues>;
+	update?: FormUpdateActionConfig<Entry, FormValues>;
+	delete?:
+		| SingleActionConfig<Entry, FormValues>
+		| MultipleActionConfig<Entry, FormValues>;
+	restore?:
+		| SingleActionConfig<Entry, FormValues>
+		| MultipleActionConfig<Entry, FormValues>;
 };
 
 // ============================================================================

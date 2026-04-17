@@ -383,8 +383,8 @@ export const dataSourceConfigTemplates: DataSourceConfigType<
 			permission: 'template.delete',
 			entriesSelection: 'single',
 			customEntryCheck: (entry: TemplateModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			operationFunction: (ids: number[]) =>
-				requestDelete('templates', ids),
+			operationFunction: (entry: TemplateModel) =>
+				requestDelete('templates', entry),
 			buttonPosition: 'left',
 			button: {
 				variant: 'outline',
@@ -397,8 +397,8 @@ export const dataSourceConfigTemplates: DataSourceConfigType<
 			permission: 'template.delete',
 			entriesSelection: 'single',
 			customEntryCheck: (entry: TemplateModel) => !!entry.deleted_at, // Return true if the entry is deleted
-			operationFunction: (ids: number[]) =>
-				requestRestore('templates', ids),
+			operationFunction: (entry: TemplateModel) =>
+				requestRestore('templates', entry),
 			buttonPosition: 'left',
 			button: {
 				variant: 'outline',

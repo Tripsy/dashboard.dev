@@ -419,7 +419,8 @@ export const dataSourceConfigUsers: DataSourceConfigType<
 			permission: 'user.delete',
 			entriesSelection: 'single',
 			customEntryCheck: (entry: UserModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			operationFunction: (ids: number[]) => requestDelete('users', ids),
+			operationFunction: (entry: UserModel) =>
+				requestDelete('users', entry),
 			buttonPosition: 'left',
 			button: {
 				variant: 'outline',
@@ -436,8 +437,8 @@ export const dataSourceConfigUsers: DataSourceConfigType<
 				[UserStatusEnum.PENDING, UserStatusEnum.INACTIVE].includes(
 					entry.status,
 				),
-			operationFunction: (ids: number[]) =>
-				requestUpdateStatus('users', ids, 'active'),
+			operationFunction: (entry: UserModel) =>
+				requestUpdateStatus('users', entry, 'active'),
 			buttonPosition: 'left',
 			button: {
 				variant: 'outline',
@@ -454,8 +455,8 @@ export const dataSourceConfigUsers: DataSourceConfigType<
 				[UserStatusEnum.PENDING, UserStatusEnum.ACTIVE].includes(
 					entry.status,
 				),
-			operationFunction: (ids: number[]) =>
-				requestUpdateStatus('users', ids, 'inactive'),
+			operationFunction: (entry: UserModel) =>
+				requestUpdateStatus('users', entry, 'inactive'),
 			buttonPosition: 'left',
 			button: {
 				variant: 'outline',
@@ -468,7 +469,8 @@ export const dataSourceConfigUsers: DataSourceConfigType<
 			permission: 'user.delete',
 			entriesSelection: 'single',
 			customEntryCheck: (entry: UserModel) => !!entry.deleted_at, // Return true if the entry is deleted
-			operationFunction: (ids: number[]) => requestRestore('users', ids),
+			operationFunction: (entry: UserModel) =>
+				requestRestore('users', entry),
 			buttonPosition: 'left',
 			button: {
 				variant: 'outline',

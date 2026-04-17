@@ -68,16 +68,22 @@ export default function DataTableList<Model extends DataTableValue>(props: {
 	dataKey: string;
 	scrollHeight?: string;
 }) {
-	const { dataSource, dataStorageKey, selectionMode, dataTableStore } =
-		useDataTable();
+	const { dataSource, selectionMode, dataTableStore } = useDataTable();
 
-	const {
-		tableState,
-		updateTableState,
-		selectedEntries,
-		setSelectedEntries,
-		clearSelectedEntries,
-	} = useStore(dataTableStore, (state) => state);
+	const tableState = useStore(dataTableStore, (s) => s.tableState);
+	const selectedEntries = useStore(dataTableStore, (s) => s.selectedEntries);
+	const updateTableState = useStore(
+		dataTableStore,
+		(s) => s.updateTableState,
+	);
+	const setSelectedEntries = useStore(
+		dataTableStore,
+		(s) => s.setSelectedEntries,
+	);
+	const clearSelectedEntries = useStore(
+		dataTableStore,
+		(s) => s.clearSelectedEntries,
+	);
 
 	const translationsKeys = useMemo(
 		() =>
@@ -115,7 +121,14 @@ export default function DataTableList<Model extends DataTableValue>(props: {
 			tableState.sortOrder,
 			tableState.filters,
 		],
-		[dataSource, tableState],
+		[
+			dataSource,
+			tableState.first,
+			tableState.rows,
+			tableState.sortField,
+			tableState.sortOrder,
+			tableState.filters,
+		],
 	);
 
 	const { data, isLoading } = useQuery({
@@ -242,8 +255,6 @@ export default function DataTableList<Model extends DataTableValue>(props: {
 			scrollHeight={props.scrollHeight}
 			resizableColumns
 			reorderableColumns
-			stateStorage="local"
-			stateKey={dataStorageKey}
 			filters={tableState.filters}
 			paginator
 			rowsPerPageOptions={[5, 10, 25, 50]}

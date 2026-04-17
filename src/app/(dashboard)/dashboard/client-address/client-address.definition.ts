@@ -13,13 +13,7 @@ import {
 	getFormDataAsNumber,
 	getFormDataAsString,
 } from '@/helpers/form.helper';
-import {
-	requestCreate,
-	requestDelete,
-	requestFind,
-	requestRestore,
-	requestUpdate,
-} from '@/helpers/services.helper';
+import { requestFind } from '@/helpers/services.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import { getClientDisplayName } from '@/models/client.model';
 import {
@@ -28,6 +22,12 @@ import {
 	ClientAddressTypeEnum,
 } from '@/models/client-address.model';
 import { getPlaceContentProp } from '@/models/place.model';
+import {
+	createClientAddress,
+	deleteClientAddress,
+	restoreClientAddress,
+	updateClientAddress,
+} from '@/services/client-address.service';
 import type { FindFunctionParamsType } from '@/types/action.type';
 import type { FormStateType } from '@/types/form.type';
 
@@ -87,7 +87,7 @@ class ClientAddressValidator extends BaseValidator<typeof validatorMessages> {
 			if (data.city && !data.city_id) {
 				ctx.addIssue({
 					path: ['city'],
-					message: this.getMessage('invalid_city'),
+					message: this.getMessage('invalid_city_id'),
 					code: 'custom',
 				});
 			}
@@ -126,10 +126,10 @@ function getFormState(
 		message: null,
 		situation: null,
 		values: {
-			client_id: data?.client_id ?? null,
+			client_id: data?.client.id ?? null,
 			client: data?.client ? getClientDisplayName(data?.client) : null,
 			address_type: data?.address_type ?? ClientAddressTypeEnum.DELIVERY,
-			city_id: data?.city_id ?? null,
+			city_id: data?.city?.id ?? null,
 			city: data?.city ? getPlaceContentProp(data?.city, 'name') : null,
 			details: data?.details ?? null,
 			postal_code: data?.postal_code ?? null,
@@ -154,7 +154,7 @@ export const clientAddressDataTableFilters: ClientAddressDataTableFiltersType =
 function displayButtonViewClient(
 	entry: ClientAddressModel,
 ): DataTableValueOptionsType<ClientAddressModel>['displayButton'] {
-	if (!entry.client_id) {
+	if (!entry.client) {
 		return undefined;
 	}
 
@@ -162,7 +162,7 @@ function displayButtonViewClient(
 		action: 'view',
 		dataSource: 'clients',
 		altTitle: translations['viewClient.label'],
-		alternateEntryId: entry.client_id,
+		alternateEntryId: entry.client.id,
 	};
 }
 
@@ -226,7 +226,9 @@ export const dataSourceConfigClientAddress: DataSourceConfigType<
 					column: DataTableColumnType<ClientAddressModel>,
 				) =>
 					DataTableValue(entry, column, {
-						customValue: entry.city?.code || '',
+						customValue: entry.city
+							? getPlaceContentProp(entry.city, 'name')
+							: undefined,
 					}),
 			},
 			{
@@ -239,7 +241,7 @@ export const dataSourceConfigClientAddress: DataSourceConfigType<
 			requestFind<ClientAddressModel>('client-address', params),
 	},
 	displayEntryLabel: (entry: ClientAddressModel) => {
-		return entry.details;
+		return `${getClientDisplayName(entry.client)} - ${entry.details}`;
 	},
 	actions: {
 		create: {
@@ -248,11 +250,11 @@ export const dataSourceConfigClientAddress: DataSourceConfigType<
 			windowComponent: FormManageClientAddress,
 			permission: 'client-address.create',
 			entriesSelection: 'free',
-			operationFunction: (params: ClientAddressFormValuesType) =>
-				requestCreate<ClientAddressModel, ClientAddressFormValuesType>(
-					'client-address',
-					params,
-				),
+			operationFunction: (params: ClientAddressFormValuesType) => {
+				const { client_id, client, city, ...prepareParams } = params;
+
+				return createClientAddress(client_id, prepareParams);
+			},
 			buttonPosition: 'right',
 			button: {
 				variant: 'info',
@@ -270,12 +272,11 @@ export const dataSourceConfigClientAddress: DataSourceConfigType<
 			operationFunction: (
 				params: ClientAddressFormValuesType,
 				id: number,
-			) =>
-				requestUpdate<ClientAddressModel, ClientAddressFormValuesType>(
-					'client-address',
-					params,
-					id,
-				),
+			) => {
+				const { client_id, client, city, ...prepareParams } = params;
+
+				return updateClientAddress(client_id, prepareParams, id);
+			},
 			buttonPosition: 'left',
 			button: {
 				variant: 'outline',
@@ -291,8 +292,8 @@ export const dataSourceConfigClientAddress: DataSourceConfigType<
 			permission: 'client-address.delete',
 			entriesSelection: 'single',
 			customEntryCheck: (entry: ClientAddressModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			operationFunction: (ids: number[]) =>
-				requestDelete('client-address', ids),
+			operationFunction: (entry: ClientAddressModel) =>
+				deleteClientAddress(entry),
 			buttonPosition: 'left',
 			button: {
 				variant: 'outline',
@@ -305,8 +306,8 @@ export const dataSourceConfigClientAddress: DataSourceConfigType<
 			permission: 'client-address.delete',
 			entriesSelection: 'single',
 			customEntryCheck: (entry: ClientAddressModel) => !!entry.deleted_at, // Return true if the entry is deleted
-			operationFunction: (ids: number[]) =>
-				requestRestore('client-address', ids),
+			operationFunction: (entry: ClientAddressModel) =>
+				restoreClientAddress(entry),
 			buttonPosition: 'left',
 			button: {
 				variant: 'outline',

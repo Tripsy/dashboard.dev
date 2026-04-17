@@ -5,26 +5,32 @@ import {
 	getDataSourceConfig,
 } from '@/config/data-source.config';
 import ValueError from '@/exceptions/value.error';
+import { generateWindowUid } from '@/helpers/window.helper';
 import type {
 	WindowConfig,
 	WindowCreateConfig,
 	WindowDefinition,
+	WindowEntryType,
 } from '@/types/window.type';
-import {generateWindowUid} from "@/helpers/window.helper";
 
 type WindowStore = {
 	stack: WindowConfig[];
-	open: (config: WindowCreateConfig, replacedUid?: string) => string;  // If argument `replacedUid` is provided and a window exists it will be closed
+	open: <Entry extends WindowEntryType>(
+		config: WindowCreateConfig<Entry>,
+		replacedUid?: string,
+	) => string; // If argument `replacedUid` is provided and a window exists it will be closed
 	close: (uid?: string) => void; // Removes from stack
 	closeAll: () => void; // Clear stack
 	minimize: (uid: string) => void; // Still in stack, hidden
-	restore: (uid: string) => void; // Still in stack, visible again
+	focus: (uid: string) => void; // Still in stack, visible again
 	getWindow: (uid: string) => WindowConfig | undefined; // Get window by uid
 	getCurrentWindow: () => WindowConfig | undefined; // Get top window
 };
 
 // Helper to prepare config on create
-const prepareConfigOnCreate = (config: WindowCreateConfig): WindowConfig => {
+const prepareConfigOnCreate = <Entry extends WindowEntryType>(
+	config: WindowCreateConfig<Entry>,
+): WindowConfig => {
 	const enrichedConfig = { ...config };
 
 	switch (enrichedConfig.section) {
@@ -68,12 +74,14 @@ const prepareConfigOnCreate = (config: WindowCreateConfig): WindowConfig => {
 			// Return complete WindowConfig
 			return {
 				...enrichedConfig,
-				uid: enrichedConfig.uid ?? generateWindowUid({
-					dataSource: enrichedConfig.dataSource,
-					action: enrichedConfig.action,
-					entriesSelection: actionConfig.entriesSelection,
-					entries: enrichedConfig.data?.entries,
-				}),
+				uid:
+					enrichedConfig.uid ??
+					generateWindowUid({
+						dataSource: enrichedConfig.dataSource,
+						action: enrichedConfig.action,
+						entriesSelection: actionConfig.entriesSelection,
+						entries: enrichedConfig.data?.entries,
+					}),
 				definition,
 				props: {
 					...actionConfig.windowConfigProps,
@@ -137,9 +145,9 @@ export const useModalStore = create<WindowStore>()(
 								stack: minimizedStack.map((w) =>
 									w.uid === preparedConfig.uid
 										? {
-											...preparedConfig,
-											minimized: false,
-										}
+												...preparedConfig,
+												minimized: false,
+											}
 										: w,
 								),
 							};
@@ -164,7 +172,7 @@ export const useModalStore = create<WindowStore>()(
 							),
 						})),
 
-					restore: (uid) =>
+					focus: (uid) =>
 						set((state) => ({
 							stack: minimizeAll(state.stack).map((m) =>
 								m.uid === uid ? { ...m, minimized: false } : m,

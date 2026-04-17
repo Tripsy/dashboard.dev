@@ -23,7 +23,6 @@ import {
 
 type DataTableContextType<K extends DataSourceKey, Model> = {
 	dataSource: K;
-	dataStorageKey: string;
 	selectionMode: DataTableSelectionModeType;
 	dataTableStateDefault: DataTableStateType;
 	dataTableStore: DataTableStoreType<K, Model>;
@@ -45,11 +44,6 @@ function DataTableProvider<K extends DataSourceKey, Model>({
 }) {
 	const [dataTableStore] = useState<DataTableStoreType<K, Model>>(
 		() => createDataTableStore(dataSource) as DataTableStoreType<K, Model>,
-	);
-
-	const dataStorageKey = useMemo(
-		() => `data-table-state-${dataSource}`,
-		[dataSource],
 	);
 
 	const dataTable = useMemo(
@@ -89,16 +83,18 @@ function DataTableProvider<K extends DataSourceKey, Model>({
 		500,
 	);
 
+	const contextValue = useMemo(
+		() => ({
+			dataSource,
+			selectionMode,
+			dataTableStateDefault: dataTable.state,
+			dataTableStore,
+		}),
+		[dataSource, selectionMode, dataTable.state, dataTableStore],
+	);
+
 	return (
-		<DataTableContext.Provider
-			value={{
-				dataSource,
-				dataStorageKey,
-				selectionMode,
-				dataTableStateDefault: dataTable.state,
-				dataTableStore,
-			}}
-		>
+		<DataTableContext.Provider value={contextValue}>
 			{children}
 		</DataTableContext.Provider>
 	);

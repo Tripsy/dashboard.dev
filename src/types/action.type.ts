@@ -31,14 +31,6 @@ export type UpdateFunctionType<Model, FormValues extends FormValuesType> = (
 	id: number,
 ) => Promise<ApiResponseFetch<Partial<Model>>>;
 
-export type DeleteFunctionType = (
-	ids: number[],
-) => Promise<ApiResponseFetch<null>>;
-
-export type RestoreFunctionType = (
-	ids: number[],
-) => Promise<ApiResponseFetch<null>>;
-
 export type FormOperationFunctionType<
 	Entry,
 	FormValues extends FormValuesType,
@@ -46,15 +38,36 @@ export type FormOperationFunctionType<
 	| CreateFunctionType<Entry, FormValues>
 	| UpdateFunctionType<Entry, FormValues>;
 
-export type ActionOperationFunctionType =
-	| DeleteFunctionType
-	| RestoreFunctionType;
+export type DeleteMultipleFunctionType = (
+	ids: number[],
+) => Promise<ApiResponseFetch<null>>;
+
+export type RestoreMultipleFunctionType = (
+	ids: number[],
+) => Promise<ApiResponseFetch<null>>;
+
+export type ActionOperationMultipleFunctionType =
+	| DeleteMultipleFunctionType
+	| RestoreMultipleFunctionType;
+
+export type DeleteSingleFunctionType<Entry> = (
+	entry: Entry,
+) => Promise<ApiResponseFetch<null>>;
+
+export type RestoreSingleFunctionType<Entry> = (
+	entry: Entry,
+) => Promise<ApiResponseFetch<null>>;
+
+export type ActionOperationSingleFunctionType<Entry> =
+	| DeleteSingleFunctionType<Entry>
+	| RestoreSingleFunctionType<Entry>;
 
 export type OperationFunctionType<Entry, FormValues extends FormValuesType> =
 	| FormOperationFunctionType<Entry, FormValues>
-	| ActionOperationFunctionType;
+	| ActionOperationMultipleFunctionType
+	| ActionOperationSingleFunctionType<Entry>;
 
-export type ActionEventType<Data> = (data: Data) => void;
+export type ActionEventType<Data> = (data?: Data) => void;
 
 export type DisplayEntryLabelFnType<Entry> = (entry: Entry) => string;
 

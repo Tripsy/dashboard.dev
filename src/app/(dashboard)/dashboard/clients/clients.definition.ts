@@ -391,11 +391,26 @@ export const dataSourceConfigClients: DataSourceConfigType<
 			permission: 'client.delete',
 			entriesSelection: 'single',
 			customEntryCheck: (entry: ClientModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			operationFunction: (ids: number[]) => requestDelete('clients', ids),
+			operationFunction: (entry: ClientModel) =>
+				requestDelete('clients', entry),
 			buttonPosition: 'left',
 			button: {
 				variant: 'outline',
 				hover: 'error',
+			},
+		},
+		restore: {
+			windowType: 'action',
+			windowTitle: translations['restore.title'],
+			permission: 'client.delete',
+			entriesSelection: 'single',
+			customEntryCheck: (entry: ClientModel) => !!entry.deleted_at, // Return true if the entry is deleted
+			operationFunction: (entry: ClientModel) =>
+				requestRestore('clients', entry),
+			buttonPosition: 'left',
+			button: {
+				variant: 'outline',
+				hover: 'info',
 			},
 		},
 		enable: {
@@ -408,8 +423,8 @@ export const dataSourceConfigClients: DataSourceConfigType<
 				[ClientStatusEnum.PENDING, ClientStatusEnum.INACTIVE].includes(
 					entry.status,
 				),
-			operationFunction: (ids: number[]) =>
-				requestUpdateStatus('clients', ids, 'active'),
+			operationFunction: (entry: ClientModel) =>
+				requestUpdateStatus('clients', entry, 'active'),
 			buttonPosition: 'left',
 			button: {
 				variant: 'outline',
@@ -426,26 +441,12 @@ export const dataSourceConfigClients: DataSourceConfigType<
 				[ClientStatusEnum.PENDING, ClientStatusEnum.ACTIVE].includes(
 					entry.status,
 				),
-			operationFunction: (ids: number[]) =>
-				requestUpdateStatus('clients', ids, 'inactive'),
+			operationFunction: (entry: ClientModel) =>
+				requestUpdateStatus('clients', entry, 'inactive'),
 			buttonPosition: 'left',
 			button: {
 				variant: 'outline',
 				hover: 'error',
-			},
-		},
-		restore: {
-			windowType: 'action',
-			windowTitle: translations['restore.title'],
-			permission: 'client.delete',
-			entriesSelection: 'single',
-			customEntryCheck: (entry: ClientModel) => !!entry.deleted_at, // Return true if the entry is deleted
-			operationFunction: (ids: number[]) =>
-				requestRestore('clients', ids),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'info',
 			},
 		},
 		view: {

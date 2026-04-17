@@ -66,10 +66,14 @@ export type WindowConfig<
 	definition: WindowDefinition<FormValues, Entry>;
 	data?: {
 		entries?: Entry[];
-		prefillEntry?: Entry;
+		prefillEntry?: Partial<Entry>;
 	};
-	events?: Record<string, ActionEventType<unknown>>;
+	events?: Record<string, ActionEventType<Entry>>;
 	props?: WindowConfigPropsType;
 };
 
-export type WindowCreateConfig = Omit<WindowConfig, 'uid' | 'definition'> & { uid?: string};
+export type WindowCreateConfig<
+	Entry extends WindowEntryType = WindowEntryType,
+> = Omit<WindowConfig<FormValuesType, Entry>, 'uid' | 'definition'> & {
+	uid?: string;
+};

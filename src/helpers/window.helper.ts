@@ -47,7 +47,9 @@ export function generateWindowUid<Entry>({
 		const entry = entries?.[0];
 
 		if (!entry) {
-			throw new Error(`Entry not defined for window type "${dataSource}-${action}"`);
+			throw new Error(
+				`Entry not defined for window type "${dataSource}-${action}"`,
+			);
 		}
 
 		// We assume every entry has an `id` property & entries exist

@@ -171,8 +171,8 @@ export const dataSourceConfigPermissions: DataSourceConfigType<
 			permission: 'permission.delete',
 			entriesSelection: 'single',
 			customEntryCheck: (entry: PermissionModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			operationFunction: (ids: number[]) =>
-				requestDelete('permissions', ids),
+			operationFunction: (entry: PermissionModel) =>
+				requestDelete('permissions', entry),
 			buttonPosition: 'left',
 			button: {
 				variant: 'outline',
@@ -185,8 +185,8 @@ export const dataSourceConfigPermissions: DataSourceConfigType<
 			permission: 'permission.delete',
 			entriesSelection: 'single',
 			customEntryCheck: (entry: PermissionModel) => !!entry.deleted_at, // Return true if the entry is deleted
-			operationFunction: (ids: number[]) =>
-				requestRestore('permissions', ids),
+			operationFunction: (entry: PermissionModel) =>
+				requestRestore('permissions', entry),
 			buttonPosition: 'left',
 			button: {
 				variant: 'outline',

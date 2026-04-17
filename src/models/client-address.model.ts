@@ -8,14 +8,14 @@ export enum ClientAddressTypeEnum {
 
 export type ClientAddressModel<D = Date | string> = {
 	id: number;
-	client_id: number;
+	// client_id: number;
 	address_type: ClientAddressTypeEnum;
-	city_id: number | null;
+	// city_id: number | null;
 	details: string;
 	postal_code: string | null;
 	notes: string | null;
-	city: PlaceModel<D> | null;
 	client: ClientModel<D>;
+	city: PlaceModel<D> | null;
 	created_at: D;
 	updated_at: D;
 	deleted_at: D | null;

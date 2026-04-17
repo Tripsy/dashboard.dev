@@ -5,7 +5,6 @@ const FILTER_RESET_EVENT = 'filterReset' as const;
 type FilterResetDetail = { source: DataSourceKey };
 
 export function dispatchFilterReset(source: DataSourceKey): void {
-	console.log(source, 'dispatchFilterReset');
 	window.dispatchEvent(
 		new CustomEvent(FILTER_RESET_EVENT, {
 			detail: { source },

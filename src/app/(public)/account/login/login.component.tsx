@@ -164,7 +164,7 @@ export default function Login() {
 					errors={errors}
 					button={{
 						label: 'Login',
-						icon: Icons.Action.Login,
+						iconLabel: 'login',
 					}}
 				/>
 

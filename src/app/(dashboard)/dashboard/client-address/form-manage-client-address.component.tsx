@@ -30,7 +30,7 @@ import {
 import { useWindowForm } from '@/providers/window-form.provider';
 import { useModalStore } from '@/stores/window.store';
 import type { FindFunctionResponseType } from '@/types/action.type';
-import {generateWindowUid} from "@/helpers/window.helper";
+import type { ApiResponseFetch } from '@/types/api.type';
 
 const language = await getLanguage();
 const addressTypes = toOptionsFromEnum(ClientAddressTypeEnum, {
@@ -41,7 +41,9 @@ export function FormManageClientAddress() {
 	const { formValues, errors, handleChange, pending } =
 		useWindowForm<ClientAddressFormValuesType>();
 
-	const { open } = useModalStore();
+	const { open, focus, getCurrentWindow } = useModalStore();
+
+	const window = getCurrentWindow();
 
 	const elementIds = useElementIds([
 		'address_type',
@@ -51,6 +53,24 @@ export function FormManageClientAddress() {
 		'postal_code',
 		'notes',
 	] as const);
+
+	const [searchClient, setSearchClient] = useState('');
+
+	const { suggestions: clients, isFetching: isClientLoading } =
+		useRemoteAutocomplete<ClientModel>({
+			query: searchClient,
+			queryKey: ['clients'],
+			queryFn: async (q) => {
+				const res: FindFunctionResponseType<ClientModel> | undefined =
+					await requestFind('clients', {
+						filter: { term: q },
+						limit: 10,
+					});
+
+				return res?.entries ?? [];
+			},
+			minLength: 3,
+		});
 
 	const [searchCity, setSearchCity] = useState('');
 
@@ -72,38 +92,21 @@ export function FormManageClientAddress() {
 
 	const createCityMutation = useMutation({
 		mutationFn: async (name: string) => {
-			const res = await requestCreate('places', {
-				...CITY_DEFAULT,
-				contents: [
-					{
-						...CITY_DEFAULT.contents[0],
-						language,
-						name,
-					},
-				],
-			});
+			const res: ApiResponseFetch<Partial<PlaceModel>> =
+				await requestCreate('places', {
+					...CITY_DEFAULT,
+					contents: [
+						{
+							...CITY_DEFAULT.contents[0],
+							language,
+							name,
+						},
+					],
+				});
 
 			return res?.data;
 		},
 	});
-
-	const [searchClient, setSearchClient] = useState('');
-
-	const { suggestions: clients, isFetching: isClientLoading } =
-		useRemoteAutocomplete<ClientModel>({
-			query: searchClient,
-			queryKey: ['clients'],
-			queryFn: async (q) => {
-				const res: FindFunctionResponseType<ClientModel> | undefined =
-					await requestFind('clients', {
-						filter: { term: q },
-						limit: 10,
-					});
-
-				return res?.entries ?? [];
-			},
-			minLength: 3,
-		});
 
 	return (
 		<>
@@ -120,65 +123,98 @@ export function FormManageClientAddress() {
 				error={errors.address_type}
 			/>
 
-			<FormComponentAutoComplete<ClientAddressFormValuesType, ClientModel>
-				labelText="Client"
-				id={elementIds.client}
-				fieldName="client"
-				fieldValue={formValues.client ?? ''}
-				className="pl-8"
-				isRequired={true}
-				disabled={pending}
-				error={errors.client}
-				onInputChange={(value) => {
-					handleChange('client', value);
-					handleChange('client_id', null);
-					setSearchClient(value);
-				}}
-				autoCompleteProps={{
-					suggestions: clients,
-					isLoading: isClientLoading,
-					onSelect: (c) => {
-						handleChange('client', getClientDisplayName(c));
-						handleChange('client_id', c.id);
-					},
-					getOptionLabel: (c) => getClientDisplayName(c),
-					getOptionKey: (c) => c.id,
-
-					allowCreate: true,
-
-					onCreate: (value) => {
-						open({
-							dataSource: 'clients',
-							actionName: 'create',
-							actionEntries: [],
-							prefillEntry: {
-								client_type: ClientTypeEnum.COMPANY,
-								company_name: value,
-								person_name: value,
-							},
-							onSuccess: (client: ClientModel) => {
-								if (!client) {
-									return;
-								}
-
-								handleChange(
-									'client',
-									getClientDisplayName(client),
-								);
-								handleChange('client_id', client.id);
-							},
-							props: {
-								size: 'x2l' as const,
-							},
-						});
-					},
-					createLabel: (value) => `Create client "${value}"`,
-				}}
-				icons={{
-					left: <Icons.Client className="opacity-40 h-4.5 w-4.5" />,
-				}}
+			<input
+				type="hidden"
+				name="client_id"
+				value={formValues.client_id ?? ''}
 			/>
 
+			{window?.action === 'create' && (
+				<FormComponentAutoComplete<
+					ClientAddressFormValuesType,
+					ClientModel
+				>
+					labelText="Client"
+					id={elementIds.client}
+					fieldName="client"
+					fieldValue={formValues.client ?? ''}
+					className="pl-8"
+					isRequired={true}
+					disabled={pending}
+					error={errors.client}
+					onInputChange={(value) => {
+						handleChange('client', value);
+						handleChange('client_id', null);
+						setSearchClient(value);
+					}}
+					autoCompleteProps={{
+						suggestions: clients,
+						isLoading: isClientLoading,
+						onSelect: (c) => {
+							handleChange('client', getClientDisplayName(c));
+							handleChange('client_id', c.id);
+						},
+						getOptionLabel: (c) => getClientDisplayName(c),
+						getOptionKey: (c) => c.id,
+
+						allowCreate: true,
+
+						onCreate: (value) => {
+							open<ClientModel>({
+								section: 'dashboard',
+								dataSource: 'clients',
+								action: 'create',
+								minimized: false,
+								data: {
+									prefillEntry: {
+										client_type: ClientTypeEnum.COMPANY,
+										company_name: value,
+									},
+								},
+								events: {
+									success: (client?: ClientModel) => {
+										if (!client) {
+											return;
+										}
+
+										handleChange(
+											'client',
+											getClientDisplayName(client),
+										);
+										handleChange('client_id', client.id);
+
+										// Back to client address form
+										focus(window.uid);
+									},
+								},
+								props: {
+									size: 'x2l',
+								},
+							});
+						},
+						createLabel: (value) => `Create client "${value}"`,
+					}}
+					icons={{
+						left: (
+							<Icons.Client className="opacity-40 h-4.5 w-4.5" />
+						),
+					}}
+				/>
+			)}
+
+			{window?.action === 'update' && (
+				<input
+					type="hidden"
+					name="client"
+					value={formValues.client ?? ''}
+				/>
+			)}
+
+			<input
+				type="hidden"
+				name="city_id"
+				value={formValues.city_id ?? ''}
+			/>
 			<FormComponentAutoComplete<ClientAddressFormValuesType, PlaceModel>
 				labelText="City"
 				id={elementIds.city}

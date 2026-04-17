@@ -70,7 +70,10 @@ export function WindowForm<
 
 	// WindowForm only handles form operations.
 	const operationFunction =
-		formOperationFunction as FormOperationFunctionType<unknown, FormValues>;
+		formOperationFunction as FormOperationFunctionType<
+			WindowEntry,
+			FormValues
+		>;
 
 	const initState = getFormState(entry);
 

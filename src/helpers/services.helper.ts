@@ -54,13 +54,11 @@ export async function requestUpdate<Entry, FormValues>(
 	});
 }
 
-export async function requestDelete(
+export async function requestDelete<Entry extends { id: number }>(
 	dataSource: DataSourceKey,
-	ids: number[],
+	entry: Entry,
 ): Promise<ApiResponseFetch<null>> {
-	const id = ids[0];
-
-	return await new ApiRequest().doFetch(`/${dataSource}/${id}`, {
+	return await new ApiRequest().doFetch(`/${dataSource}/${entry.id}`, {
 		method: 'DELETE',
 	});
 }
@@ -77,26 +75,25 @@ export async function requestDeleteMultiple(
 	});
 }
 
-export async function requestRestore(
+export async function requestRestore<Entry extends { id: number }>(
 	dataSource: DataSourceKey,
-	ids: number[],
+	entry: Entry,
 ): Promise<ApiResponseFetch<null>> {
-	const id = ids[0];
-
-	return await new ApiRequest().doFetch(`/${dataSource}/${id}/restore`, {
-		method: 'PATCH',
-	});
+	return await new ApiRequest().doFetch(
+		`/${dataSource}/${entry.id}/restore`,
+		{
+			method: 'PATCH',
+		},
+	);
 }
 
-export async function requestUpdateStatus(
+export async function requestUpdateStatus<Entry extends { id: number }>(
 	dataSource: DataSourceKey,
-	ids: number[],
+	entry: Entry,
 	status: string,
 ): Promise<ApiResponseFetch<null>> {
-	const id = ids[0];
-
 	return await new ApiRequest().doFetch(
-		`/${dataSource}/${id}/status/${status}`,
+		`/${dataSource}/${entry.id}/status/${status}`,
 		{
 			method: 'PATCH',
 		},

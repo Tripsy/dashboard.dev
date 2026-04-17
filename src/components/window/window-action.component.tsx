@@ -13,7 +13,10 @@ import { replaceVars } from '@/helpers/string.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { useToast } from '@/providers/toast.provider';
 import { useModalStore } from '@/stores/window.store';
-import type { ActionOperationFunctionType } from '@/types/action.type';
+import type {
+	ActionOperationMultipleFunctionType,
+	ActionOperationSingleFunctionType,
+} from '@/types/action.type';
 import type { FormValuesType } from '@/types/form.type';
 import type { WindowConfig, WindowEntryType } from '@/types/window.type';
 
@@ -48,8 +51,7 @@ export function WindowAction<WindowEntry extends WindowEntryType>({
 	}
 
 	// WindowAction only handles action operations.
-	const operationFunction =
-		windowDefinition.operationFunction as ActionOperationFunctionType;
+	const operationFunction = windowDefinition.operationFunction;
 
 	// + Guards
 	if (!operationFunction || typeof operationFunction !== 'function') {
@@ -94,10 +96,14 @@ export function WindowAction<WindowEntry extends WindowEntryType>({
 		setLoading(true);
 
 		try {
-			const fetchResponse = await operationFunction(
-				// We assume every entry has an `id` property
-				entries.map((e) => e.id as number),
-			);
+			const fetchResponse =
+				windowDefinition.entriesSelection === 'single'
+					? await (
+							operationFunction as ActionOperationSingleFunctionType<WindowEntry>
+						)(entries[0])
+					: await (
+							operationFunction as ActionOperationMultipleFunctionType
+						)(entries.map((e) => e.id as number));
 
 			if (fetchResponse?.success) {
 				showToast({
@@ -112,7 +118,7 @@ export function WindowAction<WindowEntry extends WindowEntryType>({
 					);
 				}
 
-				windowEvents?.success?.({});
+				windowEvents?.success?.();
 
 				handleClose();
 			} else {
@@ -122,7 +128,7 @@ export function WindowAction<WindowEntry extends WindowEntryType>({
 					detail: fetchResponse?.message,
 				});
 
-				windowEvents?.error?.({});
+				windowEvents?.error?.();
 			}
 		} catch (error) {
 			showToast({

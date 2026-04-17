@@ -11,7 +11,6 @@ import {
 	getDataSourceConfig,
 } from '@/config/data-source.config';
 import { getErrorMessage } from '@/helpers/objects.helper';
-import { generateWindowUid } from '@/helpers/window.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { hasPermission } from '@/models/auth.model';
 import { useAuth } from '@/providers/auth.provider';

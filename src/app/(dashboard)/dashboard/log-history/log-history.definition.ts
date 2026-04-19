@@ -1,10 +1,10 @@
-import {
-	type DataTableColumnType,
-	DataTableValue,
-	type DataTableValueOptionsType,
-} from '@/app/(dashboard)/_components/data-table-value';
+import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
 import { ViewLogHistory } from '@/app/(dashboard)/dashboard/log-history/view-log-history.component';
-import type { DataSourceConfigType } from '@/config/data-source.config';
+import type {
+	DataSourceConfigType,
+	DataTableColumnType,
+	DataTableValueOptionsType,
+} from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import { requestDeleteMultiple, requestFind } from '@/helpers/services.helper';
 import { toTitleCase } from '@/helpers/string.helper';

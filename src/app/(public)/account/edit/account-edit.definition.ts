@@ -46,10 +46,7 @@ class AccountEditValidator extends BaseValidator<typeof validatorMessages> {
 				minChars: Configuration.get('user.nameMinChars') as number,
 			},
 		),
-		language: this.validateEnum(
-			LanguageEnum,
-			this.getMessage('invalid_language'),
-		),
+		language: this.validateLanguage(this.getMessage('invalid_language')),
 	});
 }
 

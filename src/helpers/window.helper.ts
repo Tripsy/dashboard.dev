@@ -6,6 +6,8 @@ import type {
 	WindowType,
 } from '@/types/window.type';
 
+export const WINDOW_CACHE_LABEL = 'window-entry';
+
 export function displayWindowTitle({
 	entriesSelection,
 	entriesCount,

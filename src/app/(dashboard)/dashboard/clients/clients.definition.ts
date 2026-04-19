@@ -1,11 +1,11 @@
 import { z } from 'zod';
-import {
-	type DataTableColumnType,
-	DataTableValue,
-} from '@/app/(dashboard)/_components/data-table-value';
+import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
 import { FormManageClient } from '@/app/(dashboard)/dashboard/clients/form-manage-client.component';
 import { ViewClient } from '@/app/(dashboard)/dashboard/clients/view-client.component';
-import type { DataSourceConfigType } from '@/config/data-source.config';
+import type {
+	DataSourceConfigType,
+	DataTableColumnType,
+} from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import { getFormDataAsEnum, getFormDataAsString } from '@/helpers/form.helper';
 import {

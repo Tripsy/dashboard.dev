@@ -1,10 +1,10 @@
-import {
-	type DataTableColumnType,
-	DataTableValue,
-	type DataTableValueOptionsType,
-} from '@/app/(dashboard)/_components/data-table-value';
+import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
 import { ViewMailQueue } from '@/app/(dashboard)/dashboard/mail-queue/view-mail-queue.component';
-import type { DataSourceConfigType } from '@/config/data-source.config';
+import type {
+	DataSourceConfigType,
+	DataTableColumnType,
+	DataTableValueOptionsType,
+} from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import { formatDate } from '@/helpers/date.helper';
 import { requestDeleteMultiple, requestFind } from '@/helpers/services.helper';

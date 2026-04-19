@@ -1,12 +1,15 @@
 'use client';
 
+import { useQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
+import { LoadingComponent } from '@/components/status.component';
 import { Modal } from '@/components/ui/modal';
 import { WindowAction } from '@/components/window/window-action.component';
 import { WindowForm } from '@/components/window/window-form.component';
 import {
 	displayWindowTitle,
 	resolveWindowEntries,
+	WINDOW_CACHE_LABEL,
 } from '@/helpers/window.helper';
 import { useModalStore } from '@/stores/window.store';
 import type { EntriesSelectionType } from '@/types/action.type';
@@ -90,7 +93,19 @@ export function WindowInstance({
 	const type = definition.windowType || 'other';
 	const WindowComponent = definition?.windowComponent;
 
-	const { entry, entries } = resolveWindowEntries(current, type);
+	const { entry: rawEntry, entries } = resolveWindowEntries(current, type);
+
+	const entryId =
+		rawEntry && 'id' in rawEntry ? (rawEntry.id as number) : undefined;
+	const reloadFn = definition.reloadEntry;
+
+	const { data: reloadedEntry, isLoading: isEntryLoading } = useQuery({
+		queryKey: [WINDOW_CACHE_LABEL, current.uid, entryId],
+		queryFn: reloadFn && entryId ? () => reloadFn(entryId) : undefined,
+		enabled: !!reloadFn && !!entryId,
+	});
+
+	const entry = reloadedEntry ?? rawEntry;
 
 	const modalTitle =
 		windowProps?.title ||
@@ -122,7 +137,11 @@ export function WindowInstance({
 			onClose={handleClose}
 			onMinimize={handleMinimize}
 		>
-			{renderer({ uid, type, entry, entries, WindowComponent })}
+			{isEntryLoading && definition.reloadEntry ? (
+				<LoadingComponent />
+			) : (
+				renderer({ uid, type, entry, entries, WindowComponent })
+			)}
 		</Modal>
 	);
 }

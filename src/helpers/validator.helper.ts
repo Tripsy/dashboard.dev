@@ -748,20 +748,20 @@ export abstract class BaseValidator<
 		optionsData?: {
 			required?: true;
 		},
-	): z.ZodType<string>;
+	): z.ZodType<LanguageEnum>;
 
 	protected validateLanguage(
 		message: string,
 		optionsData: {
 			required: false;
 		},
-	): z.ZodType<string | TEmpty>;
+	): z.ZodType<LanguageEnum | TEmpty>;
 
 	// Implementation signature
 	protected validateLanguage(
 		message = 'Invalid language',
 		optionsData?: { required?: boolean },
-	): z.ZodType<string | TEmpty> {
+	): z.ZodType<LanguageEnum | TEmpty> {
 		const options = {
 			required: true,
 			...optionsData,

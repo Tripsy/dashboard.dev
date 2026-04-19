@@ -1,6 +1,8 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo } from 'react';
 import { dispatchFilterReset } from '@/app/(dashboard)/_events/data-table-filter-reset.event';
 import type { DataSourceKey } from '@/config/data-source.config';
+import { WINDOW_CACHE_LABEL } from '@/helpers/window.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { useToast } from '@/providers/toast.provider';
 import { useModalStore } from '@/stores/window.store';
@@ -15,6 +17,7 @@ type UseWindowFormProcessedParams<
 	state: FormStateType<FormValues>;
 	windowConfig: WindowConfig<FormValues, Entry>;
 	windowEvents?: Record<string, ActionEventType<Entry>>;
+	entryId?: number;
 };
 
 export function useWindowFormProcessed<
@@ -24,9 +27,11 @@ export function useWindowFormProcessed<
 	state,
 	windowConfig,
 	windowEvents,
+	entryId,
 }: UseWindowFormProcessedParams<FormValues, Entry>) {
 	const { close } = useModalStore();
 	const { showToast } = useToast();
+	const queryClient = useQueryClient();
 
 	const actionLabelKey = `${windowConfig.dataSource}.action.${windowConfig.action}.label`;
 	const successMessageKey = `${windowConfig.dataSource}.action.${windowConfig.action}.success`;
@@ -58,6 +63,21 @@ export function useWindowFormProcessed<
 					);
 				}
 
+				// Invalidate reloaded entry cache on update
+				if (windowConfig.action === 'update' && entryId) {
+					const windowDefinition = windowConfig?.definition;
+
+					if (windowDefinition?.reloadEntry) {
+						await queryClient.invalidateQueries({
+							queryKey: [
+								WINDOW_CACHE_LABEL,
+								windowConfig.uid,
+								entryId,
+							],
+						});
+					}
+				}
+
 				close(windowConfig.uid);
 			}
 
@@ -69,6 +89,8 @@ export function useWindowFormProcessed<
 			translations,
 			successMessageKey,
 			windowConfig,
+			entryId,
+			queryClient,
 			close,
 		],
 	);

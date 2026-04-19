@@ -99,8 +99,7 @@ class RegisterValidator extends BaseValidator<typeof validatorMessages> {
 			password_confirm: this.validateString(
 				this.getMessage('password_confirm_required'),
 			),
-			language: this.validateEnum(
-				LanguageEnum,
+			language: this.validateLanguage(
 				this.getMessage('invalid_language'),
 			),
 			terms: this.validateBoolean(this.getMessage('terms_required')),

@@ -56,10 +56,10 @@ export function FormManageClientAddress() {
 
 	const [searchClient, setSearchClient] = useState('');
 
-	const { suggestions: clients, isFetching: isClientLoading } =
+	const { suggestions: clientsSuggestions, isFetching: isClientsFetching } =
 		useRemoteAutocomplete<ClientModel>({
 			query: searchClient,
-			queryKey: ['clients'],
+			queryKey: ['s-clients'],
 			queryFn: async (q) => {
 				const res: FindFunctionResponseType<ClientModel> | undefined =
 					await requestFind('clients', {
@@ -74,10 +74,10 @@ export function FormManageClientAddress() {
 
 	const [searchCity, setSearchCity] = useState('');
 
-	const { suggestions: cities, isFetching: isCityLoading } =
+	const { suggestions: citiesSuggestions, isFetching: isCitiesFetching } =
 		useRemoteAutocomplete<PlaceModel>({
 			query: searchCity,
-			queryKey: ['cities'],
+			queryKey: ['s-cities'],
 			queryFn: async (q) => {
 				const res: FindFunctionResponseType<PlaceModel> | undefined =
 					await requestFind('places', {
@@ -148,8 +148,8 @@ export function FormManageClientAddress() {
 						setSearchClient(value);
 					}}
 					autoCompleteProps={{
-						suggestions: clients,
-						isLoading: isClientLoading,
+						suggestions: clientsSuggestions,
+						isLoading: isClientsFetching,
 						onSelect: (c) => {
 							handleChange('client', getClientDisplayName(c));
 							handleChange('client_id', c.id);
@@ -230,8 +230,8 @@ export function FormManageClientAddress() {
 					setSearchCity(value);
 				}}
 				autoCompleteProps={{
-					suggestions: cities,
-					isLoading: isCityLoading,
+					suggestions: citiesSuggestions,
+					isLoading: isCitiesFetching,
 					onSelect: (c) => {
 						handleChange('city', getPlaceContentProp(c, language));
 						handleChange('city_id', c.id);

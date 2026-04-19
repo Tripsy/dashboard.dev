@@ -1,5 +1,5 @@
 import type React from 'react';
-import type { DataTableColumnType } from '@/app/(dashboard)/_components/data-table-value';
+import type { JSX } from 'react';
 import type {
 	ActionEventType,
 	ActionOperationMultipleFunctionType,
@@ -9,6 +9,7 @@ import type {
 	EntriesSelectionType,
 	FindFunctionType,
 	OperationFunctionType,
+	ReloadEntryFnType,
 	UpdateFunctionType,
 } from '@/types/action.type';
 import type {
@@ -50,6 +51,31 @@ export type DataTableStateType = {
 	filters: DataTableFiltersType;
 };
 
+export type DataTableColumnType<Entry> = {
+	field: string;
+	header: string;
+	sortable?: boolean;
+	body?: (
+		entry: Entry,
+		column: DataTableColumnType<Entry>,
+	) => JSX.Element | string;
+	style?: React.CSSProperties;
+};
+
+export type DataTableValueOptionsType<Entry> = {
+	customValue?: string | JSX.Element;
+	capitalize?: boolean;
+	markDeleted?: boolean;
+	isStatus?: boolean;
+	displayDate?: boolean;
+	displayButton?: {
+		action: string | ((entry: Entry) => string | undefined);
+		dataSource: DataSourceKey;
+		altTitle?: string;
+		alternateEntryId?: number;
+	};
+};
+
 // ============================================================================
 // Action Types
 // ============================================================================
@@ -69,6 +95,7 @@ type ActionConfigBase<
 	button?: ActionButtonPropsType; // Action button configuration
 
 	operationFunction?: OperationFunctionType<Entry, FormValues>; // e.g: createUser, updateUser, etc.
+	reloadEntry?: ReloadEntryFnType<Entry>; // Used to reload entry data for form and view; the entry passed from the list may not have all the data
 
 	// Form-related
 	validateForm?: ValidateFormFnType<FormValues>;
@@ -101,6 +128,7 @@ type FormUpdateActionConfig<
 	validateForm: ValidateFormFnType<FormValues>;
 	getFormValues: GetFormValuesFnType<FormValues>;
 	getFormState: GetFormStateFnType<FormValues, Entry>;
+	reloadEntry?: ReloadEntryFnType<Entry>;
 };
 
 type SingleActionConfig<
@@ -128,6 +156,7 @@ type ViewActionConfig<
 	windowType: 'view';
 	entriesSelection: 'single';
 	operationFunction?: never;
+	reloadEntry?: ReloadEntryFnType<Entry>;
 };
 
 type OtherActionConfig<

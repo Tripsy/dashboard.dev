@@ -65,6 +65,7 @@ const prepareConfigOnCreate = <Entry extends WindowEntryType>(
 				validateForm: actionConfig.validateForm,
 				getFormValues: actionConfig.getFormValues,
 				getFormState: actionConfig.getFormState,
+				reloadEntry: actionConfig.reloadEntry,
 				displayEntryLabel: getDataSourceConfig(
 					enrichedConfig.dataSource as DataSourceKey,
 					'displayEntryLabel',

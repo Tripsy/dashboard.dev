@@ -1,9 +1,9 @@
-import {
-	type DataTableColumnType,
-	DataTableValue,
-} from '@/app/(dashboard)/_components/data-table-value';
+import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
 import { ViewLogData } from '@/app/(dashboard)/dashboard/log-data/view-log-data.component';
-import type { DataSourceConfigType } from '@/config/data-source.config';
+import type {
+	DataSourceConfigType,
+	DataTableColumnType,
+} from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import { requestDeleteMultiple, requestFind } from '@/helpers/services.helper';
 import type {

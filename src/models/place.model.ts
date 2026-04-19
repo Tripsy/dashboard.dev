@@ -1,3 +1,4 @@
+import { capitalizeFirstLetter } from '@/helpers/string.helper';
 import { LANGUAGE_DEFAULT, type LanguageEnum } from '@/models/user.model';
 
 export enum PlaceTypeEnum {
@@ -6,15 +7,12 @@ export enum PlaceTypeEnum {
 	CITY = 'city',
 }
 
-// Content types
 export type PlaceContent = {
-	language: LanguageEnum | string; // Using LanguageEnum if available, otherwise string
+	language: LanguageEnum;
 	name: string;
 	type_label: string;
-	details?: Record<string, string | number | boolean> | null;
 };
 
-// Full place model with relations
 export type PlaceModel<D = Date | string> = {
 	id: number;
 	place_type: PlaceTypeEnum;
@@ -28,7 +26,7 @@ export type PlaceModel<D = Date | string> = {
 	children?: PlaceModel<D>[];
 
 	// Content translations
-	contents?: PlaceContent[];
+	contents: PlaceContent[];
 
 	// Timestamps
 	created_at: D;
@@ -40,9 +38,8 @@ export type PlaceFormValuesType = {
 	place_type: PlaceTypeEnum;
 	code: string | null;
 	parent_id: number | null;
-
-	name: string;
-	type_label: string;
+	parent: string | null;
+	contents: PlaceContent[];
 };
 
 // Helpers
@@ -73,6 +70,31 @@ export function getPlaceContentProp(
 
 	return contentFirst[prop];
 }
+
+export function getParentPlaceType(place_type: PlaceTypeEnum) {
+	if (place_type === PlaceTypeEnum.COUNTRY) {
+		return null;
+	}
+
+	if (place_type === PlaceTypeEnum.REGION) {
+		return PlaceTypeEnum.COUNTRY;
+	}
+
+	if (place_type === PlaceTypeEnum.CITY) {
+		return PlaceTypeEnum.REGION;
+	}
+}
+
+export const displayPlaceLabel = (
+	p: PlaceModel,
+	selectedLanguage: LanguageEnum,
+) => {
+	const name = getPlaceContentProp(p, selectedLanguage, 'name');
+	const place_type =
+		getPlaceContentProp(p, selectedLanguage, 'type_label') || p.place_type;
+
+	return `${capitalizeFirstLetter(place_type)} / ${name}`;
+};
 
 export const CITY_DEFAULT = {
 	code: null,

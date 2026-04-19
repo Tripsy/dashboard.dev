@@ -194,16 +194,6 @@ export function safeHtml(dirtyHtml: string): string {
 	});
 }
 
-// export function createHandleChange<FormValues extends FormValuesType>(
-// 	setFormValues: (updater: (prev: FormValues) => FormValues) => void,
-// 	markFieldAsTouched: (field: keyof FormValues) => void,
-// ): FormComponentType<FormValues>['handleChange'] {
-// 	return (field, value) => {
-// 		setFormValues((prev) => ({ ...prev, [field]: value }));
-// 		markFieldAsTouched(field);
-// 	};
-// }
-
 export function createHandleChange<FormValues extends FormValuesType>(
 	setFormValues: Dispatch<SetStateAction<FormValues>>,
 	markFieldAsTouched: (path: string) => void, // now a string path, not keyof FormValues
@@ -258,6 +248,32 @@ export function getFormDataAsEnum<T extends Record<string, string>>(
 
 	return null;
 }
+
+// export function getFormDataAsArray(
+// 	formData: FormData,
+// 	schemaKey: string,
+// ): Record<number, Record<string, FormDataEntryValue>> {
+// 	const schema: Record<number, Record<string, FormDataEntryValue>> = {};
+//
+// 	for (const [key, value] of formData.entries()) {
+// 		const match = key.match(new RegExp(`^${schemaKey}[(d+)][(w+)]$`));
+//
+// 		if (!match) {
+// 			continue;
+// 		}
+//
+// 		const index = Number(match[1]);
+// 		const field = match[2];
+//
+// 		if (!schema[index]) {
+// 			schema[index] = {};
+// 		}
+//
+// 		schema[index][field] = value;
+// 	}
+//
+// 	return schema;
+// }
 
 // export function getFormDataAsDate(formData: FormData, key: string): Date {
 // 	return new Date(formData.get(key) as string);

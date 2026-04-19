@@ -13,6 +13,7 @@ import {
 	CircleX,
 	ClipboardClock,
 	Clock,
+	Code,
 	Ellipsis,
 	Eraser,
 	Expand,
@@ -103,6 +104,7 @@ export const Icons = {
 	Address: createIcon(MapPinHouse),
 	Brand: createIcon(FileSignal),
 	City: createIcon(Building2),
+	Code: createIcon(Code),
 
 	Status: {
 		Active: createIcon(CircleCheck),

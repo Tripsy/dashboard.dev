@@ -7,7 +7,7 @@ import { dataSourceConfigLogData } from '@/app/(dashboard)/dashboard/log-data/lo
 import { dataSourceConfigLogHistory } from '@/app/(dashboard)/dashboard/log-history/log-history.definition';
 import { dataSourceConfigMailQueue } from '@/app/(dashboard)/dashboard/mail-queue/mail-queue.definition';
 import { dataSourceConfigPermissions } from '@/app/(dashboard)/dashboard/permissions/permissions.definition';
-// // import { dataSourceConfigPlaces } from '@/app/(dashboard)/dashboard/places/places.definition';
+import { dataSourceConfigPlaces } from '@/app/(dashboard)/dashboard/places/places.definition';
 import { dataSourceConfigTemplates } from '@/app/(dashboard)/dashboard/templates/templates.definition';
 import { dataSourceConfigUsers } from '@/app/(dashboard)/dashboard/users/users.definition';
 import { registerDataSource } from '@/config/data-source.config';
@@ -26,7 +26,7 @@ export function registerDashboardDataSource() {
 	registerDataSource('log-history', dataSourceConfigLogHistory);
 	registerDataSource('mail-queue', dataSourceConfigMailQueue);
 	registerDataSource('permissions', dataSourceConfigPermissions);
-	// // registerDataSource('places', dataSourceConfigPlaces);
+	registerDataSource('places', dataSourceConfigPlaces);
 	registerDataSource('templates', dataSourceConfigTemplates);
 	registerDataSource('users', dataSourceConfigUsers);
 }

@@ -17,10 +17,10 @@ export function WindowMinimizedInstance({
 	current: WindowConfig;
 	isActive: boolean;
 }) {
-	const { close, restore } = useModalStore();
+	const { close, focus } = useModalStore();
 
 	const handleClose = () => close(current.uid);
-	const handleRestore = () => restore(current.uid);
+	const handleRestore = () => focus(current.uid);
 
 	const windowProps = current.props;
 	const definition = current.definition;

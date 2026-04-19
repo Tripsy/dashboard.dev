@@ -1,11 +1,11 @@
 import { z } from 'zod';
-import {
-	type DataTableColumnType,
-	DataTableValue,
-} from '@/app/(dashboard)/_components/data-table-value';
+import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
 import { FormManageTemplate } from '@/app/(dashboard)/dashboard/templates/form-manage-template.component';
 import { ViewTemplate } from '@/app/(dashboard)/dashboard/templates/view-template.component';
-import type { DataSourceConfigType } from '@/config/data-source.config';
+import type {
+	DataSourceConfigType,
+	DataTableColumnType,
+} from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import { getFormDataAsEnum, getFormDataAsString } from '@/helpers/form.helper';
 import {
@@ -58,10 +58,7 @@ const validatorMessages = await BaseValidator.getValidatorMessages(
 class TemplateValidator extends BaseValidator<typeof validatorMessages> {
 	baseSchema = {
 		label: this.validateString(this.getMessage('invalid_label')),
-		language: this.validateEnum(
-			LanguageEnum,
-			this.getMessage('invalid_language'),
-		),
+		language: this.validateLanguage(this.getMessage('invalid_language')),
 	};
 
 	manage = z.discriminatedUnion('type', [

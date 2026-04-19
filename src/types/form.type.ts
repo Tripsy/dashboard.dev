@@ -3,7 +3,10 @@ import type { ZodSafeParseError, ZodSafeParseSuccess } from 'zod';
 export type FormSituationType = 'success' | 'error' | null;
 type FormValueType = string | number | boolean | Date | null | undefined;
 export type FormValuesType = {
-	[key: string]: FormValueType | FormValuesType;
+	[key: string]:
+		| FormValueType
+		| FormValuesType
+		| Record<string, FormValueType>[];
 };
 
 export type GetFormValuesFnType<FormValues> = (
@@ -19,9 +22,13 @@ export type ValidateFormFnType<FormValues> = (
 ) => ValidateFormReturnType<FormValues>;
 
 export type FormErrorsType<FormValues extends FormValuesType> = {
-	[K in keyof FormValues]?: FormValues[K] extends FormValuesType
-		? FormErrorsType<FormValues[K]>
-		: string[];
+	[K in keyof FormValues]?: FormValues[K] extends Array<infer Item>
+		? Item extends FormValuesType
+			? Array<FormErrorsType<Item>>
+			: string[]
+		: FormValues[K] extends FormValuesType
+			? FormErrorsType<FormValues[K]>
+			: string[];
 };
 
 export type TouchedFieldsType<T> = {

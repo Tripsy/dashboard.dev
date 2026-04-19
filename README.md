@@ -210,30 +210,39 @@ pnpm run build    # Production build
 
 # 📌 TODO
 
-1. Displayed dates should be converted to local TZ
-2. Strange interaction on login after existing session is removed
-3. App reload on tab switch - maybe a Zustand configuration issue
-4. Clients > Client Address > Brands > Places > Cash Flow
+1. commit for BE, sync with STAR
+2. replace enum types
+   export const LanguageEnum = {
+   EN: "en",
+   RO: "ro",
+   } as const;
+
+    export type LanguageEnum =
+    typeof LanguageEnum[keyof typeof LanguageEnum];
+3. Displayed dates should be converted to local TZ
+4. Strange interaction on login after existing session is removed
+5. App reload on tab switch - maybe a Zustand configuration issue
+6. Clients > Client Address > Brands > Places > Cash Flow
     - address details
     - address manage
     - cash flow status update 
     - cash flow manage
     - cash flow details
     - add places  icons region > area, city > building, country → map
-5. Review security
-6. Add section "documentation"
-7. login with google / facebook
-8. Replace all console.error with logging
-9. Implement kill all sessions except current
-      // // This will actually remove all sessions - keep it for further implementation
-      // await AccountTokenRepository.createQuery()
-      //     .filterBy('user_id', policy.getUserId())
-      //     .delete(false, true);
-10. For template section
+7. Review security
+8. Add section "documentation"
+9. login with google / facebook
+10. Replace all console.error with logging
+11. Implement kill all sessions except current
+       // // This will actually remove all sessions - keep it for further implementation
+       // await AccountTokenRepository.createQuery()
+       //     .filterBy('user_id', policy.getUserId())
+       //     .delete(false, true);
+12. For template section
      - would be a nice idea to keep track of the last changes (maybe add a new column - prev version id and a button to restore to that version)
      - view presentation could be enhanced
-11. https://nextjs.org/docs/app/getting-started/partial-prerendering
-12. https://react.dev/learn/react-compiler/introduction
+13. https://nextjs.org/docs/app/getting-started/partial-prerendering
+14. https://react.dev/learn/react-compiler/introduction
 
 # 🔗 Dependencies
 

@@ -1,12 +1,12 @@
 import { z } from 'zod';
-import {
-	type DataTableColumnType,
-	DataTableValue,
-} from '@/app/(dashboard)/_components/data-table-value';
+import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
 import { FormManageUser } from '@/app/(dashboard)/dashboard/users/form-manage-user.component';
 import { SetupPermissionsUser } from '@/app/(dashboard)/dashboard/users/setup-permissions-user.component';
 import { ViewUser } from '@/app/(dashboard)/dashboard/users/view-user.component';
-import type { DataSourceConfigType } from '@/config/data-source.config';
+import type {
+	DataSourceConfigType,
+	DataTableColumnType,
+} from '@/config/data-source.config';
 import { Configuration } from '@/config/settings.config';
 import { translateBatch } from '@/config/translate.setup';
 import { getFormDataAsEnum, getFormDataAsString } from '@/helpers/form.helper';
@@ -78,10 +78,7 @@ class UserValidator extends BaseValidator<typeof validatorMessages> {
 			},
 		),
 		email: this.validateEmail(this.getMessage('invalid_email')),
-		language: this.validateEnum(
-			LanguageEnum,
-			this.getMessage('invalid_language'),
-		),
+		language: this.validateLanguage(this.getMessage('invalid_language')),
 		role: this.validateEnum(UserRoleEnum, this.getMessage('invalid_role')),
 		operator_type: this.validateEnum(
 			UserOperatorTypeEnum,
@@ -427,6 +424,21 @@ export const dataSourceConfigUsers: DataSourceConfigType<
 				hover: 'error',
 			},
 		},
+		restore: {
+			windowType: 'action',
+			windowTitle: translations['restore.title'],
+			permission: 'user.delete',
+			entriesSelection: 'single',
+			customEntryCheck: (entry: UserModel) => !!entry.deleted_at, // Return true if the entry is deleted
+			operationFunction: (entry: UserModel) =>
+				requestRestore('users', entry),
+			buttonPosition: 'left',
+			button: {
+				variant: 'outline',
+				hover: 'info',
+			},
+		},
+
 		enable: {
 			windowType: 'action',
 			windowTitle: translations['enable.title'],
@@ -461,20 +473,6 @@ export const dataSourceConfigUsers: DataSourceConfigType<
 			button: {
 				variant: 'outline',
 				hover: 'error',
-			},
-		},
-		restore: {
-			windowType: 'action',
-			windowTitle: translations['restore.title'],
-			permission: 'user.delete',
-			entriesSelection: 'single',
-			customEntryCheck: (entry: UserModel) => !!entry.deleted_at, // Return true if the entry is deleted
-			operationFunction: (entry: UserModel) =>
-				requestRestore('users', entry),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'info',
 			},
 		},
 		view: {

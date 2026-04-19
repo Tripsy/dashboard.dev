@@ -1,9 +1,12 @@
 'use client';
 
-import type React from 'react';
 import type { JSX } from 'react';
 import { dispatchDataTableAction } from '@/app/(dashboard)/_events/data-table-action.event';
-import type { DataSourceKey } from '@/config/data-source.config';
+import type {
+	DataSourceKey,
+	DataTableColumnType,
+	DataTableValueOptionsType,
+} from '@/config/data-source.config';
 import { formatDate } from '@/helpers/date.helper';
 import {
 	DisplayDeleted,
@@ -15,31 +18,6 @@ import { requestView } from '@/helpers/services.helper';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
 import { useToast } from '@/providers/toast.provider';
 import type { ActionButtonPropsType } from '@/types/html.type';
-
-export type DataTableColumnType<Entry> = {
-	field: string;
-	header: string;
-	sortable?: boolean;
-	body?: (
-		entry: Entry,
-		column: DataTableColumnType<Entry>,
-	) => JSX.Element | string;
-	style?: React.CSSProperties;
-};
-
-export type DataTableValueOptionsType<Entry> = {
-	customValue?: string | JSX.Element;
-	capitalize?: boolean;
-	markDeleted?: boolean;
-	isStatus?: boolean;
-	displayDate?: boolean;
-	displayButton?: {
-		action: string | ((entry: Entry) => string | undefined);
-		dataSource: DataSourceKey;
-		altTitle?: string;
-		alternateEntryId?: number;
-	};
-};
 
 export const DisplayButton = <Entry,>({
 	buttonProps,

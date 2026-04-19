@@ -1,10 +1,10 @@
 import { z } from 'zod';
-import {
-	type DataTableColumnType,
-	DataTableValue,
-} from '@/app/(dashboard)/_components/data-table-value';
+import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
 import { FormManagePermission } from '@/app/(dashboard)/dashboard/permissions/form-manage-permission.component';
-import type { DataSourceConfigType } from '@/config/data-source.config';
+import type {
+	DataSourceConfigType,
+	DataTableColumnType,
+} from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import { getFormDataAsString } from '@/helpers/form.helper';
 import {

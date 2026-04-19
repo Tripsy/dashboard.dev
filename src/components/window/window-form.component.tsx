@@ -76,6 +76,7 @@ export function WindowForm<
 		>;
 
 	const initState = getFormState(entry);
+	const entryId = entry && 'id' in entry ? (entry.id as number) : undefined; // Present for update, undefined for create
 
 	const [state, action, pending] = useActionState<
 		FormStateType<FormValues>,
@@ -88,7 +89,7 @@ export function WindowForm<
 				getFormValues,
 				validateForm,
 				operationFunction,
-				entry && 'id' in entry ? (entry.id as number) : undefined, // Present for update, undefined for create
+				entryId,
 			),
 		initState,
 	);
@@ -102,6 +103,7 @@ export function WindowForm<
 		state,
 		windowConfig,
 		windowEvents,
+		entryId,
 	});
 
 	const handleChange = createHandleChange<FormValues>(

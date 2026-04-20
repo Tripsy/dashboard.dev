@@ -19,6 +19,7 @@ export type ValidateFormReturnType<FormValues> =
 
 export type ValidateFormFnType<FormValues> = (
 	values: FormValues,
+	isSubmit?: boolean,
 ) => ValidateFormReturnType<FormValues>;
 
 export type FormErrorsType<FormValues extends FormValuesType> = {

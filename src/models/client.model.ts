@@ -29,7 +29,7 @@ export type ClientStatus =
 
 export type ClientIdentity =
 	| {
-			client_type: ClientTypeEnum.COMPANY;
+			client_type: typeof ClientTypeEnum.COMPANY;
 
 			company_name: string | null;
 			company_cui: string | null;
@@ -39,7 +39,7 @@ export type ClientIdentity =
 			person_identification_number?: never;
 	  }
 	| {
-			client_type: ClientTypeEnum.PERSON;
+			client_type: typeof ClientTypeEnum.PERSON;
 
 			person_name: string | null;
 			person_identification_number: string | null;

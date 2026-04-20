@@ -73,44 +73,48 @@ class PlaceValidator extends BaseValidator<typeof validatorMessages> {
 		});
 	}
 
-	manage = z
-		.object({
-			place_type: this.validateEnum(
-				PlaceTypeEnum,
-				this.getMessage('invalid_place_type'),
-			),
-			code: this.validateString(this.getMessage('invalid_code'), {
-				required: false,
-			}),
-			parent_id: this.validateId(this.getMessage('invalid_parent_id'), {
-				required: false,
-			}),
-			parent: this.validateString(this.getMessage('invalid_parent'), {
-				required: false,
-			}),
-			contents: this.contentsSchema()
-				.array()
-				.min(1, this.getMessage('invalid_contents'))
-				.refine(
-					(contents) => {
-						const languages = contents.map((c) => c.language);
-						return new Set(languages).size === languages.length;
-					},
-					{ message: this.getMessage('duplicate_contents') },
+	manage = (isSubmit: boolean = true) =>
+		z
+			.object({
+				place_type: this.validateEnum(
+					PlaceTypeEnum,
+					this.getMessage('invalid_place_type'),
 				),
-		})
-		.superRefine((data, ctx) => {
-			if (data.parent && !data.parent_id) {
-				ctx.addIssue({
-					path: ['parent'],
-					message: this.getMessage('invalid_parent_id'),
-					code: 'custom',
-				});
-			}
-		});
+				code: this.validateString(this.getMessage('invalid_code'), {
+					required: false,
+				}),
+				parent_id: this.validateId(
+					this.getMessage('invalid_parent_id'),
+					{
+						required: false,
+					},
+				),
+				parent: this.validateString(this.getMessage('invalid_parent'), {
+					required: false,
+				}),
+				contents: this.contentsSchema().array(),
+			})
+			.superRefine((data, ctx) => {
+				if (isSubmit && data.parent && !data.parent_id) {
+					ctx.addIssue({
+						path: ['parent'],
+						message: this.getMessage('invalid_parent_id'),
+						code: 'custom',
+					});
+				}
+			})
+			.superRefine((data, ctx) => {
+				if (!data.contents || data.contents.length < 1) {
+					ctx.addIssue({
+						path: ['contents', 0, 'name'],
+						message: this.getMessage('invalid_contents'),
+						code: 'custom',
+					});
+				}
+			});
 }
 
-function validateForm(values: PlaceFormValuesType) {
+function validateForm(values: PlaceFormValuesType, isSubmit: boolean = true) {
 	const validator = new PlaceValidator(validatorMessages);
 
 	const normalizedValues = {
@@ -120,7 +124,7 @@ function validateForm(values: PlaceFormValuesType) {
 		),
 	};
 
-	return validator.manage.safeParse(normalizedValues);
+	return validator.manage(isSubmit).safeParse(normalizedValues);
 }
 
 function getFormValues(formData: FormData): PlaceFormValuesType {

@@ -59,46 +59,65 @@ const validatorMessages = await BaseValidator.getValidatorMessages(
 );
 
 class ClientAddressValidator extends BaseValidator<typeof validatorMessages> {
-	manage = z
-		.object({
-			client_id: this.validateId(this.getMessage('invalid_client_id')),
-			client: this.validateString(this.getMessage('invalid_client')),
-			address_type: this.validateEnum(
-				ClientAddressTypeEnum,
-				this.getMessage('invalid_address_type'),
-			),
-			city_id: this.validateId(this.getMessage('invalid_city_id'), {
-				required: false,
-			}),
-			city: this.validateString(this.getMessage('invalid_city'), {
-				required: false,
-			}),
-			details: this.validateString(this.getMessage('invalid_details')),
-			postal_code: this.validatePostalCode(
-				this.getMessage('invalid_postal_code'),
-				{
+	manage = (isSubmit: boolean = true) =>
+		z
+			.object({
+				client_id: this.validateId(
+					this.getMessage('invalid_client_id'),
+					{
+						required: false,
+					},
+				),
+				client: this.validateString(this.getMessage('invalid_client')),
+				address_type: this.validateEnum(
+					ClientAddressTypeEnum,
+					this.getMessage('invalid_address_type'),
+				),
+				city_id: this.validateId(this.getMessage('invalid_city_id'), {
 					required: false,
-				},
-			),
-			notes: this.validateString(this.getMessage('invalid_notes'), {
-				required: false,
-			}),
-		})
-		.superRefine((data, ctx) => {
-			if (data.city && !data.city_id) {
-				ctx.addIssue({
-					path: ['city'],
-					message: this.getMessage('invalid_city_id'),
-					code: 'custom',
-				});
-			}
-		});
+				}),
+				city: this.validateString(this.getMessage('invalid_city'), {
+					required: false,
+				}),
+				details: this.validateString(
+					this.getMessage('invalid_details'),
+				),
+				postal_code: this.validatePostalCode(
+					this.getMessage('invalid_postal_code'),
+					{
+						required: false,
+					},
+				),
+				notes: this.validateString(this.getMessage('invalid_notes'), {
+					required: false,
+				}),
+			})
+			.superRefine((data, ctx) => {
+				if (isSubmit && data.client && !data.client_id) {
+					ctx.addIssue({
+						path: ['client'],
+						message: this.getMessage('invalid_client_id'),
+						code: 'custom',
+					});
+				}
+
+				if (isSubmit && data.city && !data.city_id) {
+					ctx.addIssue({
+						path: ['city'],
+						message: this.getMessage('invalid_city_id'),
+						code: 'custom',
+					});
+				}
+			});
 }
 
-function validateForm(values: ClientAddressFormValuesType) {
+function validateForm(
+	values: ClientAddressFormValuesType,
+	isSubmit: boolean = true,
+) {
 	const validator = new ClientAddressValidator(validatorMessages);
 
-	return validator.manage.safeParse(values);
+	return validator.manage(isSubmit).safeParse(values);
 }
 
 function getFormValues(formData: FormData): ClientAddressFormValuesType {

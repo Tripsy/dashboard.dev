@@ -105,19 +105,6 @@ export function FormManagePlace() {
 			) as Partial<Record<Language, PlaceContent>>,
 	);
 
-	// // Sync contentsMap when formValues.contents is updated from outside (e.g. reloaded entry)
-	// const prevContentsRef = useRef(formValues.contents);
-	//
-	// if (prevContentsRef.current !== formValues.contents) {
-	// 	prevContentsRef.current = formValues.contents;
-	//
-	// 	setContentsMap(
-	// 		Object.fromEntries(
-	// 			(formValues.contents ?? []).map((c) => [c.language, c])
-	// 		) as Partial<Record<LanguageEnum, PlaceContent>>
-	// 	);
-	// }
-
 	const handleContentChange = (
 		language: Language,
 		field: keyof PlaceContent,
@@ -243,9 +230,13 @@ export function FormManagePlace() {
 					</TabsList>
 				</div>
 				{languages.map((language) => {
-					const contentIndex = formValues.contents.findIndex(
+					const findIndex = formValues.contents.findIndex(
 						(c) => c.language === language,
 					);
+					const contentIndex =
+						findIndex === -1 && language === LANGUAGE_DEFAULT
+							? 0
+							: findIndex;
 
 					return (
 						<TabsContent key={`form-${language}`} value={language}>

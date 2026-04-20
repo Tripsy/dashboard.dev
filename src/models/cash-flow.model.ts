@@ -1,3 +1,5 @@
+import { arrayHasValue } from '@/helpers/objects.helper';
+
 export const CurrencyEnum = {
 	RON: 'RON',
 	EUR: 'EUR',
@@ -114,15 +116,15 @@ export const getExpectedCategoryType = (
 		CashFlowCategoryEnum.EMPLOYEE_REIMBURSEMENT,
 	];
 
-	if (revenueCategories.includes(category)) {
+	if (arrayHasValue(category, revenueCategories)) {
 		return CashFlowCategoryTypeEnum.REVENUE;
 	}
 
-	if (expenseCategories.includes(category)) {
+	if (arrayHasValue(category, expenseCategories)) {
 		return CashFlowCategoryTypeEnum.EXPENSE;
 	}
 
-	if (correctionCategories.includes(category)) {
+	if (arrayHasValue(category, correctionCategories)) {
 		return CashFlowCategoryTypeEnum.CORRECTION;
 	}
 

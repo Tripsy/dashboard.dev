@@ -101,7 +101,12 @@ export function WindowInstance({
 
 	const { data: reloadedEntry, isLoading: isEntryLoading } = useQuery({
 		queryKey: [WINDOW_CACHE_LABEL, current.uid, entryId],
-		queryFn: reloadFn && entryId ? () => reloadFn(entryId) : undefined,
+		queryFn: () => {
+			if (!reloadFn || entryId == null) {
+				return Promise.resolve(undefined);
+			}
+			return reloadFn(entryId);
+		},
 		enabled: !!reloadFn && !!entryId,
 	});
 

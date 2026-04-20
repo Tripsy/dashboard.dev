@@ -132,3 +132,16 @@ export function hasAtLeastOneValue(obj: unknown): boolean {
 export function getErrorMessage(error: unknown): string {
 	return error instanceof Error ? error.message : String(error);
 }
+
+/**
+ * Determine if value is included in array
+ *
+ * @param value
+ * @param array
+ */
+export function arrayHasValue<T extends readonly unknown[]>(
+	value: unknown,
+	array: T,
+): value is T[number] {
+	return array.includes(value);
+}

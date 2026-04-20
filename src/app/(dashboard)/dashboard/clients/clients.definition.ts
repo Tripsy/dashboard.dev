@@ -8,6 +8,7 @@ import type {
 } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import { getFormDataAsEnum, getFormDataAsString } from '@/helpers/form.helper';
+import { arrayHasValue } from '@/helpers/objects.helper';
 import {
 	requestCreate,
 	requestDelete,
@@ -422,9 +423,10 @@ export const dataSourceConfigClients: DataSourceConfigType<
 			entriesSelection: 'single',
 			customEntryCheck: (entry: ClientModel) =>
 				!entry.deleted_at &&
-				[ClientStatusEnum.PENDING, ClientStatusEnum.INACTIVE].includes(
-					entry.status,
-				),
+				arrayHasValue(entry.status, [
+					ClientStatusEnum.PENDING,
+					ClientStatusEnum.INACTIVE,
+				]),
 			operationFunction: (entry: ClientModel) =>
 				requestUpdateStatus('clients', entry, 'active'),
 			buttonPosition: 'left',
@@ -440,9 +442,10 @@ export const dataSourceConfigClients: DataSourceConfigType<
 			entriesSelection: 'single',
 			customEntryCheck: (entry: ClientModel) =>
 				!entry.deleted_at &&
-				[ClientStatusEnum.PENDING, ClientStatusEnum.ACTIVE].includes(
-					entry.status,
-				),
+				arrayHasValue(entry.status, [
+					ClientStatusEnum.PENDING,
+					ClientStatusEnum.ACTIVE,
+				]),
 			operationFunction: (entry: ClientModel) =>
 				requestUpdateStatus('clients', entry, 'inactive'),
 			buttonPosition: 'left',

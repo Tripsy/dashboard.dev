@@ -52,7 +52,7 @@ export function useFormValidation<FormValues extends FormValuesType>({
 				return;
 			}
 
-			const result = validateForm(formValues);
+			const result = validateForm(formValues, false);
 
 			if (result.success) {
 				setErrors({});

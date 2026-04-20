@@ -158,8 +158,24 @@ export function WindowForm<
 				{state.situation === 'error' && state.message && (
 					<FormError>
 						<React.Fragment key="form-error-content">
-							<Icons.Status.Error />
-							<div>{state.message}</div>
+							<div className="flex items-center gap-1.5 mb-2">
+								<Icons.Status.Error />
+								<div>{state.message}</div>
+							</div>
+							{Object.entries(state.errors ?? {}).length > 0 && (
+								<ul className="list-disc ml-8 text-sm">
+									{Object.entries(state.errors ?? {}).flatMap(
+										([_field, messages]) =>
+											Array.isArray(messages)
+												? messages.map((message) => (
+														<li key={`${message}`}>
+															{message}
+														</li>
+													))
+												: [],
+									)}
+								</ul>
+							)}
 						</React.Fragment>
 					</FormError>
 				)}

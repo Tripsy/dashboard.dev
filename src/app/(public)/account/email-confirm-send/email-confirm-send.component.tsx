@@ -97,7 +97,7 @@ export default function EmailConfirmSend() {
 					errors={errors}
 					button={{
 						label: 'Get confirmation',
-						icon: Icons.Action.Go,
+						iconLabel: 'submit',
 					}}
 				/>
 

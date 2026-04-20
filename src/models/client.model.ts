@@ -1,13 +1,18 @@
-export enum ClientTypeEnum {
-	PERSON = 'person',
-	COMPANY = 'company',
-}
+export const ClientTypeEnum = {
+	PERSON: 'person',
+	COMPANY: 'company',
+} as const;
 
-export enum ClientStatusEnum {
-	ACTIVE = 'active',
-	INACTIVE = 'inactive',
-	PENDING = 'pending',
-}
+export type ClientType = (typeof ClientTypeEnum)[keyof typeof ClientTypeEnum];
+
+export const ClientStatusEnum = {
+	ACTIVE: 'active',
+	INACTIVE: 'inactive',
+	PENDING: 'pending',
+} as const;
+
+export type ClientStatus =
+	(typeof ClientStatusEnum)[keyof typeof ClientStatusEnum];
 
 // // Status transition configuration
 // export const CLIENT_STATUS_TRANSITIONS: Record<
@@ -58,7 +63,7 @@ export type ClientContact = {
 type ClientBase<D = Date | string> = {
 	id: number;
 
-	status: ClientStatusEnum;
+	status: ClientStatus;
 
 	notes: string | null;
 
@@ -73,7 +78,7 @@ export type ClientModel<D = Date | string> = ClientBase<D> &
 	ClientContact;
 
 export type ClientFormValuesType = {
-	client_type: ClientTypeEnum;
+	client_type: ClientType;
 
 	company_name?: string | null;
 	company_cui?: string | null;

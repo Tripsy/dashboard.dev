@@ -1,23 +1,30 @@
-import type { LanguageEnum } from '@/models/user.model';
+import type { Language } from '@/models/user.model';
 
-export enum TemplateTypeEnum {
-	PAGE = 'page',
-	EMAIL = 'email',
-}
+export const TemplateTypeEnum = {
+	PAGE: 'page',
+	EMAIL: 'email',
+} as const;
 
-export enum TemplateLayoutEmailEnum {
-	DEFAULT = 'default',
-	SPECIAL = 'special',
-}
+export type TemplateType =
+	(typeof TemplateTypeEnum)[keyof typeof TemplateTypeEnum];
 
-export enum TemplateLayoutPageEnum {
-	DEFAULT = 'default',
-	ARTICLE = 'article',
-}
+export const TemplateLayoutEmailEnum = {
+	DEFAULT: 'default',
+} as const;
+
+export type TemplateLayoutEmail =
+	(typeof TemplateLayoutEmailEnum)[keyof typeof TemplateLayoutEmailEnum];
+
+export const TemplateLayoutPageEnum = {
+	DEFAULT: 'default',
+} as const;
+
+export type TemplateLayoutPage =
+	(typeof TemplateLayoutPageEnum)[keyof typeof TemplateLayoutPageEnum];
 
 export type TemplateContentEmailType = {
 	subject: string;
-	layout: TemplateLayoutEmailEnum;
+	layout: TemplateLayoutEmail;
 	html: string;
 	text?: string;
 	vars: Record<string, unknown>;
@@ -26,14 +33,14 @@ export type TemplateContentEmailType = {
 export type TemplateContentPageType = {
 	title: string;
 	html: string;
-	layout: TemplateLayoutPageEnum;
+	layout: TemplateLayoutPage;
 };
 
 export type TemplateModel<D = Date | string> = {
 	id: number;
 	label: string;
-	language: LanguageEnum;
-	type: TemplateTypeEnum;
+	language: Language;
+	type: TemplateType;
 	content: string;
 	created_at: D;
 	updated_at: D;
@@ -48,7 +55,7 @@ export type TemplateFormValuesType = Pick<
 	content: {
 		subject?: string | null; // Email specific
 		title?: string | null; // Page specific
-		layout: TemplateLayoutEmailEnum | TemplateLayoutPageEnum;
+		layout: TemplateLayoutEmail | TemplateLayoutPage;
 		html: string | null;
 		text?: string | null;
 	};

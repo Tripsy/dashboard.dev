@@ -11,7 +11,7 @@ import { ToggleTheme } from '@/components/layout/toggle-theme';
 import { UserMenu } from '@/components/layout/user-menu.component';
 import ProtectedRoute from '@/components/protected-route.component';
 import { WindowContainer } from '@/components/window/window-container.component';
-import Routes, { RouteAuth } from '@/config/routes.setup';
+import Routes, { RouteAuthEnum } from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
 
 function Header() {
@@ -50,7 +50,7 @@ export default async function Layout({ children }: { children: JSX.Element }) {
 			<DataSourceRegistrar />
 			<div className="dashboard-layout min-h-screen bg-background">
 				<Header />
-				<ProtectedRoute routeAuth={RouteAuth.PROTECTED}>
+				<ProtectedRoute routeAuth={RouteAuthEnum.PROTECTED}>
 					<DashboardMain>
 						<SideMenu />
 						<div className="container-dashboard">

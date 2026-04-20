@@ -20,7 +20,9 @@ import { BaseValidator } from '@/helpers/validator.helper';
 import {
 	type ClientFormValuesType,
 	type ClientModel,
+	type ClientStatus,
 	ClientStatusEnum,
+	type ClientType,
 	ClientTypeEnum,
 	getClientDisplayName,
 } from '@/models/client.model';
@@ -225,8 +227,8 @@ function getFormState(data?: ClientModel): FormStateType<ClientFormValuesType> {
 
 export type ClientsDataTableFiltersType = {
 	global: { value: string | null; matchMode: 'contains' };
-	status: { value: ClientStatusEnum | null; matchMode: 'equals' };
-	client_type: { value: ClientTypeEnum | null; matchMode: 'equals' };
+	status: { value: ClientStatus | null; matchMode: 'equals' };
+	client_type: { value: ClientType | null; matchMode: 'equals' };
 	create_date_start: { value: string | null; matchMode: 'equals' };
 	create_date_end: { value: string | null; matchMode: 'equals' };
 	is_deleted: { value: boolean; matchMode: 'equals' };

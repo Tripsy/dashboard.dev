@@ -151,7 +151,6 @@ export function WindowForm<
 							variant: buttonSubmit?.variant || 'info',
 							label: (buttonSubmit?.label as string) || 'Submit',
 							iconLabel: buttonSubmit?.icon || 'submit',
-							iconSize: 16,
 						}}
 					/>
 				</div>

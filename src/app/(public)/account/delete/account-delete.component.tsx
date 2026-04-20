@@ -122,7 +122,7 @@ export default function AccountDelete() {
 						button={{
 							variant: 'error',
 							label: 'Delete account',
-							icon: Icons.Action.Destroy,
+							iconLabel: 'destroy',
 						}}
 					/>
 				</div>

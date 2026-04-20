@@ -19,6 +19,7 @@ import {
 } from '@/models/client.model';
 import {
 	type ClientAddressFormValuesType,
+	type ClientAddressType,
 	ClientAddressTypeEnum,
 } from '@/models/client-address.model';
 import {
@@ -118,7 +119,7 @@ export function FormManageClientAddress() {
 				options={addressTypes}
 				disabled={pending}
 				onChange={(value) =>
-					handleChange('address_type', value as ClientAddressTypeEnum)
+					handleChange('address_type', value as ClientAddressType)
 				}
 				error={errors.address_type}
 			/>

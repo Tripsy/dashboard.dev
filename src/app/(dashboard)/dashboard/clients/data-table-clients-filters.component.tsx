@@ -17,7 +17,9 @@ import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hoo
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import {
 	type ClientModel,
+	type ClientStatus,
 	ClientStatusEnum,
+	type ClientType,
 	ClientTypeEnum,
 } from '@/models/client.model';
 
@@ -95,7 +97,7 @@ export const DataTableClientsFilters = (): JSX.Element => {
 				fieldValue={filters.status.value}
 				options={statuses}
 				onChange={(value) =>
-					setFilterValue('status', value as ClientStatusEnum)
+					setFilterValue('status', value as ClientStatus)
 				}
 			/>
 
@@ -105,7 +107,7 @@ export const DataTableClientsFilters = (): JSX.Element => {
 				fieldValue={filters.client_type.value}
 				options={clientTypes}
 				onChange={(value) =>
-					setFilterValue('client_type', value as ClientTypeEnum)
+					setFilterValue('client_type', value as ClientType)
 				}
 			/>
 

@@ -17,9 +17,14 @@ import {
 	type PlaceContent,
 	type PlaceFormValuesType,
 	type PlaceModel,
+	type PlaceType,
 	PlaceTypeEnum,
 } from '@/models/place.model';
-import { LANGUAGE_DEFAULT, LanguageEnum } from '@/models/user.model';
+import {
+	LANGUAGE_DEFAULT,
+	type Language,
+	LanguageEnum,
+} from '@/models/user.model';
 import { useWindowForm } from '@/providers/window-form.provider';
 import type { FindFunctionResponseType } from '@/types/action.type';
 
@@ -43,13 +48,13 @@ export function FormManagePlace() {
 	const previousParentsRef = useRef<
 		Partial<
 			Record<
-				PlaceTypeEnum,
+				PlaceType,
 				{ parent: string | null; parent_id: number | null }
 			>
 		>
 	>({});
 
-	const handlePlaceTypeChange = (value: PlaceTypeEnum) => {
+	const handlePlaceTypeChange = (value: PlaceType) => {
 		if (formValues.parent_id) {
 			previousParentsRef.current[formValues.place_type] = {
 				parent: formValues.parent,
@@ -66,7 +71,8 @@ export function FormManagePlace() {
 		setSearchParentPlaces('');
 	};
 
-	const [selectedLanguage, setSelectedLanguage] = useState(LANGUAGE_DEFAULT);
+	const [selectedLanguage, setSelectedLanguage] =
+		useState<Language>(LANGUAGE_DEFAULT);
 	const [searchParentPlaces, setSearchParentPlaces] = useState('');
 
 	const parentPlaceType = getParentPlaceType(formValues.place_type);
@@ -91,12 +97,12 @@ export function FormManagePlace() {
 
 	// Derive map from formValues
 	const [contentsMap, setContentsMap] = useState<
-		Partial<Record<LanguageEnum, PlaceContent>>
+		Partial<Record<Language, PlaceContent>>
 	>(
 		() =>
 			Object.fromEntries(
 				(formValues.contents ?? []).map((c) => [c.language, c]),
-			) as Partial<Record<LanguageEnum, PlaceContent>>,
+			) as Partial<Record<Language, PlaceContent>>,
 	);
 
 	// // Sync contentsMap when formValues.contents is updated from outside (e.g. reloaded entry)
@@ -113,7 +119,7 @@ export function FormManagePlace() {
 	// }
 
 	const handleContentChange = (
-		language: LanguageEnum,
+		language: Language,
 		field: keyof PlaceContent,
 		value: string,
 	) => {
@@ -144,9 +150,7 @@ export function FormManagePlace() {
 				fieldValue={formValues.place_type}
 				options={placeTypes}
 				disabled={pending}
-				onChange={(value) =>
-					handlePlaceTypeChange(value as PlaceTypeEnum)
-				}
+				onChange={(value) => handlePlaceTypeChange(value as PlaceType)}
 				error={errors.place_type}
 			/>
 
@@ -222,7 +226,7 @@ export function FormManagePlace() {
 			<Tabs
 				defaultValue={LANGUAGE_DEFAULT}
 				onValueChange={(value) =>
-					setSelectedLanguage(value as LanguageEnum)
+					setSelectedLanguage(value as Language)
 				}
 				className="w-full"
 			>

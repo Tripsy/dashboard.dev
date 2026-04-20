@@ -40,6 +40,7 @@ import {
 	Play,
 	Plus,
 	RefreshCcw,
+	Save,
 	Search,
 	Settings,
 	Shield,
@@ -119,6 +120,7 @@ export const Icons = {
 		Loading: createIcon(Loader),
 	},
 	Action: {
+		Save: createIcon(Save),
 		Submit: createIcon(Play),
 		Login: createIcon(LogIn),
 		Create: createIcon(Plus),

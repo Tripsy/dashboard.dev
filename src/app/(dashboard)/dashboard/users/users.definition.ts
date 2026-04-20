@@ -25,7 +25,9 @@ import {
 	type UserFormValuesType,
 	type UserModel,
 	UserOperatorTypeEnum,
+	type UserRole,
 	UserRoleEnum,
+	type UserStatus,
 	UserStatusEnum,
 } from '@/models/user.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
@@ -247,8 +249,8 @@ function getFormState(data?: UserModel): FormStateType<UserFormValuesType> {
 
 export type UsersDataTableFiltersType = {
 	global: { value: string | null; matchMode: 'contains' };
-	role: { value: UserRoleEnum | null; matchMode: 'equals' };
-	status: { value: UserStatusEnum | null; matchMode: 'equals' };
+	role: { value: UserRole | null; matchMode: 'equals' };
+	status: { value: UserStatus | null; matchMode: 'equals' };
 	create_date_start: { value: string | null; matchMode: 'equals' };
 	create_date_end: { value: string | null; matchMode: 'equals' };
 	is_deleted: { value: boolean; matchMode: 'equals' };

@@ -22,7 +22,8 @@ import {
 	LogHistoryActions,
 	LogHistoryEntities,
 	type LogHistoryModel,
-	LogHistorySource,
+	type LogHistorySource,
+	LogHistorySourceEnum,
 } from '@/models/log-history.model';
 
 const entities = LogHistoryEntities.map((v) => ({
@@ -35,7 +36,7 @@ const actions = LogHistoryActions.map((v) => ({
 	value: v,
 }));
 
-const sources = toOptionsFromEnum(LogHistorySource, {
+const sources = toOptionsFromEnum(LogHistorySourceEnum, {
 	formatter: formatEnumLabel,
 });
 

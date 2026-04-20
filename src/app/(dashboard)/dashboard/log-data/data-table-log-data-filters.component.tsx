@@ -15,8 +15,10 @@ import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import {
+	type LogCategory,
 	LogCategoryEnum,
 	type LogDataModel,
+	type LogLevel,
 	LogLevelEnum,
 } from '@/models/log-data.model';
 
@@ -94,7 +96,7 @@ export const DataTableLogDataFilters = (): JSX.Element => {
 				fieldValue={filters.category.value}
 				options={logCategories}
 				onChange={(value) =>
-					setFilterValue('category', value as LogCategoryEnum)
+					setFilterValue('category', value as LogCategory)
 				}
 			/>
 
@@ -103,9 +105,7 @@ export const DataTableLogDataFilters = (): JSX.Element => {
 				fieldName="level"
 				fieldValue={filters.level.value}
 				options={logLevels}
-				onChange={(value) =>
-					setFilterValue('level', value as LogLevelEnum)
-				}
+				onChange={(value) => setFilterValue('level', value as LogLevel)}
 			/>
 
 			<FormFiltersDateRange<LogDataDataTableFiltersType>

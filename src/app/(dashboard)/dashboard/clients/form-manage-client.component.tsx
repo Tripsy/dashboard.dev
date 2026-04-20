@@ -7,6 +7,7 @@ import { formatEnumLabel } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import {
 	type ClientFormValuesType,
+	type ClientType,
 	ClientTypeEnum,
 } from '@/models/client.model';
 import { useWindowForm } from '@/providers/window-form.provider';
@@ -44,7 +45,7 @@ export function FormManageClient() {
 				options={clientTypes}
 				disabled={pending}
 				onChange={(value) =>
-					handleChange('client_type', value as ClientTypeEnum)
+					handleChange('client_type', value as ClientType)
 				}
 				error={errors.client_type}
 			/>

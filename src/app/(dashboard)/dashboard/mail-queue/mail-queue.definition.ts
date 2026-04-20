@@ -10,7 +10,7 @@ import { formatDate } from '@/helpers/date.helper';
 import { requestDeleteMultiple, requestFind } from '@/helpers/services.helper';
 import type {
 	MailQueueModel,
-	MailQueueStatusEnum,
+	MailQueueStatus,
 } from '@/models/mail-queue.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
 
@@ -20,7 +20,7 @@ const translations = await translateBatch(
 );
 
 export type MailQueueDataTableFiltersType = {
-	status: { value: MailQueueStatusEnum | null; matchMode: 'equals' };
+	status: { value: MailQueueStatus | null; matchMode: 'equals' };
 	template: { value: string | null; matchMode: 'contains' };
 	content: { value: string | null; matchMode: 'contains' };
 	to: { value: string | null; matchMode: 'contains' };

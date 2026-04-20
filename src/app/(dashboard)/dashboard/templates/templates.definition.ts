@@ -19,9 +19,12 @@ import { parseJson, toKebabCase } from '@/helpers/string.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import {
 	type TemplateFormValuesType,
+	type TemplateLayoutEmail,
 	TemplateLayoutEmailEnum,
+	type TemplateLayoutPage,
 	TemplateLayoutPageEnum,
 	type TemplateModel,
+	type TemplateType,
 	TemplateTypeEnum,
 } from '@/models/template.model';
 import { LANGUAGE_DEFAULT, LanguageEnum } from '@/models/user.model';
@@ -205,7 +208,7 @@ function getFormState(
 				? (parsedContent as {
 						subject?: string;
 						html?: string;
-						layout?: TemplateLayoutEmailEnum;
+						layout?: TemplateLayoutEmail;
 					})
 				: {};
 
@@ -228,7 +231,7 @@ function getFormState(
 			? (parsedContent as {
 					title?: string;
 					html?: string;
-					layout?: TemplateLayoutPageEnum;
+					layout?: TemplateLayoutPage;
 				})
 			: {};
 
@@ -248,7 +251,7 @@ function getFormState(
 export type TemplateDataTableFiltersType = {
 	global: { value: string | null; matchMode: 'contains' };
 	language: { value: string | null; matchMode: 'equals' };
-	type: { value: TemplateTypeEnum | null; matchMode: 'equals' };
+	type: { value: TemplateType | null; matchMode: 'equals' };
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 

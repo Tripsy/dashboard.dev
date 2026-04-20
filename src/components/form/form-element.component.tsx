@@ -853,7 +853,7 @@ type FormComponentSubmitButtonType = {
 	label: string;
 	variant?: ButtonVariant;
 	iconLabel: string;
-	iconSize: number;
+	iconSize?: number;
 	className?: string;
 };
 

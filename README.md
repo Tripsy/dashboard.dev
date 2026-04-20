@@ -211,38 +211,28 @@ pnpm run build    # Production build
 # 📌 TODO
 
 1. commit for BE, sync with STAR
-2. replace enum types
-   export const LanguageEnum = {
-   EN: "en",
-   RO: "ro",
-   } as const;
-
-    export type LanguageEnum =
-    typeof LanguageEnum[keyof typeof LanguageEnum];
-3. Displayed dates should be converted to local TZ
-4. Strange interaction on login after existing session is removed
-5. App reload on tab switch - maybe a Zustand configuration issue
-6. Clients > Client Address > Brands > Places > Cash Flow
-    - address details
-    - address manage
+2. Displayed dates should be converted to local TZ
+3. Strange interaction on login after existing session is removed
+4. App reload on tab switch - maybe a Zustand configuration issue
+5. Brands > Cash Flow
     - cash flow status update 
     - cash flow manage
     - cash flow details
     - add places  icons region > area, city > building, country → map
-7. Review security
-8. Add section "documentation"
-9. login with google / facebook
-10. Replace all console.error with logging
-11. Implement kill all sessions except current
+6. Review security
+7. Add section "documentation"
+8. login with google / facebook
+9. Replace all console.error with logging
+10. Implement kill all sessions except current
        // // This will actually remove all sessions - keep it for further implementation
        // await AccountTokenRepository.createQuery()
        //     .filterBy('user_id', policy.getUserId())
        //     .delete(false, true);
-12. For template section
+11. For template section
      - would be a nice idea to keep track of the last changes (maybe add a new column - prev version id and a button to restore to that version)
      - view presentation could be enhanced
-13. https://nextjs.org/docs/app/getting-started/partial-prerendering
-14. https://react.dev/learn/react-compiler/introduction
+12. https://nextjs.org/docs/app/getting-started/partial-prerendering
+13. https://react.dev/learn/react-compiler/introduction
 
 # 🔗 Dependencies
 

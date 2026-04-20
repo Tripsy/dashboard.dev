@@ -1,34 +1,36 @@
-import type { LanguageEnum } from '@/models/user.model';
+import type { Language } from '@/models/user.model';
 import type { PageMeta } from '@/types/page-meta.type';
 
-export enum BrandStatusEnum {
-	ACTIVE = 'active',
-	INACTIVE = 'inactive',
-}
+export const BrandStatusEnum = {
+	ACTIVE: 'active',
+	INACTIVE: 'inactive',
+} as const;
+
+export type BrandStatus =
+	(typeof BrandStatusEnum)[keyof typeof BrandStatusEnum];
 
 // Status transition configuration
-export const BRAND_STATUS_TRANSITIONS: Record<
-	BrandStatusEnum,
-	BrandStatusEnum[]
-> = {
+export const BRAND_STATUS_TRANSITIONS: Record<BrandStatus, BrandStatus[]> = {
 	[BrandStatusEnum.ACTIVE]: [BrandStatusEnum.INACTIVE],
 	[BrandStatusEnum.INACTIVE]: [BrandStatusEnum.ACTIVE],
 };
 
-export enum BrandTypeEnum {
-	PRODUCT = 'product',
-}
+export const BrandTypeEnum = {
+	PRODUCT: 'product',
+} as const;
+
+export type BrandType = (typeof BrandTypeEnum)[keyof typeof BrandTypeEnum];
 
 // Content types
 export type BrandContent = {
-	language: LanguageEnum | string;
+	language: Language | string;
 	description: string | null;
 	meta: PageMeta | null;
 };
 
 // Form input for brand content
 export type BrandContentInput = {
-	language: LanguageEnum | string;
+	language: Language | string;
 	description?: string | null;
 	meta?: PageMeta | null;
 };
@@ -38,8 +40,8 @@ type BrandBase<D = Date | string> = {
 	id: number;
 	name: string;
 	slug: string;
-	status: BrandStatusEnum;
-	type: BrandTypeEnum;
+	status: BrandStatus;
+	type: BrandType;
 	sort_order: number;
 	details: Record<string, string | number | boolean> | null;
 
@@ -59,8 +61,8 @@ export type BrandModel<D = Date | string> = BrandBase<D> & {
 export type BrandFormValuesType = {
 	name: string;
 	slug: string;
-	status: BrandStatusEnum;
-	type: BrandTypeEnum;
+	status: BrandStatus;
+	type: BrandType;
 	sort_order: number;
 	details: Record<string, string | number | boolean> | null;
 

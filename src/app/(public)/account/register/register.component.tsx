@@ -33,7 +33,7 @@ import { formatEnumLabel } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
-import { LanguageEnum } from '@/models/user.model';
+import { type Language, LanguageEnum } from '@/models/user.model';
 
 const languages = toOptionsFromEnum(LanguageEnum, {
 	formatter: formatEnumLabel,
@@ -190,7 +190,7 @@ export default function Register() {
 					disabled={pending}
 					options={languages}
 					onChange={(value) =>
-						handleChange('language', value as LanguageEnum)
+						handleChange('language', value as Language)
 					}
 					error={errors.language}
 				/>
@@ -243,7 +243,7 @@ export default function Register() {
 					errors={errors}
 					button={{
 						label: 'Create account',
-						icon: Icons.Action.Go,
+						iconLabel: 'submit',
 					}}
 				/>
 

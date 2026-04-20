@@ -149,7 +149,7 @@ export default function PasswordUpdate() {
 						errors={errors}
 						button={{
 							label: 'Update password',
-							icon: Icons.Action.Go,
+							iconLabel: 'save',
 						}}
 					/>
 				</div>

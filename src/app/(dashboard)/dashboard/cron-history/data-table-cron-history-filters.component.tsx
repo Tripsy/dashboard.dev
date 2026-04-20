@@ -16,6 +16,7 @@ import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hoo
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import {
 	type CronHistoryModel,
+	type CronHistoryStatus,
 	CronHistoryStatusEnum,
 } from '@/models/cron-history.model';
 
@@ -90,7 +91,7 @@ export const DataTableCronHistoryFilters = (): JSX.Element => {
 				fieldValue={filters.status.value}
 				options={statuses}
 				onChange={(value) =>
-					setFilterValue('status', value as CronHistoryStatusEnum)
+					setFilterValue('status', value as CronHistoryStatus)
 				}
 			/>
 

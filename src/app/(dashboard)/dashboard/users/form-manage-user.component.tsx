@@ -10,9 +10,12 @@ import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import {
+	type Language,
 	LanguageEnum,
 	type UserFormValuesType,
+	type UserOperatorType,
 	UserOperatorTypeEnum,
+	type UserRole,
 	UserRoleEnum,
 } from '@/models/user.model';
 import { useWindowForm } from '@/providers/window-form.provider';
@@ -117,7 +120,7 @@ export function FormManageUser() {
 				disabled={pending}
 				options={languages}
 				onChange={(value) =>
-					handleChange('language', value as LanguageEnum)
+					handleChange('language', value as Language)
 				}
 				error={errors.language}
 			/>
@@ -129,9 +132,7 @@ export function FormManageUser() {
 				fieldValue={formValues.role}
 				options={roles}
 				disabled={pending}
-				onChange={(value) =>
-					handleChange('role', value as UserRoleEnum)
-				}
+				onChange={(value) => handleChange('role', value as UserRole)}
 				error={errors.role}
 			/>
 
@@ -146,7 +147,7 @@ export function FormManageUser() {
 					onChange={(value) =>
 						handleChange(
 							'operator_type',
-							value as UserOperatorTypeEnum | null,
+							value as UserOperatorType | null,
 						)
 					}
 					error={errors.operator_type}

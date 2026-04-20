@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { Configuration } from '@/config/settings.config';
 import { BaseValidator } from '@/helpers/validator.helper';
-import { LanguageEnum } from '@/models/user.model';
+import { type Language, LanguageEnum } from '@/models/user.model';
 import type { FormSituationType } from '@/types/form.type';
 
 export type RegisterFormFieldsType = {
@@ -9,7 +9,7 @@ export type RegisterFormFieldsType = {
 	email: string | null;
 	password: string | null;
 	password_confirm: string | null;
-	language: LanguageEnum;
+	language: Language;
 	terms: boolean;
 };
 

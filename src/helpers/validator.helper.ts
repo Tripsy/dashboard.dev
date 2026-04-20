@@ -4,7 +4,7 @@ import { Configuration } from '@/config/settings.config';
 import { translateBatch } from '@/config/translate.setup';
 import { isValidDate } from '@/helpers/date.helper';
 import { replaceVars } from '@/helpers/string.helper';
-import { LanguageEnum } from '@/models/user.model';
+import { type Language, LanguageEnum } from '@/models/user.model';
 
 export abstract class IsValidator {
 	/**
@@ -748,20 +748,20 @@ export abstract class BaseValidator<
 		optionsData?: {
 			required?: true;
 		},
-	): z.ZodType<LanguageEnum>;
+	): z.ZodType<Language>;
 
 	protected validateLanguage(
 		message: string,
 		optionsData: {
 			required: false;
 		},
-	): z.ZodType<LanguageEnum | TEmpty>;
+	): z.ZodType<Language | TEmpty>;
 
 	// Implementation signature
 	protected validateLanguage(
 		message = 'Invalid language',
 		optionsData?: { required?: boolean },
-	): z.ZodType<LanguageEnum | TEmpty> {
+	): z.ZodType<Language | TEmpty> {
 		const options = {
 			required: true,
 			...optionsData,

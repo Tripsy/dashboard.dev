@@ -1,21 +1,23 @@
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
-import { LANGUAGE_DEFAULT, type LanguageEnum } from '@/models/user.model';
+import { LANGUAGE_DEFAULT, type Language } from '@/models/user.model';
 
-export enum PlaceTypeEnum {
-	COUNTRY = 'country',
-	REGION = 'region',
-	CITY = 'city',
-}
+export const PlaceTypeEnum = {
+	COUNTRY: 'country',
+	REGION: 'region',
+	CITY: 'city',
+} as const;
+
+export type PlaceType = (typeof PlaceTypeEnum)[keyof typeof PlaceTypeEnum];
 
 export type PlaceContent = {
-	language: LanguageEnum;
+	language: Language;
 	name: string;
 	type_label: string;
 };
 
 export type PlaceModel<D = Date | string> = {
 	id: number;
-	place_type: PlaceTypeEnum;
+	place_type: PlaceType;
 	code: string | null;
 
 	// Parent relationship
@@ -35,7 +37,7 @@ export type PlaceModel<D = Date | string> = {
 };
 
 export type PlaceFormValuesType = {
-	place_type: PlaceTypeEnum;
+	place_type: PlaceType;
 	code: string | null;
 	parent_id: number | null;
 	parent: string | null;
@@ -45,7 +47,7 @@ export type PlaceFormValuesType = {
 // Helpers
 export function getPlaceContentProp(
 	place: PlaceModel,
-	language: LanguageEnum | string,
+	language: Language | string,
 	prop: keyof Pick<PlaceContent, 'name' | 'type_label'> = 'name',
 ): string {
 	if (!place.contents) {
@@ -71,7 +73,7 @@ export function getPlaceContentProp(
 	return contentFirst[prop];
 }
 
-export function getParentPlaceType(place_type: PlaceTypeEnum) {
+export function getParentPlaceType(place_type: PlaceType) {
 	if (place_type === PlaceTypeEnum.COUNTRY) {
 		return null;
 	}
@@ -87,7 +89,7 @@ export function getParentPlaceType(place_type: PlaceTypeEnum) {
 
 export const displayPlaceLabel = (
 	p: PlaceModel,
-	selectedLanguage: LanguageEnum,
+	selectedLanguage: Language,
 ) => {
 	const name = getPlaceContentProp(p, selectedLanguage, 'name');
 	const place_type =

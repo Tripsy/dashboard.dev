@@ -1,15 +1,18 @@
 import type { ClientModel } from '@/models/client.model';
 import type { PlaceModel } from '@/models/place.model';
 
-export enum ClientAddressTypeEnum {
-	BILLING = 'billing',
-	DELIVERY = 'delivery',
-}
+export const ClientAddressTypeEnum = {
+	BILLING: 'billing',
+	DELIVERY: 'delivery',
+} as const;
+
+export type ClientAddressType =
+	(typeof ClientAddressTypeEnum)[keyof typeof ClientAddressTypeEnum];
 
 export type ClientAddressModel<D = Date | string> = {
 	id: number;
 	// client_id: number;
-	address_type: ClientAddressTypeEnum;
+	address_type: ClientAddressType;
 	// city_id: number | null;
 	details: string;
 	postal_code: string | null;

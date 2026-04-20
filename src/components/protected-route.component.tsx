@@ -7,7 +7,11 @@ import {
 	ErrorComponent,
 	LoadingComponent,
 } from '@/components/status.component';
-import Routes, { RouteAuth } from '@/config/routes.setup';
+import Routes, {
+	isProtectedRoute,
+	type RouteAuth,
+	RouteAuthEnum,
+} from '@/config/routes.setup';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { hasPermission } from '@/models/auth.model';
 import { useAuth } from '@/providers/auth.provider';
@@ -44,12 +48,7 @@ export default function ProtectedRoute({
 
 	// Redirect to the login page if not authenticated, and route is protected or authenticated
 	useEffect(() => {
-		if (
-			[RouteAuth.AUTHENTICATED, RouteAuth.PROTECTED].includes(
-				routeAuth,
-			) &&
-			authStatus === 'unauthenticated'
-		) {
+		if (isProtectedRoute(routeAuth) && authStatus === 'unauthenticated') {
 			router.push(
 				`${Routes.get('login')}?from=${encodeURIComponent(pathname)}`,
 			);
@@ -75,7 +74,7 @@ export default function ProtectedRoute({
 		}
 
 		if (
-			routeAuth === RouteAuth.PROTECTED &&
+			routeAuth === RouteAuthEnum.PROTECTED &&
 			authStatus === 'authenticated'
 		) {
 			return Routes.match(pathname)?.props?.permission;
@@ -90,7 +89,7 @@ export default function ProtectedRoute({
 	}
 
 	// Is a public route so return content
-	if (routeAuth === RouteAuth.PUBLIC) {
+	if (routeAuth === RouteAuthEnum.PUBLIC) {
 		return <>{children}</>;
 	}
 
@@ -102,7 +101,7 @@ export default function ProtectedRoute({
 	}
 
 	if (
-		routeAuth === RouteAuth.UNAUTHENTICATED &&
+		routeAuth === RouteAuthEnum.UNAUTHENTICATED &&
 		authStatus === 'authenticated'
 	) {
 		return (
@@ -117,7 +116,10 @@ export default function ProtectedRoute({
 	}
 
 	// If this is a protected route and the user doesn't have the required permission
-	if (routeAuth === RouteAuth.PROTECTED && !hasPermission(auth, permission)) {
+	if (
+		routeAuth === RouteAuthEnum.PROTECTED &&
+		!hasPermission(auth, permission)
+	) {
 		return (
 			<ProtectedRouteWrapper className={className}>
 				<ErrorComponent

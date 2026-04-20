@@ -1,12 +1,12 @@
 import { z } from 'zod';
 import { Configuration } from '@/config/settings.config';
 import { BaseValidator } from '@/helpers/validator.helper';
-import { LanguageEnum } from '@/models/user.model';
+import { LANGUAGE_DEFAULT, type Language } from '@/models/user.model';
 import type { FormSituationType } from '@/types/form.type';
 
 export type AccountEditFormFieldsType = {
 	name: string | null;
-	language: LanguageEnum;
+	language: Language;
 };
 
 export type AccountEditSituationType = FormSituationType | 'csrf_error';
@@ -21,7 +21,7 @@ export type AccountEditStateType = {
 export const AccountEditState: AccountEditStateType = {
 	values: {
 		name: '',
-		language: LanguageEnum.RO,
+		language: LANGUAGE_DEFAULT,
 	},
 	errors: {},
 	message: null,

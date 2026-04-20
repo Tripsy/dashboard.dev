@@ -9,11 +9,13 @@ import { formatEnumLabel } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import {
 	type TemplateFormValuesType,
+	type TemplateLayoutEmail,
 	TemplateLayoutEmailEnum,
-	type TemplateLayoutPageEnum,
+	type TemplateLayoutPage,
+	type TemplateType,
 	TemplateTypeEnum,
 } from '@/models/template.model';
-import { LanguageEnum } from '@/models/user.model';
+import { type Language, LanguageEnum } from '@/models/user.model';
 import { useWindowForm } from '@/providers/window-form.provider';
 
 const languages = toOptionsFromEnum(LanguageEnum, {
@@ -62,7 +64,7 @@ export function FormManageTemplate() {
 					disabled={pending}
 					options={languages}
 					onChange={(value) =>
-						handleChange('language', value as LanguageEnum)
+						handleChange('language', value as Language)
 					}
 					error={errors.language}
 				/>
@@ -75,7 +77,7 @@ export function FormManageTemplate() {
 					disabled={pending}
 					options={types}
 					onChange={(value) =>
-						handleChange('type', value as TemplateTypeEnum)
+						handleChange('type', value as TemplateType)
 					}
 					error={errors.type}
 				/>
@@ -111,7 +113,7 @@ export function FormManageTemplate() {
 						onChange={(value) =>
 							handleChange('content', {
 								...formValues.content,
-								layout: value as TemplateLayoutEmailEnum,
+								layout: value as TemplateLayoutEmail,
 							})
 						}
 						error={errors.content?.layout}
@@ -166,7 +168,7 @@ export function FormManageTemplate() {
 						onChange={(value) =>
 							handleChange('content', {
 								...formValues.content,
-								layout: value as TemplateLayoutPageEnum,
+								layout: value as TemplateLayoutPage,
 							})
 						}
 						error={errors.content?.layout}

@@ -7,9 +7,9 @@ import type {
 import { translateBatch } from '@/config/translate.setup';
 import { requestDeleteMultiple, requestFind } from '@/helpers/services.helper';
 import type {
-	LogCategoryEnum,
+	LogCategory,
 	LogDataModel,
-	LogLevelEnum,
+	LogLevel,
 } from '@/models/log-data.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
 
@@ -20,8 +20,8 @@ const translations = await translateBatch(
 
 export type LogDataDataTableFiltersType = {
 	global: { value: string | null; matchMode: 'contains' };
-	level: { value: LogLevelEnum | null; matchMode: 'equals' };
-	category: { value: LogCategoryEnum | null; matchMode: 'equals' };
+	level: { value: LogLevel | null; matchMode: 'equals' };
+	category: { value: LogCategory | null; matchMode: 'equals' };
 	create_date_start: { value: string | null; matchMode: 'equals' };
 	create_date_end: { value: string | null; matchMode: 'equals' };
 };

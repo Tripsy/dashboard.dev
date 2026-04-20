@@ -4,7 +4,8 @@ import { SesEmailService } from '@/services/email/email-ses.service';
 import { SmtpEmailService } from '@/services/email/email-smtp.service';
 import {
 	type EmailContent,
-	EmailProvider,
+	type EmailProvider,
+	EmailProviderEnum,
 	type EmailService,
 	type EmailTemplate,
 } from '@/types/email.type';
@@ -48,14 +49,14 @@ let currentServiceInstance: EmailService | null = null;
 export function getEmailService(): EmailService {
 	const provider =
 		(Configuration.get('mail.provider') as EmailProvider) ||
-		EmailProvider.SES;
+		EmailProviderEnum.SES;
 
 	if (currentServiceInstance) {
 		return currentServiceInstance;
 	}
 
 	switch (provider) {
-		case EmailProvider.SMTP:
+		case EmailProviderEnum.SMTP:
 			currentServiceInstance = new SmtpEmailService();
 			break;
 		default:

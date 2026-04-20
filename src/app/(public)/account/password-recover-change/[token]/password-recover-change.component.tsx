@@ -123,7 +123,7 @@ export default function PasswordRecoverChange() {
 					errors={errors}
 					button={{
 						label: 'Set password',
-						icon: Icons.Action.Go,
+						iconLabel: 'submit',
 					}}
 				/>
 

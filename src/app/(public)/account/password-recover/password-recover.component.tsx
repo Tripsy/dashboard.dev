@@ -97,7 +97,7 @@ export default function PasswordRecover() {
 					errors={errors}
 					button={{
 						label: 'Recover password',
-						icon: Icons.Action.Go,
+						iconLabel: 'submit',
 					}}
 				/>
 

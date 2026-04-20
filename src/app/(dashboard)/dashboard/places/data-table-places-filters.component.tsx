@@ -15,8 +15,16 @@ import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
-import { type PlaceModel, PlaceTypeEnum } from '@/models/place.model';
-import { LANGUAGE_DEFAULT, LanguageEnum } from '@/models/user.model';
+import {
+	type PlaceModel,
+	type PlaceType,
+	PlaceTypeEnum,
+} from '@/models/place.model';
+import {
+	LANGUAGE_DEFAULT,
+	type Language,
+	LanguageEnum,
+} from '@/models/user.model';
 
 const placeTypes = toOptionsFromEnum(PlaceTypeEnum, {
 	formatter: formatEnumLabel,
@@ -92,7 +100,7 @@ export const DataTablePlacesFilters = (): JSX.Element => {
 				fieldValue={filters.place_type.value}
 				options={placeTypes}
 				onChange={(value) =>
-					setFilterValue('place_type', value as PlaceTypeEnum)
+					setFilterValue('place_type', value as PlaceType)
 				}
 			/>
 
@@ -102,7 +110,7 @@ export const DataTablePlacesFilters = (): JSX.Element => {
 				fieldValue={filters.language.value ?? LANGUAGE_DEFAULT}
 				options={languages}
 				onChange={(value) =>
-					setFilterValue('language', value as LanguageEnum)
+					setFilterValue('language', value as Language)
 				}
 			/>
 

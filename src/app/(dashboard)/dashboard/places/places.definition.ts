@@ -27,9 +27,10 @@ import {
 	type PlaceContent,
 	type PlaceFormValuesType,
 	type PlaceModel,
+	type PlaceType,
 	PlaceTypeEnum,
 } from '@/models/place.model';
-import { LANGUAGE_DEFAULT, type LanguageEnum } from '@/models/user.model';
+import { LANGUAGE_DEFAULT, type Language } from '@/models/user.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
 import type { FormStateType } from '@/types/form.type';
 
@@ -165,8 +166,8 @@ function getFormState(data?: PlaceModel): FormStateType<PlaceFormValuesType> {
 
 export type PlacesDataTableFiltersType = {
 	global: { value: string | null; matchMode: 'contains' };
-	place_type: { value: PlaceTypeEnum | null; matchMode: 'equals' };
-	language: { value: LanguageEnum | null; matchMode: 'equals' };
+	place_type: { value: PlaceType | null; matchMode: 'equals' };
+	language: { value: Language | null; matchMode: 'equals' };
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 

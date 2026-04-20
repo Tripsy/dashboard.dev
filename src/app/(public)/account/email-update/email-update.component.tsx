@@ -110,7 +110,7 @@ export default function EmailUpdate() {
 						errors={errors}
 						button={{
 							label: 'Update',
-							icon: Icons.Action.Go,
+							iconLabel: 'save',
 						}}
 					/>
 				</div>

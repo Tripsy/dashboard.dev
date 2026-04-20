@@ -1,9 +1,12 @@
-export enum LogHistorySource {
-	CRON = 'cron',
-	API = 'api',
-	SEED = 'seed',
-	UNKNOWN = 'unknown',
-}
+export const LogHistorySourceEnum = {
+	CRON: 'cron',
+	API: 'api',
+	SEED: 'seed',
+	UNKNOWN: 'unknown',
+} as const;
+
+export type LogHistorySource =
+	(typeof LogHistorySourceEnum)[keyof typeof LogHistorySourceEnum];
 
 export const LogHistoryEntities = [
 	'permission',

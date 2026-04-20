@@ -19,6 +19,7 @@ import { getClientDisplayName } from '@/models/client.model';
 import {
 	type ClientAddressFormValuesType,
 	type ClientAddressModel,
+	type ClientAddressType,
 	ClientAddressTypeEnum,
 } from '@/models/client-address.model';
 import { getPlaceContentProp } from '@/models/place.model';
@@ -140,7 +141,7 @@ function getFormState(
 
 export type ClientAddressDataTableFiltersType = {
 	global: { value: string | null; matchMode: 'contains' };
-	address_type: { value: ClientAddressTypeEnum | null; matchMode: 'equals' };
+	address_type: { value: ClientAddressType | null; matchMode: 'equals' };
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 

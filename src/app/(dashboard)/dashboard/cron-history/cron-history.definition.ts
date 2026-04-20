@@ -8,7 +8,7 @@ import { translateBatch } from '@/config/translate.setup';
 import { requestDeleteMultiple, requestFind } from '@/helpers/services.helper';
 import type {
 	CronHistoryModel,
-	CronHistoryStatusEnum,
+	CronHistoryStatus,
 } from '@/models/cron-history.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
 
@@ -19,7 +19,7 @@ const translations = await translateBatch(
 
 export type CronHistoryDataTableFiltersType = {
 	global: { value: string | null; matchMode: 'contains' };
-	status: { value: CronHistoryStatusEnum | null; matchMode: 'equals' };
+	status: { value: CronHistoryStatus | null; matchMode: 'equals' };
 	start_date_start: { value: string | null; matchMode: 'equals' };
 	start_date_end: { value: string | null; matchMode: 'equals' };
 };

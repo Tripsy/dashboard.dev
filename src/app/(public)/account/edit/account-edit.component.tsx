@@ -28,7 +28,7 @@ import { formatEnumLabel } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
-import { LanguageEnum } from '@/models/user.model';
+import { type Language, LanguageEnum } from '@/models/user.model';
 import { useAuth } from '@/providers/auth.provider';
 
 const languages = toOptionsFromEnum(LanguageEnum, {
@@ -120,7 +120,7 @@ export default function AccountEdit() {
 					disabled={pending}
 					options={languages}
 					onChange={(value) =>
-						handleChange('language', value as LanguageEnum)
+						handleChange('language', value as Language)
 					}
 					error={errors.language}
 				/>
@@ -141,7 +141,7 @@ export default function AccountEdit() {
 						errors={errors}
 						button={{
 							label: 'Save',
-							icon: Icons.Action.Go,
+							iconLabel: 'save',
 						}}
 					/>
 				</div>

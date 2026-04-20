@@ -16,6 +16,7 @@ import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hoo
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import {
 	type MailQueueModel,
+	type MailQueueStatus,
 	MailQueueStatusEnum,
 } from '@/models/mail-queue.model';
 
@@ -113,7 +114,7 @@ export const DataTableMailQueueFilters = (): JSX.Element => {
 				fieldValue={filters.status.value}
 				options={statuses}
 				onChange={(value) =>
-					setFilterValue('status', value as MailQueueStatusEnum)
+					setFilterValue('status', value as MailQueueStatus)
 				}
 			/>
 

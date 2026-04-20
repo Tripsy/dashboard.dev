@@ -1,83 +1,103 @@
-export enum CurrencyEnum {
-	RON = 'RON',
-	EUR = 'EUR',
-	USD = 'USD',
-}
+export const CurrencyEnum = {
+	RON: 'RON',
+	EUR: 'EUR',
+	USD: 'USD',
+} as const;
+
+export type Currency = (typeof CurrencyEnum)[keyof typeof CurrencyEnum];
 
 export const CURRENCY_DEFAULT = CurrencyEnum.RON;
 export const VAT_RATE_DEFAULT = 24;
 
-export enum CashFlowDirectionEnum { // relative to company
-	IN = 'in', // money received
-	OUT = 'out', // money sent
-}
+export const CashFlowDirectionEnum = {
+	IN: 'in', // money received relative to company
+	OUT: 'out', // money sent relative to company
+} as const;
 
-export enum CashFlowCategoryTypeEnum {
-	REVENUE = 'revenue',
-	EXPENSE = 'expense',
-	CORRECTION = 'correction',
-}
+export type CashFlowDirection =
+	(typeof CashFlowDirectionEnum)[keyof typeof CashFlowDirectionEnum];
 
-export enum CashFlowCategoryEnum {
+export const CashFlowCategoryTypeEnum = {
+	REVENUE: 'revenue',
+	EXPENSE: 'expense',
+	CORRECTION: 'correction',
+} as const;
+
+export type CashFlowCategoryType =
+	(typeof CashFlowCategoryTypeEnum)[keyof typeof CashFlowCategoryTypeEnum];
+
+export const CashFlowCategoryEnum = {
 	// Revenue
-	CUSTOMER = 'customer', // When company receive money from customer (invoice based)
+	CUSTOMER: 'customer', // When company receive money from customer (invoice based)
 
 	// Operational Expenses
-	FUEL = 'fuel', // Vehicle fuel
-	MAINTENANCE = 'maintenance', // Vehicle repairs
-	TOLLS = 'tolls', // Road tolls
+	FUEL: 'fuel', // Vehicle fuel
+	MAINTENANCE: 'maintenance', // Vehicle repairs
+	TOLLS: 'tolls', // Road tolls
 
 	// Personnel
-	EMPLOYEE_SALARY = 'employee_salary',
+	EMPLOYEE_SALARY: 'employee_salary',
 
 	// Business Expenses
-	VENDOR = 'vendor', // Third-party services
-	INSURANCE = 'insurance',
-	TAXES = 'taxes',
+	VENDOR: 'vendor', // Third-party services
+	INSURANCE: 'insurance',
+	TAXES: 'taxes',
 
 	// Correction
-	CORRECTION = 'correction',
-	REFUND = 'refund',
-	EMPLOYEE_REIMBURSEMENT = 'employee_reimbursement',
-}
+	CORRECTION: 'correction',
+	REFUND: 'refund',
+	EMPLOYEE_REIMBURSEMENT: 'employee_reimbursement',
+} as const;
 
-export enum CashFlowStatusEnum {
-	PENDING = 'pending', // Created, waiting for gateway or user redirect
-	AUTHORIZED = 'authorized', // CashFlow authorized but not captured
-	COMPLETED = 'completed', // Money captured
-	FAILED = 'failed',
-	CANCELED = 'canceled', // User canceled before completion
-	EXPIRED = 'expired', // Authorization expired
-	REQUIRES_ACTION = 'requires_action', // 3D Secure, etc.
-}
+export type CashFlowCategory =
+	(typeof CashFlowCategoryEnum)[keyof typeof CashFlowCategoryEnum];
 
-export enum CashFlowGatewayEnum {
-	DIRECT = 'direct',
-	// STRIPE = 'stripe',
-	// PAYPAL = 'paypal',
-}
+export const CashFlowStatusEnum = {
+	PENDING: 'pending', // Created, waiting for gateway or user redirect
+	AUTHORIZED: 'authorized', // CashFlow authorized but not captured
+	COMPLETED: 'completed', // Money captured
+	FAILED: 'failed',
+	CANCELED: 'canceled', // User canceled before completion
+	EXPIRED: 'expired', // Authorization expired
+	REQUIRES_ACTION: 'requires_action', // 3D Secure, etc.
+} as const;
 
-export enum CashFlowMethodEnum {
+export type CashFlowStatus =
+	(typeof CashFlowStatusEnum)[keyof typeof CashFlowStatusEnum];
+
+export const CashFlowGatewayEnum = {
+	DIRECT: 'direct',
+	// STRIPE: 'stripe',
+	// PAYPAL: 'paypal',
+} as const;
+
+export type CashFlowGateway =
+	(typeof CashFlowGatewayEnum)[keyof typeof CashFlowGatewayEnum];
+
+export const CashFlowMethodEnum = {
 	// // Card methods
-	// CREDIT_CARD = 'credit_card',
-	// DEBIT_CARD = 'debit_card',
+	// CREDIT_CARD: 'credit_card',
+	// DEBIT_CARD: 'debit_card',
 	//
 	// // Digital wallets
-	// PAYPAL = 'paypal',
+	// PAYPAL: 'paypal',
 
 	// Traditional
-	CASH = 'cash',
-	BANK_TRANSFER = 'bank_transfer',
-	// CHECK = 'check',
+	CASH: 'cash',
+	BANK_TRANSFER: 'bank_transfer',
+	// CHECK: 'check',
 
 	// // Other
-	// CRYPTO = 'crypto',
-	// GIFT_CARD = 'gift_card',
-}
+	// CRYPTO: 'crypto',
+	// GIFT_CARD: 'gift_card',
+} as const;
+
+export type CashFlowMethod =
+	(typeof CashFlowMethodEnum)[keyof typeof CashFlowMethodEnum];
 
 export const getExpectedCategoryType = (
-	category: CashFlowCategoryEnum,
-): CashFlowCategoryTypeEnum => {
+	category: CashFlowCategory,
+): CashFlowCategoryType => {
 	const revenueCategories = [CashFlowCategoryEnum.CUSTOMER];
 	const expenseCategories = [
 		CashFlowCategoryEnum.FUEL,
@@ -110,8 +130,8 @@ export const getExpectedCategoryType = (
 };
 
 export const getExpectedDirection = (
-	categoryType: CashFlowCategoryTypeEnum,
-): CashFlowDirectionEnum | null => {
+	categoryType: CashFlowCategoryType,
+): CashFlowDirection | null => {
 	switch (categoryType) {
 		case CashFlowCategoryTypeEnum.REVENUE:
 			return CashFlowDirectionEnum.IN;
@@ -143,20 +163,20 @@ export type CashFlowModel<D = Date | string> = {
 	id: number;
 
 	// Classification
-	direction: CashFlowDirectionEnum;
-	category_type: CashFlowCategoryTypeEnum;
-	category: CashFlowCategoryEnum;
+	direction: CashFlowDirection;
+	category_type: CashFlowCategoryType;
+	category: CashFlowCategory;
 
 	// Payment metadata
-	gateway: CashFlowGatewayEnum;
-	method: CashFlowMethodEnum;
-	status: CashFlowStatusEnum;
+	gateway: CashFlowGateway;
+	method: CashFlowMethod;
+	status: CashFlowStatus;
 
 	// Amount data
 	amount: number; // stored in cents
 	vat_rate: number;
 
-	currency: CurrencyEnum;
+	currency: Currency;
 	exchange_rate: number;
 
 	// Other
@@ -171,13 +191,13 @@ export type CashFlowModel<D = Date | string> = {
 	CashFlowDates;
 
 export type CashFlowFormValuesType = {
-	category: CashFlowCategoryEnum;
-	method: CashFlowMethodEnum;
+	category: CashFlowCategory;
+	method: CashFlowMethod;
 
 	amount: number | null;
 	vat_rate: number | null;
 
-	currency: CurrencyEnum;
+	currency: Currency;
 
 	external_reference: string | null;
 

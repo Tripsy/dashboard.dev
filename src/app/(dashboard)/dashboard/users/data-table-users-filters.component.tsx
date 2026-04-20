@@ -17,7 +17,9 @@ import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hoo
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import {
 	type UserModel,
+	type UserRole,
 	UserRoleEnum,
+	type UserStatus,
 	UserStatusEnum,
 } from '@/models/user.model';
 
@@ -95,7 +97,7 @@ export const DataTableUsersFilters = (): JSX.Element => {
 				fieldValue={filters.status.value}
 				options={statuses}
 				onChange={(value) =>
-					setFilterValue('status', value as UserStatusEnum)
+					setFilterValue('status', value as UserStatus)
 				}
 			/>
 
@@ -104,9 +106,7 @@ export const DataTableUsersFilters = (): JSX.Element => {
 				fieldName="role"
 				fieldValue={filters.role.value}
 				options={roles}
-				onChange={(value) =>
-					setFilterValue('role', value as UserRoleEnum)
-				}
+				onChange={(value) => setFilterValue('role', value as UserRole)}
 			/>
 
 			<FormFiltersDateRange<UsersDataTableFiltersType>

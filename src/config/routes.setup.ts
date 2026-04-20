@@ -1,11 +1,13 @@
 import ValueError from '@/exceptions/value.error';
 
-export enum RouteAuth {
-	PUBLIC = 'public',
-	UNAUTHENTICATED = 'unauthenticated',
-	AUTHENTICATED = 'authenticated',
-	PROTECTED = 'protected', // Admin OR Operator
-} // Note: There shouldn't be any other types
+export const RouteAuthEnum = {
+	PUBLIC: 'public',
+	UNAUTHENTICATED: 'unauthenticated',
+	AUTHENTICATED: 'authenticated',
+	PROTECTED: 'protected', // Admin OR Operator
+} as const;
+
+export type RouteAuth = (typeof RouteAuthEnum)[keyof typeof RouteAuthEnum];
 
 type RouteProps = {
 	type?: string;
@@ -42,7 +44,7 @@ class RouteBuilder {
 	): this {
 		this.parent.add(name, path, {
 			type: this.type,
-			auth: props.auth ?? this._routeAuth ?? RouteAuth.PUBLIC,
+			auth: props.auth ?? this._routeAuth ?? RouteAuthEnum.PUBLIC,
 			...props,
 		});
 		return this;
@@ -59,7 +61,7 @@ class RoutesCollection {
 
 		props = {
 			...props,
-			auth: props?.auth ?? RouteAuth.PUBLIC,
+			auth: props?.auth ?? RouteAuthEnum.PUBLIC,
 		};
 
 		this.data[name] = { path, ...props };
@@ -163,31 +165,31 @@ Routes.group('api')
 
 // Account
 Routes.group('account')
-	.auth(RouteAuth.UNAUTHENTICATED)
+	.auth(RouteAuthEnum.UNAUTHENTICATED)
 	.add('login', '/account/login')
-	.add('logout', '/account/logout', { auth: RouteAuth.AUTHENTICATED })
+	.add('logout', '/account/logout', { auth: RouteAuthEnum.AUTHENTICATED })
 	.add('register', '/account/register')
 	.add('password-recover', '/account/password-recover')
 	.add('password-recover-change', '/account/password-recover-change/:token')
 	.add('email-confirm', '/account/email-confirm/:token', {
-		auth: RouteAuth.PUBLIC,
+		auth: RouteAuthEnum.PUBLIC,
 	})
 	.add('email-confirm-send', '/account/email-confirm-send')
-	.add('account-me', '/account/me', { auth: RouteAuth.AUTHENTICATED })
-	.add('account-edit', '/account/edit', { auth: RouteAuth.AUTHENTICATED })
+	.add('account-me', '/account/me', { auth: RouteAuthEnum.AUTHENTICATED })
+	.add('account-edit', '/account/edit', { auth: RouteAuthEnum.AUTHENTICATED })
 	.add('password-update', '/account/password-update', {
-		auth: RouteAuth.AUTHENTICATED,
+		auth: RouteAuthEnum.AUTHENTICATED,
 	})
 	.add('email-update', '/account/email-update', {
-		auth: RouteAuth.AUTHENTICATED,
+		auth: RouteAuthEnum.AUTHENTICATED,
 	})
 	.add('account-delete', '/account/delete', {
-		auth: RouteAuth.AUTHENTICATED,
+		auth: RouteAuthEnum.AUTHENTICATED,
 	});
 
 // Dashboard
 Routes.group('dashboard')
-	.auth(RouteAuth.PROTECTED)
+	.auth(RouteAuthEnum.PROTECTED)
 	.add('dashboard', '/dashboard')
 	.add('template', '/dashboard/templates', {
 		permission: 'template.find',
@@ -245,6 +247,19 @@ export function isExcludedRoute(pathname: string) {
 	];
 
 	return excludeRoutes.includes(pathname);
+}
+
+/**
+ * Check if the given route is protected
+ *
+ * @param auth
+ */
+export function isProtectedRoute(
+	auth: RouteAuth,
+): auth is 'authenticated' | 'protected' {
+	return (
+		auth === RouteAuthEnum.AUTHENTICATED || auth === RouteAuthEnum.PROTECTED
+	);
 }
 
 export default Routes;

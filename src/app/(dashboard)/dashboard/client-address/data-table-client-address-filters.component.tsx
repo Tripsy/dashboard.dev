@@ -16,6 +16,7 @@ import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hoo
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import {
 	type ClientAddressModel,
+	type ClientAddressType,
 	ClientAddressTypeEnum,
 } from '@/models/client-address.model';
 
@@ -91,10 +92,7 @@ export const DataTableClientAddressFilters = (): JSX.Element => {
 				fieldValue={filters.address_type.value}
 				options={addressTypes}
 				onChange={(value) =>
-					setFilterValue(
-						'address_type',
-						value as ClientAddressTypeEnum,
-					)
+					setFilterValue('address_type', value as ClientAddressType)
 				}
 			/>
 

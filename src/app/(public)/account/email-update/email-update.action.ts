@@ -1,76 +1,53 @@
 import {
-	type EmailUpdateFormFieldsType,
-	EmailUpdateSchema,
+	type EmailUpdateFormValuesType,
 	type EmailUpdateSituationType,
 	type EmailUpdateStateType,
+	getEmailUpdateFormValues,
+	validateFormEmailUpdate,
 } from '@/app/(public)/account/email-update/email-update.definition';
-import { Configuration } from '@/config/settings.config';
 import { translate } from '@/config/translate.setup';
 import { ApiError } from '@/exceptions/api.error';
-import {
-	accumulateZodErrors,
-	getFormDataAsString,
-} from '@/helpers/form.helper';
+import { accumulateZodErrors } from '@/helpers/form.helper';
 import { isValidCsrfToken } from '@/helpers/session.helper';
-import { emailUpdateAccount } from '@/services/account.service';
-
-export function emailUpdateFormValues(
-	formData: FormData,
-): EmailUpdateFormFieldsType {
-	return {
-		email_new: getFormDataAsString(formData, 'email_new'),
-	};
-}
-
-export function emailUpdateValidate(values: EmailUpdateFormFieldsType) {
-	return EmailUpdateSchema.safeParse(values);
-}
+import { requestEmailUpdate } from '@/services/account.service';
 
 export async function emailUpdateAction(
-	state: EmailUpdateStateType,
+	formState: EmailUpdateStateType,
 	formData: FormData,
 ): Promise<EmailUpdateStateType> {
-	const values = emailUpdateFormValues(formData);
-	const validated = emailUpdateValidate(values);
-
-	const result: EmailUpdateStateType = {
-		...state, // Spread existing state
-		values, // Override with new values
-		message: null,
-		situation: null,
-	};
-
-	const csrfToken = getFormDataAsString(
-		formData,
-		Configuration.get('csrf.inputName') as string,
-	);
-
-	if (!(await isValidCsrfToken(csrfToken))) {
+	if (!(await isValidCsrfToken(formData))) {
 		return {
-			...result,
+			...formState,
 			message: await translate('app.error.csrf'),
 			situation: 'csrf_error',
 		};
 	}
 
+	const formValues = getEmailUpdateFormValues(formData);
+	const validated = validateFormEmailUpdate(formValues);
+
 	if (!validated.success) {
+		const errors = accumulateZodErrors<EmailUpdateFormValuesType>(
+			validated.error,
+		);
+
 		return {
-			...result,
+			...formState,
+			values: formValues,
 			situation: 'error',
-			errors: accumulateZodErrors<EmailUpdateFormFieldsType>(
-				validated.error,
-			),
+			message: await translate('app.error.validation'),
+			errors,
 		};
 	}
 
 	try {
-		const fetchResponse = await emailUpdateAccount(validated.data);
+		const requestResponse = await requestEmailUpdate(validated.data);
 
 		return {
-			...result,
-			errors: {},
-			message: fetchResponse?.message || null,
-			situation: fetchResponse?.success ? 'success' : 'error',
+			...formState,
+			values: validated.data,
+			message: requestResponse?.message || null,
+			situation: requestResponse?.success ? 'success' : 'error',
 		};
 	} catch (error: unknown) {
 		let message: string = '';
@@ -87,8 +64,8 @@ export async function emailUpdateAction(
 		}
 
 		return {
-			...result,
-			errors: {},
+			...formState,
+			values: validated.data,
 			message: message || (await translate('app.error.form')),
 			situation: situation,
 		};

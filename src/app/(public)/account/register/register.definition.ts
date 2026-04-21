@@ -1,10 +1,19 @@
 import { z } from 'zod';
 import { Configuration } from '@/config/settings.config';
+import {
+	getFormDataAsBoolean,
+	getFormDataAsEnum,
+	getFormDataAsString,
+} from '@/helpers/form.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
-import { type Language, LanguageEnum } from '@/models/user.model';
-import type { FormSituationType } from '@/types/form.type';
+import {
+	LANGUAGE_DEFAULT,
+	type Language,
+	LanguageEnum,
+} from '@/models/user.model';
+import type { FormErrorsType, FormSituationType } from '@/types/form.type';
 
-export type RegisterFormFieldsType = {
+export type RegisterFormValuesType = {
 	name: string | null;
 	email: string | null;
 	password: string | null;
@@ -19,8 +28,8 @@ export type RegisterSituationType =
 	| 'pending_account';
 
 export type RegisterStateType = {
-	values: RegisterFormFieldsType;
-	errors: Partial<Record<keyof RegisterFormFieldsType, string[]>>;
+	values: RegisterFormValuesType;
+	errors: FormErrorsType<RegisterFormValuesType>;
 	message: string | null;
 	situation: RegisterSituationType;
 };
@@ -31,7 +40,7 @@ export const RegisterState: RegisterStateType = {
 		email: '',
 		password: '',
 		password_confirm: '',
-		language: LanguageEnum.RO,
+		language: LANGUAGE_DEFAULT,
 		terms: false,
 	},
 	errors: {},
@@ -115,4 +124,23 @@ class RegisterValidator extends BaseValidator<typeof validatorMessages> {
 		});
 }
 
-export const RegisterSchema = new RegisterValidator(validatorMessages).register;
+export function validateFormRegister(values: RegisterFormValuesType) {
+	const validator = new RegisterValidator(validatorMessages);
+
+	return validator.register.safeParse(values);
+}
+
+export function getRegisterFormValues(
+	formData: FormData,
+): RegisterFormValuesType {
+	return {
+		name: getFormDataAsString(formData, 'name'),
+		email: getFormDataAsString(formData, 'email'),
+		password: getFormDataAsString(formData, 'password'),
+		password_confirm: getFormDataAsString(formData, 'password_confirm'),
+		language:
+			getFormDataAsEnum(formData, 'language', LanguageEnum) ||
+			LANGUAGE_DEFAULT,
+		terms: getFormDataAsBoolean(formData, 'terms') || false,
+	};
+}

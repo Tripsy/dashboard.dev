@@ -1,14 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import React, { useActionState } from 'react';
+import { useActionState } from 'react';
+import { emailConfirmSendAction } from '@/app/(public)/account/email-confirm-send/email-confirm-send.action';
 import {
-	emailConfirmSendAction,
-	emailConfirmSendValidate,
-} from '@/app/(public)/account/email-confirm-send/email-confirm-send.action';
-import {
-	type EmailConfirmSendFormFieldsType,
+	type EmailConfirmSendFormValuesType,
 	EmailConfirmSendState,
+	validateFormEmailConfirmSend,
 } from '@/app/(public)/account/email-confirm-send/email-confirm-send.definition';
 import { FormCsrf } from '@/components/form/form-csrf';
 import {
@@ -32,12 +30,12 @@ export default function EmailConfirmSend() {
 	);
 
 	const [formValues, setFormValues] =
-		useFormValues<EmailConfirmSendFormFieldsType>(state.values);
+		useFormValues<EmailConfirmSendFormValuesType>(state.values);
 
 	const { errors, submitted, markSubmit, markFieldAsTouched } =
 		useFormValidation({
 			formValues: formValues,
-			validate: emailConfirmSendValidate,
+			validateForm: validateFormEmailConfirmSend,
 			debounceDelay: 800,
 		});
 
@@ -82,7 +80,7 @@ export default function EmailConfirmSend() {
 			>
 				<FormCsrf />
 
-				<FormComponentEmail<EmailConfirmSendFormFieldsType>
+				<FormComponentEmail<EmailConfirmSendFormValuesType>
 					labelText="Email Address"
 					id={elementIds.email}
 					fieldValue={formValues.email ?? ''}
@@ -103,10 +101,10 @@ export default function EmailConfirmSend() {
 
 				{state.situation === 'error' && state.message && (
 					<FormError>
-						<React.Fragment key="error-content">
+						<div className="flex items-center gap-1.5">
 							<Icons.Status.Error />
 							<div>{state.message}</div>
-						</React.Fragment>
+						</div>
 					</FormError>
 				)}
 

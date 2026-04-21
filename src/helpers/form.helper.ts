@@ -41,11 +41,6 @@ export async function processForm<Entry, FormValues extends FormValuesType>(
 			};
 		}
 
-		const result = {
-			...formState,
-			values: validated.data,
-		};
-
 		// If entryId is provided, it's an update operation — pass id as second argument.
 		const fetchResponse =
 			entryId !== undefined
@@ -63,8 +58,8 @@ export async function processForm<Entry, FormValues extends FormValuesType>(
 					)(validated.data);
 
 		return {
-			...result,
-			errors: {},
+			...formState,
+			values: validated.data,
 			message: fetchResponse?.message || null,
 			situation: fetchResponse?.success ? 'success' : 'error',
 			resultData: fetchResponse?.data,

@@ -1,16 +1,17 @@
 import { z } from 'zod';
+import { getFormDataAsString } from '@/helpers/form.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
-import type { FormSituationType } from '@/types/form.type';
+import type { FormErrorsType, FormSituationType } from '@/types/form.type';
 
-export type AccountDeleteFormFieldsType = {
+export type AccountDeleteFormValuesType = {
 	password_current: string | null;
 };
 
 export type AccountDeleteSituationType = FormSituationType | 'csrf_error';
 
 export type AccountDeleteStateType = {
-	values: AccountDeleteFormFieldsType;
-	errors: Partial<Record<keyof AccountDeleteFormFieldsType, string[]>>;
+	values: AccountDeleteFormValuesType;
+	errors: FormErrorsType<AccountDeleteFormValuesType>;
 	message: string | null;
 	situation: AccountDeleteSituationType;
 };
@@ -37,5 +38,16 @@ class AccountDeleteValidator extends BaseValidator<typeof validatorMessages> {
 	});
 }
 
-export const AccountDeleteSchema = new AccountDeleteValidator(validatorMessages)
-	.accountDelete;
+export function validateFormAccountDelete(values: AccountDeleteFormValuesType) {
+	const validator = new AccountDeleteValidator(validatorMessages);
+
+	return validator.accountDelete.safeParse(values);
+}
+
+export function getAccountDeleteFormValues(
+	formData: FormData,
+): AccountDeleteFormValuesType {
+	return {
+		password_current: getFormDataAsString(formData, 'password_current'),
+	};
+}

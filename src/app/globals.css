@@ -331,7 +331,7 @@
 	}
 
 	.dashboard-layout .p-paginator.data-table-paginator {
-		@apply relative !border-b-0;
+		@apply relative border-b-0!;
 	}
 
 	.dashboard-layout

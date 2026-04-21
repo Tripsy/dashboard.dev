@@ -1,16 +1,17 @@
 import { z } from 'zod';
+import { getFormDataAsString } from '@/helpers/form.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
-import type { FormSituationType } from '@/types/form.type';
+import type { FormErrorsType, FormSituationType } from '@/types/form.type';
 
-export type EmailConfirmSendFormFieldsType = {
+export type EmailConfirmSendFormValuesType = {
 	email: string | null;
 };
 
 export type EmailConfirmSendSituationType = FormSituationType | 'csrf_error';
 
 export type EmailConfirmSendStateType = {
-	values: EmailConfirmSendFormFieldsType;
-	errors: Partial<Record<keyof EmailConfirmSendFormFieldsType, string[]>>;
+	values: EmailConfirmSendFormValuesType;
+	errors: FormErrorsType<EmailConfirmSendFormValuesType>;
 	message: string | null;
 	situation: EmailConfirmSendSituationType;
 };
@@ -37,6 +38,18 @@ class EmailConfirmSendValidator extends BaseValidator<
 	});
 }
 
-export const EmailConfirmSendSchema = new EmailConfirmSendValidator(
-	validatorMessages,
-).emailConfirmSend;
+export function validateFormEmailConfirmSend(
+	values: EmailConfirmSendFormValuesType,
+) {
+	const validator = new EmailConfirmSendValidator(validatorMessages);
+
+	return validator.emailConfirmSend.safeParse(values);
+}
+
+export function getEmailConfirmSendFormValues(
+	formData: FormData,
+): EmailConfirmSendFormValuesType {
+	return {
+		email: getFormDataAsString(formData, 'email'),
+	};
+}

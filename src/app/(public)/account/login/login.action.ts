@@ -1,101 +1,75 @@
 import {
-	type LoginFormFieldsType,
-	LoginSchema,
+	getLoginFormValues,
+	type LoginApiResponseType,
+	type LoginFormValuesType,
 	type LoginSituationType,
 	type LoginStateType,
+	validateFormLogin,
 } from '@/app/(public)/account/login/login.definition';
-import { Configuration } from '@/config/settings.config';
 import { translate } from '@/config/translate.setup';
 import { ApiError } from '@/exceptions/api.error';
-import {
-	accumulateZodErrors,
-	getFormDataAsString,
-} from '@/helpers/form.helper';
+import { accumulateZodErrors } from '@/helpers/form.helper';
 import { isValidCsrfToken } from '@/helpers/session.helper';
-import { loginAccount } from '@/services/account.service';
+import { requestLogin } from '@/services/account.service';
 import { createAuth } from '@/services/auth.service';
-import type { AuthTokenListType } from '@/types/auth.type';
-
-export function loginFormValues(formData: FormData): LoginFormFieldsType {
-	return {
-		email: getFormDataAsString(formData, 'email'),
-		password: getFormDataAsString(formData, 'password'),
-	};
-}
-
-export function loginValidate(values: LoginFormFieldsType) {
-	return LoginSchema.safeParse(values);
-}
 
 export async function loginAction(
-	state: LoginStateType,
+	formState: LoginStateType,
 	formData: FormData,
 ): Promise<LoginStateType> {
-	const values = loginFormValues(formData);
-	const validated = loginValidate(values);
-
-	const result: LoginStateType = {
-		...state, // Spread existing state
-		values, // Override with new values
-		message: null,
-		situation: null,
-	};
-
-	const csrfToken = getFormDataAsString(
-		formData,
-		Configuration.get('csrf.inputName') as string,
-	);
-
-	if (!(await isValidCsrfToken(csrfToken))) {
+	if (!(await isValidCsrfToken(formData))) {
 		return {
-			...result,
+			...formState,
 			message: await translate('app.error.csrf'),
 			situation: 'csrf_error',
 		};
 	}
 
+	const formValues = getLoginFormValues(formData);
+	const validated = validateFormLogin(formValues);
+
 	if (!validated.success) {
+		const errors = accumulateZodErrors<LoginFormValuesType>(
+			validated.error,
+		);
+
 		return {
-			...result,
+			...formState,
+			values: formValues,
 			situation: 'error',
-			errors: accumulateZodErrors<LoginFormFieldsType>(validated.error),
+			message: await translate('app.error.validation'),
+			errors,
 		};
 	}
 
 	try {
-		const fetchResponse = await loginAccount(validated.data);
+		const requestResponse = await requestLogin(validated.data);
 
 		if (
-			fetchResponse?.success &&
-			fetchResponse.data &&
-			'token' in fetchResponse.data
+			requestResponse?.success &&
+			requestResponse.data &&
+			'token' in requestResponse.data
 		) {
-			const authResponse = await createAuth(fetchResponse.data.token);
+			const authResponse = await createAuth(requestResponse.data.token);
 
-			if (authResponse?.success) {
-				return {
-					...result,
-					message: authResponse?.message || null,
-					situation: 'success',
-				};
-			} else {
-				return {
-					...result,
-					message: authResponse?.message || null,
-					situation: 'error',
-				};
-			}
+			return {
+				...formState,
+				values: validated.data,
+				message: authResponse?.message || null,
+				situation: authResponse?.success ? 'success' : 'error',
+			};
 		} else {
 			return {
-				...result,
-				message: fetchResponse?.message || null,
+				...formState,
+				values: validated.data,
+				message: requestResponse?.message || null,
 				situation: 'error',
 			};
 		}
 	} catch (error: unknown) {
 		let message: string = '';
 		let situation: LoginSituationType = 'error';
-		let responseBody: { authValidTokens: AuthTokenListType } | undefined;
+		let resultData: LoginApiResponseType | undefined;
 
 		if (error instanceof ApiError) {
 			switch (error.status) {
@@ -107,9 +81,7 @@ export async function loginAction(
 						'login.message.max_active_sessions',
 					);
 					situation = 'max_active_sessions';
-					responseBody = error.body?.data as {
-						authValidTokens: AuthTokenListType;
-					};
+					resultData = error.body?.data;
 					break;
 				case 406:
 					situation = 'success'; // Already logged in
@@ -127,11 +99,12 @@ export async function loginAction(
 		}
 
 		return {
-			...result,
+			...formState,
+			values: validated.data,
 			message:
 				message || (await translate('login.message.could_not_login')),
 			situation: situation,
-			body: responseBody,
+			resultData: resultData,
 		};
 	}
 }

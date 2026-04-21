@@ -1,16 +1,17 @@
 import { z } from 'zod';
+import { getFormDataAsString } from '@/helpers/form.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
-import type { FormSituationType } from '@/types/form.type';
+import type { FormErrorsType, FormSituationType } from '@/types/form.type';
 
-export type EmailUpdateFormFieldsType = {
+export type EmailUpdateFormValuesType = {
 	email_new: string | null;
 };
 
 export type EmailUpdateSituationType = FormSituationType | 'csrf_error';
 
 export type EmailUpdateStateType = {
-	values: EmailUpdateFormFieldsType;
-	errors: Partial<Record<keyof EmailUpdateFormFieldsType, string[]>>;
+	values: EmailUpdateFormValuesType;
+	errors: FormErrorsType<EmailUpdateFormValuesType>;
 	message: string | null;
 	situation: EmailUpdateSituationType;
 };
@@ -35,5 +36,16 @@ class EmailUpdateValidator extends BaseValidator<typeof validatorMessages> {
 	});
 }
 
-export const EmailUpdateSchema = new EmailUpdateValidator(validatorMessages)
-	.emailUpdate;
+export function validateFormEmailUpdate(values: EmailUpdateFormValuesType) {
+	const validator = new EmailUpdateValidator(validatorMessages);
+
+	return validator.emailUpdate.safeParse(values);
+}
+
+export function getEmailUpdateFormValues(
+	formData: FormData,
+): EmailUpdateFormValuesType {
+	return {
+		email_new: getFormDataAsString(formData, 'email_new'),
+	};
+}

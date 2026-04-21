@@ -1,16 +1,17 @@
 import { z } from 'zod';
+import { getFormDataAsString } from '@/helpers/form.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
-import type { FormSituationType } from '@/types/form.type';
+import type { FormErrorsType, FormSituationType } from '@/types/form.type';
 
-export type PasswordRecoverFormFieldsType = {
+export type PasswordRecoverFormValuesType = {
 	email: string | null;
 };
 
 export type PasswordRecoverSituationType = FormSituationType | 'csrf_error';
 
 export type PasswordRecoverStateType = {
-	values: PasswordRecoverFormFieldsType;
-	errors: Partial<Record<keyof PasswordRecoverFormFieldsType, string[]>>;
+	values: PasswordRecoverFormValuesType;
+	errors: FormErrorsType<PasswordRecoverFormValuesType>;
 	message: string | null;
 	situation: PasswordRecoverSituationType;
 };
@@ -35,6 +36,18 @@ class PasswordRecoverValidator extends BaseValidator<typeof validatorMessages> {
 	});
 }
 
-export const PasswordRecoverSchema = new PasswordRecoverValidator(
-	validatorMessages,
-).passwordRecover;
+export function validateFormPasswordRecover(
+	values: PasswordRecoverFormValuesType,
+) {
+	const validator = new PasswordRecoverValidator(validatorMessages);
+
+	return validator.passwordRecover.safeParse(values);
+}
+
+export function getPasswordRecoverFormValues(
+	formData: FormData,
+): PasswordRecoverFormValuesType {
+	return {
+		email: getFormDataAsString(formData, 'email'),
+	};
+}

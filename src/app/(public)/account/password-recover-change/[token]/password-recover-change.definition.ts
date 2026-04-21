@@ -1,9 +1,10 @@
 import { z } from 'zod';
 import { Configuration } from '@/config/settings.config';
+import { getFormDataAsString } from '@/helpers/form.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
-import type { FormSituationType } from '@/types/form.type';
+import type { FormErrorsType, FormSituationType } from '@/types/form.type';
 
-export type PasswordRecoverChangeFormFieldsType = {
+export type PasswordRecoverChangeFormValuesType = {
 	password: string | null;
 	password_confirm: string | null;
 };
@@ -14,10 +15,8 @@ export type PasswordRecoverChangeSituationType =
 
 export type PasswordRecoverChangeStateType = {
 	token: string;
-	values: PasswordRecoverChangeFormFieldsType;
-	errors: Partial<
-		Record<keyof PasswordRecoverChangeFormFieldsType, string[]>
-	>;
+	values: PasswordRecoverChangeFormValuesType;
+	errors: FormErrorsType<PasswordRecoverChangeFormValuesType>;
 	message: string | null;
 	situation: PasswordRecoverChangeSituationType;
 };
@@ -90,6 +89,19 @@ class PasswordRecoverChangeValidator extends BaseValidator<
 		});
 }
 
-export const PasswordRecoverChangeSchema = new PasswordRecoverChangeValidator(
-	validatorMessages,
-).passwordRecoverChange;
+export function validateFormPasswordRecoverChange(
+	values: PasswordRecoverChangeFormValuesType,
+) {
+	const validator = new PasswordRecoverChangeValidator(validatorMessages);
+
+	return validator.passwordRecoverChange.safeParse(values);
+}
+
+export function getPasswordRecoverChangeFormValues(
+	formData: FormData,
+): PasswordRecoverChangeFormValuesType {
+	return {
+		password: getFormDataAsString(formData, 'password'),
+		password_confirm: getFormDataAsString(formData, 'password_confirm'),
+	};
+}

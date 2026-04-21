@@ -1,15 +1,12 @@
 'use client';
 
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { useActionState, useEffect, useState } from 'react';
+import { useActionState, useEffect, useState } from 'react';
+import { accountDeleteAction } from '@/app/(public)/account/delete/account-delete.action';
 import {
-	accountDeleteAction,
-	accountDeleteValidate,
-} from '@/app/(public)/account/delete/account-delete.action';
-import {
-	type AccountDeleteFormFieldsType,
+	type AccountDeleteFormValuesType,
 	AccountDeleteState,
+	validateFormAccountDelete,
 } from '@/app/(public)/account/delete/account-delete.definition';
 import { FormCsrf } from '@/components/form/form-csrf';
 import {
@@ -20,7 +17,7 @@ import { FormError } from '@/components/form/form-error.component';
 import { FormWrapperComponent } from '@/components/form/form-wrapper';
 import { Icons } from '@/components/icon.component';
 import { LoadingComponent } from '@/components/status.component';
-import { Button } from '@/components/ui/button';
+import { Link } from '@/components/ui/link';
 import Routes from '@/config/routes.setup';
 import { createHandleChange } from '@/helpers/form.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
@@ -29,6 +26,7 @@ import { useFormValues } from '@/hooks/use-form-values.hook';
 import { useAuth } from '@/providers/auth.provider';
 
 export default function AccountDelete() {
+	const [showPassword, setShowPassword] = useState(false);
 	const { auth, authStatus } = useAuth();
 
 	const [state, action, pending] = useActionState(
@@ -36,15 +34,13 @@ export default function AccountDelete() {
 		AccountDeleteState,
 	);
 
-	const [showPassword, setShowPassword] = useState(false);
-
 	const [formValues, setFormValues] =
-		useFormValues<AccountDeleteFormFieldsType>(state.values);
+		useFormValues<AccountDeleteFormValuesType>(state.values);
 
 	const { errors, submitted, markSubmit, markFieldAsTouched } =
 		useFormValidation({
 			formValues: formValues,
-			validate: accountDeleteValidate,
+			validateForm: validateFormAccountDelete,
 			debounceDelay: 800,
 		});
 
@@ -54,7 +50,7 @@ export default function AccountDelete() {
 
 	// Refresh auth and redirect to `/status/error`
 	useEffect(() => {
-		if (state.situation === 'success' && router) {
+		if (state.situation === 'success') {
 			router.replace(
 				`${Routes.get('status', { type: 'error' })}?r=account-delete`,
 			);
@@ -68,7 +64,8 @@ export default function AccountDelete() {
 	}
 
 	if (!auth) {
-		throw new Error('Not authenticated.');
+		router.replace(Routes.get('login'));
+		return null;
 	}
 
 	if (state.situation === 'csrf_error') {
@@ -89,7 +86,7 @@ export default function AccountDelete() {
 			>
 				<FormCsrf />
 
-				<FormComponentPassword<AccountDeleteFormFieldsType>
+				<FormComponentPassword<AccountDeleteFormValuesType>
 					labelText="Current Password"
 					id={elementIds.passwordCurrent}
 					fieldName="password_current"
@@ -106,15 +103,14 @@ export default function AccountDelete() {
 				/>
 
 				<div className="flex justify-end gap-2">
-					<Button variant="outline" hover="warning">
-						<Link
-							href={Routes.get('account-me')}
-							title="Cancel & Go back to my account"
-							className="flex items-center gap-1"
-						>
-							<Icons.Action.Cancel /> Cancel
-						</Link>
-					</Button>
+					<Link
+						href={Routes.get('account-me')}
+						title="Cancel & Go back to my account"
+						variant="outline"
+						hover="warning"
+					>
+						<Icons.Action.Cancel /> Cancel
+					</Link>
 					<FormComponentSubmit
 						pending={pending}
 						submitted={submitted}
@@ -129,10 +125,10 @@ export default function AccountDelete() {
 
 				{state.situation === 'error' && state.message && (
 					<FormError>
-						<React.Fragment key="error-content">
+						<div className="flex items-center gap-1.5">
 							<Icons.Status.Error />
 							<div>{state.message}</div>
-						</React.Fragment>
+						</div>
 					</FormError>
 				)}
 			</form>

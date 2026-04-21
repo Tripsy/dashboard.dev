@@ -18,7 +18,7 @@ export type ModalSizeType = keyof typeof SizeClasses;
 
 interface ModalProps {
 	isOpen: boolean;
-	isHidden: boolean;
+	isHidden?: boolean;
 	onClose: () => void;
 	onMinimize?: () => void;
 	title?: string;
@@ -33,7 +33,7 @@ interface ModalProps {
 
 export function Modal({
 	isOpen,
-	isHidden,
+	isHidden = false,
 	onClose,
 	onMinimize,
 	title,

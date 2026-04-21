@@ -1,84 +1,53 @@
 import {
-	type RegisterFormFieldsType,
-	RegisterSchema,
+	getRegisterFormValues,
+	type RegisterFormValuesType,
 	type RegisterSituationType,
 	type RegisterStateType,
+	validateFormRegister,
 } from '@/app/(public)/account/register/register.definition';
-import { Configuration } from '@/config/settings.config';
 import { translate } from '@/config/translate.setup';
 import { ApiError } from '@/exceptions/api.error';
-import {
-	accumulateZodErrors,
-	getFormDataAsBoolean,
-	getFormDataAsEnum,
-	getFormDataAsString,
-} from '@/helpers/form.helper';
+import { accumulateZodErrors } from '@/helpers/form.helper';
 import { isValidCsrfToken } from '@/helpers/session.helper';
-import { LANGUAGE_DEFAULT, LanguageEnum } from '@/models/user.model';
-import { registerAccount } from '@/services/account.service';
-
-export function registerFormValues(formData: FormData): RegisterFormFieldsType {
-	return {
-		name: getFormDataAsString(formData, 'name'),
-		email: getFormDataAsString(formData, 'email'),
-		password: getFormDataAsString(formData, 'password'),
-		password_confirm: getFormDataAsString(formData, 'password_confirm'),
-		language:
-			getFormDataAsEnum(formData, 'language', LanguageEnum) ||
-			LANGUAGE_DEFAULT,
-		terms: getFormDataAsBoolean(formData, 'terms'),
-	};
-}
-
-export function registerValidate(values: RegisterFormFieldsType) {
-	return RegisterSchema.safeParse(values);
-}
+import { requestRegister } from '@/services/account.service';
 
 export async function registerAction(
-	state: RegisterStateType,
+	formState: RegisterStateType,
 	formData: FormData,
 ): Promise<RegisterStateType> {
-	const values = registerFormValues(formData);
-	const validated = registerValidate(values);
-
-	const result: RegisterStateType = {
-		...state, // Spread existing state
-		values, // Override with new values
-		message: null,
-		situation: null,
-	};
-
-	const csrfToken = getFormDataAsString(
-		formData,
-		Configuration.get('csrf.inputName') as string,
-	);
-
-	if (!(await isValidCsrfToken(csrfToken))) {
+	if (!(await isValidCsrfToken(formData))) {
 		return {
-			...result,
+			...formState,
 			message: await translate('app.error.csrf'),
 			situation: 'csrf_error',
 		};
 	}
 
+	const formValues = getRegisterFormValues(formData);
+	const validated = validateFormRegister(formValues);
+
 	if (!validated.success) {
+		const errors = accumulateZodErrors<RegisterFormValuesType>(
+			validated.error,
+		);
+
 		return {
-			...result,
+			...formState,
+			values: formValues,
 			situation: 'error',
-			errors: accumulateZodErrors<RegisterFormFieldsType>(
-				validated.error,
-			),
+			message: await translate('app.error.validation'),
+			errors,
 		};
 	}
 
 	try {
-		const fetchResponse = await registerAccount(validated.data);
+		const requestResponse = await requestRegister(validated.data);
 
 		return {
-			...result,
-			errors: {},
-			message: fetchResponse?.message || null,
-			situation: fetchResponse?.success ? 'success' : 'error',
+			...formState,
+			values: validated.data,
+			message: requestResponse?.message || null,
+			situation: requestResponse?.success ? 'success' : 'error',
 		};
 	} catch (error: unknown) {
 		let message: string = '';
@@ -96,7 +65,8 @@ export async function registerAction(
 		}
 
 		return {
-			...result,
+			...formState,
+			values: validated.data,
 			errors: {},
 			message: message || (await translate('app.error.form')),
 			situation: situation,

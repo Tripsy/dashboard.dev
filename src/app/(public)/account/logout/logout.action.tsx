@@ -4,15 +4,15 @@ import type {
 } from '@/app/(public)/account/logout/logout.definition';
 import { translate } from '@/config/translate.setup';
 import { ApiError } from '@/exceptions/api.error';
-import { logoutAccount } from '@/services/account.service';
+import { requestLogout } from '@/services/account.service';
 import { clearAuth } from '@/services/auth.service';
 import type { ApiResponseFetch } from '@/types/api.type';
 
 export async function logoutAction(): Promise<LogoutState> {
 	try {
-		const fetchResponse: ApiResponseFetch<null> = await logoutAccount();
+		const requestResponse: ApiResponseFetch<null> = await requestLogout();
 
-		if (fetchResponse?.success) {
+		if (requestResponse?.success) {
 			const authResponse = await clearAuth();
 
 			if (authResponse?.success) {
@@ -31,7 +31,7 @@ export async function logoutAction(): Promise<LogoutState> {
 		} else {
 			return {
 				message:
-					fetchResponse?.message ||
+					requestResponse?.message ||
 					(await translate('logout.message.error')),
 				situation: 'error',
 			};

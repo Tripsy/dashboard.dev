@@ -1,78 +1,53 @@
 import {
-	type EmailConfirmSendFormFieldsType,
-	EmailConfirmSendSchema,
+	type EmailConfirmSendFormValuesType,
 	type EmailConfirmSendSituationType,
 	type EmailConfirmSendStateType,
+	getEmailConfirmSendFormValues,
+	validateFormEmailConfirmSend,
 } from '@/app/(public)/account/email-confirm-send/email-confirm-send.definition';
-import { Configuration } from '@/config/settings.config';
 import { translate } from '@/config/translate.setup';
 import { ApiError } from '@/exceptions/api.error';
-import {
-	accumulateZodErrors,
-	getFormDataAsString,
-} from '@/helpers/form.helper';
+import { accumulateZodErrors } from '@/helpers/form.helper';
 import { isValidCsrfToken } from '@/helpers/session.helper';
-import { emailConfirmSendAccount } from '@/services/account.service';
-
-export function emailConfirmSendFormValues(
-	formData: FormData,
-): EmailConfirmSendFormFieldsType {
-	return {
-		email: getFormDataAsString(formData, 'email'),
-	};
-}
-
-export function emailConfirmSendValidate(
-	values: EmailConfirmSendFormFieldsType,
-) {
-	return EmailConfirmSendSchema.safeParse(values);
-}
+import { requestEmailConfirmSend } from '@/services/account.service';
 
 export async function emailConfirmSendAction(
-	state: EmailConfirmSendStateType,
+	formState: EmailConfirmSendStateType,
 	formData: FormData,
 ): Promise<EmailConfirmSendStateType> {
-	const values = emailConfirmSendFormValues(formData);
-	const validated = emailConfirmSendValidate(values);
-
-	const result: EmailConfirmSendStateType = {
-		...state, // Spread existing state
-		values, // Override with new values
-		message: null,
-		situation: null,
-	};
-
-	const csrfToken = getFormDataAsString(
-		formData,
-		Configuration.get('csrf.inputName') as string,
-	);
-
-	if (!(await isValidCsrfToken(csrfToken))) {
+	if (!(await isValidCsrfToken(formData))) {
 		return {
-			...result,
+			...formState,
 			message: await translate('app.error.csrf'),
 			situation: 'csrf_error',
 		};
 	}
 
+	const formValues = getEmailConfirmSendFormValues(formData);
+	const validated = validateFormEmailConfirmSend(formValues);
+
 	if (!validated.success) {
+		const errors = accumulateZodErrors<EmailConfirmSendFormValuesType>(
+			validated.error,
+		);
+
 		return {
-			...result,
+			...formState,
+			values: formValues,
 			situation: 'error',
-			errors: accumulateZodErrors<EmailConfirmSendFormFieldsType>(
-				validated.error,
-			),
+			message: await translate('app.error.validation'),
+			errors,
 		};
 	}
 
 	try {
-		const fetchResponse = await emailConfirmSendAccount(validated.data);
+		const requestResponse = await requestEmailConfirmSend(validated.data);
 
 		return {
-			...result,
-			errors: {},
-			message: fetchResponse?.message || null,
-			situation: fetchResponse?.success ? 'success' : 'error',
+			...formState,
+			values: validated.data,
+			message: requestResponse?.message || null,
+			situation: requestResponse?.success ? 'success' : 'error',
 		};
 	} catch (error: unknown) {
 		let message: string = '';
@@ -96,7 +71,8 @@ export async function emailConfirmSendAction(
 		}
 
 		return {
-			...result,
+			...formState,
+			values: validated.data,
 			message:
 				message ||
 				(await translate('email-confirm-send.message.failed')),

@@ -1,10 +1,15 @@
 import { z } from 'zod';
 import { Configuration } from '@/config/settings.config';
+import { getFormDataAsEnum, getFormDataAsString } from '@/helpers/form.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
-import { LANGUAGE_DEFAULT, type Language } from '@/models/user.model';
+import {
+	LANGUAGE_DEFAULT,
+	type Language,
+	LanguageEnum,
+} from '@/models/user.model';
 import type { FormSituationType } from '@/types/form.type';
 
-export type AccountEditFormFieldsType = {
+export type AccountEditFormValuesType = {
 	name: string | null;
 	language: Language;
 };
@@ -12,8 +17,8 @@ export type AccountEditFormFieldsType = {
 export type AccountEditSituationType = FormSituationType | 'csrf_error';
 
 export type AccountEditStateType = {
-	values: AccountEditFormFieldsType;
-	errors: Partial<Record<keyof AccountEditFormFieldsType, string[]>>;
+	values: AccountEditFormValuesType;
+	errors: Partial<Record<keyof AccountEditFormValuesType, string[]>>;
 	message: string | null;
 	situation: AccountEditSituationType;
 };
@@ -50,5 +55,19 @@ class AccountEditValidator extends BaseValidator<typeof validatorMessages> {
 	});
 }
 
-export const AccountEditSchema = new AccountEditValidator(validatorMessages)
-	.accountEdit;
+export function validateFormAccountEdit(values: AccountEditFormValuesType) {
+	const validator = new AccountEditValidator(validatorMessages);
+
+	return validator.accountEdit.safeParse(values);
+}
+
+export function getAccountEditFormValues(
+	formData: FormData,
+): AccountEditFormValuesType {
+	return {
+		name: getFormDataAsString(formData, 'name'),
+		language:
+			getFormDataAsEnum(formData, 'language', LanguageEnum) ||
+			LANGUAGE_DEFAULT,
+	};
+}

@@ -1,9 +1,10 @@
 import { z } from 'zod';
 import { Configuration } from '@/config/settings.config';
+import { getFormDataAsString } from '@/helpers/form.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
-import type { FormSituationType } from '@/types/form.type';
+import type { FormErrorsType, FormSituationType } from '@/types/form.type';
 
-export type PasswordUpdateFormFieldsType = {
+export type PasswordUpdateFormValuesType = {
 	password_current: string | null;
 	password_new: string | null;
 	password_confirm: string | null;
@@ -12,8 +13,8 @@ export type PasswordUpdateFormFieldsType = {
 export type PasswordUpdateSituationType = FormSituationType | 'csrf_error';
 
 export type PasswordUpdateStateType = {
-	values: PasswordUpdateFormFieldsType;
-	errors: Partial<Record<keyof PasswordUpdateFormFieldsType, string[]>>;
+	values: PasswordUpdateFormValuesType;
+	errors: FormErrorsType<PasswordUpdateFormValuesType>;
 	message: string | null;
 	situation: PasswordUpdateSituationType;
 };
@@ -88,6 +89,20 @@ class PasswordUpdateValidator extends BaseValidator<typeof validatorMessages> {
 		});
 }
 
-export const PasswordUpdateSchema = new PasswordUpdateValidator(
-	validatorMessages,
-).passwordUpdate;
+export function validateFormPasswordUpdate(
+	values: PasswordUpdateFormValuesType,
+) {
+	const validator = new PasswordUpdateValidator(validatorMessages);
+
+	return validator.passwordUpdate.safeParse(values);
+}
+
+export function getPasswordUpdateFormValues(
+	formData: FormData,
+): PasswordUpdateFormValuesType {
+	return {
+		password_current: getFormDataAsString(formData, 'password_current'),
+		password_new: getFormDataAsString(formData, 'password_new'),
+		password_confirm: getFormDataAsString(formData, 'password_confirm'),
+	};
+}

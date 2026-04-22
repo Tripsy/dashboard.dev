@@ -4,10 +4,15 @@ import { translate } from '@/config/translate.setup';
 export function useTranslation<const T extends readonly string[]>(keys: T) {
 	type TranslationMap = Record<T[number], string>;
 
-	const [translations, setTranslations] = useState<TranslationMap>(
-		{} as TranslationMap,
-	);
-	const [isLoading, setIsLoading] = useState(true);
+	type TranslationState = {
+		translations: TranslationMap;
+		isLoading: boolean;
+	};
+
+	const [state, setState] = useState<TranslationState>({
+		translations: {} as TranslationMap,
+		isLoading: true,
+	});
 
 	useEffect(() => {
 		let isMounted = true;
@@ -18,18 +23,20 @@ export function useTranslation<const T extends readonly string[]>(keys: T) {
 					keys.map((key) => translate(key)),
 				);
 
-				if (!isMounted) return;
+				if (!isMounted) {
+					return;
+				}
 
-				const newTranslations = keys.reduce((acc, key, index) => {
+				const translations = keys.reduce((acc, key, index) => {
 					(acc as Record<string, string>)[key] = results[index];
 					return acc;
 				}, {} as TranslationMap);
 
-				setTranslations(newTranslations);
-				setIsLoading(false);
+				setState({ translations, isLoading: false });
 			} catch (error) {
 				console.error('Failed to load translations:', error);
-				if (isMounted) setIsLoading(false);
+				if (isMounted)
+					setState((prev) => ({ ...prev, isLoading: false }));
 			}
 		})();
 
@@ -39,7 +46,7 @@ export function useTranslation<const T extends readonly string[]>(keys: T) {
 	}, [keys]);
 
 	return {
-		translations,
-		isTranslationLoading: isLoading,
+		translations: state.translations,
+		isTranslationLoading: state.isLoading,
 	};
 }

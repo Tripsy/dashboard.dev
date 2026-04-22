@@ -4,7 +4,7 @@ import { ApiRequest, getResponseData } from '@/helpers/api.helper';
 import { formatDate } from '@/helpers/date.helper';
 import type {
 	TemplateContentPageType,
-	TemplateLayoutPageEnum,
+	TemplateLayoutPage,
 	TemplateModel,
 } from '@/models/template.model';
 import type { ApiResponseFetch } from '@/types/api.type';
@@ -18,7 +18,7 @@ interface Props {
 async function getPageData(label: string): Promise<{
 	title: string;
 	html: string;
-	layout: TemplateLayoutPageEnum;
+	layout: TemplateLayoutPage;
 	updated_at: string | Date;
 } | null> {
 	try {

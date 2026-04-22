@@ -73,10 +73,16 @@ export function SideMenu() {
 	const translationsKeys = useMemo(
 		() =>
 			[
+				'dashboard.labels.financial',
 				'dashboard.labels.content',
 				'dashboard.labels.settings',
 				'dashboard.labels.logs',
 				'dashboard.labels.templates',
+				'dashboard.labels.clients',
+				'dashboard.labels.client-address',
+				'dashboard.labels.places',
+				'dashboard.labels.brands',
+				'dashboard.labels.cash-flow',
 				'dashboard.labels.log-data',
 				'dashboard.labels.log-history',
 				'dashboard.labels.cron-history',
@@ -97,6 +103,57 @@ export function SideMenu() {
 		}
 
 		const sections: SideMenuSectionProps[] = [
+			{
+				label: 'financial',
+				text: translations['dashboard.labels.financial'],
+				icon: Icons.Financial,
+				isExpanded: false,
+				items: [
+					{
+						page: 'clients',
+						href: Routes.get('client'),
+						text: translations['dashboard.labels.clients'],
+						icon: Icons.Client,
+						permission: hasPermission(auth, 'client.find'),
+					},
+					{
+						page: 'cash-flow',
+						href: Routes.get('cash-flow'),
+						text: translations['dashboard.labels.cash-flow'],
+						icon: Icons.CashFlow,
+						permission: hasPermission(auth, 'cash_flow.find'),
+					},
+				],
+			},
+			{
+				label: 'content',
+				text: translations['dashboard.labels.content'],
+				icon: Icons.Content,
+				isExpanded: false,
+				items: [
+					{
+						page: 'places',
+						href: Routes.get('place'),
+						text: translations['dashboard.labels.places'],
+						icon: Icons.Location,
+						permission: hasPermission(auth, 'place.find'),
+					},
+					{
+						page: 'client-address',
+						href: Routes.get('client-address'),
+						text: translations['dashboard.labels.client-address'],
+						icon: Icons.Address,
+						permission: hasPermission(auth, 'client_address.find'),
+					},
+					{
+						page: 'brands',
+						href: Routes.get('brand'),
+						text: translations['dashboard.labels.brands'],
+						icon: Icons.Brand,
+						permission: hasPermission(auth, 'brand.find'),
+					},
+				],
+			},
 			{
 				label: 'settings',
 				text: translations['dashboard.labels.settings'],
@@ -122,28 +179,28 @@ export function SideMenu() {
 						href: Routes.get('log-data'),
 						text: translations['dashboard.labels.log-data'],
 						icon: Icons.HardDrive,
-						permission: hasPermission(auth, 'log-data.find'),
+						permission: hasPermission(auth, 'log_data.find'),
 					},
 					{
 						page: 'log-history',
 						href: Routes.get('log-history'),
 						text: translations['dashboard.labels.log-history'],
 						icon: Icons.History,
-						permission: hasPermission(auth, 'log-history.find'),
+						permission: hasPermission(auth, 'log_history.find'),
 					},
 					{
 						page: 'cron-history',
 						href: Routes.get('cron-history'),
 						text: translations['dashboard.labels.cron-history'],
 						icon: Icons.Cron,
-						permission: hasPermission(auth, 'cron-history.find'),
+						permission: hasPermission(auth, 'cron_history.find'),
 					},
 					{
 						page: 'mail-queue',
 						href: Routes.get('mail-queue'),
 						text: translations['dashboard.labels.mail-queue'],
 						icon: Icons.Mails,
-						permission: hasPermission(auth, 'mail-queue.find'),
+						permission: hasPermission(auth, 'mail_queue.find'),
 					},
 				],
 			},
@@ -291,9 +348,9 @@ function SideMenuOpenSection({
 				className="flex items-center text-left gap-2 px-3 py-2.5 w-full transition-all duration-200 text-sidebar-foreground hover:bg-sidebar-accent"
 			>
 				{sectionState === 'expanded' ? (
-					<ArrowDown className="h-4 w-4 flex-shrink-0" />
+					<ArrowDown className="h-4 w-4 shrink-0" />
 				) : (
-					<ArrowRight className="h-4 w-4 flex-shrink-0" />
+					<ArrowRight className="h-4 w-4 shrink-0" />
 				)}
 				<span className="flex-1 truncate">{text}</span>
 			</button>
@@ -317,7 +374,7 @@ function SideMenuOpenSection({
 										: 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground',
 								)}
 							>
-								<item.icon className="h-4 w-4 flex-shrink-0" />{' '}
+								<item.icon className="h-4 w-4 shrink-0" />{' '}
 								{item.text}
 							</Link>
 						</li>
@@ -357,7 +414,7 @@ function SideMenuClosedSection({
 				>
 					<SectionIcon
 						className={cn(
-							'h-5 w-5 flex-shrink-0',
+							'h-5 w-5 shrink-0',
 							isSelected && 'text-sidebar-primary',
 						)}
 					/>
@@ -380,7 +437,7 @@ function SideMenuClosedSection({
 										: 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground',
 								)}
 							>
-								<item.icon className="h-4 w-4 flex-shrink-0" />{' '}
+								<item.icon className="h-4 w-4 shrink-0" />{' '}
 								{item.text}
 							</Link>
 						</li>

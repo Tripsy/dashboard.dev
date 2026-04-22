@@ -1,19 +1,20 @@
 import { z } from 'zod';
 import { Configuration } from '@/config/settings.config';
-import { translateBatch } from '@/config/translate.setup';
-import type { FormSituationType } from '@/types/form.type';
+import { getFormDataAsString } from '@/helpers/form.helper';
+import { BaseValidator } from '@/helpers/validator.helper';
+import type { FormErrorsType, FormSituationType } from '@/types/form.type';
 
-export type PasswordUpdateFormFieldsType = {
-	password_current: string;
-	password_new: string;
-	password_confirm: string;
+export type PasswordUpdateFormValuesType = {
+	password_current: string | null;
+	password_new: string | null;
+	password_confirm: string | null;
 };
 
 export type PasswordUpdateSituationType = FormSituationType | 'csrf_error';
 
 export type PasswordUpdateStateType = {
-	values: PasswordUpdateFormFieldsType;
-	errors: Partial<Record<keyof PasswordUpdateFormFieldsType, string[]>>;
+	values: PasswordUpdateFormValuesType;
+	errors: FormErrorsType<PasswordUpdateFormValuesType>;
 	message: string | null;
 	situation: PasswordUpdateSituationType;
 };
@@ -29,94 +30,79 @@ export const PasswordUpdateState: PasswordUpdateStateType = {
 	situation: null,
 };
 
-const translations = await translateBatch([
-	'account-password-update.validation.password_current_invalid',
-	'account-password-update.validation.password_new_invalid',
-	{
-		key: 'account-password-update.validation.password_new_min',
-		vars: {
-			min: Configuration.get('user.passwordMinLength') as string,
-		},
-	},
-	'account-password-update.validation.password_new_condition_capital_letter',
-	'account-password-update.validation.password_new_condition_number',
-	'account-password-update.validation.password_new_condition_special_character',
-	'account-password-update.validation.password_confirm_required',
-	'account-password-update.validation.password_confirm_mismatch',
-]);
+const validatorMessages = await BaseValidator.getValidatorMessages(
+	[
+		'invalid_password_current',
+		'invalid_password_new',
+		'password_min',
+		'password_condition_capital_letter',
+		'password_condition_number',
+		'password_condition_special_character',
+		'password_confirm_required',
+		'password_confirm_mismatch',
+	] as const,
+	'account-password-update.validation',
+);
 
-export const PasswordUpdateSchema = z
-	.object({
-		password_current: z
-			.string({
-				message:
-					translations[
-						'account-password-update.validation.password_current_invalid'
-					],
-			})
-			.trim()
-			.nonempty({
-				message:
-					translations[
-						'account-password-update.validation.password_current_invalid'
-					],
-			}),
-		password_new: z
-			.string({
-				message:
-					translations[
-						'account-password-update.validation.password_new_invalid'
-					],
-			})
-			.trim()
-			.min(Configuration.get('user.passwordMinLength') as number, {
-				message:
-					translations[
-						'account-password-update.validation.password_new_min'
-					],
-			})
-			.refine((value) => /[A-Z]/.test(value), {
-				message:
-					translations[
-						'account-password-update.validation.password_new_condition_capital_letter'
-					],
-			})
-			.refine((value) => /[0-9]/.test(value), {
-				message:
-					translations[
-						'account-password-update.validation.password_new_condition_number'
-					],
-			})
-			.refine((value) => /[!@#$%^&*()_+{}[\]:;<>,.?~\\/-]/.test(value), {
-				message:
-					translations[
-						'account-password-update.validation.password_new_condition_special_character'
-					],
-			}),
-		password_confirm: z
-			.string({
-				message:
-					translations[
-						'account-password-update.validation.password_confirm_required'
-					],
-			})
-			.trim()
-			.nonempty({
-				message:
-					translations[
-						'account-password-update.validation.password_confirm_required'
-					],
-			}),
-	})
-	.superRefine(({ password_new, password_confirm }, ctx) => {
-		if (password_new !== password_confirm) {
-			ctx.addIssue({
-				path: ['password_confirm'],
-				message:
-					translations[
-						'account-password-update.validation.password_confirm_mismatch'
-					],
-				code: 'custom',
-			});
-		}
-	});
+class PasswordUpdateValidator extends BaseValidator<typeof validatorMessages> {
+	passwordUpdate = z
+		.object({
+			password_current: this.validateString(
+				this.getMessage('invalid_password_current'),
+			),
+			password_new: this.validatePassword(
+				{
+					invalid_password: this.getMessage('invalid_password_new'),
+					password_min: this.getMessage('password_min', {
+						min: Configuration.get(
+							'user.passwordMinChars',
+						) as string,
+					}),
+					password_condition_capital_letter: this.getMessage(
+						'password_condition_capital_letter',
+					),
+					password_condition_number: this.getMessage(
+						'password_condition_number',
+					),
+					password_condition_special_character: this.getMessage(
+						'password_condition_special_character',
+					),
+				},
+				{
+					minLength: Configuration.get(
+						'user.passwordMinChars',
+					) as number,
+				},
+			),
+			password_confirm: this.validateString(
+				this.getMessage('password_confirm_required'),
+			),
+		})
+		.superRefine(({ password_new, password_confirm }, ctx) => {
+			if (password_new !== password_confirm) {
+				ctx.addIssue({
+					path: ['password_confirm'],
+					message: this.getMessage('password_confirm_mismatch'),
+					code: 'custom',
+				});
+			}
+		});
+}
+
+export function validateFormPasswordUpdate(
+	values: PasswordUpdateFormValuesType,
+) {
+	const validator = new PasswordUpdateValidator(validatorMessages);
+
+	return validator.passwordUpdate.safeParse(values);
+}
+
+export function getPasswordUpdateFormValues(
+	formData: FormData,
+): PasswordUpdateFormValuesType {
+	return {
+		password_current: getFormDataAsString(formData, 'password_current'),
+		password_new: getFormDataAsString(formData, 'password_new'),
+		password_confirm: getFormDataAsString(formData, 'password_confirm'),
+	};
+}

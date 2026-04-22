@@ -1,16 +1,17 @@
 import { z } from 'zod';
-import { translateBatch } from '@/config/translate.setup';
-import type { FormSituationType } from '@/types/form.type';
+import { getFormDataAsString } from '@/helpers/form.helper';
+import { BaseValidator } from '@/helpers/validator.helper';
+import type { FormErrorsType, FormSituationType } from '@/types/form.type';
 
-export type EmailConfirmSendFormFieldsType = {
-	email: string;
+export type EmailConfirmSendFormValuesType = {
+	email: string | null;
 };
 
 export type EmailConfirmSendSituationType = FormSituationType | 'csrf_error';
 
 export type EmailConfirmSendStateType = {
-	values: EmailConfirmSendFormFieldsType;
-	errors: Partial<Record<keyof EmailConfirmSendFormFieldsType, string[]>>;
+	values: EmailConfirmSendFormValuesType;
+	errors: FormErrorsType<EmailConfirmSendFormValuesType>;
 	message: string | null;
 	situation: EmailConfirmSendSituationType;
 };
@@ -24,12 +25,31 @@ export const EmailConfirmSendState: EmailConfirmSendStateType = {
 	situation: null,
 };
 
-const translations = await translateBatch([
-	'email-confirm-send.validation.email_invalid',
-]);
+const validatorMessages = await BaseValidator.getValidatorMessages(
+	['invalid_email'] as const,
+	'email-confirm-send.validation',
+);
 
-export const EmailConfirmSendSchema = z.object({
-	email: z.email({
-		message: translations['email-confirm-send.validation.email_invalid'],
-	}),
-});
+class EmailConfirmSendValidator extends BaseValidator<
+	typeof validatorMessages
+> {
+	emailConfirmSend = z.object({
+		email: this.validateEmail(this.getMessage('invalid_email')),
+	});
+}
+
+export function validateFormEmailConfirmSend(
+	values: EmailConfirmSendFormValuesType,
+) {
+	const validator = new EmailConfirmSendValidator(validatorMessages);
+
+	return validator.emailConfirmSend.safeParse(values);
+}
+
+export function getEmailConfirmSendFormValues(
+	formData: FormData,
+): EmailConfirmSendFormValuesType {
+	return {
+		email: getFormDataAsString(formData, 'email'),
+	};
+}

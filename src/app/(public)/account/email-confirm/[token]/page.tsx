@@ -8,8 +8,7 @@ import Routes from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
 import { translate } from '@/config/translate.setup';
 import { ApiError } from '@/exceptions/api.error';
-import { ApiRequest } from '@/helpers/api.helper';
-import type { ApiResponseFetch } from '@/types/api.type';
+import { requestEmailConfirm } from '@/services/account.service';
 
 interface Props {
 	params: Promise<{
@@ -36,17 +35,11 @@ export default async function Page(props: Props) {
 	let success = false;
 
 	try {
-		const fetchResponse: ApiResponseFetch<null> | undefined =
-			await new ApiRequest()
-				.setRequestMode('remote-api')
-				.doFetch(`/account/email-confirm/${token}`, {
-					method: 'POST',
-					next: { revalidate: 3600 },
-				});
+		const requestResponse = await requestEmailConfirm(token);
 
-		if (fetchResponse?.success === false) {
+		if (requestResponse?.success === false) {
 			message =
-				fetchResponse?.message ||
+				requestResponse?.message ||
 				(await translate('email-confirm.message.failed'));
 		} else {
 			success = true;

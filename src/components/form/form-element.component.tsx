@@ -1,14 +1,6 @@
-import React, {
-	type ComponentType,
-	type JSX,
-	useCallback,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-} from 'react';
+import React, { type JSX, useEffect, useMemo, useRef, useState } from 'react';
 import { FormElementError } from '@/components/form/form-element-error.component';
-import { Icons } from '@/components/icon.component';
+import { getActionIcon, Icons } from '@/components/icon.component';
 import { LoadingIcon } from '@/components/status.component';
 import { Button, type ButtonVariant } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
@@ -24,7 +16,9 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
 	Select,
 	SelectContent,
+	SelectGroup,
 	SelectItem,
+	SelectLabel,
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
@@ -33,12 +27,16 @@ import { cn } from '@/helpers/css.helper';
 import { formatDate, toDateInstance } from '@/helpers/date.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 
-export type InputValueType = string | null;
-export type OptionValueType = string | null;
+export type InputValueType = string | null | undefined;
+export type OptionValueType = string | null | undefined;
 export type CheckboxValueType = boolean;
 export type OptionsType = {
 	label: string;
 	value: string;
+}[];
+type GroupedOptionsType = {
+	label: string;
+	options: OptionsType;
 }[];
 
 export const FormElement = ({
@@ -49,7 +47,7 @@ export const FormElement = ({
 }: {
 	children: JSX.Element;
 	className?: string;
-	label?: { text: string; for?: string; required?: boolean };
+	label?: { text?: string; for?: string; required?: boolean };
 	error?: string[];
 }): JSX.Element | null => (
 	<div className={cn('form-element', className)}>
@@ -143,7 +141,7 @@ const useFieldState = ({
 
 export type FormComponentProps<Fields, Value> = {
 	id: string;
-	labelText: string;
+	labelText?: string;
 	fieldType?: 'text' | 'password' | 'email' | 'number';
 	fieldName: keyof Fields & string;
 	fieldValue: Value;
@@ -272,15 +270,17 @@ export const FormComponentSelect = <Fields,>({
 	disabled,
 	error,
 	options,
-	onValueChange,
+	onChange,
 }: Omit<
 	FormComponentProps<Fields, OptionValueType>,
 	'autoComplete' | 'icons' | 'onChange'
 > & {
-	options: OptionsType;
-	onValueChange: (value: string) => void;
+	options: OptionsType | GroupedOptionsType;
+	onChange: (value: string) => void;
 }) => {
 	const { borderClass } = useFieldState({ value: fieldValue, error });
+
+	const isGrouped = 'options' in options[0];
 
 	return (
 		<FormElement
@@ -297,7 +297,7 @@ export const FormComponentSelect = <Fields,>({
 
 				<Select
 					value={fieldValue ?? ''}
-					onValueChange={onValueChange}
+					onValueChange={onChange}
 					disabled={disabled}
 				>
 					<SelectTrigger
@@ -307,16 +307,43 @@ export const FormComponentSelect = <Fields,>({
 						<SelectValue placeholder={placeholderText} />
 					</SelectTrigger>
 					<SelectContent>
-						{options.map(({ label, value }) => {
-							const key = `${id}-${value}`;
+						{isGrouped
+							? (options as GroupedOptionsType).map((group) => (
+									<SelectGroup key={group.label}>
+										<SelectLabel>{group.label}</SelectLabel>
 
-							return (
-								<SelectItem key={key} value={value}>
-									{label}
-								</SelectItem>
-							);
-						})}
+										{group.options.map(
+											({ label, value }) => (
+												<SelectItem
+													key={value}
+													value={value}
+													className="pl-12"
+												>
+													{label}
+												</SelectItem>
+											),
+										)}
+									</SelectGroup>
+								))
+							: (options as OptionsType).map(
+									({ label, value }) => (
+										<SelectItem key={value} value={value}>
+											{label}
+										</SelectItem>
+									),
+								)}
 					</SelectContent>
+					{/*<SelectContent>*/}
+					{/*	{options.map(({ label, value }) => {*/}
+					{/*		const key = `${id}-${value}`;*/}
+
+					{/*		return (*/}
+					{/*			<SelectItem key={key} value={value}>*/}
+					{/*				{label}*/}
+					{/*			</SelectItem>*/}
+					{/*		);*/}
+					{/*	})}*/}
+					{/*</SelectContent>*/}
 				</Select>
 			</div>
 		</FormElement>
@@ -377,13 +404,13 @@ export const FormComponentRadio = <Fields,>({
 	disabled,
 	error,
 	options,
-	onValueChange,
+	onChange,
 }: Omit<
 	FormComponentProps<Fields, OptionValueType>,
 	'fieldType' | 'onChange' | 'placeholderText' | 'autoComplete' | 'icons'
 > & {
 	options: OptionsType;
-	onValueChange: (value: string) => void;
+	onChange: (value: string) => void;
 }) => (
 	<FormElement
 		label={{ text: labelText, required: isRequired }}
@@ -399,7 +426,7 @@ export const FormComponentRadio = <Fields,>({
 
 			<RadioGroup
 				value={fieldValue}
-				onValueChange={onValueChange}
+				onValueChange={onChange}
 				className={className}
 				disabled={disabled}
 			>
@@ -446,9 +473,11 @@ export const FormComponentCalendarWithoutFormElement = <Fields,>({
 	minDate?: Date | string;
 	maxDate?: Date | string;
 }) => {
-	const fieldValueAsDate = toDateInstance(fieldValue) || undefined;
-	const minDateAsDate = (minDate && toDateInstance(minDate)) || undefined;
-	const maxDateAsDate = (maxDate && toDateInstance(maxDate)) || undefined;
+	const fieldValueAsDate = fieldValue
+		? toDateInstance(fieldValue)
+		: undefined;
+	const minDateAsDate = minDate ? toDateInstance(minDate) : undefined;
+	const maxDateAsDate = maxDate ? toDateInstance(maxDate) : undefined;
 
 	return (
 		<>
@@ -483,7 +512,7 @@ export const FormComponentCalendarWithoutFormElement = <Fields,>({
 					<Calendar
 						mode="single"
 						required={false}
-						selected={fieldValueAsDate}
+						selected={fieldValueAsDate || undefined}
 						onSelect={(date: Date | undefined) => {
 							const value = date
 								? (formatDate(date, 'default') as string)
@@ -542,7 +571,7 @@ export const FormComponentCalendar = <Fields,>({
 	);
 };
 
-export const FormComponentAutoComplete = <Fields,>({
+export const FormComponentAutoComplete = <Fields, T>({
 	labelText,
 	id,
 	fieldName,
@@ -553,36 +582,45 @@ export const FormComponentAutoComplete = <Fields,>({
 	disabled,
 	error,
 	icons,
-	onChange,
+	onInputChange,
 	autoCompleteProps,
 }: Omit<
 	FormComponentProps<Fields, InputValueType>,
 	'fieldType' | 'autoComplete' | 'onChange' | 'icons'
 > & {
 	icons?: { left?: JSX.Element };
-	onChange?: (value: string) => void;
+	onInputChange?: (value: string) => void;
 	autoCompleteProps: {
-		suggestions: string[];
-		onSearch: (query: string) => void;
-		debounceMs?: number;
-		minQueryLength: number;
+		suggestions: T[];
+		onSelect?: (item: T) => void;
+
+		getOptionLabel: (item: T) => string;
+		getOptionKey?: (item: T) => string | number;
+
 		maxSuggestions?: number;
-		dropdown?: boolean;
+
+		isLoading?: boolean;
+		emptyMessage?: string;
+		loadingMessage?: string;
+
+		allowCreate?: boolean;
+		onCreate?: (value: string) => void;
+		createLabel?: (value: string) => string;
 	};
 }) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [inputValue, setInputValue] = useState(fieldValue ?? '');
 	const [highlightedIndex, setHighlightedIndex] = useState(-1);
+
 	const wrapperRef = useRef<HTMLDivElement>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
-	const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-	// Update input value when prop changes
+	// Sync external value
 	useEffect(() => {
 		setInputValue(fieldValue ?? '');
 	}, [fieldValue]);
 
-	// Handle click outside
+	// Click outside
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
 			if (
@@ -594,45 +632,26 @@ export const FormComponentAutoComplete = <Fields,>({
 		};
 
 		document.addEventListener('mousedown', handleClickOutside);
-
 		return () =>
 			document.removeEventListener('mousedown', handleClickOutside);
 	}, []);
 
-	// Debounced search
-	const debouncedSearch = useCallback(
-		(query: string) => {
-			if (debounceTimerRef.current) {
-				clearTimeout(debounceTimerRef.current);
-			}
-
-			debounceTimerRef.current = setTimeout(() => {
-				if (query.length >= autoCompleteProps.minQueryLength) {
-					autoCompleteProps.onSearch(query);
-				}
-			}, autoCompleteProps.debounceMs || 300);
-		},
-		[autoCompleteProps],
-	);
-
 	const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const newValue = e.target.value;
-		setInputValue(newValue);
 
-		if (onChange) {
-			onChange(newValue);
-		}
+		setInputValue(newValue);
+		onInputChange?.(newValue);
 
 		setIsOpen(true);
 		setHighlightedIndex(-1);
-		debouncedSearch(newValue);
 	};
 
-	const handleSuggestionClick = (suggestion: string) => {
-		setInputValue(suggestion);
-		if (onChange) {
-			onChange(suggestion);
-		}
+	const handleSuggestionClick = (item: T) => {
+		const label = autoCompleteProps.getOptionLabel(item);
+
+		setInputValue(label);
+		autoCompleteProps.onSelect?.(item);
+
 		setIsOpen(false);
 		setHighlightedIndex(-1);
 	};
@@ -657,10 +676,12 @@ export const FormComponentAutoComplete = <Fields,>({
 					prev < suggestionsList.length - 1 ? prev + 1 : prev,
 				);
 				break;
+
 			case 'ArrowUp':
 				e.preventDefault();
 				setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : -1));
 				break;
+
 			case 'Enter':
 				e.preventDefault();
 				if (
@@ -670,10 +691,8 @@ export const FormComponentAutoComplete = <Fields,>({
 					handleSuggestionClick(suggestionsList[highlightedIndex]);
 				}
 				break;
+
 			case 'Escape':
-				setIsOpen(false);
-				setHighlightedIndex(-1);
-				break;
 			case 'Tab':
 				setIsOpen(false);
 				setHighlightedIndex(-1);
@@ -683,22 +702,30 @@ export const FormComponentAutoComplete = <Fields,>({
 
 	const handleClear = () => {
 		setInputValue('');
-
-		if (onChange) {
-			onChange('');
-		}
-
+		onInputChange?.('');
 		inputRef.current?.focus();
 	};
 
-	const shouldShowDropdown =
-		isOpen && autoCompleteProps.suggestions.length > 0 && !disabled;
+	const shouldShowDropdown = isOpen && !disabled && inputValue.length > 0;
+
 	const displayedSuggestions = autoCompleteProps.suggestions.slice(
 		0,
 		autoCompleteProps.maxSuggestions || 99,
 	);
 
 	const { borderClass } = useFieldState({ value: fieldValue, error });
+
+	const isLoading = autoCompleteProps.isLoading;
+	const isEmpty =
+		!isLoading &&
+		displayedSuggestions.length === 0 &&
+		!autoCompleteProps.allowCreate;
+
+	const canCreate =
+		autoCompleteProps.allowCreate &&
+		!isLoading &&
+		inputValue.trim().length > 0 &&
+		displayedSuggestions.length === 0;
 
 	return (
 		<FormElement
@@ -726,18 +753,14 @@ export const FormComponentAutoComplete = <Fields,>({
 							aria-invalid={!!error}
 							onChange={handleOnChange}
 							onKeyDown={handleKeyDown}
-							onFocus={() =>
-								setIsOpen(autoCompleteProps.dropdown ?? false)
-							}
 						/>
 
-						{/* Clear button */}
 						{inputValue && !disabled && (
 							<FormElementIcon position="right">
 								<button
 									type="button"
 									onClick={handleClear}
-									className="cursor-pointer focus:outline-none hover:opacity-100 transition-opacity"
+									className="cursor-pointer"
 								>
 									<Icons.Clear className="h-4.5 w-4.5 text-muted-foreground hover:text-foreground" />
 								</button>
@@ -746,37 +769,77 @@ export const FormComponentAutoComplete = <Fields,>({
 					</div>
 				</FormElementWrapper>
 
-				{/* Dropdown */}
 				{shouldShowDropdown && (
 					<ul className="absolute z-50 w-full mt-1 max-h-60 overflow-auto bg-popover border border-border rounded-md shadow-lg">
-						{displayedSuggestions.map((suggestion) => (
-							<li key={suggestion} className="list-none">
+						{/* Loading */}
+						{isLoading && (
+							<li className="px-3 py-2 text-sm text-muted-foreground">
+								{autoCompleteProps.loadingMessage ??
+									'Searching...'}
+							</li>
+						)}
+
+						{/* Empty */}
+						{isEmpty && (
+							<li className="px-3 py-2 text-sm text-muted-foreground">
+								{autoCompleteProps.emptyMessage ?? 'No results'}
+							</li>
+						)}
+
+						{canCreate && (
+							<li className="list-none">
 								<button
 									type="button"
-									onClick={() =>
-										handleSuggestionClick(suggestion)
-									}
-									onMouseEnter={() =>
-										setHighlightedIndex(
-											displayedSuggestions.indexOf(
-												suggestion,
-											),
-										)
-									}
-									className={cn(
-										'w-full px-3 py-2 text-sm text-left cursor-pointer',
-										'hover:bg-accent hover:text-accent-foreground',
-										'focus:bg-accent focus:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-inset',
-										displayedSuggestions.indexOf(
-											suggestion,
-										) === highlightedIndex &&
-											'bg-accent text-accent-foreground',
-									)}
+									onClick={() => {
+										autoCompleteProps.onCreate?.(
+											inputValue,
+										);
+										setIsOpen(false);
+									}}
+									className="w-full px-3 py-2 text-sm text-left text-primary hover:bg-accent"
 								>
-									{suggestion}
+									{autoCompleteProps.createLabel?.(
+										inputValue,
+									) ?? `Create "${inputValue}"`}
 								</button>
 							</li>
-						))}
+						)}
+
+						{/* Results */}
+						{!isLoading &&
+							displayedSuggestions.map((item, index) => {
+								const label =
+									autoCompleteProps.getOptionLabel(item);
+								const key =
+									autoCompleteProps.getOptionKey?.(item) ??
+									label;
+
+								const isHighlighted =
+									index === highlightedIndex;
+
+								return (
+									<li key={key} className="list-none">
+										<button
+											type="button"
+											onClick={() =>
+												handleSuggestionClick(item)
+											}
+											onMouseEnter={() =>
+												setHighlightedIndex(index)
+											}
+											className={cn(
+												'w-full px-3 py-2 text-sm text-left',
+												'hover:bg-accent hover:text-accent-foreground',
+												'focus:bg-accent focus:text-accent-foreground',
+												isHighlighted &&
+													'bg-accent text-accent-foreground',
+											)}
+										>
+											{label}
+										</button>
+									</li>
+								);
+							})}
 					</ul>
 				)}
 			</div>
@@ -789,7 +852,8 @@ export const FormComponentAutoComplete = <Fields,>({
 type FormComponentSubmitButtonType = {
 	label: string;
 	variant?: ButtonVariant;
-	icon: ComponentType<{ className?: string }>;
+	iconLabel: string;
+	iconSize?: number;
 	className?: string;
 };
 
@@ -810,6 +874,7 @@ export const FormComponentSubmit = ({
 	);
 
 	const { translations } = useTranslation(translationsKeys);
+	const IconButton = getActionIcon(button.iconLabel);
 
 	return (
 		<Button
@@ -831,7 +896,7 @@ export const FormComponentSubmit = ({
 				</span>
 			) : (
 				<span className="flex items-center gap-1.5">
-					<button.icon /> {button.label}
+					<IconButton size={button.iconSize || 16} /> {button.label}
 				</span>
 			)}
 		</Button>

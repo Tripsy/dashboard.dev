@@ -10,30 +10,8 @@
 			"confirmText": "Are you sure you want to delete the selected cron record(s)?"
 		},
 		"view": {
-			"title": "Cron record details",
+			"title": "Cron record - {{entry}}",
 			"label": "View"
 		}
-	},
-	"data_table": {
-		"column_id": "ID",
-		"column_label": "Label",
-		"column_start_at": "Start At",
-		"column_status": "Status",
-		"column_run_time": "Run Time"
-	},
-	"form_filters": {
-		"label_global": "ID / Label / Content",
-		"label_status": "Status",
-		"label_start_date": "Start Date"
-	},
-	"view": {
-		"section_details": "Details",
-		"label_id": "ID:",
-		"label_label": "Label:",
-		"label_start_at": "Start At:",
-		"label_end_at": "End At:",
-		"label_status": "Status:",
-		"label_run_time": "Run Time:",
-		"section_content": "Content"
 	}
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useStore } from 'zustand/react';
 import {
 	FormFiltersReset,
@@ -9,41 +9,32 @@ import {
 	FormFiltersSelect,
 	FormFiltersShowDeleted,
 } from '@/app/(dashboard)/_components/form-filters.component';
-import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
+import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
 import type { TemplateDataTableFiltersType } from '@/app/(dashboard)/dashboard/templates/templates.definition';
-import { capitalizeFirstLetter } from '@/helpers/string.helper';
+import { toOptionsFromEnum } from '@/helpers/form.helper';
+import { formatEnumLabel } from '@/helpers/string.helper';
+import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
-import { useTranslation } from '@/hooks/use-translation.hook';
-import { type TemplateModel, TemplateTypeEnum } from '@/models/template.model';
+import {
+	type TemplateModel,
+	type TemplateType,
+	TemplateTypeEnum,
+} from '@/models/template.model';
 import { LanguageEnum } from '@/models/user.model';
 
-const languages = Object.values(LanguageEnum).map((language) => ({
-	label: capitalizeFirstLetter(language),
-	value: language,
-}));
+const languages = toOptionsFromEnum(LanguageEnum, {
+	formatter: formatEnumLabel,
+});
 
-const types = Object.values(TemplateTypeEnum).map((v) => ({
-	label: capitalizeFirstLetter(v),
-	value: v,
-}));
+const types = toOptionsFromEnum(TemplateTypeEnum, {
+	formatter: formatEnumLabel,
+});
 
 export const DataTableTemplatesFilters = (): React.JSX.Element => {
-	const { stateDefault, dataTableStore } = useDataTable<
+	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
 		'templates',
 		TemplateModel
 	>();
-
-	const translationsKeys = useMemo(
-		() =>
-			[
-				'templates.form_filters.label_global',
-				'templates.form_filters.label_language',
-				'templates.form_filters.label_type',
-			] as const,
-		[],
-	);
-
-	const { translations } = useTranslation(translationsKeys);
 
 	const filters = useStore(
 		dataTableStore,
@@ -74,67 +65,55 @@ export const DataTableTemplatesFilters = (): React.JSX.Element => {
 	);
 
 	const searchGlobal = useSearchFilter({
-		initialValue: filters.global?.value ?? '',
+		initialValue: filters.global.value ?? '',
 		debounceDelay: 1000,
 		minLength: 3,
 		onSearch: (value) => setFilterValue('global', value),
 	});
 
-	useEffect(() => {
-		const handleFilterReset = () => {
-			updateTableState({
-				filters: stateDefault.filters,
-			});
+	const resetCallbacks = useMemo(
+		() => [searchGlobal.onReset],
+		[searchGlobal.onReset],
+	);
 
-			searchGlobal.onReset();
-		};
-
-		window.addEventListener(
-			'filterReset',
-			handleFilterReset as EventListener,
-		);
-
-		return () => {
-			window.removeEventListener(
-				'filterReset',
-				handleFilterReset as EventListener,
-			);
-		};
-	}, [searchGlobal, stateDefault.filters, updateTableState]);
+	useDataTableFilterReset({
+		dataSource,
+		defaultFilters: dataTableStateDefault.filters,
+		updateTableState,
+		onReset: resetCallbacks,
+	});
 
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
 			<FormFiltersSearch<TemplateDataTableFiltersType>
-				labelText={translations['templates.form_filters.label_global']}
+				labelText="ID / Label / Content"
 				search={searchGlobal}
 			/>
 
 			<FormFiltersSelect<TemplateDataTableFiltersType>
-				labelText={
-					translations['templates.form_filters.label_language']
-				}
+				labelText="Language"
 				fieldName="language"
 				fieldValue={filters.language.value}
 				options={languages}
-				onValueChange={(value) => setFilterValue('language', value)}
+				onChange={(value) => setFilterValue('language', value)}
 			/>
 
 			<FormFiltersSelect<TemplateDataTableFiltersType>
-				labelText={translations['templates.form_filters.label_type']}
+				labelText="Type"
 				fieldName="type"
 				fieldValue={filters.type.value}
 				options={types}
-				onValueChange={(value) =>
-					setFilterValue('type', value as TemplateTypeEnum)
+				onChange={(value) =>
+					setFilterValue('type', value as TemplateType)
 				}
 			/>
 
 			<FormFiltersShowDeleted
-				checked={filters.is_deleted?.value || false}
+				checked={filters.is_deleted.value ?? false}
 				onCheckedChange={(value) => setFilterValue('is_deleted', value)}
 			/>
 
-			<FormFiltersReset source="DataTableTemplatesFilters" />
+			<FormFiltersReset dataSource="templates" />
 		</div>
 	);
 };

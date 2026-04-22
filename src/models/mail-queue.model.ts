@@ -1,11 +1,14 @@
 import type { TemplateContentEmailType } from '@/models/template.model';
-import type { LanguageEnum } from '@/models/user.model';
+import type { Language } from '@/models/user.model';
 
-export enum MailQueueStatusEnum {
-	PENDING = 'pending',
-	SENT = 'sent',
-	ERROR = 'error',
-}
+export const MailQueueStatusEnum = {
+	PENDING: 'pending',
+	SENT: 'sent',
+	ERROR: 'error',
+} as const;
+
+export type MailQueueStatus =
+	(typeof MailQueueStatusEnum)[keyof typeof MailQueueStatusEnum];
 
 export type MailQueueModel<D = Date | string> = {
 	id: number;
@@ -13,7 +16,7 @@ export type MailQueueModel<D = Date | string> = {
 		id: number;
 		label: string;
 	} | null;
-	language: LanguageEnum;
+	language: Language;
 	content: TemplateContentEmailType;
 	to: {
 		name: string;
@@ -23,7 +26,7 @@ export type MailQueueModel<D = Date | string> = {
 		name: string;
 		address: string;
 	};
-	status: MailQueueStatusEnum;
+	status: MailQueueStatus;
 	error: string | null;
 	sent_at: D;
 	created_at: D;

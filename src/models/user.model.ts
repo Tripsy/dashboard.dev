@@ -1,25 +1,36 @@
-export enum UserRoleEnum {
-	ADMIN = 'admin',
-	MEMBER = 'member',
-	OPERATOR = 'operator',
-}
+export const LanguageEnum = {
+	EN: 'en',
+	RO: 'ro',
+} as const;
 
-export enum UserStatusEnum {
-	ACTIVE = 'active',
-	INACTIVE = 'inactive',
-	PENDING = 'pending',
-}
+export type Language = (typeof LanguageEnum)[keyof typeof LanguageEnum];
 
-export enum LanguageEnum {
-	EN = 'en',
-	RO = 'ro',
-}
+export const LANGUAGE_DEFAULT = LanguageEnum.EN;
 
-export enum UserOperatorTypeEnum {
-	SELLER = 'seller',
-	PRODUCT_MANAGER = 'product_manager',
-	CONTENT_EDITOR = 'content_editor',
-}
+export const UserRoleEnum = {
+	ADMIN: 'admin',
+	MEMBER: 'member',
+	OPERATOR: 'operator',
+} as const;
+
+export type UserRole = (typeof UserRoleEnum)[keyof typeof UserRoleEnum];
+
+export const UserStatusEnum = {
+	ACTIVE: 'active',
+	INACTIVE: 'inactive',
+	PENDING: 'pending',
+} as const;
+
+export type UserStatus = (typeof UserStatusEnum)[keyof typeof UserStatusEnum];
+
+export const UserOperatorTypeEnum = {
+	SELLER: 'seller',
+	PRODUCT_MANAGER: 'product_manager',
+	CONTENT_EDITOR: 'content_editor',
+};
+
+export type UserOperatorType =
+	(typeof UserOperatorTypeEnum)[keyof typeof UserOperatorTypeEnum];
 
 export type UserModel<D = Date | string> = {
 	id: number;
@@ -27,21 +38,21 @@ export type UserModel<D = Date | string> = {
 	email: string;
 	email_verified_at: D;
 	password_updated_at: D;
-	status: UserStatusEnum;
-	language: LanguageEnum;
-	role: UserRoleEnum;
-	operator_type: UserOperatorTypeEnum | null;
+	status: UserStatus;
+	language: Language;
+	role: UserRole;
+	operator_type: UserOperatorType | null;
 	created_at: D;
 	updated_at: D;
 	deleted_at: D;
 };
 
-export type UserFormValuesType = {
-	name: string;
-	email: string;
-	password?: string;
-	password_confirm?: string;
-	language: LanguageEnum;
-	role: UserRoleEnum;
-	operator_type: UserOperatorTypeEnum | null;
+export type UserFormValuesType = Pick<
+	UserModel,
+	'language' | 'role' | 'operator_type'
+> & {
+	name: string | null;
+	email: string | null;
+	password: string | null;
+	password_confirm: string | null;
 };

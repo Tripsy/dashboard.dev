@@ -2,6 +2,7 @@
 
 import { cookies } from 'next/headers';
 import { Configuration } from '@/config/settings.config';
+import { getFormDataAsString } from '@/helpers/form.helper';
 
 export type CookieOptions = {
 	httpOnly?: boolean;
@@ -105,10 +106,11 @@ export async function setupTrackedCookie(
 	);
 }
 
-export async function isValidCsrfToken(inputValue: string) {
-	if (!inputValue) {
-		return false;
-	}
+export async function isValidCsrfToken(formData: FormData) {
+	const inputValue = getFormDataAsString(
+		formData,
+		Configuration.get('csrf.inputName') as string,
+	);
 
 	const cookieValue = await getCookie(
 		Configuration.get('csrf.cookieName') as string,

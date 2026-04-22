@@ -1,58 +1,19 @@
 'use client';
 
-import { type JSX, useMemo } from 'react';
+import type { JSX } from 'react';
 import { DataTableActions } from '@/app/(dashboard)/_components/data-table-actions.component';
 import DataTableList from '@/app/(dashboard)/_components/data-table-list.component';
-import { DataTableModal } from '@/app/(dashboard)/_components/data-table-modal.component';
-import { DataTableProvider } from '@/app/(dashboard)/_providers/data-table-provider';
-import { createDataTableStore } from '@/app/(dashboard)/_stores/model.store';
+import { DataTableProvider } from '@/app/(dashboard)/_providers/data-table.provider';
 import { DataTableTemplatesFilters } from '@/app/(dashboard)/dashboard/templates/data-table-templates-filters.component';
-import { FormManageTemplate } from '@/app/(dashboard)/dashboard/templates/form-manage-template.component';
-import { ViewTemplate } from '@/app/(dashboard)/dashboard/templates/view-template.component';
-import { LoadingComponent } from '@/components/status.component';
-import { useMounted } from '@/hooks/use-mounted.hook';
-import { useTranslation } from '@/hooks/use-translation.hook';
-
-const dataTableStore = createDataTableStore('templates');
 
 export const DataTableTemplates = (): JSX.Element => {
-	const translationsKeys = useMemo(() => ['app.text.loading'] as const, []);
-
-	const { translations } = useTranslation(translationsKeys);
-	const isMounted = useMounted();
-
-	if (!isMounted) {
-		return (
-			<LoadingComponent description={translations['app.text.loading']} />
-		);
-	}
-
 	return (
-		<DataTableProvider
-			dataSource="templates"
-			selectionMode="checkbox"
-			dataTableStore={dataTableStore}
-		>
+		<DataTableProvider dataSource="templates" selectionMode="checkbox">
 			<div className="table-container">
 				<DataTableTemplatesFilters />
 				<DataTableActions />
 				<DataTableList dataKey="id" />
 			</div>
-
-			<DataTableModal
-				modals={{
-					// @ts-expect-error FormManageTemplate props are injected at runtime via FormManage
-					create: <FormManageTemplate />,
-					// @ts-expect-error FormManageTemplate props are injected at runtime via FormManage
-					update: <FormManageTemplate />,
-					view: <ViewTemplate />,
-				}}
-				modalsProps={{
-					create: { size: 'x4l' },
-					update: { size: 'x4l' },
-					view: { size: 'x4l' },
-				}}
-			/>
 		</DataTableProvider>
 	);
 };

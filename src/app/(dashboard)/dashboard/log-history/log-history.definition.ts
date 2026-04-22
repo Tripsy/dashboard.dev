@@ -1,27 +1,23 @@
-import {
-	type DataTableColumnType,
-	DataTableValue,
-} from '@/app/(dashboard)/_components/data-table-value';
+import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
+import { ViewLogHistory } from '@/app/(dashboard)/dashboard/log-history/view-log-history.component';
+import type {
+	DataSourceConfigType,
+	DataTableColumnType,
+	DataTableValueOptionsType,
+} from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
+import { requestDeleteMultiple, requestFind } from '@/helpers/services.helper';
 import { toTitleCase } from '@/helpers/string.helper';
 import type {
 	LogHistoryModel,
 	LogHistorySource,
 } from '@/models/log-history.model';
-import {
-	deleteLogHistory,
-	findLogHistory,
-} from '@/services/log-history.service';
+import type { FindFunctionParamsType } from '@/types/action.type';
 
-const translations = await translateBatch([
-	'log-history.data_table.column_id',
-	'log-history.data_table.column_request_id',
-	'log-history.data_table.column_entity',
-	'log-history.data_table.column_entity_id',
-	'log-history.data_table.column_action',
-	'log-history.data_table.column_performed_by',
-	'log-history.data_table.column_recorded_at',
-]);
+const translations = await translateBatch(
+	['delete.title', 'view.title', 'viewUser.label'],
+	'log-history.action',
+);
 
 export type LogHistoryDataTableFiltersType = {
 	request_id: { value: string | null; matchMode: 'contains' };
@@ -43,122 +39,130 @@ const logHistoryDataTableFilters: LogHistoryDataTableFiltersType = {
 	recorded_at_end: { value: null, matchMode: 'equals' },
 };
 
-export const dataSourceConfigLogHistory = {
-	dataTableState: {
-		reloadTrigger: 0,
-		first: 0,
-		rows: 10,
-		sortField: 'id',
-		sortOrder: -1 as const,
-		filters: logHistoryDataTableFilters,
-	},
-	dataTableColumns: [
-		{
-			field: 'id',
-			header: translations['log-history.data_table.column_id'],
-			sortable: true,
-			body: (
-				entry: LogHistoryModel,
-				column: DataTableColumnType<LogHistoryModel>,
-			) =>
-				DataTableValue(entry, column, {
-					markDeleted: true,
-					action: {
-						name: 'view',
-						source: 'log-history',
-					},
-				}),
+function displayButtonViewUser(
+	entry: LogHistoryModel,
+): DataTableValueOptionsType<LogHistoryModel>['displayButton'] {
+	if (!entry.auth_id) {
+		return undefined;
+	}
+
+	return {
+		action: 'view',
+		dataSource: 'users',
+		altTitle: translations['viewUser.label'],
+		alternateEntryId: entry.auth_id,
+	};
+}
+
+export const dataSourceConfigLogHistory: DataSourceConfigType<LogHistoryModel> =
+	{
+		dataTable: {
+			state: {
+				first: 0,
+				rows: 10,
+				sortField: 'id',
+				sortOrder: -1 as const,
+				filters: logHistoryDataTableFilters,
+			},
+			columns: [
+				{
+					field: 'id',
+					header: 'ID',
+					sortable: true,
+					body: (
+						entry: LogHistoryModel,
+						column: DataTableColumnType<LogHistoryModel>,
+					) =>
+						DataTableValue(entry, column, {
+							markDeleted: true,
+							displayButton: {
+								action: 'view',
+								dataSource: 'log-history',
+							},
+						}),
+				},
+				{
+					field: 'request_id',
+					header: 'Request ID',
+				},
+				{
+					field: 'entity',
+					header: 'Entity',
+					sortable: true,
+					body: (
+						entry: LogHistoryModel,
+						column: DataTableColumnType<LogHistoryModel>,
+					) =>
+						DataTableValue(entry, column, {
+							customValue: toTitleCase(entry.entity),
+						}),
+				},
+				{
+					field: 'entity_id',
+					header: 'Entity ID',
+				},
+				{
+					field: 'action',
+					header: 'Action',
+					sortable: true,
+				},
+				{
+					field: 'performed_by',
+					header: 'Performed By',
+					body: (
+						entry: LogHistoryModel,
+						column: DataTableColumnType<LogHistoryModel>,
+					) =>
+						DataTableValue(entry, column, {
+							customValue: entry.auth_id
+								? `${entry.performed_by} (#${entry.auth_id})`
+								: entry.performed_by,
+							displayButton: displayButtonViewUser(entry),
+						}),
+				},
+				{
+					field: 'recorded_at',
+					header: 'Recorded At',
+					sortable: true,
+					body: (
+						entry: LogHistoryModel,
+						column: DataTableColumnType<LogHistoryModel>,
+					) =>
+						DataTableValue(entry, column, {
+							displayDate: true,
+						}),
+				},
+			],
+			find: (params: FindFunctionParamsType) =>
+				requestFind<LogHistoryModel>('log-history', params),
 		},
-		{
-			field: 'request_id',
-			header: translations['log-history.data_table.column_request_id'],
+		displayEntryLabel: (entry: LogHistoryModel) => {
+			return `${entry.entity}-${entry.entity_id}`;
 		},
-		{
-			field: 'entity',
-			header: translations['log-history.data_table.column_entity'],
-			sortable: true,
-			body: (
-				entry: LogHistoryModel,
-				column: DataTableColumnType<LogHistoryModel>,
-			) =>
-				DataTableValue(entry, column, {
-					customValue: toTitleCase(entry.entity),
-				}),
-		},
-		{
-			field: 'entity_id',
-			header: translations['log-history.data_table.column_entity_id'],
-		},
-		{
-			field: 'action',
-			header: translations['log-history.data_table.column_action'],
-			sortable: true,
-		},
-		{
-			field: 'performed_by',
-			header: translations['log-history.data_table.column_performed_by'],
-			body: (
-				entry: LogHistoryModel,
-				column: DataTableColumnType<LogHistoryModel>,
-			) =>
-				DataTableValue(entry, column, {
-					customValue: entry.auth_id
-						? `${entry.performed_by} (#${entry.auth_id})`
-						: entry.performed_by,
-					action: entry.auth_id
-						? {
-								name: 'viewUser',
-								source: 'log-history',
-							}
-						: undefined,
-				}),
-		},
-		{
-			field: 'recorded_at',
-			header: translations['log-history.data_table.column_recorded_at'],
-			sortable: true,
-			body: (
-				entry: LogHistoryModel,
-				column: DataTableColumnType<LogHistoryModel>,
-			) =>
-				DataTableValue(entry, column, {
-					displayDate: true,
-				}),
-		},
-	],
-	functions: {
-		find: findLogHistory,
-		displayActionEntries: (entries: LogHistoryModel[]) => {
-			return entries.map((entry) => ({
-				id: entry.id,
-				label: `${entry.entity}-${entry.entity_id}`,
-			}));
-		},
-	},
-	actions: {
-		delete: {
-			mode: 'action' as const,
-			permission: 'log-history.delete',
-			allowedEntries: 'multiple' as const,
-			position: 'left' as const,
-			function: deleteLogHistory,
-			buttonProps: {
-				variant: 'outline' as const,
-				hover: 'error' as const,
+		actions: {
+			delete: {
+				windowType: 'action',
+				windowTitle: translations['delete.title'],
+				permission: 'log-history.delete',
+				entriesSelection: 'multiple',
+				operationFunction: (ids: number[]) =>
+					requestDeleteMultiple('log-history', ids),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'error',
+				},
+			},
+			view: {
+				windowType: 'view',
+				windowTitle: translations['view.title'],
+				windowComponent: ViewLogHistory,
+				windowConfigProps: {
+					size: 'x2l',
+				},
+				permission: 'log-history.read',
+				entriesSelection: 'single',
+				buttonPosition: 'hidden',
 			},
 		},
-		view: {
-			mode: 'other' as const,
-			permission: 'log-history.read',
-			allowedEntries: 'single' as const,
-			position: 'hidden' as const,
-		},
-		viewUser: {
-			type: 'view' as const,
-			mode: 'other' as const,
-			permission: 'user.read',
-			allowedEntries: 'single' as const,
-			position: 'hidden' as const,
-		},
-	},
-};
+	};

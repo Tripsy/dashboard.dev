@@ -10,42 +10,8 @@
 			"confirmText": "Are you sure you want to delete the selected log(s)?"
 		},
 		"view": {
-			"title": "Log details",
+			"title": "Log - {{entry}}",
 			"label": "View"
 		}
-	},
-	"data_table": {
-		"column_id": "ID",
-		"column_category": "Category",
-		"column_level": "Level",
-		"column_message": "Message",
-		"column_created_at": "Created At"
-	},
-	"form_filters": {
-		"label_global": "ID / Pid / Message / Context",
-		"label_category": "Category",
-		"label_level": "Level",
-		"label_created_at": "Created At"
-	},
-	"view": {
-		"section_details": "Details",
-		"label_id": "ID:",
-		"label_pid": "PID:",
-		"label_request_id": "Request ID:",
-		"label_category": "Category:",
-		"label_level": "Level:",
-		"label_message": "Message:",
-		"label_created_at": "Created At:",
-		"section_context": "Request Context",
-		"label_method": "Method:",
-		"label_url": "URL:",
-		"label_body": "Body:",
-		"label_params": "Params:",
-		"label_query": "Query:",
-		"section_debug_stack": "Debug Stack",
-		"label_file": "File:",
-		"label_line": "Line:",
-		"label_function": "Function:",
-		"label_trace": "Trace:"
 	}
 }

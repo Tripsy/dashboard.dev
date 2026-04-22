@@ -1,14 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import React, { useActionState } from 'react';
+import { useActionState } from 'react';
+import { passwordRecoverAction } from '@/app/(public)/account/password-recover/password-recover.action';
 import {
-	passwordRecoverAction,
-	passwordRecoverValidate,
-} from '@/app/(public)/account/password-recover/password-recover.action';
-import {
-	type PasswordRecoverFormFieldsType,
+	type PasswordRecoverFormValuesType,
 	PasswordRecoverState,
+	validateFormPasswordRecover,
 } from '@/app/(public)/account/password-recover/password-recover.definition';
 import { FormCsrf } from '@/components/form/form-csrf';
 import {
@@ -32,12 +30,12 @@ export default function PasswordRecover() {
 	);
 
 	const [formValues, setFormValues] =
-		useFormValues<PasswordRecoverFormFieldsType>(state.values);
+		useFormValues<PasswordRecoverFormValuesType>(state.values);
 
 	const { errors, submitted, markSubmit, markFieldAsTouched } =
 		useFormValidation({
 			formValues: formValues,
-			validate: passwordRecoverValidate,
+			validateForm: validateFormPasswordRecover,
 			debounceDelay: 800,
 		});
 
@@ -82,7 +80,7 @@ export default function PasswordRecover() {
 			>
 				<FormCsrf />
 
-				<FormComponentEmail<PasswordRecoverFormFieldsType>
+				<FormComponentEmail<PasswordRecoverFormValuesType>
 					labelText="Email Address"
 					id={elementIds.email}
 					fieldValue={formValues.email ?? ''}
@@ -97,16 +95,16 @@ export default function PasswordRecover() {
 					errors={errors}
 					button={{
 						label: 'Recover password',
-						icon: Icons.Action.Go,
+						iconLabel: 'submit',
 					}}
 				/>
 
 				{state.situation === 'error' && state.message && (
 					<FormError>
-						<React.Fragment key="error-content">
+						<div className="flex items-center gap-1.5">
 							<Icons.Status.Error />
 							<div>{state.message}</div>
-						</React.Fragment>
+						</div>
 					</FormError>
 				)}
 

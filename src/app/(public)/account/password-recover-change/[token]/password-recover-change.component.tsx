@@ -2,14 +2,12 @@
 
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import React, { useActionState, useState } from 'react';
+import { useActionState, useState } from 'react';
+import { passwordRecoverChangeAction } from '@/app/(public)/account/password-recover-change/[token]/password-recover-change.action';
 import {
-	passwordRecoverChangeAction,
-	passwordRecoverChangeValidate,
-} from '@/app/(public)/account/password-recover-change/[token]/password-recover-change.action';
-import {
-	type PasswordRecoverChangeFormFieldsType,
+	type PasswordRecoverChangeFormValuesType,
 	PasswordRecoverChangeState,
+	validateFormPasswordRecoverChange,
 } from '@/app/(public)/account/password-recover-change/[token]/password-recover-change.definition';
 import { FormCsrf } from '@/components/form/form-csrf';
 import {
@@ -27,6 +25,8 @@ import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
 
 export default function PasswordRecoverChange() {
+	const [showPassword, setShowPassword] = useState(false);
+
 	const params = useParams<{ token: string }>();
 
 	const token = params.token;
@@ -35,19 +35,17 @@ export default function PasswordRecoverChange() {
 		passwordRecoverChangeAction,
 		{
 			...PasswordRecoverChangeState,
-			token: token,
+			token,
 		},
 	);
 
-	const [showPassword, setShowPassword] = useState(false);
-
 	const [formValues, setFormValues] =
-		useFormValues<PasswordRecoverChangeFormFieldsType>(state.values);
+		useFormValues<PasswordRecoverChangeFormValuesType>(state.values);
 
 	const { errors, submitted, markSubmit, markFieldAsTouched } =
 		useFormValidation({
 			formValues: formValues,
-			validate: passwordRecoverChangeValidate,
+			validateForm: validateFormPasswordRecoverChange,
 			debounceDelay: 800,
 		});
 
@@ -91,7 +89,7 @@ export default function PasswordRecoverChange() {
 			>
 				<FormCsrf />
 
-				<FormComponentPassword<PasswordRecoverChangeFormFieldsType>
+				<FormComponentPassword<PasswordRecoverChangeFormValuesType>
 					labelText="New Password"
 					id={elementIds.password}
 					fieldName="password"
@@ -103,7 +101,7 @@ export default function PasswordRecoverChange() {
 					setShowPassword={setShowPassword}
 				/>
 
-				<FormComponentPassword<PasswordRecoverChangeFormFieldsType>
+				<FormComponentPassword<PasswordRecoverChangeFormValuesType>
 					labelText="Confirm Password"
 					id={elementIds.passwordConfirm}
 					fieldName="password_confirm"
@@ -123,16 +121,16 @@ export default function PasswordRecoverChange() {
 					errors={errors}
 					button={{
 						label: 'Set password',
-						icon: Icons.Action.Go,
+						iconLabel: 'submit',
 					}}
 				/>
 
 				{state.situation === 'error' && state.message && (
 					<FormError>
-						<React.Fragment key="error-content">
+						<div className="flex items-center gap-1.5">
 							<Icons.Status.Error />
 							<div>{state.message}</div>
-						</React.Fragment>
+						</div>
 					</FormError>
 				)}
 			</form>

@@ -7,6 +7,7 @@ import {
 	useContext,
 	useEffect,
 	useMemo,
+	useRef,
 	useState,
 } from 'react';
 import { ApiError } from '@/exceptions/api.error';
@@ -35,57 +36,73 @@ const AuthProvider = ({
 	initAuth?: AuthModel;
 }) => {
 	const [auth, setAuth] = useState<AuthModel>(initAuth);
-	const [authStatus, setAuthStatus] = useState<AuthStatus>('loading');
+	const [authStatus, setAuthStatus] = useState<AuthStatus>(
+		initAuth ? 'authenticated' : 'loading',
+	);
+	const authRefreshingRef = useRef(false);
 
-	const refreshAuth = useCallback(async () => {
+	const refreshAuth = useCallback(async ({ silent = false } = {}) => {
+		if (authRefreshingRef.current) {
+			return;
+		}
+
 		try {
-			setAuthStatus('loading');
+			authRefreshingRef.current = true;
+
+			if (!silent) {
+				setAuthStatus('loading');
+			}
 
 			const authResponse = await getAuth();
-
 			const authData =
 				authResponse?.success && authResponse?.data
-					? authResponse?.data
+					? authResponse.data
 					: null;
 
 			setAuth(authData);
-
-			if (authData) {
-				setAuthStatus('authenticated');
-			} else {
-				setAuthStatus('unauthenticated');
-			}
+			setAuthStatus(authData ? 'authenticated' : 'unauthenticated');
 		} catch (error: unknown) {
 			if (error instanceof ApiError && error.status === 401) {
 				setAuthStatus('unauthenticated');
 			} else {
 				setAuthStatus('error');
 			}
+		} finally {
+			authRefreshingRef.current = false;
 		}
 	}, []);
 
-	// Initial auth setup
 	useEffect(() => {
-		if (initAuth) {
-			setAuth(initAuth);
-			setAuthStatus('authenticated');
-		} else {
-			(async () => {
-				await refreshAuth();
-			})();
+		if (!initAuth) {
+			refreshAuth().catch(() => {
+				setAuthStatus('error');
+			});
 		}
 	}, [initAuth, refreshAuth]);
 
 	useEffect(() => {
+		// Interval-based refresh — runs regardless of visibility
+		const intervalId = setInterval(() => {
+			refreshAuth({ silent: true }).catch(console.error);
+		}, REFRESH_INTERVAL);
+
+		// Tab visibility refresh — only refresh if tab was hidden long enough
+		let hiddenAt: number | null = null;
+		const HIDDEN_THRESHOLD = 5 * 60 * 1000; // only refresh if hidden for 5+ minutes
+
 		const refreshIfVisible = () => {
-			if (document.visibilityState === 'visible') {
-				(async () => {
-					await refreshAuth();
-				})();
+			if (document.visibilityState === 'hidden') {
+				hiddenAt = Date.now();
+				return;
 			}
+
+			if (hiddenAt && Date.now() - hiddenAt > HIDDEN_THRESHOLD) {
+				refreshAuth({ silent: true }).catch(console.error);
+			}
+
+			hiddenAt = null;
 		};
 
-		const intervalId = setInterval(refreshIfVisible, REFRESH_INTERVAL);
 		document.addEventListener('visibilitychange', refreshIfVisible);
 
 		return () => {

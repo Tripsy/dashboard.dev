@@ -127,9 +127,8 @@ export function UserMenu() {
 					</DropdownMenuItem>
 					<DropdownMenuSeparator />
 					{auth?.role &&
-						[UserRoleEnum.ADMIN, UserRoleEnum.OPERATOR].includes(
-							auth.role,
-						) && (
+						(auth.role === UserRoleEnum.ADMIN ||
+							auth.role === UserRoleEnum.OPERATOR) && (
 							<>
 								<DropdownMenuItem>
 									<Link

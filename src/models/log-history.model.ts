@@ -1,11 +1,23 @@
-export enum LogHistorySource {
-	CRON = 'cron',
-	API = 'api',
-	SEED = 'seed',
-	UNKNOWN = 'unknown',
-}
+export const LogHistorySourceEnum = {
+	CRON: 'cron',
+	API: 'api',
+	SEED: 'seed',
+	UNKNOWN: 'unknown',
+} as const;
 
-export const LogHistoryEntities = ['permission', 'template', 'user'];
+export type LogHistorySource =
+	(typeof LogHistorySourceEnum)[keyof typeof LogHistorySourceEnum];
+
+export const LogHistoryEntities = [
+	'permission',
+	'template',
+	'user',
+	'client',
+	'client_address',
+	'place',
+	'brand',
+	'cash_flow',
+];
 export const LogHistoryActions = ['created', 'updated', 'deleted'];
 
 export type LogHistoryModel<D = Date | string> = {

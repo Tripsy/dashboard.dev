@@ -1,14 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import React, { useActionState, useState } from 'react';
+import { useActionState, useState } from 'react';
+import { registerAction } from '@/app/(public)/account/register/register.action';
 import {
-	registerAction,
-	registerValidate,
-} from '@/app/(public)/account/register/register.action';
-import {
-	type RegisterFormFieldsType,
+	type RegisterFormValuesType,
 	RegisterState,
+	validateFormRegister,
 } from '@/app/(public)/account/register/register.definition';
 import { FormCsrf } from '@/components/form/form-csrf';
 import {
@@ -28,33 +26,33 @@ import {
 } from '@/components/status.component';
 import { Label } from '@/components/ui/label';
 import Routes from '@/config/routes.setup';
-import { createHandleChange } from '@/helpers/form.helper';
-import { capitalizeFirstLetter } from '@/helpers/string.helper';
+import { createHandleChange, toOptionsFromEnum } from '@/helpers/form.helper';
+import { formatEnumLabel } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
-import { LanguageEnum } from '@/models/user.model';
+import { type Language, LanguageEnum } from '@/models/user.model';
 
-const languages = Object.values(LanguageEnum).map((language) => ({
-	label: capitalizeFirstLetter(language),
-	value: language,
-}));
+const languages = toOptionsFromEnum(LanguageEnum, {
+	formatter: formatEnumLabel,
+});
 
 export default function Register() {
+	const [showPassword, setShowPassword] = useState(false);
+
 	const [state, action, pending] = useActionState(
 		registerAction,
 		RegisterState,
 	);
-	const [showPassword, setShowPassword] = useState(false);
 
-	const [formValues, setFormValues] = useFormValues<RegisterFormFieldsType>(
+	const [formValues, setFormValues] = useFormValues<RegisterFormValuesType>(
 		state.values,
 	);
 
 	const { errors, submitted, markSubmit, markFieldAsTouched } =
 		useFormValidation({
 			formValues: formValues,
-			validate: registerValidate,
+			validateForm: validateFormRegister,
 			debounceDelay: 800,
 		});
 
@@ -139,7 +137,7 @@ export default function Register() {
 			>
 				<FormCsrf />
 
-				<FormComponentName<RegisterFormFieldsType>
+				<FormComponentName<RegisterFormValuesType>
 					labelText="Name"
 					id={elementIds.name}
 					fieldValue={formValues.name ?? ''}
@@ -148,7 +146,7 @@ export default function Register() {
 					error={errors.name}
 				/>
 
-				<FormComponentEmail<RegisterFormFieldsType>
+				<FormComponentEmail<RegisterFormValuesType>
 					labelText="Email Address"
 					id={elementIds.email}
 					fieldValue={formValues.email ?? ''}
@@ -157,7 +155,7 @@ export default function Register() {
 					error={errors.email}
 				/>
 
-				<FormComponentPassword<RegisterFormFieldsType>
+				<FormComponentPassword<RegisterFormValuesType>
 					labelText="Password"
 					id={elementIds.password}
 					fieldName="password"
@@ -169,7 +167,7 @@ export default function Register() {
 					setShowPassword={setShowPassword}
 				/>
 
-				<FormComponentPassword<RegisterFormFieldsType>
+				<FormComponentPassword<RegisterFormValuesType>
 					labelText="Confirm Password"
 					id={elementIds.passwordConfirm}
 					fieldName="password_confirm"
@@ -183,20 +181,20 @@ export default function Register() {
 					showPassword={showPassword}
 				/>
 
-				<FormComponentRadio<RegisterFormFieldsType>
+				<FormComponentRadio<RegisterFormValuesType>
 					labelText="Language"
 					id={elementIds.language}
 					fieldName="language"
 					fieldValue={formValues.language}
 					disabled={pending}
 					options={languages}
-					onValueChange={(value) =>
-						handleChange('language', value as LanguageEnum)
+					onChange={(value) =>
+						handleChange('language', value as Language)
 					}
 					error={errors.language}
 				/>
 
-				<FormComponentCheckbox<RegisterFormFieldsType>
+				<FormComponentCheckbox<RegisterFormValuesType>
 					id={elementIds.terms}
 					onCheckedChange={(checked) =>
 						handleChange('terms', checked)
@@ -244,16 +242,16 @@ export default function Register() {
 					errors={errors}
 					button={{
 						label: 'Create account',
-						icon: Icons.Action.Go,
+						iconLabel: 'submit',
 					}}
 				/>
 
 				{state.situation === 'error' && state.message && (
 					<FormError>
-						<React.Fragment key="error-content">
+						<div className="flex items-center gap-1.5">
 							<Icons.Status.Error />
 							<div>{state.message}</div>
-						</React.Fragment>
+						</div>
 					</FormError>
 				)}
 

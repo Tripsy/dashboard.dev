@@ -1,47 +1,105 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useStore } from 'zustand/react';
-import { DataTableActionButton } from '@/app/(dashboard)/_components/data-table-action-button.component';
-import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
+import { addDataTableActionListener } from '@/app/(dashboard)/_events/data-table-action.event';
+import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
+import { ActionButton } from '@/components/action-button.component';
 import {
+	type ActionConfigType,
 	type DataSourceKey,
 	getDataSourceConfig,
 } from '@/config/data-source.config';
+import { getErrorMessage } from '@/helpers/objects.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { hasPermission } from '@/models/auth.model';
 import { useAuth } from '@/providers/auth.provider';
 import { useToast } from '@/providers/toast.provider';
+import { useModalStore } from '@/stores/window.store';
+import type { EntriesSelectionType } from '@/types/action.type';
+import type { WindowEntryType } from '@/types/window.type';
 
-export const handleReset = (source: string) => {
-	const event = new CustomEvent('filterReset', {
-		detail: {
-			source: source,
-		},
-	});
+type HandleActionType = (
+	action: string,
+	dataSource: DataSourceKey,
+	entries: WindowEntryType[],
+	actionConfig?: ActionConfigType,
+) => Promise<void>;
 
-	window.dispatchEvent(event);
-};
+type AllowActionType = (
+	entries: WindowEntryType[],
+	permission: string,
+	entriesSelection: EntriesSelectionType,
+	customEntryCheck?: (entry: WindowEntryType) => boolean,
+) => boolean;
 
-type ActionKey = 'create' | 'update' | 'delete' | string;
+function buildActionButtons(
+	position: 'left' | 'right',
+	actions: Record<string, ActionConfigType>,
+	dataSource: DataSourceKey,
+	selectedEntries: WindowEntryType[],
+	allowAction: AllowActionType,
+	handleAction: HandleActionType,
+	handleActionError: (error: unknown) => void,
+) {
+	return Object.entries(actions)
+		.filter(
+			([, actionConfig]) =>
+				actionConfig.buttonPosition === position &&
+				(selectedEntries.length > 0 ||
+					actionConfig.entriesSelection === 'free') &&
+				allowAction(
+					selectedEntries,
+					actionConfig.permission,
+					actionConfig.entriesSelection,
+					actionConfig.customEntryCheck,
+				),
+		)
+		.map(([action, actionConfig]) => (
+			<ActionButton
+				key={`button-${dataSource}-${action}`}
+				dataSource={dataSource}
+				action={action}
+				buttonProps={actionConfig.button}
+				handleClick={() =>
+					handleAction(
+						action,
+						dataSource,
+						selectedEntries,
+						actionConfig,
+					).catch(handleActionError)
+				}
+			/>
+		));
+}
 
-export function DataTableActions<K extends DataSourceKey, Model>() {
-	const [error, setError] = useState<string | null>(null);
+function resolveActionEntries(
+	entries: WindowEntryType[],
+	entriesSelection: EntriesSelectionType,
+): WindowEntryType[] {
+	if (entriesSelection === 'free') {
+		return [];
+	}
 
+	if (entriesSelection === 'single') {
+		return entries[0] ? [entries[0]] : [];
+	}
+
+	return entries;
+}
+
+export function DataTableActions<
+	K extends DataSourceKey,
+	Entry extends WindowEntryType,
+>() {
 	const { dataSource, selectionMode, dataTableStore } = useDataTable<
 		K,
-		Model
+		Entry
 	>();
 	const { auth } = useAuth();
 	const { showToast } = useToast();
+	const { open } = useModalStore();
 
-	const openCreate = useStore(dataTableStore, (state) => state.openCreate);
-	const openUpdate = useStore(dataTableStore, (state) => state.openUpdate);
-	const openAction = useStore(dataTableStore, (state) => state.openAction);
-	const setActionEntry = useStore(
-		dataTableStore,
-		(state) => state.setActionEntry,
-	);
 	const selectedEntries = useStore(
 		dataTableStore,
 		(state) => state.selectedEntries,
@@ -63,14 +121,14 @@ export function DataTableActions<K extends DataSourceKey, Model>() {
 
 	const { translations } = useTranslation(translationsKeys);
 
-	const allowAction = useCallback(
+	const allowAction: AllowActionType = useCallback(
 		(
-			entries: Model[],
+			entries: WindowEntryType[],
 			permission: string,
-			allowedEntries: 'free' | 'single' | 'multiple',
-			customEntryCheck?: (entry: Model) => boolean,
+			entriesSelection: EntriesSelectionType,
+			customEntryCheck?: (entry: WindowEntryType) => boolean,
 		) => {
-			if (allowedEntries === 'single') {
+			if (entriesSelection === 'single') {
 				if (entries.length !== 1) {
 					return false;
 				}
@@ -80,7 +138,7 @@ export function DataTableActions<K extends DataSourceKey, Model>() {
 				}
 			}
 
-			if (allowedEntries === 'multiple' && entries.length === 0) {
+			if (entriesSelection === 'multiple' && entries.length === 0) {
 				return false;
 			}
 
@@ -89,178 +147,123 @@ export function DataTableActions<K extends DataSourceKey, Model>() {
 		[auth],
 	);
 
-	const handleClick = useCallback(
-		(
-			entries: Model[],
-			actionName: ActionKey,
-			permission: string,
-			allowedEntries: 'free' | 'single' | 'multiple',
-			customEntryCheck?: (entry: Model) => boolean,
-		) => {
+	const handleAction: HandleActionType = useCallback(
+		async (action, targetDataSource, entries, actionConfig) => {
+			const resolvedActionConfig: ActionConfigType | undefined =
+				actionConfig ??
+				getDataSourceConfig(targetDataSource, 'actions')?.[action];
+
+			if (!resolvedActionConfig) {
+				throw new Error(`Action "${action}" is not defined`);
+			}
+
 			if (
 				!allowAction(
 					entries,
-					permission,
-					allowedEntries,
-					customEntryCheck,
+					resolvedActionConfig.permission,
+					resolvedActionConfig.entriesSelection,
+					resolvedActionConfig.customEntryCheck,
 				)
 			) {
-				setError(translations['app.error.operation_not_allowed']);
-
-				return;
+				throw new Error(
+					translations['app.error.operation_not_allowed'],
+				);
 			}
 
-			switch (actionName) {
-				case 'create':
-					openCreate();
-					break;
-				case 'update':
-					setActionEntry(entries[0]);
-					openUpdate();
-					break;
-				default:
-					if (allowedEntries === 'single') {
-						setActionEntry(entries[0]);
-					}
+			const actionEntries = resolveActionEntries(
+				entries,
+				resolvedActionConfig.entriesSelection,
+			);
 
-					openAction(actionName);
-					break;
-			}
+			open({
+				minimized: false,
+				section: 'dashboard',
+				dataSource: targetDataSource,
+				action: action,
+				data: {
+					entries: actionEntries,
+				},
+			});
 		},
-		[
-			allowAction,
-			openAction,
-			openCreate,
-			openUpdate,
-			setActionEntry,
-			translations,
-		],
+		[allowAction, open, translations],
 	);
 
-	const renderActions = (position: 'left' | 'right') => {
-		if (!actions) {
-			return null;
-		}
-
-		return Object.entries(actions).map(([actionName, actionProps]) => {
-			if (
-				selectedEntries.length === 0 &&
-				actionProps.allowedEntries !== 'free'
-			) {
-				return null;
-			}
-
-			if (actionProps.position !== position) {
-				return null;
-			}
-
-			const customCheck = actionProps.customEntryCheck as
-				| ((entry: unknown) => boolean)
-				| undefined;
-
-			if (
-				!allowAction(
-					selectedEntries,
-					actionProps.permission,
-					actionProps.allowedEntries,
-					customCheck,
-				)
-			) {
-				return null;
-			}
-
-			return (
-				<DataTableActionButton
-					key={`button-${actionName}`}
-					dataSource={dataSource}
-					actionName={actionName}
-					buttonProps={actionProps.buttonProps}
-					handleClick={() =>
-						handleClick(
-							selectedEntries,
-							actionName,
-							actionProps.permission,
-							actionProps.allowedEntries,
-							customCheck,
-						)
-					}
-				/>
-			);
-		});
-	};
-
-	useEffect(() => {
-		const handleUseDataTableAction = (
-			event: CustomEvent<{
-				source: string;
-				actionName: string;
-				entry: Model;
-			}>,
-		) => {
-			const actionName = event.detail.actionName;
-			const actionProps = actions?.[actionName];
-
-			if (!actionProps) {
-				setError(
-					`'actionProps' action props are not defined for '${actionName}'`,
-				);
-
-				return;
-			}
-
-			const customCheck = actionProps.customEntryCheck as
-				| ((entry: Model) => boolean)
-				| undefined;
-
-			handleClick(
-				[event.detail.entry],
-				actionName,
-				actionProps.permission,
-				actionProps.allowedEntries,
-				customCheck,
-			);
-		};
-
-		// Attach listener
-		window.addEventListener(
-			'useDataTableAction',
-			handleUseDataTableAction as EventListener,
-		);
-
-		// Cleanup on unmounting
-		return () => {
-			window.removeEventListener(
-				'useDataTableAction',
-				handleUseDataTableAction as EventListener,
-			);
-		};
-	}, [actions, handleClick]);
-
-	useEffect(() => {
-		if (error) {
+	const handleActionError = useCallback(
+		(error: unknown) => {
 			showToast({
 				severity: 'error',
 				summary: translations['app.text.error_title'],
-				detail: error,
+				detail: getErrorMessage(error),
 			});
+		},
+		[showToast, translations],
+	);
 
-			setError(null);
-		}
-	}, [error, showToast, translations]);
+	useEffect(() => {
+		return addDataTableActionListener<Entry>(
+			({ action, dataSource, entries }) => {
+				handleAction(action, dataSource, entries).catch(
+					handleActionError,
+				);
+			},
+		);
+	}, [handleAction, handleActionError]);
 
-	if (error) {
-		return;
-	}
+	const leftActions = useMemo(
+		() =>
+			actions
+				? buildActionButtons(
+						'left',
+						actions,
+						dataSource,
+						selectedEntries,
+						allowAction,
+						handleAction,
+						handleActionError,
+					)
+				: null,
+		[
+			actions,
+			dataSource,
+			selectedEntries,
+			allowAction,
+			handleAction,
+			handleActionError,
+		],
+	);
+
+	const rightActions = useMemo(
+		() =>
+			actions
+				? buildActionButtons(
+						'right',
+						actions,
+						dataSource,
+						selectedEntries,
+						allowAction,
+						handleAction,
+						handleActionError,
+					)
+				: null,
+		[
+			actions,
+			dataSource,
+			selectedEntries,
+			allowAction,
+			handleAction,
+			handleActionError,
+		],
+	);
 
 	return (
-		<div className="flex flex-wrap gap-4 justify-between min-h-[74px] py-4">
+		<div className="flex flex-wrap gap-4 justify-between min-h-18.5 py-4">
 			<div className="flex flex-wrap gap-4 items-center">
 				{selectionMode === 'multiple' && (
 					<div>{selectedEntries.length} selected</div>
 				)}
-				{renderActions('left')}
+				{leftActions}
 			</div>
-			<div className="flex flex-wrap gap-4">{renderActions('right')}</div>
+			<div className="flex flex-wrap gap-4">{rightActions}</div>
 		</div>
 	);
 }

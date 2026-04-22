@@ -6,6 +6,11 @@ export const PermissionEntitiesSuggestions = [
 	'permission',
 	'template',
 	'user',
+	'client',
+	'client_address',
+	'place',
+	'brand',
+	'cash_flow',
 ];
 
 export const PermissionOperationSuggestions = [
@@ -24,6 +29,6 @@ export type PermissionModel<D = Date | string> = {
 };
 
 export type PermissionFormValuesType = {
-	entity: string;
-	operation: string;
+	entity: string | null;
+	operation: string | null;
 };

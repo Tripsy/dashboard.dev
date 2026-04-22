@@ -1,16 +1,15 @@
 'use client';
 
-import { ArrowDownRight } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import React, { useActionState, useEffect, useMemo, useState } from 'react';
+import { useActionState, useEffect, useMemo, useState } from 'react';
+import { AuthTokenList } from '@/app/(public)/_components/auth-token-list.component';
+import { loginAction } from '@/app/(public)/account/login/login.action';
 import {
-	loginAction,
-	loginValidate,
-} from '@/app/(public)/account/login/login.action';
-import {
-	type LoginFormFieldsType,
+	isLoginResponseMaxActiveSessions,
+	type LoginFormValuesType,
 	LoginState,
+	validateFormLogin,
 } from '@/app/(public)/account/login/login.definition';
 import { FormCsrf } from '@/components/form/form-csrf';
 import {
@@ -22,11 +21,7 @@ import { FormError } from '@/components/form/form-error.component';
 import { FormWrapperComponent } from '@/components/form/form-wrapper';
 import { Icons } from '@/components/icon.component';
 import { ErrorComponent, ErrorIcon } from '@/components/status.component';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Modal } from '@/components/ui/modal';
 import Routes, { isExcludedRoute } from '@/config/routes.setup';
-import { formatDate } from '@/helpers/date.helper';
 import { createHandleChange } from '@/helpers/form.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
@@ -34,27 +29,25 @@ import { useFormValues } from '@/hooks/use-form-values.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { useAuth } from '@/providers/auth.provider';
 import { useToast } from '@/providers/toast.provider';
-import { removeTokenAccount } from '@/services/account.service';
-import type { AuthTokenListType, AuthTokenType } from '@/types/auth.type';
 
 export default function Login() {
-	const { showToast } = useToast();
-	const [state, action, pending] = useActionState(loginAction, LoginState);
 	const [showPassword, setShowPassword] = useState(false);
+	const { showToast } = useToast();
 
 	const { refreshAuth } = useAuth();
-
 	const router = useRouter();
 	const searchParams = useSearchParams();
 
-	const [formValues, setFormValues] = useFormValues<LoginFormFieldsType>(
+	const [state, action, pending] = useActionState(loginAction, LoginState);
+
+	const [formValues, setFormValues] = useFormValues<LoginFormValuesType>(
 		state.values,
 	);
 
 	const { errors, submitted, markSubmit, markFieldAsTouched } =
 		useFormValidation({
 			formValues: formValues,
-			validate: loginValidate,
+			validateForm: validateFormLogin,
 			debounceDelay: 800,
 		});
 
@@ -72,7 +65,7 @@ export default function Login() {
 	const handleChange = createHandleChange(setFormValues, markFieldAsTouched);
 
 	useEffect(() => {
-		if (state.situation === 'success' && router) {
+		if (state.situation === 'success') {
 			(async () => {
 				await refreshAuth();
 			})();
@@ -124,6 +117,11 @@ export default function Login() {
 		);
 	}
 
+	const authTokens =
+		state.resultData && isLoginResponseMaxActiveSessions(state.resultData)
+			? state.resultData.authTokens
+			: undefined;
+
 	return (
 		<FormWrapperComponent
 			title="Welcome back"
@@ -136,7 +134,7 @@ export default function Login() {
 			>
 				<FormCsrf />
 
-				<FormComponentEmail<LoginFormFieldsType>
+				<FormComponentEmail<LoginFormValuesType>
 					labelText="Email Address"
 					id={elementIds.email}
 					fieldValue={formValues.email ?? ''}
@@ -145,7 +143,7 @@ export default function Login() {
 					error={errors.email}
 				/>
 
-				<FormComponentPassword<LoginFormFieldsType>
+				<FormComponentPassword<LoginFormValuesType>
 					labelText="Password"
 					id={elementIds.password}
 					fieldName="password"
@@ -164,44 +162,47 @@ export default function Login() {
 					errors={errors}
 					button={{
 						label: 'Login',
-						icon: Icons.Action.Login,
+						iconLabel: 'login',
 					}}
 				/>
 
 				{state.situation === 'error' && state.message && (
 					<FormError>
-						<React.Fragment key="error-content">
+						<div className="flex items-center gap-1.5">
 							<Icons.Status.Error />
 							<div>{state.message}</div>
-						</React.Fragment>
+						</div>
 					</FormError>
 				)}
 
-				{state.situation === 'max_active_sessions' && state.message && (
-					<div className="space-y-4">
-						<div className="text-error text-sm">
-							<ErrorIcon /> {state.message}
-						</div>
+				{state.situation === 'max_active_sessions' &&
+					state.message &&
+					authTokens && (
+						<div className="space-y-4">
+							<div className="text-error text-sm">
+								<ErrorIcon /> {state.message}
+							</div>
 
-						<AuthTokenList
-							tokens={state.body?.authValidTokens || []}
-							callbackAction={(success, message) => {
-								showToast({
-									severity: success ? 'success' : 'error',
-									summary: success ? 'Success' : 'Error',
-									detail:
-										message === 'session_destroy_success'
-											? translations[
-													'login.message.session_destroy_success'
-												]
-											: translations[
-													`login.message.session_destroy_error`
-												],
-								});
-							}}
-						/>
-					</div>
-				)}
+							<AuthTokenList
+								tokens={authTokens}
+								onResult={(success, message) => {
+									showToast({
+										severity: success ? 'success' : 'error',
+										summary: success ? 'Success' : 'Error',
+										detail:
+											message ===
+											'session_destroy_success'
+												? translations[
+														'login.message.session_destroy_success'
+													]
+												: translations[
+														`login.message.session_destroy_error`
+													],
+									});
+								}}
+							/>
+						</div>
+					)}
 
 				<div className="text-center space-y-2">
 					<p className="text-sm text-muted-foreground">
@@ -227,117 +228,3 @@ export default function Login() {
 		</FormWrapperComponent>
 	);
 }
-
-export const AuthTokenList = ({
-	callbackAction,
-	tokens,
-}: {
-	callbackAction: (success: boolean, message: string) => void;
-	tokens: AuthTokenListType | [];
-}) => {
-	const [selectedToken, setSelectedToken] = useState<string | null>(null);
-	const [loading, setLoading] = useState(false);
-	const [tokenList, setTokenList] = useState<AuthTokenListType>([
-		...(tokens || []),
-	]);
-
-	useEffect(() => {
-		setTokenList([...tokens]);
-	}, [tokens]);
-
-	const handleConfirmDestroy = async () => {
-		if (!selectedToken) {
-			return;
-		}
-
-		try {
-			setLoading(true);
-
-			await removeTokenAccount(selectedToken);
-
-			callbackAction(true, 'session_destroy_success');
-
-			setTokenList((prev) =>
-				prev.filter((token) => token.ident !== selectedToken),
-			);
-		} catch {
-			callbackAction(false, 'session_destroy_error');
-		} finally {
-			setLoading(false);
-			setSelectedToken(null);
-		}
-	};
-
-	const selectedTokenData: AuthTokenType | undefined = useMemo(
-		() => tokenList.find((token) => token.ident === selectedToken),
-		[selectedToken, tokenList],
-	);
-
-	return (
-		<>
-			{tokenList.map((token: AuthTokenType) => (
-				<div key={token.ident} className="pb-4">
-					<div className="text-sm">
-						<ArrowDownRight className="h-4 w-4" />
-						{token.label}
-					</div>
-					<div className="flex justify-between items-center">
-						<div className="text-xs mt-1">
-							Last used: {formatDate(token.used_at, 'date-time')}
-						</div>
-						{token.used_now ? (
-							<Badge variant="success" size="sm">
-								<Icons.Status.Active className="w-4 h-4" />{' '}
-								Active Session
-							</Badge>
-						) : (
-							<Button
-								variant="error"
-								size="sm"
-								onClick={() => setSelectedToken(token.ident)}
-							>
-								<Icons.Action.Destroy className="w-4 h-4" />{' '}
-								Destroy Session
-							</Button>
-						)}
-					</div>
-				</div>
-			))}
-
-			{selectedToken && (
-				<Modal
-					isOpen={true}
-					onClose={() => setSelectedToken(null)}
-					title="Destroy session"
-					footer={
-						<>
-							<Button
-								variant="error"
-								size="sm"
-								onClick={handleConfirmDestroy}
-								disabled={loading}
-							>
-								{loading ? 'Deleting...' : 'Confirm'}
-							</Button>
-							<Button
-								variant="outline"
-								size="sm"
-								onClick={() => setSelectedToken(null)}
-								disabled={loading}
-							>
-								Cancel
-							</Button>
-						</>
-					}
-				>
-					<p className="text-sm semi-bold">
-						Are you sure you want to destroy the session?
-					</p>
-					<p className="font-mono text-xs break-words mt-2">
-						{selectedTokenData?.label}
-					</p>
-				</Modal>
-			)}
-		</>
-	);
-};

@@ -11,7 +11,7 @@ const badgeVariants = cva(
 				default: 'bg-primary text-primary-foreground',
 				secondary: 'bg-secondary text-secondary-foreground',
 				success: 'bg-success text-success-foreground',
-				warning: 'bg-warning text-warning-foreground',
+				warning: 'bg-warning text-primary-foreground',
 				info: 'bg-info text-info-foreground',
 				error: 'bg-error text-error-foreground',
 			},
@@ -31,7 +31,7 @@ const badgeVariants = cva(
 );
 
 export type BadgeVariant = VariantProps<typeof badgeVariants>['variant'];
-export type BadgeSize = VariantProps<typeof badgeVariants>['size'];
+// export type BadgeSize = VariantProps<typeof badgeVariants>['size'];
 
 export interface BadgeProps
 	extends React.HTMLAttributes<HTMLDivElement>,

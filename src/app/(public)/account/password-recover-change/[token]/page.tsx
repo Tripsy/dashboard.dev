@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import PasswordRecoverChange from '@/app/(public)/account/password-recover-change/[token]/password-recover-change.component';
 import ProtectedRoute from '@/components/protected-route.component';
-import { RouteAuth } from '@/config/routes.setup';
+import { RouteAuthEnum } from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
 import { translate } from '@/config/translate.setup';
 
@@ -16,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Page() {
 	return (
-		<ProtectedRoute routeAuth={RouteAuth.UNAUTHENTICATED}>
+		<ProtectedRoute routeAuth={RouteAuthEnum.UNAUTHENTICATED}>
 			<div className="bg-gradient-hero">
 				<PasswordRecoverChange />
 			</div>

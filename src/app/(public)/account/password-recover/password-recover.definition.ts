@@ -1,16 +1,17 @@
 import { z } from 'zod';
-import { translateBatch } from '@/config/translate.setup';
-import type { FormSituationType } from '@/types/form.type';
+import { getFormDataAsString } from '@/helpers/form.helper';
+import { BaseValidator } from '@/helpers/validator.helper';
+import type { FormErrorsType, FormSituationType } from '@/types/form.type';
 
-export type PasswordRecoverFormFieldsType = {
-	email: string;
+export type PasswordRecoverFormValuesType = {
+	email: string | null;
 };
 
 export type PasswordRecoverSituationType = FormSituationType | 'csrf_error';
 
 export type PasswordRecoverStateType = {
-	values: PasswordRecoverFormFieldsType;
-	errors: Partial<Record<keyof PasswordRecoverFormFieldsType, string[]>>;
+	values: PasswordRecoverFormValuesType;
+	errors: FormErrorsType<PasswordRecoverFormValuesType>;
 	message: string | null;
 	situation: PasswordRecoverSituationType;
 };
@@ -24,12 +25,29 @@ export const PasswordRecoverState: PasswordRecoverStateType = {
 	situation: null,
 };
 
-const translations = await translateBatch([
-	'password-recover.validation.email_invalid',
-]);
+const validatorMessages = await BaseValidator.getValidatorMessages(
+	['invalid_email'] as const,
+	'password-recover.validation',
+);
 
-export const PasswordRecoverSchema = z.object({
-	email: z.email({
-		message: translations['password-recover.validation.email_invalid'],
-	}),
-});
+class PasswordRecoverValidator extends BaseValidator<typeof validatorMessages> {
+	passwordRecover = z.object({
+		email: this.validateEmail(this.getMessage('invalid_email')),
+	});
+}
+
+export function validateFormPasswordRecover(
+	values: PasswordRecoverFormValuesType,
+) {
+	const validator = new PasswordRecoverValidator(validatorMessages);
+
+	return validator.passwordRecover.safeParse(values);
+}
+
+export function getPasswordRecoverFormValues(
+	formData: FormData,
+): PasswordRecoverFormValuesType {
+	return {
+		email: getFormDataAsString(formData, 'email'),
+	};
+}

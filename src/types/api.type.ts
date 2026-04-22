@@ -11,3 +11,14 @@ export type ApiResponseFetch<T> =
 			success: boolean;
 	  }
 	| undefined;
+
+export type QueryValueType =
+	| string
+	| number
+	| boolean
+	| Date
+	| null
+	| undefined
+	| Array<string | number | boolean>;
+
+export type QueryFiltersType = Record<string, QueryValueType>;

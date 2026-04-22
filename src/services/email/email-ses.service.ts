@@ -2,7 +2,7 @@ import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
 import { defaultProvider } from '@aws-sdk/credential-provider-node';
 import { Configuration } from '@/config/settings.config';
 import { translate } from '@/config/translate.setup';
-import { getErrorMessage } from '@/helpers/system.helper';
+import { getErrorMessage } from '@/helpers/objects.helper';
 import type {
 	EmailAddressType,
 	EmailContent,

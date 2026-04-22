@@ -3,7 +3,7 @@
 		"title": "My account - Email update | {{app_name}}"
 	},
 	"validation": {
-		"email_invalid": "Please enter a valid email address",
+		"invalid_email": "Please enter a valid email address",
 		"email_already_used": "Email already in use"
 	},
 	"message": {

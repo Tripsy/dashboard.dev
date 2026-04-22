@@ -19,6 +19,7 @@ function loadSettings(): Settings {
 			environment: process.env.NEXT_PUBLIC_NODE_ENV || 'production',
 			url: process.env.NEXT_PUBLIC_APP_URL,
 			name: process.env.NEXT_PUBLIC_APP_NAME,
+			timezone: process.env.NEXT_PUBLIC_TIMEZONE || 'UTC',
 		},
 		security: {
 			allowedOrigins: process.env.ALLOWED_ORIGINS?.split(',').map((v) =>
@@ -31,8 +32,8 @@ function loadSettings(): Settings {
 			inputName: 'x-csrf-token',
 		},
 		user: {
-			nameMinLength: 3,
-			passwordMinLength: 8,
+			nameMinChars: 3,
+			passwordMinChars: 8,
 			// loginMaxFailedAttemptsForIp: 5,
 			// loginMaxFailedAttemptsForEmail: 3,
 			// LoginFailedAttemptsLockTime: 900, // block logins for 15 minutes when too many failed attempts

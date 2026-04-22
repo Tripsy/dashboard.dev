@@ -1,52 +1,38 @@
-import { useMemo } from 'react';
 import { FormComponentAutoComplete } from '@/components/form/form-element.component';
 import { Icons } from '@/components/icon.component';
-import type { FormManageType } from '@/config/data-source.config';
-import { useAutocomplete } from '@/hooks/use-autocomplete';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
-import { useTranslation } from '@/hooks/use-translation.hook';
+import { useLocalAutocomplete } from '@/hooks/use-local-autocomplete';
 import {
 	PermissionEntitiesSuggestions,
 	type PermissionFormValuesType,
 	PermissionOperationSuggestions,
 } from '@/models/permission.model';
+import { useWindowForm } from '@/providers/window-form.provider';
 
-export function FormManagePermission({
-	formValues,
-	errors,
-	handleChange,
-	pending,
-}: FormManageType<PermissionFormValuesType>) {
-	const translationsKeys = useMemo(
-		() =>
-			[
-				'permissions.form_manage.label_entity',
-				'permissions.form_manage.label_operation',
-			] as const,
-		[],
-	);
-
-	const { translations } = useTranslation(translationsKeys);
-
-	const entityAutocomplete = useAutocomplete(PermissionEntitiesSuggestions, {
-		filterMode: 'includes',
-		caseSensitive: false,
-	});
-
-	const operationAutocomplete = useAutocomplete(
-		PermissionOperationSuggestions,
-		{
-			filterMode: 'includes',
-			caseSensitive: false,
-		},
-	);
+export function FormManagePermission() {
+	const { formValues, errors, handleChange, pending } =
+		useWindowForm<PermissionFormValuesType>();
 
 	const elementIds = useElementIds(['entity', 'operation']);
 
+	const entityAutocomplete = useLocalAutocomplete({
+		source: PermissionEntitiesSuggestions,
+		filter: (item, query) =>
+			item.toLowerCase().startsWith(query.toLowerCase()),
+		minLength: 1,
+	});
+
+	const operationAutocomplete = useLocalAutocomplete({
+		source: PermissionOperationSuggestions,
+		filter: (item, query) =>
+			item.toLowerCase().startsWith(query.toLowerCase()),
+		minLength: 1,
+	});
+
 	return (
 		<>
-			<FormComponentAutoComplete<PermissionFormValuesType>
-				labelText={translations['permissions.form_manage.label_entity']}
+			<FormComponentAutoComplete<PermissionFormValuesType, string>
+				labelText="Entity"
 				id={elementIds.entity}
 				fieldName="entity"
 				fieldValue={formValues.entity}
@@ -54,12 +40,13 @@ export function FormManagePermission({
 				isRequired={true}
 				disabled={pending}
 				error={errors.entity}
-				onChange={(value) => handleChange('entity', value)}
+				onInputChange={(value) => {
+					handleChange('entity', value);
+					entityAutocomplete.setQuery(value);
+				}}
 				autoCompleteProps={{
 					suggestions: entityAutocomplete.suggestions,
-					onSearch: entityAutocomplete.onSearch,
-					minQueryLength: 2,
-					dropdown: false,
+					getOptionLabel: (item) => item,
 				}}
 				icons={{
 					left: (
@@ -68,10 +55,8 @@ export function FormManagePermission({
 				}}
 			/>
 
-			<FormComponentAutoComplete<PermissionFormValuesType>
-				labelText={
-					translations['permissions.form_manage.label_operation']
-				}
+			<FormComponentAutoComplete<PermissionFormValuesType, string>
+				labelText="Operation"
 				id={elementIds.operation}
 				fieldName="operation"
 				fieldValue={formValues.operation}
@@ -79,12 +64,13 @@ export function FormManagePermission({
 				isRequired={true}
 				disabled={pending}
 				error={errors.operation}
-				onChange={(value) => handleChange('operation', value)}
+				onInputChange={(value) => {
+					handleChange('operation', value);
+					operationAutocomplete.setQuery(value);
+				}}
 				autoCompleteProps={{
 					suggestions: operationAutocomplete.suggestions,
-					onSearch: operationAutocomplete.onSearch,
-					minQueryLength: 2,
-					dropdown: false,
+					getOptionLabel: (item) => item,
 				}}
 				icons={{
 					left: (

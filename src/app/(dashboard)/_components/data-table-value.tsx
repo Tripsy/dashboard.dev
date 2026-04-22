@@ -1,169 +1,72 @@
 'use client';
 
-import clsx from 'clsx';
-import { type ComponentType, type JSX, useMemo } from 'react';
-import { Icons } from '@/components/icon.component';
-import { Badge, type BadgeVariant } from '@/components/ui/badge';
+import type { JSX } from 'react';
+import { dispatchDataTableAction } from '@/app/(dashboard)/_events/data-table-action.event';
+import type {
+	DataSourceKey,
+	DataTableColumnType,
+	DataTableValueOptionsType,
+} from '@/config/data-source.config';
 import { formatDate } from '@/helpers/date.helper';
+import {
+	DisplayDeleted,
+	DisplayStatus,
+	type statusList,
+} from '@/helpers/display.helper';
+import { getErrorMessage } from '@/helpers/objects.helper';
+import { requestView } from '@/helpers/services.helper';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
-import { useTranslation } from '@/hooks/use-translation.hook';
+import { useToast } from '@/providers/toast.provider';
+import type { ActionButtonPropsType } from '@/types/html.type';
 
-export type DataTableColumnType<Model> = {
-	field: string;
-	header: string;
-	sortable?: boolean;
-	body?: (
-		entry: Model,
-		column: DataTableColumnType<Model>,
-	) => JSX.Element | string;
-	style?: React.CSSProperties;
-};
-
-type DataTableValueOptionsType<Model> = {
-	customValue?: string;
-	capitalize?: boolean;
-	markDeleted?: boolean;
-	isStatus?: boolean;
-	displayDate?: boolean;
-	source?: string;
-	action?: {
-		name: null | string | ((entry: Model) => string | null);
-		source: string;
-	};
-};
-
-const statusList: Record<
-	string,
-	{ variant: BadgeVariant; icon: ComponentType<{ className?: string }> }
-> = {
-	active: {
-		variant: 'success',
-		icon: Icons.Status.Active,
-	},
-	pending: {
-		variant: 'warning',
-		icon: Icons.Status.Pending,
-	},
-	inactive: {
-		variant: 'error',
-		icon: Icons.Status.Inactive,
-	},
-	deleted: {
-		variant: 'default',
-		icon: Icons.Status.Deleted,
-	},
-	ok: {
-		variant: 'success',
-		icon: Icons.Status.Ok,
-	},
-	error: {
-		variant: 'error',
-		icon: Icons.Status.Error,
-	},
-	warning: {
-		variant: 'warning',
-		icon: Icons.Status.Warning,
-	},
-	sent: {
-		variant: 'success',
-		icon: Icons.Status.Sent,
-	},
-};
-
-export const DisplayDeleted = ({
-	value,
-	isDeleted,
-}: {
-	value: string | JSX.Element;
-	isDeleted: boolean;
-}) => {
-	return <div className={clsx(isDeleted && 'line-through')}>{value}</div>;
-};
-
-export const DisplayStatus = ({
-	status,
-}: {
-	status: keyof typeof statusList;
-}) => {
-	const translationsKeys = useMemo(
-		() => [`app.status.${status}`] as const,
-		[status],
-	);
-
-	const { translations } = useTranslation(translationsKeys);
-
-	const { variant, icon: Icon } = statusList[status] || {};
-
-	// When status props are not defined
-	if (!variant || !Icon) {
-		return <Badge variant="default">{status}</Badge>;
-	}
-
-	return (
-		<Badge
-			variant={variant}
-			size="status"
-			className="min-w-28 opacity-70 hover:opacity-100"
-		>
-			<Icon className="w-4 h-4" />
-			{translations[`app.status.${status}`]}
-		</Badge>
-	);
-};
-
-export const DisplayAction = <Model extends Record<string, unknown>>({
-	value,
+export const DisplayButton = <Entry,>({
+	buttonProps,
 	action,
-	entry,
+	dataSource,
+	entryOrId,
 }: {
-	value: string | JSX.Element;
-	action: NonNullable<DataTableValueOptionsType<Model>['action']>;
-	entry: Model;
+	buttonProps: ActionButtonPropsType;
+	action: string;
+	dataSource: DataSourceKey;
+	entryOrId: Entry | number;
 }) => {
-	const actionName =
-		typeof action.name === 'function' ? action.name(entry) : action.name;
-
-	const actionTitleKey = `${action.source}.action.${actionName}.title`;
-
-	const translationsKeys = useMemo(
-		() => [actionTitleKey] as const,
-		[actionTitleKey],
-	);
-
-	const { translations } = useTranslation(translationsKeys);
-
-	if (!actionName) {
-		return value;
-	}
-
-	const triggerAction = () => {
-		const event = new CustomEvent('useDataTableAction', {
-			detail: {
-				source: action.source,
-				actionName: actionName,
-				entry,
-			},
-		});
-
-		window.dispatchEvent(event);
-	};
+	const { showToast } = useToast();
 
 	return (
 		<button
 			type="button"
-			onClick={triggerAction}
-			title={translations[actionTitleKey]}
 			className="cursor-pointer hover:underline"
+			onClick={async () => {
+				try {
+					const entry =
+						typeof entryOrId === 'number'
+							? await requestView<Entry>(dataSource, entryOrId)
+							: entryOrId;
+
+					dispatchDataTableAction({
+						dataSource,
+						action,
+						entries: [entry],
+					});
+				} catch (error) {
+					showToast({
+						severity: 'error',
+						summary: `Failed to resolve entry for action "${action}"`,
+						detail: getErrorMessage(error),
+					});
+				}
+			}}
+			title={buttonProps.title}
 		>
-			{value}
+			{buttonProps.label}
 		</button>
 	);
 };
 
-export const DataTableValue = <Model extends Record<string, unknown>>(
-	entry: Model,
-	column: DataTableColumnType<Model>,
-	options: DataTableValueOptionsType<Model>,
+export const DataTableValue = <Entry extends Record<string, unknown>>(
+	entry: Entry,
+	column: DataTableColumnType<Entry>,
+	options: DataTableValueOptionsType<Entry>,
 ) => {
 	let outputValue: string | JSX.Element;
 
@@ -185,11 +88,11 @@ export const DataTableValue = <Model extends Record<string, unknown>>(
 		}
 	}
 
-	if (options.capitalize) {
+	if (options.capitalize && typeof outputValue === 'string') {
 		outputValue = capitalizeFirstLetter(outputValue);
 	}
 
-	if (options.displayDate) {
+	if (options.displayDate && typeof outputValue === 'string') {
 		outputValue = formatDate(outputValue, 'date-time') || '-';
 	}
 
@@ -209,14 +112,25 @@ export const DataTableValue = <Model extends Record<string, unknown>>(
 		);
 	}
 
-	if (options.action) {
-		outputValue = (
-			<DisplayAction
-				value={outputValue}
-				action={options.action}
-				entry={entry}
-			/>
-		);
+	if (options.displayButton) {
+		const { action, dataSource } = options.displayButton;
+
+		const resolvedAction =
+			typeof action === 'function' ? action(entry) : action;
+
+		if (resolvedAction) {
+			outputValue = (
+				<DisplayButton
+					buttonProps={{
+						label: outputValue,
+						title: options.displayButton.altTitle,
+					}}
+					action={resolvedAction}
+					dataSource={dataSource}
+					entryOrId={options.displayButton.alternateEntryId ?? entry}
+				/>
+			);
+		}
 	}
 
 	return outputValue;

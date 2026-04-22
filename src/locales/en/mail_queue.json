@@ -10,45 +10,11 @@
 			"confirmText": "Are you sure you want to delete the selected mail queue record(s)?"
 		},
 		"view": {
-			"title": "Mail queue details",
+			"title": "Mail queue - {{entry}}",
 			"label": "View"
 		},
 		"viewTemplate": {
-			"title": "Template details",
 			"label": "View template"
 		}
-	},
-	"data_table": {
-		"column_id": "ID",
-		"column_template": "Template",
-		"column_to": "To",
-		"column_status": "Status",
-		"column_sent_at": "Sent At"
-	},
-	"form_filters": {
-		"label_sent_date_start": "Sent Date",
-		"label_status": "Status",
-		"label_template": "Template",
-		"label_content": "Content",
-		"label_to": "To"
-	},
-	"view": {
-		"section_details": "Details",
-		"label_id": "ID:",
-		"label_template": "Template:",
-		"label_language": "Language:",
-		"label_created_at": "Created At:",
-		"label_updated_at": "Updated At:",
-		"section_status": "Status",
-		"label_status": "Status:",
-		"label_error": "Error:",
-		"label_sent_at": "Sent At:",
-		"label_to": "To:",
-		"label_from": "From:",
-		"section_content": "Content",
-		"label_layout": "Layout:",
-		"label_subject": "Subject:",
-		"label_html": "HTML:",
-		"label_vars": "Vars:"
 	}
 }

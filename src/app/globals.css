@@ -283,7 +283,7 @@
 	}
 
 	.form-section .form-error {
-		@apply flex items-center gap-1.5 text-error;
+		@apply text-error;
 	}
 
 	/* Dashboard related */
@@ -331,7 +331,7 @@
 	}
 
 	.dashboard-layout .p-paginator.data-table-paginator {
-		@apply relative !border-b-0;
+		@apply relative border-b-0!;
 	}
 
 	.dashboard-layout

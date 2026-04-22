@@ -1,122 +1,28 @@
-import type { DataTableColumnType } from '@/app/(dashboard)/_components/data-table-value';
+import type React from 'react';
+import type { JSX } from 'react';
 import type {
-	ButtonHover,
-	ButtonSize,
-	ButtonVariant,
-} from '@/components/ui/button';
-import type { ValidateFormFunctionType } from '@/hooks/use-form-validation.hook';
-import type { ApiResponseFetch } from '@/types/api.type';
-import type { FormSituationType } from '@/types/form.type';
-
-// ============================================================================
-// API Function Types
-// ============================================================================
-
-export type FindFunctionParamsType = {
-	order_by?: string;
-	direction?: 'ASC' | 'DESC';
-	limit?: number;
-	page?: number;
-	filter?: string;
-};
-
-export type FindFunctionResponseType<Model> = {
-	entries: Model[];
-	pagination: {
-		page: number;
-		limit: number;
-		total: number;
-	};
-};
-
-export type FindFunctionType<Model> = (
-	params: FindFunctionParamsType,
-) => Promise<FindFunctionResponseType<Model> | undefined>;
-
-export type CreateFunctionType<
-	Model,
-	FormValues extends FormStateValuesType,
-> = (data: FormValues) => Promise<ApiResponseFetch<Partial<Model>>>;
-
-export type UpdateFunctionType<
-	Model,
-	FormValues extends FormStateValuesType,
-> = (data: FormValues, id: number) => Promise<ApiResponseFetch<Partial<Model>>>;
-
-export type DeleteFunctionType = (
-	ids: number[],
-) => Promise<ApiResponseFetch<null>>;
-
-// ============================================================================
-// Form Types
-// ============================================================================
-
-export type FormStateValuesType = Record<string, unknown>;
-type EmptyFormValues = Record<never, never>;
-
-export type FormStateType<
-	K extends DataSourceKey,
-	Model,
-	FormValues extends FormStateValuesType,
-> = {
-	dataSource: K;
-	id?: number;
-	values: FormValues;
-	errors: Partial<Record<keyof FormValues, string[]>>;
-	message: string | null;
-	situation: FormSituationType;
-	resultData?: Partial<Model>;
-};
-
-export type FormManageType<FormValues extends FormStateValuesType> = {
-	actionName: 'create' | 'update';
-	formValues: FormValues;
-	errors: Partial<Record<keyof FormValues, string[]>>;
-	handleChange: (
-		field: keyof FormValues,
-		value: string | boolean | number | Date | null,
-	) => void;
-	pending: boolean;
-};
-
-export type ValidateGetFormValuesFunctionType<FormValues> = (
-	formData: FormData,
-) => FormValues;
-
-export type ValidateSyncFormStateFunctionType<
-	K extends DataSourceKey,
-	Entity,
-	FormValues extends FormStateValuesType,
-> = (
-	state: FormStateType<K, Entity, FormValues>,
-	model: Entity,
-) => FormStateType<K, Entity, FormValues>;
-
-// ============================================================================
-// Action Types
-// ============================================================================
-
-type DataTableActionType = 'view' | 'create' | 'update' | 'delete';
-type DataTableActionMode = 'form' | 'action' | 'other';
-type DataTableEntryRequirement = 'free' | 'single' | 'multiple';
-type DataTableActionPosition = 'left' | 'right' | 'hidden';
-export type DataTableActionButtonPropsType = {
-	className?: string;
-	variant?: ButtonVariant;
-	size?: ButtonSize;
-	hover?: ButtonHover;
-};
-
-export type DataTableActionConfigType<Model, Function> = {
-	type?: DataTableActionType;
-	mode: DataTableActionMode;
-	permission: string;
-	allowedEntries: DataTableEntryRequirement;
-	customEntryCheck?: (entry: Model) => boolean;
-	position: DataTableActionPosition;
-	function?: Function;
-	buttonProps?: DataTableActionButtonPropsType;
-};
+	ActionEventType,
+	ActionOperationMultipleFunctionType,
+	ActionOperationSingleFunctionType,
+	CreateFunctionType,
+	DisplayEntryLabelFnType,
+	EntriesSelectionType,
+	FindFunctionType,
+	OperationFunctionType,
+	ReloadEntryFnType,
+	UpdateFunctionType,
+} from '@/types/action.type';
+import type {
+	FormValuesType,
+	GetFormStateFnType,
+	GetFormValuesFnType,
+	ValidateFormFnType,
+} from '@/types/form.type';
+import type { ActionButtonPropsType } from '@/types/html.type';
+import type {
+	WindowConfigPropsType,
+	WindowEntryType,
+} from '@/types/window.type';
 
 // ============================================================================
 // Data Table Types
@@ -124,19 +30,20 @@ export type DataTableActionConfigType<Model, Function> = {
 
 export type DataTableSelectionModeType = 'checkbox' | 'multiple' | null;
 
-export type FilterValueType = string | number | boolean | Date | null;
-
-type DataTableBaseFilterType = {
-	value: FilterValueType;
-	matchMode?: 'contains' | 'equals' | 'startsWith' | 'endsWith' | 'gt' | 'lt';
-};
-
 export type DataTableFiltersType = {
-	[key: string]: DataTableBaseFilterType;
+	[key: string]: {
+		value: string | number | boolean | Date | null;
+		matchMode:
+			| 'contains'
+			| 'equals'
+			| 'startsWith'
+			| 'endsWith'
+			| 'gt'
+			| 'lt';
+	};
 };
 
 export type DataTableStateType = {
-	reloadTrigger: number; // Flag used to reload the data table entries
 	first: number;
 	rows: number;
 	sortField: string;
@@ -144,103 +51,215 @@ export type DataTableStateType = {
 	filters: DataTableFiltersType;
 };
 
-export type DisplayActionEntriesFunctionType<Entity> = (
-	entries: Entity[],
-) => Array<{ id: number; label: string }>;
+export type DataTableColumnType<Entry> = {
+	field: string;
+	header: string;
+	sortable?: boolean;
+	body?: (
+		entry: Entry,
+		column: DataTableColumnType<Entry>,
+	) => JSX.Element | string;
+	style?: React.CSSProperties;
+};
 
-export type DataTableActionsType<
-	Model,
-	FormValues extends FormStateValuesType,
+export type DataTableValueOptionsType<Entry> = {
+	customValue?: string | JSX.Element;
+	capitalize?: boolean;
+	markDeleted?: boolean;
+	isStatus?: boolean;
+	displayDate?: boolean;
+	displayButton?: {
+		action: string | ((entry: Entry) => string | undefined);
+		dataSource: DataSourceKey;
+		altTitle?: string;
+		alternateEntryId?: number;
+	};
+};
+
+// ============================================================================
+// Action Types
+// ============================================================================
+
+type ActionConfigBase<
+	Entry extends WindowEntryType,
+	FormValues extends FormValuesType,
 > = {
-	[key: string]: DataTableActionConfigType<Model, unknown>;
+	windowTitle: string;
+	// biome-ignore lint/suspicious/noExplicitAny: It's fine
+	windowComponent?: React.ComponentType<any>; // e.g: ViewUser, FormManageUser, SetupPermissionsUser, etc.
+	windowConfigProps?: WindowConfigPropsType;
+
+	permission: string; // Related to auth policy (e.g.: 'users.create')
+	customEntryCheck?: (entry: Entry) => boolean; // Additional function to check if the action is available (hint: active users cannot have `active` action)
+	buttonPosition: 'left' | 'right' | 'hidden'; // Describe where the action button should be placed in data-table
+	button?: ActionButtonPropsType; // Action button configuration
+
+	operationFunction?: OperationFunctionType<Entry, FormValues>; // e.g: createUser, updateUser, etc.
+	reloadEntry?: ReloadEntryFnType<Entry>; // Used to reload entry data for form and view; the entry passed from the list may not have all the data
+
+	// Form-related
+	validateForm?: ValidateFormFnType<FormValues>;
+	getFormValues?: GetFormValuesFnType<FormValues>;
+	getFormState?: GetFormStateFnType<FormValues, Entry>;
+
+	events?: Partial<Record<'success' | 'error', ActionEventType<Entry>>>;
+};
+
+// Each variant enforces the valid windowType <-> entriesSelection correlation
+type FormCreateActionConfig<
+	Entry extends WindowEntryType,
+	FormValues extends FormValuesType,
+> = ActionConfigBase<Entry, FormValues> & {
+	windowType: 'form';
+	entriesSelection: 'free';
+	operationFunction: CreateFunctionType<Entry, FormValues>;
+	validateForm: ValidateFormFnType<FormValues>;
+	getFormValues: GetFormValuesFnType<FormValues>;
+	getFormState: GetFormStateFnType<FormValues, Entry>;
+};
+
+type FormUpdateActionConfig<
+	Entry extends WindowEntryType,
+	FormValues extends FormValuesType,
+> = ActionConfigBase<Entry, FormValues> & {
+	windowType: 'form';
+	entriesSelection: 'single';
+	operationFunction: UpdateFunctionType<Entry, FormValues>;
+	validateForm: ValidateFormFnType<FormValues>;
+	getFormValues: GetFormValuesFnType<FormValues>;
+	getFormState: GetFormStateFnType<FormValues, Entry>;
+	reloadEntry?: ReloadEntryFnType<Entry>;
+};
+
+type SingleActionConfig<
+	Entry extends WindowEntryType,
+	FormValues extends FormValuesType,
+> = ActionConfigBase<Entry, FormValues> & {
+	windowType: 'action';
+	entriesSelection: 'single';
+	operationFunction: ActionOperationSingleFunctionType<Entry>;
+};
+
+type MultipleActionConfig<
+	Entry extends WindowEntryType,
+	FormValues extends FormValuesType,
+> = ActionConfigBase<Entry, FormValues> & {
+	windowType: 'action';
+	entriesSelection: 'multiple';
+	operationFunction: ActionOperationMultipleFunctionType;
+};
+
+type ViewActionConfig<
+	Entry extends WindowEntryType,
+	FormValues extends FormValuesType,
+> = ActionConfigBase<Entry, FormValues> & {
+	windowType: 'view';
+	entriesSelection: 'single';
+	operationFunction?: never;
+	reloadEntry?: ReloadEntryFnType<Entry>;
+};
+
+type OtherActionConfig<
+	Entry extends WindowEntryType,
+	FormValues extends FormValuesType,
+> = ActionConfigBase<Entry, FormValues> & {
+	windowType: 'other';
+	entriesSelection: EntriesSelectionType;
+	operationFunction?: never;
+};
+
+export type ActionConfigType<
+	Entry extends WindowEntryType = WindowEntryType,
+	FormValues extends FormValuesType = FormValuesType,
+> =
+	| FormCreateActionConfig<Entry, FormValues>
+	| FormUpdateActionConfig<Entry, FormValues>
+	| SingleActionConfig<Entry, FormValues>
+	| MultipleActionConfig<Entry, FormValues>
+	| ViewActionConfig<Entry, FormValues>
+	| OtherActionConfig<Entry, FormValues>;
+
+export type ActionsType<
+	Entry extends WindowEntryType,
+	FormValues extends FormValuesType = FormValuesType,
+> = {
+	[key: string]: ActionConfigType<Entry, FormValues>;
 } & {
-	create?: DataTableActionConfigType<
-		Model,
-		CreateFunctionType<Model, FormValues>
-	>;
-	update?: DataTableActionConfigType<
-		Model,
-		UpdateFunctionType<Model, FormValues>
-	>;
-	delete?: DataTableActionConfigType<Model, DeleteFunctionType>;
+	create?: FormCreateActionConfig<Entry, FormValues>;
+	update?: FormUpdateActionConfig<Entry, FormValues>;
+	delete?:
+		| SingleActionConfig<Entry, FormValues>
+		| MultipleActionConfig<Entry, FormValues>;
+	restore?:
+		| SingleActionConfig<Entry, FormValues>
+		| MultipleActionConfig<Entry, FormValues>;
 };
 
 // ============================================================================
 // Data Source
 // ============================================================================
 
-export type BaseModelType = {
-	id: number;
-};
-
 export type DataSourceKey =
+	| 'brands'
+	| 'cash-flow'
+	| 'client-address'
+	| 'clients'
 	| 'cron-history'
 	| 'log-data'
 	| 'log-history'
 	| 'mail-queue'
 	| 'permissions'
+	| 'places'
 	| 'templates'
 	| 'users';
 
-const dataSourceConfig: Partial<
-	// biome-ignore lint/suspicious/noExplicitAny: Concrete types are enforced at the public API boundary (register/get),
-	Record<DataSourceKey, DataSourceConfigType<any, any, any>>
-> = {};
-
 export type DataSourceConfigType<
-	K extends DataSourceKey,
-	Entity,
-	FormValues extends FormStateValuesType = EmptyFormValues,
+	Entry extends WindowEntryType,
+	FormValues extends FormValuesType = FormValuesType,
 > = {
-	dataTableState: DataTableStateType;
-	dataTableColumns: DataTableColumnType<Entity>[];
-	formState?: FormStateType<K, Entity, FormValues>;
-	functions: {
-		find: FindFunctionType<Entity>;
-		onRowSelect?: (entry: Entity) => void;
-		onRowUnselect?: (entry: Entity) => void;
-		displayActionEntries?: DisplayActionEntriesFunctionType<Entity>;
-	} & (FormValues extends EmptyFormValues
-		? object
-		: {
-				validateForm: ValidateFormFunctionType<FormValues>;
-				getFormValues: ValidateGetFormValuesFunctionType<FormValues>;
-				syncFormState: ValidateSyncFormStateFunctionType<
-					K,
-					Entity,
-					FormValues
-				>;
-			});
-	actions?: DataTableActionsType<Entity, FormValues>;
+	dataTable: {
+		state: DataTableStateType;
+		columns: DataTableColumnType<Entry>[];
+		find: FindFunctionType<Entry>;
+		onRowSelect?: (entry: Entry) => void;
+		onRowUnselect?: (entry: Entry) => void;
+	};
+	displayEntryLabel?: DisplayEntryLabelFnType<Entry>;
+	actions?: ActionsType<Entry, FormValues>;
 };
+
+const registry: Partial<
+	// biome-ignore lint/suspicious/noExplicitAny: It's fine
+	Record<DataSourceKey, DataSourceConfigType<any, any>>
+> = {};
 
 export function registerDataSource<
 	K extends DataSourceKey,
-	Entity,
-	FormValues extends FormStateValuesType = EmptyFormValues,
->(key: K, config: DataSourceConfigType<K, Entity, FormValues>) {
+	Entry extends WindowEntryType,
+	FormValues extends FormValuesType,
+>(key: K, config: DataSourceConfigType<Entry, FormValues>) {
 	if (hasDataSourceConfig(key)) {
 		return;
 	}
 
-	dataSourceConfig[key] = config;
+	registry[key] = config;
+}
+
+export function hasDataSourceConfig<K extends DataSourceKey>(key: K): boolean {
+	return !!registry[key];
 }
 
 export function getDataSourceConfig<
 	K extends DataSourceKey,
-	Entity,
-	FormValues extends FormStateValuesType,
-	P extends keyof DataSourceConfigType<K, Entity, FormValues>,
->(key: K, prop: P): DataSourceConfigType<K, Entity, FormValues>[P] {
-	const config = dataSourceConfig[key];
+	// biome-ignore lint/suspicious/noExplicitAny: It's fine
+	P extends keyof DataSourceConfigType<any, any>,
+	// biome-ignore lint/suspicious/noExplicitAny: It's fine
+>(key: K, prop: P): DataSourceConfigType<any, any>[P] {
+	const config = registry[key];
 
 	if (!config) {
 		throw new Error(`DataSource "${key}" is not registered`);
 	}
 
 	return config[prop];
-}
-
-export function hasDataSourceConfig<K extends DataSourceKey>(key: K): boolean {
-	return !!dataSourceConfig[key];
 }

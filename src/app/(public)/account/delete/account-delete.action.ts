@@ -1,73 +1,53 @@
 import {
-	type AccountDeleteFormFieldsType,
-	AccountDeleteSchema,
+	type AccountDeleteFormValuesType,
 	type AccountDeleteSituationType,
 	type AccountDeleteStateType,
+	getAccountDeleteFormValues,
+	validateFormAccountDelete,
 } from '@/app/(public)/account/delete/account-delete.definition';
-import { Configuration } from '@/config/settings.config';
 import { translate } from '@/config/translate.setup';
 import { ApiError } from '@/exceptions/api.error';
 import { accumulateZodErrors } from '@/helpers/form.helper';
 import { isValidCsrfToken } from '@/helpers/session.helper';
-import { deleteAccount } from '@/services/account.service';
-
-export function accountDeleteFormValues(
-	formData: FormData,
-): AccountDeleteFormFieldsType {
-	return {
-		password_current: formData.get('password_current') as string,
-	};
-}
-
-export function accountDeleteValidate(values: AccountDeleteFormFieldsType) {
-	return AccountDeleteSchema.safeParse(values);
-}
+import { requestDeleteAccount } from '@/services/account.service';
 
 export async function accountDeleteAction(
-	state: AccountDeleteStateType,
+	formState: AccountDeleteStateType,
 	formData: FormData,
 ): Promise<AccountDeleteStateType> {
-	const values = accountDeleteFormValues(formData);
-	const validated = accountDeleteValidate(values);
-
-	const result: AccountDeleteStateType = {
-		...state, // Spread existing state
-		values, // Override with new values
-		message: null,
-		situation: null,
-	};
-
-	// Check CSRF token
-	const csrfToken = formData.get(
-		Configuration.get('csrf.inputName') as string,
-	) as string;
-
-	if (!(await isValidCsrfToken(csrfToken))) {
+	if (!(await isValidCsrfToken(formData))) {
 		return {
-			...result,
+			...formState,
 			message: await translate('app.error.csrf'),
 			situation: 'csrf_error',
 		};
 	}
 
+	const formValues = getAccountDeleteFormValues(formData);
+	const validated = validateFormAccountDelete(formValues);
+
 	if (!validated.success) {
+		const errors = accumulateZodErrors<AccountDeleteFormValuesType>(
+			validated.error,
+		);
+
 		return {
-			...result,
+			...formState,
+			values: formValues,
 			situation: 'error',
-			errors: accumulateZodErrors<AccountDeleteFormFieldsType>(
-				validated.error,
-			),
+			message: await translate('app.error.validation'),
+			errors,
 		};
 	}
 
 	try {
-		const fetchResponse = await deleteAccount(validated.data);
+		const requestResponse = await requestDeleteAccount(validated.data);
 
 		return {
-			...result,
-			errors: {},
-			message: fetchResponse?.message || null,
-			situation: fetchResponse?.success ? 'success' : 'error',
+			...formState,
+			values: validated.data,
+			message: requestResponse?.message || null,
+			situation: requestResponse?.success ? 'success' : 'error',
 		};
 	} catch (error: unknown) {
 		let message: string = '';
@@ -77,15 +57,15 @@ export async function accountDeleteAction(
 			switch (error.status) {
 				case 401:
 					message = await translate(
-						'account-delete.validation.password_current_incorrect',
+						'account-delete.error.password_current_incorrect',
 					);
 					break;
 			}
 		}
 
 		return {
-			...result,
-			errors: {},
+			...formState,
+			values: validated.data,
 			message: message || (await translate('app.error.form')),
 			situation: situation,
 		};

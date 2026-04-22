@@ -3,17 +3,17 @@
 		"title": "Create account | {{app_name}}"
 	},
 	"validation": {
-		"name_invalid": "Please enter your name",
+		"invalid_name": "Please enter your name",
 		"name_min": "Name must be at least {{min}} characters long",
-		"email_invalid": "Please enter a valid email address",
-		"password_invalid": "Please create a password",
+		"invalid_email": "Please enter a valid email address",
+		"invalid_password": "Please create a password",
 		"password_min": "Password must be at least {{min}} characters long",
 		"password_condition_capital_letter": "Password must contain at least one capital letter",
 		"password_condition_number": "Password must contain at least one number",
 		"password_condition_special_character": "Password must contain at least one special character",
 		"password_confirm_required": "Please confirm your password",
 		"password_confirm_mismatch": "Passwords do not match",
-		"language_invalid": "Please select a valid language",
+		"invalid_language": "Please select a valid language",
 		"terms_required": "You must accept the terms and conditions to continue",
 		"email_already_used": "This email address is already registered"
 	},

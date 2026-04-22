@@ -3,8 +3,8 @@
 		"title": "Permissions - Dashboard | {{app_name}}"
 	},
 	"validation": {
-		"entity_invalid": "Select an entity",
-		"operation_invalid": "Select an operation"
+		"invalid_entity": "Select an entity",
+		"invalid_operation": "Select an operation"
 	},
 	"action": {
 		"create": {
@@ -29,17 +29,5 @@
 			"success": "Permission restored",
 			"confirmText": "Are you sure you want to restore this permission?"
 		}
-	},
-	"data_table": {
-		"column_id": "ID",
-		"column_entity": "Entity",
-		"column_operation": "Operation"
-	},
-	"form_filters": {
-		"label_global": "ID / Entity / Operation"
-	},
-	"form_manage": {
-		"label_entity": "Entity:",
-		"label_operation": "Operation:"
 	}
 }

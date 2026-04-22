@@ -3,6 +3,7 @@ import type React from 'react';
 import type { AuthModel } from '@/models/auth.model';
 import { AuthProvider } from '@/providers/auth.provider';
 import { PrimeProvider } from '@/providers/prime.provider';
+import { QueryProvider } from '@/providers/query-client.provider';
 import { ThemeProvider } from '@/providers/theme.provider';
 import { ToastProvider } from '@/providers/toast.provider';
 
@@ -22,7 +23,11 @@ export async function Providers({ children }: { children: React.ReactNode }) {
 		<ThemeProvider>
 			<PrimeProvider>
 				<ToastProvider>
-					<AuthProvider initAuth={initAuth}>{children}</AuthProvider>
+					<QueryProvider>
+						<AuthProvider initAuth={initAuth}>
+							{children}
+						</AuthProvider>
+					</QueryProvider>
 				</ToastProvider>
 			</PrimeProvider>
 		</ThemeProvider>

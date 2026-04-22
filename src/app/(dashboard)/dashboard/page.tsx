@@ -1,16 +1,16 @@
 import {
 	ArrowUpRight,
+	BanknoteArrowDown,
 	DollarSign,
-	Eye,
-	FileText,
+	Hourglass,
 	MoreHorizontal,
 	TrendingDown,
 	TrendingUp,
-	Users,
+	Truck,
 } from 'lucide-react';
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { Card } from 'primereact/card';
-import BreadcrumbSetter from '@/app/(dashboard)/_components/breadcrumb.setter';
 import { Button } from '@/components/ui/button';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -19,6 +19,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import Routes from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
 import { translate } from '@/config/translate.setup';
 import { cn } from '@/helpers/css.helper';
@@ -34,31 +35,31 @@ export async function generateMetadata(): Promise<Metadata> {
 const stats = [
 	{
 		id: 1,
-		title: 'Total Entries',
+		title: 'CMRs',
 		value: '1,284',
 		change: '+12%',
 		trend: 'up',
-		icon: FileText,
+		icon: Truck,
 	},
 	{
 		id: 2,
-		title: 'Active Users',
+		title: 'Working Hours',
 		value: '892',
 		change: '+8%',
 		trend: 'up',
-		icon: Users,
+		icon: Hourglass,
 	},
 	{
 		id: 3,
-		title: 'Page Views',
+		title: 'Expenses',
 		value: '24.5K',
 		change: '-3%',
 		trend: 'down',
-		icon: Eye,
+		icon: BanknoteArrowDown,
 	},
 	{
 		id: 4,
-		title: 'Revenue',
+		title: 'Revenues',
 		value: '$12,840',
 		change: '+18%',
 		trend: 'up',
@@ -105,10 +106,8 @@ const topEntries = [
 export default async function Page() {
 	return (
 		<>
-			<BreadcrumbSetter page={null} items={[]} />
-
 			{/* Stats grid */}
-			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+			<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-6">
 				{stats.map((stat) => (
 					<Card key={stat.id} className="card-hover">
 						<CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -141,127 +140,191 @@ export default async function Page() {
 				))}
 			</div>
 
-			{/* Charts and tables */}
-			<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-				{/* Chart placeholder */}
+			<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+				{/* Recent activity */}
 				<Card>
 					<CardHeader className="flex flex-row items-center justify-between">
-						<CardTitle>Analytics Overview</CardTitle>
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<Button variant="ghost" className="h-8 w-8">
-									<MoreHorizontal className="h-4 w-4" />
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent align="end">
-								<DropdownMenuItem>Last 7 days</DropdownMenuItem>
-								<DropdownMenuItem>
-									Last 30 days
-								</DropdownMenuItem>
-								<DropdownMenuItem>
-									Last 90 days
-								</DropdownMenuItem>
-							</DropdownMenuContent>
-						</DropdownMenu>
-					</CardHeader>
-					<CardContent>
-						{/* Placeholder chart visualization */}
-						<div className="h-64 flex items-end gap-2">
-							{[
-								40, 65, 45, 80, 55, 70, 90, 60, 75, 85, 50, 95,
-							].map((height) => (
-								<div
-									key={height}
-									className="flex-1 bg-primary/20 rounded-t-md transition-all hover:bg-primary/40"
-									style={{ height: `${height}%` }}
-								/>
-							))}
-						</div>
-						<div className="flex justify-between mt-2 text-xs text-muted-foreground">
-							<span>Jan</span>
-							<span>Feb</span>
-							<span>Mar</span>
-							<span>Apr</span>
-							<span>May</span>
-							<span>Jun</span>
-							<span>Jul</span>
-							<span>Aug</span>
-							<span>Sep</span>
-							<span>Oct</span>
-							<span>Nov</span>
-							<span>Dec</span>
-						</div>
-					</CardContent>
-				</Card>
-
-				{/* Top entries */}
-				<Card>
-					<CardHeader className="flex flex-row items-center justify-between">
-						<CardTitle>Top Entries</CardTitle>
-						<Button variant="ghost" size="sm" className="gap-1">
-							View all <ArrowUpRight className="h-4 w-4" />
-						</Button>
+						<CardTitle>Recent Activity</CardTitle>
+						<Link href={Routes.get('log-history')}>
+							<Button variant="ghost" size="sm" className="gap-1">
+								View more <ArrowUpRight className="h-4 w-4" />
+							</Button>
+						</Link>
 					</CardHeader>
 					<CardContent>
 						<div className="space-y-4">
-							{topEntries.map((entry, i) => (
+							{recentActivity.map((activity) => (
 								<div
-									key={entry.id}
-									className="flex items-center justify-between"
+									key={activity.id}
+									className="flex items-center justify-between py-2 border-b border-border last:border-0"
 								>
-									<div className="flex items-center gap-3">
-										<span className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-sm font-medium">
-											{i + 1}
-										</span>
-										<span className="font-medium">
-											{entry.title}
-										</span>
+									<div>
+										<p className="font-medium">
+											{activity.action}
+										</p>
+										<p className="text-sm text-muted-foreground">
+											by {activity.user}
+										</p>
 									</div>
-									<div className="flex items-center gap-2">
-										<span className="text-sm text-muted-foreground">
-											{entry.views.toLocaleString()} views
-										</span>
-										{entry.trend === 'up' ? (
-											<TrendingUp className="h-4 w-4 text-success" />
-										) : (
-											<TrendingDown className="h-4 w-4 text-error" />
-										)}
-									</div>
+									<span className="text-sm text-muted-foreground">
+										{activity.time}
+									</span>
 								</div>
 							))}
 						</div>
 					</CardContent>
 				</Card>
-			</div>
 
-			{/* Recent activity */}
-			<Card>
-				<CardHeader>
-					<CardTitle>Recent Activity</CardTitle>
-				</CardHeader>
-				<CardContent>
-					<div className="space-y-4">
-						{recentActivity.map((activity) => (
-							<div
-								key={activity.id}
-								className="flex items-center justify-between py-2 border-b border-border last:border-0"
-							>
-								<div>
-									<p className="font-medium">
-										{activity.action}
-									</p>
-									<p className="text-sm text-muted-foreground">
-										by {activity.user}
-									</p>
-								</div>
-								<span className="text-sm text-muted-foreground">
-									{activity.time}
-								</span>
+				<div className="space-y-6">
+					{/* Work Sessions */}
+					<Card>
+						<CardHeader className="flex flex-row items-center justify-between">
+							<CardTitle>Work Sessions</CardTitle>
+							<Link href="#">
+								<Button
+									variant="ghost"
+									size="sm"
+									className="gap-1"
+								>
+									View all{' '}
+									<ArrowUpRight className="h-4 w-4" />
+								</Button>
+							</Link>
+						</CardHeader>
+						<CardContent>
+							<div className="space-y-4">
+								{topEntries.map((entry, i) => (
+									<div
+										key={entry.id}
+										className="flex items-center justify-between"
+									>
+										<div className="flex items-center gap-3">
+											<span className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-sm font-medium">
+												{i + 1}
+											</span>
+											<span className="font-medium">
+												{entry.title}
+											</span>
+										</div>
+										<div className="flex items-center gap-2">
+											<span className="text-sm text-muted-foreground">
+												{entry.views.toLocaleString()}{' '}
+												views
+											</span>
+											{entry.trend === 'up' ? (
+												<TrendingUp className="h-4 w-4 text-success" />
+											) : (
+												<TrendingDown className="h-4 w-4 text-error" />
+											)}
+										</div>
+									</div>
+								))}
 							</div>
-						))}
-					</div>
-				</CardContent>
-			</Card>
+						</CardContent>
+					</Card>
+
+					{/* Latest CMRs */}
+					<Card>
+						<CardHeader className="flex flex-row items-center justify-between">
+							<CardTitle>Latest CMRs</CardTitle>
+							<Link href="#">
+								<Button
+									variant="ghost"
+									size="sm"
+									className="gap-1"
+								>
+									View all{' '}
+									<ArrowUpRight className="h-4 w-4" />
+								</Button>
+							</Link>
+						</CardHeader>
+						<CardContent>
+							<div className="space-y-4">
+								{topEntries.map((entry, i) => (
+									<div
+										key={entry.id}
+										className="flex items-center justify-between"
+									>
+										<div className="flex items-center gap-3">
+											<span className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-sm font-medium">
+												{i + 1}
+											</span>
+											<span className="font-medium">
+												{entry.title}
+											</span>
+										</div>
+										<div className="flex items-center gap-2">
+											<span className="text-sm text-muted-foreground">
+												{entry.views.toLocaleString()}{' '}
+												views
+											</span>
+											{entry.trend === 'up' ? (
+												<TrendingUp className="h-4 w-4 text-success" />
+											) : (
+												<TrendingDown className="h-4 w-4 text-error" />
+											)}
+										</div>
+									</div>
+								))}
+							</div>
+						</CardContent>
+					</Card>
+
+					{/* Chart placeholder */}
+					<Card>
+						<CardHeader className="flex flex-row items-center justify-between">
+							<CardTitle>Analytics Overview</CardTitle>
+							<DropdownMenu>
+								<DropdownMenuTrigger asChild>
+									<Button variant="ghost" className="h-8 w-8">
+										<MoreHorizontal className="h-4 w-4" />
+									</Button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent align="end">
+									<DropdownMenuItem>
+										Last 7 days
+									</DropdownMenuItem>
+									<DropdownMenuItem>
+										Last 30 days
+									</DropdownMenuItem>
+									<DropdownMenuItem>
+										Last 90 days
+									</DropdownMenuItem>
+								</DropdownMenuContent>
+							</DropdownMenu>
+						</CardHeader>
+						<CardContent>
+							{/* Placeholder chart visualization */}
+							<div className="h-64 flex items-end gap-2">
+								{[
+									40, 65, 45, 80, 55, 70, 90, 60, 75, 85, 50,
+									95,
+								].map((height) => (
+									<div
+										key={height}
+										className="flex-1 bg-primary/20 rounded-t-md transition-all hover:bg-primary/40"
+										style={{ height: `${height}%` }}
+									/>
+								))}
+							</div>
+							<div className="flex justify-between mt-2 text-xs text-muted-foreground">
+								<span>Jan</span>
+								<span>Feb</span>
+								<span>Mar</span>
+								<span>Apr</span>
+								<span>May</span>
+								<span>Jun</span>
+								<span>Jul</span>
+								<span>Aug</span>
+								<span>Sep</span>
+								<span>Oct</span>
+								<span>Nov</span>
+								<span>Dec</span>
+							</div>
+						</CardContent>
+					</Card>
+				</div>
+			</div>
 		</>
 	);
 }

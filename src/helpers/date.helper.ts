@@ -3,11 +3,22 @@ import dayjs from '@/config/dayjs.config';
 const DEFAULT_DATE_FORMAT = 'YYYY-MM-DD';
 
 /**
- * Checks if a value is a valid Date object
- * @param date - The value to check
- * @returns `true` if the value is a valid Date object, `false` otherwise
+ * Check if a string is a valid date
+ *
+ * @param {string} date - The date string to check
+ * @returns {boolean} - True if the date is valid, false otherwise
  */
-export function isValidDateInstance(date: unknown): date is Date {
+export function isValidDate(date: string): boolean {
+	return dayjs(date).isValid();
+}
+
+/**
+ * Checks if a value is a valid Date object
+ *
+ * @param date - The value to check
+ * @returns {boolean} - `true` if the value is a valid Date object, `false` otherwise
+ */
+function isValidDateInstance(date: unknown): date is Date {
 	return (
 		date instanceof Date &&
 		!Number.isNaN(date.getTime()) &&
@@ -18,9 +29,9 @@ export function isValidDateInstance(date: unknown): date is Date {
 /**
  * Converts a date string to a Date object with strict validation
  *
- * @returns Valid Date object
+ * @param {Date | string | null} date
  * @throws {Error} If the input is not a valid date string or cannot be parsed
- * @param date
+ * @returns Valid Date object
  */
 export function toDateInstance(date: Date | string | null): Date | null {
 	if (!date) {
@@ -110,8 +121,8 @@ export function toDateInstanceCustom(
  * Create a future date by adding seconds to the current date
  *
  * @param {number} seconds - The number of seconds to add
- * @returns {Date} - The future date
  * @throws {Error} - If seconds is a negative number
+ * @returns {Date} - The future date
  */
 export function createFutureDate(seconds: number): Date {
 	if (seconds <= 0) {
@@ -127,8 +138,8 @@ export function createFutureDate(seconds: number): Date {
  * Create a past date by subtracting seconds from the current date
  *
  * @param {number} seconds - The number of seconds to subtract
- * @returns {Date} - The past date
  * @throws {Error} - If seconds is a negative number
+ * @returns {Date} - The past date
  */
 export function createPastDate(seconds: number): Date {
 	if (seconds <= 0) {
@@ -145,8 +156,8 @@ export function createPastDate(seconds: number): Date {
  *
  * @param {Date} date1 - The first date
  * @param {Date} date2 - The second date
- * @returns {number} - The difference in seconds
  * @throws {Error} - If either date is invalid
+ * @returns {number} - The difference in seconds
  */
 export function dateDiffInSeconds(date1: Date, date2: Date): number {
 	if (!isValidDateInstance(date1)) {
@@ -164,6 +175,7 @@ export function dateDiffInSeconds(date1: Date, date2: Date): number {
  * Return the `date` if it is a valid `Date` instance, otherwise return `undefined`.
  *
  * @param date
+ * @returns {Date | undefined}
  */
 export function getValidDate(date: unknown): Date | undefined {
 	return isValidDateInstance(date) ? date : undefined;
@@ -220,4 +232,49 @@ export function formatDate(
 
 			return date.toISOString();
 	}
+}
+
+/**
+ * Converts a date string to a Date object with strict validation
+ *
+ * @param {string | null} value - The date string to convert (ISO 8601, RFC 2822, or other supported formats)
+ * @returns {Date | null}
+ * @throws {Error} If the input is not a valid date string or cannot be parsed
+ */
+export function stringToDate(value: string | null): Date | null {
+	if (!value) {
+		return null;
+	}
+
+	const trimmedString = value.trim();
+
+	if (!trimmedString) {
+		return null;
+	}
+
+	// Special handling for ISO 8601 date-only format (YYYY-MM-DD)
+	if (/^\d{4}-\d{2}-\d{2}$/.test(trimmedString)) {
+		const [year, month, day] = trimmedString.split('-').map(Number);
+		const date = new Date(Date.UTC(year, month - 1, day));
+
+		if (!isValidDateInstance(date)) {
+			throw new Error(`Invalid ISO date: ${trimmedString}`);
+		}
+
+		return date;
+	}
+
+	// General date parsing
+	const parsedDate = new Date(trimmedString);
+
+	if (!isValidDateInstance(parsedDate)) {
+		throw new Error(`Invalid date format: ${trimmedString}`);
+	}
+
+	// Additional validation for non-ISO formats
+	if (parsedDate.toString() === 'Invalid Date') {
+		throw new Error(`Unparsable date: ${trimmedString}`);
+	}
+
+	return parsedDate;
 }

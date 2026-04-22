@@ -1,39 +1,68 @@
 import { z } from 'zod';
-import type { FormStateType } from '@/config/data-source.config';
+import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
+import { FormManagePermission } from '@/app/(dashboard)/dashboard/permissions/form-manage-permission.component';
+import type {
+	DataSourceConfigType,
+	DataTableColumnType,
+} from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
+import { getFormDataAsString } from '@/helpers/form.helper';
+import {
+	requestCreate,
+	requestDelete,
+	requestFind,
+	requestRestore,
+	requestUpdate,
+} from '@/helpers/services.helper';
+import { BaseValidator } from '@/helpers/validator.helper';
 import type {
 	PermissionFormValuesType,
 	PermissionModel,
 } from '@/models/permission.model';
-import {
-	createPermissions,
-	deletePermissions,
-	findPermissions,
-	restorePermissions,
-	updatePermissions,
-} from '@/services/permissions.service';
+import type { FindFunctionParamsType } from '@/types/action.type';
+import type { FormStateType } from '@/types/form.type';
 
-const translations = await translateBatch([
-	'permissions.validation.entity_invalid',
-	'permissions.validation.operation_invalid',
-	'permissions.data_table.column_id',
-	'permissions.data_table.column_entity',
-	'permissions.data_table.column_operation',
-]);
+const translations = await translateBatch(
+	['create.title', 'update.title', 'delete.title', 'restore.title'],
+	'permissions.action',
+);
 
-const ValidateSchemaBasePermissions = z.object({
-	entity: z.string().trim().nonempty({
-		message: translations['permissions.validation.entity_invalid'],
-	}),
-	operation: z.string().trim().nonempty({
-		message: translations['permissions.validation.operation_invalid'],
-	}),
-});
+const validatorMessages = await BaseValidator.getValidatorMessages(
+	['invalid_entity', 'invalid_operation'] as const,
+	'permissions.validation',
+);
 
-function getFormValuesPermission(formData: FormData): PermissionFormValuesType {
+class PermissionValidator extends BaseValidator<typeof validatorMessages> {
+	manage = z.object({
+		entity: this.validateString(this.getMessage('invalid_entity')),
+		operation: this.validateString(this.getMessage('invalid_operation')),
+	});
+}
+
+function validateForm(values: PermissionFormValuesType) {
+	const validator = new PermissionValidator(validatorMessages);
+
+	return validator.manage.safeParse(values);
+}
+
+function getFormValues(formData: FormData): PermissionFormValuesType {
 	return {
-		entity: formData.get('entity') as string,
-		operation: formData.get('operation') as string,
+		entity: getFormDataAsString(formData, 'entity'),
+		operation: getFormDataAsString(formData, 'operation'),
+	};
+}
+
+function getFormState(
+	data?: PermissionModel,
+): FormStateType<PermissionFormValuesType> {
+	return {
+		errors: {},
+		message: null,
+		situation: null,
+		values: {
+			entity: data?.entity ?? null,
+			operation: data?.operation ?? null,
+		},
 	};
 }
 
@@ -47,122 +76,121 @@ export const permissionDataTableFilters: PermissionDataTableFiltersType = {
 	is_deleted: { value: false, matchMode: 'equals' },
 };
 
-export const dataSourceConfigPermissions = {
-	dataTableState: {
-		reloadTrigger: 0,
-		first: 0,
-		rows: 10,
-		sortField: 'id',
-		sortOrder: -1 as const,
-		filters: permissionDataTableFilters,
+export const dataSourceConfigPermissions: DataSourceConfigType<
+	PermissionModel,
+	PermissionFormValuesType
+> = {
+	dataTable: {
+		state: {
+			first: 0,
+			rows: 10,
+			sortField: 'id',
+			sortOrder: -1 as const,
+			filters: permissionDataTableFilters,
+		},
+		columns: [
+			{
+				field: 'id',
+				header: 'ID',
+				sortable: true,
+				body: (
+					entry: PermissionModel,
+					column: DataTableColumnType<PermissionModel>,
+				) =>
+					DataTableValue(entry, column, {
+						markDeleted: true,
+					}),
+			},
+			{
+				field: 'entity',
+				header: 'Entity',
+				sortable: true,
+			},
+			{
+				field: 'operation',
+				header: 'Operation',
+				sortable: true,
+			},
+		],
+		find: (params: FindFunctionParamsType) =>
+			requestFind<PermissionModel>('permissions', params),
 	},
-	dataTableColumns: [
-		{
-			field: 'id',
-			header: translations['permissions.data_table.column_id'],
-			sortable: true,
-		},
-		{
-			field: 'entity',
-			header: translations['permissions.data_table.column_entity'],
-			sortable: true,
-		},
-		{
-			field: 'operation',
-			header: translations['permissions.data_table.column_operation'],
-			sortable: true,
-		},
-	],
-	formState: {
-		dataSource: 'permissions' as const,
-		id: undefined,
-		values: {
-			entity: '',
-			operation: '',
-		},
-		errors: {},
-		message: null,
-		situation: null,
-	},
-	functions: {
-		find: findPermissions,
-		getFormValues: getFormValuesPermission,
-		validateForm: (values: PermissionFormValuesType) => {
-			return ValidateSchemaBasePermissions.safeParse(values);
-		},
-		syncFormState: (
-			state: FormStateType<
-				'permissions',
-				PermissionModel,
-				PermissionFormValuesType
-			>,
-			model: PermissionModel,
-		): FormStateType<
-			'permissions',
-			PermissionModel,
-			PermissionFormValuesType
-		> => {
-			return {
-				...state,
-				id: model.id,
-				values: {
-					...state.values,
-					entity: model.entity,
-					operation: model.operation,
-				},
-			};
-		},
-		displayActionEntries: (entries: PermissionModel[]) => {
-			return entries.map((entry) => ({
-				id: entry.id,
-				label: `${entry.entity}.${entry.operation}`,
-			}));
-		},
+	displayEntryLabel: (entry: PermissionModel) => {
+		return `${entry.entity}.${entry.operation}`;
 	},
 	actions: {
 		create: {
-			mode: 'form' as const,
-			permission: 'permission.create',
-			allowedEntries: 'free' as const,
-			position: 'right' as const,
-			function: createPermissions,
-			buttonProps: {
-				variant: 'info' as const,
+			windowType: 'form',
+			windowTitle: translations['create.title'],
+			windowComponent: FormManagePermission,
+			windowConfigProps: {
+				size: 'xl',
 			},
+			permission: 'permission.create',
+			entriesSelection: 'free',
+			operationFunction: (params: PermissionFormValuesType) =>
+				requestCreate<PermissionModel, PermissionFormValuesType>(
+					'permissions',
+					params,
+				),
+			buttonPosition: 'right',
+			button: {
+				variant: 'info',
+			},
+			getFormValues: getFormValues,
+			validateForm: validateForm,
+			getFormState: getFormState,
 		},
 		update: {
-			mode: 'form' as const,
-			permission: 'permission.update',
-			allowedEntries: 'single' as const,
-			position: 'left' as const,
-			function: updatePermissions,
-			buttonProps: {
-				variant: 'outline' as const,
-				hover: 'success' as const,
+			windowType: 'form',
+			windowTitle: translations['update.title'],
+			windowComponent: FormManagePermission,
+			windowConfigProps: {
+				size: 'xl',
 			},
+			permission: 'permission.update',
+			entriesSelection: 'single',
+			operationFunction: (params: PermissionFormValuesType, id: number) =>
+				requestUpdate<PermissionModel, PermissionFormValuesType>(
+					'permissions',
+					params,
+					id,
+				),
+			buttonPosition: 'left',
+			button: {
+				variant: 'outline',
+				hover: 'success',
+			},
+			getFormValues: getFormValues,
+			validateForm: validateForm,
+			getFormState: getFormState,
 		},
 		delete: {
-			mode: 'action' as const,
+			windowType: 'action',
+			windowTitle: translations['delete.title'],
 			permission: 'permission.delete',
-			allowedEntries: 'single' as const,
-			position: 'left' as const,
+			entriesSelection: 'single',
 			customEntryCheck: (entry: PermissionModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			function: deletePermissions,
-			buttonProps: {
-				variant: 'outline' as const,
-				hover: 'error' as const,
+			operationFunction: (entry: PermissionModel) =>
+				requestDelete('permissions', entry),
+			buttonPosition: 'left',
+			button: {
+				variant: 'outline',
+				hover: 'error',
 			},
 		},
 		restore: {
-			mode: 'action' as const,
+			windowType: 'action',
+			windowTitle: translations['restore.title'],
 			permission: 'permission.delete',
-			allowedEntries: 'single' as const,
-			position: 'left' as const,
+			entriesSelection: 'single',
 			customEntryCheck: (entry: PermissionModel) => !!entry.deleted_at, // Return true if the entry is deleted
-			function: restorePermissions,
-			buttonProps: {
-				variant: 'outline' as const,
-				hover: 'info' as const,
+			operationFunction: (entry: PermissionModel) =>
+				requestRestore('permissions', entry),
+			buttonPosition: 'left',
+			button: {
+				variant: 'outline',
+				hover: 'info',
 			},
 		},
 	},

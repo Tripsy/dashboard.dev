@@ -1,6 +1,6 @@
 'use client';
 
-import { type JSX, useCallback, useEffect, useMemo } from 'react';
+import { type JSX, useCallback, useMemo } from 'react';
 import { useStore } from 'zustand/react';
 import {
 	FormFiltersDateRange,
@@ -8,16 +8,22 @@ import {
 	FormFiltersSearch,
 	FormFiltersSelect,
 } from '@/app/(dashboard)/_components/form-filters.component';
-import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
+import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
 import type { LogHistoryDataTableFiltersType } from '@/app/(dashboard)/dashboard/log-history/log-history.definition';
-import { capitalizeFirstLetter, toTitleCase } from '@/helpers/string.helper';
+import { toOptionsFromEnum } from '@/helpers/form.helper';
+import {
+	capitalizeFirstLetter,
+	formatEnumLabel,
+	toTitleCase,
+} from '@/helpers/string.helper';
+import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
-import { useTranslation } from '@/hooks/use-translation.hook';
 import {
 	LogHistoryActions,
 	LogHistoryEntities,
 	type LogHistoryModel,
-	LogHistorySource,
+	type LogHistorySource,
+	LogHistorySourceEnum,
 } from '@/models/log-history.model';
 
 const entities = LogHistoryEntities.map((v) => ({
@@ -30,31 +36,15 @@ const actions = LogHistoryActions.map((v) => ({
 	value: v,
 }));
 
-const sources = Object.values(LogHistorySource).map((v) => ({
-	label: capitalizeFirstLetter(v),
-	value: v,
-}));
+const sources = toOptionsFromEnum(LogHistorySourceEnum, {
+	formatter: formatEnumLabel,
+});
 
 export const DataTableLogHistoryFilters = (): JSX.Element => {
-	const { stateDefault, dataTableStore } = useDataTable<
+	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
 		'log-history',
 		LogHistoryModel
 	>();
-
-	const translationsKeys = useMemo(
-		() =>
-			[
-				'log-history.form_filters.label_request_id',
-				'log-history.form_filters.label_entity',
-				'log-history.form_filters.label_entity_id',
-				'log-history.form_filters.label_action',
-				'log-history.form_filters.label_source',
-				'log-history.form_filters.label_recorded_at',
-			] as const,
-		[],
-	);
-
-	const { translations } = useTranslation(translationsKeys);
 
 	const filters = useStore(
 		dataTableStore,
@@ -85,103 +75,73 @@ export const DataTableLogHistoryFilters = (): JSX.Element => {
 	);
 
 	const searchRequestId = useSearchFilter({
-		initialValue: filters.request_id?.value ?? '',
+		initialValue: filters.request_id.value ?? '',
 		debounceDelay: 1000,
 		minLength: 36,
 		onSearch: (value) => setFilterValue('request_id', value),
 	});
 
 	const searchEntityId = useSearchFilter({
-		initialValue: filters.entity_id?.value ?? '',
+		initialValue: filters.entity_id.value ?? '',
 		debounceDelay: 1000,
 		minLength: 2,
 		onSearch: (value) => setFilterValue('entity_id', value),
 	});
 
-	useEffect(() => {
-		const handleFilterReset = () => {
-			updateTableState({
-				filters: stateDefault.filters,
-			});
+	const resetCallbacks = useMemo(
+		() => [searchRequestId.onReset, searchEntityId.onReset],
+		[searchRequestId.onReset, searchEntityId.onReset],
+	);
 
-			searchRequestId.onReset();
-			searchEntityId.onReset();
-		};
-
-		window.addEventListener(
-			'filterReset',
-			handleFilterReset as EventListener,
-		);
-
-		return () => {
-			window.removeEventListener(
-				'filterReset',
-				handleFilterReset as EventListener,
-			);
-		};
-	}, [
-		searchRequestId,
-		searchRequestId.onReset,
-		searchEntityId,
-		searchEntityId.onReset,
-		stateDefault.filters,
+	useDataTableFilterReset({
+		dataSource,
+		defaultFilters: dataTableStateDefault.filters,
 		updateTableState,
-	]);
+		onReset: resetCallbacks,
+	});
 
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
 			<FormFiltersSearch<LogHistoryDataTableFiltersType>
-				labelText={
-					translations['log-history.form_filters.label_request_id']
-				}
+				labelText="Request ID"
 				fieldName="request_id"
 				search={searchRequestId}
 			/>
 
 			<FormFiltersSelect<LogHistoryDataTableFiltersType>
-				labelText={
-					translations['log-history.form_filters.label_entity']
-				}
+				labelText="Entity"
 				fieldName="entity"
 				fieldValue={filters.entity.value}
 				options={entities}
-				onValueChange={(value) => setFilterValue('entity', value)}
+				onChange={(value) => setFilterValue('entity', value)}
 			/>
 
 			<FormFiltersSearch<LogHistoryDataTableFiltersType>
-				labelText={
-					translations['log-history.form_filters.label_entity_id']
-				}
+				labelText="Entity ID"
 				fieldName="entity_id"
 				search={searchEntityId}
 			/>
 
 			<FormFiltersSelect<LogHistoryDataTableFiltersType>
-				labelText={
-					translations['log-history.form_filters.label_action']
-				}
+				labelText="Action"
 				fieldName="action"
 				fieldValue={filters.action.value}
 				options={actions}
-				onValueChange={(value) => setFilterValue('action', value)}
+				onChange={(value) => setFilterValue('action', value)}
 			/>
 
 			<FormFiltersSelect<LogHistoryDataTableFiltersType>
-				labelText={
-					translations['log-history.form_filters.label_source']
-				}
+				labelText="Source"
 				fieldName="source"
 				fieldValue={filters.source.value}
 				options={sources}
-				onValueChange={(value) =>
+				onChange={(value) =>
 					setFilterValue('source', value as LogHistorySource)
 				}
 			/>
 
 			<FormFiltersDateRange<LogHistoryDataTableFiltersType>
-				labelText={
-					translations['log-history.form_filters.label_recorded_at']
-				}
+				labelText="Recorded At"
 				start={{
 					fieldName: 'recorded_at_start',
 					fieldValue: filters.recorded_at_start.value,
@@ -196,7 +156,7 @@ export const DataTableLogHistoryFilters = (): JSX.Element => {
 				}}
 			/>
 
-			<FormFiltersReset source="DataTableLogHistoryFilters" />
+			<FormFiltersReset dataSource="log-history" />
 		</div>
 	);
 };

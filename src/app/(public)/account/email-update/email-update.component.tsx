@@ -1,15 +1,12 @@
 'use client';
 
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { useActionState, useEffect } from 'react';
+import { useActionState, useEffect } from 'react';
+import { emailUpdateAction } from '@/app/(public)/account/email-update/email-update.action';
 import {
-	emailUpdateAction,
-	emailUpdateValidate,
-} from '@/app/(public)/account/email-update/email-update.action';
-import {
-	type EmailUpdateFormFieldsType,
+	type EmailUpdateFormValuesType,
 	EmailUpdateState,
+	validateFormEmailUpdate,
 } from '@/app/(public)/account/email-update/email-update.definition';
 import { FormCsrf } from '@/components/form/form-csrf';
 import {
@@ -20,7 +17,7 @@ import { FormError } from '@/components/form/form-error.component';
 import { FormWrapperComponent } from '@/components/form/form-wrapper';
 import { Icons } from '@/components/icon.component';
 import { LoadingComponent } from '@/components/status.component';
-import { Button } from '@/components/ui/button';
+import { Link } from '@/components/ui/link';
 import Routes from '@/config/routes.setup';
 import { createHandleChange } from '@/helpers/form.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
@@ -37,12 +34,12 @@ export default function EmailUpdate() {
 	);
 
 	const [formValues, setFormValues] =
-		useFormValues<EmailUpdateFormFieldsType>(state.values);
+		useFormValues<EmailUpdateFormValuesType>(state.values);
 
 	const { errors, submitted, markSubmit, markFieldAsTouched } =
 		useFormValidation({
 			formValues: formValues,
-			validate: emailUpdateValidate,
+			validateForm: validateFormEmailUpdate,
 			debounceDelay: 800,
 		});
 
@@ -52,7 +49,7 @@ export default function EmailUpdate() {
 
 	// Refresh auth & redirect to `/account/me`
 	useEffect(() => {
-		if (state.situation === 'success' && router) {
+		if (state.situation === 'success') {
 			router.replace(`${Routes.get('account-me')}?from=emailUpdate`);
 		}
 	}, [state.situation, router]);
@@ -64,7 +61,8 @@ export default function EmailUpdate() {
 	}
 
 	if (!auth) {
-		throw new Error('Not authenticated.');
+		router.replace(Routes.get('login'));
+		return null;
 	}
 
 	if (state.situation === 'csrf_error') {
@@ -84,7 +82,7 @@ export default function EmailUpdate() {
 			>
 				<FormCsrf />
 
-				<FormComponentEmail<EmailUpdateFormFieldsType>
+				<FormComponentEmail<EmailUpdateFormValuesType>
 					labelText="New Email"
 					id={elementIds.emailNew}
 					fieldName="email_new"
@@ -95,32 +93,31 @@ export default function EmailUpdate() {
 				/>
 
 				<div className="flex justify-end gap-2">
-					<Button variant="outline" hover="warning">
-						<Link
-							href={Routes.get('account-me')}
-							title="Cancel & Go back to my account"
-							className="flex items-center gap-1"
-						>
-							<Icons.Action.Cancel /> Cancel
-						</Link>
-					</Button>
+					<Link
+						href={Routes.get('account-me')}
+						title="Cancel & Go back to my account"
+						variant="outline"
+						hover="warning"
+					>
+						<Icons.Action.Cancel /> Cancel
+					</Link>
 					<FormComponentSubmit
 						pending={pending}
 						submitted={submitted}
 						errors={errors}
 						button={{
 							label: 'Update',
-							icon: Icons.Action.Go,
+							iconLabel: 'save',
 						}}
 					/>
 				</div>
 
 				{state.situation === 'error' && state.message && (
 					<FormError>
-						<React.Fragment key="error-content">
+						<div className="flex items-center gap-1.5">
 							<Icons.Status.Error />
 							<div>{state.message}</div>
-						</React.Fragment>
+						</div>
 					</FormError>
 				)}
 			</form>

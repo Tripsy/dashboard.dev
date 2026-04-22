@@ -1,32 +1,42 @@
-# Description
+# NReady Dashboard
 
-(Dashboard) is a demo FE implementation using [NReady](https://github.com/Tripsy/nready) as a backend API. 
+![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![Next.js](https://img.shields.io/badge/Next.js-16.1-black)
+![React](https://img.shields.io/badge/React-19.2-blue)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-This boilerplate provide implementation for authentication system and include and administration dashboard.
+# 📄 Description
 
-The codebase is fully typed in **TypeScript** — no as any shortcuts. **Biome** (on top of ESLint) ensures code quality.
+(Dashboard) is a demo frontend implementation using [NReady](https://github.com/Tripsy/nready) as a backend API.
 
-At this date (e.g.: 2026 February), all [dependencies](#Dependencies) are updated to their latest versions, and Node.js 22 is supported.
-
-A ready-to-use Docker environment is provided for quick [setup](#Setup).
+This boilerplate provides an authentication system (login, register, recover password, account pages, etc.)
+and includes an administration dashboard (users, cron-history, log-history, log-data, mail-queue, permissions, 
+templates, clients, client-address, places, brands, cash-flow, etc.)
 
 This project is still a work in progress, and the next goals are:
 - Include additional [NReady](https://github.com/Tripsy/nready) features in the administration dashboard
 
 Meanwhile, we're open to suggestions / feedback, and if you find this project useful, please consider giving it a star ⭐
 
-# Tech Stack
+# 🚀 Tech Stack
 
-- Runtime: React
-- Framework: Next.js
-- Database: -
-- Language: TypeScript
-- Security: rate limiting, input validation (powered by Zod)
-- Logging: -
+## Core
+- Language: TypeScript 5.9
+- Runtime Environment: Node.js 22
+- Runtime: React 19.2
+- Framework: Next.js 16.1
+
+## Code Quality
+- Linting & Formatting: Biome
+- Circular Dependency Check: Madge
+- Validation: Zod 4.3
+
+## Infrastructure
 - Containerization: Docker
-- Testing: -
+- Security: rate limiting, input validation
 
-# Characteristics
+# ⚙️ Characteristics
 
 - [x] Dashboard: Administration panel with CRUD operations for users, permissions, templates, logs, etc.
 - [x] Auth system: Login, register, logout, forgot password, reset password, email confirmation, etc.
@@ -34,10 +44,11 @@ Meanwhile, we're open to suggestions / feedback, and if you find this project us
 - [x] Security: rate limiting, input validation
 - [x] Request validation (powered by Zod)
 - [x] Language files
-- [x] Providers included: Auth, Theme, Toast
-- [x] Development environment available (Docker)
+- [x] Providers included: Auth, Theme, Toast, QueryClient
+- [x] Docker development environment
+- [x] Responsive design
 
-# Features
+# ✨ Features
 
 ### Core features
 
@@ -45,8 +56,10 @@ Meanwhile, we're open to suggestions / feedback, and if you find this project us
     - Auth system: login, register, logout, forgot password, reset password, email confirmation, etc.
 - [x] (Dashboard) 
     - cron-history, log-data, log-history, mail-queue, permissions, templates, users
+    - brands, cash-flow, client-address, clients, places
+    - // TODO 
 
-# Setup
+# 🛠 Setup
 
 ### 1. Add `hosts` record
 For configuration refer to this guide:  
@@ -63,7 +76,7 @@ docker compose up
 Once the container is running, connect to it with:
 
 ```
-docker exec -it dashboard.dev /bin/bash
+docker exec -it dashboard.test /bin/bash
 ```
 
 ### 4. Install dependencies inside the container
@@ -73,9 +86,12 @@ Run the following command to install project dependencies:
 $ pnpm install
 ```
 
-### 5. Update .env
+### 5. Configure environment variables
 
-Start by copying the `.env.example` file to `.env` and update the environment variables accordingly.
+Copy the `.env.example` file to `.env` and update the variables:
+```bash
+cp .env.example .env
+```
 
 ### 6. Run the application
 
@@ -86,25 +102,24 @@ Start by copying the `.env.example` file to `.env` and update the environment va
 $ pnpm run dev
 ```
 
-# Commands
+# 🖥️ Commands
 
 ```bash
-
-// Code sanity
-$ pnpm run biome
-$ pnpm run madge
-
+pnpm run biome    # Lint and format
+pnpm run madge    # Check for circular dependencies
+pnpm run dev      # Start development server
+pnpm run build    # Production build
 ```
 
-# Structure
+# 📁 Structure
 
 ```
 ├── docker/
 ├── public/
 ├── src/
 │   ├── app/    
-│   │   ├── (dashboard)/   # Dashboard related     
-│   │   ├── (public)/  
+│   │   ├── (dashboard)/   # Dashboard related routes  
+│   │   ├── (public)/      # Public routes
 │   │   │   ├── account/ 
 │   │   │   ├── docs/ 
 │   │   │   ├── page/ 
@@ -115,19 +130,21 @@ $ pnpm run madge
 │   │   │   ├── csrf/ 
 │   │   │   ├── language/ 
 │   │   │   ├── proxy/ 
-│   │   │   ├── error.tsx 
-│   │   │   ├── global.css
-│   │   │   ├── layout.css  # Base layout
-│   │   │   ├── providers.tsx # Base providers
+│   │   ├── error.tsx 
+│   │   ├── favicon.ico
+│   │   ├── global.css
+│   │   ├── layout.css  # Base layout
+│   │   ├── providers.tsx # Base providers
 │   ├── components/        # Common components
 │   │   ├── form/          # Form related components
 │   │   ├── layout/        # Layout components
-│   │   │   ├── footer-default.component.tsx
-│   │   │   ├── header-default.component.tsx
-│   │   │   ├── logo-default.component.tsx
-│   │   │   ├── toggle-theme.component.tsx
+│   │   │   ├── footer.default.tsx
+│   │   │   ├── header.default.tsx
+│   │   │   ├── logo.default.tsx
+│   │   │   ├── toggle-theme.tsx
 │   │   │   ├── user-menu.component.tsx
-│   │   ├── ui/            # UI related components
+│   │   ├── ui/
+│   │   ├── window/
 │   │   ├── icon.component.tsx
 │   │   ├── protected-route.component.tsx
 │   │   ├── status.component.tsx
@@ -136,6 +153,7 @@ $ pnpm run madge
 │   │   ├── data-source.register.ts
 │   │   ├── daysjs.config.ts 
 │   │   ├── init-redis.config.ts 
+│   │   ├── nunjucks.config.ts 
 │   │   ├── routes.setup.ts
 │   │   ├── settings.config.ts 
 │   │   ├── translate.setup.ts 
@@ -143,17 +161,21 @@ $ pnpm run madge
 │   ├── helpers/           # Utilities (date, string, object, etc.)
 │   ├── hooks/             # Custom hooks
 │   ├── locales/           # Language files
-│   ├── models/            # Models (entities) related to (dashboard)
-│   ├── provider/           
+│   ├── models/            # Models (entities)
+│   ├── providers/           
 │   │   ├── auth.provider.tsx 
 │   │   ├── prime.provider.tsx 
+│   │   ├── query-client.provider.tsx 
 │   │   ├── theme.provider.tsx 
 │   │   ├── toast.provider.tsx 
 │   ├── services/          # Back-end (eg: NReady) services
 │   │   ├── account.service.ts
 │   │   ├── auth.service.ts
 │   │   ├── ...
-│   ├── types/             # Some types
+│   ├── stores/
+│   │   ├── data-table.store.ts
+│   │   ├── window.store.ts
+│   ├── types/            
 │   └── proxy.ts           
 ├── .env
 ├── .madgerc
@@ -163,52 +185,52 @@ $ pnpm run madge
 └── tsconfig.json
 ```
 
-# How to
+# 💡 How to
 
 ## Adding new model for `dashboard` (ex: `cars`)
 
-1. Create `lib/entities/cars.model.ts` from `lib/entities/users.model.ts`
+1. Create `models/cars.model.ts` from `models/users.model.ts`
 2. Duplicate `src/(dashboard)/dashboard/users` > `src/(dashboard)/dashboard/cars` & rename files
+    - data-table-cars.component.tsx    
+    - data-table-cars-filters.component.tsx
+    - form-manage-cars.component.tsx
     - page.tsx
     - cars.definition.ts
-    - data-table-cars.component.tsx
-    - form-manage-cars.component.tsx
-    - data-table-cars-filters.component.tsx
+    - view-car.component.ts 
 3. Update `src/config/data-source.config.ts`
     - export type DataSourceKey
 4. Update `src/config/data-source.register.ts`
-    - add `registerDataSource('cars', dataSourceConfigCars)`
 5. Add `cars.json` to `src/locales/[language]` & update src/locales/en/index.ts
 6. Update `Routes.group('dashboard')` in `src/config/routes.setup.ts`
-7. Create `src/services/cars.service.ts` from `src/services/users.service.ts`
-8. Update `src/app/(dashboard)/_components/side-menu.component.tsx`
-9. Update `src/models/permission.model.ts`
+7. Update `src/app/(dashboard)/_components/side-menu.component.tsx`
+8. Update `src/models/permission.model.ts`
     - PermissionEntitiesSuggestions
-10. Update `src/models/log-history.model.ts`
-     - LogHistoryEntities
+9. Update `src/models/log-history.model.ts`
+    - LogHistoryEntities
 
-# TODO
+# 📌 TODO
 
-1. Displayed dates should be converted to local TZ
-
-# Bugs & Issues & Ideas
-
-1. Review security
-2. Add section "documentation"
-3. login with google / facebook
-4. Replace all console.error with logging
-5. Implement kill all sessions except current
+1. Cash Flow
+    - cash flow status update 
+    - cash flow manage
+    - cash flow details
+    - add places  icons region > area, city > building, country → map
+2. Review security
+3. Add section "documentation"
+4. login with google / facebook
+5. Replace all console.error with logging
+6. Implement kill all sessions except current
       // // This will actually remove all sessions - keep it for further implementation
       // await AccountTokenRepository.createQuery()
       //     .filterBy('user_id', policy.getUserId())
       //     .delete(false, true);
-6. For template section
+7. For template section
     - would be a nice idea to keep track of the last changes (maybe add a new column - prev version id and a button to restore to that version)
     - view presentation could be enhanced
-7. https://nextjs.org/docs/app/getting-started/partial-prerendering
-8. https://react.dev/learn/react-compiler/introduction
+8. https://nextjs.org/docs/app/getting-started/partial-prerendering
+9. https://react.dev/learn/react-compiler/introduction
 
-# Dependencies
+# 🔗 Dependencies
 
 - [next](https://nextjs.org/)
 - [react](https://reactjs.org/)
@@ -218,6 +240,8 @@ $ pnpm run madge
 - [zod](https://zod.dev) — TypeScript-first schema validation with static type inference
 - [ioredis](https://github.com/luin/ioredis) — Robust Redis client for Node.js
 - [dayjs](https://day.js.org/) — Parses, validates, manipulates, and displays dates and times
+- [TanStack  Query](https://tanstack.com/query/latest) — Powerful asynchronous state management, server-state utilities and data fetching
+- [primereact](https://primereact.org/datatable/)
 
 Dev only:
 
@@ -225,9 +249,3 @@ Dev only:
 - [tailwindcss](https://tailwindcss.com/)
 - [madge](https://github.com/pahen/madge) — Helps finding circular dependencies
 - [biome](https://biomejs.dev/) — Biome is a fast formatter for JavaScript, TypeScript, JSX, TSX, JSON, HTML, CSS and GraphQL
-
-# RESOURCES
-
-- https://primereact.org/datatable/
-- https://nextjs.org/docs/app/api-reference/functions/use-params
-- https://nextjs.org/docs/app/api-reference/components/form

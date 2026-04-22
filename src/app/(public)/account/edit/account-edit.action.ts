@@ -1,83 +1,56 @@
 import {
-	type AccountEditFormFieldsType,
-	AccountEditSchema,
+	type AccountEditFormValuesType,
 	type AccountEditStateType,
+	getAccountEditFormValues,
+	validateFormAccountEdit,
 } from '@/app/(public)/account/edit/account-edit.definition';
-import { Configuration } from '@/config/settings.config';
 import { translate } from '@/config/translate.setup';
 import { accumulateZodErrors } from '@/helpers/form.helper';
 import { isValidCsrfToken } from '@/helpers/session.helper';
-import { LanguageEnum } from '@/models/user.model';
-import { editAccount } from '@/services/account.service';
-
-export function accountEditFormValues(
-	formData: FormData,
-): AccountEditFormFieldsType {
-	const language = formData.get('language');
-	const validLanguages = Object.values(LanguageEnum);
-
-	return {
-		name: formData.get('name') as string,
-		language: validLanguages.includes(language as LanguageEnum)
-			? (language as LanguageEnum)
-			: LanguageEnum.EN,
-	};
-}
-
-export function accountEditValidate(values: AccountEditFormFieldsType) {
-	return AccountEditSchema.safeParse(values);
-}
+import { requestEditAccount } from '@/services/account.service';
 
 export async function accountEditAction(
-	state: AccountEditStateType,
+	formState: AccountEditStateType,
 	formData: FormData,
 ): Promise<AccountEditStateType> {
-	const values = accountEditFormValues(formData);
-	const validated = accountEditValidate(values);
-
-	const result: AccountEditStateType = {
-		...state, // Spread existing state
-		values, // Override with new values
-		message: null,
-		situation: null,
-	};
-
-	// Check CSRF token
-	const csrfToken = formData.get(
-		Configuration.get('csrf.inputName') as string,
-	) as string;
-
-	if (!(await isValidCsrfToken(csrfToken))) {
+	if (!(await isValidCsrfToken(formData))) {
 		return {
-			...result,
+			...formState,
 			message: await translate('app.error.csrf'),
 			situation: 'csrf_error',
 		};
 	}
 
+	const formValues = getAccountEditFormValues(formData);
+	const validated = validateFormAccountEdit(formValues);
+
 	if (!validated.success) {
+		const errors = accumulateZodErrors<AccountEditFormValuesType>(
+			validated.error,
+		);
+
 		return {
-			...result,
+			...formState,
+			values: formValues,
 			situation: 'error',
-			errors: accumulateZodErrors<AccountEditFormFieldsType>(
-				validated.error,
-			),
+			message: await translate('app.error.validation'),
+			errors,
 		};
 	}
 
 	try {
-		const fetchResponse = await editAccount(validated.data);
+		const requestResponse = await requestEditAccount(validated.data);
 
 		return {
-			...result,
-			errors: {},
-			message: fetchResponse?.message || null,
-			situation: fetchResponse?.success ? 'success' : 'error',
+			...formState,
+			values: validated.data,
+			message: requestResponse?.message || null,
+			situation: requestResponse?.success ? 'success' : 'error',
 		};
 	} catch {
 		return {
-			...result,
-			errors: {},
+			...formState,
+			values: validated.data,
 			message: await translate('app.error.form'),
 			situation: 'error',
 		};

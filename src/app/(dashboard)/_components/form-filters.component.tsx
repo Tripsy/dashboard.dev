@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { handleReset } from '@/app/(dashboard)/_components/data-table-actions.component';
+import { dispatchFilterReset } from '@/app/(dashboard)/_events/data-table-filter-reset.event';
 import {
 	FormComponentCalendarWithoutFormElement,
 	FormComponentCheckbox,
@@ -7,10 +7,12 @@ import {
 	FormComponentSelect,
 	type InputValueType,
 	type OptionsType,
+	type OptionValueType,
 } from '@/components/form/form-element.component';
 import { Icons } from '@/components/icon.component';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import type { DataSourceKey } from '@/config/data-source.config';
 import { cn } from '@/helpers/css.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import type { useSearchFilter } from '@/hooks/use-search-filter.hook';
@@ -55,15 +57,15 @@ export function FormFiltersSelect<Fields>({
 	fieldValue,
 	placeholderText = 'Select...',
 	options,
-	onValueChange,
+	onChange,
 	className,
 }: {
 	labelText: string;
 	fieldName: keyof Fields & string;
-	fieldValue: string | null;
+	fieldValue: OptionValueType;
 	placeholderText?: string;
 	options: OptionsType;
-	onValueChange: (value: string) => void;
+	onChange: (value: string) => void;
 	className?: string;
 }) {
 	const elementKey = `search-${String(fieldName)}`;
@@ -79,7 +81,7 @@ export function FormFiltersSelect<Fields>({
 			disabled={false}
 			placeholderText={placeholderText}
 			options={options}
-			onValueChange={onValueChange}
+			onChange={onChange}
 		/>
 	);
 }
@@ -177,7 +179,11 @@ export function FormFiltersShowDeleted({
 	);
 }
 
-export function FormFiltersReset({ source }: { source: string }) {
+export function FormFiltersReset({
+	dataSource,
+}: {
+	dataSource: DataSourceKey;
+}) {
 	const translationsKeys = useMemo(
 		() => ['dashboard.text.label_reset'] as const,
 		[],
@@ -191,7 +197,7 @@ export function FormFiltersReset({ source }: { source: string }) {
 				type="reset"
 				variant="outline"
 				hover="warning"
-				onClick={() => handleReset(source)}
+				onClick={() => dispatchFilterReset(dataSource)}
 				title="Reset filters"
 			>
 				<Icons.Action.Reset />

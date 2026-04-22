@@ -3,7 +3,7 @@
 		"title": "Email confirmation resend | {{app_name}}"
 	},
 	"validation": {
-		"email_invalid": "Please enter a valid email address"
+		"invalid_email": "Please enter a valid email address"
 	},
 	"message": {
 		"not_active": "No account using this email address was found",

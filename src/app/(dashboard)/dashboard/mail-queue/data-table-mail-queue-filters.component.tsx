@@ -1,6 +1,6 @@
 'use client';
 
-import { type JSX, useCallback, useEffect, useMemo } from 'react';
+import { type JSX, useCallback, useMemo } from 'react';
 import { useStore } from 'zustand/react';
 import {
 	FormFiltersDateRange,
@@ -8,40 +8,27 @@ import {
 	FormFiltersSearch,
 	FormFiltersSelect,
 } from '@/app/(dashboard)/_components/form-filters.component';
-import { useDataTable } from '@/app/(dashboard)/_providers/data-table-provider';
+import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
 import type { MailQueueDataTableFiltersType } from '@/app/(dashboard)/dashboard/mail-queue/mail-queue.definition';
-import { capitalizeFirstLetter } from '@/helpers/string.helper';
+import { toOptionsFromEnum } from '@/helpers/form.helper';
+import { formatEnumLabel } from '@/helpers/string.helper';
+import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
-import { useTranslation } from '@/hooks/use-translation.hook';
 import {
 	type MailQueueModel,
+	type MailQueueStatus,
 	MailQueueStatusEnum,
 } from '@/models/mail-queue.model';
 
-const statuses = Object.values(MailQueueStatusEnum).map((v) => ({
-	label: capitalizeFirstLetter(v),
-	value: v,
-}));
+const statuses = toOptionsFromEnum(MailQueueStatusEnum, {
+	formatter: formatEnumLabel,
+});
 
 export const DataTableMailQueueFilters = (): JSX.Element => {
-	const { stateDefault, dataTableStore } = useDataTable<
+	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
 		'mail-queue',
 		MailQueueModel
 	>();
-
-	const translationsKeys = useMemo(
-		() =>
-			[
-				'mail-queue.form_filters.label_sent_date_start',
-				'mail-queue.form_filters.label_status',
-				'mail-queue.form_filters.label_template',
-				'mail-queue.form_filters.label_content',
-				'mail-queue.form_filters.label_to',
-			] as const,
-		[],
-	);
-
-	const { translations } = useTranslation(translationsKeys);
 
 	const filters = useStore(
 		dataTableStore,
@@ -72,64 +59,42 @@ export const DataTableMailQueueFilters = (): JSX.Element => {
 	);
 
 	const searchTemplate = useSearchFilter({
-		initialValue: filters.template?.value ?? '',
+		initialValue: filters.template.value ?? '',
 		debounceDelay: 1000,
 		minLength: 1,
 		onSearch: (value) => setFilterValue('template', value),
 	});
 
 	const searchContent = useSearchFilter({
-		initialValue: filters.content?.value ?? '',
+		initialValue: filters.content.value ?? '',
 		debounceDelay: 1000,
 		minLength: 3,
 		onSearch: (value) => setFilterValue('content', value),
 	});
 
 	const searchTo = useSearchFilter({
-		initialValue: filters.to?.value ?? '',
+		initialValue: filters.to.value ?? '',
 		debounceDelay: 1000,
 		minLength: 3,
 		onSearch: (value) => setFilterValue('to', value),
 	});
 
-	useEffect(() => {
-		const handleFilterReset = () => {
-			updateTableState({
-				filters: stateDefault.filters,
-			});
+	const resetCallbacks = useMemo(
+		() => [searchTemplate.onReset, searchContent.onReset, searchTo.onReset],
+		[searchTemplate.onReset, searchContent.onReset, searchTo.onReset],
+	);
 
-			searchTemplate.onReset();
-			searchContent.onReset();
-			searchTo.onReset();
-		};
-
-		window.addEventListener(
-			'filterReset',
-			handleFilterReset as EventListener,
-		);
-
-		return () => {
-			window.removeEventListener(
-				'filterReset',
-				handleFilterReset as EventListener,
-			);
-		};
-	}, [
-		searchContent,
-		searchTemplate,
-		searchTo,
-		stateDefault.filters,
+	useDataTableFilterReset({
+		dataSource,
+		defaultFilters: dataTableStateDefault.filters,
 		updateTableState,
-	]);
+		onReset: resetCallbacks,
+	});
 
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
 			<FormFiltersDateRange<MailQueueDataTableFiltersType>
-				labelText={
-					translations[
-						'mail-queue.form_filters.label_sent_date_start'
-					]
-				}
+				labelText="Sent Date"
 				start={{
 					fieldName: 'sent_date_start',
 					fieldValue: filters.sent_date_start.value,
@@ -144,38 +109,34 @@ export const DataTableMailQueueFilters = (): JSX.Element => {
 			/>
 
 			<FormFiltersSelect<MailQueueDataTableFiltersType>
-				labelText={translations['mail-queue.form_filters.label_status']}
+				labelText="Status"
 				fieldName="status"
 				fieldValue={filters.status.value}
 				options={statuses}
-				onValueChange={(value) =>
-					setFilterValue('status', value as MailQueueStatusEnum)
+				onChange={(value) =>
+					setFilterValue('status', value as MailQueueStatus)
 				}
 			/>
 
 			<FormFiltersSearch<MailQueueDataTableFiltersType>
-				labelText={
-					translations['mail-queue.form_filters.label_template']
-				}
+				labelText="Template"
 				fieldName="template"
 				search={searchTemplate}
 			/>
 
 			<FormFiltersSearch<MailQueueDataTableFiltersType>
-				labelText={
-					translations['mail-queue.form_filters.label_content']
-				}
+				labelText="Content"
 				fieldName="content"
 				search={searchContent}
 			/>
 
 			<FormFiltersSearch<MailQueueDataTableFiltersType>
-				labelText={translations['mail-queue.form_filters.label_to']}
+				labelText="To"
 				fieldName="to"
 				search={searchTo}
 			/>
 
-			<FormFiltersReset source="DataTableMailQueueFilters" />
+			<FormFiltersReset dataSource="mail-queue" />
 		</div>
 	);
 };

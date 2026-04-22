@@ -10,42 +10,11 @@
 			"confirmText": "Are you sure you want to delete the selected log(s)?"
 		},
 		"view": {
-			"title": "Log details",
+			"title": "Log details - {{entry}}",
 			"label": "View"
 		},
 		"viewUser": {
-			"title": "User details",
 			"label": "View user"
 		}
-	},
-	"data_table": {
-		"column_id": "ID",
-		"column_request_id": "Request ID",
-		"column_entity": "Entity",
-		"column_entity_id": "Entity ID",
-		"column_action": "Action",
-		"column_performed_by": "Performed By",
-		"column_recorded_at": "Recorded At"
-	},
-	"form_filters": {
-		"label_request_id": "Request ID",
-		"label_entity": "Entity",
-		"label_entity_id": "Entity ID",
-		"label_action": "Action",
-		"label_source": "Source",
-		"label_recorded_at": "Recorded At"
-	},
-	"view": {
-		"section_info": "Info",
-		"section_details": "Details",
-		"label_id": "ID:",
-		"label_request_id": "Request ID:",
-		"label_entity": "Entity:",
-		"label_entity_id": "Entity ID:",
-		"label_action": "Action:",
-		"label_auth_id": "Auth ID:",
-		"label_performed_by": "Performed By:",
-		"label_source": "Source:",
-		"label_recorded_at": "Recorded At:"
 	}
 }

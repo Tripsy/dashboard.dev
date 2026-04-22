@@ -3,25 +3,35 @@
 		"title": "Dashboard | {{app_name}}"
 	},
 	"labels": {
-		"content": "Content",
-		"settings": "Settings",
 		"dashboard": "Dashboard",
+
+		"financial": "Financial",
+		"cash-flow": "Cash Flow",
+		"clients": "Clients",
+
+		"content": "Content",
+		"brands": "Brands",
+		"client-address": "Client Addresses",
+		"places": "Places",
+
+		"settings": "Settings",
+		"templates": "Templates",
+
+		"logs": "System Logs",
+
 		"cron-history": "Cron History",
 		"log-data": "Log Data",
 		"log-history": "Log History",
 		"mail-queue": "Mail Queue",
-		"permissions": "Permissions",
-		"logs": "System Logs",
-		"templates": "Templates",
-		"users": "Users"
+
+		"users": "Users",
+		"permissions": "Permissions"
 	},
 	"text": {
 		"showing_entries": "Showing {{first}} to {{last}} of {{total}} entries",
 		"selected_entries_one": "{{count}} entry selected",
 		"selected_entries_many": "{{count}} entries selected",
 		"no_entries": "No entries found",
-		"select_one": "Please select at least one entry",
-		"no_entry_selected": "No entry selected",
 		"placeholder_select_default": "Select...",
 		"placeholder_start_date": "Start Date",
 		"placeholder_end_date": "End Date",

@@ -1,79 +1,56 @@
 import {
-	type PasswordRecoverChangeFormFieldsType,
-	PasswordRecoverChangeSchema,
+	getPasswordRecoverChangeFormValues,
+	type PasswordRecoverChangeFormValuesType,
 	type PasswordRecoverChangeSituationType,
 	type PasswordRecoverChangeStateType,
+	validateFormPasswordRecoverChange,
 } from '@/app/(public)/account/password-recover-change/[token]/password-recover-change.definition';
-import { Configuration } from '@/config/settings.config';
 import { translate } from '@/config/translate.setup';
 import { ApiError } from '@/exceptions/api.error';
 import { accumulateZodErrors } from '@/helpers/form.helper';
 import { isValidCsrfToken } from '@/helpers/session.helper';
-import { passwordRecoverChangeAccount } from '@/services/account.service';
-
-export function passwordRecoverChangeFormValues(
-	formData: FormData,
-): PasswordRecoverChangeFormFieldsType {
-	return {
-		password: formData.get('password') as string,
-		password_confirm: formData.get('password_confirm') as string,
-	};
-}
-
-export function passwordRecoverChangeValidate(
-	values: PasswordRecoverChangeFormFieldsType,
-) {
-	return PasswordRecoverChangeSchema.safeParse(values);
-}
+import { requestPasswordRecoverChange } from '@/services/account.service';
 
 export async function passwordRecoverChangeAction(
-	state: PasswordRecoverChangeStateType,
+	formState: PasswordRecoverChangeStateType,
 	formData: FormData,
 ): Promise<PasswordRecoverChangeStateType> {
-	const values = passwordRecoverChangeFormValues(formData);
-	const validated = passwordRecoverChangeValidate(values);
-
-	const result: PasswordRecoverChangeStateType = {
-		...state, // Spread existing state
-		values, // Override with new values
-		message: null,
-		situation: null,
-	};
-
-	// Check CSRF token
-	const csrfToken = formData.get(
-		Configuration.get('csrf.inputName') as string,
-	) as string;
-
-	if (!(await isValidCsrfToken(csrfToken))) {
+	if (!(await isValidCsrfToken(formData))) {
 		return {
-			...result,
+			...formState,
 			message: await translate('app.error.csrf'),
 			situation: 'csrf_error',
 		};
 	}
 
+	const formValues = getPasswordRecoverChangeFormValues(formData);
+	const validated = validateFormPasswordRecoverChange(formValues);
+
 	if (!validated.success) {
+		const errors = accumulateZodErrors<PasswordRecoverChangeFormValuesType>(
+			validated.error,
+		);
+
 		return {
-			...result,
+			...formState,
+			values: formValues,
 			situation: 'error',
-			errors: accumulateZodErrors<PasswordRecoverChangeFormFieldsType>(
-				validated.error,
-			),
+			message: await translate('app.error.validation'),
+			errors,
 		};
 	}
 
 	try {
-		const fetchResponse = await passwordRecoverChangeAccount(
-			result.token,
+		const requestResponse = await requestPasswordRecoverChange(
 			validated.data,
+			formState.token,
 		);
 
 		return {
-			...result,
-			errors: {},
-			message: fetchResponse?.message || null,
-			situation: fetchResponse?.success ? 'success' : 'error',
+			...formState,
+			values: validated.data,
+			message: requestResponse?.message || null,
+			situation: requestResponse?.success ? 'success' : 'error',
 		};
 	} catch (error: unknown) {
 		let message: string = '';
@@ -84,7 +61,8 @@ export async function passwordRecoverChangeAction(
 		}
 
 		return {
-			...result,
+			...formState,
+			values: validated.data,
 			message:
 				message ||
 				(await translate('password-recover-change.message.failed')),

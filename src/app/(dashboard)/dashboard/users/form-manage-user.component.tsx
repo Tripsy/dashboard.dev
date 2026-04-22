@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
 	FormComponentEmail,
 	FormComponentName,
@@ -6,58 +6,35 @@ import {
 	FormComponentRadio,
 	FormComponentSelect,
 } from '@/components/form/form-element.component';
-import type { FormManageType } from '@/config/data-source.config';
-import {
-	capitalizeFirstLetter,
-	formatEnumLabel,
-} from '@/helpers/string.helper';
+import { toOptionsFromEnum } from '@/helpers/form.helper';
+import { formatEnumLabel } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
-import { useTranslation } from '@/hooks/use-translation.hook';
 import {
+	type Language,
 	LanguageEnum,
 	type UserFormValuesType,
+	type UserOperatorType,
 	UserOperatorTypeEnum,
+	type UserRole,
 	UserRoleEnum,
 } from '@/models/user.model';
+import { useWindowForm } from '@/providers/window-form.provider';
 
-const roles = Object.values(UserRoleEnum).map((v) => ({
-	label: capitalizeFirstLetter(v),
-	value: v,
-}));
+const roles = toOptionsFromEnum(UserRoleEnum, {
+	formatter: formatEnumLabel,
+});
 
-const languages = Object.values(LanguageEnum).map((v) => ({
-	label: capitalizeFirstLetter(v),
-	value: v,
-}));
+const languages = toOptionsFromEnum(LanguageEnum, {
+	formatter: formatEnumLabel,
+});
 
-const operatorTypes = Object.values(UserOperatorTypeEnum).map((v) => ({
-	label: formatEnumLabel(v),
-	value: v,
-}));
+const operatorTypes = toOptionsFromEnum(UserOperatorTypeEnum, {
+	formatter: formatEnumLabel,
+});
 
-export function FormManageUser({
-	actionName,
-	formValues,
-	errors,
-	handleChange,
-	pending,
-}: FormManageType<UserFormValuesType>) {
-	const translationsKeys = useMemo(
-		() =>
-			[
-				'users.form_manage.label_name',
-				'users.form_manage.label_email',
-				'users.form_manage.label_password_on_create',
-				'users.form_manage.label_password_on_update',
-				'users.form_manage.label_password_confirm',
-				'users.form_manage.label_language',
-				'users.form_manage.label_role',
-				'users.form_manage.label_operator_type',
-			] as const,
-		[],
-	);
-
-	const { translations } = useTranslation(translationsKeys);
+export function FormManageUser() {
+	const { formValues, errors, handleChange, pending } =
+		useWindowForm<UserFormValuesType>();
 
 	const [showPassword, setShowPassword] = useState(false);
 
@@ -92,7 +69,7 @@ export function FormManageUser({
 	return (
 		<>
 			<FormComponentName<UserFormValuesType>
-				labelText={translations['users.form_manage.label_name']}
+				labelText="Name"
 				id={elementIds.name}
 				fieldValue={formValues.name ?? ''}
 				disabled={pending}
@@ -101,7 +78,7 @@ export function FormManageUser({
 			/>
 
 			<FormComponentEmail<UserFormValuesType>
-				labelText={translations['users.form_manage.label_email']}
+				labelText="Email"
 				id={elementIds.email}
 				fieldValue={formValues.email ?? ''}
 				disabled={pending}
@@ -110,15 +87,7 @@ export function FormManageUser({
 			/>
 
 			<FormComponentPassword<UserFormValuesType>
-				labelText={
-					actionName === 'create'
-						? translations[
-								'users.form_manage.label_password_on_create'
-							]
-						: translations[
-								'users.form_manage.label_password_on_update'
-							]
-				}
+				labelText="Password"
 				id={elementIds.password}
 				fieldName="password"
 				fieldValue={formValues.password ?? ''}
@@ -130,9 +99,7 @@ export function FormManageUser({
 			/>
 
 			<FormComponentPassword<UserFormValuesType>
-				labelText={
-					translations['users.form_manage.label_password_confirm']
-				}
+				labelText="Confirm Password"
 				id={elementIds.passwordConfirm}
 				fieldName="password_confirm"
 				fieldValue={formValues.password_confirm ?? ''}
@@ -146,39 +113,42 @@ export function FormManageUser({
 			/>
 
 			<FormComponentSelect<UserFormValuesType>
-				labelText={translations['users.form_manage.label_language']}
+				labelText="Language"
 				id={elementIds.language}
 				fieldName="language"
 				fieldValue={formValues.language}
 				disabled={pending}
 				options={languages}
-				onValueChange={(value) => handleChange('language', value)}
+				onChange={(value) =>
+					handleChange('language', value as Language)
+				}
 				error={errors.language}
 			/>
 
 			<FormComponentRadio<UserFormValuesType>
-				labelText={translations['users.form_manage.label_role']}
+				labelText="Role"
 				id={elementIds.role}
 				fieldName="role"
 				fieldValue={formValues.role}
 				options={roles}
 				disabled={pending}
-				onValueChange={(value) => handleChange('role', value)}
+				onChange={(value) => handleChange('role', value as UserRole)}
 				error={errors.role}
 			/>
 
 			{formValues.role === UserRoleEnum.OPERATOR && (
 				<FormComponentSelect<UserFormValuesType>
-					labelText={
-						translations['users.form_manage.label_operator_type']
-					}
+					labelText="Operator Type"
 					id={elementIds.operatorType}
 					fieldName="operator_type"
 					fieldValue={formValues.operator_type ?? ''}
 					options={operatorTypes}
 					disabled={pending}
-					onValueChange={(value) =>
-						handleChange('operator_type', value)
+					onChange={(value) =>
+						handleChange(
+							'operator_type',
+							value as UserOperatorType | null,
+						)
 					}
 					error={errors.operator_type}
 				/>

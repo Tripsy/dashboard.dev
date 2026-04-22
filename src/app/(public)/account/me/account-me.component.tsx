@@ -1,26 +1,25 @@
 'use client';
 
-import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
-import { AuthTokenList } from '@/app/(public)/account/login/login.component';
+import { AuthTokenList } from '@/app/(public)/_components/auth-token-list.component';
 import { Icons } from '@/components/icon.component';
 import { LogoComponent } from '@/components/layout/logo.default';
 import { LoadingComponent } from '@/components/status.component';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Link } from '@/components/ui/link';
 import Routes from '@/config/routes.setup';
 import { formatDate } from '@/helpers/date.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { useAuth } from '@/providers/auth.provider';
 import { useToast } from '@/providers/toast.provider';
-import { getSessions } from '@/services/account.service';
-import type { AuthTokenListType } from '@/types/auth.type';
+import { requestGetSessions } from '@/services/account.service';
+import type { AuthTokenType } from '@/types/auth.type';
 
 export default function AccountMe() {
 	const { auth, authStatus } = useAuth();
 	const { showToast } = useToast();
-	const [sessions, setSessions] = useState<AuthTokenListType>([]);
+	const [sessions, setSessions] = useState<AuthTokenType[]>([]);
 
 	const translationsKeys = useMemo(
 		() =>
@@ -40,7 +39,7 @@ export default function AccountMe() {
 	useEffect(() => {
 		if (authStatus === 'authenticated') {
 			(async () => {
-				setSessions(await getSessions());
+				setSessions(await requestGetSessions());
 			})();
 		}
 	}, [authStatus]);
@@ -90,7 +89,8 @@ export default function AccountMe() {
 	}
 
 	if (!auth) {
-		throw new Error('Not authenticated.');
+		router.replace(Routes.get('login'));
+		return null;
 	}
 
 	return (
@@ -110,16 +110,15 @@ export default function AccountMe() {
 							<Icons.User />
 							Personal Information
 						</h2>
-						<Button variant="outline" size="sm">
-							<Link
-								href={Routes.get('account-edit')}
-								prefetch={false}
-								title="Edit my account"
-								className="inline-flex items-center justify-center gap-1"
-							>
-								<Icons.Action.Update /> Edit
-							</Link>
-						</Button>
+						<Link
+							href={Routes.get('account-edit')}
+							prefetch={false}
+							title="Edit my account"
+							variant="outline"
+							size="sm"
+						>
+							<Icons.Action.Update /> Edit
+						</Link>
 					</div>
 
 					<div className="border-b pb-4">
@@ -156,16 +155,15 @@ export default function AccountMe() {
 									</Badge>
 								)}
 							</div>
-							<Button variant="outline" size="sm">
-								<Link
-									href={Routes.get('email-update')}
-									prefetch={false}
-									title="Update email address"
-									className="inline-flex items-center justify-center gap-1"
-								>
-									<Icons.Action.Update /> Change
-								</Link>
-							</Button>
+							<Link
+								href={Routes.get('email-update')}
+								prefetch={false}
+								title="Update email address"
+								variant="outline"
+								size="sm"
+							>
+								<Icons.Action.Update /> Change
+							</Link>
 						</div>
 					</div>
 
@@ -205,30 +203,28 @@ export default function AccountMe() {
 									)}
 								</p>
 							</div>
-							<Button variant="outline" size="sm">
-								<Link
-									href={Routes.get('password-update')}
-									prefetch={false}
-									title="Update password"
-									className="inline-flex items-center justify-center gap-1"
-								>
-									<Icons.Password /> Change
-								</Link>
-							</Button>
+							<Link
+								href={Routes.get('password-update')}
+								prefetch={false}
+								title="Update password"
+								variant="outline"
+								size="sm"
+							>
+								<Icons.Password /> Change
+							</Link>
 						</div>
 					</div>
 
 					<div className="flex justify-end mt-6">
-						<Button variant="error" size="sm">
-							<Link
-								href={Routes.get('account-delete')}
-								prefetch={false}
-								title="Delete my account"
-								className="flex items-center gap-1"
-							>
-								<Icons.Action.Delete /> Delete Account
-							</Link>
-						</Button>
+						<Link
+							href={Routes.get('account-delete')}
+							prefetch={false}
+							title="Delete my account"
+							variant="error"
+							size="sm"
+						>
+							<Icons.Action.Delete /> Delete Account
+						</Link>
 					</div>
 				</div>
 
@@ -242,7 +238,7 @@ export default function AccountMe() {
 					<div className="py-2 space-y-4">
 						<AuthTokenList
 							tokens={sessions}
-							callbackAction={(success, message) => {
+							onResult={(success, message) => {
 								showToast({
 									severity: success ? 'success' : 'error',
 									summary: success ? 'Success' : 'Error',

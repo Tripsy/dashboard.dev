@@ -1,15 +1,24 @@
 import { z } from 'zod';
 import { Configuration } from '@/config/settings.config';
-import { translateBatch } from '@/config/translate.setup';
-import { LanguageEnum } from '@/models/user.model';
-import type { FormSituationType } from '@/types/form.type';
+import {
+	getFormDataAsBoolean,
+	getFormDataAsEnum,
+	getFormDataAsString,
+} from '@/helpers/form.helper';
+import { BaseValidator } from '@/helpers/validator.helper';
+import {
+	LANGUAGE_DEFAULT,
+	type Language,
+	LanguageEnum,
+} from '@/models/user.model';
+import type { FormErrorsType, FormSituationType } from '@/types/form.type';
 
-export type RegisterFormFieldsType = {
-	name: string;
-	email: string;
-	password: string;
-	password_confirm: string;
-	language: LanguageEnum;
+export type RegisterFormValuesType = {
+	name: string | null;
+	email: string | null;
+	password: string | null;
+	password_confirm: string | null;
+	language: Language;
 	terms: boolean;
 };
 
@@ -19,8 +28,8 @@ export type RegisterSituationType =
 	| 'pending_account';
 
 export type RegisterStateType = {
-	values: RegisterFormFieldsType;
-	errors: Partial<Record<keyof RegisterFormFieldsType, string[]>>;
+	values: RegisterFormValuesType;
+	errors: FormErrorsType<RegisterFormValuesType>;
 	message: string | null;
 	situation: RegisterSituationType;
 };
@@ -31,7 +40,7 @@ export const RegisterState: RegisterStateType = {
 		email: '',
 		password: '',
 		password_confirm: '',
-		language: LanguageEnum.RO,
+		language: LANGUAGE_DEFAULT,
 		terms: false,
 	},
 	errors: {},
@@ -39,100 +48,99 @@ export const RegisterState: RegisterStateType = {
 	situation: null,
 };
 
-const translations = await translateBatch([
-	'register.validation.name_invalid',
-	{
-		key: 'register.validation.name_min',
-		vars: {
-			min: Configuration.get('user.nameMinLength') as string,
-		},
-	},
-	'register.validation.email_invalid',
-	'register.validation.password_invalid',
-	{
-		key: 'register.validation.password_min',
-		vars: {
-			min: Configuration.get('user.passwordMinLength') as string,
-		},
-	},
-	'register.validation.password_condition_capital_letter',
-	'register.validation.password_condition_number',
-	'register.validation.password_condition_special_character',
-	'register.validation.password_confirm_required',
-	'register.validation.password_confirm_mismatch',
-	'register.validation.language_invalid',
-	'register.validation.terms_required',
-]);
+const validatorMessages = await BaseValidator.getValidatorMessages(
+	[
+		'invalid_name',
+		'name_min',
+		'invalid_email',
+		'invalid_password',
+		'password_min',
+		'password_condition_capital_letter',
+		'password_condition_number',
+		'password_condition_special_character',
+		'password_confirm_required',
+		'password_confirm_mismatch',
+		'invalid_language',
+		'terms_required',
+	] as const,
+	'register.validation',
+);
 
-export const RegisterSchema = z
-	.object({
-		name: z
-			.string({
-				message: translations['register.validation.name_invalid'],
-			})
-			.trim()
-			.min(Configuration.get('user.nameMinLength') as number, {
-				message: translations['register.validation.name_min'],
-			}),
-		email: z.email({
-			message: translations['register.validation.email_invalid'],
-		}),
-		password: z
-			.string({
-				message: translations['register.validation.password_invalid'],
-			})
-			.trim()
-			.min(Configuration.get('user.passwordMinLength') as number, {
-				message: translations['register.validation.password_min'],
-			})
-			.refine((value) => /[A-Z]/.test(value), {
-				message:
-					translations[
-						'register.validation.password_condition_capital_letter'
-					],
-			})
-			.refine((value) => /[0-9]/.test(value), {
-				message:
-					translations[
-						'register.validation.password_condition_number'
-					],
-			})
-			.refine((value) => /[!@#$%^&*()_+{}[\]:;<>,.?~\\/-]/.test(value), {
-				message:
-					translations[
-						'register.validation.password_condition_special_character'
-					],
-			}),
-		password_confirm: z
-			.string({
-				message:
-					translations[
-						'register.validation.password_confirm_required'
-					],
-			})
-			.trim()
-			.nonempty({
-				message:
-					translations[
-						'register.validation.password_confirm_required'
-					],
-			}),
-		language: z.enum(LanguageEnum, {
-			message: translations['register.validation.language_invalid'],
-		}),
-		terms: z.boolean().refine((val) => val === true, {
-			message: translations['register.validation.terms_required'],
-		}),
-	})
-	.superRefine(({ password, password_confirm }, ctx) => {
-		if (password !== password_confirm) {
-			ctx.addIssue({
-				path: ['password_confirm'],
-				message:
-					translations[
-						'register.validation.password_confirm_mismatch'
-					],
-				code: 'custom',
-			});
-		}
-	});
+class RegisterValidator extends BaseValidator<typeof validatorMessages> {
+	register = z
+		.object({
+			name: this.validateString(
+				{
+					invalid: this.getMessage('invalid_name'),
+					min_chars: this.getMessage('name_min', {
+						min: Configuration.get('user.nameMinChars') as string,
+					}),
+				},
+				{
+					minChars: Configuration.get('user.nameMinChars') as number,
+				},
+			),
+			email: this.validateEmail(this.getMessage('invalid_email')),
+			password: this.validatePassword(
+				{
+					invalid_password: this.getMessage('invalid_password'),
+					password_min: this.getMessage('password_min', {
+						min: Configuration.get(
+							'user.passwordMinChars',
+						) as string,
+					}),
+					password_condition_capital_letter: this.getMessage(
+						'password_condition_capital_letter',
+					),
+					password_condition_number: this.getMessage(
+						'password_condition_number',
+					),
+					password_condition_special_character: this.getMessage(
+						'password_condition_special_character',
+					),
+				},
+				{
+					minLength: Configuration.get(
+						'user.passwordMinChars',
+					) as number,
+				},
+			),
+			password_confirm: this.validateString(
+				this.getMessage('password_confirm_required'),
+			),
+			language: this.validateLanguage(
+				this.getMessage('invalid_language'),
+			),
+			terms: this.validateBoolean(this.getMessage('terms_required')),
+		})
+		.superRefine(({ password, password_confirm }, ctx) => {
+			if (password !== password_confirm) {
+				ctx.addIssue({
+					path: ['password_confirm'],
+					message: this.getMessage('password_confirm_mismatch'),
+					code: 'custom',
+				});
+			}
+		});
+}
+
+export function validateFormRegister(values: RegisterFormValuesType) {
+	const validator = new RegisterValidator(validatorMessages);
+
+	return validator.register.safeParse(values);
+}
+
+export function getRegisterFormValues(
+	formData: FormData,
+): RegisterFormValuesType {
+	return {
+		name: getFormDataAsString(formData, 'name'),
+		email: getFormDataAsString(formData, 'email'),
+		password: getFormDataAsString(formData, 'password'),
+		password_confirm: getFormDataAsString(formData, 'password_confirm'),
+		language:
+			getFormDataAsEnum(formData, 'language', LanguageEnum) ||
+			LANGUAGE_DEFAULT,
+		terms: getFormDataAsBoolean(formData, 'terms') || false,
+	};
+}

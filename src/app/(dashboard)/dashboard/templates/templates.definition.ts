@@ -1,150 +1,234 @@
 import { z } from 'zod';
-import {
-	type DataTableColumnType,
-	DataTableValue,
-} from '@/app/(dashboard)/_components/data-table-value';
-import type { FormStateType } from '@/config/data-source.config';
+import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
+import { FormManageTemplate } from '@/app/(dashboard)/dashboard/templates/form-manage-template.component';
+import { ViewTemplate } from '@/app/(dashboard)/dashboard/templates/view-template.component';
+import type {
+	DataSourceConfigType,
+	DataTableColumnType,
+} from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
-import { safeHtml } from '@/helpers/form.helper';
-import { parseJson } from '@/helpers/string.helper';
+import { getFormDataAsEnum, getFormDataAsString } from '@/helpers/form.helper';
+import {
+	requestCreate,
+	requestDelete,
+	requestFind,
+	requestRestore,
+	requestUpdate,
+} from '@/helpers/services.helper';
+import { parseJson, toKebabCase } from '@/helpers/string.helper';
+import { BaseValidator } from '@/helpers/validator.helper';
 import {
 	type TemplateFormValuesType,
+	type TemplateLayoutEmail,
 	TemplateLayoutEmailEnum,
+	type TemplateLayoutPage,
 	TemplateLayoutPageEnum,
 	type TemplateModel,
+	type TemplateType,
 	TemplateTypeEnum,
 } from '@/models/template.model';
-import { LanguageEnum } from '@/models/user.model';
-import {
-	createTemplate,
-	deleteTemplate,
-	findTemplates,
-	restoreTemplate,
-	updateTemplate,
-} from '@/services/templates.service';
+import { LANGUAGE_DEFAULT, LanguageEnum } from '@/models/user.model';
+import type { FindFunctionParamsType } from '@/types/action.type';
+import type { FormStateType } from '@/types/form.type';
 
-const translations = await translateBatch([
-	'templates.validation.label_invalid',
-	'templates.validation.language_invalid',
-	'templates.validation.type_invalid',
-	'templates.validation.email_subject_invalid',
-	'templates.validation.email_html_invalid',
-	'templates.validation.email_layout_invalid',
-	'templates.validation.page_title_invalid',
-	'templates.validation.page_body_invalid',
-	'templates.validation.page_layout_invalid',
-	'templates.data_table.column_id',
-	'templates.data_table.column_label',
-	'templates.data_table.column_language',
-	'templates.data_table.column_type',
-	'templates.data_table.column_created_at',
-]);
+const translations = await translateBatch(
+	[
+		'create.title',
+		'update.title',
+		'view.title',
+		'delete.title',
+		'restore.title',
+		'permissions.title',
+	],
+	'templates.action',
+);
 
-const ValidateSchemaBaseTemplates = z.object({
-	label: z.string().nonempty({
-		message: translations['templates.validation.label_invalid'],
-	}),
-	language: z.enum(LanguageEnum, {
-		message: translations['templates.validation.language_invalid'],
-	}),
-	type: z.enum(TemplateTypeEnum, {
-		message: translations['templates.validation.type_invalid'],
-	}),
-});
+const validatorMessages = await BaseValidator.getValidatorMessages(
+	[
+		'invalid_label',
+		'invalid_language',
+		'invalid_email_subject',
+		'invalid_email_text',
+		'invalid_email_html',
+		'invalid_email_layout',
+		'invalid_page_title',
+		'invalid_page_html',
+		'invalid_page_layout',
+	] as const,
+	'templates.validation',
+);
 
-const ValidateSchemaEmailTemplates = ValidateSchemaBaseTemplates.extend({
-	type: z.literal(TemplateTypeEnum.EMAIL),
-	subject: z.string().nonempty({
-		message: translations['templates.validation.email_subject_invalid'],
-	}),
-	text: z
-		.string({
-			message: translations['templates.validation.email_text_invalid'],
-		})
-		.optional(),
-	html: z
-		.string()
-		.nonempty({
-			message: translations['templates.validation.email_html_invalid'],
-		})
-		.transform((val) => safeHtml(val)),
-	layout: z
-		.string({
-			message: translations['templates.validation.email_layout_invalid'],
-		})
-		.optional(),
-});
+class TemplateValidator extends BaseValidator<typeof validatorMessages> {
+	baseSchema = {
+		label: this.validateString(this.getMessage('invalid_label')),
+		language: this.validateLanguage(this.getMessage('invalid_language')),
+	};
 
-const ValidateSchemaPageTemplates = ValidateSchemaBaseTemplates.extend({
-	type: z.literal(TemplateTypeEnum.PAGE),
-	title: z.string().nonempty({
-		message: translations['templates.validation.page_title_invalid'],
-	}),
-	html: z
-		.string()
-		.nonempty({
-			message: translations['templates.validation.page_html_invalid'],
-		})
-		.transform((val) => safeHtml(val)),
-	layout: z
-		.string({
-			message: translations['templates.validation.page_layout_invalid'],
-		})
-		.optional(),
-});
+	manage = z.discriminatedUnion('type', [
+		// Email schema
+		z
+			.object({
+				type: z.literal(TemplateTypeEnum.EMAIL),
+				content: z.object({
+					subject: this.validateString(
+						this.getMessage('invalid_email_subject'),
+					),
+					text: this.validateString(
+						this.getMessage('invalid_email_text'),
+						{
+							required: false,
+						},
+					),
+					html: this.validateString(
+						this.getMessage('invalid_email_html'),
+					),
+					layout: this.validateEnum(
+						TemplateLayoutEmailEnum,
+						this.getMessage('invalid_email_layout'),
+					),
+				}),
+			})
+			.extend(this.baseSchema),
 
-export const ValidateSchemaTemplates = z.union([
-	ValidateSchemaEmailTemplates,
-	ValidateSchemaPageTemplates,
-]);
+		// Page schema
+		z
+			.object({
+				type: z.literal(TemplateTypeEnum.PAGE),
+				content: z.object({
+					title: this.validateString(
+						this.getMessage('invalid_page_title'),
+					),
+					html: this.validateString(
+						this.getMessage('invalid_page_html'),
+					),
+					layout: this.validateEnum(
+						TemplateLayoutPageEnum,
+						this.getMessage('invalid_page_layout'),
+					),
+				}),
+			})
+			.extend(this.baseSchema),
+	]);
+}
 
-export function getFormValuesTemplates(
-	formData: FormData,
-): TemplateFormValuesType {
-	const language = formData.get('language');
-	const validLanguages = Object.values(LanguageEnum);
+function validateForm(values: TemplateFormValuesType) {
+	const validator = new TemplateValidator(validatorMessages);
 
-	const type = formData.get('type');
-	const validTypes = Object.values(TemplateTypeEnum);
+	return validator.manage.safeParse(values);
+}
 
-	// Fallback-safe values
-	const selectedLanguage = validLanguages.includes(language as LanguageEnum)
-		? (language as LanguageEnum)
-		: LanguageEnum.EN;
+export function getFormValues(formData: FormData): TemplateFormValuesType {
+	const type =
+		getFormDataAsEnum(formData, 'type', TemplateTypeEnum) ||
+		TemplateTypeEnum.EMAIL;
 
-	const selectedType = validTypes.includes(type as TemplateTypeEnum)
-		? (type as TemplateTypeEnum)
-		: TemplateTypeEnum.EMAIL;
+	const label = getFormDataAsString(formData, 'label');
 
-	if (selectedType === TemplateTypeEnum.EMAIL) {
+	const base = {
+		label: label ? toKebabCase(label) : null,
+		language:
+			getFormDataAsEnum(formData, 'language', LanguageEnum) ||
+			LANGUAGE_DEFAULT,
+	};
+
+	if (type === TemplateTypeEnum.EMAIL) {
 		return {
-			label: (formData.get('label') as string) ?? '',
-			language: selectedLanguage,
+			...base,
 			type: TemplateTypeEnum.EMAIL,
-			subject: (formData.get('subject') as string) ?? '',
-			html: (formData.get('html') as string) ?? '',
-			layout:
-				(formData.get('layout') as TemplateLayoutEmailEnum) ??
-				TemplateLayoutEmailEnum.DEFAULT,
+			content: {
+				subject: getFormDataAsString(formData, 'subject'),
+				html: getFormDataAsString(formData, 'html'),
+				text: getFormDataAsString(formData, 'text'),
+				layout:
+					getFormDataAsEnum(
+						formData,
+						'layout',
+						TemplateLayoutEmailEnum,
+					) || TemplateLayoutEmailEnum.DEFAULT,
+			},
 		};
 	}
 
 	return {
-		label: (formData.get('label') as string) ?? '',
-		language: selectedLanguage,
+		...base,
 		type: TemplateTypeEnum.PAGE,
-		title: (formData.get('title') as string) ?? '',
-		html: (formData.get('html') as string) ?? '',
-		layout:
-			(formData.get('content[layout]') as TemplateLayoutPageEnum) ??
-			TemplateLayoutPageEnum.DEFAULT,
+		content: {
+			title: getFormDataAsString(formData, 'title'),
+			html: getFormDataAsString(formData, 'html'),
+			layout:
+				getFormDataAsEnum(formData, 'layout', TemplateLayoutPageEnum) ||
+				TemplateLayoutPageEnum.DEFAULT,
+		},
+	};
+}
+
+function getFormState(
+	data?: TemplateModel,
+): FormStateType<TemplateFormValuesType> {
+	const type = data?.type ?? TemplateTypeEnum.EMAIL;
+
+	const state = {
+		errors: {},
+		message: null,
+		situation: null,
+		values: {
+			label: data?.label ?? null,
+			language: data?.language ?? LanguageEnum.EN,
+			type: type,
+		},
+	};
+
+	if (type === TemplateTypeEnum.EMAIL) {
+		const parsedContent = parseJson(data?.content);
+		const parsed =
+			parsedContent && typeof parsedContent === 'object'
+				? (parsedContent as {
+						subject?: string;
+						html?: string;
+						layout?: TemplateLayoutEmail;
+					})
+				: {};
+
+		return {
+			...state,
+			values: {
+				...state.values,
+				content: {
+					subject: parsed.subject ?? null,
+					html: parsed.html ?? null,
+					layout: parsed.layout ?? TemplateLayoutEmailEnum.DEFAULT,
+				},
+			},
+		};
+	}
+
+	const parsedContent = parseJson(data?.content);
+	const parsed =
+		parsedContent && typeof parsedContent === 'object'
+			? (parsedContent as {
+					title?: string;
+					html?: string;
+					layout?: TemplateLayoutPage;
+				})
+			: {};
+
+	return {
+		...state,
+		values: {
+			...state.values,
+			content: {
+				title: parsed.title ?? null,
+				html: parsed.html ?? null,
+				layout: parsed.layout ?? TemplateLayoutPageEnum.DEFAULT,
+			},
+		},
 	};
 }
 
 export type TemplateDataTableFiltersType = {
 	global: { value: string | null; matchMode: 'contains' };
 	language: { value: string | null; matchMode: 'equals' };
-	type: { value: TemplateTypeEnum | null; matchMode: 'equals' };
+	type: { value: TemplateType | null; matchMode: 'equals' };
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
@@ -155,187 +239,159 @@ export const templatesDataTableFilters: TemplateDataTableFiltersType = {
 	is_deleted: { value: false, matchMode: 'equals' },
 };
 
-export const dataSourceConfigTemplates = {
-	dataTableState: {
-		reloadTrigger: 0,
-		first: 0,
-		rows: 10,
-		sortField: 'id',
-		sortOrder: -1 as const,
-		filters: templatesDataTableFilters,
+export const dataSourceConfigTemplates: DataSourceConfigType<
+	TemplateModel,
+	TemplateFormValuesType
+> = {
+	dataTable: {
+		state: {
+			first: 0,
+			rows: 10,
+			sortField: 'id',
+			sortOrder: -1 as const,
+			filters: templatesDataTableFilters,
+		},
+		columns: [
+			{
+				field: 'id',
+				header: 'ID',
+				sortable: true,
+				body: (
+					entry: TemplateModel,
+					column: DataTableColumnType<TemplateModel>,
+				) =>
+					DataTableValue(entry, column, {
+						markDeleted: true,
+						displayButton: {
+							action: 'view',
+							dataSource: 'templates',
+						},
+					}),
+			},
+			{
+				field: 'label',
+				header: 'Label',
+				sortable: true,
+			},
+			{
+				field: 'language',
+				header: 'Language',
+			},
+			{
+				field: 'type',
+				header: 'Type',
+				body: (
+					entry: TemplateModel,
+					column: DataTableColumnType<TemplateModel>,
+				) =>
+					DataTableValue(entry, column, {
+						capitalize: true,
+					}),
+			},
+			{
+				field: 'created_at',
+				header: 'Created At',
+				sortable: true,
+				body: (
+					entry: TemplateModel,
+					column: DataTableColumnType<TemplateModel>,
+				) =>
+					DataTableValue(entry, column, {
+						displayDate: true,
+					}),
+			},
+		],
+		find: (params: FindFunctionParamsType) =>
+			requestFind<TemplateModel>('templates', params),
 	},
-	dataTableColumns: [
-		{
-			field: 'id',
-			header: translations['templates.data_table.column_id'],
-			sortable: true,
-			body: (
-				entry: TemplateModel,
-				column: DataTableColumnType<TemplateModel>,
-			) =>
-				DataTableValue(entry, column, {
-					markDeleted: true,
-					action: {
-						name: 'view',
-						source: 'templates',
-					},
-				}),
-		},
-		{
-			field: 'label',
-			header: translations['templates.data_table.column_label'],
-			sortable: true,
-		},
-		{
-			field: 'language',
-			header: translations['templates.data_table.column_language'],
-		},
-		{
-			field: 'type',
-			header: translations['templates.data_table.column_type'],
-			body: (
-				entry: TemplateModel,
-				column: DataTableColumnType<TemplateModel>,
-			) =>
-				DataTableValue(entry, column, {
-					capitalize: true,
-				}),
-		},
-		{
-			field: 'created_at',
-			header: translations['templates.data_table.column_created_at'],
-			sortable: true,
-			body: (
-				entry: TemplateModel,
-				column: DataTableColumnType<TemplateModel>,
-			) =>
-				DataTableValue(entry, column, {
-					displayDate: true,
-				}),
-		},
-	],
-	formState: {
-		dataSource: 'templates' as const,
-		id: undefined,
-		values: {
-			label: '',
-			language: LanguageEnum.EN,
-			type: TemplateTypeEnum.EMAIL,
-			subject: '',
-			html: '',
-			layout: TemplateLayoutEmailEnum.DEFAULT,
-		} as TemplateFormValuesType,
-		errors: {},
-		message: null,
-		situation: null,
-	},
-	functions: {
-		find: findTemplates,
-		getFormValues: getFormValuesTemplates,
-		validateForm: (values: TemplateFormValuesType) => {
-			return ValidateSchemaTemplates.safeParse(values);
-		},
-		syncFormState: (
-			state: FormStateType<
-				'templates',
-				TemplateModel,
-				TemplateFormValuesType
-			>,
-			model: TemplateModel,
-		): FormStateType<
-			'templates',
-			TemplateModel,
-			TemplateFormValuesType
-		> => {
-			const parsed = parseJson(model.content);
-
-			if (model.type === TemplateTypeEnum.EMAIL) {
-				return {
-					...state,
-					id: model.id,
-					values: {
-						label: model.label,
-						language: model.language,
-						type: TemplateTypeEnum.EMAIL,
-						subject: parsed.subject ?? '',
-						html: parsed.html ?? '',
-						layout:
-							parsed.layout ?? TemplateLayoutEmailEnum.DEFAULT,
-					},
-				};
-			}
-
-			return {
-				...state,
-				id: model.id,
-				values: {
-					label: model.label,
-					language: model.language,
-					type: TemplateTypeEnum.PAGE,
-					title: parsed.title ?? '',
-					html: parsed.html ?? '',
-					layout: parsed.layout ?? TemplateLayoutPageEnum.DEFAULT,
-				},
-			};
-		},
-		displayActionEntries: (entries: TemplateModel[]) => {
-			return entries.map((entry) => ({
-				id: entry.id,
-				label: `(${entry.type}) ${entry.label}`,
-			}));
-		},
+	displayEntryLabel: (entry: TemplateModel) => {
+		return `[${entry.type}] ${entry.label}`;
 	},
 	actions: {
 		create: {
-			mode: 'form' as const,
-			permission: 'template.create',
-			allowedEntries: 'free' as const,
-			position: 'right' as const,
-			function: createTemplate,
-			buttonProps: {
-				variant: 'info' as const,
+			windowType: 'form',
+			windowTitle: translations['create.title'],
+			windowComponent: FormManageTemplate,
+			windowConfigProps: {
+				size: 'x4l',
 			},
+			permission: 'template.create',
+			entriesSelection: 'free',
+			operationFunction: (params: TemplateFormValuesType) =>
+				requestCreate<TemplateModel, TemplateFormValuesType>(
+					'templates',
+					params,
+				),
+			buttonPosition: 'right',
+			button: {
+				variant: 'info',
+			},
+			getFormValues: getFormValues,
+			validateForm: validateForm,
+			getFormState: getFormState,
 		},
 		update: {
-			mode: 'form' as const,
-			permission: 'template.update',
-			allowedEntries: 'single' as const,
-			position: 'left' as const,
-			function: updateTemplate,
-			buttonProps: {
-				variant: 'outline' as const,
-				hover: 'success' as const,
+			windowType: 'form',
+			windowTitle: translations['update.title'],
+			windowComponent: FormManageTemplate,
+			windowConfigProps: {
+				size: 'x4l',
 			},
+			permission: 'template.update',
+			entriesSelection: 'single',
+			operationFunction: (params: TemplateFormValuesType, id: number) =>
+				requestUpdate<TemplateModel, TemplateFormValuesType>(
+					'templates',
+					params,
+					id,
+				),
+			buttonPosition: 'left',
+			button: {
+				variant: 'outline',
+				hover: 'success',
+			},
+			getFormValues: getFormValues,
+			validateForm: validateForm,
+			getFormState: getFormState,
 		},
 		delete: {
-			mode: 'action' as const,
+			windowType: 'action',
+			windowTitle: translations['delete.title'],
 			permission: 'template.delete',
-			allowedEntries: 'single' as const,
+			entriesSelection: 'single',
 			customEntryCheck: (entry: TemplateModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			position: 'left' as const,
-			function: deleteTemplate,
-			buttonProps: {
-				variant: 'outline' as const,
-				hover: 'error' as const,
+			operationFunction: (entry: TemplateModel) =>
+				requestDelete('templates', entry),
+			buttonPosition: 'left',
+			button: {
+				variant: 'outline',
+				hover: 'error',
 			},
 		},
 		restore: {
-			mode: 'action' as const,
+			windowType: 'action',
+			windowTitle: translations['restore.title'],
 			permission: 'template.delete',
-			allowedEntries: 'single' as const,
+			entriesSelection: 'single',
 			customEntryCheck: (entry: TemplateModel) => !!entry.deleted_at, // Return true if the entry is deleted
-			position: 'left' as const,
-			function: restoreTemplate,
-			buttonProps: {
-				variant: 'outline' as const,
-				hover: 'info' as const,
+			operationFunction: (entry: TemplateModel) =>
+				requestRestore('templates', entry),
+			buttonPosition: 'left',
+			button: {
+				variant: 'outline',
+				hover: 'info',
 			},
 		},
 		view: {
-			mode: 'other' as const,
+			windowType: 'view',
+			windowTitle: translations['view.title'],
+			windowComponent: ViewTemplate,
+			windowConfigProps: {
+				size: 'x4l',
+			},
 			permission: 'template.read',
-			allowedEntries: 'single' as const,
-			position: 'hidden' as const,
+			entriesSelection: 'single',
+			buttonPosition: 'hidden',
 		},
 	},
 };

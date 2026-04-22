@@ -1,15 +1,12 @@
 'use client';
 
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { useActionState, useEffect } from 'react';
+import { useActionState, useEffect } from 'react';
+import { accountEditAction } from '@/app/(public)/account/edit/account-edit.action';
 import {
-	accountEditAction,
-	accountEditValidate,
-} from '@/app/(public)/account/edit/account-edit.action';
-import {
-	type AccountEditFormFieldsType,
+	type AccountEditFormValuesType,
 	AccountEditState,
+	validateFormAccountEdit,
 } from '@/app/(public)/account/edit/account-edit.definition';
 import { FormCsrf } from '@/components/form/form-csrf';
 import {
@@ -21,45 +18,42 @@ import { FormError } from '@/components/form/form-error.component';
 import { FormWrapperComponent } from '@/components/form/form-wrapper';
 import { Icons } from '@/components/icon.component';
 import { LoadingComponent } from '@/components/status.component';
-import { Button } from '@/components/ui/button';
+import { Link } from '@/components/ui/link';
 import Routes from '@/config/routes.setup';
-import { createHandleChange } from '@/helpers/form.helper';
-import { capitalizeFirstLetter } from '@/helpers/string.helper';
+import { createHandleChange, toOptionsFromEnum } from '@/helpers/form.helper';
+import { formatEnumLabel } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
-import { LanguageEnum } from '@/models/user.model';
+import {
+	LANGUAGE_DEFAULT,
+	type Language,
+	LanguageEnum,
+} from '@/models/user.model';
 import { useAuth } from '@/providers/auth.provider';
 
-const languages = Object.values(LanguageEnum).map((language) => ({
-	label: capitalizeFirstLetter(language),
-	value: language,
-}));
+const languages = toOptionsFromEnum(LanguageEnum, {
+	formatter: formatEnumLabel,
+});
 
 export default function AccountEdit() {
 	const { auth, authStatus, refreshAuth } = useAuth();
 
-	const [state, action, pending] = useActionState(
-		accountEditAction,
-		AccountEditState,
-	);
+	const [state, action, pending] = useActionState(accountEditAction, {
+		...AccountEditState,
+		values: {
+			name: auth?.name ?? '',
+			language: auth?.language ?? LANGUAGE_DEFAULT,
+		},
+	});
 
 	const [formValues, setFormValues] =
-		useFormValues<AccountEditFormFieldsType>(state.values);
-
-	useEffect(() => {
-		if (authStatus === 'authenticated' && auth) {
-			setFormValues({
-				name: auth.name || '',
-				language: auth.language || LanguageEnum.EN,
-			});
-		}
-	}, [authStatus, auth, setFormValues]);
+		useFormValues<AccountEditFormValuesType>(state.values);
 
 	const { errors, submitted, markSubmit, markFieldAsTouched } =
 		useFormValidation({
 			formValues: formValues,
-			validate: accountEditValidate,
+			validateForm: validateFormAccountEdit,
 			debounceDelay: 800,
 		});
 
@@ -69,7 +63,7 @@ export default function AccountEdit() {
 
 	// Refresh auth & redirect to `/account/me`
 	useEffect(() => {
-		if (state.situation === 'success' && router) {
+		if (state.situation === 'success') {
 			(async () => {
 				await refreshAuth();
 			})();
@@ -85,7 +79,8 @@ export default function AccountEdit() {
 	}
 
 	if (!auth) {
-		throw new Error('Not authenticated.');
+		router.replace(Routes.get('login'));
+		return null;
 	}
 
 	if (state.situation === 'csrf_error') {
@@ -104,7 +99,7 @@ export default function AccountEdit() {
 			>
 				<FormCsrf />
 
-				<FormComponentName<AccountEditFormFieldsType>
+				<FormComponentName<AccountEditFormValuesType>
 					labelText="Name"
 					id={elementIds.name}
 					fieldValue={formValues.name ?? ''}
@@ -113,46 +108,45 @@ export default function AccountEdit() {
 					error={errors.name}
 				/>
 
-				<FormComponentRadio<AccountEditFormFieldsType>
+				<FormComponentRadio<AccountEditFormValuesType>
 					labelText="Language"
 					id={elementIds.language}
 					fieldName="language"
 					fieldValue={formValues.language}
 					disabled={pending}
 					options={languages}
-					onValueChange={(value) =>
-						handleChange('language', value as LanguageEnum)
+					onChange={(value) =>
+						handleChange('language', value as Language)
 					}
 					error={errors.language}
 				/>
 
 				<div className="flex justify-end gap-2">
-					<Button variant="outline" hover="warning">
-						<Link
-							href={Routes.get('account-me')}
-							title="Cancel & Go back to my account"
-							className="flex items-center gap-1"
-						>
-							<Icons.Action.Cancel /> Cancel
-						</Link>
-					</Button>
+					<Link
+						href={Routes.get('account-me')}
+						title="Cancel & Go back to my account"
+						variant="outline"
+						hover="warning"
+					>
+						<Icons.Action.Cancel /> Cancel
+					</Link>
 					<FormComponentSubmit
 						pending={pending}
 						submitted={submitted}
 						errors={errors}
 						button={{
 							label: 'Save',
-							icon: Icons.Action.Go,
+							iconLabel: 'save',
 						}}
 					/>
 				</div>
 
 				{state.situation === 'error' && state.message && (
 					<FormError>
-						<React.Fragment key="error-content">
+						<div className="flex items-center gap-1.5">
 							<Icons.Status.Error />
 							<div>{state.message}</div>
-						</React.Fragment>
+						</div>
 					</FormError>
 				)}
 			</form>

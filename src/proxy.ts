@@ -1,6 +1,6 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import Routes, { RouteAuth, type RouteMatch } from '@/config/routes.setup';
+import Routes, { RouteAuthEnum, type RouteMatch } from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
 import { ApiRequest, getResponseData } from '@/helpers/api.helper';
 import { getTrackedCookie } from '@/helpers/session.helper';
@@ -141,17 +141,17 @@ class MiddlewareContext {
 
 		const { auth: routeAuth, permission: routePermission } =
 			routeMatch?.props || {
-				auth: RouteAuth.PUBLIC,
+				auth: RouteAuthEnum.PUBLIC,
 				permission: undefined,
 			};
 
 		if (!sessionToken.value) {
 			switch (routeAuth) {
-				case RouteAuth.UNAUTHENTICATED:
-				case RouteAuth.PUBLIC:
+				case RouteAuthEnum.UNAUTHENTICATED:
+				case RouteAuthEnum.PUBLIC:
 					return this.success();
-				case RouteAuth.AUTHENTICATED:
-				case RouteAuth.PROTECTED:
+				case RouteAuthEnum.AUTHENTICATED:
+				case RouteAuthEnum.PROTECTED:
 					return this.redirectToLogin();
 				default:
 					return this.redirectToError('undefined_route');
@@ -162,15 +162,15 @@ class MiddlewareContext {
 
 		if (!authModel) {
 			switch (routeAuth) {
-				case RouteAuth.UNAUTHENTICATED:
-				case RouteAuth.PUBLIC: {
+				case RouteAuthEnum.UNAUTHENTICATED:
+				case RouteAuthEnum.PUBLIC: {
 					// Destroy session -> token exists but is invalid
 					this.destroySession();
 
 					return this.success();
 				}
-				case RouteAuth.AUTHENTICATED:
-				case RouteAuth.PROTECTED: {
+				case RouteAuthEnum.AUTHENTICATED:
+				case RouteAuthEnum.PROTECTED: {
 					this.res = this.redirectToError('unauthorized');
 
 					// Destroy session -> token exists but is invalid
@@ -184,11 +184,11 @@ class MiddlewareContext {
 			}
 		}
 
-		if (routeAuth === RouteAuth.UNAUTHENTICATED) {
+		if (routeAuth === RouteAuthEnum.UNAUTHENTICATED) {
 			return this.redirectToError('already_logged_in');
 		}
 
-		if (routeAuth === RouteAuth.PROTECTED) {
+		if (routeAuth === RouteAuthEnum.PROTECTED) {
 			if (!hasPermission(authModel, routePermission)) {
 				return this.redirectToError('unauthorized');
 			}

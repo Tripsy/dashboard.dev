@@ -22,7 +22,7 @@
 		"update": {
 			"title": "Update place - {{entry}}",
 			"label": "Update",
-			"success": "User updated successfully"
+			"success": "Place updated successfully"
 		},
 		"delete": {
 			"title": "Delete place - {{entry}}",

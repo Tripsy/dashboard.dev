@@ -10,6 +10,7 @@ import type {
 import { Configuration } from '@/config/settings.config';
 import { translateBatch } from '@/config/translate.setup';
 import { getFormDataAsEnum, getFormDataAsString } from '@/helpers/form.helper';
+import { arrayHasValue } from '@/helpers/objects.helper';
 import {
 	requestCreate,
 	requestDelete,
@@ -440,7 +441,6 @@ export const dataSourceConfigUsers: DataSourceConfigType<
 				hover: 'info',
 			},
 		},
-
 		enable: {
 			windowType: 'action',
 			windowTitle: translations['enable.title'],
@@ -448,9 +448,10 @@ export const dataSourceConfigUsers: DataSourceConfigType<
 			entriesSelection: 'single',
 			customEntryCheck: (entry: UserModel) =>
 				!entry.deleted_at &&
-				[UserStatusEnum.PENDING, UserStatusEnum.INACTIVE].includes(
-					entry.status,
-				),
+				arrayHasValue(entry.status, [
+					UserStatusEnum.PENDING,
+					UserStatusEnum.INACTIVE,
+				]),
 			operationFunction: (entry: UserModel) =>
 				requestUpdateStatus('users', entry, 'active'),
 			buttonPosition: 'left',
@@ -466,9 +467,10 @@ export const dataSourceConfigUsers: DataSourceConfigType<
 			entriesSelection: 'single',
 			customEntryCheck: (entry: UserModel) =>
 				!entry.deleted_at &&
-				[UserStatusEnum.PENDING, UserStatusEnum.ACTIVE].includes(
-					entry.status,
-				),
+				arrayHasValue(entry.status, [
+					UserStatusEnum.PENDING,
+					UserStatusEnum.ACTIVE,
+				]),
 			operationFunction: (entry: UserModel) =>
 				requestUpdateStatus('users', entry, 'inactive'),
 			buttonPosition: 'left',

@@ -51,11 +51,11 @@ const validatorMessages = await BaseValidator.getValidatorMessages(
 		'invalid_code',
 		'invalid_parent',
 		'invalid_parent_id',
+		'invalid_contents',
+		'duplicate_contents',
 		'invalid_language',
 		'invalid_name',
 		'invalid_type_label',
-		'invalid_contents',
-		'duplicate_contents',
 	],
 	'places.validation',
 );

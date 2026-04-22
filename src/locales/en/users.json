@@ -42,6 +42,12 @@
 			"success": "User deleted successfully",
 			"confirmText": "Are you sure you want to delete this user?"
 		},
+		"restore": {
+			"title": "Restore user - {{entry}}",
+			"label": "Restore",
+			"success": "User restored successfully",
+			"confirmText": "Are you sure you want to restore this user?"
+		},
 		"enable": {
 			"title": "Enable user - {{entry}}",
 			"label": "Enable",
@@ -53,12 +59,6 @@
 			"label": "Disable",
 			"success": "User status marked as inactive",
 			"confirmText": "Are you sure you want to mark this user as inactive?"
-		},
-		"restore": {
-			"title": "Restore user - {{entry}}",
-			"label": "Restore",
-			"success": "User restored successfully",
-			"confirmText": "Are you sure you want to restore this user?"
 		},
 		"view": {
 			"title": "User details - {{entry}}",

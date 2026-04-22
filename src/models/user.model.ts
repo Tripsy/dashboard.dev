@@ -19,7 +19,7 @@ export const UserStatusEnum = {
 	ACTIVE: 'active',
 	INACTIVE: 'inactive',
 	PENDING: 'pending',
-};
+} as const;
 
 export type UserStatus = (typeof UserStatusEnum)[keyof typeof UserStatusEnum];
 

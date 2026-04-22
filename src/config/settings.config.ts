@@ -3,6 +3,7 @@ import {
 	type ObjectValue,
 	setObjectValue,
 } from '@/helpers/objects.helper';
+import type { Currency, Language } from '@/types/common.type';
 
 type Settings = { [key: string]: ObjectValue };
 
@@ -11,6 +12,7 @@ function loadSettings(): Settings {
 		app: {
 			debug: process.env.NEXT_PUBLIC_APP_DEBUG === 'true',
 			language: process.env.NEXT_PUBLIC_APP_LANGUAGE || 'en',
+			currency: process.env.NEXT_PUBLIC_APP_CURRENCY || 'RON',
 			languageSupported: (
 				process.env.NEXT_PUBLIC_APP_SUPPORTED_LANGUAGES || 'en'
 			)
@@ -101,6 +103,14 @@ export const Configuration = {
 
 	isEnvironment: (value: string) => {
 		return Configuration.environment() === value;
+	},
+
+	language: () => {
+		return Configuration.get('app.language') as Language;
+	},
+
+	currency: () => {
+		return Configuration.get('app.currency') as Currency;
 	},
 
 	resolveExtension: () => {

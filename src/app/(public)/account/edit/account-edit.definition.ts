@@ -2,11 +2,7 @@ import { z } from 'zod';
 import { Configuration } from '@/config/settings.config';
 import { getFormDataAsEnum, getFormDataAsString } from '@/helpers/form.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
-import {
-	LANGUAGE_DEFAULT,
-	type Language,
-	LanguageEnum,
-} from '@/types/common.type';
+import { type Language, LanguageEnum } from '@/types/common.type';
 import type { FormSituationType } from '@/types/form.type';
 
 export type AccountEditFormValuesType = {
@@ -26,7 +22,7 @@ export type AccountEditStateType = {
 export const AccountEditState: AccountEditStateType = {
 	values: {
 		name: '',
-		language: LANGUAGE_DEFAULT,
+		language: Configuration.language(),
 	},
 	errors: {},
 	message: null,
@@ -68,6 +64,6 @@ export function getAccountEditFormValues(
 		name: getFormDataAsString(formData, 'name'),
 		language:
 			getFormDataAsEnum(formData, 'language', LanguageEnum) ||
-			LANGUAGE_DEFAULT,
+			Configuration.language(),
 	};
 }

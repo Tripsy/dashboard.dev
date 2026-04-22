@@ -6,11 +6,7 @@ import {
 	getFormDataAsString,
 } from '@/helpers/form.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
-import {
-	LANGUAGE_DEFAULT,
-	type Language,
-	LanguageEnum,
-} from '@/types/common.type';
+import { type Language, LanguageEnum } from '@/types/common.type';
 import type { FormErrorsType, FormSituationType } from '@/types/form.type';
 
 export type RegisterFormValuesType = {
@@ -40,7 +36,7 @@ export const RegisterState: RegisterStateType = {
 		email: '',
 		password: '',
 		password_confirm: '',
-		language: LANGUAGE_DEFAULT,
+		language: Configuration.language(),
 		terms: false,
 	},
 	errors: {},
@@ -140,7 +136,7 @@ export function getRegisterFormValues(
 		password_confirm: getFormDataAsString(formData, 'password_confirm'),
 		language:
 			getFormDataAsEnum(formData, 'language', LanguageEnum) ||
-			LANGUAGE_DEFAULT,
+			Configuration.language(),
 		terms: getFormDataAsBoolean(formData, 'terms') || false,
 	};
 }

@@ -30,7 +30,7 @@ import {
 	UserStatusEnum,
 } from '@/models/user.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
-import { LANGUAGE_DEFAULT, LanguageEnum } from '@/types/common.type';
+import { LanguageEnum } from '@/types/common.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(
@@ -218,7 +218,7 @@ function getFormValues(formData: FormData): UserFormValuesType {
 		password_confirm: getFormDataAsString(formData, 'password_confirm'),
 		language:
 			getFormDataAsEnum(formData, 'language', LanguageEnum) ||
-			LANGUAGE_DEFAULT,
+			Configuration.language(),
 		role:
 			getFormDataAsEnum(formData, 'role', UserRoleEnum) ||
 			UserRoleEnum.MEMBER,

@@ -6,6 +6,7 @@ import type {
 	DataSourceConfigType,
 	DataTableColumnType,
 } from '@/config/data-source.config';
+import { Configuration } from '@/config/settings.config';
 import { translateBatch } from '@/config/translate.setup';
 import {
 	getFormDataAsEnum,
@@ -31,7 +32,7 @@ import {
 	PlaceTypeEnum,
 } from '@/models/place.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
-import { LANGUAGE_DEFAULT, type Language } from '@/types/common.type';
+import type { Language } from '@/types/common.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(
@@ -256,7 +257,7 @@ export const dataSourceConfigPlaces: DataSourceConfigType<
 			requestFind<PlaceModel>('places', params),
 	},
 	displayEntryLabel: (entry: PlaceModel) => {
-		return displayPlaceLabel(entry, LANGUAGE_DEFAULT);
+		return displayPlaceLabel(entry, Configuration.language());
 	},
 	actions: {
 		create: {

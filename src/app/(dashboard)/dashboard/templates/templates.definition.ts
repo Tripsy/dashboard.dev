@@ -6,6 +6,7 @@ import type {
 	DataSourceConfigType,
 	DataTableColumnType,
 } from '@/config/data-source.config';
+import { Configuration } from '@/config/settings.config';
 import { translateBatch } from '@/config/translate.setup';
 import { getFormDataAsEnum, getFormDataAsString } from '@/helpers/form.helper';
 import {
@@ -28,7 +29,7 @@ import {
 	TemplateTypeEnum,
 } from '@/models/template.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
-import { LANGUAGE_DEFAULT, LanguageEnum } from '@/types/common.type';
+import { LanguageEnum } from '@/types/common.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(
@@ -128,7 +129,7 @@ export function getFormValues(formData: FormData): TemplateFormValuesType {
 		label: label ? toKebabCase(label) : null,
 		language:
 			getFormDataAsEnum(formData, 'language', LanguageEnum) ||
-			LANGUAGE_DEFAULT,
+			Configuration.language(),
 	};
 
 	if (type === TemplateTypeEnum.EMAIL) {

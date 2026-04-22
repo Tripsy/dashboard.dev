@@ -11,6 +11,7 @@ import {
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
 import type { PlacesDataTableFiltersType } from '@/app/(dashboard)/dashboard/places/places.definition';
 import type { TemplateDataTableFiltersType } from '@/app/(dashboard)/dashboard/templates/templates.definition';
+import { Configuration } from '@/config/settings.config';
 import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
@@ -20,11 +21,7 @@ import {
 	type PlaceType,
 	PlaceTypeEnum,
 } from '@/models/place.model';
-import {
-	LANGUAGE_DEFAULT,
-	type Language,
-	LanguageEnum,
-} from '@/types/common.type';
+import { type Language, LanguageEnum } from '@/types/common.type';
 
 const placeTypes = toOptionsFromEnum(PlaceTypeEnum, {
 	formatter: formatEnumLabel,
@@ -107,7 +104,7 @@ export const DataTablePlacesFilters = (): JSX.Element => {
 			<FormFiltersSelect<TemplateDataTableFiltersType>
 				labelText="Language"
 				fieldName="language"
-				fieldValue={filters.language.value ?? LANGUAGE_DEFAULT}
+				fieldValue={filters.language.value ?? Configuration.language()}
 				options={languages}
 				onChange={(value) =>
 					setFilterValue('language', value as Language)

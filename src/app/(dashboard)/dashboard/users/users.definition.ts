@@ -21,8 +21,6 @@ import {
 } from '@/helpers/services.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import {
-	LANGUAGE_DEFAULT,
-	LanguageEnum,
 	type UserFormValuesType,
 	type UserModel,
 	UserOperatorTypeEnum,
@@ -32,6 +30,7 @@ import {
 	UserStatusEnum,
 } from '@/models/user.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
+import { LANGUAGE_DEFAULT, LanguageEnum } from '@/types/common.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(

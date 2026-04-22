@@ -1,14 +1,6 @@
 import { arrayHasValue } from '@/helpers/objects.helper';
+import type { Currency } from '@/types/common.type';
 
-export const CurrencyEnum = {
-	RON: 'RON',
-	EUR: 'EUR',
-	USD: 'USD',
-} as const;
-
-export type Currency = (typeof CurrencyEnum)[keyof typeof CurrencyEnum];
-
-export const CURRENCY_DEFAULT = CurrencyEnum.RON;
 export const VAT_RATE_DEFAULT = 24;
 
 export const CashFlowDirectionEnum = {

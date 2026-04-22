@@ -1,5 +1,5 @@
 import type { TemplateContentEmailType } from '@/models/template.model';
-import type { Language } from '@/models/user.model';
+import type { Language } from '@/types/common.type';
 
 export const MailQueueStatusEnum = {
 	PENDING: 'pending',

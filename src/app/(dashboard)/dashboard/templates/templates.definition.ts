@@ -27,8 +27,8 @@ import {
 	type TemplateType,
 	TemplateTypeEnum,
 } from '@/models/template.model';
-import { LANGUAGE_DEFAULT, LanguageEnum } from '@/models/user.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
+import { LANGUAGE_DEFAULT, LanguageEnum } from '@/types/common.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(

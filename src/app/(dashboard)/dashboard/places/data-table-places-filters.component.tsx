@@ -24,7 +24,7 @@ import {
 	LANGUAGE_DEFAULT,
 	type Language,
 	LanguageEnum,
-} from '@/models/user.model';
+} from '@/types/common.type';
 
 const placeTypes = toOptionsFromEnum(PlaceTypeEnum, {
 	formatter: formatEnumLabel,

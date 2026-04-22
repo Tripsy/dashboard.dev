@@ -4,7 +4,7 @@ import { Configuration } from '@/config/settings.config';
 import { translateBatch } from '@/config/translate.setup';
 import { isValidDate } from '@/helpers/date.helper';
 import { replaceVars } from '@/helpers/string.helper';
-import { type Language, LanguageEnum } from '@/models/user.model';
+import { type Language, LanguageEnum } from '@/types/common.type';
 
 export abstract class IsValidator {
 	/**

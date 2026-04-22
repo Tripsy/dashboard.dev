@@ -1,4 +1,4 @@
-import type { Language } from '@/models/user.model';
+import type { Language } from '@/types/common.type';
 
 export const TemplateTypeEnum = {
 	PAGE: 'page',

@@ -10,7 +10,7 @@ import {
 	LANGUAGE_DEFAULT,
 	type Language,
 	LanguageEnum,
-} from '@/models/user.model';
+} from '@/types/common.type';
 import type { FormErrorsType, FormSituationType } from '@/types/form.type';
 
 export type RegisterFormValuesType = {

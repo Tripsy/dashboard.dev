@@ -1,5 +1,5 @@
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
-import { LANGUAGE_DEFAULT, type Language } from '@/models/user.model';
+import { LANGUAGE_DEFAULT, type Language } from '@/types/common.type';
 import type { PageMeta } from '@/types/page-meta.type';
 
 export const BrandStatusEnum = {

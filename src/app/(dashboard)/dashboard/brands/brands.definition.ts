@@ -30,8 +30,8 @@ import {
 	BrandTypeEnum,
 	displayBrandLabel,
 } from '@/models/brand.model';
-import type { Language } from '@/models/user.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
+import type { Language } from '@/types/common.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(

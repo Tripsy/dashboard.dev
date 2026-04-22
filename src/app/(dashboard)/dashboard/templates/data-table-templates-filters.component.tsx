@@ -20,7 +20,7 @@ import {
 	type TemplateType,
 	TemplateTypeEnum,
 } from '@/models/template.model';
-import { LanguageEnum } from '@/models/user.model';
+import { LanguageEnum } from '@/types/common.type';
 
 const languages = toOptionsFromEnum(LanguageEnum, {
 	formatter: formatEnumLabel,

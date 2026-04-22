@@ -14,12 +14,12 @@ import {
 	type BrandType,
 	BrandTypeEnum,
 } from '@/models/brand.model';
+import { useWindowForm } from '@/providers/window-form.provider';
 import {
 	LANGUAGE_DEFAULT,
 	type Language,
 	LanguageEnum,
-} from '@/models/user.model';
-import { useWindowForm } from '@/providers/window-form.provider';
+} from '@/types/common.type';
 import type { PageMeta } from '@/types/page-meta.type';
 
 const languages = Object.values(LanguageEnum);

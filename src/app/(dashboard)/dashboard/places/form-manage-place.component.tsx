@@ -20,13 +20,13 @@ import {
 	type PlaceType,
 	PlaceTypeEnum,
 } from '@/models/place.model';
+import { useWindowForm } from '@/providers/window-form.provider';
+import type { FindFunctionResponseType } from '@/types/action.type';
 import {
 	LANGUAGE_DEFAULT,
 	type Language,
 	LanguageEnum,
-} from '@/models/user.model';
-import { useWindowForm } from '@/providers/window-form.provider';
-import type { FindFunctionResponseType } from '@/types/action.type';
+} from '@/types/common.type';
 
 const languages = Object.values(LanguageEnum);
 

@@ -15,8 +15,8 @@ import {
 	type TemplateType,
 	TemplateTypeEnum,
 } from '@/models/template.model';
-import { type Language, LanguageEnum } from '@/models/user.model';
 import { useWindowForm } from '@/providers/window-form.provider';
+import { type Language, LanguageEnum } from '@/types/common.type';
 
 const languages = toOptionsFromEnum(LanguageEnum, {
 	formatter: formatEnumLabel,

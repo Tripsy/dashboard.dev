@@ -30,8 +30,8 @@ import {
 	type PlaceType,
 	PlaceTypeEnum,
 } from '@/models/place.model';
-import { LANGUAGE_DEFAULT, type Language } from '@/models/user.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
+import { LANGUAGE_DEFAULT, type Language } from '@/types/common.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(

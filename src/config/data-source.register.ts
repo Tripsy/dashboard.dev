@@ -1,4 +1,4 @@
-// // import { dataSourceConfigBrands } from '@/app/(dashboard)/dashboard/brands/brands.definition';
+import { dataSourceConfigBrands } from '@/app/(dashboard)/dashboard/brands/brands.definition';
 // // import { dataSourceConfigCashFlow } from '@/app/(dashboard)/dashboard/cash-flow/cash-flow.definition';
 import { dataSourceConfigClientAddress } from '@/app/(dashboard)/dashboard/client-address/client-address.definition';
 import { dataSourceConfigClients } from '@/app/(dashboard)/dashboard/clients/clients.definition';
@@ -17,7 +17,7 @@ import { registerDataSource } from '@/config/data-source.config';
  * This avoids circular dependencies
  */
 export function registerDashboardDataSource() {
-	// // registerDataSource('brands', dataSourceConfigBrands);
+	registerDataSource('brands', dataSourceConfigBrands);
 	// // registerDataSource('cash-flow', dataSourceConfigCashFlow);
 	registerDataSource('client-address', dataSourceConfigClientAddress);
 	registerDataSource('clients', dataSourceConfigClients);

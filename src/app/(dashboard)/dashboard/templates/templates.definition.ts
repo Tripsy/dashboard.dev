@@ -114,29 +114,6 @@ class TemplateValidator extends BaseValidator<typeof validatorMessages> {
 function validateForm(values: TemplateFormValuesType) {
 	const validator = new TemplateValidator(validatorMessages);
 
-	// const payload = values.type === TemplateTypeEnum.EMAIL
-	// 	? {
-	// 		type: values.type,
-	// 		label: values.label,
-	// 		language: values.language,
-	// 		content: {
-	// 			subject: values.subject,
-	// 			text: values.text,
-	// 			html: values.html,
-	// 			layout: values.layout,
-	// 		},
-	// 	}
-	// 	: {
-	// 		type: values.type,
-	// 		label: values.label,
-	// 		language: values.language,
-	// 		content: {
-	// 			title: values.title,
-	// 			html: values.html,
-	// 			layout: values.layout,
-	// 		},
-	// 	};
-
 	return validator.manage.safeParse(values);
 }
 

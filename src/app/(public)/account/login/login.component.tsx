@@ -121,6 +121,7 @@ export default function Login() {
 		state.resultData && isLoginResponseMaxActiveSessions(state.resultData)
 			? state.resultData.authTokens
 			: undefined;
+
 	return (
 		<FormWrapperComponent
 			title="Welcome back"

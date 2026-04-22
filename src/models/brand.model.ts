@@ -1,4 +1,5 @@
-import type { Language } from '@/models/user.model';
+import { capitalizeFirstLetter } from '@/helpers/string.helper';
+import { LANGUAGE_DEFAULT, type Language } from '@/models/user.model';
 import type { PageMeta } from '@/types/page-meta.type';
 
 export const BrandStatusEnum = {
@@ -9,30 +10,18 @@ export const BrandStatusEnum = {
 export type BrandStatus =
 	(typeof BrandStatusEnum)[keyof typeof BrandStatusEnum];
 
-// Status transition configuration
-export const BRAND_STATUS_TRANSITIONS: Record<BrandStatus, BrandStatus[]> = {
-	[BrandStatusEnum.ACTIVE]: [BrandStatusEnum.INACTIVE],
-	[BrandStatusEnum.INACTIVE]: [BrandStatusEnum.ACTIVE],
-};
-
 export const BrandTypeEnum = {
 	PRODUCT: 'product',
 } as const;
 
 export type BrandType = (typeof BrandTypeEnum)[keyof typeof BrandTypeEnum];
 
-// Content types
+export const BRAND_DEFAULT_TYPE = BrandTypeEnum.PRODUCT;
+
 export type BrandContent = {
 	language: Language | string;
 	description: string | null;
-	meta: PageMeta | null;
-};
-
-// Form input for brand content
-export type BrandContentInput = {
-	language: Language | string;
-	description?: string | null;
-	meta?: PageMeta | null;
+	meta: PageMeta;
 };
 
 // Brand base type without relations
@@ -41,7 +30,7 @@ type BrandBase<D = Date | string> = {
 	name: string;
 	slug: string;
 	status: BrandStatus;
-	type: BrandType;
+	brand_type: BrandType;
 	sort_order: number;
 	details: Record<string, string | number | boolean> | null;
 
@@ -59,47 +48,45 @@ export type BrandModel<D = Date | string> = BrandBase<D> & {
 
 // Form values type for creating/editing a brand
 export type BrandFormValuesType = {
-	name: string;
-	slug: string;
-	status: BrandStatus;
-	type: BrandType;
-	sort_order: number;
-	details: Record<string, string | number | boolean> | null;
+	name: string | null;
+	slug: string | null;
+	brand_type: BrandType;
 
-	contents: BrandContentInput[];
+	contents: BrandContent[];
 };
 
-// For forms, ensure at least one content if required
-export type BrandFormValuesWithContent = BrandFormValuesType & {
-	contents: [BrandContentInput, ...BrandContentInput[]]; // At least one content
-};
+// Helpers
+export function getBrandDescription(
+	brand: BrandModel,
+	language: Language | string,
+): string {
+	if (!brand.contents) {
+		return '[empty description]';
+	}
 
-// // Helper function to get content for specific language
-// export const getBrandContentByLanguage = (
-//     brand: BrandModel,
-//     language: LanguageEnum | string
-// ): BrandContent | undefined => {
-//     return brand.contents?.find(content => content.language === language);
-// };
-//
-// // Helper function to get brand name with optional language fallback
-// export const getBrandDisplayName = (
-//     brand: BrandModel,
-//     currentLanguage: LanguageEnum | string,
-//     fallbackLanguage: LanguageEnum | string = 'en'
-// ): string => {
-//     // Try current language
-//     const currentContent = getBrandContentByLanguage(brand, currentLanguage);
-//     if (currentContent?.description) {
-//         return currentContent.description;
-//     }
-//
-//     // Try fallback language
-//     const fallbackContent = getBrandContentByLanguage(brand, fallbackLanguage);
-//     if (fallbackContent?.description) {
-//         return fallbackContent.description;
-//     }
-//
-//     // Fall back to brand name
-//     return brand.name;
-// };
+	const contentSelected = brand.contents.find((c) => c.language === language);
+
+	if (contentSelected?.description) {
+		return contentSelected.description;
+	}
+
+	const contentDefault = brand.contents.find(
+		(c) => c.language === LANGUAGE_DEFAULT,
+	);
+
+	if (contentDefault?.description) {
+		return contentDefault.description;
+	}
+
+	const contentFirst = brand.contents[0];
+
+	if (contentFirst?.description) {
+		return contentFirst.description;
+	}
+
+	return '[empty description]';
+}
+
+export const displayBrandLabel = (p: BrandModel) => {
+	return `${capitalizeFirstLetter(p.brand_type)} / ${p.name}`;
+};

@@ -104,7 +104,7 @@ class PlaceValidator extends BaseValidator<typeof validatorMessages> {
 				}
 			})
 			.superRefine((data, ctx) => {
-				if (!data.contents || data.contents.length < 1) {
+				if (data.contents.length === 0) {
 					ctx.addIssue({
 						path: ['contents', 0, 'name'],
 						message: this.getMessage('invalid_contents'),

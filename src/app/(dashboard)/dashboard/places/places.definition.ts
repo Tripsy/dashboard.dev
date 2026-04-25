@@ -42,7 +42,7 @@ const translations = await translateBatch(
 		'view.title',
 		'delete.title',
 		'restore.title',
-	],
+	] as const,
 	'places.action',
 );
 
@@ -57,7 +57,7 @@ const validatorMessages = await BaseValidator.getValidatorMessages(
 		'invalid_language',
 		'invalid_name',
 		'invalid_type_label',
-	],
+	] as const,
 	'places.validation',
 );
 

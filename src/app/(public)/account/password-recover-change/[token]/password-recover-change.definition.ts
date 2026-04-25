@@ -41,7 +41,7 @@ const validatorMessages = await BaseValidator.getValidatorMessages(
 		'password_condition_special_character',
 		'password_confirm_required',
 		'password_confirm_mismatch',
-	],
+	] as const,
 	'password-recover-change.validation',
 );
 

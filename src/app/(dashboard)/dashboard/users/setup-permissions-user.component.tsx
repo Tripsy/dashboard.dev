@@ -22,7 +22,7 @@ export function SetupPermissionsUser({
 }: {
 	entries: WindowEntryType[];
 }) {
-	const user = entries[0] as UserModel;
+	const entry = entries[0] as UserModel;
 
 	const translationsKeys = useMemo(
 		() =>
@@ -60,14 +60,14 @@ export function SetupPermissionsUser({
 		isLoading: isLoadingUserPermissions,
 		error: userPermissionsError,
 	} = useQuery({
-		queryKey: ['user-permissions', user.id],
+		queryKey: ['user-permissions', entry.id],
 		queryFn: () =>
-			getUserPermissions(user.id, {
+			getUserPermissions(entry.id, {
 				order_by: 'permission_id',
 				direction: 'ASC',
 				limit: 999,
 			}),
-		enabled: !!user.id,
+		enabled: !!entry.id,
 	});
 
 	const isLoading =
@@ -122,7 +122,7 @@ export function SetupPermissionsUser({
 
 	const handleToggleEntity = useCallback(
 		async (entity: string, checked: boolean) => {
-			if (!user.id) {
+			if (!entry.id) {
 				return;
 			}
 
@@ -137,7 +137,7 @@ export function SetupPermissionsUser({
 
 			try {
 				if (checked) {
-					await createUserPermissions(user.id, entityPermIds);
+					await createUserPermissions(entry.id, entityPermIds);
 
 					showToast({
 						severity: 'success',
@@ -147,7 +147,7 @@ export function SetupPermissionsUser({
 				} else {
 					await Promise.all(
 						entityPermIds.map((id) =>
-							deleteUserPermission(user.id, id),
+							deleteUserPermission(entry.id, id),
 						),
 					);
 					showToast({
@@ -169,12 +169,12 @@ export function SetupPermissionsUser({
 				});
 			}
 		},
-		[user.id, listPermissions, showToast, translations],
+		[entry.id, listPermissions, showToast, translations],
 	);
 
 	const handleTogglePermission = useCallback(
 		async (permission_id: number, checked: boolean, label: string) => {
-			if (!user.id) {
+			if (!entry.id) {
 				return;
 			}
 
@@ -188,7 +188,7 @@ export function SetupPermissionsUser({
 
 			try {
 				if (checked) {
-					await createUserPermissions(user.id, [numericId]);
+					await createUserPermissions(entry.id, [numericId]);
 
 					showToast({
 						severity: 'success',
@@ -196,7 +196,7 @@ export function SetupPermissionsUser({
 						detail: `'${label}' granted`,
 					});
 				} else {
-					await deleteUserPermission(user.id, numericId);
+					await deleteUserPermission(entry.id, numericId);
 
 					showToast({
 						severity: 'info',
@@ -217,7 +217,7 @@ export function SetupPermissionsUser({
 				});
 			}
 		},
-		[user.id, showToast, translations],
+		[entry.id, showToast, translations],
 	);
 
 	if (isLoading) {

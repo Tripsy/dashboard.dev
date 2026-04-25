@@ -13,7 +13,7 @@ import type {
 import type { FindFunctionParamsType } from '@/types/action.type';
 
 const translations = await translateBatch(
-	['view.title', 'delete.title'],
+	['view.title', 'delete.title'] as const,
 	'cron-history.action',
 );
 

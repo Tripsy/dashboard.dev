@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import dayjs from '@/config/dayjs.config';
 import { Configuration } from '@/config/settings.config';
-import { translateBatch } from '@/config/translate.setup';
+import { type TranslateKey, translateBatch } from '@/config/translate.setup';
 import { isValidDate } from '@/helpers/date.helper';
 import { replaceVars } from '@/helpers/string.helper';
 import { type Language, LanguageEnum } from '@/types/common.type';
@@ -84,11 +84,11 @@ export abstract class BaseValidator<
 		this.emptyValue = options?.emptyValue ?? (undefined as TEmpty);
 	}
 
-	static async getValidatorMessages<T extends readonly string[]>(
+	static async getValidatorMessages<const T extends readonly string[]>(
 		keys: T,
 		prefix: string,
-	): Promise<Record<T[number], string>> {
-		return await translateBatch(keys, prefix);
+	): Promise<Record<TranslateKey<T[number]>, string>> {
+		return translateBatch(keys, prefix);
 	}
 
 	protected getMessage<K extends keyof TMessage>(
@@ -270,10 +270,12 @@ export abstract class BaseValidator<
 	 * validateNumber({
 	 *   invalid: 'Invalid name',
 	 *   only_positive: 'Only positive number',
-	 *   no_decimals: 'Decimals not allowed'
+	 *   no_decimals: 'Decimals not allowed',
+	 *   max_decimals: 'Too many decimals',
 	 * }, {
+	 *   required: true,
 	 *   onlyPositive: true,
-	 *   allowDecimals: false
+	 *   allowDecimals: number
 	 * })
 	 */
 	// Overload signatures
@@ -284,11 +286,12 @@ export abstract class BaseValidator<
 					invalid?: string;
 					only_positive?: string;
 					no_decimals?: string;
+					max_decimals?: string;
 			  },
 		optionsData?: {
 			required?: true;
 			onlyPositive?: boolean;
-			allowDecimals?: boolean;
+			allowDecimals?: number;
 		},
 	): z.ZodType<number>;
 
@@ -299,11 +302,12 @@ export abstract class BaseValidator<
 					invalid?: string;
 					only_positive?: string;
 					no_decimals?: string;
+					max_decimals?: string;
 			  },
 		optionsData?: {
 			required: false;
 			onlyPositive?: boolean;
-			allowDecimals?: boolean;
+			allowDecimals?: number;
 		},
 	): z.ZodType<number | TEmpty>;
 
@@ -315,17 +319,18 @@ export abstract class BaseValidator<
 					invalid?: string;
 					only_positive?: string;
 					no_decimals?: string;
+					max_decimals?: string;
 			  },
 		optionsData?: {
 			required?: boolean;
 			onlyPositive?: boolean;
-			allowDecimals?: boolean;
+			allowDecimals?: number;
 		},
 	): z.ZodType<number | TEmpty> {
 		const options = {
 			required: true,
 			onlyPositive: true,
-			allowDecimals: false,
+			allowDecimals: 0,
 			...optionsData,
 		};
 
@@ -337,8 +342,10 @@ export abstract class BaseValidator<
 			defaultMessages.onlyPositive = 'Must be a positive number';
 		}
 
-		if (!options.allowDecimals) {
-			defaultMessages.noDecimals = 'Must not contain decimals';
+		if (options.allowDecimals < 1) {
+			defaultMessages.no_decimals = 'Must not contain decimals';
+		} else {
+			defaultMessages.max_decimals = `Must have at most ${options.allowDecimals} decimal place${options.allowDecimals !== 1 ? 's' : ''}`;
 		}
 
 		const message = this.buildMessage(defaultMessages, messageData);
@@ -351,8 +358,23 @@ export abstract class BaseValidator<
 			});
 		}
 
-		if (!options.allowDecimals) {
+		if (options.allowDecimals < 1) {
 			baseSchema = baseSchema.int({ message: message.no_decimals });
+		} else {
+			baseSchema = baseSchema.refine(
+				(value) => {
+					// Check if the number has more than the allowed decimal places
+					const decimalPart = value.toString().split('.')[1];
+
+					return (
+						!decimalPart ||
+						decimalPart.length <= options.allowDecimals
+					);
+				},
+				{
+					message: message.max_decimals,
+				},
+			);
 		}
 
 		if (options.required) {
@@ -464,14 +486,14 @@ export abstract class BaseValidator<
 			return this.validateNumber(message, {
 				required: true,
 				onlyPositive: true,
-				allowDecimals: false,
+				allowDecimals: 0,
 			});
 		}
 
 		return this.validateNumber(message, {
 			required: false,
 			onlyPositive: true,
-			allowDecimals: false,
+			allowDecimals: 0,
 		});
 	}
 

@@ -5,6 +5,7 @@ import type {
 	DisplayEntryLabelFnType,
 	EntriesSelectionType,
 	OperationFunctionType,
+	PrepareEntryFnType,
 	ReloadEntryFnType,
 } from '@/types/action.type';
 import type {
@@ -51,6 +52,7 @@ export type WindowDefinition<
 	getFormState?: GetFormStateFnType<FormValues, Entry>;
 	displayEntryLabel?: AllowedDisplayEntryLabel<T, Entry>;
 	reloadEntry?: ReloadEntryFnType<Entry>;
+	prepareEntry?: PrepareEntryFnType<Entry>;
 };
 
 // biome-ignore lint/suspicious/noExplicitAny: It's fine

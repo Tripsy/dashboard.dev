@@ -12,3 +12,5 @@ export const LanguageEnum = {
 } as const;
 
 export type Language = (typeof LanguageEnum)[keyof typeof LanguageEnum];
+
+export type StatusTransitions<S extends string> = Record<S, S[]>;

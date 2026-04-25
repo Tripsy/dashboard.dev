@@ -14,19 +14,6 @@ export const ClientStatusEnum = {
 export type ClientStatus =
 	(typeof ClientStatusEnum)[keyof typeof ClientStatusEnum];
 
-// // Status transition configuration
-// export const CLIENT_STATUS_TRANSITIONS: Record<
-// 	ClientStatusEnum,
-// 	ClientStatusEnum[]
-// > = {
-// 	[ClientStatusEnum.ACTIVE]: [ClientStatusEnum.INACTIVE],
-// 	[ClientStatusEnum.INACTIVE]: [ClientStatusEnum.ACTIVE],
-// 	[ClientStatusEnum.PENDING]: [
-// 		ClientStatusEnum.ACTIVE,
-// 		ClientStatusEnum.INACTIVE,
-// 	],
-// };
-
 export type ClientIdentity =
 	| {
 			client_type: typeof ClientTypeEnum.COMPANY;

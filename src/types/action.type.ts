@@ -76,3 +76,5 @@ export type EntriesSelectionType = 'free' | 'single' | 'multiple'; // Allowed en
 export type ReloadEntryFnType<Entry> = (
 	id: number,
 ) => Promise<Entry | undefined>;
+
+export type PrepareEntryFnType<Entry> = (entry: Entry) => Partial<Entry>;

@@ -107,6 +107,14 @@ export const translate = async (
 	return value;
 };
 
+export type TranslateKey<T> = T extends string
+	? T
+	: T extends { key: infer K }
+		? K extends string
+			? K
+			: never
+		: never;
+
 /**
  * Translate multiple keys with optional replacements.
  *
@@ -116,13 +124,15 @@ export const translate = async (
  *     { key: "user.delete" }
  * ])
  */
-export const translateBatch = async (
-	requests: readonly (
+export const translateBatch = async <
+	const T extends readonly (
 		| string
 		| { key: string; vars?: Record<string, string> }
 	)[],
+>(
+	requests: T,
 	keyPrefix?: string,
-): Promise<Record<string, string>> => {
+): Promise<Record<TranslateKey<T[number]>, string>> => {
 	const language = await getLanguage();
 	const resource = await loadLanguageResource(language);
 

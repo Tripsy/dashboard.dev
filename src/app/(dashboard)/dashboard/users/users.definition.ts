@@ -43,7 +43,7 @@ const translations = await translateBatch(
 		'enable.title',
 		'disable.title',
 		'permissions.title',
-	],
+	] as const,
 	'users.action',
 );
 
@@ -62,7 +62,7 @@ const validatorMessages = await BaseValidator.getValidatorMessages(
 		'password_confirm_required',
 		'password_confirm_mismatch',
 		'invalid_operator_type',
-	],
+	] as const,
 	'users.validation',
 );
 

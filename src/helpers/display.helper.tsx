@@ -41,6 +41,30 @@ export const statusList: Record<
 		variant: 'success',
 		icon: Icons.Status.Sent,
 	},
+	authorized: {
+		variant: 'success',
+		icon: Icons.Status.Authorized,
+	},
+	completed: {
+		variant: 'success',
+		icon: Icons.Status.Ok,
+	},
+	failed: {
+		variant: 'error',
+		icon: Icons.Status.Failed,
+	},
+	canceled: {
+		variant: 'warning',
+		icon: Icons.Status.Canceled,
+	},
+	expired: {
+		variant: 'warning',
+		icon: Icons.Status.Expired,
+	},
+	requires_action: {
+		variant: 'info',
+		icon: Icons.Status.RequiresAction,
+	},
 };
 
 export const DisplayStatus = ({
@@ -85,19 +109,19 @@ export const DisplayDeleted = ({
 };
 
 export function DisplayAmount({
-	cents,
+	amount,
 	currencyCode,
 	sign,
 }: {
-	cents: number;
+	amount: number;
 	currencyCode: string;
 	sign: 1 | -1;
 }) {
-	const formatted = formatAmount(cents, currencyCode, sign);
+	const formatted = formatAmount(amount, currencyCode);
 
 	return (
-		<span style={{ color: formatted.sign === '-' ? 'red' : 'inherit' }}>
-			{formatted.sign} {formatted.value} {formatted.currency}
+		<span className={sign === -1 ? 'text-error dark:text-warning' : ''}>
+			{formatted.value} {formatted.currency}
 		</span>
 	);
 }

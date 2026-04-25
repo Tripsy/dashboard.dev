@@ -12,7 +12,6 @@ function loadSettings(): Settings {
 		app: {
 			debug: process.env.NEXT_PUBLIC_APP_DEBUG === 'true',
 			language: process.env.NEXT_PUBLIC_APP_LANGUAGE || 'en',
-			currency: process.env.NEXT_PUBLIC_APP_CURRENCY || 'RON',
 			languageSupported: (
 				process.env.NEXT_PUBLIC_APP_SUPPORTED_LANGUAGES || 'en'
 			)
@@ -22,6 +21,9 @@ function loadSettings(): Settings {
 			url: process.env.NEXT_PUBLIC_APP_URL,
 			name: process.env.NEXT_PUBLIC_APP_NAME,
 			timezone: process.env.NEXT_PUBLIC_TIMEZONE || 'UTC',
+
+			currency: process.env.NEXT_PUBLIC_APP_CURRENCY || 'RON',
+			vat_rate: process.env.NEXT_PUBLIC_APP_VAT_RATE || 24,
 		},
 		security: {
 			allowedOrigins: process.env.ALLOWED_ORIGINS?.split(',').map((v) =>

@@ -8,6 +8,53 @@
 		"invalid_amount": "Enter a valid amount",
 		"invalid_vat_rate": "VAT rate must be between 0 and 100",
 		"invalid_currency": "Select a valid currency",
-		"invalid_exchange_rate": "Enter a positive exchange rate"
+		"invalid_external_reference": "Enter a valid external reference",
+		"invalid_parent_id": "Select a valid parent",
+		"invalid_notes": "Enter a valid notes"
+	},
+	"action": {
+		"create": {
+			"title": "Add new cash flow",
+			"label": "Add",
+			"success": "New cash flow added successfully"
+		},
+		"refund": {
+			"title": "Setup refund",
+			"label": "Refund",
+			"success": "New refund created successfully"
+		},
+		"update": {
+			"title": "Update cash flow: {{entry}}",
+			"label": "Update",
+			"success": "Cash flow updated successfully"
+		},
+		"delete": {
+			"title": "Delete cash flow: {{entry}}",
+			"label": "Delete",
+			"success": "Cash flow deleted successfully",
+			"confirmText": "Are you sure you want to delete this cash flow?"
+		},
+		"restore": {
+			"title": "Restore cash flow: {{entry}}",
+			"label": "Restore",
+			"success": "Cash flow restored successfully",
+			"confirmText": "Are you sure you want to restore this cash flow?"
+		},
+		"complete": {
+			"title": "Mark as completed: {{entry}}",
+			"label": "Complete",
+			"success": "Cash flow status marked as completed",
+			"confirmText": "Are you sure you want to mark this cash flow as completed?"
+		},
+		"drop": {
+			"title": "Mark as canceled: {{entry}}",
+			"label": "Drop",
+			"success": "Cash flow status marked as cancelled",
+			"confirmText": "Are you sure you want to mark this cash flow as cancelled?"
+		},
+		"view": {
+			"title": "Cash flow details: {{entry}}",
+			"label": "View details"
+		}
 	}
 }

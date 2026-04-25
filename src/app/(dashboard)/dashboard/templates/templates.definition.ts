@@ -40,7 +40,7 @@ const translations = await translateBatch(
 		'delete.title',
 		'restore.title',
 		'permissions.title',
-	],
+	] as const,
 	'templates.action',
 );
 

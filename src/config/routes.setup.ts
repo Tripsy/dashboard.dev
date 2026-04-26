@@ -226,7 +226,29 @@ Routes.group('dashboard')
 	})
 	.add('permission', '/dashboard/permissions', {
 		permission: 'permission.find',
-	});
+	})
+
+    .add('vehicle', '/dashboard/vehicles', {
+        permission: 'vehicle.find',
+    }).add('company-vehicle', '/dashboard/company-vehicles', {
+        permission: 'company-vehicle.find',
+    })
+
+    .add('cmr', '/dashboard/cmrs', {
+        permission: 'cmr.find',
+    })
+    .add('cmr-driver', '/dashboard/cmr-drivers', {
+        permission: 'cmr-driver.find',
+    })
+    .add('cmr-vehicle', '/dashboard/cmr-vehicles', {
+        permission: 'cmr-vehicle.find',
+    })
+	.add('work-session', '/dashboard/work-sessions', {
+        permission: 'work-session.find',
+    })
+	.add('work-session-vehicles', '/dashboard/work-session-vehicles', {
+        permission: 'work-session-vehicle.find',
+    })
 
 /**
  * Check if the given path is an excluded route (usually auth related routes)

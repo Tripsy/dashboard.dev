@@ -309,7 +309,7 @@
 	}
 
 	.dashboard-layout .main-section .side-menu-container {
-		@apply fixed left-0 top-16 z-40 border-r border-b border-sidebar-border bg-sidebar-background/93 shadow-xl transition-all duration-500 ease-in-out w-64;
+		@apply fixed left-0 top-16 z-40 border-r border-b border-sidebar-border bg-sidebar-background/93 shadow-xl transition-all duration-500 ease-in-out w-64 h-[calc(100vh-4rem)] overflow-hidden flex flex-col;
 	}
 
 	@media (min-width: 768px) {
@@ -323,7 +323,7 @@
 	}
 
 	.dashboard-layout .main-section .side-menu-container .side-menu-content {
-		@apply flex-1 px-2 py-4 space-y-1;
+		@apply px-2 py-4 space-y-1 overflow-y-auto flex-1;
 	}
 
 	.dashboard-layout .table-container {

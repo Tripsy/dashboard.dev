@@ -89,6 +89,20 @@ export function SideMenu() {
 				'dashboard.labels.mail-queue',
 				'dashboard.labels.permissions',
 				'dashboard.labels.users',
+
+				'dashboard.labels.vehicles',
+				'dashboard.labels.operational-records',
+
+				'dashboard.labels.assets',
+				'dashboard.labels.company-vehicles',
+
+				'dashboard.labels.activity',
+				'dashboard.labels.cmr',
+				'dashboard.labels.cmr-drivers',
+				'dashboard.labels.cmr-vehicles',
+				'dashboard.labels.work-sessions',
+				'dashboard.labels.work-session-vehicles',
+
 			] as const,
 		[],
 	);
@@ -126,6 +140,64 @@ export function SideMenu() {
 				],
 			},
 			{
+				label: 'activity',
+				text: translations['dashboard.labels.activity'],
+				icon: Icons.Activity,
+				isExpanded: false,
+				items: [
+					{
+						page: 'cmrs',
+						href: Routes.get('cmr'),
+						text: translations['dashboard.labels.cmr'],
+						icon: Icons.Document,
+						permission: hasPermission(auth, 'cmr.find'),
+					},
+					{
+						page: 'cmr-drivers',
+						href: Routes.get('cmr-driver'),
+						text: translations['dashboard.labels.cmr-drivers'],
+						icon: Icons.Driver,
+						permission: hasPermission(auth, 'cmr-driver.find'),
+					},
+					{
+						page: 'cmr-vehicles',
+						href: Routes.get('cmr-vehicle'),
+						text: translations['dashboard.labels.cmr-vehicles'],
+						icon: Icons.Vehicle,
+						permission: hasPermission(auth, 'cmr-vehicle.find'),
+					},
+					{
+						page: 'work-sessions',
+						href: Routes.get('work-session'),
+						text: translations['dashboard.labels.work-sessions'],
+						icon: Icons.Session,
+						permission: hasPermission(auth, 'work-session.find'),
+					},
+					{
+						page: 'work-session-vehicles',
+						href: Routes.get('cmr-vehicle'),
+						text: translations['dashboard.labels.work-session-vehicles'],
+						icon: Icons.Vehicle,
+						permission: hasPermission(auth, 'work-session-vehicle.find'),
+					},
+				],
+			},
+			{
+				label: 'assets',
+				text: translations['dashboard.labels.assets'],
+				icon: Icons.Asset,
+				isExpanded: false,
+				items: [
+					{
+						page: 'company-vehicles',
+						href: Routes.get('company-vehicle'),
+						text: translations['dashboard.labels.company-vehicles'],
+						icon: Icons.CompanyVehicle,
+						permission: hasPermission(auth, 'company-vehicle.find'),
+					},
+				],
+			},
+			{
 				label: 'content',
 				text: translations['dashboard.labels.content'],
 				icon: Icons.Content,
@@ -151,6 +223,13 @@ export function SideMenu() {
 						text: translations['dashboard.labels.brands'],
 						icon: Icons.Brand,
 						permission: hasPermission(auth, 'brand.find'),
+					},
+					{
+						page: 'vehicles',
+						href: Routes.get('vehicle'),
+						text: translations['dashboard.labels.vehicles'],
+						icon: Icons.Vehicle,
+						permission: hasPermission(auth, 'vehicle.find'),
 					},
 				],
 			},

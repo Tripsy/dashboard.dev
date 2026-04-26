@@ -213,7 +213,16 @@ export type DataSourceKey =
 	| 'permissions'
 	| 'places'
 	| 'templates'
-	| 'users';
+	| 'users'
+
+	| 'vehicles'
+	| 'company-vehicles'
+	| 'cmrs'
+	| 'cmr-drivers'
+	| 'cmr-vehicles'
+	| 'operational-records'
+	| 'work-sessions'
+	| 'work-session-vehicles';
 
 export type DataSourceConfigType<
 	Entry extends WindowEntryType,

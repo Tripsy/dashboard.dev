@@ -1,11 +1,12 @@
 import {
+	Activity,
 	ArchiveRestore,
 	Ban,
 	Banknote,
 	BanknoteArrowDown,
 	BookText,
 	Building2,
-	Calendar,
+	Calendar, Car, CarFront,
 	Check,
 	ChevronLeft,
 	CircleAlert,
@@ -23,7 +24,7 @@ import {
 	Eye,
 	EyeOff,
 	FileSignal,
-	FileStack,
+	FileStack, FileText,
 	HardDrive,
 	IdCard,
 	Info,
@@ -45,7 +46,7 @@ import {
 	RefreshCcw,
 	Save,
 	Search,
-	Settings,
+	Settings, Settings2, Shell,
 	Shield,
 	SquarePen,
 	SquareStack,
@@ -54,13 +55,15 @@ import {
 	TextSearch,
 	ThumbsUp,
 	Trash2,
+	GalleryVerticalEnd,
 	TriangleAlert,
 	UserRound,
 	Users,
+	ShieldUser,
 	Wrench,
 	X,
 } from 'lucide-react';
-import type React from 'react';
+import React from 'react';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
 
 const createIcon = (IconComponent: React.ComponentType<LucideProps>) => {
@@ -93,7 +96,7 @@ export const Icons = {
 	Users: createIcon(Users),
 	HardDrive: createIcon(HardDrive),
 	History: createIcon(ClipboardClock),
-	Cron: createIcon(SquareStack),
+	Cron: createIcon(GalleryVerticalEnd),
 	List: createIcon(ListStart),
 	Mails: createIcon(Mails),
 	Template: createIcon(LayoutTemplate),
@@ -109,6 +112,12 @@ export const Icons = {
 	Brand: createIcon(FileSignal),
 	City: createIcon(Building2),
 	Code: createIcon(Code),
+	Activity: createIcon(Activity),
+	Asset: createIcon(Settings2),
+	Vehicle: createIcon(Car),
+	CompanyVehicle: createIcon(CarFront),
+	Document: createIcon(FileText),
+	Driver: createIcon(ShieldUser),
 
 	Status: {
 		Active: createIcon(CircleCheck),

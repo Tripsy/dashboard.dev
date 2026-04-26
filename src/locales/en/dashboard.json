@@ -25,7 +25,20 @@
 		"mail-queue": "Mail Queue",
 
 		"users": "Users",
-		"permissions": "Permissions"
+		"permissions": "Permissions",
+
+		"vehicles": "Vehicles",
+		"operational-records": "Operational Records",
+
+		"assets": "Company Assets",
+		"company-vehicles": "Company Vehicles",
+
+		"activity": "Company Activity",
+		"cmr": "CMRs",
+		"cmr-drivers": "CMR Drivers",
+		"cmr-vehicles": "CMR Vehicles",
+		"work-sessions": "Work Sessions",
+		"work-session-vehicles": "Work Session Vehicles"
 	},
 	"text": {
 		"showing_entries": "Showing {{first}} to {{last}} of {{total}} entries",

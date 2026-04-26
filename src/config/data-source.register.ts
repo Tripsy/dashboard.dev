@@ -1,5 +1,5 @@
 import { dataSourceConfigBrands } from '@/app/(dashboard)/dashboard/brands/brands.definition';
-// // import { dataSourceConfigCashFlow } from '@/app/(dashboard)/dashboard/cash-flow/cash-flow.definition';
+import { dataSourceConfigCashFlow } from '@/app/(dashboard)/dashboard/cash-flow/cash-flow.definition';
 import { dataSourceConfigClientAddress } from '@/app/(dashboard)/dashboard/client-address/client-address.definition';
 import { dataSourceConfigClients } from '@/app/(dashboard)/dashboard/clients/clients.definition';
 import { dataSourceConfigCronHistory } from '@/app/(dashboard)/dashboard/cron-history/cron-history.definition';
@@ -18,7 +18,7 @@ import { registerDataSource } from '@/config/data-source.config';
  */
 export function registerDashboardDataSource() {
 	registerDataSource('brands', dataSourceConfigBrands);
-	// // registerDataSource('cash-flow', dataSourceConfigCashFlow);
+	registerDataSource('cash-flow', dataSourceConfigCashFlow);
 	registerDataSource('client-address', dataSourceConfigClientAddress);
 	registerDataSource('clients', dataSourceConfigClients);
 	registerDataSource('cron-history', dataSourceConfigCronHistory);

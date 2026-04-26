@@ -98,19 +98,12 @@ export function parseJson(val: unknown) {
 }
 
 /**
- * Formats an amount in cents to a currency string
+ * Formats an amount
  *
- * @param cents Should be a number without decimals
+ * @param amount
  * @param currencyCode
- * @param sign 1 | -1
  */
-export function formatAmount(
-	cents: number,
-	currencyCode: string,
-	sign: 1 | -1,
-) {
-	const value = Math.abs(cents) / 100;
-
+export function formatAmount(amount: number, currencyCode: string) {
 	const numberFormatter = new Intl.NumberFormat(undefined, {
 		minimumFractionDigits: 2,
 		maximumFractionDigits: 2,
@@ -127,8 +120,7 @@ export function formatAmount(
 		parts.find((part) => part.type === 'currency')?.value ?? currencyCode;
 
 	return {
-		sign: sign === 1 ? '+' : '-',
-		value: numberFormatter.format(value),
+		value: numberFormatter.format(amount),
 		currency,
 	};
 }

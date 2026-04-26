@@ -23,6 +23,7 @@ import type {
 type WindowRenderProps = {
 	uid: string;
 	type: WindowType<EntriesSelectionType>;
+	action: string;
 	entry: WindowEntryType | undefined;
 	entries: WindowEntryType[];
 	WindowComponent: WindowComponent | undefined;
@@ -51,23 +52,30 @@ const WINDOW_RENDERERS: Partial<
 
 		return <WindowAction uid={uid} entries={actionEntries} />;
 	},
-	form: ({ uid, entry, WindowComponent }) => {
+	form: ({ uid, action, entry, WindowComponent }) => {
 		if (!WindowComponent) {
 			throw new Error('Component not defined for form');
 		}
 
 		return (
 			<WindowForm uid={uid} entry={entry}>
-				<WindowComponent />
+				<WindowComponent action={action} />
 			</WindowForm>
 		);
 	},
-	other: ({ WindowComponent }) => {
+	other: ({ uid, entry, entries, WindowComponent }) => {
 		if (!WindowComponent) {
-			throw new Error('Component not defined for other');
+			throw new Error('Component not defined');
 		}
 
-		return <WindowComponent />;
+		const actionEntries: WindowEntryType[] =
+			entries.length > 0 ? entries : entry ? [entry] : [];
+
+		if (actionEntries.length === 0) {
+			throw new Error('No entries defined for action');
+		}
+
+		return <WindowComponent uid={uid} entries={actionEntries} />;
 	},
 };
 
@@ -84,6 +92,7 @@ export function WindowInstance({
 	const handleMinimize = () => minimize(current.uid);
 
 	const uid = current.uid;
+	const action = current.action;
 	const definition = current.definition;
 
 	const windowProps = current.props;
@@ -93,24 +102,42 @@ export function WindowInstance({
 	const type = definition.windowType || 'other';
 	const WindowComponent = definition?.windowComponent;
 
-	const { entry: rawEntry, entries } = resolveWindowEntries(current, type);
+	const { entry: rawEntry, entries: rawEntries } = resolveWindowEntries(
+		current,
+		type,
+	);
 
 	const entryId =
 		rawEntry && 'id' in rawEntry ? (rawEntry.id as number) : undefined;
 	const reloadFn = definition.reloadEntry;
 
+	// Entry provided via data-table may not contain all the required fields / data for the window
 	const { data: reloadedEntry, isLoading: isEntryLoading } = useQuery({
 		queryKey: [WINDOW_CACHE_LABEL, current.uid, entryId],
 		queryFn: () => {
 			if (!reloadFn || entryId == null) {
 				return Promise.resolve(undefined);
 			}
+
 			return reloadFn(entryId);
 		},
 		enabled: !!reloadFn && !!entryId,
 	});
 
-	const entry = reloadedEntry ?? rawEntry;
+	let entry = reloadedEntry ?? rawEntry;
+	let entries = rawEntries;
+
+	const prepareFn = definition.prepareEntry;
+
+	if (definition.entriesSelection !== 'free' && prepareFn) {
+		if (entry) {
+			entry = prepareFn(entry);
+		}
+
+		if (entries && Array.isArray(entries)) {
+			entries = entries.map(prepareFn);
+		}
+	}
 
 	const modalTitle =
 		windowProps?.title ||
@@ -145,7 +172,7 @@ export function WindowInstance({
 			{isEntryLoading && definition.reloadEntry ? (
 				<LoadingComponent />
 			) : (
-				renderer({ uid, type, entry, entries, WindowComponent })
+				renderer({ uid, type, action, entry, entries, WindowComponent })
 			)}
 		</Modal>
 	);

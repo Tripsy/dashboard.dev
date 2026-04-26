@@ -1,15 +1,6 @@
 import { arrayHasValue } from '@/helpers/objects.helper';
-
-export const CurrencyEnum = {
-	RON: 'RON',
-	EUR: 'EUR',
-	USD: 'USD',
-} as const;
-
-export type Currency = (typeof CurrencyEnum)[keyof typeof CurrencyEnum];
-
-export const CURRENCY_DEFAULT = CurrencyEnum.RON;
-export const VAT_RATE_DEFAULT = 24;
+import { formatEnumLabel } from '@/helpers/string.helper';
+import type { Currency, StatusTransitions } from '@/types/common.type';
 
 export const CashFlowDirectionEnum = {
 	IN: 'in', // money received relative to company
@@ -67,31 +58,43 @@ export const CashFlowStatusEnum = {
 export type CashFlowStatus =
 	(typeof CashFlowStatusEnum)[keyof typeof CashFlowStatusEnum];
 
-export const CashFlowGatewayEnum = {
-	DIRECT: 'direct',
-	// STRIPE: 'stripe',
-	// PAYPAL: 'paypal',
-} as const;
+// Only entries with specified statuses are available for update
+export const MUTABLE_STATUSES = [
+	CashFlowStatusEnum.PENDING,
+	CashFlowStatusEnum.AUTHORIZED,
+	CashFlowStatusEnum.REQUIRES_ACTION,
+];
 
-export type CashFlowGateway =
-	(typeof CashFlowGatewayEnum)[keyof typeof CashFlowGatewayEnum];
+// Only entries with specified statuses are eligible for refund
+export const REFUNDABLE_STATUSES = [CashFlowStatusEnum.COMPLETED];
+
+// Allowed status transition configuration
+export const STATUS_TRANSITIONS: StatusTransitions<CashFlowStatus> = {
+	[CashFlowStatusEnum.PENDING]: [
+		CashFlowStatusEnum.COMPLETED,
+		CashFlowStatusEnum.CANCELED,
+	],
+
+	[CashFlowStatusEnum.AUTHORIZED]: [CashFlowStatusEnum.CANCELED],
+
+	[CashFlowStatusEnum.REQUIRES_ACTION]: [CashFlowStatusEnum.CANCELED],
+
+	[CashFlowStatusEnum.COMPLETED]: [
+		// maybe allow nothing
+	],
+
+	[CashFlowStatusEnum.FAILED]: [],
+	[CashFlowStatusEnum.CANCELED]: [],
+	[CashFlowStatusEnum.EXPIRED]: [],
+};
+
+export function getStatusTransitions(status: CashFlowStatus): CashFlowStatus[] {
+	return STATUS_TRANSITIONS[status] ?? [];
+}
 
 export const CashFlowMethodEnum = {
-	// // Card methods
-	// CREDIT_CARD: 'credit_card',
-	// DEBIT_CARD: 'debit_card',
-	//
-	// // Digital wallets
-	// PAYPAL: 'paypal',
-
-	// Traditional
 	CASH: 'cash',
 	BANK_TRANSFER: 'bank_transfer',
-	// CHECK: 'check',
-
-	// // Other
-	// CRYPTO: 'crypto',
-	// GIFT_CARD: 'gift_card',
 } as const;
 
 export type CashFlowMethod =
@@ -131,34 +134,66 @@ export const getExpectedCategoryType = (
 	throw new Error(`Unknown category: ${category}`);
 };
 
+export const GroupedCategories = [
+	{
+		label: formatEnumLabel(CashFlowCategoryTypeEnum.REVENUE),
+		options: [{ label: 'Customer', value: CashFlowCategoryEnum.CUSTOMER }],
+	},
+	{
+		label: formatEnumLabel(CashFlowCategoryTypeEnum.EXPENSE),
+		options: [
+			{ label: 'Fuel', value: CashFlowCategoryEnum.FUEL },
+			{ label: 'Maintenance', value: CashFlowCategoryEnum.MAINTENANCE },
+			{ label: 'Tolls', value: CashFlowCategoryEnum.TOLLS },
+			{
+				label: 'Employee Salary',
+				value: CashFlowCategoryEnum.EMPLOYEE_SALARY,
+			},
+			{ label: 'Vendor', value: CashFlowCategoryEnum.VENDOR },
+			{ label: 'Insurance', value: CashFlowCategoryEnum.INSURANCE },
+			{ label: 'Taxes', value: CashFlowCategoryEnum.TAXES },
+		],
+	},
+	{
+		label: formatEnumLabel(CashFlowCategoryTypeEnum.CORRECTION),
+		options: [
+			{ label: 'Correction', value: CashFlowCategoryEnum.CORRECTION },
+			{ label: 'Refund', value: CashFlowCategoryEnum.REFUND },
+			{
+				label: 'Employee Reimbursement',
+				value: CashFlowCategoryEnum.EMPLOYEE_REIMBURSEMENT,
+			},
+		],
+	},
+];
+
+export const filterGroupedCategories = (excludeValues: CashFlowCategory[]) => {
+	return GroupedCategories.map((group) => ({
+		...group,
+		options: group.options.filter(
+			(option) => !excludeValues.includes(option.value),
+		),
+	}));
+};
+
 export const getExpectedDirection = (
 	categoryType: CashFlowCategoryType,
-): CashFlowDirection | null => {
+	amount: number,
+): CashFlowDirection => {
 	switch (categoryType) {
 		case CashFlowCategoryTypeEnum.REVENUE:
 			return CashFlowDirectionEnum.IN;
 		case CashFlowCategoryTypeEnum.EXPENSE:
 			return CashFlowDirectionEnum.OUT;
 		case CashFlowCategoryTypeEnum.CORRECTION:
-			// Correction can be both, so no specific direction
-			return null;
+			if (amount > 0) {
+				return CashFlowDirectionEnum.IN;
+			} else {
+				return CashFlowDirectionEnum.OUT;
+			}
+		default:
+			throw new Error(`Unknown category type: ${categoryType}`);
 	}
-};
-
-export type CashFlowTracking = {
-	external_reference: string | null;
-	parent_id: number | null;
-};
-
-export type CashFlowGatewayData = {
-	transaction_id: string | null;
-	gateway_response: Record<string, unknown> | null;
-	fail_reason: string | null;
-};
-
-export type CashFlowDates<D = Date | string> = {
-	captured_at: D | null;
-	authorized_at: D | null;
 };
 
 export type CashFlowModel<D = Date | string> = {
@@ -170,16 +205,17 @@ export type CashFlowModel<D = Date | string> = {
 	category: CashFlowCategory;
 
 	// Payment metadata
-	gateway: CashFlowGateway;
 	method: CashFlowMethod;
 	status: CashFlowStatus;
 
 	// Amount data
 	amount: number; // stored in cents
 	vat_rate: number;
-
 	currency: Currency;
 	exchange_rate: number;
+
+	external_reference: string | null;
+	parent_id: number | null;
 
 	// Other
 	notes: string | null;
@@ -188,9 +224,7 @@ export type CashFlowModel<D = Date | string> = {
 	created_at: D;
 	updated_at: D;
 	deleted_at: D;
-} & CashFlowGatewayData &
-	CashFlowTracking &
-	CashFlowDates;
+};
 
 export type CashFlowFormValuesType = {
 	category: CashFlowCategory;
@@ -198,10 +232,16 @@ export type CashFlowFormValuesType = {
 
 	amount: number | null;
 	vat_rate: number | null;
-
 	currency: Currency;
 
 	external_reference: string | null;
 
+	parent_id: number | null;
+
 	notes: string | null;
+};
+
+export type CashFlowParamsType = CashFlowFormValuesType & {
+	direction: CashFlowDirection;
+	category_type: CashFlowCategoryType;
 };

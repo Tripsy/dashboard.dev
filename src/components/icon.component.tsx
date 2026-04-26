@@ -2,9 +2,11 @@ import {
 	ArchiveRestore,
 	Ban,
 	Banknote,
+	BanknoteArrowDown,
 	BookText,
 	Building2,
 	Calendar,
+	Check,
 	ChevronLeft,
 	CircleAlert,
 	CircleCheck,
@@ -13,6 +15,7 @@ import {
 	CircleX,
 	ClipboardClock,
 	Clock,
+	ClockFading,
 	Code,
 	Ellipsis,
 	Eraser,
@@ -118,6 +121,13 @@ export const Icons = {
 		Sent: createIcon(MailCheck),
 		Success: createIcon(CircleCheck),
 		Loading: createIcon(Loader),
+
+		Authorized: createIcon(CircleCheck),
+		Completed: createIcon(Check),
+		Failed: createIcon(CircleAlert),
+		Canceled: createIcon(CircleX),
+		Expired: createIcon(ClockFading),
+		RequiresAction: createIcon(TriangleAlert),
 	},
 	Action: {
 		Save: createIcon(Save),
@@ -134,6 +144,9 @@ export const Icons = {
 		Restore: createIcon(ArchiveRestore),
 		Permissions: createIcon(Wrench),
 		View: createIcon(Eye),
+		Complete: createIcon(Check),
+		Drop: createIcon(CircleX),
+		Refund: createIcon(BanknoteArrowDown),
 	},
 };
 

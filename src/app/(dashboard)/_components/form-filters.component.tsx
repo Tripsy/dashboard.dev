@@ -5,6 +5,7 @@ import {
 	FormComponentCheckbox,
 	FormComponentInput,
 	FormComponentSelect,
+	type GroupedOptionsType,
 	type InputValueType,
 	type OptionsType,
 	type OptionValueType,
@@ -64,7 +65,7 @@ export function FormFiltersSelect<Fields>({
 	fieldName: keyof Fields & string;
 	fieldValue: OptionValueType;
 	placeholderText?: string;
-	options: OptionsType;
+	options: OptionsType | GroupedOptionsType;
 	onChange: (value: string) => void;
 	className?: string;
 }) {

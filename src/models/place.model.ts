@@ -1,5 +1,6 @@
+import { Configuration } from '@/config/settings.config';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
-import { LANGUAGE_DEFAULT, type Language } from '@/models/user.model';
+import type { Language } from '@/types/common.type';
 
 export const PlaceTypeEnum = {
 	COUNTRY: 'country',
@@ -61,7 +62,7 @@ export function getPlaceContentProp(
 	}
 
 	const contentDefault = place.contents.find(
-		(c) => c.language === LANGUAGE_DEFAULT,
+		(c) => c.language === Configuration.language(),
 	);
 
 	if (contentDefault) {
@@ -104,7 +105,7 @@ export const CITY_DEFAULT = {
 	place_type: PlaceTypeEnum.CITY,
 	contents: [
 		{
-			language: LANGUAGE_DEFAULT,
+			language: Configuration.language(),
 			type_label: PlaceTypeEnum.CITY.toLowerCase(),
 		},
 	],

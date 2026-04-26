@@ -15,7 +15,7 @@ import type {
 import type { FindFunctionParamsType } from '@/types/action.type';
 
 const translations = await translateBatch(
-	['delete.title', 'view.title', 'viewUser.label'],
+	['delete.title', 'view.title', 'viewUser.label'] as const,
 	'log-history.action',
 );
 

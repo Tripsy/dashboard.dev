@@ -2,6 +2,7 @@
 
 import { formatDate } from '@/helpers/date.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
+import { getClientDisplayName } from '@/models/client.model';
 import type { ClientAddressModel } from '@/models/client-address.model';
 
 export function ViewClientAddress({ entry }: { entry: ClientAddressModel }) {
@@ -13,7 +14,7 @@ export function ViewClientAddress({ entry }: { entry: ClientAddressModel }) {
 				</div>
 				<div>
 					<span className="font-semibold">Client</span>{' '}
-					{/*{entry.name}*/}
+					{getClientDisplayName(entry.client)}
 				</div>
 				<div>
 					<span className="font-semibold">Address Type</span>{' '}

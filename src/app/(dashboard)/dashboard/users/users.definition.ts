@@ -21,8 +21,6 @@ import {
 } from '@/helpers/services.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import {
-	LANGUAGE_DEFAULT,
-	LanguageEnum,
 	type UserFormValuesType,
 	type UserModel,
 	UserOperatorTypeEnum,
@@ -32,6 +30,7 @@ import {
 	UserStatusEnum,
 } from '@/models/user.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
+import { LanguageEnum } from '@/types/common.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(
@@ -44,7 +43,7 @@ const translations = await translateBatch(
 		'enable.title',
 		'disable.title',
 		'permissions.title',
-	],
+	] as const,
 	'users.action',
 );
 
@@ -63,7 +62,7 @@ const validatorMessages = await BaseValidator.getValidatorMessages(
 		'password_confirm_required',
 		'password_confirm_mismatch',
 		'invalid_operator_type',
-	],
+	] as const,
 	'users.validation',
 );
 
@@ -219,7 +218,7 @@ function getFormValues(formData: FormData): UserFormValuesType {
 		password_confirm: getFormDataAsString(formData, 'password_confirm'),
 		language:
 			getFormDataAsEnum(formData, 'language', LanguageEnum) ||
-			LANGUAGE_DEFAULT,
+			Configuration.language(),
 		role:
 			getFormDataAsEnum(formData, 'role', UserRoleEnum) ||
 			UserRoleEnum.MEMBER,

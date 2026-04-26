@@ -6,6 +6,7 @@ import type {
 	DataSourceConfigType,
 	DataTableColumnType,
 } from '@/config/data-source.config';
+import { Configuration } from '@/config/settings.config';
 import { translateBatch } from '@/config/translate.setup';
 import {
 	getFormDataAsEnum,
@@ -30,8 +31,8 @@ import {
 	type PlaceType,
 	PlaceTypeEnum,
 } from '@/models/place.model';
-import { LANGUAGE_DEFAULT, type Language } from '@/models/user.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
+import type { Language } from '@/types/common.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(
@@ -41,7 +42,7 @@ const translations = await translateBatch(
 		'view.title',
 		'delete.title',
 		'restore.title',
-	],
+	] as const,
 	'places.action',
 );
 
@@ -56,7 +57,7 @@ const validatorMessages = await BaseValidator.getValidatorMessages(
 		'invalid_language',
 		'invalid_name',
 		'invalid_type_label',
-	],
+	] as const,
 	'places.validation',
 );
 
@@ -256,7 +257,7 @@ export const dataSourceConfigPlaces: DataSourceConfigType<
 			requestFind<PlaceModel>('places', params),
 	},
 	displayEntryLabel: (entry: PlaceModel) => {
-		return displayPlaceLabel(entry, LANGUAGE_DEFAULT);
+		return displayPlaceLabel(entry, Configuration.language());
 	},
 	actions: {
 		create: {

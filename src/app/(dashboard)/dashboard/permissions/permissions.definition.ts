@@ -23,7 +23,7 @@ import type { FindFunctionParamsType } from '@/types/action.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(
-	['create.title', 'update.title', 'delete.title', 'restore.title'],
+	['create.title', 'update.title', 'delete.title', 'restore.title'] as const,
 	'permissions.action',
 );
 

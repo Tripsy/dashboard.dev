@@ -30,8 +30,8 @@ import {
 	BrandTypeEnum,
 	displayBrandLabel,
 } from '@/models/brand.model';
-import type { Language } from '@/models/user.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
+import type { Language } from '@/types/common.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(
@@ -43,13 +43,13 @@ const translations = await translateBatch(
 		'restore.title',
 		'enable.title',
 		'disable.title',
-	],
+	] as const,
 	'brands.action',
 );
 
 const validatorMessages = await BaseValidator.getValidatorMessages(
 	[
-		'invalid_type',
+		'invalid_brand_type',
 		'invalid_name',
 		'invalid_slug',
 		'invalid_contents',
@@ -59,7 +59,7 @@ const validatorMessages = await BaseValidator.getValidatorMessages(
 		'invalid_meta_title',
 		'invalid_meta_description',
 		'invalid_meta_keywords',
-	],
+	] as const,
 	'brands.validation',
 );
 

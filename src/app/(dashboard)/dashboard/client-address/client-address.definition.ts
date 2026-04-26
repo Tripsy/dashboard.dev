@@ -40,7 +40,7 @@ const translations = await translateBatch(
 		'restore.title',
 		'view.title',
 		'viewClient.label',
-	],
+	] as const,
 	'client-address.action',
 );
 

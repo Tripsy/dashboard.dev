@@ -40,7 +40,7 @@ const translations = await translateBatch(
 		'enable.title',
 		'disable.title',
 		'permissions.title',
-	],
+	] as const,
 	'clients.action',
 );
 
@@ -58,7 +58,7 @@ const validatorMessages = await BaseValidator.getValidatorMessages(
 		'invalid_company_reg_com',
 		'invalid_person_name',
 		'invalid_person_identification_number',
-	],
+	] as const,
 	'clients.validation',
 );
 

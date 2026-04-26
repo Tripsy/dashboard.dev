@@ -34,7 +34,7 @@ export type OptionsType = {
 	label: string;
 	value: string;
 }[];
-type GroupedOptionsType = {
+export type GroupedOptionsType = {
 	label: string;
 	options: OptionsType;
 }[];
@@ -176,7 +176,9 @@ export const FormComponentInput = <Fields,>({
 	onChange,
 	error,
 	icons,
-}: FormComponentProps<Fields, InputValueType>) => {
+}: FormComponentProps<Fields, InputValueType | number> & {
+	step?: number;
+}) => {
 	const { borderClass } = useFieldState({ value: fieldValue, error });
 
 	return (

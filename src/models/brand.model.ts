@@ -1,5 +1,6 @@
+import { Configuration } from '@/config/settings.config';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
-import { LANGUAGE_DEFAULT, type Language } from '@/models/user.model';
+import type { Language } from '@/types/common.type';
 import type { PageMeta } from '@/types/page-meta.type';
 
 export const BrandStatusEnum = {
@@ -71,7 +72,7 @@ export function getBrandDescription(
 	}
 
 	const contentDefault = brand.contents.find(
-		(c) => c.language === LANGUAGE_DEFAULT,
+		(c) => c.language === Configuration.language(),
 	);
 
 	if (contentDefault?.description) {

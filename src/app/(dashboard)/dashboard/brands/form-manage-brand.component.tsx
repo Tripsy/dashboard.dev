@@ -5,6 +5,7 @@ import {
 } from '@/components/form/form-element.component';
 import { Icons } from '@/components/icon.component';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Configuration } from '@/config/settings.config';
 import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
@@ -14,12 +15,8 @@ import {
 	type BrandType,
 	BrandTypeEnum,
 } from '@/models/brand.model';
-import {
-	LANGUAGE_DEFAULT,
-	type Language,
-	LanguageEnum,
-} from '@/models/user.model';
 import { useWindowForm } from '@/providers/window-form.provider';
+import { type Language, LanguageEnum } from '@/types/common.type';
 import type { PageMeta } from '@/types/page-meta.type';
 
 const languages = Object.values(LanguageEnum);
@@ -137,7 +134,7 @@ export function FormManageBrand() {
 					) as BrandContent[],
 				)}
 			/>
-			<Tabs defaultValue={LANGUAGE_DEFAULT} className="w-full">
+			<Tabs defaultValue={Configuration.language()} className="w-full">
 				<div className="flex items-center justify-center border-b border-line pb-2 mb-4">
 					<h3 className="font-bold whitespace-nowrap">
 						Language specific
@@ -155,7 +152,8 @@ export function FormManageBrand() {
 						(c) => c.language === language,
 					);
 					const contentIndex =
-						findIndex === -1 && language === LANGUAGE_DEFAULT
+						findIndex === -1 &&
+						language === Configuration.language()
 							? 0
 							: findIndex;
 

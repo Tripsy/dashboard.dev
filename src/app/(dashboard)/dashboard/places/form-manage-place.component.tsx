@@ -6,6 +6,7 @@ import {
 } from '@/components/form/form-element.component';
 import { Icons } from '@/components/icon.component';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Configuration } from '@/config/settings.config';
 import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { requestFind } from '@/helpers/services.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
@@ -20,13 +21,9 @@ import {
 	type PlaceType,
 	PlaceTypeEnum,
 } from '@/models/place.model';
-import {
-	LANGUAGE_DEFAULT,
-	type Language,
-	LanguageEnum,
-} from '@/models/user.model';
 import { useWindowForm } from '@/providers/window-form.provider';
 import type { FindFunctionResponseType } from '@/types/action.type';
+import { type Language, LanguageEnum } from '@/types/common.type';
 
 const languages = Object.values(LanguageEnum);
 
@@ -71,8 +68,9 @@ export function FormManagePlace() {
 		setSearchParentPlaces('');
 	};
 
-	const [selectedLanguage, setSelectedLanguage] =
-		useState<Language>(LANGUAGE_DEFAULT);
+	const [selectedLanguage, setSelectedLanguage] = useState<Language>(
+		Configuration.language(),
+	);
 	const [searchParentPlaces, setSearchParentPlaces] = useState('');
 
 	const parentPlaceType = getParentPlaceType(formValues.place_type);
@@ -211,7 +209,7 @@ export function FormManagePlace() {
 				)}
 			/>
 			<Tabs
-				defaultValue={LANGUAGE_DEFAULT}
+				defaultValue={Configuration.language()}
 				onValueChange={(value) =>
 					setSelectedLanguage(value as Language)
 				}
@@ -234,7 +232,8 @@ export function FormManagePlace() {
 						(c) => c.language === language,
 					);
 					const contentIndex =
-						findIndex === -1 && language === LANGUAGE_DEFAULT
+						findIndex === -1 &&
+						language === Configuration.language()
 							? 0
 							: findIndex;
 

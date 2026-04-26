@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useActionState, useEffect } from 'react';
+import { type Language, LanguageEnum } from '@//types/common.type';
 import { accountEditAction } from '@/app/(public)/account/edit/account-edit.action';
 import {
 	type AccountEditFormValuesType,
@@ -20,16 +21,12 @@ import { Icons } from '@/components/icon.component';
 import { LoadingComponent } from '@/components/status.component';
 import { Link } from '@/components/ui/link';
 import Routes from '@/config/routes.setup';
+import { Configuration } from '@/config/settings.config';
 import { createHandleChange, toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
-import {
-	LANGUAGE_DEFAULT,
-	type Language,
-	LanguageEnum,
-} from '@/models/user.model';
 import { useAuth } from '@/providers/auth.provider';
 
 const languages = toOptionsFromEnum(LanguageEnum, {
@@ -43,7 +40,7 @@ export default function AccountEdit() {
 		...AccountEditState,
 		values: {
 			name: auth?.name ?? '',
-			language: auth?.language ?? LANGUAGE_DEFAULT,
+			language: auth?.language ?? Configuration.language(),
 		},
 	});
 

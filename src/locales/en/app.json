@@ -29,6 +29,12 @@
 		"ok": "Ok",
 		"error": "Error",
 		"warning": "Warning",
-		"sent": "Sent"
+		"sent": "Sent",
+		"authorized": "Authorized",
+		"completed": "Completed",
+		"failed": "Failed",
+		"canceled": "Canceled",
+		"expired": "Expired",
+		"requires_action": "Requires action"
 	}
 }

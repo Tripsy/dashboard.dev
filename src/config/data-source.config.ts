@@ -9,6 +9,7 @@ import type {
 	EntriesSelectionType,
 	FindFunctionType,
 	OperationFunctionType,
+	PrepareEntryFnType,
 	ReloadEntryFnType,
 	UpdateFunctionType,
 } from '@/types/action.type';
@@ -96,6 +97,7 @@ type ActionConfigBase<
 
 	operationFunction?: OperationFunctionType<Entry, FormValues>; // e.g: createUser, updateUser, etc.
 	reloadEntry?: ReloadEntryFnType<Entry>; // Used to reload entry data for form and view; the entry passed from the list may not have all the data
+	prepareEntry?: PrepareEntryFnType<Entry>; // Prepare entry before passing to renderer; Note: this run after reloadEntry if present
 
 	// Form-related
 	validateForm?: ValidateFormFnType<FormValues>;

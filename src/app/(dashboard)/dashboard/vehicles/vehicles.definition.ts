@@ -90,7 +90,7 @@ class VehicleValidator extends BaseValidator<typeof validatorMessages> {
 			.superRefine((data, ctx) => {
 				if (isSubmit && data.brand && !data.brand_id) {
 					ctx.addIssue({
-						path: ['client'],
+						path: ['brand'],
 						message: this.getMessage('invalid_brand_id'),
 						code: 'custom',
 					});

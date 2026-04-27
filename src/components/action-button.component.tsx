@@ -26,9 +26,14 @@ export function ActionButton({
 		[actionLabelKey, actionTitleKey],
 	);
 
-	const { translations } = useTranslation(translationsKeys);
+	const { translations, isTranslationLoading } =
+		useTranslation(translationsKeys);
 
 	const ActionIcon = getActionIcon(action);
+
+	if (isTranslationLoading) {
+		return null;
+	}
 
 	return (
 		<Button
@@ -37,7 +42,7 @@ export function ActionButton({
 			hover={buttonProps?.hover}
 			size={buttonProps?.size}
 			className={buttonProps?.className}
-			title={translations[actionTitleKey]}
+			title={translations[actionTitleKey].replace(' - {{entry}}', '')}
 			onClick={handleClick}
 			disabled={disabled}
 		>

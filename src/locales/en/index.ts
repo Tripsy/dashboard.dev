@@ -9,6 +9,7 @@ import brands from '@/locales/en/brands.json';
 import cash_flow from '@/locales/en/cash_flow.json';
 import client_address from '@/locales/en/client_address.json';
 import clients from '@/locales/en/clients.json';
+import company_vehicles from '@/locales/en/company_vehicles.json';
 import cron_history from '@/locales/en/cron_history.json';
 import dashboard from '@/locales/en/dashboard.json';
 import email_confirm from '@/locales/en/email_confirm.json';
@@ -57,7 +58,9 @@ const en = {
 	register,
 	templates,
 	users,
+
 	vehicles,
+	'company-vehicles': company_vehicles,
 };
 
 export default en;

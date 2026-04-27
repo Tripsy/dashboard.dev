@@ -1,3 +1,6 @@
+import type { VehicleModel } from '@/models/vehicle.model';
+import type { StatusTransitions } from '@/types/common.type';
+
 export const CompanyVehicleStatusEnum = {
 	IN_USE: 'in_use',
 	DAMAGED: 'damaged',
@@ -7,6 +10,28 @@ export const CompanyVehicleStatusEnum = {
 
 export type CompanyVehicleStatus =
 	(typeof CompanyVehicleStatusEnum)[keyof typeof CompanyVehicleStatusEnum];
+
+// Allowed status transition configuration
+export const STATUS_TRANSITIONS: StatusTransitions<CompanyVehicleStatus> = {
+	[CompanyVehicleStatusEnum.IN_USE]: [
+		CompanyVehicleStatusEnum.DAMAGED,
+		CompanyVehicleStatusEnum.SOLD,
+		CompanyVehicleStatusEnum.SCRAPPED,
+	],
+	[CompanyVehicleStatusEnum.DAMAGED]: [
+		CompanyVehicleStatusEnum.IN_USE,
+		CompanyVehicleStatusEnum.SOLD,
+		CompanyVehicleStatusEnum.SCRAPPED,
+	],
+	[CompanyVehicleStatusEnum.SOLD]: [],
+	[CompanyVehicleStatusEnum.SCRAPPED]: [],
+};
+
+export function getStatusTransitions(
+	status: CompanyVehicleStatus,
+): CompanyVehicleStatus[] {
+	return STATUS_TRANSITIONS[status] ?? [];
+}
 
 export const CompanyVehicleScopeEnum = {
 	PERSONAL: 'personal',
@@ -19,13 +44,13 @@ export type CompanyVehicleScope =
 export type CompanyVehicleModel<D = Date | string> = {
 	id: number;
 
-	vehicle_id: number;
+	vehicle: VehicleModel;
 
 	status: CompanyVehicleStatus;
 	scope: CompanyVehicleScope;
 
-	vin: string;
 	license_plate: string | null;
+	vin: string | null;
 
 	notes: string | null;
 
@@ -34,11 +59,11 @@ export type CompanyVehicleModel<D = Date | string> = {
 	deleted_at: D;
 };
 
-export type CompanyVehicleFormValuesType = Pick<
-	CompanyVehicleModel,
-	'vehicle_id' | 'status' | 'scope'
-> & {
-	vin: string | null;
+export type CompanyVehicleFormValuesType = {
+	vehicle_id: number | null;
+	vehicle: string | null;
+	scope: CompanyVehicleScope;
 	license_plate: string | null;
+	vin: string | null;
 	notes: string | null;
 };

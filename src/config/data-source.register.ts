@@ -2,6 +2,7 @@ import { dataSourceConfigBrands } from '@/app/(dashboard)/dashboard/brands/brand
 import { dataSourceConfigCashFlow } from '@/app/(dashboard)/dashboard/cash-flow/cash-flow.definition';
 import { dataSourceConfigClientAddress } from '@/app/(dashboard)/dashboard/client-address/client-address.definition';
 import { dataSourceConfigClients } from '@/app/(dashboard)/dashboard/clients/clients.definition';
+import { dataSourceConfigCompanyVehicles } from '@/app/(dashboard)/dashboard/company-vehicles/company-vehicles.definition';
 import { dataSourceConfigCronHistory } from '@/app/(dashboard)/dashboard/cron-history/cron-history.definition';
 import { dataSourceConfigLogData } from '@/app/(dashboard)/dashboard/log-data/log-data.definition';
 import { dataSourceConfigLogHistory } from '@/app/(dashboard)/dashboard/log-history/log-history.definition';
@@ -31,4 +32,5 @@ export function registerDashboardDataSource() {
 	registerDataSource('templates', dataSourceConfigTemplates);
 	registerDataSource('users', dataSourceConfigUsers);
 	registerDataSource('vehicles', dataSourceConfigVehicles);
+	registerDataSource('company-vehicles', dataSourceConfigCompanyVehicles);
 }

@@ -73,6 +73,22 @@ export const statusList: Record<
 		variant: 'warning',
 		icon: Icons.Status.Draft,
 	},
+	in_use: {
+		variant: 'success',
+		icon: Icons.Status.InUse,
+	},
+	damaged: {
+		variant: 'error',
+		icon: Icons.Status.Damaged,
+	},
+	sold: {
+		variant: 'info',
+		icon: Icons.Status.Sold,
+	},
+	scrapped: {
+		variant: 'warning',
+		icon: Icons.Status.Scrapped,
+	},
 };
 
 export const DisplayStatus = ({

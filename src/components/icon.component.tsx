@@ -4,6 +4,7 @@ import {
 	Ban,
 	Banknote,
 	BanknoteArrowDown,
+	BanknoteArrowUp,
 	BookText,
 	Building2,
 	Calendar,
@@ -30,6 +31,7 @@ import {
 	FileStack,
 	FileText,
 	GalleryVerticalEnd,
+	Hammer,
 	HardDrive,
 	IdCard,
 	Info,
@@ -55,12 +57,14 @@ import {
 	Settings2,
 	Shield,
 	ShieldUser,
+	SquareParkingOff,
 	SquarePen,
 	TableOfContents,
 	Tag,
 	TextSearch,
 	ThumbsUp,
 	Trash2,
+	TrendingUp,
 	TriangleAlert,
 	UserRound,
 	Users,
@@ -144,6 +148,11 @@ export const Icons = {
 
 		Verified: createIcon(Check),
 		Draft: createIcon(FilePenLine),
+
+		InUse: createIcon(Car),
+		Damaged: createIcon(Hammer),
+		Sold: createIcon(BanknoteArrowUp),
+		Scrapped: createIcon(SquareParkingOff),
 	},
 	Action: {
 		Save: createIcon(Save),
@@ -165,6 +174,7 @@ export const Icons = {
 		Refund: createIcon(BanknoteArrowDown),
 		Verified: createIcon(Check),
 		Draft: createIcon(FilePenLine),
+		StatusTransition: createIcon(TrendingUp),
 	},
 };
 

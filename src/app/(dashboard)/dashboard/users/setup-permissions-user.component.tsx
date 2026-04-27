@@ -2,7 +2,10 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { LoadingComponent } from '@/components/status.component';
+import {
+	ErrorComponent,
+	LoadingComponent,
+} from '@/components/status.component';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { requestFind } from '@/helpers/services.helper';
@@ -226,9 +229,9 @@ export function SetupPermissionsUser({
 
 	if (!permissions.length) {
 		return (
-			<div className="min-h-48 flex items-center justify-center">
-				{translations['users.error.no_permissions_defined']}
-			</div>
+			<ErrorComponent
+				description={translations['users.error.no_permissions_defined']}
+			/>
 		);
 	}
 

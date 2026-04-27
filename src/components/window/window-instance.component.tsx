@@ -6,6 +6,7 @@ import { LoadingComponent } from '@/components/status.component';
 import { Modal } from '@/components/ui/modal';
 import { WindowAction } from '@/components/window/window-action.component';
 import { WindowForm } from '@/components/window/window-form.component';
+import { cn } from '@/helpers/css.helper';
 import {
 	displayWindowTitle,
 	resolveWindowEntries,
@@ -162,7 +163,7 @@ export function WindowInstance({
 	return (
 		<Modal
 			size={modalSize}
-			className={modalClassName}
+			className={cn('pb-4', modalClassName)}
 			isOpen={true}
 			isHidden={isHidden}
 			title={modalTitle}

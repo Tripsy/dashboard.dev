@@ -293,13 +293,13 @@ export const dataSourceConfigCashFlow: DataSourceConfigType<
 						markDeleted: true,
 						displayButton: {
 							action: (entry: CashFlowModel) => {
-								const statusTransitions = getStatusTransitions(
-									entry.status,
-								);
-
 								if (entry.deleted_at) {
 									return undefined;
 								}
+
+								const statusTransitions = getStatusTransitions(
+									entry.status,
+								);
 
 								if (statusTransitions.length === 0) {
 									return undefined;

@@ -44,7 +44,7 @@ export function FormManageVehicle() {
 
 	const [searchBrand, setSearchBrand] = useState('');
 
-	const { suggestions: brandSuggestions, isFetching: isBrandsFetching } =
+	const { suggestions: brandsSuggestions, isFetching: isBrandsFetching } =
 		useRemoteAutocomplete<BrandModel>({
 			query: searchBrand,
 			queryKey: ['s-brand'],
@@ -96,7 +96,7 @@ export function FormManageVehicle() {
 					setSearchBrand(value);
 				}}
 				autoCompleteProps={{
-					suggestions: brandSuggestions,
+					suggestions: brandsSuggestions,
 					isLoading: isBrandsFetching,
 					onSelect: (b) => {
 						handleChange('brand', b.name);

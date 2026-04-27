@@ -34,7 +34,12 @@ export function FormManageTemplate() {
 	const { formValues, errors, handleChange, pending } =
 		useWindowForm<TemplateFormValuesType>();
 
-	const elementIds = useElementIds(['label', 'language', 'type', 'content']);
+	const elementIds = useElementIds([
+		'label',
+		'language',
+		'type',
+		'content',
+	] as const);
 
 	return (
 		<>

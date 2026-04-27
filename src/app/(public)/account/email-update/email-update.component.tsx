@@ -54,7 +54,7 @@ export default function EmailUpdate() {
 		}
 	}, [state.situation, router]);
 
-	const elementIds = useElementIds(['emailNew']);
+	const elementIds = useElementIds(['emailNew'] as const);
 
 	if (authStatus === 'loading') {
 		return <LoadingComponent />;

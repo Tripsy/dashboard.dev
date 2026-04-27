@@ -26,6 +26,7 @@ import places from '@/locales/en/places.json';
 import register from '@/locales/en/register.json';
 import templates from '@/locales/en/templates.json';
 import users from '@/locales/en/users.json';
+import vehicles from '@/locales/en/vehicles.json';
 
 const en = {
 	'account-delete': account_delete,
@@ -56,6 +57,7 @@ const en = {
 	register,
 	templates,
 	users,
+	vehicles,
 };
 
 export default en;

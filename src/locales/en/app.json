@@ -35,6 +35,8 @@
 		"failed": "Failed",
 		"canceled": "Canceled",
 		"expired": "Expired",
-		"requires_action": "Requires action"
+		"requires_action": "Requires action",
+		"verified": "Verified",
+		"draft": "Draft"
 	}
 }

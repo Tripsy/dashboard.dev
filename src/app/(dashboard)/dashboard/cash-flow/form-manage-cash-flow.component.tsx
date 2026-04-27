@@ -42,7 +42,7 @@ export function FormManageCashFlow({ action }: { action: string }) {
 		'currency',
 		'externalReference',
 		'notes',
-	]);
+	] as const);
 
 	return (
 		<>

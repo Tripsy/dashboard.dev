@@ -13,7 +13,7 @@ export function FormManagePermission() {
 	const { formValues, errors, handleChange, pending } =
 		useWindowForm<PermissionFormValuesType>();
 
-	const elementIds = useElementIds(['entity', 'operation']);
+	const elementIds = useElementIds(['entity', 'operation'] as const);
 
 	const entityAutocomplete = useLocalAutocomplete({
 		source: PermissionEntitiesSuggestions,

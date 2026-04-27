@@ -2,12 +2,14 @@ import { useId } from 'react';
 
 export function useElementIds<T extends readonly string[]>(
 	keys: T,
-): Record<T[number], string> {
+): { [K in T[number]]: string } {
 	const id = useId();
 
-	return keys.reduce((acc: Record<string, string>, field: string) => {
-		acc[field] = `id-${field}-${id}`;
-
-		return acc;
-	}, {});
+	return keys.reduce(
+		(acc, field) => {
+			acc[field as T[number]] = `id-${field}-${id}`;
+			return acc;
+		},
+		{} as { [K in T[number]]: string },
+	);
 }

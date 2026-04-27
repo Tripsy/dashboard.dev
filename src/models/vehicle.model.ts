@@ -1,47 +1,49 @@
+import type { BrandModel } from '@/models/brand.model';
+
 export const VehicleStatusEnum = {
-    DRAFT: 'draft',
-    VERIFIED: 'verified',
+	DRAFT: 'draft',
+	VERIFIED: 'verified',
 } as const;
 
 export type VehicleStatus =
-    (typeof VehicleStatusEnum)[keyof typeof VehicleStatusEnum];
+	(typeof VehicleStatusEnum)[keyof typeof VehicleStatusEnum];
 
 export const VehicleTypeEnum = {
-    AUTO: 'auto',
-    MOTO: 'moto',
-    TRAILER: 'trailer',
+	AUTO: 'auto',
+	MOTO: 'moto',
+	TRAILER: 'trailer',
 } as const;
 
 export type VehicleType =
-    (typeof VehicleTypeEnum)[keyof typeof VehicleTypeEnum];
+	(typeof VehicleTypeEnum)[keyof typeof VehicleTypeEnum];
 
 export type VehicleModel<D = Date | string> = {
-    id: number;
+	id: number;
 
-    brand_id: number | null;
-    model: string;
+	brand: BrandModel<D> | null;
+	model: string;
 
-    vehicle_type: VehicleType;
-    status: VehicleStatus;
+	vehicle_type: VehicleType;
+	status: VehicleStatus;
 
-    // details
-    length: number | null;
-    width: number | null;
-    height: number | null;
-    weight: number | null;
+	// details
+	length: number | null;
+	width: number | null;
+	height: number | null;
+	weight: number | null;
 
-    created_at: D;
-    updated_at: D;
-    deleted_at: D;
+	created_at: D;
+	updated_at: D;
+	deleted_at: D;
 };
 
-export type VehicleFormValuesType = Pick<
-    VehicleModel,
-    'brand_id' | 'vehicle_type' | 'status'
-> & {
-    model: string | null;
-    length: number | null;
-    width: number | null;
-    height: number | null;
-    weight: number | null;
+export type VehicleFormValuesType = {
+	brand_id: number | null;
+	brand: string | null;
+	vehicle_type: VehicleType;
+	model: string | null;
+	length: number | null;
+	width: number | null;
+	height: number | null;
+	weight: number | null;
 };

@@ -34,7 +34,7 @@ export function FormManageClient() {
 		'contactEmail',
 		'contactPhone',
 		'notes',
-	]);
+	] as const);
 
 	return (
 		<>

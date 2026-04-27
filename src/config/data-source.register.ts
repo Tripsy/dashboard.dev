@@ -10,6 +10,7 @@ import { dataSourceConfigPermissions } from '@/app/(dashboard)/dashboard/permiss
 import { dataSourceConfigPlaces } from '@/app/(dashboard)/dashboard/places/places.definition';
 import { dataSourceConfigTemplates } from '@/app/(dashboard)/dashboard/templates/templates.definition';
 import { dataSourceConfigUsers } from '@/app/(dashboard)/dashboard/users/users.definition';
+import { dataSourceConfigVehicles } from '@/app/(dashboard)/dashboard/vehicles/vehicles.definition';
 import { registerDataSource } from '@/config/data-source.config';
 
 /**
@@ -29,4 +30,5 @@ export function registerDashboardDataSource() {
 	registerDataSource('places', dataSourceConfigPlaces);
 	registerDataSource('templates', dataSourceConfigTemplates);
 	registerDataSource('users', dataSourceConfigUsers);
+	registerDataSource('vehicles', dataSourceConfigVehicles);
 }

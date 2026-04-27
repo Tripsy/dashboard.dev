@@ -12,12 +12,12 @@ export type BrandStatus =
 	(typeof BrandStatusEnum)[keyof typeof BrandStatusEnum];
 
 export const BrandTypeEnum = {
-	PRODUCT: 'product',
+	VEHICLE: 'vehicle',
 } as const;
 
 export type BrandType = (typeof BrandTypeEnum)[keyof typeof BrandTypeEnum];
 
-export const BRAND_DEFAULT_TYPE = BrandTypeEnum.PRODUCT;
+export const BRAND_DEFAULT_TYPE = BrandTypeEnum.VEHICLE;
 
 export type BrandContent = {
 	language: Language | string;

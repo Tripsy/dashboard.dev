@@ -31,10 +31,10 @@ export function FormManageBrand() {
 
 	const elementIds = useElementIds([
 		'brandType',
-		'code',
+		'name',
 		'parent',
 		'contents',
-	]);
+	] as const);
 
 	// Derive map from formValues
 	const [contentsMap, setContentsMap] = useState<

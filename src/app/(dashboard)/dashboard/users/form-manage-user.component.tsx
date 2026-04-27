@@ -63,7 +63,7 @@ export function FormManageUser() {
 		'language',
 		'role',
 		'operatorType',
-	]);
+	] as const);
 
 	return (
 		<>

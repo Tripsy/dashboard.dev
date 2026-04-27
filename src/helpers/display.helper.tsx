@@ -65,6 +65,14 @@ export const statusList: Record<
 		variant: 'info',
 		icon: Icons.Status.RequiresAction,
 	},
+	verified: {
+		variant: 'success',
+		icon: Icons.Status.Verified,
+	},
+	draft: {
+		variant: 'warning',
+		icon: Icons.Status.Draft,
+	},
 };
 
 export const DisplayStatus = ({

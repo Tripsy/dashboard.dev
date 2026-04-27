@@ -3,10 +3,10 @@
 		"title": "Client addresses - Dashboard | {{app_name}}"
 	},
 	"validation": {
-		"invalid_client_id": "Invalid client; Select client from select",
+		"invalid_client_id": "Invalid client; Pick client from select",
 		"invalid_client": "Invalid client",
 		"invalid_address_type": "Address type is required",
-		"invalid_city_id": "Invalid city; Select city from select",
+		"invalid_city_id": "Invalid city; Pick city from select",
 		"invalid_city": "Invalid city",
 		"invalid_details": "Invalid address info",
 		"invalid_postal_code": "Invalid postal code",

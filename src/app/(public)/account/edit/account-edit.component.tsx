@@ -69,7 +69,7 @@ export default function AccountEdit() {
 		}
 	}, [state.situation, router, refreshAuth]);
 
-	const elementIds = useElementIds(['name', 'language']);
+	const elementIds = useElementIds(['name', 'language'] as const);
 
 	if (authStatus === 'loading') {
 		return <LoadingComponent />;

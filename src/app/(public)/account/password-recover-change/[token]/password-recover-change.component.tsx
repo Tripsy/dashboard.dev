@@ -51,7 +51,7 @@ export default function PasswordRecoverChange() {
 
 	const handleChange = createHandleChange(setFormValues, markFieldAsTouched);
 
-	const elementIds = useElementIds(['password', 'passwordConfirm']);
+	const elementIds = useElementIds(['password', 'passwordConfirm'] as const);
 
 	if (state.situation === 'csrf_error') {
 		throw new Error(state.message as string);

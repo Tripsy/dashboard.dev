@@ -1,23 +1,23 @@
 export const CmrDriverRoleEnum = {
-    PRIMARY: 'primary',
-    SECONDARY: 'secondary',
+	PRIMARY: 'primary',
+	SECONDARY: 'secondary',
 } as const;
 
 export type CmrDriverRole =
-    (typeof CmrDriverRoleEnum)[keyof typeof CmrDriverRoleEnum];
+	(typeof CmrDriverRoleEnum)[keyof typeof CmrDriverRoleEnum];
 
 export type CmrDriverModel<D = Date | string> = {
-    id: number;
+	id: number;
 
-    cmr_id: number;
-    work_session_id: number;
+	cmr_id: number;
+	work_session_id: number;
 
-    role: CmrDriverRole;
+	role: CmrDriverRole;
 
-    created_at: D;
+	created_at: D;
 };
 
 export type CmrDriverFormValuesType = Pick<
-    CmrDriverModel,
-    'cmr_id' | 'work_session_id' | 'role'
+	CmrDriverModel,
+	'cmr_id' | 'work_session_id' | 'role'
 >;

@@ -65,7 +65,7 @@ export default function Register() {
 		'passwordConfirm',
 		'language',
 		'terms',
-	]);
+	] as const);
 
 	if (state.situation === 'csrf_error') {
 		throw new Error(state.message as string);

@@ -92,7 +92,7 @@ export default function Login() {
 		}
 	}, [state.situation, router, refreshAuth, searchParams]);
 
-	const elementIds = useElementIds(['email', 'password']);
+	const elementIds = useElementIds(['email', 'password'] as const);
 
 	if (state.situation === 'csrf_error') {
 		throw new Error(state.message as string);

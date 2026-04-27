@@ -102,7 +102,6 @@ export function SideMenu() {
 				'dashboard.labels.cmr-vehicles',
 				'dashboard.labels.work-sessions',
 				'dashboard.labels.work-session-vehicles',
-
 			] as const,
 		[],
 	);
@@ -176,9 +175,14 @@ export function SideMenu() {
 					{
 						page: 'work-session-vehicles',
 						href: Routes.get('cmr-vehicle'),
-						text: translations['dashboard.labels.work-session-vehicles'],
+						text: translations[
+							'dashboard.labels.work-session-vehicles'
+						],
 						icon: Icons.Vehicle,
-						permission: hasPermission(auth, 'work-session-vehicle.find'),
+						permission: hasPermission(
+							auth,
+							'work-session-vehicle.find',
+						),
 					},
 				],
 			},

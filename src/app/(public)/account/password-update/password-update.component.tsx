@@ -60,7 +60,7 @@ export default function PasswordUpdate() {
 		'passwordCurrent',
 		'passwordNew',
 		'passwordConfirm',
-	]);
+	] as const);
 
 	if (authStatus === 'loading') {
 		return <LoadingComponent />;

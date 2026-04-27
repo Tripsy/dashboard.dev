@@ -40,7 +40,7 @@ export function FormManagePlace() {
 		'code',
 		'parent',
 		'contents',
-	]);
+	] as const);
 
 	const previousParentsRef = useRef<
 		Partial<
@@ -80,7 +80,7 @@ export function FormManagePlace() {
 		isFetching: isParentPlacesFetching,
 	} = useRemoteAutocomplete<PlaceModel>({
 		query: parentPlaceType ? searchParentPlaces : '', // Do not query if no parent type
-		queryKey: ['s-parent-places', parentPlaceType],
+		queryKey: ['s-parent-place', parentPlaceType],
 		queryFn: async (q) => {
 			const res: FindFunctionResponseType<PlaceModel> | undefined =
 				await requestFind('places', {

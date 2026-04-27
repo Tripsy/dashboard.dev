@@ -60,7 +60,7 @@ export function SetupPermissionsUser({
 		isLoading: isLoadingUserPermissions,
 		error: userPermissionsError,
 	} = useQuery({
-		queryKey: ['user-permissions', entry.id],
+		queryKey: ['s-user-permission', entry.id],
 		queryFn: () =>
 			getUserPermissions(entry.id, {
 				order_by: 'permission_id',

@@ -60,7 +60,7 @@ export function FormManageClientAddress() {
 	const { suggestions: clientsSuggestions, isFetching: isClientsFetching } =
 		useRemoteAutocomplete<ClientModel>({
 			query: searchClient,
-			queryKey: ['s-clients'],
+			queryKey: ['s-client'],
 			queryFn: async (q) => {
 				const res: FindFunctionResponseType<ClientModel> | undefined =
 					await requestFind('clients', {
@@ -78,7 +78,7 @@ export function FormManageClientAddress() {
 	const { suggestions: citiesSuggestions, isFetching: isCitiesFetching } =
 		useRemoteAutocomplete<PlaceModel>({
 			query: searchCity,
-			queryKey: ['s-cities'],
+			queryKey: ['s-city'],
 			queryFn: async (q) => {
 				const res: FindFunctionResponseType<PlaceModel> | undefined =
 					await requestFind('places', {

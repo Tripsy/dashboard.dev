@@ -6,7 +6,9 @@ import {
 	BanknoteArrowDown,
 	BookText,
 	Building2,
-	Calendar, Car, CarFront,
+	Calendar,
+	Car,
+	CarFront,
 	Check,
 	ChevronLeft,
 	CircleAlert,
@@ -23,8 +25,11 @@ import {
 	Expand,
 	Eye,
 	EyeOff,
+	FilePenLine,
 	FileSignal,
-	FileStack, FileText,
+	FileStack,
+	FileText,
+	GalleryVerticalEnd,
 	HardDrive,
 	IdCard,
 	Info,
@@ -46,24 +51,23 @@ import {
 	RefreshCcw,
 	Save,
 	Search,
-	Settings, Settings2, Shell,
+	Settings,
+	Settings2,
 	Shield,
+	ShieldUser,
 	SquarePen,
-	SquareStack,
 	TableOfContents,
 	Tag,
 	TextSearch,
 	ThumbsUp,
 	Trash2,
-	GalleryVerticalEnd,
 	TriangleAlert,
 	UserRound,
 	Users,
-	ShieldUser,
 	Wrench,
 	X,
 } from 'lucide-react';
-import React from 'react';
+import type React from 'react';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
 
 const createIcon = (IconComponent: React.ComponentType<LucideProps>) => {
@@ -137,6 +141,9 @@ export const Icons = {
 		Canceled: createIcon(CircleX),
 		Expired: createIcon(ClockFading),
 		RequiresAction: createIcon(TriangleAlert),
+
+		Verified: createIcon(Check),
+		Draft: createIcon(FilePenLine),
 	},
 	Action: {
 		Save: createIcon(Save),
@@ -156,6 +163,8 @@ export const Icons = {
 		Complete: createIcon(Check),
 		Drop: createIcon(CircleX),
 		Refund: createIcon(BanknoteArrowDown),
+		Verified: createIcon(Check),
+		Draft: createIcon(FilePenLine),
 	},
 };
 

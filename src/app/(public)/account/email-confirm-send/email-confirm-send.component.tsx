@@ -41,7 +41,7 @@ export default function EmailConfirmSend() {
 
 	const handleChange = createHandleChange(setFormValues, markFieldAsTouched);
 
-	const elementIds = useElementIds(['email']);
+	const elementIds = useElementIds(['email'] as const);
 
 	if (state.situation === 'csrf_error') {
 		throw new Error(state.message as string);

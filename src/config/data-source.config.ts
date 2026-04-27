@@ -214,7 +214,6 @@ export type DataSourceKey =
 	| 'places'
 	| 'templates'
 	| 'users'
-
 	| 'vehicles'
 	| 'company-vehicles'
 	| 'cmrs'

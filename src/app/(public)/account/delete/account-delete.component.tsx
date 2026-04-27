@@ -57,7 +57,7 @@ export default function AccountDelete() {
 		}
 	}, [state.situation, router]);
 
-	const elementIds = useElementIds(['passwordCurrent']);
+	const elementIds = useElementIds(['passwordCurrent'] as const);
 
 	if (authStatus === 'loading') {
 		return <LoadingComponent />;

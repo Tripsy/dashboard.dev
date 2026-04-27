@@ -14,6 +14,7 @@ import {
 	getFormDataAsString,
 } from '@/helpers/form.helper';
 import { requestFind } from '@/helpers/services.helper';
+import { formatEnumLabel } from '@/helpers/string.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import { getClientDisplayName } from '@/models/client.model';
 import {
@@ -235,7 +236,7 @@ export const dataSourceConfigClientAddress: DataSourceConfigType<
 					column: DataTableColumnType<ClientAddressModel>,
 				) =>
 					DataTableValue(entry, column, {
-						capitalize: true,
+						customValue: formatEnumLabel(entry.address_type),
 					}),
 			},
 			{

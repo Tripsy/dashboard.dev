@@ -3,43 +3,44 @@
 import { type JSX, useCallback, useMemo } from 'react';
 import { useStore } from 'zustand/react';
 import {
-	FormFiltersDateRange,
 	FormFiltersReset,
 	FormFiltersSearch,
 	FormFiltersSelect,
+	FormFiltersShowDeleted,
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
-import type { LogDataDataTableFiltersType } from '@/app/(dashboard)/dashboard/log-data/log-data.definition';
+import type { BrandsDataTableFiltersType } from '@/app/(dashboard)/dashboard/brands/brands.definition';
+import type { TemplateDataTableFiltersType } from '@/app/(dashboard)/dashboard/templates/templates.definition';
+import { Configuration } from '@/config/settings.config';
 import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import {
-	type LogCategory,
-	LogCategoryEnum,
-	type LogDataModel,
-	type LogLevel,
-	LogLevelEnum,
-} from '@/models/log-data.model';
+	type BrandModel,
+	type BrandType,
+	BrandTypeEnum,
+} from '@/models/brand.model';
+import { type Language, LanguageEnum } from '@/types/common.type';
 
-const logLevels = toOptionsFromEnum(LogLevelEnum, {
+const brandTypes = toOptionsFromEnum(BrandTypeEnum, {
 	formatter: formatEnumLabel,
 });
 
-const logCategories = toOptionsFromEnum(LogCategoryEnum, {
+const languages = toOptionsFromEnum(LanguageEnum, {
 	formatter: formatEnumLabel,
 });
 
-export const DataTableLogDataFilters = (): JSX.Element => {
+export const DataTableFiltersBrands = (): JSX.Element => {
 	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
-		'log-data',
-		LogDataModel
+		'brands',
+		BrandModel
 	>();
 
 	const filters = useStore(
 		dataTableStore,
 		(state) => state.tableState.filters,
-	) as LogDataDataTableFiltersType;
+	) as BrandsDataTableFiltersType;
 
 	const updateTableState = useStore(
 		dataTableStore,
@@ -47,9 +48,9 @@ export const DataTableLogDataFilters = (): JSX.Element => {
 	);
 
 	const setFilterValue = useCallback(
-		<K extends keyof LogDataDataTableFiltersType>(
+		<K extends keyof BrandsDataTableFiltersType>(
 			key: K,
-			value: LogDataDataTableFiltersType[K]['value'],
+			value: BrandsDataTableFiltersType[K]['value'],
 		) => {
 			updateTableState({
 				filters: {
@@ -85,46 +86,37 @@ export const DataTableLogDataFilters = (): JSX.Element => {
 
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
-			<FormFiltersSearch<LogDataDataTableFiltersType>
-				labelText="ID / PID / Message / Context"
+			<FormFiltersSearch<BrandsDataTableFiltersType>
+				labelText="ID / Name"
 				search={searchGlobal}
 			/>
 
-			<FormFiltersSelect<LogDataDataTableFiltersType>
-				labelText="Category"
-				fieldName="category"
-				fieldValue={filters.category.value}
-				options={logCategories}
+			<FormFiltersSelect<BrandsDataTableFiltersType>
+				labelText="Type"
+				fieldName="brand_type"
+				fieldValue={filters.brand_type.value}
+				options={brandTypes}
 				onChange={(value) =>
-					setFilterValue('category', value as LogCategory)
+					setFilterValue('brand_type', value as BrandType)
 				}
 			/>
 
-			<FormFiltersSelect<LogDataDataTableFiltersType>
-				labelText="Level"
-				fieldName="level"
-				fieldValue={filters.level.value}
-				options={logLevels}
-				onChange={(value) => setFilterValue('level', value as LogLevel)}
+			<FormFiltersSelect<TemplateDataTableFiltersType>
+				labelText="Language"
+				fieldName="language"
+				fieldValue={filters.language.value ?? Configuration.language()}
+				options={languages}
+				onChange={(value) =>
+					setFilterValue('language', value as Language)
+				}
 			/>
 
-			<FormFiltersDateRange<LogDataDataTableFiltersType>
-				labelText="Created At"
-				start={{
-					fieldName: 'create_date_start',
-					fieldValue: filters.create_date_start.value,
-					onSelect: (value) =>
-						setFilterValue('create_date_start', value),
-				}}
-				end={{
-					fieldName: 'create_date_end',
-					fieldValue: filters.create_date_end.value,
-					onSelect: (value) =>
-						setFilterValue('create_date_end', value),
-				}}
+			<FormFiltersShowDeleted
+				checked={filters.is_deleted.value ?? false}
+				onCheckedChange={(value) => setFilterValue('is_deleted', value)}
 			/>
 
-			<FormFiltersReset dataSource="log-data" />
+			<FormFiltersReset dataSource="brands" />
 		</div>
 	);
 };

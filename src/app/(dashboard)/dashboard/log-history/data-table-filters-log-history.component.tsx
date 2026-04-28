@@ -40,7 +40,7 @@ const sources = toOptionsFromEnum(LogHistorySourceEnum, {
 	formatter: formatEnumLabel,
 });
 
-export const DataTableLogHistoryFilters = (): JSX.Element => {
+export const DataTableFiltersLogHistory = (): JSX.Element => {
 	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
 		'log-history',
 		LogHistoryModel

@@ -33,7 +33,7 @@ const vehicleTypes = toOptionsFromEnum(VehicleTypeEnum, {
 	formatter: formatEnumLabel,
 });
 
-export const DataTableVehiclesFilters = (): JSX.Element => {
+export const DataTableFiltersVehicles = (): JSX.Element => {
 	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
 		'vehicles',
 		VehicleModel

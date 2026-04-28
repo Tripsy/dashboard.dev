@@ -3,44 +3,43 @@
 import { type JSX, useCallback, useMemo } from 'react';
 import { useStore } from 'zustand/react';
 import {
-	FormFiltersDateRange,
 	FormFiltersReset,
 	FormFiltersSearch,
 	FormFiltersSelect,
 	FormFiltersShowDeleted,
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
-import type { UsersDataTableFiltersType } from '@/app/(dashboard)/dashboard/users/users.definition';
+import type { CompanyVehiclesDataTableFiltersType } from '@/app/(dashboard)/dashboard/company-vehicles/company-vehicles.definition';
 import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import {
-	type UserModel,
-	type UserRole,
-	UserRoleEnum,
-	type UserStatus,
-	UserStatusEnum,
-} from '@/models/user.model';
+	type CompanyVehicleModel,
+	type CompanyVehicleScope,
+	CompanyVehicleScopeEnum,
+	type CompanyVehicleStatus,
+	CompanyVehicleStatusEnum,
+} from '@/models/company-vehicle.model';
 
-const statuses = toOptionsFromEnum(UserStatusEnum, {
+const statuses = toOptionsFromEnum(CompanyVehicleStatusEnum, {
 	formatter: formatEnumLabel,
 });
 
-const roles = toOptionsFromEnum(UserRoleEnum, {
+const scopes = toOptionsFromEnum(CompanyVehicleScopeEnum, {
 	formatter: formatEnumLabel,
 });
 
-export const DataTableUsersFilters = (): JSX.Element => {
+export const DataTableFiltersCompanyVehicles = (): JSX.Element => {
 	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
-		'users',
-		UserModel
+		'company-vehicles',
+		CompanyVehicleModel
 	>();
 
 	const filters = useStore(
 		dataTableStore,
 		(state) => state.tableState.filters,
-	) as UsersDataTableFiltersType;
+	) as CompanyVehiclesDataTableFiltersType;
 
 	const updateTableState = useStore(
 		dataTableStore,
@@ -48,9 +47,9 @@ export const DataTableUsersFilters = (): JSX.Element => {
 	);
 
 	const setFilterValue = useCallback(
-		<K extends keyof UsersDataTableFiltersType>(
+		<K extends keyof CompanyVehiclesDataTableFiltersType>(
 			key: K,
-			value: UsersDataTableFiltersType[K]['value'],
+			value: CompanyVehiclesDataTableFiltersType[K]['value'],
 		) => {
 			updateTableState({
 				filters: {
@@ -86,43 +85,29 @@ export const DataTableUsersFilters = (): JSX.Element => {
 
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
-			<FormFiltersSearch<UsersDataTableFiltersType>
-				labelText="ID / Email / Name"
+			<FormFiltersSearch<CompanyVehiclesDataTableFiltersType>
+				labelText="ID / Plate / VIN / Notes"
 				search={searchGlobal}
 			/>
 
-			<FormFiltersSelect<UsersDataTableFiltersType>
+			<FormFiltersSelect<CompanyVehiclesDataTableFiltersType>
+				labelText="Scope"
+				fieldName="scope"
+				fieldValue={filters.scope.value}
+				options={scopes}
+				onChange={(value) =>
+					setFilterValue('scope', value as CompanyVehicleScope)
+				}
+			/>
+
+			<FormFiltersSelect<CompanyVehiclesDataTableFiltersType>
 				labelText="Status"
 				fieldName="status"
 				fieldValue={filters.status.value}
 				options={statuses}
 				onChange={(value) =>
-					setFilterValue('status', value as UserStatus)
+					setFilterValue('status', value as CompanyVehicleStatus)
 				}
-			/>
-
-			<FormFiltersSelect<UsersDataTableFiltersType>
-				labelText="Role"
-				fieldName="role"
-				fieldValue={filters.role.value}
-				options={roles}
-				onChange={(value) => setFilterValue('role', value as UserRole)}
-			/>
-
-			<FormFiltersDateRange<UsersDataTableFiltersType>
-				labelText="Create Date"
-				start={{
-					fieldName: 'create_date_start',
-					fieldValue: filters.create_date_start.value,
-					onSelect: (value) =>
-						setFilterValue('create_date_start', value),
-				}}
-				end={{
-					fieldName: 'create_date_end',
-					fieldValue: filters.create_date_end.value,
-					onSelect: (value) =>
-						setFilterValue('create_date_end', value),
-				}}
 			/>
 
 			<FormFiltersShowDeleted
@@ -130,7 +115,7 @@ export const DataTableUsersFilters = (): JSX.Element => {
 				onCheckedChange={(value) => setFilterValue('is_deleted', value)}
 			/>
 
-			<FormFiltersReset dataSource="users" />
+			<FormFiltersReset dataSource="company-vehicles" />
 		</div>
 	);
 };

@@ -44,7 +44,7 @@ const methods = toOptionsFromEnum(CashFlowMethodEnum, {
 	formatter: formatEnumLabel,
 });
 
-export const DataTableCashFlowFilters = (): JSX.Element => {
+export const DataTableFiltersCashFlow = (): JSX.Element => {
 	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
 		'cash-flow',
 		CashFlowModel

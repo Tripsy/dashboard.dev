@@ -3,37 +3,37 @@
 import { type JSX, useCallback, useMemo } from 'react';
 import { useStore } from 'zustand/react';
 import {
+	FormFiltersDateRange,
 	FormFiltersReset,
 	FormFiltersSearch,
 	FormFiltersSelect,
-	FormFiltersShowDeleted,
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
-import type { ClientAddressDataTableFiltersType } from '@/app/(dashboard)/dashboard/client-address/client-address.definition';
+import type { CronHistoryDataTableFiltersType } from '@/app/(dashboard)/dashboard/cron-history/cron-history.definition';
 import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import {
-	type ClientAddressModel,
-	type ClientAddressType,
-	ClientAddressTypeEnum,
-} from '@/models/client-address.model';
+	type CronHistoryModel,
+	type CronHistoryStatus,
+	CronHistoryStatusEnum,
+} from '@/models/cron-history.model';
 
-const addressTypes = toOptionsFromEnum(ClientAddressTypeEnum, {
+const statuses = toOptionsFromEnum(CronHistoryStatusEnum, {
 	formatter: formatEnumLabel,
 });
 
-export const DataTableClientAddressFilters = (): JSX.Element => {
+export const DataTableFiltersCronHistory = (): JSX.Element => {
 	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
-		'client-address',
-		ClientAddressModel
+		'cron-history',
+		CronHistoryModel
 	>();
 
 	const filters = useStore(
 		dataTableStore,
 		(state) => state.tableState.filters,
-	) as ClientAddressDataTableFiltersType;
+	) as CronHistoryDataTableFiltersType;
 
 	const updateTableState = useStore(
 		dataTableStore,
@@ -41,9 +41,9 @@ export const DataTableClientAddressFilters = (): JSX.Element => {
 	);
 
 	const setFilterValue = useCallback(
-		<K extends keyof ClientAddressDataTableFiltersType>(
+		<K extends keyof CronHistoryDataTableFiltersType>(
 			key: K,
-			value: ClientAddressDataTableFiltersType[K]['value'],
+			value: CronHistoryDataTableFiltersType[K]['value'],
 		) => {
 			updateTableState({
 				filters: {
@@ -79,29 +79,39 @@ export const DataTableClientAddressFilters = (): JSX.Element => {
 
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
-			<FormFiltersSearch<ClientAddressDataTableFiltersType>
-				labelText="ID / Address / Postal Code"
+			<FormFiltersSearch<CronHistoryDataTableFiltersType>
+				labelText="ID / Label / Content"
+				fieldName="global"
 				search={searchGlobal}
 			/>
 
-			{/*TODO ADD CLIENT*/}
-
-			<FormFiltersSelect<ClientAddressDataTableFiltersType>
-				labelText="Address Type"
-				fieldName="address_type"
-				fieldValue={filters.address_type.value}
-				options={addressTypes}
+			<FormFiltersSelect<CronHistoryDataTableFiltersType>
+				labelText="Status"
+				fieldName="status"
+				fieldValue={filters.status.value}
+				options={statuses}
 				onChange={(value) =>
-					setFilterValue('address_type', value as ClientAddressType)
+					setFilterValue('status', value as CronHistoryStatus)
 				}
 			/>
 
-			<FormFiltersShowDeleted
-				checked={filters.is_deleted.value ?? false}
-				onCheckedChange={(value) => setFilterValue('is_deleted', value)}
+			<FormFiltersDateRange<CronHistoryDataTableFiltersType>
+				labelText="Start Date"
+				start={{
+					fieldName: 'start_date_start',
+					fieldValue: filters.start_date_start.value,
+					onSelect: (value) =>
+						setFilterValue('start_date_start', value),
+				}}
+				end={{
+					fieldName: 'start_date_end',
+					fieldValue: filters.start_date_end.value,
+					onSelect: (value) =>
+						setFilterValue('start_date_end', value),
+				}}
 			/>
 
-			<FormFiltersReset dataSource="client-address" />
+			<FormFiltersReset dataSource="cron-history" />
 		</div>
 	);
 };

@@ -7,40 +7,39 @@ import {
 	FormFiltersReset,
 	FormFiltersSearch,
 	FormFiltersSelect,
-	FormFiltersShowDeleted,
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
-import type { ClientsDataTableFiltersType } from '@/app/(dashboard)/dashboard/clients/clients.definition';
+import type { LogDataDataTableFiltersType } from '@/app/(dashboard)/dashboard/log-data/log-data.definition';
 import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import {
-	type ClientModel,
-	type ClientStatus,
-	ClientStatusEnum,
-	type ClientType,
-	ClientTypeEnum,
-} from '@/models/client.model';
+	type LogCategory,
+	LogCategoryEnum,
+	type LogDataModel,
+	type LogLevel,
+	LogLevelEnum,
+} from '@/models/log-data.model';
 
-const statuses = toOptionsFromEnum(ClientStatusEnum, {
+const logLevels = toOptionsFromEnum(LogLevelEnum, {
 	formatter: formatEnumLabel,
 });
 
-const clientTypes = toOptionsFromEnum(ClientTypeEnum, {
+const logCategories = toOptionsFromEnum(LogCategoryEnum, {
 	formatter: formatEnumLabel,
 });
 
-export const DataTableClientsFilters = (): JSX.Element => {
+export const DataTableFiltersLogData = (): JSX.Element => {
 	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
-		'clients',
-		ClientModel
+		'log-data',
+		LogDataModel
 	>();
 
 	const filters = useStore(
 		dataTableStore,
 		(state) => state.tableState.filters,
-	) as ClientsDataTableFiltersType;
+	) as LogDataDataTableFiltersType;
 
 	const updateTableState = useStore(
 		dataTableStore,
@@ -48,9 +47,9 @@ export const DataTableClientsFilters = (): JSX.Element => {
 	);
 
 	const setFilterValue = useCallback(
-		<K extends keyof ClientsDataTableFiltersType>(
+		<K extends keyof LogDataDataTableFiltersType>(
 			key: K,
-			value: ClientsDataTableFiltersType[K]['value'],
+			value: LogDataDataTableFiltersType[K]['value'],
 		) => {
 			updateTableState({
 				filters: {
@@ -86,33 +85,31 @@ export const DataTableClientsFilters = (): JSX.Element => {
 
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
-			<FormFiltersSearch<ClientsDataTableFiltersType>
-				labelText="ID / Name / CUI / CNP"
+			<FormFiltersSearch<LogDataDataTableFiltersType>
+				labelText="ID / PID / Message / Context"
 				search={searchGlobal}
 			/>
 
-			<FormFiltersSelect<ClientsDataTableFiltersType>
-				labelText="Status"
-				fieldName="status"
-				fieldValue={filters.status.value}
-				options={statuses}
+			<FormFiltersSelect<LogDataDataTableFiltersType>
+				labelText="Category"
+				fieldName="category"
+				fieldValue={filters.category.value}
+				options={logCategories}
 				onChange={(value) =>
-					setFilterValue('status', value as ClientStatus)
+					setFilterValue('category', value as LogCategory)
 				}
 			/>
 
-			<FormFiltersSelect<ClientsDataTableFiltersType>
-				labelText="Type"
-				fieldName="client_type"
-				fieldValue={filters.client_type.value}
-				options={clientTypes}
-				onChange={(value) =>
-					setFilterValue('client_type', value as ClientType)
-				}
+			<FormFiltersSelect<LogDataDataTableFiltersType>
+				labelText="Level"
+				fieldName="level"
+				fieldValue={filters.level.value}
+				options={logLevels}
+				onChange={(value) => setFilterValue('level', value as LogLevel)}
 			/>
 
-			<FormFiltersDateRange<ClientsDataTableFiltersType>
-				labelText="Create Date"
+			<FormFiltersDateRange<LogDataDataTableFiltersType>
+				labelText="Created At"
 				start={{
 					fieldName: 'create_date_start',
 					fieldValue: filters.create_date_start.value,
@@ -127,12 +124,7 @@ export const DataTableClientsFilters = (): JSX.Element => {
 				}}
 			/>
 
-			<FormFiltersShowDeleted
-				checked={filters.is_deleted.value ?? false}
-				onCheckedChange={(value) => setFilterValue('is_deleted', value)}
-			/>
-
-			<FormFiltersReset dataSource="clients" />
+			<FormFiltersReset dataSource="log-data" />
 		</div>
 	);
 };

@@ -247,7 +247,7 @@ Routes.group('dashboard')
 	.add('work-session', '/dashboard/work-sessions', {
 		permission: 'work-session.find',
 	})
-	.add('work-session-vehicles', '/dashboard/work-session-vehicles', {
+	.add('work-session-vehicle', '/dashboard/work-session-vehicles', {
 		permission: 'work-session-vehicle.find',
 	});
 

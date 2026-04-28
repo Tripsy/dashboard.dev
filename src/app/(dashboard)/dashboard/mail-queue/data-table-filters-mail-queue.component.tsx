@@ -24,7 +24,7 @@ const statuses = toOptionsFromEnum(MailQueueStatusEnum, {
 	formatter: formatEnumLabel,
 });
 
-export const DataTableMailQueueFilters = (): JSX.Element => {
+export const DataTableFiltersMailQueue = (): JSX.Element => {
 	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
 		'mail-queue',
 		MailQueueModel

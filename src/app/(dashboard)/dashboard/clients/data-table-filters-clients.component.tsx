@@ -3,44 +3,44 @@
 import { type JSX, useCallback, useMemo } from 'react';
 import { useStore } from 'zustand/react';
 import {
+	FormFiltersDateRange,
 	FormFiltersReset,
 	FormFiltersSearch,
 	FormFiltersSelect,
 	FormFiltersShowDeleted,
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
-import type { BrandsDataTableFiltersType } from '@/app/(dashboard)/dashboard/brands/brands.definition';
-import type { TemplateDataTableFiltersType } from '@/app/(dashboard)/dashboard/templates/templates.definition';
-import { Configuration } from '@/config/settings.config';
+import type { ClientsDataTableFiltersType } from '@/app/(dashboard)/dashboard/clients/clients.definition';
 import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import {
-	type BrandModel,
-	type BrandType,
-	BrandTypeEnum,
-} from '@/models/brand.model';
-import { type Language, LanguageEnum } from '@/types/common.type';
+	type ClientModel,
+	type ClientStatus,
+	ClientStatusEnum,
+	type ClientType,
+	ClientTypeEnum,
+} from '@/models/client.model';
 
-const brandTypes = toOptionsFromEnum(BrandTypeEnum, {
+const statuses = toOptionsFromEnum(ClientStatusEnum, {
 	formatter: formatEnumLabel,
 });
 
-const languages = toOptionsFromEnum(LanguageEnum, {
+const clientTypes = toOptionsFromEnum(ClientTypeEnum, {
 	formatter: formatEnumLabel,
 });
 
-export const DataTableBrandsFilters = (): JSX.Element => {
+export const DataTableFiltersClients = (): JSX.Element => {
 	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
-		'brands',
-		BrandModel
+		'clients',
+		ClientModel
 	>();
 
 	const filters = useStore(
 		dataTableStore,
 		(state) => state.tableState.filters,
-	) as BrandsDataTableFiltersType;
+	) as ClientsDataTableFiltersType;
 
 	const updateTableState = useStore(
 		dataTableStore,
@@ -48,9 +48,9 @@ export const DataTableBrandsFilters = (): JSX.Element => {
 	);
 
 	const setFilterValue = useCallback(
-		<K extends keyof BrandsDataTableFiltersType>(
+		<K extends keyof ClientsDataTableFiltersType>(
 			key: K,
-			value: BrandsDataTableFiltersType[K]['value'],
+			value: ClientsDataTableFiltersType[K]['value'],
 		) => {
 			updateTableState({
 				filters: {
@@ -86,29 +86,45 @@ export const DataTableBrandsFilters = (): JSX.Element => {
 
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
-			<FormFiltersSearch<BrandsDataTableFiltersType>
-				labelText="ID / Name"
+			<FormFiltersSearch<ClientsDataTableFiltersType>
+				labelText="ID / Name / CUI / CNP"
 				search={searchGlobal}
 			/>
 
-			<FormFiltersSelect<BrandsDataTableFiltersType>
-				labelText="Type"
-				fieldName="brand_type"
-				fieldValue={filters.brand_type.value}
-				options={brandTypes}
+			<FormFiltersSelect<ClientsDataTableFiltersType>
+				labelText="Status"
+				fieldName="status"
+				fieldValue={filters.status.value}
+				options={statuses}
 				onChange={(value) =>
-					setFilterValue('brand_type', value as BrandType)
+					setFilterValue('status', value as ClientStatus)
 				}
 			/>
 
-			<FormFiltersSelect<TemplateDataTableFiltersType>
-				labelText="Language"
-				fieldName="language"
-				fieldValue={filters.language.value ?? Configuration.language()}
-				options={languages}
+			<FormFiltersSelect<ClientsDataTableFiltersType>
+				labelText="Type"
+				fieldName="client_type"
+				fieldValue={filters.client_type.value}
+				options={clientTypes}
 				onChange={(value) =>
-					setFilterValue('language', value as Language)
+					setFilterValue('client_type', value as ClientType)
 				}
+			/>
+
+			<FormFiltersDateRange<ClientsDataTableFiltersType>
+				labelText="Create Date"
+				start={{
+					fieldName: 'create_date_start',
+					fieldValue: filters.create_date_start.value,
+					onSelect: (value) =>
+						setFilterValue('create_date_start', value),
+				}}
+				end={{
+					fieldName: 'create_date_end',
+					fieldValue: filters.create_date_end.value,
+					onSelect: (value) =>
+						setFilterValue('create_date_end', value),
+				}}
 			/>
 
 			<FormFiltersShowDeleted
@@ -116,7 +132,7 @@ export const DataTableBrandsFilters = (): JSX.Element => {
 				onCheckedChange={(value) => setFilterValue('is_deleted', value)}
 			/>
 
-			<FormFiltersReset dataSource="brands" />
+			<FormFiltersReset dataSource="clients" />
 		</div>
 	);
 };

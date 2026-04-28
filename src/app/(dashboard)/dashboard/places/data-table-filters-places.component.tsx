@@ -9,37 +9,38 @@ import {
 	FormFiltersShowDeleted,
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
-import type { CompanyVehiclesDataTableFiltersType } from '@/app/(dashboard)/dashboard/company-vehicles/company-vehicles.definition';
+import type { PlacesDataTableFiltersType } from '@/app/(dashboard)/dashboard/places/places.definition';
+import type { TemplateDataTableFiltersType } from '@/app/(dashboard)/dashboard/templates/templates.definition';
+import { Configuration } from '@/config/settings.config';
 import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import {
-	type CompanyVehicleModel,
-	type CompanyVehicleScope,
-	CompanyVehicleScopeEnum,
-	type CompanyVehicleStatus,
-	CompanyVehicleStatusEnum,
-} from '@/models/company-vehicle.model';
+	type PlaceModel,
+	type PlaceType,
+	PlaceTypeEnum,
+} from '@/models/place.model';
+import { type Language, LanguageEnum } from '@/types/common.type';
 
-const statuses = toOptionsFromEnum(CompanyVehicleStatusEnum, {
+const placeTypes = toOptionsFromEnum(PlaceTypeEnum, {
 	formatter: formatEnumLabel,
 });
 
-const scopes = toOptionsFromEnum(CompanyVehicleScopeEnum, {
+const languages = toOptionsFromEnum(LanguageEnum, {
 	formatter: formatEnumLabel,
 });
 
-export const DataTableCompanyVehiclesFilters = (): JSX.Element => {
+export const DataTableFiltersPlaces = (): JSX.Element => {
 	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
-		'company-vehicles',
-		CompanyVehicleModel
+		'places',
+		PlaceModel
 	>();
 
 	const filters = useStore(
 		dataTableStore,
 		(state) => state.tableState.filters,
-	) as CompanyVehiclesDataTableFiltersType;
+	) as PlacesDataTableFiltersType;
 
 	const updateTableState = useStore(
 		dataTableStore,
@@ -47,9 +48,9 @@ export const DataTableCompanyVehiclesFilters = (): JSX.Element => {
 	);
 
 	const setFilterValue = useCallback(
-		<K extends keyof CompanyVehiclesDataTableFiltersType>(
+		<K extends keyof PlacesDataTableFiltersType>(
 			key: K,
-			value: CompanyVehiclesDataTableFiltersType[K]['value'],
+			value: PlacesDataTableFiltersType[K]['value'],
 		) => {
 			updateTableState({
 				filters: {
@@ -85,28 +86,28 @@ export const DataTableCompanyVehiclesFilters = (): JSX.Element => {
 
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
-			<FormFiltersSearch<CompanyVehiclesDataTableFiltersType>
-				labelText="ID / Plate / VIN / Notes"
+			<FormFiltersSearch<PlacesDataTableFiltersType>
+				labelText="ID / Name"
 				search={searchGlobal}
 			/>
 
-			<FormFiltersSelect<CompanyVehiclesDataTableFiltersType>
-				labelText="Scope"
-				fieldName="scope"
-				fieldValue={filters.scope.value}
-				options={scopes}
+			<FormFiltersSelect<PlacesDataTableFiltersType>
+				labelText="Type"
+				fieldName="place_type"
+				fieldValue={filters.place_type.value}
+				options={placeTypes}
 				onChange={(value) =>
-					setFilterValue('scope', value as CompanyVehicleScope)
+					setFilterValue('place_type', value as PlaceType)
 				}
 			/>
 
-			<FormFiltersSelect<CompanyVehiclesDataTableFiltersType>
-				labelText="Status"
-				fieldName="status"
-				fieldValue={filters.status.value}
-				options={statuses}
+			<FormFiltersSelect<TemplateDataTableFiltersType>
+				labelText="Language"
+				fieldName="language"
+				fieldValue={filters.language.value ?? Configuration.language()}
+				options={languages}
 				onChange={(value) =>
-					setFilterValue('status', value as CompanyVehicleStatus)
+					setFilterValue('language', value as Language)
 				}
 			/>
 
@@ -115,7 +116,7 @@ export const DataTableCompanyVehiclesFilters = (): JSX.Element => {
 				onCheckedChange={(value) => setFilterValue('is_deleted', value)}
 			/>
 
-			<FormFiltersReset dataSource="company-vehicles" />
+			<FormFiltersReset dataSource="places" />
 		</div>
 	);
 };

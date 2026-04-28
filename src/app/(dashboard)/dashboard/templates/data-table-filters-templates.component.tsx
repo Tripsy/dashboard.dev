@@ -1,6 +1,7 @@
 'use client';
 
-import { type JSX, useCallback, useMemo } from 'react';
+import type React from 'react';
+import { useCallback, useMemo } from 'react';
 import { useStore } from 'zustand/react';
 import {
 	FormFiltersReset,
@@ -9,38 +10,36 @@ import {
 	FormFiltersShowDeleted,
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
-import type { PlacesDataTableFiltersType } from '@/app/(dashboard)/dashboard/places/places.definition';
 import type { TemplateDataTableFiltersType } from '@/app/(dashboard)/dashboard/templates/templates.definition';
-import { Configuration } from '@/config/settings.config';
 import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import {
-	type PlaceModel,
-	type PlaceType,
-	PlaceTypeEnum,
-} from '@/models/place.model';
-import { type Language, LanguageEnum } from '@/types/common.type';
-
-const placeTypes = toOptionsFromEnum(PlaceTypeEnum, {
-	formatter: formatEnumLabel,
-});
+	type TemplateModel,
+	type TemplateType,
+	TemplateTypeEnum,
+} from '@/models/template.model';
+import { LanguageEnum } from '@/types/common.type';
 
 const languages = toOptionsFromEnum(LanguageEnum, {
 	formatter: formatEnumLabel,
 });
 
-export const DataTablePlacesFilters = (): JSX.Element => {
+const types = toOptionsFromEnum(TemplateTypeEnum, {
+	formatter: formatEnumLabel,
+});
+
+export const DataTableFiltersTemplates = (): React.JSX.Element => {
 	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
-		'places',
-		PlaceModel
+		'templates',
+		TemplateModel
 	>();
 
 	const filters = useStore(
 		dataTableStore,
 		(state) => state.tableState.filters,
-	) as PlacesDataTableFiltersType;
+	) as TemplateDataTableFiltersType;
 
 	const updateTableState = useStore(
 		dataTableStore,
@@ -48,9 +47,9 @@ export const DataTablePlacesFilters = (): JSX.Element => {
 	);
 
 	const setFilterValue = useCallback(
-		<K extends keyof PlacesDataTableFiltersType>(
+		<K extends keyof TemplateDataTableFiltersType>(
 			key: K,
-			value: PlacesDataTableFiltersType[K]['value'],
+			value: TemplateDataTableFiltersType[K]['value'],
 		) => {
 			updateTableState({
 				filters: {
@@ -86,28 +85,26 @@ export const DataTablePlacesFilters = (): JSX.Element => {
 
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
-			<FormFiltersSearch<PlacesDataTableFiltersType>
-				labelText="ID / Name"
+			<FormFiltersSearch<TemplateDataTableFiltersType>
+				labelText="ID / Label / Content"
 				search={searchGlobal}
-			/>
-
-			<FormFiltersSelect<PlacesDataTableFiltersType>
-				labelText="Type"
-				fieldName="place_type"
-				fieldValue={filters.place_type.value}
-				options={placeTypes}
-				onChange={(value) =>
-					setFilterValue('place_type', value as PlaceType)
-				}
 			/>
 
 			<FormFiltersSelect<TemplateDataTableFiltersType>
 				labelText="Language"
 				fieldName="language"
-				fieldValue={filters.language.value ?? Configuration.language()}
+				fieldValue={filters.language.value}
 				options={languages}
+				onChange={(value) => setFilterValue('language', value)}
+			/>
+
+			<FormFiltersSelect<TemplateDataTableFiltersType>
+				labelText="Type"
+				fieldName="type"
+				fieldValue={filters.type.value}
+				options={types}
 				onChange={(value) =>
-					setFilterValue('language', value as Language)
+					setFilterValue('type', value as TemplateType)
 				}
 			/>
 
@@ -116,7 +113,7 @@ export const DataTablePlacesFilters = (): JSX.Element => {
 				onCheckedChange={(value) => setFilterValue('is_deleted', value)}
 			/>
 
-			<FormFiltersReset dataSource="places" />
+			<FormFiltersReset dataSource="templates" />
 		</div>
 	);
 };

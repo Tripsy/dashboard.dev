@@ -7,33 +7,40 @@ import {
 	FormFiltersReset,
 	FormFiltersSearch,
 	FormFiltersSelect,
+	FormFiltersShowDeleted,
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
-import type { CronHistoryDataTableFiltersType } from '@/app/(dashboard)/dashboard/cron-history/cron-history.definition';
+import type { UsersDataTableFiltersType } from '@/app/(dashboard)/dashboard/users/users.definition';
 import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import {
-	type CronHistoryModel,
-	type CronHistoryStatus,
-	CronHistoryStatusEnum,
-} from '@/models/cron-history.model';
+	type UserModel,
+	type UserRole,
+	UserRoleEnum,
+	type UserStatus,
+	UserStatusEnum,
+} from '@/models/user.model';
 
-const statuses = toOptionsFromEnum(CronHistoryStatusEnum, {
+const statuses = toOptionsFromEnum(UserStatusEnum, {
 	formatter: formatEnumLabel,
 });
 
-export const DataTableCronHistoryFilters = (): JSX.Element => {
+const roles = toOptionsFromEnum(UserRoleEnum, {
+	formatter: formatEnumLabel,
+});
+
+export const DataTableFiltersUsers = (): JSX.Element => {
 	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
-		'cron-history',
-		CronHistoryModel
+		'users',
+		UserModel
 	>();
 
 	const filters = useStore(
 		dataTableStore,
 		(state) => state.tableState.filters,
-	) as CronHistoryDataTableFiltersType;
+	) as UsersDataTableFiltersType;
 
 	const updateTableState = useStore(
 		dataTableStore,
@@ -41,9 +48,9 @@ export const DataTableCronHistoryFilters = (): JSX.Element => {
 	);
 
 	const setFilterValue = useCallback(
-		<K extends keyof CronHistoryDataTableFiltersType>(
+		<K extends keyof UsersDataTableFiltersType>(
 			key: K,
-			value: CronHistoryDataTableFiltersType[K]['value'],
+			value: UsersDataTableFiltersType[K]['value'],
 		) => {
 			updateTableState({
 				filters: {
@@ -79,39 +86,51 @@ export const DataTableCronHistoryFilters = (): JSX.Element => {
 
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
-			<FormFiltersSearch<CronHistoryDataTableFiltersType>
-				labelText="ID / Label / Content"
-				fieldName="global"
+			<FormFiltersSearch<UsersDataTableFiltersType>
+				labelText="ID / Email / Name"
 				search={searchGlobal}
 			/>
 
-			<FormFiltersSelect<CronHistoryDataTableFiltersType>
+			<FormFiltersSelect<UsersDataTableFiltersType>
 				labelText="Status"
 				fieldName="status"
 				fieldValue={filters.status.value}
 				options={statuses}
 				onChange={(value) =>
-					setFilterValue('status', value as CronHistoryStatus)
+					setFilterValue('status', value as UserStatus)
 				}
 			/>
 
-			<FormFiltersDateRange<CronHistoryDataTableFiltersType>
-				labelText="Start Date"
+			<FormFiltersSelect<UsersDataTableFiltersType>
+				labelText="Role"
+				fieldName="role"
+				fieldValue={filters.role.value}
+				options={roles}
+				onChange={(value) => setFilterValue('role', value as UserRole)}
+			/>
+
+			<FormFiltersDateRange<UsersDataTableFiltersType>
+				labelText="Create Date"
 				start={{
-					fieldName: 'start_date_start',
-					fieldValue: filters.start_date_start.value,
+					fieldName: 'create_date_start',
+					fieldValue: filters.create_date_start.value,
 					onSelect: (value) =>
-						setFilterValue('start_date_start', value),
+						setFilterValue('create_date_start', value),
 				}}
 				end={{
-					fieldName: 'start_date_end',
-					fieldValue: filters.start_date_end.value,
+					fieldName: 'create_date_end',
+					fieldValue: filters.create_date_end.value,
 					onSelect: (value) =>
-						setFilterValue('start_date_end', value),
+						setFilterValue('create_date_end', value),
 				}}
 			/>
 
-			<FormFiltersReset dataSource="cron-history" />
+			<FormFiltersShowDeleted
+				checked={filters.is_deleted.value ?? false}
+				onCheckedChange={(value) => setFilterValue('is_deleted', value)}
+			/>
+
+			<FormFiltersReset dataSource="users" />
 		</div>
 	);
 };

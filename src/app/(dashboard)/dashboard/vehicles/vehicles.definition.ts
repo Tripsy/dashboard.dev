@@ -148,15 +148,6 @@ export type VehiclesDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
-export const vehiclesDataTableFilters: VehiclesDataTableFiltersType = {
-	global: { value: null, matchMode: 'contains' },
-	brand: { value: '', matchMode: 'equals' },
-	brand_id: { value: null, matchMode: 'equals' },
-	vehicle_type: { value: null, matchMode: 'equals' },
-	status: { value: null, matchMode: 'equals' },
-	is_deleted: { value: false, matchMode: 'equals' },
-};
-
 export const dataSourceConfigVehicles: DataSourceConfigType<
 	VehicleModel,
 	VehicleFormValuesType
@@ -167,7 +158,14 @@ export const dataSourceConfigVehicles: DataSourceConfigType<
 			rows: 10,
 			sortField: 'id',
 			sortOrder: -1 as const,
-			filters: vehiclesDataTableFilters,
+			filters: {
+				global: { value: null, matchMode: 'contains' },
+				brand: { value: '', matchMode: 'equals' },
+				brand_id: { value: null, matchMode: 'equals' },
+				vehicle_type: { value: null, matchMode: 'equals' },
+				status: { value: null, matchMode: 'equals' },
+				is_deleted: { value: false, matchMode: 'equals' },
+			} satisfies VehiclesDataTableFiltersType,
 		},
 		columns: [
 			{

@@ -233,13 +233,6 @@ export type TemplateDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
-export const templatesDataTableFilters: TemplateDataTableFiltersType = {
-	global: { value: null, matchMode: 'contains' },
-	language: { value: null, matchMode: 'equals' },
-	type: { value: null, matchMode: 'equals' },
-	is_deleted: { value: false, matchMode: 'equals' },
-};
-
 export const dataSourceConfigTemplates: DataSourceConfigType<
 	TemplateModel,
 	TemplateFormValuesType
@@ -250,7 +243,12 @@ export const dataSourceConfigTemplates: DataSourceConfigType<
 			rows: 10,
 			sortField: 'id',
 			sortOrder: -1 as const,
-			filters: templatesDataTableFilters,
+			filters: {
+				global: { value: null, matchMode: 'contains' },
+				language: { value: null, matchMode: 'equals' },
+				type: { value: null, matchMode: 'equals' },
+				is_deleted: { value: false, matchMode: 'equals' },
+			} satisfies TemplateDataTableFiltersType,
 		},
 		columns: [
 			{

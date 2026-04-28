@@ -256,15 +256,6 @@ export type UsersDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
-export const usersDataTableFilters: UsersDataTableFiltersType = {
-	global: { value: null, matchMode: 'contains' },
-	role: { value: null, matchMode: 'equals' },
-	status: { value: null, matchMode: 'equals' },
-	create_date_start: { value: null, matchMode: 'equals' },
-	create_date_end: { value: null, matchMode: 'equals' },
-	is_deleted: { value: false, matchMode: 'equals' },
-};
-
 export const dataSourceConfigUsers: DataSourceConfigType<
 	UserModel,
 	UserFormValuesType
@@ -275,7 +266,14 @@ export const dataSourceConfigUsers: DataSourceConfigType<
 			rows: 10,
 			sortField: 'id',
 			sortOrder: -1 as const,
-			filters: usersDataTableFilters,
+			filters: {
+				global: { value: null, matchMode: 'contains' },
+				role: { value: null, matchMode: 'equals' },
+				status: { value: null, matchMode: 'equals' },
+				create_date_start: { value: null, matchMode: 'equals' },
+				create_date_end: { value: null, matchMode: 'equals' },
+				is_deleted: { value: false, matchMode: 'equals' },
+			} satisfies UsersDataTableFiltersType,
 		},
 		columns: [
 			{

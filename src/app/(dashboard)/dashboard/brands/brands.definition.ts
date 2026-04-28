@@ -159,14 +159,6 @@ export type BrandsDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
-export const brandsDataTableFilters: BrandsDataTableFiltersType = {
-	global: { value: null, matchMode: 'contains' },
-	brand_type: { value: null, matchMode: 'equals' },
-	status: { value: null, matchMode: 'equals' },
-	language: { value: null, matchMode: 'equals' },
-	is_deleted: { value: false, matchMode: 'equals' },
-};
-
 export const dataSourceConfigBrands: DataSourceConfigType<
 	BrandModel,
 	BrandFormValuesType
@@ -177,7 +169,13 @@ export const dataSourceConfigBrands: DataSourceConfigType<
 			rows: 10,
 			sortField: 'id',
 			sortOrder: -1 as const,
-			filters: brandsDataTableFilters,
+			filters: {
+				global: { value: null, matchMode: 'contains' },
+				brand_type: { value: null, matchMode: 'equals' },
+				status: { value: null, matchMode: 'equals' },
+				language: { value: null, matchMode: 'equals' },
+				is_deleted: { value: false, matchMode: 'equals' },
+			} satisfies BrandsDataTableFiltersType,
 		},
 		columns: [
 			{

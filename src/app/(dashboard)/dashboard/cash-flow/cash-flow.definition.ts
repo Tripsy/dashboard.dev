@@ -184,18 +184,6 @@ export type CashFlowDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
-export const cashFlowDataTableFilters: CashFlowDataTableFiltersType = {
-	global: { value: null, matchMode: 'contains' },
-	direction: { value: null, matchMode: 'equals' },
-	category: { value: null, matchMode: 'equals' },
-	method: { value: null, matchMode: 'equals' },
-	currency: { value: null, matchMode: 'equals' },
-	status: { value: null, matchMode: 'equals' },
-	create_date_start: { value: null, matchMode: 'equals' },
-	create_date_end: { value: null, matchMode: 'equals' },
-	is_deleted: { value: false, matchMode: 'equals' },
-};
-
 export const dataSourceConfigCashFlow: DataSourceConfigType<
 	CashFlowModel,
 	CashFlowFormValuesType
@@ -206,7 +194,17 @@ export const dataSourceConfigCashFlow: DataSourceConfigType<
 			rows: 10,
 			sortField: 'id',
 			sortOrder: -1 as const,
-			filters: cashFlowDataTableFilters,
+			filters: {
+				global: { value: null, matchMode: 'contains' },
+				direction: { value: null, matchMode: 'equals' },
+				category: { value: null, matchMode: 'equals' },
+				method: { value: null, matchMode: 'equals' },
+				currency: { value: null, matchMode: 'equals' },
+				status: { value: null, matchMode: 'equals' },
+				create_date_start: { value: null, matchMode: 'equals' },
+				create_date_end: { value: null, matchMode: 'equals' },
+				is_deleted: { value: false, matchMode: 'equals' },
+			} satisfies CashFlowDataTableFiltersType,
 		},
 		columns: [
 			{

@@ -29,16 +29,6 @@ export type LogHistoryDataTableFiltersType = {
 	recorded_at_end: { value: string | null; matchMode: 'equals' };
 };
 
-const logHistoryDataTableFilters: LogHistoryDataTableFiltersType = {
-	request_id: { value: null, matchMode: 'contains' },
-	entity: { value: null, matchMode: 'equals' },
-	entity_id: { value: null, matchMode: 'equals' },
-	action: { value: null, matchMode: 'equals' },
-	source: { value: null, matchMode: 'equals' },
-	recorded_at_start: { value: null, matchMode: 'equals' },
-	recorded_at_end: { value: null, matchMode: 'equals' },
-};
-
 function displayButtonViewUser(
 	entry: LogHistoryModel,
 ): DataTableValueOptionsType<LogHistoryModel>['displayButton'] {
@@ -62,7 +52,15 @@ export const dataSourceConfigLogHistory: DataSourceConfigType<LogHistoryModel> =
 				rows: 10,
 				sortField: 'id',
 				sortOrder: -1 as const,
-				filters: logHistoryDataTableFilters,
+				filters: {
+					request_id: { value: null, matchMode: 'contains' },
+					entity: { value: null, matchMode: 'equals' },
+					entity_id: { value: null, matchMode: 'equals' },
+					action: { value: null, matchMode: 'equals' },
+					source: { value: null, matchMode: 'equals' },
+					recorded_at_start: { value: null, matchMode: 'equals' },
+					recorded_at_end: { value: null, matchMode: 'equals' },
+				} satisfies LogHistoryDataTableFiltersType,
 			},
 			columns: [
 				{

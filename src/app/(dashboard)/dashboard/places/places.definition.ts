@@ -176,13 +176,6 @@ export type PlacesDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
-export const placesDataTableFilters: PlacesDataTableFiltersType = {
-	global: { value: null, matchMode: 'contains' },
-	place_type: { value: null, matchMode: 'equals' },
-	language: { value: null, matchMode: 'equals' },
-	is_deleted: { value: false, matchMode: 'equals' },
-};
-
 export const dataSourceConfigPlaces: DataSourceConfigType<
 	PlaceModel,
 	PlaceFormValuesType
@@ -193,7 +186,12 @@ export const dataSourceConfigPlaces: DataSourceConfigType<
 			rows: 10,
 			sortField: 'id',
 			sortOrder: -1 as const,
-			filters: placesDataTableFilters,
+			filters: {
+				global: { value: null, matchMode: 'contains' },
+				place_type: { value: null, matchMode: 'equals' },
+				language: { value: null, matchMode: 'equals' },
+				is_deleted: { value: false, matchMode: 'equals' },
+			} satisfies PlacesDataTableFiltersType,
 		},
 		columns: [
 			{

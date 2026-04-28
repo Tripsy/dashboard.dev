@@ -71,11 +71,6 @@ export type PermissionDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
-export const permissionDataTableFilters: PermissionDataTableFiltersType = {
-	global: { value: null, matchMode: 'contains' },
-	is_deleted: { value: false, matchMode: 'equals' },
-};
-
 export const dataSourceConfigPermissions: DataSourceConfigType<
 	PermissionModel,
 	PermissionFormValuesType
@@ -86,7 +81,10 @@ export const dataSourceConfigPermissions: DataSourceConfigType<
 			rows: 10,
 			sortField: 'id',
 			sortOrder: -1 as const,
-			filters: permissionDataTableFilters,
+			filters: {
+				global: { value: null, matchMode: 'contains' },
+				is_deleted: { value: false, matchMode: 'equals' },
+			} satisfies PermissionDataTableFiltersType,
 		},
 		columns: [
 			{

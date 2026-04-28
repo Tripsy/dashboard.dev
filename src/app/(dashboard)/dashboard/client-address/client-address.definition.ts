@@ -165,13 +165,6 @@ export type ClientAddressDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
-export const clientAddressDataTableFilters: ClientAddressDataTableFiltersType =
-	{
-		global: { value: null, matchMode: 'contains' },
-		address_type: { value: null, matchMode: 'equals' },
-		is_deleted: { value: false, matchMode: 'equals' },
-	};
-
 function displayButtonViewClient(
 	entry: ClientAddressModel,
 ): DataTableValueOptionsType<ClientAddressModel>['displayButton'] {
@@ -197,7 +190,11 @@ export const dataSourceConfigClientAddress: DataSourceConfigType<
 			rows: 10,
 			sortField: 'id',
 			sortOrder: -1 as const,
-			filters: clientAddressDataTableFilters,
+			filters:{
+				global: { value: null, matchMode: 'contains' },
+				address_type: { value: null, matchMode: 'equals' },
+				is_deleted: { value: false, matchMode: 'equals' },
+			} satisfies ClientAddressDataTableFiltersType,
 		},
 		columns: [
 			{

@@ -24,13 +24,6 @@ export type CronHistoryDataTableFiltersType = {
 	start_date_end: { value: string | null; matchMode: 'equals' };
 };
 
-export const cronHistoryDataTableFilters: CronHistoryDataTableFiltersType = {
-	global: { value: null, matchMode: 'contains' },
-	status: { value: null, matchMode: 'equals' },
-	start_date_start: { value: null, matchMode: 'equals' },
-	start_date_end: { value: null, matchMode: 'equals' },
-};
-
 export const dataSourceConfigCronHistory: DataSourceConfigType<CronHistoryModel> =
 	{
 		dataTable: {
@@ -39,7 +32,12 @@ export const dataSourceConfigCronHistory: DataSourceConfigType<CronHistoryModel>
 				rows: 10,
 				sortField: 'id',
 				sortOrder: -1 as const,
-				filters: cronHistoryDataTableFilters,
+				filters: {
+					global: { value: null, matchMode: 'contains' },
+					status: { value: null, matchMode: 'equals' },
+					start_date_start: { value: null, matchMode: 'equals' },
+					start_date_end: { value: null, matchMode: 'equals' },
+				} satisfies CronHistoryDataTableFiltersType,
 			},
 			columns: [
 				{

@@ -26,14 +26,6 @@ export type LogDataDataTableFiltersType = {
 	create_date_end: { value: string | null; matchMode: 'equals' };
 };
 
-export const logDataDataTableFilters: LogDataDataTableFiltersType = {
-	global: { value: null, matchMode: 'contains' },
-	level: { value: null, matchMode: 'equals' },
-	category: { value: null, matchMode: 'equals' },
-	create_date_start: { value: null, matchMode: 'equals' },
-	create_date_end: { value: null, matchMode: 'equals' },
-};
-
 export const dataSourceConfigLogData: DataSourceConfigType<LogDataModel> = {
 	dataTable: {
 		state: {
@@ -41,7 +33,13 @@ export const dataSourceConfigLogData: DataSourceConfigType<LogDataModel> = {
 			rows: 10,
 			sortField: 'id',
 			sortOrder: -1 as const,
-			filters: logDataDataTableFilters,
+			filters: {
+				global: { value: null, matchMode: 'contains' },
+				level: { value: null, matchMode: 'equals' },
+				category: { value: null, matchMode: 'equals' },
+				create_date_start: { value: null, matchMode: 'equals' },
+				create_date_end: { value: null, matchMode: 'equals' },
+			} satisfies LogDataDataTableFiltersType,
 		},
 		columns: [
 			{

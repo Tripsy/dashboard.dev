@@ -190,7 +190,7 @@ export const dataSourceConfigClientAddress: DataSourceConfigType<
 			rows: 10,
 			sortField: 'id',
 			sortOrder: -1 as const,
-			filters:{
+			filters: {
 				global: { value: null, matchMode: 'contains' },
 				address_type: { value: null, matchMode: 'equals' },
 				is_deleted: { value: false, matchMode: 'equals' },

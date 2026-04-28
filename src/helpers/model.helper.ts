@@ -1,3 +1,5 @@
+import type { StatusTransitions } from '@/types/common.type';
+
 /**
  * Normalizes date fields in an object while preserving all other properties
  *
@@ -24,4 +26,17 @@ export function normalizeDates<
 	});
 
 	return result as { [P in keyof T]: P extends K ? Date : T[P] };
+}
+
+/**
+ * Returns the allowed status transitions for a given status
+ *
+ * @param status
+ * @param transitions
+ */
+export function getStatusTransitions<Status extends string>(
+	status: Status,
+	transitions: StatusTransitions<Status>,
+): Status[] {
+	return transitions[status] ?? [];
 }

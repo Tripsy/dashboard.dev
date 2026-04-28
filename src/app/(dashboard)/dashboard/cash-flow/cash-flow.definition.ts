@@ -14,6 +14,7 @@ import {
 	getFormDataAsNumber,
 	getFormDataAsString,
 } from '@/helpers/form.helper';
+import { getStatusTransitions } from '@/helpers/model.helper';
 import { arrayHasValue } from '@/helpers/objects.helper';
 import {
 	requestCreate,
@@ -38,9 +39,9 @@ import {
 	CashFlowStatusEnum,
 	getExpectedCategoryType,
 	getExpectedDirection,
-	getStatusTransitions,
 	MUTABLE_STATUSES,
 	REFUNDABLE_STATUSES,
+	STATUS_TRANSITIONS,
 } from '@/models/cash-flow.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
 import { type Currency, CurrencyEnum } from '@/types/common.type';
@@ -297,6 +298,7 @@ export const dataSourceConfigCashFlow: DataSourceConfigType<
 
 								const statusTransitions = getStatusTransitions(
 									entry.status,
+									STATUS_TRANSITIONS,
 								);
 
 								if (statusTransitions.length === 0) {
@@ -437,7 +439,10 @@ export const dataSourceConfigCashFlow: DataSourceConfigType<
 			permission: 'cash-flow.update',
 			entriesSelection: 'single',
 			customEntryCheck: (entry: CashFlowModel) => {
-				const statusTransitions = getStatusTransitions(entry.status);
+				const statusTransitions = getStatusTransitions(
+					entry.status,
+					STATUS_TRANSITIONS,
+				);
 
 				return (
 					!entry.deleted_at &&
@@ -461,7 +466,10 @@ export const dataSourceConfigCashFlow: DataSourceConfigType<
 			permission: 'cash-flow.update',
 			entriesSelection: 'single',
 			customEntryCheck: (entry: CashFlowModel) => {
-				const statusTransitions = getStatusTransitions(entry.status);
+				const statusTransitions = getStatusTransitions(
+					entry.status,
+					STATUS_TRANSITIONS,
+				);
 
 				return (
 					!entry.deleted_at &&

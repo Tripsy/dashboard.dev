@@ -13,6 +13,7 @@ import {
 	getFormDataAsNumber,
 	getFormDataAsString,
 } from '@/helpers/form.helper';
+import { getStatusTransitions } from '@/helpers/model.helper';
 import {
 	requestCreate,
 	requestDelete,
@@ -28,7 +29,7 @@ import {
 	type CompanyVehicleScope,
 	CompanyVehicleScopeEnum,
 	type CompanyVehicleStatus,
-	getStatusTransitions,
+	STATUS_TRANSITIONS,
 } from '@/models/company-vehicle.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
 import type { FormStateType } from '@/types/form.type';
@@ -237,6 +238,7 @@ export const dataSourceConfigCompanyVehicles: DataSourceConfigType<
 
 								const statusTransitions = getStatusTransitions(
 									entry.status,
+									STATUS_TRANSITIONS,
 								);
 
 								if (statusTransitions.length === 0) {
@@ -354,7 +356,8 @@ export const dataSourceConfigCompanyVehicles: DataSourceConfigType<
 			permission: 'company-vehicle.update',
 			entriesSelection: 'single',
 			customEntryCheck: (entry: CompanyVehicleModel) =>
-				getStatusTransitions(entry.status).length > 0,
+				getStatusTransitions(entry.status, STATUS_TRANSITIONS).length >
+				0,
 			buttonPosition: 'left',
 			button: {
 				variant: 'outline',

@@ -27,12 +27,6 @@ export const STATUS_TRANSITIONS: StatusTransitions<CompanyVehicleStatus> = {
 	[CompanyVehicleStatusEnum.SCRAPPED]: [],
 };
 
-export function getStatusTransitions(
-	status: CompanyVehicleStatus,
-): CompanyVehicleStatus[] {
-	return STATUS_TRANSITIONS[status] ?? [];
-}
-
 export const CompanyVehicleScopeEnum = {
 	PERSONAL: 'personal',
 	OPERATIONAL: 'operational',

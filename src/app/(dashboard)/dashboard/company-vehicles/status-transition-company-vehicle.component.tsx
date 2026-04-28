@@ -7,12 +7,13 @@ import {
 	LoadingComponent,
 } from '@/components/status.component';
 import { DisplayStatus } from '@/helpers/display.helper';
+import { getStatusTransitions } from '@/helpers/model.helper';
 import { requestUpdateStatus } from '@/helpers/services.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import {
 	type CompanyVehicleModel,
 	type CompanyVehicleStatus,
-	getStatusTransitions,
+	STATUS_TRANSITIONS,
 } from '@/models/company-vehicle.model';
 import { useToast } from '@/providers/toast.provider';
 import { useModalStore } from '@/stores/window.store';
@@ -45,7 +46,8 @@ export function StatusTransitionCompanyVehicle({
 	const entry = entries[0] as CompanyVehicleModel | undefined;
 
 	const statusTransitions = useMemo(
-		() => (entry ? getStatusTransitions(entry.status) : []),
+		() =>
+			entry ? getStatusTransitions(entry.status, STATUS_TRANSITIONS) : [],
 		[entry],
 	);
 

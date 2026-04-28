@@ -1,3 +1,5 @@
+import type { StatusTransitions } from '@/types/common.type';
+
 export const WorkSessionStatusEnum = {
 	ACTIVE: 'active',
 	CLOSED: 'closed',
@@ -5,6 +7,12 @@ export const WorkSessionStatusEnum = {
 
 export type WorkSessionStatus =
 	(typeof WorkSessionStatusEnum)[keyof typeof WorkSessionStatusEnum];
+
+// Allowed status transition configuration
+export const STATUS_TRANSITIONS: StatusTransitions<WorkSessionStatus> = {
+	[WorkSessionStatusEnum.ACTIVE]: [WorkSessionStatusEnum.CLOSED],
+	[WorkSessionStatusEnum.CLOSED]: [],
+};
 
 export type WorkSessionModel<D = Date | string> = {
 	id: number;

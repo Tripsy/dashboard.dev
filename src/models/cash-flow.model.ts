@@ -88,10 +88,6 @@ export const STATUS_TRANSITIONS: StatusTransitions<CashFlowStatus> = {
 	[CashFlowStatusEnum.EXPIRED]: [],
 };
 
-export function getStatusTransitions(status: CashFlowStatus): CashFlowStatus[] {
-	return STATUS_TRANSITIONS[status] ?? [];
-}
-
 export const CashFlowMethodEnum = {
 	CASH: 'cash',
 	BANK_TRANSFER: 'bank_transfer',

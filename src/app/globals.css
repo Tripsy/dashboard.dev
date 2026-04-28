@@ -309,12 +309,12 @@
 	}
 
 	.dashboard-layout .main-section .side-menu-container {
-		@apply fixed left-0 top-16 z-40 border-r border-b border-sidebar-border bg-sidebar-background/93 shadow-xl transition-all duration-500 ease-in-out w-64 h-[calc(100vh-4rem)] overflow-hidden flex flex-col;
+		@apply fixed left-0 top-16 z-40 border-r border-b border-sidebar-border bg-sidebar-background/93 shadow-xl transition-all duration-500 ease-in-out flex flex-col h-[calc(100vh-4rem)] ;
 	}
 
 	@media (min-width: 768px) {
 		.dashboard-layout .main-section .side-menu-container {
-			@apply h-[calc(100vh-4rem)] border-b-0 bg-sidebar-background shadow-none;
+			@apply border-b-0 bg-sidebar-background shadow-none;
 		}
 	}
 

@@ -180,8 +180,8 @@ export type CashFlowDataTableFiltersType = {
 	method: { value: CashFlowMethod | null; matchMode: 'equals' };
 	currency: { value: Currency | null; matchMode: 'equals' };
 	status: { value: CashFlowStatus | null; matchMode: 'equals' };
-	create_date_start: { value: string | null; matchMode: 'equals' };
-	create_date_end: { value: string | null; matchMode: 'equals' };
+	create_at_start: { value: string | null; matchMode: 'equals' };
+	create_at_end: { value: string | null; matchMode: 'equals' };
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
@@ -202,8 +202,8 @@ export const dataSourceConfigCashFlow: DataSourceConfigType<
 				method: { value: null, matchMode: 'equals' },
 				currency: { value: null, matchMode: 'equals' },
 				status: { value: null, matchMode: 'equals' },
-				create_date_start: { value: null, matchMode: 'equals' },
-				create_date_end: { value: null, matchMode: 'equals' },
+				create_at_start: { value: null, matchMode: 'equals' },
+				create_at_end: { value: null, matchMode: 'equals' },
 				is_deleted: { value: false, matchMode: 'equals' },
 			} satisfies CashFlowDataTableFiltersType,
 		},

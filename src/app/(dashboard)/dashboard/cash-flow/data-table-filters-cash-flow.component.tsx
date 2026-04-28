@@ -157,16 +157,16 @@ export const DataTableFiltersCashFlow = (): JSX.Element => {
 			<FormFiltersDateRange<CashFlowDataTableFiltersType>
 				labelText="Create Date"
 				start={{
-					fieldName: 'create_date_start',
-					fieldValue: filters.create_date_start.value,
+					fieldName: 'create_at_start',
+					fieldValue: filters.create_at_start.value,
 					onSelect: (value) =>
-						setFilterValue('create_date_start', value),
+						setFilterValue('create_at_start', value),
 				}}
 				end={{
-					fieldName: 'create_date_end',
-					fieldValue: filters.create_date_end.value,
+					fieldName: 'create_at_end',
+					fieldValue: filters.create_at_end.value,
 					onSelect: (value) =>
-						setFilterValue('create_date_end', value),
+						setFilterValue('create_at_end', value),
 				}}
 			/>
 

@@ -127,8 +127,8 @@ export const DataTableFiltersVehicles = (): JSX.Element => {
 				setFilterValues={setFilterValues}
 				setSearch={setSearchBrand}
 				dataSourceKey="brands"
-				getOptionLabel={(b) => b.name}
-				getOptionKey={(b) => b.id}
+				getOptionLabel={(m) => m.name}
+				getOptionKey={(m) => m.id}
 			/>
 
 			<FormFiltersSelect<VehiclesDataTableFiltersType>

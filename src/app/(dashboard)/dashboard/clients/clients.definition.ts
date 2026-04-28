@@ -230,8 +230,8 @@ export type ClientsDataTableFiltersType = {
 	global: { value: string | null; matchMode: 'contains' };
 	status: { value: ClientStatus | null; matchMode: 'equals' };
 	client_type: { value: ClientType | null; matchMode: 'equals' };
-	create_date_start: { value: string | null; matchMode: 'equals' };
-	create_date_end: { value: string | null; matchMode: 'equals' };
+	create_at_start: { value: string | null; matchMode: 'equals' };
+	create_at_end: { value: string | null; matchMode: 'equals' };
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
@@ -249,8 +249,8 @@ export const dataSourceConfigClients: DataSourceConfigType<
 				global: { value: null, matchMode: 'contains' },
 				status: { value: null, matchMode: 'equals' },
 				client_type: { value: null, matchMode: 'equals' },
-				create_date_start: { value: null, matchMode: 'equals' },
-				create_date_end: { value: null, matchMode: 'equals' },
+				create_at_start: { value: null, matchMode: 'equals' },
+				create_at_end: { value: null, matchMode: 'equals' },
 				is_deleted: { value: false, matchMode: 'equals' },
 			} satisfies ClientsDataTableFiltersType,
 		},

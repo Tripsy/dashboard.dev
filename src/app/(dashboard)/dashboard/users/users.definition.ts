@@ -251,8 +251,8 @@ export type UsersDataTableFiltersType = {
 	global: { value: string | null; matchMode: 'contains' };
 	role: { value: UserRole | null; matchMode: 'equals' };
 	status: { value: UserStatus | null; matchMode: 'equals' };
-	create_date_start: { value: string | null; matchMode: 'equals' };
-	create_date_end: { value: string | null; matchMode: 'equals' };
+	create_at_start: { value: string | null; matchMode: 'equals' };
+	create_at_end: { value: string | null; matchMode: 'equals' };
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
@@ -270,8 +270,8 @@ export const dataSourceConfigUsers: DataSourceConfigType<
 				global: { value: null, matchMode: 'contains' },
 				role: { value: null, matchMode: 'equals' },
 				status: { value: null, matchMode: 'equals' },
-				create_date_start: { value: null, matchMode: 'equals' },
-				create_date_end: { value: null, matchMode: 'equals' },
+				create_at_start: { value: null, matchMode: 'equals' },
+				create_at_end: { value: null, matchMode: 'equals' },
 				is_deleted: { value: false, matchMode: 'equals' },
 			} satisfies UsersDataTableFiltersType,
 		},

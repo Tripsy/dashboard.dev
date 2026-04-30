@@ -1,3 +1,5 @@
+import { dateDiff } from '@/helpers/date.helper';
+import type { UserModel } from '@/models/user.model';
 import type { StatusTransitions } from '@/types/common.type';
 
 export const WorkSessionStatusEnum = {
@@ -17,7 +19,7 @@ export const STATUS_TRANSITIONS: StatusTransitions<WorkSessionStatus> = {
 export type WorkSessionModel<D = Date | string> = {
 	id: number;
 
-	user_id: number;
+	user: UserModel;
 
 	status: WorkSessionStatus;
 
@@ -29,10 +31,18 @@ export type WorkSessionModel<D = Date | string> = {
 	deleted_at: D;
 };
 
-export type WorkSessionFormValuesType = Pick<
-	WorkSessionModel,
-	'user_id' | 'status'
-> & {
+export type WorkSessionFormValuesType = {
+	user_id: number | null;
+	user: string | null;
 	start_at: string | null;
-	end_at: string | null;
+	start_at_time: string | null;
+	end_at_time: string | null;
 };
+
+export function displayWorkSessionDuration(entry: WorkSessionModel) {
+	if (!entry.end_at) {
+		return 'n/a';
+	}
+
+	return dateDiff(entry.start_at, entry.end_at, 'display');
+}

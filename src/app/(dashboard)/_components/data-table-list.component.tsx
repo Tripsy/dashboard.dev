@@ -18,7 +18,7 @@ import {
 	type DataTableFiltersType,
 	getDataSourceConfig,
 } from '@/config/data-source.config';
-import { toDateInstanceCustom } from '@/helpers/date.helper';
+import { toUTCISOString } from '@/helpers/date.helper';
 import { replaceVars } from '@/helpers/string.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import type { QueryFiltersType } from '@/types/api.type';
@@ -33,22 +33,10 @@ function findFunctionFilter(filters: DataTableFiltersType): QueryFiltersType {
 		}
 
 		// Handle date filters
-		if (/_date_start$/.test(key)) {
-			const date = toDateInstanceCustom(value as string);
-
-			if (!date) {
-				throw new Error(`Invalid start date: ${value}`);
-			}
-
-			acc[key] = date.startOf('day').toISOString();
-		} else if (/_date_end$/.test(key)) {
-			const date = toDateInstanceCustom(value as string);
-
-			if (!date) {
-				throw new Error(`Invalid end date: ${value}`);
-			}
-
-			acc[key] = date.endOf('day').toISOString();
+		if (/_at_start$/.test(key)) {
+			acc[key] = toUTCISOString(value as string);
+		} else if (/_at_end$/.test(key)) {
+			acc[key] = toUTCISOString(value as string, true);
 		} else {
 			// Convert key 'global' to 'term' for search
 			const newKey = key === 'global' ? 'term' : key;

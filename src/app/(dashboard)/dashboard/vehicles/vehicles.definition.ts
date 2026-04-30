@@ -66,7 +66,7 @@ class VehicleValidator extends BaseValidator<typeof validatorMessages> {
 		z
 			.object({
 				brand_id: this.validateId(this.getMessage('invalid_brand_id'), {
-					required: false,
+					required: false, // Further check is done in superRefine
 				}),
 				brand: this.validateString(this.getMessage('invalid_brand')),
 				vehicle_type: this.validateEnum(

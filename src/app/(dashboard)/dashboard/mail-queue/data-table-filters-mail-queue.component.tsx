@@ -96,15 +96,14 @@ export const DataTableFiltersMailQueue = (): JSX.Element => {
 			<FormFiltersDateRange<MailQueueDataTableFiltersType>
 				labelText="Sent Date"
 				start={{
-					fieldName: 'sent_date_start',
-					fieldValue: filters.sent_date_start.value,
-					onSelect: (value) =>
-						setFilterValue('sent_date_start', value),
+					fieldName: 'sent_at_start',
+					fieldValue: filters.sent_at_start.value,
+					onSelect: (value) => setFilterValue('sent_at_start', value),
 				}}
 				end={{
-					fieldName: 'sent_date_end',
-					fieldValue: filters.sent_date_end.value,
-					onSelect: (value) => setFilterValue('sent_date_end', value),
+					fieldName: 'sent_at_end',
+					fieldValue: filters.sent_at_end.value,
+					onSelect: (value) => setFilterValue('sent_at_end', value),
 				}}
 			/>
 

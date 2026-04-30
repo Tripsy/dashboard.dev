@@ -114,8 +114,4 @@ export const Configuration = {
 	currency: () => {
 		return Configuration.get('app.currency') as Currency;
 	},
-
-	resolveExtension: () => {
-		return Configuration.environment() === 'production' ? 'js' : 'ts';
-	},
 };

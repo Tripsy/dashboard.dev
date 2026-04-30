@@ -98,16 +98,15 @@ export const DataTableFiltersCronHistory = (): JSX.Element => {
 			<FormFiltersDateRange<CronHistoryDataTableFiltersType>
 				labelText="Start Date"
 				start={{
-					fieldName: 'start_date_start',
-					fieldValue: filters.start_date_start.value,
+					fieldName: 'start_at_start',
+					fieldValue: filters.start_at_start.value,
 					onSelect: (value) =>
-						setFilterValue('start_date_start', value),
+						setFilterValue('start_at_start', value),
 				}}
 				end={{
-					fieldName: 'start_date_end',
-					fieldValue: filters.start_date_end.value,
-					onSelect: (value) =>
-						setFilterValue('start_date_end', value),
+					fieldName: 'start_at_end',
+					fieldValue: filters.start_at_end.value,
+					onSelect: (value) => setFilterValue('start_at_end', value),
 				}}
 			/>
 

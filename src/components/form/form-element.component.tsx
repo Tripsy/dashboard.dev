@@ -24,7 +24,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/helpers/css.helper';
-import { formatDate, toDateInstance } from '@/helpers/date.helper';
+import { formatDate, stringToDate } from '@/helpers/date.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 
 export type InputValueType = string | null | undefined;
@@ -125,7 +125,7 @@ const useFieldState = ({
 	value,
 	error,
 }: {
-	value?: string | number | boolean | Date | null;
+	value?: string | number | boolean | null;
 	error?: string[];
 }) => {
 	if (error?.length) {
@@ -142,7 +142,7 @@ const useFieldState = ({
 export type FormComponentProps<Fields, Value> = {
 	id: string;
 	labelText?: string;
-	fieldType?: 'text' | 'password' | 'email' | 'number';
+	fieldType?: 'text' | 'password' | 'email' | 'number' | 'time';
 	fieldName: keyof Fields & string;
 	fieldValue: Value;
 	isRequired?: boolean;
@@ -472,25 +472,18 @@ export const FormComponentCalendarWithoutFormElement = <Fields,>({
 	| 'onChange'
 > & {
 	onSelect: (value: string) => void;
-	minDate?: Date | string;
-	maxDate?: Date | string;
+	minDate?: Date;
+	maxDate?: Date;
 }) => {
-	const fieldValueAsDate = fieldValue
-		? toDateInstance(fieldValue)
-		: undefined;
-	const minDateAsDate = minDate ? toDateInstance(minDate) : undefined;
-	const maxDateAsDate = maxDate ? toDateInstance(maxDate) : undefined;
+	const [open, setOpen] = useState(false);
+
+	const selected = fieldValue ? stringToDate(fieldValue) : undefined;
 
 	return (
 		<>
-			<input
-				type="hidden"
-				name={fieldName}
-				value={fieldValue ?? ''}
-				disabled={disabled}
-			/>
+			<input type="hidden" name={fieldName} value={fieldValue ?? ''} />
 
-			<Popover>
+			<Popover open={open} onOpenChange={setOpen}>
 				<PopoverTrigger asChild>
 					<Button
 						id={id}
@@ -504,7 +497,7 @@ export const FormComponentCalendarWithoutFormElement = <Fields,>({
 					>
 						<Icons.Calendar className="mr-2 h-4 w-4" />
 						{fieldValue ? (
-							formatDate(fieldValue, 'default')
+							fieldValue
 						) : (
 							<span>{placeholderText}</span>
 						)}
@@ -514,22 +507,19 @@ export const FormComponentCalendarWithoutFormElement = <Fields,>({
 					<Calendar
 						mode="single"
 						required={false}
-						selected={fieldValueAsDate || undefined}
+						selected={selected}
 						onSelect={(date: Date | undefined) => {
 							const value = date
 								? (formatDate(date, 'default') as string)
 								: '';
 
 							onSelect(value);
+							setOpen(false);
 						}}
 						aria-placeholder={placeholderText}
 						disabled={[
-							...(minDateAsDate
-								? [{ before: minDateAsDate }]
-								: []),
-							...(maxDateAsDate
-								? [{ after: maxDateAsDate }]
-								: []),
+							...(minDate ? [{ before: minDate }] : []),
+							...(maxDate ? [{ after: maxDate }] : []),
 						]}
 					/>
 				</PopoverContent>
@@ -549,11 +539,15 @@ export const FormComponentCalendar = <Fields,>({
 	disabled,
 	error,
 	onSelect,
+	minDate,
+	maxDate,
 }: Omit<
 	FormComponentProps<Fields, InputValueType>,
 	'fieldType' | 'autoComplete' | 'icons' | 'onChange'
 > & {
 	onSelect: (value: string) => void;
+	minDate?: Date;
+	maxDate?: Date;
 }) => {
 	return (
 		<FormElement
@@ -568,6 +562,8 @@ export const FormComponentCalendar = <Fields,>({
 				placeholderText={placeholderText}
 				disabled={disabled}
 				onSelect={onSelect}
+				minDate={minDate}
+				maxDate={maxDate}
 			/>
 		</FormElement>
 	);

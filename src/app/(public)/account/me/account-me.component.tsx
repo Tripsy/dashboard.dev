@@ -178,7 +178,11 @@ export default function AccountMe() {
 						<div className="text-sm text-muted-foreground font-semibold">
 							Member Since
 						</div>
-						<p>{formatDate(auth.created_at, 'MMMM D, YYYY')}</p>
+						<p>
+							{formatDate(auth.created_at, undefined, {
+								customFormat: 'MMMM D, YYYY',
+							})}
+						</p>
 					</div>
 				</div>
 
@@ -199,7 +203,10 @@ export default function AccountMe() {
 									Last updated:{' '}
 									{formatDate(
 										auth.password_updated_at,
-										'D MMMM YYYY, h:mm A',
+										undefined,
+										{
+											customFormat: 'D MMMM YYYY, h:mm A',
+										},
 									)}
 								</p>
 							</div>

@@ -1,5 +1,4 @@
 import type { ApiResponseFetch, QueryFiltersType } from '@/types/api.type';
-import type { FormValuesType } from '@/types/form.type';
 
 export type FindFunctionParamsType = {
 	order_by?: string;
@@ -22,21 +21,18 @@ export type FindFunctionType<Model> = (
 	params: FindFunctionParamsType,
 ) => Promise<FindFunctionResponseType<Model> | undefined>;
 
-export type CreateFunctionType<Model, FormValues extends FormValuesType> = (
-	data: FormValues,
+export type CreateFunctionType<Model, Params> = (
+	params: Params,
 ) => Promise<ApiResponseFetch<Partial<Model>>>;
 
-export type UpdateFunctionType<Model, FormValues extends FormValuesType> = (
-	data: FormValues,
+export type UpdateFunctionType<Model, Params> = (
+	params: Params,
 	id: number,
 ) => Promise<ApiResponseFetch<Partial<Model>>>;
 
-export type FormOperationFunctionType<
-	Entry,
-	FormValues extends FormValuesType,
-> =
-	| CreateFunctionType<Entry, FormValues>
-	| UpdateFunctionType<Entry, FormValues>;
+export type FormOperationFunctionType<Entry, Params> =
+	| CreateFunctionType<Entry, Params>
+	| UpdateFunctionType<Entry, Params>;
 
 export type DeleteMultipleFunctionType = (
 	ids: number[],
@@ -62,8 +58,8 @@ export type ActionOperationSingleFunctionType<Entry> =
 	| DeleteSingleFunctionType<Entry>
 	| RestoreSingleFunctionType<Entry>;
 
-export type OperationFunctionType<Entry, FormValues extends FormValuesType> =
-	| FormOperationFunctionType<Entry, FormValues>
+export type OperationFunctionType<Entry, Params> =
+	| FormOperationFunctionType<Entry, Params>
 	| ActionOperationMultipleFunctionType
 	| ActionOperationSingleFunctionType<Entry>;
 

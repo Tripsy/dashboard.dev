@@ -1,120 +1,22 @@
 import dayjs from '@/config/dayjs.config';
+import { Configuration } from '@/config/settings.config';
 
 const DEFAULT_DATE_FORMAT = 'YYYY-MM-DD';
 
 /**
- * Check if a string is a valid date
+ * Create a current date
  *
- * @param {string} date - The date string to check
- * @returns {boolean} - True if the date is valid, false otherwise
+ * @param startOfDay - If true, returns the current date at 00:00:00.000
+ * @returns {Date} - The current date
  */
-export function isValidDate(date: string): boolean {
-	return dayjs(date).isValid();
-}
+export function createCurrentDate(startOfDay: boolean = false): Date {
+	const now = new Date();
 
-/**
- * Checks if a value is a valid Date object
- *
- * @param date - The value to check
- * @returns {boolean} - `true` if the value is a valid Date object, `false` otherwise
- */
-function isValidDateInstance(date: unknown): date is Date {
-	return (
-		date instanceof Date &&
-		!Number.isNaN(date.getTime()) &&
-		date.toString() !== 'Invalid Date'
-	);
-}
-
-/**
- * Converts a date string to a Date object with strict validation
- *
- * @param {Date | string | null} date
- * @throws {Error} If the input is not a valid date string or cannot be parsed
- * @returns Valid Date object
- */
-export function toDateInstance(date: Date | string | null): Date | null {
-	if (!date) {
-		return null;
+	if (startOfDay) {
+		now.setHours(0, 0, 0, 0);
 	}
 
-	if (date instanceof Date) {
-		return date;
-	}
-
-	const dateString = date.trim();
-
-	if (!dateString) {
-		return null;
-	}
-
-	// Special handling for ISO 8601 date-only format (YYYY-MM-DD)
-	if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
-		const [year, month, day] = dateString.split('-').map(Number);
-		const date = new Date(Date.UTC(year, month - 1, day));
-
-		if (!isValidDateInstance(date)) {
-			throw new Error(`Invalid ISO date: ${dateString}`);
-		}
-
-		return date;
-	}
-
-	// General date parsing
-	const dateObject = new Date(dateString);
-
-	if (!isValidDateInstance(dateObject)) {
-		throw new Error(`Invalid date format: ${dateString}`);
-	}
-
-	// Additional validation for non-ISO formats
-	if (dateObject.toString() === 'Invalid Date') {
-		throw new Error(`Unparsable date: ${dateString}`);
-	}
-
-	return dateObject;
-}
-
-/**
- * Converts a date string to a Dayjs object with strict validation
- *
- * @param date
- */
-export function toDateInstanceCustom(
-	date: Date | string | null,
-): dayjs.Dayjs | null {
-	if (!date) {
-		return null;
-	}
-
-	if (date instanceof Date) {
-		return dayjs(date);
-	}
-
-	const trimmed = date.trim();
-
-	if (!trimmed) {
-		return null;
-	}
-
-	// ISO date-only (YYYY-MM-DD) → UTC midnight
-	if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
-		const date = dayjs.utc(trimmed, 'YYYY-MM-DD', true);
-
-		if (!date.isValid()) {
-			throw new Error(`Invalid ISO date: ${trimmed}`);
-		}
-
-		return date;
-	}
-
-	const parsed = dayjs(trimmed);
-
-	if (!parsed.isValid()) {
-		throw new Error(`Invalid date format: ${trimmed}`);
-	}
-
-	return parsed;
+	return now;
 }
 
 /**
@@ -152,37 +54,37 @@ export function createPastDate(seconds: number): Date {
 }
 
 /**
- * Calculate the difference between two dates in seconds
+ * Check if a string is a valid date
  *
- * @param {Date} date1 - The first date
- * @param {Date} date2 - The second date
- * @throws {Error} - If either date is invalid
- * @returns {number} - The difference in seconds
+ * @param {string} date - The date string to check
+ * @returns {boolean} - True if the date is valid, false otherwise
  */
-export function dateDiffInSeconds(date1: Date, date2: Date): number {
-	if (!isValidDateInstance(date1)) {
-		throw new Error('Invalid date (eg: date1)');
-	}
-
-	if (!isValidDateInstance(date2)) {
-		throw new Error('Invalid date (eg: date2)');
-	}
-
-	return Math.ceil((date1.getTime() - date2.getTime()) / 1000);
+export function isValidDate(date: string): boolean {
+	return dayjs(date).isValid();
 }
 
 /**
- * Return the `date` if it is a valid `Date` instance, otherwise return `undefined`.
+ * Convert string to Date object using dayjs
  *
  * @param date
- * @returns {Date | undefined}
+ * @param startOfDay
  */
-export function getValidDate(date: unknown): Date | undefined {
-	return isValidDateInstance(date) ? date : undefined;
+export function stringToDate(date: string, startOfDay: boolean = false): Date {
+	const parsed = dayjs(date);
+
+	if (!parsed.isValid()) {
+		throw new Error(`Invalid date value: "${date}"`);
+	}
+
+	if (startOfDay) {
+		return parsed.startOf('day').toDate();
+	}
+
+	return parsed.toDate();
 }
 
 /**
- * Universal date formatter with Moment.js
+ * Date formatter with dayjs
  *
  * @param value - Date input (string, Date, null, undefined)
  * @param format - Output format (or preset)
@@ -190,9 +92,10 @@ export function getValidDate(date: unknown): Date | undefined {
  * @returns Formatted string or null
  */
 export function formatDate(
-	value: string | Date | null | undefined,
-	format?: 'default' | 'date-time' | string,
+	value: string | number | Date | null | undefined,
+	format?: 'default' | 'date-time' | 'time',
 	options?: {
+		customFormat?: string;
 		strict?: boolean;
 	},
 ): string | null {
@@ -224,10 +127,16 @@ export function formatDate(
 		case 'default':
 			return date.format(DEFAULT_DATE_FORMAT);
 		case 'date-time':
-			return date.format('DD-MM-YYYY, hh:mm A');
+			return date.format('DD-MM-YYYY, HH:mm');
+		case 'time':
+			return date.format('HH:mm');
 		default:
 			if (format) {
 				return date.format(format);
+			}
+
+			if (options?.customFormat) {
+				return date.format(options.customFormat);
 			}
 
 			return date.toISOString();
@@ -235,46 +144,98 @@ export function formatDate(
 }
 
 /**
- * Converts a date string to a Date object with strict validation
+ * Combine a date with specified time
  *
- * @param {string | null} value - The date string to convert (ISO 8601, RFC 2822, or other supported formats)
- * @returns {Date | null}
- * @throws {Error} If the input is not a valid date string or cannot be parsed
+ * @param date
+ * @param time
  */
-export function stringToDate(value: string | null): Date | null {
-	if (!value) {
-		return null;
+export function combineDateAndTime(date: Date, time: string): Date {
+	const parts = time.split(':').map(Number);
+	const hours = parts[0];
+	const minutes = parts[1];
+
+	if (Number.isNaN(hours) || Number.isNaN(minutes)) {
+		throw new Error(`Invalid time format: "${time}". Expected "HH:MM".`);
 	}
 
-	const trimmedString = value.trim();
+	const result = new Date(date);
+	result.setHours(hours, minutes, 0, 0);
 
-	if (!trimmedString) {
-		return null;
+	return result;
+}
+
+/**
+ * Calculate the difference between two dates
+ *
+ * @example
+ * dateDiff(start, end, 'minutes') → 90
+ * dateDiff(start, end, 'display') → "1h 30'"
+ * dateDiff(start, end, 'seconds') → 5400
+ */
+// Overload signatures
+export function dateDiff(
+	start: string | Date,
+	end: string | Date,
+	unit: 'display',
+): string;
+export function dateDiff(
+	start: string | Date,
+	end: string | Date,
+	unit: 'seconds' | 'minutes' | 'hours',
+): number;
+// Implementation signature
+export function dateDiff(
+	startDate: string | Date,
+	endDate: string | Date,
+	unit: 'seconds' | 'minutes' | 'hours' | 'display',
+): number | string {
+	const start = dayjs(startDate);
+	const end = dayjs(endDate);
+
+	if (!start.isValid() || !end.isValid()) {
+		throw new Error('Invalid date arguments provided for dateDiff');
 	}
 
-	// Special handling for ISO 8601 date-only format (YYYY-MM-DD)
-	if (/^\d{4}-\d{2}-\d{2}$/.test(trimmedString)) {
-		const [year, month, day] = trimmedString.split('-').map(Number);
-		const date = new Date(Date.UTC(year, month - 1, day));
+	switch (unit) {
+		case 'seconds':
+			return Math.ceil(end.diff(start, 'second', true));
+		case 'minutes':
+			return Math.ceil(end.diff(start, 'minute', true));
+		case 'hours':
+			return Math.ceil(end.diff(start, 'hour', true));
+		case 'display': {
+			const diffInMinutes = end.diff(start, 'minute');
+			const hours = Math.floor(diffInMinutes / 60);
+			const minutes = diffInMinutes % 60;
 
-		if (!isValidDateInstance(date)) {
-			throw new Error(`Invalid ISO date: ${trimmedString}`);
+			return `${hours}h ${minutes}'`;
 		}
+	}
+}
 
-		return date;
+/**
+ * Convert a local datetime string to UTC ISO string for sending to BE
+ *
+ * @param value - Date string in local timezone (e.g. "2024-01-15" or "2024-01-15T20:00")
+ * @param endOfDay
+ * @param timezone - IANA timezone (e.g. "Europe/Bucharest"), falls back to app config
+ * @returns UTC ISO string (e.g. "2024-01-15T18:00:00.000Z")
+ */
+export function toUTCISOString(
+	value: string,
+	endOfDay: boolean = false,
+	timezone?: string,
+): string {
+	const tz = timezone ?? Configuration.get<string>('app.timezone');
+	let parsed = dayjs.tz(value, tz);
+
+	if (!parsed.isValid()) {
+		throw new Error(`Invalid date value: "${value}"`);
 	}
 
-	// General date parsing
-	const parsedDate = new Date(trimmedString);
-
-	if (!isValidDateInstance(parsedDate)) {
-		throw new Error(`Invalid date format: ${trimmedString}`);
+	if (endOfDay) {
+		parsed = parsed.endOf('day');
 	}
 
-	// Additional validation for non-ISO formats
-	if (parsedDate.toString() === 'Invalid Date') {
-		throw new Error(`Unparsable date: ${trimmedString}`);
-	}
-
-	return parsedDate;
+	return parsed.utc().toISOString();
 }

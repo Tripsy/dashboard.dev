@@ -16,7 +16,6 @@ export type QueryValueType =
 	| string
 	| number
 	| boolean
-	| Date
 	| null
 	| undefined
 	| Array<string | number | boolean>;

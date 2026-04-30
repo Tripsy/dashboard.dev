@@ -20,8 +20,8 @@ const translations = await translateBatch(
 export type CronHistoryDataTableFiltersType = {
 	global: { value: string | null; matchMode: 'contains' };
 	status: { value: CronHistoryStatus | null; matchMode: 'equals' };
-	start_date_start: { value: string | null; matchMode: 'equals' };
-	start_date_end: { value: string | null; matchMode: 'equals' };
+	start_at_start: { value: string | null; matchMode: 'equals' };
+	start_at_end: { value: string | null; matchMode: 'equals' };
 };
 
 export const dataSourceConfigCronHistory: DataSourceConfigType<CronHistoryModel> =
@@ -35,8 +35,8 @@ export const dataSourceConfigCronHistory: DataSourceConfigType<CronHistoryModel>
 				filters: {
 					global: { value: null, matchMode: 'contains' },
 					status: { value: null, matchMode: 'equals' },
-					start_date_start: { value: null, matchMode: 'equals' },
-					start_date_end: { value: null, matchMode: 'equals' },
+					start_at_start: { value: null, matchMode: 'equals' },
+					start_at_end: { value: null, matchMode: 'equals' },
 				} satisfies CronHistoryDataTableFiltersType,
 			},
 			columns: [

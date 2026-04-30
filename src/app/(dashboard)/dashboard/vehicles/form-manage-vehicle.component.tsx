@@ -98,12 +98,12 @@ export function FormManageVehicle() {
 				autoCompleteProps={{
 					suggestions: brandsSuggestions,
 					isLoading: isBrandsFetching,
-					onSelect: (b) => {
-						handleChange('brand', b.name);
-						handleChange('brand_id', b.id);
+					onSelect: (m) => {
+						handleChange('brand', m.name);
+						handleChange('brand_id', m.id);
 					},
-					getOptionLabel: (b) => b.name,
-					getOptionKey: (b) => b.id,
+					getOptionLabel: (m) => m.name,
+					getOptionKey: (m) => m.id,
 
 					allowCreate: true,
 

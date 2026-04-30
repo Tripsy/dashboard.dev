@@ -19,6 +19,7 @@ import type {
 	DataTableFiltersType,
 } from '@/config/data-source.config';
 import { cn } from '@/helpers/css.helper';
+import { stringToDate } from '@/helpers/date.helper';
 import { requestFind } from '@/helpers/services.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useRemoteAutocomplete } from '@/hooks/use-remote-autocomplete';
@@ -209,6 +210,11 @@ export function FormFiltersDateRange<Fields>({
 
 	const { translations } = useTranslation(translationsKeys);
 
+	const maxDate = end.fieldValue ? stringToDate(end.fieldValue) : undefined;
+	const minDate = start.fieldValue
+		? stringToDate(start.fieldValue)
+		: undefined;
+
 	return (
 		<div className="flex flex-col gap-3 h-full">
 			<Label htmlFor={elementIds[elementKeyStart]}>{labelText}</Label>
@@ -222,7 +228,7 @@ export function FormFiltersDateRange<Fields>({
 					}
 					disabled={false}
 					onSelect={start.onSelect}
-					maxDate={end.fieldValue || undefined}
+					maxDate={maxDate}
 				/>
 				<FormComponentCalendarWithoutFormElement
 					id={elementIds[elementKeyEnd]}
@@ -233,7 +239,7 @@ export function FormFiltersDateRange<Fields>({
 					}
 					disabled={false}
 					onSelect={end.onSelect}
-					minDate={start.fieldValue || undefined}
+					minDate={minDate}
 				/>
 			</div>
 		</div>

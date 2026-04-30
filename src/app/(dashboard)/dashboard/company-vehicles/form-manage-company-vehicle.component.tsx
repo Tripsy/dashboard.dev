@@ -99,12 +99,12 @@ export function FormManageCompanyVehicle() {
 				autoCompleteProps={{
 					suggestions: vehiclesSuggestions,
 					isLoading: isVehiclesFetching,
-					onSelect: (v) => {
-						handleChange('vehicle', v.model);
-						handleChange('vehicle_id', v.id);
+					onSelect: (m) => {
+						handleChange('vehicle', m.model);
+						handleChange('vehicle_id', m.id);
 					},
-					getOptionLabel: (v) => v.model,
-					getOptionKey: (v) => v.id,
+					getOptionLabel: (m) => m.model,
+					getOptionKey: (m) => m.id,
 
 					allowCreate: true,
 

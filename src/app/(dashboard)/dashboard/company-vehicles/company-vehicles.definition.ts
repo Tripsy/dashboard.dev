@@ -65,7 +65,7 @@ class CompanyVehicleValidator extends BaseValidator<typeof validatorMessages> {
 				vehicle_id: this.validateId(
 					this.getMessage('invalid_vehicle_id'),
 					{
-						required: false,
+						required: false, // Further check is done in superRefine
 					},
 				),
 				vehicle: this.validateString(

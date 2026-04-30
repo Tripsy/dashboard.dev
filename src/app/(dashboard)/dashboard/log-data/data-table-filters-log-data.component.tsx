@@ -119,8 +119,7 @@ export const DataTableFiltersLogData = (): JSX.Element => {
 				end={{
 					fieldName: 'create_at_end',
 					fieldValue: filters.create_at_end.value,
-					onSelect: (value) =>
-						setFilterValue('create_at_end', value),
+					onSelect: (value) => setFilterValue('create_at_end', value),
 				}}
 			/>
 

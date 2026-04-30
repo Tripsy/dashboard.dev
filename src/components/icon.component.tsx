@@ -39,6 +39,7 @@ import {
 	LayoutTemplate,
 	ListStart,
 	Loader,
+	Lock,
 	LockKeyhole,
 	LogIn,
 	type LucideProps,
@@ -153,6 +154,7 @@ export const Icons = {
 		Damaged: createIcon(Hammer),
 		Sold: createIcon(BanknoteArrowUp),
 		Scrapped: createIcon(SquareParkingOff),
+		Closed: createIcon(Lock),
 	},
 	Action: {
 		Save: createIcon(Save),
@@ -175,6 +177,7 @@ export const Icons = {
 		Verified: createIcon(Check),
 		Draft: createIcon(FilePenLine),
 		StatusTransition: createIcon(TrendingUp),
+		Close: createIcon(Lock),
 	},
 };
 

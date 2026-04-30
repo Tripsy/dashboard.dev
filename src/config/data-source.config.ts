@@ -8,7 +8,6 @@ import type {
 	DisplayEntryLabelFnType,
 	EntriesSelectionType,
 	FindFunctionType,
-	OperationFunctionType,
 	PrepareEntryFnType,
 	ReloadEntryFnType,
 	UpdateFunctionType,
@@ -95,7 +94,6 @@ type ActionConfigBase<
 	buttonPosition: 'left' | 'right' | 'hidden'; // Describe where the action button should be placed in data-table
 	button?: ActionButtonPropsType; // Action button configuration
 
-	operationFunction?: OperationFunctionType<Entry, FormValues>; // e.g: createUser, updateUser, etc.
 	reloadEntry?: ReloadEntryFnType<Entry>; // Used to reload entry data for form and view; the entry passed from the list may not have all the data
 	prepareEntry?: PrepareEntryFnType<Entry>; // Prepare entry before passing to renderer; Note: this run after reloadEntry if present
 
@@ -111,10 +109,11 @@ type ActionConfigBase<
 type FormCreateActionConfig<
 	Entry extends WindowEntryType,
 	FormValues extends FormValuesType,
+	ValidatedValues = FormValues,
 > = ActionConfigBase<Entry, FormValues> & {
 	windowType: 'form';
 	entriesSelection: 'free';
-	operationFunction: CreateFunctionType<Entry, FormValues>;
+	operationFunction: CreateFunctionType<Entry, ValidatedValues>;
 	validateForm: ValidateFormFnType<FormValues>;
 	getFormValues: GetFormValuesFnType<FormValues>;
 	getFormState: GetFormStateFnType<FormValues, Entry>;
@@ -123,10 +122,11 @@ type FormCreateActionConfig<
 type FormUpdateActionConfig<
 	Entry extends WindowEntryType,
 	FormValues extends FormValuesType,
+	ValidatedValues = FormValues,
 > = ActionConfigBase<Entry, FormValues> & {
 	windowType: 'form';
 	entriesSelection: 'single';
-	operationFunction: UpdateFunctionType<Entry, FormValues>;
+	operationFunction: UpdateFunctionType<Entry, ValidatedValues>;
 	validateForm: ValidateFormFnType<FormValues>;
 	getFormValues: GetFormValuesFnType<FormValues>;
 	getFormState: GetFormStateFnType<FormValues, Entry>;
@@ -173,9 +173,10 @@ type OtherActionConfig<
 export type ActionConfigType<
 	Entry extends WindowEntryType = WindowEntryType,
 	FormValues extends FormValuesType = FormValuesType,
+	ValidatedValues = FormValues,
 > =
-	| FormCreateActionConfig<Entry, FormValues>
-	| FormUpdateActionConfig<Entry, FormValues>
+	| FormCreateActionConfig<Entry, FormValues, ValidatedValues>
+	| FormUpdateActionConfig<Entry, FormValues, ValidatedValues>
 	| SingleActionConfig<Entry, FormValues>
 	| MultipleActionConfig<Entry, FormValues>
 	| ViewActionConfig<Entry, FormValues>
@@ -184,11 +185,12 @@ export type ActionConfigType<
 export type ActionsType<
 	Entry extends WindowEntryType,
 	FormValues extends FormValuesType = FormValuesType,
+	ValidatedValues = FormValues,
 > = {
-	[key: string]: ActionConfigType<Entry, FormValues>;
+	[key: string]: ActionConfigType<Entry, FormValues, ValidatedValues>;
 } & {
-	create?: FormCreateActionConfig<Entry, FormValues>;
-	update?: FormUpdateActionConfig<Entry, FormValues>;
+	create?: FormCreateActionConfig<Entry, FormValues, ValidatedValues>;
+	update?: FormUpdateActionConfig<Entry, FormValues, ValidatedValues>;
 	delete?:
 		| SingleActionConfig<Entry, FormValues>
 		| MultipleActionConfig<Entry, FormValues>;
@@ -226,6 +228,7 @@ export type DataSourceKey =
 export type DataSourceConfigType<
 	Entry extends WindowEntryType,
 	FormValues extends FormValuesType = FormValuesType,
+	ValidatedValues = FormValues,
 > = {
 	dataTable: {
 		state: DataTableStateType;
@@ -235,19 +238,20 @@ export type DataSourceConfigType<
 		onRowUnselect?: (entry: Entry) => void;
 	};
 	displayEntryLabel?: DisplayEntryLabelFnType<Entry>;
-	actions?: ActionsType<Entry, FormValues>;
+	actions?: ActionsType<Entry, FormValues, ValidatedValues>;
 };
 
 const registry: Partial<
 	// biome-ignore lint/suspicious/noExplicitAny: It's fine
-	Record<DataSourceKey, DataSourceConfigType<any, any>>
+	Record<DataSourceKey, DataSourceConfigType<any, any, any>>
 > = {};
 
 export function registerDataSource<
 	K extends DataSourceKey,
 	Entry extends WindowEntryType,
 	FormValues extends FormValuesType,
->(key: K, config: DataSourceConfigType<Entry, FormValues>) {
+	ValidatedValues = FormValues,
+>(key: K, config: DataSourceConfigType<Entry, FormValues, ValidatedValues>) {
 	if (hasDataSourceConfig(key)) {
 		return;
 	}
@@ -262,9 +266,9 @@ export function hasDataSourceConfig<K extends DataSourceKey>(key: K): boolean {
 export function getDataSourceConfig<
 	K extends DataSourceKey,
 	// biome-ignore lint/suspicious/noExplicitAny: It's fine
-	P extends keyof DataSourceConfigType<any, any>,
+	P extends keyof DataSourceConfigType<any, any, any>,
 	// biome-ignore lint/suspicious/noExplicitAny: It's fine
->(key: K, prop: P): DataSourceConfigType<any, any>[P] {
+>(key: K, prop: P): DataSourceConfigType<any, any, any>[P] {
 	const config = registry[key];
 
 	if (!config) {

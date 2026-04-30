@@ -24,8 +24,8 @@ export type MailQueueDataTableFiltersType = {
 	template: { value: string | null; matchMode: 'contains' };
 	content: { value: string | null; matchMode: 'contains' };
 	to: { value: string | null; matchMode: 'contains' };
-	sent_date_start: { value: string | null; matchMode: 'equals' };
-	sent_date_end: { value: string | null; matchMode: 'equals' };
+	sent_at_start: { value: string | null; matchMode: 'equals' };
+	sent_at_end: { value: string | null; matchMode: 'equals' };
 };
 
 function displayButtonViewTemplate(
@@ -55,8 +55,8 @@ export const dataSourceConfigMailQueue: DataSourceConfigType<MailQueueModel> = {
 				template: { value: null, matchMode: 'contains' },
 				content: { value: null, matchMode: 'contains' },
 				to: { value: null, matchMode: 'contains' },
-				sent_date_start: { value: null, matchMode: 'equals' },
-				sent_date_end: { value: null, matchMode: 'equals' },
+				sent_at_start: { value: null, matchMode: 'equals' },
+				sent_at_end: { value: null, matchMode: 'equals' },
 			} satisfies MailQueueDataTableFiltersType,
 		},
 		columns: [

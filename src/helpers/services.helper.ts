@@ -33,9 +33,9 @@ export async function requestFind<Entry>(
 	return getResponseData<FindFunctionResponseType<Entry>>(response);
 }
 
-export async function requestCreate<Entry, FormValues>(
+export async function requestCreate<Entry, RequestParams>(
 	dataSource: DataSourceKey,
-	params: FormValues,
+	params: RequestParams,
 ): Promise<ApiResponseFetch<Partial<Entry>>> {
 	return await new ApiRequest().doFetch(`/${dataSource}`, {
 		method: 'POST',
@@ -43,9 +43,9 @@ export async function requestCreate<Entry, FormValues>(
 	});
 }
 
-export async function requestUpdate<Entry, FormValues>(
+export async function requestUpdate<Entry, RequestParams>(
 	dataSource: DataSourceKey,
-	params: FormValues,
+	params: RequestParams,
 	id: number,
 ): Promise<ApiResponseFetch<Partial<Entry>>> {
 	return await new ApiRequest().doFetch(`/${dataSource}/${id}`, {

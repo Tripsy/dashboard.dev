@@ -66,7 +66,7 @@ class ClientAddressValidator extends BaseValidator<typeof validatorMessages> {
 				client_id: this.validateId(
 					this.getMessage('invalid_client_id'),
 					{
-						required: false,
+						required: false, // Further check is done in superRefine
 					},
 				),
 				client: this.validateString(this.getMessage('invalid_client')),
@@ -75,7 +75,7 @@ class ClientAddressValidator extends BaseValidator<typeof validatorMessages> {
 					this.getMessage('invalid_address_type'),
 				),
 				city_id: this.validateId(this.getMessage('invalid_city_id'), {
-					required: false,
+					required: false, // Further check is done in superRefine
 				}),
 				city: this.validateString(this.getMessage('invalid_city'), {
 					required: false,

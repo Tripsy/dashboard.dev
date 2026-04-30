@@ -179,16 +179,16 @@ export function FormManagePlace() {
 						autoCompleteProps={{
 							suggestions: parentPlacesSuggestions,
 							isLoading: isParentPlacesFetching,
-							onSelect: (p) => {
+							onSelect: (m) => {
 								handleChange(
 									'parent',
-									displayPlaceLabel(p, selectedLanguage),
+									displayPlaceLabel(m, selectedLanguage),
 								);
-								handleChange('parent_id', p.id);
+								handleChange('parent_id', m.id);
 							},
-							getOptionLabel: (p) =>
-								displayPlaceLabel(p, selectedLanguage),
-							getOptionKey: (p) => p.id,
+							getOptionLabel: (m) =>
+								displayPlaceLabel(m, selectedLanguage),
+							getOptionKey: (m) => m.id,
 						}}
 						icons={{
 							left: (

@@ -34,7 +34,6 @@ import {
 	type CashFlowMethod,
 	CashFlowMethodEnum,
 	type CashFlowModel,
-	type CashFlowParamsType,
 	type CashFlowStatus,
 	CashFlowStatusEnum,
 	getExpectedCategoryType,
@@ -45,7 +44,7 @@ import {
 } from '@/models/cash-flow.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
 import { type Currency, CurrencyEnum } from '@/types/common.type';
-import type { FormStateType } from '@/types/form.type';
+import type { FormStateType, ValidatorOutput } from '@/types/form.type';
 
 const translations = await translateBatch(
 	[
@@ -157,17 +156,14 @@ function getFormState(
 	};
 }
 
-function prepareParamsFromFormValues(
-	params: CashFlowFormValuesType,
-): CashFlowParamsType {
-	const category_type = getExpectedCategoryType(params.category);
-	const direction = getExpectedDirection(
-		category_type,
-		Number(params.amount),
-	);
+type CashFlowManageOutput = ValidatorOutput<CashFlowValidator, 'manage'>;
+
+function prepareParamsFromFormValues(data: CashFlowManageOutput) {
+	const category_type = getExpectedCategoryType(data.category);
+	const direction = getExpectedDirection(category_type, Number(data.amount));
 
 	return {
-		...params,
+		...data,
 		direction,
 		category_type,
 	};
@@ -187,7 +183,8 @@ export type CashFlowDataTableFiltersType = {
 
 export const dataSourceConfigCashFlow: DataSourceConfigType<
 	CashFlowModel,
-	CashFlowFormValuesType
+	CashFlowFormValuesType,
+	CashFlowManageOutput
 > = {
 	dataTable: {
 		state: {
@@ -349,11 +346,14 @@ export const dataSourceConfigCashFlow: DataSourceConfigType<
 			windowComponent: FormManageCashFlow,
 			permission: 'cash-flow.create',
 			entriesSelection: 'free',
-			operationFunction: (values: CashFlowFormValuesType) =>
-				requestCreate<CashFlowModel, CashFlowParamsType>(
+			operationFunction: (values: CashFlowManageOutput) => {
+				const params = prepareParamsFromFormValues(values);
+
+				return requestCreate<CashFlowModel, typeof params>(
 					'cash-flow',
-					prepareParamsFromFormValues(values),
-				),
+					params,
+				);
+			},
 			buttonPosition: 'right',
 			button: {
 				variant: 'info',
@@ -370,11 +370,14 @@ export const dataSourceConfigCashFlow: DataSourceConfigType<
 			entriesSelection: 'single',
 			customEntryCheck: (entry: CashFlowModel) =>
 				arrayHasValue(entry.status, REFUNDABLE_STATUSES),
-			operationFunction: (values: CashFlowFormValuesType) =>
-				requestCreate<CashFlowModel, CashFlowParamsType>(
+			operationFunction: (values: CashFlowManageOutput) => {
+				const params = prepareParamsFromFormValues(values);
+
+				return requestCreate<CashFlowModel, typeof params>(
 					'cash-flow',
-					prepareParamsFromFormValues(values),
-				),
+					params,
+				);
+			},
 			prepareEntry: (entry: CashFlowModel) => {
 				return {
 					category: CashFlowCategoryEnum.REFUND,
@@ -404,12 +407,15 @@ export const dataSourceConfigCashFlow: DataSourceConfigType<
 			entriesSelection: 'single',
 			customEntryCheck: (entry: CashFlowModel) =>
 				arrayHasValue(entry.status, MUTABLE_STATUSES),
-			operationFunction: (values: CashFlowFormValuesType, id: number) =>
-				requestUpdate<CashFlowModel, CashFlowFormValuesType>(
+			operationFunction: (values: CashFlowManageOutput, id: number) => {
+				const params = prepareParamsFromFormValues(values);
+
+				return requestUpdate<CashFlowModel, typeof params>(
 					'cash-flow',
-					prepareParamsFromFormValues(values),
+					params,
 					id,
-				),
+				);
+			},
 			buttonPosition: 'left',
 			button: {
 				variant: 'outline',

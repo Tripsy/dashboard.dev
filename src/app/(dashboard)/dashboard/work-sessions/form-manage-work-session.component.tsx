@@ -2,10 +2,14 @@ import { useState } from 'react';
 import {
 	FormComponentAutoComplete,
 	FormComponentCalendar,
-	FormComponentInput,
+	FormComponentTime,
 } from '@/components/form/form-element.component';
 import { Icons } from '@/components/icon.component';
-import { createCurrentDate, createPastDate } from '@/helpers/date.helper';
+import {
+	createFutureDate,
+	createPastDate,
+	formatDate,
+} from '@/helpers/date.helper';
 import { requestFind } from '@/helpers/services.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useRemoteAutocomplete } from '@/hooks/use-remote-autocomplete';
@@ -14,7 +18,11 @@ import {
 	UserRoleEnum,
 	UserStatusEnum,
 } from '@/models/user.model';
-import type { WorkSessionFormValuesType } from '@/models/work-session.model';
+import {
+	END_AT_MAX_FUTURE_SECONDS,
+	START_AT_MAX_PAST_SECONDS,
+	type WorkSessionFormValuesType,
+} from '@/models/work-session.model';
 import { useWindowForm } from '@/providers/window-form.provider';
 import type { FindFunctionResponseType } from '@/types/action.type';
 
@@ -50,6 +58,12 @@ export function FormManageWorkSession() {
 			},
 			minLength: 3,
 		});
+
+	const minDate = createPastDate(START_AT_MAX_PAST_SECONDS);
+	const minTime = formatDate(minDate, 'time');
+
+	const maxDate = createFutureDate(END_AT_MAX_FUTURE_SECONDS);
+	const maxTime = formatDate(maxDate, 'time');
 
 	return (
 		<>
@@ -96,16 +110,15 @@ export function FormManageWorkSession() {
 				isRequired={true}
 				disabled={pending}
 				onSelect={(value) => handleChange('start_at', value)}
-				minDate={createCurrentDate(true)}
-				maxDate={createCurrentDate(true)}
+				minDate={minDate}
+				maxDate={maxDate}
 				error={errors.start_at}
 			/>
 
 			<div className="flex flex-wrap gap-2">
-				<FormComponentInput<WorkSessionFormValuesType>
+				<FormComponentTime<WorkSessionFormValuesType>
 					labelText="Start Time"
 					id={elementIds.start_at_time}
-					fieldType="time"
 					fieldName="start_at_time"
 					fieldValue={formValues.start_at_time ?? ''}
 					isRequired={true}
@@ -115,11 +128,12 @@ export function FormManageWorkSession() {
 						handleChange('start_at_time', e.target.value)
 					}
 					error={errors.start_at_time}
+					minTime={minTime ?? ''}
+					minuteInterval={5}
 				/>
-				<FormComponentInput<WorkSessionFormValuesType>
+				<FormComponentTime<WorkSessionFormValuesType>
 					labelText="End Time"
 					id={elementIds.end_at_time}
-					fieldType="time"
 					fieldName="end_at_time"
 					fieldValue={formValues.end_at_time ?? ''}
 					isRequired={false}
@@ -129,6 +143,9 @@ export function FormManageWorkSession() {
 						handleChange('end_at_time', e.target.value)
 					}
 					error={errors.end_at_time}
+					minTime={minTime ?? ''}
+					maxTime={maxTime ?? ''}
+					minuteInterval={5}
 				/>
 			</div>
 		</>

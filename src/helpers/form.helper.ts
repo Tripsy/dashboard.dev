@@ -2,6 +2,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import sanitizeHtml from 'sanitize-html';
 import type { z } from 'zod';
 import { translate } from '@/config/translate.setup';
+import { ApiError } from '@/exceptions/api.error';
 import type {
 	CreateFunctionType,
 	FormOperationFunctionType,
@@ -63,10 +64,16 @@ export async function processForm<Entry, FormValues extends FormValuesType>(
 			situation: fetchResponse?.success ? 'success' : 'error',
 			resultData: fetchResponse?.data,
 		};
-	} catch {
+	} catch (error) {
+		let message: string = await translate('app.error.form');
+
+		if (error instanceof ApiError && error.status === 409) {
+			message = error.message;
+		}
+
 		return {
 			...formState,
-			message: await translate('app.error.form'),
+			message: message,
 			situation: 'error',
 		};
 	}

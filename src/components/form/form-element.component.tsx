@@ -176,9 +176,7 @@ export const FormComponentInput = <Fields,>({
 	onChange,
 	error,
 	icons,
-}: FormComponentProps<Fields, InputValueType | number> & {
-	step?: number;
-}) => {
+}: FormComponentProps<Fields, InputValueType | number>) => {
 	const { borderClass } = useFieldState({ value: fieldValue, error });
 
 	return (
@@ -214,6 +212,189 @@ export const FormComponentInput = <Fields,>({
 					)}
 				</div>
 			</FormElementWrapper>
+		</FormElement>
+	);
+};
+
+type FormComponentTimeProps<Fields> = Omit<
+	FormComponentProps<Fields, InputValueType>,
+	'fieldType' | 'autoComplete' | 'icons'
+> & {
+	minTime?: string;
+	maxTime?: string;
+	minuteInterval?: number;
+};
+
+export const FormComponentTime = <Fields,>({
+	labelText,
+	id,
+	fieldName,
+	fieldValue,
+	isRequired = false,
+	className = 'min-w-36',
+	placeholderText = '--:--',
+	disabled,
+	onChange,
+	error,
+	minTime,
+	maxTime,
+	minuteInterval = 1,
+}: FormComponentTimeProps<Fields>) => {
+	const [open, setOpen] = useState(false);
+	const { borderClass } = useFieldState({ value: fieldValue, error });
+
+	const hours = Array.from({ length: 24 }, (_, i) =>
+		String(i).padStart(2, '0'),
+	).filter((h) => {
+		if (minTime && `${h}:59` < minTime) {
+			return false;
+		}
+
+		if (maxTime && `${h}:00` > maxTime) {
+			return false;
+		}
+
+		return true;
+	});
+
+	const getMinutes = (selectedHour: string) => {
+		const interval = minuteInterval > 1 ? minuteInterval : 1;
+		return Array.from({ length: Math.floor(60 / interval) }, (_, i) =>
+			String(i * interval).padStart(2, '0'),
+		).filter((m) => {
+			const time = `${selectedHour}:${m}`;
+
+			if (minTime && time < minTime) {
+				return false;
+			}
+
+			if (maxTime && time > maxTime) {
+				return false;
+			}
+
+			return true;
+		});
+	};
+
+	const [selectedHour, selectedMinute] = fieldValue
+		? fieldValue.split(':')
+		: [null, null];
+
+	const handleHourSelect = (hour: string) => {
+		const minutes = getMinutes(hour);
+		const minute =
+			selectedMinute && minutes.includes(selectedMinute)
+				? selectedMinute
+				: minutes[0];
+
+		const syntheticEvent = {
+			target: { value: `${hour}:${minute ?? '00'}`, name: fieldName },
+		} as React.ChangeEvent<HTMLInputElement>;
+
+		onChange(syntheticEvent);
+	};
+
+	const handleMinuteSelect = (minute: string) => {
+		const hour = selectedHour ?? '00';
+
+		const syntheticEvent = {
+			target: { value: `${hour}:${minute}`, name: fieldName },
+		} as React.ChangeEvent<HTMLInputElement>;
+
+		onChange(syntheticEvent);
+
+		setOpen(false);
+	};
+
+	const minutes = selectedHour ? getMinutes(selectedHour) : [];
+
+	return (
+		<FormElement
+			label={{ for: id, text: labelText, required: isRequired }}
+			error={error}
+		>
+			<div>
+				<input
+					type="hidden"
+					name={fieldName}
+					value={fieldValue ?? ''}
+				/>
+				<Popover open={open} onOpenChange={setOpen}>
+					<PopoverTrigger asChild>
+						<Button
+							id={id}
+							variant="outline"
+							className={cn(
+								'justify-start text-left text-sm',
+								!fieldValue && 'text-muted-foreground',
+								borderClass,
+								className,
+							)}
+							disabled={disabled}
+						>
+							<Icons.Clock className="mr-2 h-4 w-4" />
+							{fieldValue ?? <span>{placeholderText}</span>}
+						</Button>
+					</PopoverTrigger>
+					<PopoverContent className="w-auto p-2" align="start">
+						<div className="flex gap-2">
+							{/* Hours */}
+							<div className="flex flex-col gap-1">
+								<p className="text-xs text-muted-foreground text-center pb-1">
+									HH
+								</p>
+								<ul className="h-48 overflow-y-auto flex flex-col gap-0.5">
+									{hours.map((hour) => (
+										<li key={hour}>
+											<button
+												type="button"
+												onClick={() =>
+													handleHourSelect(hour)
+												}
+												className={cn(
+													'w-full px-3 py-1 text-sm rounded hover:bg-accent',
+													selectedHour === hour &&
+														'bg-accent font-semibold',
+												)}
+											>
+												{hour}
+											</button>
+										</li>
+									))}
+								</ul>
+							</div>
+
+							<div className="w-px bg-border" />
+
+							{/* Minutes */}
+							<div className="flex flex-col gap-1">
+								<p className="text-xs text-muted-foreground text-center pb-1">
+									MM
+								</p>
+								<ul className="h-48 overflow-y-auto flex flex-col gap-0.5">
+									{minutes.map((minute) => (
+										<li key={minute}>
+											<button
+												type="button"
+												onClick={() =>
+													handleMinuteSelect(minute)
+												}
+												className={cn(
+													'w-full px-3 py-1 text-sm rounded hover:bg-accent',
+													selectedMinute === minute &&
+														'bg-accent font-semibold',
+												)}
+											>
+												{minute}
+											</button>
+										</li>
+									))}
+								</ul>
+							</div>
+						</div>
+					</PopoverContent>
+				</Popover>
+			</div>
 		</FormElement>
 	);
 };

@@ -164,7 +164,6 @@ export function FormManageVehicle() {
 					id={elementIds.length}
 					fieldName="length"
 					fieldType="number"
-					step={1}
 					fieldValue={formValues.length ?? null}
 					disabled={pending}
 					onChange={(e) =>
@@ -177,7 +176,6 @@ export function FormManageVehicle() {
 					id={elementIds.width}
 					fieldName="width"
 					fieldType="number"
-					step={1}
 					fieldValue={formValues.width ?? null}
 					disabled={pending}
 					onChange={(e) =>
@@ -192,7 +190,6 @@ export function FormManageVehicle() {
 					id={elementIds.height}
 					fieldName="height"
 					fieldType="number"
-					step={1}
 					fieldValue={formValues.height ?? null}
 					disabled={pending}
 					onChange={(e) =>
@@ -205,7 +202,6 @@ export function FormManageVehicle() {
 					id={elementIds.weight}
 					fieldName="weight"
 					fieldType="number"
-					step={1}
 					fieldValue={formValues.weight ?? null}
 					disabled={pending}
 					onChange={(e) =>

@@ -29,6 +29,7 @@ import {
 import { BaseValidator } from '@/helpers/validator.helper';
 import {
 	displayWorkSessionDuration,
+	START_AT_MAX_PAST_SECONDS,
 	type WorkSessionFormValuesType,
 	type WorkSessionModel,
 	type WorkSessionStatus,
@@ -73,7 +74,7 @@ class WorkSessionValidator extends BaseValidator<typeof validatorMessages> {
 					this.getMessage('invalid_start_at'),
 					{
 						required: true,
-						maxFutureSeconds: 0,
+						maxFutureSeconds: START_AT_MAX_PAST_SECONDS,
 					},
 				),
 				start_at_time: this.validateTime(

@@ -39,6 +39,9 @@ export type WorkSessionFormValuesType = {
 	end_at_time: string | null;
 };
 
+export const START_AT_MAX_PAST_SECONDS = 1800;
+export const END_AT_MAX_FUTURE_SECONDS = 1800;
+
 export function displayWorkSessionDuration(entry: WorkSessionModel) {
 	if (!entry.end_at) {
 		return 'n/a';

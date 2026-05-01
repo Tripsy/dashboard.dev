@@ -97,7 +97,6 @@ export function FormManageCashFlow({ action }: { action: string }) {
 					id={elementIds.amount}
 					fieldName="amount"
 					fieldType="number"
-					step={0.01}
 					fieldValue={formValues.amount ?? null}
 					disabled={pending}
 					isRequired={true}

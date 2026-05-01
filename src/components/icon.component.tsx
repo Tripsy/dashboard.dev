@@ -127,6 +127,7 @@ export const Icons = {
 	CompanyVehicle: createIcon(CarFront),
 	Document: createIcon(FileText),
 	Driver: createIcon(ShieldUser),
+	Clock: createIcon(Clock),
 
 	Status: {
 		Active: createIcon(CircleCheck),

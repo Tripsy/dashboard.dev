@@ -42,7 +42,7 @@ export function FormManageBrand() {
 	>(
 		() =>
 			Object.fromEntries(
-				(formValues.contents ?? []).map((c) => [c.language, c]),
+				(formValues.contents ?? []).map((m) => [m.language, m]),
 			) as Partial<Record<Language, BrandContent>>,
 	);
 
@@ -65,7 +65,7 @@ export function FormManageBrand() {
 		// Sync back to formValues as array
 		handleChange(
 			'contents',
-			Object.values(updated).filter((c): c is BrandContent => !!c),
+			Object.values(updated).filter((m): m is BrandContent => !!m),
 		);
 	};
 

@@ -61,3 +61,9 @@ export type CompanyVehicleFormValuesType = {
 	vin: string | null;
 	notes: string | null;
 };
+
+export function getCompanyVehicleDisplayName(
+	entry: CompanyVehicleModel,
+): string {
+	return `${entry.vehicle.model} ${entry.license_plate}`;
+}

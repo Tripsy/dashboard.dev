@@ -210,7 +210,7 @@ pnpm run build    # Production build
 
 # 📌 TODO
 
-1. work-sessions, work-session-vehicles, cmr, cmr-drivers, cmr-vehicles, operational-records
+1. work-session-vehicles, cmr, cmr-drivers, cmr-vehicles, operational-records
 2. Add section "documentation"
 3. login with google / facebook
 4. Replace all console.error with logging

@@ -271,7 +271,7 @@ export const dataSourceConfigClientAddress: DataSourceConfigType<
 			operationFunction: (params: ClientAddressFormValuesType) => {
 				const { client_id, client, city, ...prepareParams } = params;
 
-				return createClientAddress(client_id, prepareParams);
+				return createClientAddress(prepareParams, client_id);
 			},
 			buttonPosition: 'right',
 			button: {
@@ -293,7 +293,7 @@ export const dataSourceConfigClientAddress: DataSourceConfigType<
 			) => {
 				const { client_id, client, city, ...prepareParams } = params;
 
-				return updateClientAddress(client_id, prepareParams, id);
+				return updateClientAddress(prepareParams, id, client_id);
 			},
 			buttonPosition: 'left',
 			button: {

@@ -33,7 +33,6 @@ export function StatusTransitionCompanyVehicle({
 			[
 				'app.text.error_title',
 				'app.text.success_title',
-				'app.error.entry_required',
 				'company-vehicles.error.cannot_update_status',
 				'company-vehicles.action.statusTransition.success',
 			] as const,

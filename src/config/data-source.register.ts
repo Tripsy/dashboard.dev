@@ -12,6 +12,7 @@ import { dataSourceConfigPlaces } from '@/app/(dashboard)/dashboard/places/place
 import { dataSourceConfigTemplates } from '@/app/(dashboard)/dashboard/templates/templates.definition';
 import { dataSourceConfigUsers } from '@/app/(dashboard)/dashboard/users/users.definition';
 import { dataSourceConfigVehicles } from '@/app/(dashboard)/dashboard/vehicles/vehicles.definition';
+import { dataSourceConfigWorkSessionVehicles } from '@/app/(dashboard)/dashboard/work-session-vehicles/work-session-vehicles.definition';
 import { dataSourceConfigWorkSessions } from '@/app/(dashboard)/dashboard/work-sessions/work-sessions.definition';
 import { registerDataSource } from '@/config/data-source.config';
 
@@ -35,4 +36,8 @@ export function registerDashboardDataSource() {
 	registerDataSource('vehicles', dataSourceConfigVehicles);
 	registerDataSource('company-vehicles', dataSourceConfigCompanyVehicles);
 	registerDataSource('work-sessions', dataSourceConfigWorkSessions);
+	registerDataSource(
+		'work-session-vehicles',
+		dataSourceConfigWorkSessionVehicles,
+	);
 }

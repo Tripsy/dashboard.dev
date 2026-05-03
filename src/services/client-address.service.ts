@@ -6,8 +6,8 @@ import type {
 import type { ApiResponseFetch } from '@/types/api.type';
 
 export const createClientAddress = async (
-	client_id: number | null,
 	params: Partial<ClientAddressFormValuesType>,
+	client_id: number | null,
 ): Promise<ApiResponseFetch<ClientAddressModel>> => {
 	return await new ApiRequest().doFetch(`/client-address/${client_id}`, {
 		method: 'POST',
@@ -16,9 +16,9 @@ export const createClientAddress = async (
 };
 
 export async function updateClientAddress(
-	client_id: number | null,
 	params: Partial<ClientAddressFormValuesType>,
 	id: number,
+	client_id: number | null,
 ): Promise<ApiResponseFetch<ClientAddressModel>> {
 	return await new ApiRequest().doFetch(
 		`/client-address/${client_id}/${id}`,

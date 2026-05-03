@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
 import { FormManageWorkSession } from '@/app/(dashboard)/dashboard/work-sessions/form-manage-work-session.component';
+import { SetupWorkSessionVehicles } from '@/app/(dashboard)/dashboard/work-sessions/setup-work-session-vehicles.component';
 import { ViewWorkSession } from '@/app/(dashboard)/dashboard/work-sessions/view-work-session.component';
 import type {
 	DataSourceConfigType,
@@ -29,6 +30,7 @@ import {
 import { BaseValidator } from '@/helpers/validator.helper';
 import {
 	displayWorkSessionDuration,
+	getWorkSessionDisplayName,
 	START_AT_MAX_PAST_SECONDS,
 	type WorkSessionFormValuesType,
 	type WorkSessionModel,
@@ -46,7 +48,8 @@ const translations = await translateBatch(
 		'delete.title',
 		'restore.title',
 		'close.title',
-		'viewUser.label',
+		'viewUser.title',
+		'setupVehicles.title',
 	] as const,
 	'work-sessions.action',
 );
@@ -244,7 +247,7 @@ function displayButtonViewUser(
 	return {
 		action: 'view',
 		dataSource: 'users',
-		altTitle: translations['viewUser.label'],
+		altTitle: translations['viewUser.title'],
 		alternateEntryId: entry.user.id,
 	};
 }
@@ -370,7 +373,7 @@ export const dataSourceConfigWorkSessions: DataSourceConfigType<
 			requestFind<WorkSessionModel>('work-sessions', params),
 	},
 	displayEntryLabel: (entry: WorkSessionModel) => {
-		return `${entry.user.name} ${formatDate(entry.start_at, 'date-time')}`;
+		return getWorkSessionDisplayName(entry);
 	},
 	actions: {
 		create: {
@@ -476,6 +479,23 @@ export const dataSourceConfigWorkSessions: DataSourceConfigType<
 			permission: 'work-session.read',
 			entriesSelection: 'single',
 			buttonPosition: 'hidden',
+		},
+		setupVehicles: {
+			windowType: 'other',
+			windowTitle: translations['setupVehicles.title'],
+			windowComponent: SetupWorkSessionVehicles,
+			windowConfigProps: {
+				size: 'x2l',
+			},
+			permission: 'company-vehicle.update',
+			entriesSelection: 'single',
+			customEntryCheck: (entry: WorkSessionModel) =>
+				entry.status === WorkSessionStatusEnum.ACTIVE,
+			buttonPosition: 'left',
+			button: {
+				variant: 'outline',
+				hover: 'info',
+			},
 		},
 	},
 };

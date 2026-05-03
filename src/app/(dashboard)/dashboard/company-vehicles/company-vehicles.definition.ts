@@ -29,6 +29,7 @@ import {
 	type CompanyVehicleScope,
 	CompanyVehicleScopeEnum,
 	type CompanyVehicleStatus,
+	getCompanyVehicleDisplayName,
 	STATUS_TRANSITIONS,
 } from '@/models/company-vehicle.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
@@ -260,7 +261,7 @@ export const dataSourceConfigCompanyVehicles: DataSourceConfigType<
 			requestFind<CompanyVehicleModel>('company-vehicles', params),
 	},
 	displayEntryLabel: (entry: CompanyVehicleModel) => {
-		return `${entry.vehicle.model} ${entry.license_plate}`;
+		return getCompanyVehicleDisplayName(entry);
 	},
 	actions: {
 		create: {
@@ -345,7 +346,6 @@ export const dataSourceConfigCompanyVehicles: DataSourceConfigType<
 			entriesSelection: 'single',
 			buttonPosition: 'hidden',
 		},
-
 		statusTransition: {
 			windowType: 'other',
 			windowTitle: translations['statusTransition.title'],

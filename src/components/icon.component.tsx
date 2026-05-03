@@ -64,9 +64,11 @@ import {
 	Tag,
 	TextSearch,
 	ThumbsUp,
+	TicketCheck,
 	Trash2,
 	TrendingUp,
 	TriangleAlert,
+	Undo2,
 	UserRound,
 	Users,
 	Wrench,
@@ -156,6 +158,8 @@ export const Icons = {
 		Sold: createIcon(BanknoteArrowUp),
 		Scrapped: createIcon(SquareParkingOff),
 		Closed: createIcon(Lock),
+		Assigned: createIcon(TicketCheck),
+		Returned: createIcon(Undo2),
 	},
 	Action: {
 		Save: createIcon(Save),
@@ -179,6 +183,8 @@ export const Icons = {
 		Draft: createIcon(FilePenLine),
 		StatusTransition: createIcon(TrendingUp),
 		Close: createIcon(Lock),
+		SetupVehicles: createIcon(CarFront),
+		Return: createIcon(Undo2),
 	},
 };
 

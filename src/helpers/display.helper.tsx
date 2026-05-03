@@ -93,6 +93,14 @@ export const statusList: Record<
 		variant: 'error',
 		icon: Icons.Status.Closed,
 	},
+	assigned: {
+		variant: 'info',
+		icon: Icons.Status.Assigned,
+	},
+	returned: {
+		variant: 'warning',
+		icon: Icons.Status.Returned,
+	},
 };
 
 export const DisplayStatus = ({

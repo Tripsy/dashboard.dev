@@ -14,7 +14,7 @@
 			"label": "View"
 		},
 		"viewUser": {
-			"label": "View user"
+			"title": "View user"
 		}
 	}
 }

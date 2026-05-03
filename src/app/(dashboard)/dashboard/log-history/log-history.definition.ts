@@ -15,7 +15,7 @@ import type {
 import type { FindFunctionParamsType } from '@/types/action.type';
 
 const translations = await translateBatch(
-	['delete.title', 'view.title', 'viewUser.label'] as const,
+	['delete.title', 'view.title', 'viewUser.title'] as const,
 	'log-history.action',
 );
 
@@ -39,7 +39,7 @@ function displayButtonViewUser(
 	return {
 		action: 'view',
 		dataSource: 'users',
-		altTitle: translations['viewUser.label'],
+		altTitle: translations['viewUser.title'],
 		alternateEntryId: entry.auth_id,
 	};
 }

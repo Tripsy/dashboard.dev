@@ -44,7 +44,7 @@ export function FormManageClientAddress() {
 
 	const { open, focus, getCurrentWindow } = useModalStore();
 
-	const window = getCurrentWindow();
+	const windowConfig = getCurrentWindow();
 
 	const elementIds = useElementIds([
 		'address_type',
@@ -130,7 +130,7 @@ export function FormManageClientAddress() {
 				value={formValues.client_id ?? ''}
 			/>
 
-			{window?.action === 'create' && (
+			{windowConfig?.action === 'create' && (
 				<FormComponentAutoComplete<
 					ClientAddressFormValuesType,
 					ClientModel
@@ -185,7 +185,7 @@ export function FormManageClientAddress() {
 										handleChange('client_id', client.id);
 
 										// Back to client address form
-										focus(window.uid);
+										focus(windowConfig.uid);
 									},
 								},
 								props: {
@@ -203,7 +203,7 @@ export function FormManageClientAddress() {
 				/>
 			)}
 
-			{window?.action === 'update' && (
+			{windowConfig?.action === 'update' && (
 				<input
 					type="hidden"
 					name="client"

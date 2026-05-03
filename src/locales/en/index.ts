@@ -28,6 +28,7 @@ import register from '@/locales/en/register.json';
 import templates from '@/locales/en/templates.json';
 import users from '@/locales/en/users.json';
 import vehicles from '@/locales/en/vehicles.json';
+import work_session_vehicles from '@/locales/en/work-session-vehicles.json';
 import work_sessions from '@/locales/en/work-sessions.json';
 
 const en = {
@@ -63,6 +64,7 @@ const en = {
 	vehicles,
 	'company-vehicles': company_vehicles,
 	'work-sessions': work_sessions,
+	'work-session-vehicles': work_session_vehicles,
 };
 
 export default en;

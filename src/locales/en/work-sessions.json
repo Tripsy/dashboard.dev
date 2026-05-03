@@ -43,7 +43,11 @@
 			"label": "View details"
 		},
 		"viewUser": {
-			"label": "View user"
+			"title": "View user"
+		},
+		"setupVehicles": {
+			"title": "Setup work session vehicles",
+			"label": "Setup vehicles"
 		}
 	}
 }

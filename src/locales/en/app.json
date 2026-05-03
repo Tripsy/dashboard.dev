@@ -43,6 +43,8 @@
 		"damaged": "Damaged",
 		"sold": "Sold",
 		"scrapped": "Scrapped",
-		"closed": "Closed"
+		"closed": "Closed",
+		"assigned": "Assigned",
+		"returned": "Returned"
 	}
 }

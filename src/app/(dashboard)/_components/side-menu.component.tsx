@@ -174,7 +174,7 @@ export function SideMenu() {
 					},
 					{
 						page: 'work-session-vehicles',
-						href: Routes.get('cmr-vehicle'),
+						href: Routes.get('work-session-vehicle'),
 						text: translations[
 							'dashboard.labels.work-session-vehicles'
 						],

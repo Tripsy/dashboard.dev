@@ -1,4 +1,4 @@
-import { dateDiff } from '@/helpers/date.helper';
+import { dateDiff, formatDate } from '@/helpers/date.helper';
 import type { UserModel } from '@/models/user.model';
 import type { StatusTransitions } from '@/types/common.type';
 
@@ -48,4 +48,8 @@ export function displayWorkSessionDuration(entry: WorkSessionModel) {
 	}
 
 	return dateDiff(entry.start_at, entry.end_at, 'display');
+}
+
+export function getWorkSessionDisplayName(entry: WorkSessionModel) {
+	return `${entry.user.name} ${formatDate(entry.start_at, 'date-time')}`;
 }

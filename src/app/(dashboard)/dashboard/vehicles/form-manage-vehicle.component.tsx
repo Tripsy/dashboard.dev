@@ -30,7 +30,7 @@ export function FormManageVehicle() {
 
 	const { open, focus, getCurrentWindow } = useModalStore();
 
-	const window = getCurrentWindow();
+	const windowConfig = getCurrentWindow();
 
 	const elementIds = useElementIds([
 		'vehicle_type',
@@ -129,8 +129,8 @@ export function FormManageVehicle() {
 									handleChange('brand_id', brand.id);
 
 									// Back to vehicle form
-									if (window) {
-										focus(window.uid);
+									if (windowConfig) {
+										focus(windowConfig.uid);
 									}
 								},
 							},

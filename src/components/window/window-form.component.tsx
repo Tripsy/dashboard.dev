@@ -113,6 +113,7 @@ export function WindowForm<
 
 	const handleClose = () => {
 		close(uid);
+		windowEvents?.close?.();
 	};
 
 	return (

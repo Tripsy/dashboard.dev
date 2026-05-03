@@ -90,6 +90,7 @@ export function WindowAction<WindowEntry extends WindowEntryType>({
 
 	const handleClose = () => {
 		close(uid);
+		windowEvents?.close?.();
 	};
 
 	const handleAction = async () => {

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { resolveRequestPath } from '@/config/data-source.config';
 import { ApiRequest, getResponseData } from '@/helpers/api.helper';
 import { formatDate } from '@/helpers/date.helper';
 import type {
@@ -25,7 +26,7 @@ async function getPageData(label: string): Promise<{
 		const fetchResponse: ApiResponseFetch<TemplateModel> | undefined =
 			await new ApiRequest()
 				.setRequestMode('remote-api')
-				.doFetch(`/templates/${label}/page`, {
+				.doFetch(`/${resolveRequestPath('template')}/${label}/page`, {
 					method: 'GET',
 					next: { revalidate: 3600 },
 				});

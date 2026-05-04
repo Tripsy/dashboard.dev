@@ -1,19 +1,19 @@
-import { dataSourceConfigBrands } from '@/app/(dashboard)/dashboard/brands/brands.definition';
+import { dataSourceConfigBrand } from '@/app/(dashboard)/dashboard/brand/brand.definition';
 import { dataSourceConfigCashFlow } from '@/app/(dashboard)/dashboard/cash-flow/cash-flow.definition';
+import { dataSourceConfigClient } from '@/app/(dashboard)/dashboard/client/client.definition';
 import { dataSourceConfigClientAddress } from '@/app/(dashboard)/dashboard/client-address/client-address.definition';
-import { dataSourceConfigClients } from '@/app/(dashboard)/dashboard/clients/clients.definition';
-import { dataSourceConfigCompanyVehicles } from '@/app/(dashboard)/dashboard/company-vehicles/company-vehicles.definition';
+import { dataSourceConfigCompanyVehicle } from '@/app/(dashboard)/dashboard/company-vehicle/company-vehicle.definition';
 import { dataSourceConfigCronHistory } from '@/app/(dashboard)/dashboard/cron-history/cron-history.definition';
 import { dataSourceConfigLogData } from '@/app/(dashboard)/dashboard/log-data/log-data.definition';
 import { dataSourceConfigLogHistory } from '@/app/(dashboard)/dashboard/log-history/log-history.definition';
 import { dataSourceConfigMailQueue } from '@/app/(dashboard)/dashboard/mail-queue/mail-queue.definition';
-import { dataSourceConfigPermissions } from '@/app/(dashboard)/dashboard/permissions/permissions.definition';
-import { dataSourceConfigPlaces } from '@/app/(dashboard)/dashboard/places/places.definition';
-import { dataSourceConfigTemplates } from '@/app/(dashboard)/dashboard/templates/templates.definition';
-import { dataSourceConfigUsers } from '@/app/(dashboard)/dashboard/users/users.definition';
-import { dataSourceConfigVehicles } from '@/app/(dashboard)/dashboard/vehicles/vehicles.definition';
-import { dataSourceConfigWorkSessionVehicles } from '@/app/(dashboard)/dashboard/work-session-vehicles/work-session-vehicles.definition';
-import { dataSourceConfigWorkSessions } from '@/app/(dashboard)/dashboard/work-sessions/work-sessions.definition';
+import { dataSourceConfigPermission } from '@/app/(dashboard)/dashboard/permission/permission.definition';
+import { dataSourceConfigPlace } from '@/app/(dashboard)/dashboard/place/place.definition';
+import { dataSourceConfigTemplate } from '@/app/(dashboard)/dashboard/template/template.definition';
+import { dataSourceConfigUser } from '@/app/(dashboard)/dashboard/user/user.definition';
+import { dataSourceConfigVehicle } from '@/app/(dashboard)/dashboard/vehicle/vehicle.definition';
+import { dataSourceConfigWorkSession } from '@/app/(dashboard)/dashboard/work-session/work-session.definition';
+import { dataSourceConfigWorkSessionVehicle } from '@/app/(dashboard)/dashboard/work-session-vehicle/work-session-vehicle.definition';
 import { registerDataSource } from '@/config/data-source.config';
 
 /**
@@ -21,23 +21,23 @@ import { registerDataSource } from '@/config/data-source.config';
  * This avoids circular dependencies
  */
 export function registerDashboardDataSource() {
-	registerDataSource('brands', dataSourceConfigBrands);
+	registerDataSource('brand', dataSourceConfigBrand);
 	registerDataSource('cash-flow', dataSourceConfigCashFlow);
 	registerDataSource('client-address', dataSourceConfigClientAddress);
-	registerDataSource('clients', dataSourceConfigClients);
+	registerDataSource('client', dataSourceConfigClient);
 	registerDataSource('cron-history', dataSourceConfigCronHistory);
 	registerDataSource('log-data', dataSourceConfigLogData);
 	registerDataSource('log-history', dataSourceConfigLogHistory);
 	registerDataSource('mail-queue', dataSourceConfigMailQueue);
-	registerDataSource('permissions', dataSourceConfigPermissions);
-	registerDataSource('places', dataSourceConfigPlaces);
-	registerDataSource('templates', dataSourceConfigTemplates);
-	registerDataSource('users', dataSourceConfigUsers);
-	registerDataSource('vehicles', dataSourceConfigVehicles);
-	registerDataSource('company-vehicles', dataSourceConfigCompanyVehicles);
-	registerDataSource('work-sessions', dataSourceConfigWorkSessions);
+	registerDataSource('permission', dataSourceConfigPermission);
+	registerDataSource('place', dataSourceConfigPlace);
+	registerDataSource('template', dataSourceConfigTemplate);
+	registerDataSource('user', dataSourceConfigUser);
+	registerDataSource('vehicle', dataSourceConfigVehicle);
+	registerDataSource('company-vehicle', dataSourceConfigCompanyVehicle);
+	registerDataSource('work-session', dataSourceConfigWorkSession);
 	registerDataSource(
-		'work-session-vehicles',
-		dataSourceConfigWorkSessionVehicles,
+		'work-session-vehicle',
+		dataSourceConfigWorkSessionVehicle,
 	);
 }

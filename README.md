@@ -11,8 +11,8 @@
 (Dashboard) is a demo frontend implementation using [NReady](https://github.com/Tripsy/nready) as a backend API.
 
 This boilerplate provides an authentication system (login, register, recover password, account pages, etc.)
-and includes an administration dashboard (users, cron-history, log-history, log-data, mail-queue, permissions, 
-templates, clients, client-address, places, brands, cash-flow, etc.)
+and includes an administration dashboard (user, cron-history, log-history, log-data, mail-queue, permission, 
+template, client, client-address, place, brand, cash-flow, etc.)
 
 This project is still a work in progress, and the next goals are:
 - Include additional [NReady](https://github.com/Tripsy/nready) features in the administration dashboard
@@ -38,7 +38,7 @@ Meanwhile, we're open to suggestions / feedback, and if you find this project us
 
 # ⚙️ Characteristics
 
-- [x] Dashboard: Administration panel with CRUD operations for users, permissions, templates, logs, etc.
+- [x] Dashboard: Administration panel with CRUD operations for user, permission, template, logs, etc.
 - [x] Auth system: Login, register, logout, forgot password, reset password, email confirmation, etc.
 - [x] Best Practices: Clean architecture, TypeScript, error handling, async patterns, DRY, SOLID, KISS
 - [x] Security: rate limiting, input validation
@@ -55,8 +55,8 @@ Meanwhile, we're open to suggestions / feedback, and if you find this project us
 - [x] (Public) 
     - Auth system: login, register, logout, forgot password, reset password, email confirmation, etc.
 - [x] (Dashboard) 
-    - cron-history, log-data, log-history, mail-queue, permissions, templates, users
-    - brands, cash-flow, client-address, clients, places
+    - cron-history, log-data, log-history, mail-queue, permission, template, user
+    - brand, cash-flow, client-address, client, place
     - // TODO 
 
 # 🛠 Setup
@@ -189,13 +189,13 @@ pnpm run build    # Production build
 
 ## Adding new model for `dashboard` (ex: `cars`)
 
-1. Create `models/cars.model.ts` from `models/users.model.ts`
-2. Duplicate `src/(dashboard)/dashboard/users` > `src/(dashboard)/dashboard/cars` & rename files
-    - data-table-cars.component.tsx    
-    - data-table-cars-filters.component.tsx
-    - form-manage-cars.component.tsx
+1. Create `models/car.model.ts` from `models/user.model.ts`
+2. Duplicate `src/(dashboard)/dashboard/user` > `src/(dashboard)/dashboard/car` & rename files
+    - data-table-filters-car.component.tsx
+    - data-table-car.component.tsx    
+    - form-manage-car.component.tsx
     - page.tsx
-    - cars.definition.ts
+    - car.definition.ts
     - view-car.component.ts 
 3. Update `src/config/data-source.config.ts`
     - export type DataSourceKey
@@ -210,7 +210,7 @@ pnpm run build    # Production build
 
 # 📌 TODO
 
-1. work-session-vehicles, cmr, cmr-drivers, cmr-vehicles, operational-records
+1. cmr, cmr-driver, cmr-vehicle, operational-record
 2. Add section "documentation"
 3. login with google / facebook
 4. Replace all console.error with logging

@@ -191,19 +191,19 @@ Routes.group('account')
 Routes.group('dashboard')
 	.auth(RouteAuthEnum.PROTECTED)
 	.add('dashboard', '/dashboard')
-	.add('template', '/dashboard/templates', {
+	.add('template', '/dashboard/template', {
 		permission: 'template.find',
 	})
-	.add('client', '/dashboard/clients', {
+	.add('client', '/dashboard/client', {
 		permission: 'client.find',
 	})
 	.add('client-address', '/dashboard/client-address', {
 		permission: 'client_address.find',
 	})
-	.add('place', '/dashboard/places', {
+	.add('place', '/dashboard/place', {
 		permission: 'place.find',
 	})
-	.add('brand', '/dashboard/brands', {
+	.add('brand', '/dashboard/brand', {
 		permission: 'brand.find',
 	})
 	.add('cash-flow', '/dashboard/cash-flow', {
@@ -221,33 +221,33 @@ Routes.group('dashboard')
 	.add('mail-queue', '/dashboard/mail-queue', {
 		permission: 'mail_queue.find',
 	})
-	.add('user', '/dashboard/users', {
+	.add('user', '/dashboard/user', {
 		permission: 'user.find',
 	})
-	.add('permission', '/dashboard/permissions', {
+	.add('permission', '/dashboard/permission', {
 		permission: 'permission.find',
 	})
 
-	.add('vehicle', '/dashboard/vehicles', {
+	.add('vehicle', '/dashboard/vehicle', {
 		permission: 'vehicle.find',
 	})
-	.add('company-vehicle', '/dashboard/company-vehicles', {
+	.add('company-vehicle', '/dashboard/company-vehicle', {
 		permission: 'company-vehicle.find',
 	})
 
 	.add('cmr', '/dashboard/cmrs', {
 		permission: 'cmr.find',
 	})
-	.add('cmr-driver', '/dashboard/cmr-drivers', {
+	.add('cmr-driver', '/dashboard/cmr-driver', {
 		permission: 'cmr-driver.find',
 	})
-	.add('cmr-vehicle', '/dashboard/cmr-vehicles', {
+	.add('cmr-vehicle', '/dashboard/cmr-vehicle', {
 		permission: 'cmr-vehicle.find',
 	})
-	.add('work-session', '/dashboard/work-sessions', {
+	.add('work-session', '/dashboard/work-session', {
 		permission: 'work-session.find',
 	})
-	.add('work-session-vehicle', '/dashboard/work-session-vehicles', {
+	.add('work-session-vehicle', '/dashboard/work-session-vehicle', {
 		permission: 'work-session-vehicle.find',
 	});
 

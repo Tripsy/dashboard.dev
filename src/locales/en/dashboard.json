@@ -7,15 +7,15 @@
 
 		"financial": "Financial",
 		"cash-flow": "Cash Flow",
-		"clients": "Clients",
+		"client": "Clients",
 
 		"content": "Content",
-		"brands": "Brands",
+		"brand": "Brands",
 		"client-address": "Client Addresses",
-		"places": "Places",
+		"place": "Places",
 
 		"settings": "Settings",
-		"templates": "Templates",
+		"template": "Templates",
 
 		"logs": "System Logs",
 
@@ -24,21 +24,21 @@
 		"log-history": "Log History",
 		"mail-queue": "Mail Queue",
 
-		"users": "Users",
-		"permissions": "Permissions",
+		"user": "Users",
+		"permission": "Permissions",
 
-		"vehicles": "Vehicles",
-		"operational-records": "Operational Records",
+		"vehicle": "Vehicle",
+		"operational-record": "Operational Records",
 
 		"assets": "Company Assets",
-		"company-vehicles": "Company Vehicles",
+		"company-vehicle": "Company Vehicle",
 
 		"activity": "Company Activity",
 		"cmr": "CMRs",
-		"cmr-drivers": "CMR Drivers",
-		"cmr-vehicles": "CMR Vehicles",
-		"work-sessions": "Work Sessions",
-		"work-session-vehicles": "Work Session Vehicles"
+		"cmr-driver": "CMR Drivers",
+		"cmr-vehicle": "CMR Vehicle",
+		"work-session": "Work Sessions",
+		"work-session-vehicle": "Work Session Vehicle"
 	},
 	"text": {
 		"showing_entries": "Showing {{first}} to {{last}} of {{total}} entries",

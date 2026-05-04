@@ -174,7 +174,7 @@ function displayButtonViewClient(
 
 	return {
 		action: 'view',
-		dataSource: 'clients',
+		dataSource: 'client',
 		altTitle: translations['viewClient.label'],
 		alternateEntryId: entry.client.id,
 	};

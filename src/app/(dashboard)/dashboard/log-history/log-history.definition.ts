@@ -38,7 +38,7 @@ function displayButtonViewUser(
 
 	return {
 		action: 'view',
-		dataSource: 'users',
+		dataSource: 'user',
 		altTitle: translations['viewUser.title'],
 		alternateEntryId: entry.auth_id,
 	};

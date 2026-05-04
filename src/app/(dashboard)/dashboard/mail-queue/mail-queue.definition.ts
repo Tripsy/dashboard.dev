@@ -37,7 +37,7 @@ function displayButtonViewTemplate(
 
 	return {
 		action: 'view',
-		dataSource: 'templates',
+		dataSource: 'template',
 		altTitle: translations['viewTemplate.label'],
 		alternateEntryId: entry.template.id,
 	};

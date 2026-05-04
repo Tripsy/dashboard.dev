@@ -89,8 +89,8 @@ type ActionConfigBase<
 	windowComponent?: React.ComponentType<any>; // e.g: ViewUser, FormManageUser, SetupPermissionsUser, etc.
 	windowConfigProps?: WindowConfigPropsType;
 
-	permission: string; // Related to auth policy (e.g.: 'users.create')
-	customEntryCheck?: (entry: Entry) => boolean; // Additional function to check if the action is available (hint: active users cannot have `active` action)
+	permission: string; // Related to auth policy (e.g.: 'user.create')
+	customEntryCheck?: (entry: Entry) => boolean; // Additional function to check if the action is available (hint: active user cannot have `active` action)
 	buttonPosition: 'left' | 'right' | 'hidden'; // Describe where the action button should be placed in data-table
 	button?: ActionButtonPropsType; // Action button configuration
 
@@ -204,26 +204,26 @@ export type ActionsType<
 // ============================================================================
 
 export type DataSourceKey =
-	| 'brands'
+	| 'brand'
 	| 'cash-flow'
 	| 'client-address'
-	| 'clients'
+	| 'client'
 	| 'cron-history'
 	| 'log-data'
 	| 'log-history'
 	| 'mail-queue'
-	| 'permissions'
-	| 'places'
-	| 'templates'
-	| 'users'
-	| 'vehicles'
-	| 'company-vehicles'
-	| 'cmrs'
-	| 'cmr-drivers'
-	| 'cmr-vehicles'
-	| 'operational-records'
-	| 'work-sessions'
-	| 'work-session-vehicles';
+	| 'permission'
+	| 'place'
+	| 'template'
+	| 'user'
+	| 'vehicle'
+	| 'company-vehicle'
+	| 'cmr'
+	| 'cmr-driver'
+	| 'cmr-vehicle'
+	| 'operational-record'
+	| 'work-session'
+	| 'work-session-vehicle';
 
 export type DataSourceConfigType<
 	Entry extends WindowEntryType,
@@ -276,4 +276,29 @@ export function getDataSourceConfig<
 	}
 
 	return config[prop];
+}
+
+export function resolveRequestPath(key: DataSourceKey) {
+	const withSuffixList: DataSourceKey[] = [
+		'brand',
+		'client',
+		'permission',
+		'place',
+		'template',
+		'user',
+		'vehicle',
+		'company-vehicle',
+		'cmr',
+		'cmr-driver',
+		'cmr-vehicle',
+		'operational-record',
+		'work-session',
+		'work-session-vehicle',
+	];
+
+	if (withSuffixList.includes(key)) {
+		return `${key}s`;
+	}
+
+	return key;
 }

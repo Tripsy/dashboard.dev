@@ -57,13 +57,13 @@ export function FormManageClientAddress() {
 
 	const [searchClient, setSearchClient] = useState('');
 
-	const { suggestions: clientsSuggestions, isFetching: isClientsFetching } =
+	const { suggestions: clientSuggestions, isFetching: isClientFetching } =
 		useRemoteAutocomplete<ClientModel>({
 			query: searchClient,
 			queryKey: ['s-client'],
 			queryFn: async (q) => {
 				const res: FindFunctionResponseType<ClientModel> | undefined =
-					await requestFind('clients', {
+					await requestFind('client', {
 						filter: { term: q },
 						limit: 10,
 					});
@@ -75,13 +75,13 @@ export function FormManageClientAddress() {
 
 	const [searchCity, setSearchCity] = useState('');
 
-	const { suggestions: citiesSuggestions, isFetching: isCitiesFetching } =
+	const { suggestions: citySuggestions, isFetching: isCityFetching } =
 		useRemoteAutocomplete<PlaceModel>({
 			query: searchCity,
 			queryKey: ['s-city'],
 			queryFn: async (q) => {
 				const res: FindFunctionResponseType<PlaceModel> | undefined =
-					await requestFind('places', {
+					await requestFind('place', {
 						filter: { term: q, place_type: PlaceTypeEnum.CITY },
 						limit: 10,
 					});
@@ -94,7 +94,7 @@ export function FormManageClientAddress() {
 	const createCityMutation = useMutation({
 		mutationFn: async (name: string) => {
 			const res: ApiResponseFetch<Partial<PlaceModel>> =
-				await requestCreate('places', {
+				await requestCreate('place', {
 					...CITY_DEFAULT,
 					contents: [
 						{
@@ -149,8 +149,8 @@ export function FormManageClientAddress() {
 						setSearchClient(value);
 					}}
 					autoCompleteProps={{
-						suggestions: clientsSuggestions,
-						isLoading: isClientsFetching,
+						suggestions: clientSuggestions,
+						isLoading: isClientFetching,
 						onSelect: (c) => {
 							handleChange('client', getClientDisplayName(c));
 							handleChange('client_id', c.id);
@@ -163,7 +163,7 @@ export function FormManageClientAddress() {
 						onCreate: (value) => {
 							open<ClientModel>({
 								section: 'dashboard',
-								dataSource: 'clients',
+								dataSource: 'client',
 								action: 'create',
 								minimized: false,
 								data: {
@@ -231,8 +231,8 @@ export function FormManageClientAddress() {
 					setSearchCity(value);
 				}}
 				autoCompleteProps={{
-					suggestions: citiesSuggestions,
-					isLoading: isCitiesFetching,
+					suggestions: citySuggestions,
+					isLoading: isCityFetching,
 					onSelect: (c) => {
 						handleChange('city', getPlaceContentProp(c, language));
 						handleChange('city_id', c.id);

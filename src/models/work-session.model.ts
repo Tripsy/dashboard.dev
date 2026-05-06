@@ -1,5 +1,6 @@
 import { dateDiff, formatDate } from '@/helpers/date.helper';
 import type { UserModel } from '@/models/user.model';
+import type { WorkSessionVehicleModel } from '@/models/work-session-vehicle.model';
 import type { StatusTransitions } from '@/types/common.type';
 
 export const WorkSessionStatusEnum = {
@@ -29,6 +30,8 @@ export type WorkSessionModel<D = Date | string> = {
 	created_at: D;
 	updated_at: D;
 	deleted_at: D;
+
+	work_session_vehicle?: WorkSessionVehicleModel[];
 };
 
 export type WorkSessionFormValuesType = {

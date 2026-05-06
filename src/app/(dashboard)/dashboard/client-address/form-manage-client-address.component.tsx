@@ -6,6 +6,7 @@ import {
 	FormComponentRadio,
 } from '@/components/form/form-element.component';
 import { Icons } from '@/components/icon.component';
+import { DataSourceSectionEnum } from '@/config/data-source.config';
 import { getLanguage } from '@/config/translate.setup';
 import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { requestCreate, requestFind } from '@/helpers/services.helper';
@@ -162,7 +163,7 @@ export function FormManageClientAddress() {
 
 						onCreate: (value) => {
 							open<ClientModel>({
-								section: 'dashboard',
+								section: DataSourceSectionEnum.DASHBOARD,
 								dataSource: 'client',
 								action: 'create',
 								minimized: false,

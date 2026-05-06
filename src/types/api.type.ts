@@ -20,4 +20,8 @@ export type QueryValueType =
 	| undefined
 	| Array<string | number | boolean>;
 
-export type QueryFiltersType = Record<string, QueryValueType>;
+export type NestedValueType = {
+	[key: string]: string | number | boolean | null | undefined;
+};
+
+export type QueryFiltersType = Record<string, QueryValueType | NestedValueType>;

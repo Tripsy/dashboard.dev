@@ -11,6 +11,7 @@ import {
 import { useStore } from 'zustand/react';
 import {
 	type DataSourceKey,
+	DataSourceSectionEnum,
 	type DataTableSelectionModeType,
 	type DataTableStateType,
 	getDataSourceConfig,
@@ -43,11 +44,20 @@ function DataTableProvider<K extends DataSourceKey, Model>({
 	children: ReactNode;
 }) {
 	const [dataTableStore] = useState<DataTableStoreType<K, Model>>(
-		() => createDataTableStore(dataSource) as DataTableStoreType<K, Model>,
+		() =>
+			createDataTableStore(
+				DataSourceSectionEnum.DASHBOARD,
+				dataSource,
+			) as DataTableStoreType<K, Model>,
 	);
 
 	const dataTable = useMemo(
-		() => getDataSourceConfig(dataSource, 'dataTable'),
+		() =>
+			getDataSourceConfig(
+				DataSourceSectionEnum.DASHBOARD,
+				dataSource,
+				'dataTable',
+			),
 		[dataSource],
 	);
 

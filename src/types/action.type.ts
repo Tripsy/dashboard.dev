@@ -10,7 +10,7 @@ export type FindFunctionParamsType = {
 
 export type FindFunctionResponseType<Model> = {
 	entries: Model[];
-	pagination: {
+	pagination?: {
 		page: number;
 		limit: number;
 		total: number;

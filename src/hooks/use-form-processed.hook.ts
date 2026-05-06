@@ -1,7 +1,10 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo } from 'react';
 import { dispatchFilterReset } from '@/app/(dashboard)/_events/data-table-filter-reset.event';
-import type { DataSourceKey } from '@/config/data-source.config';
+import {
+	type DataSourceKey,
+	DataSourceSectionEnum,
+} from '@/config/data-source.config';
 import { WINDOW_CACHE_LABEL } from '@/helpers/window.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { useToast } from '@/providers/toast.provider';
@@ -57,7 +60,7 @@ export function useWindowFormProcessed<
 					detail: translations[successMessageKey],
 				});
 
-				if (windowConfig.section === 'dashboard') {
+				if (windowConfig.section === DataSourceSectionEnum.DASHBOARD) {
 					dispatchFilterReset(
 						windowConfig.dataSource as DataSourceKey,
 					);

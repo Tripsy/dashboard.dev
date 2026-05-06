@@ -1,5 +1,6 @@
 import type React from 'react';
 import type { ModalSizeType } from '@/components/ui/modal';
+import type { DataSourceSection } from '@/config/data-source.config';
 import type {
 	ActionEventType,
 	DisplayEntryLabelFnType,
@@ -22,7 +23,6 @@ export type WindowConfigPropsType = {
 	size?: ModalSizeType;
 	className?: string;
 };
-export type WindowSectionType = 'dashboard' | 'public';
 export type WindowType<T extends EntriesSelectionType> = T extends 'free'
 	? 'form' | 'other'
 	: T extends 'single'
@@ -63,7 +63,7 @@ export type WindowConfig<
 	Entry extends WindowEntryType = WindowEntryType,
 > = {
 	uid: string;
-	section: WindowSectionType;
+	section: DataSourceSection;
 	dataSource: string;
 	action: string;
 	minimized: boolean;

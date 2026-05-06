@@ -169,7 +169,7 @@ export function SideMenu() {
 						page: 'work-session',
 						href: Routes.get('work-session'),
 						text: translations['dashboard.labels.work-session'],
-						icon: Icons.Session,
+						icon: Icons.WorkSession,
 						permission: hasPermission(auth, 'work-session.find'),
 					},
 					{

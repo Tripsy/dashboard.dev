@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import {
 	type DataSourceKey,
+	DataSourceSectionEnum,
 	getDataSourceConfig,
 } from '@/config/data-source.config';
 import ValueError from '@/exceptions/value.error';
@@ -34,8 +35,10 @@ const prepareConfigOnCreate = <Entry extends WindowEntryType>(
 	const enrichedConfig = { ...config };
 
 	switch (enrichedConfig.section) {
-		case 'dashboard': {
+		case DataSourceSectionEnum.DASHBOARD:
+		case DataSourceSectionEnum.PUBLIC: {
 			const actions = getDataSourceConfig(
+				enrichedConfig.section,
 				enrichedConfig.dataSource as DataSourceKey,
 				'actions',
 			);
@@ -68,6 +71,7 @@ const prepareConfigOnCreate = <Entry extends WindowEntryType>(
 				reloadEntry: actionConfig.reloadEntry,
 				prepareEntry: actionConfig.prepareEntry,
 				displayEntryLabel: getDataSourceConfig(
+					enrichedConfig.section,
 					enrichedConfig.dataSource as DataSourceKey,
 					'displayEntryLabel',
 				),

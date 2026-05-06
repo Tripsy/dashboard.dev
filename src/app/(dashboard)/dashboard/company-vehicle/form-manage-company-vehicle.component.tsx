@@ -5,6 +5,7 @@ import {
 	FormComponentRadio,
 } from '@/components/form/form-element.component';
 import { Icons } from '@/components/icon.component';
+import { DataSourceSectionEnum } from '@/config/data-source.config';
 import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { requestFind } from '@/helpers/services.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
@@ -110,7 +111,7 @@ export function FormManageCompanyVehicle() {
 
 					onCreate: (value) => {
 						open<VehicleModel>({
-							section: 'dashboard',
+							section: DataSourceSectionEnum.DASHBOARD,
 							dataSource: 'vehicle',
 							action: 'create',
 							minimized: false,

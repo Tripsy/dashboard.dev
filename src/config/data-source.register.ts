@@ -10,33 +10,97 @@ import { dataSourceConfigMailQueue } from '@/app/(dashboard)/dashboard/mail-queu
 import { dataSourceConfigPermission } from '@/app/(dashboard)/dashboard/permission/permission.definition';
 import { dataSourceConfigPlace } from '@/app/(dashboard)/dashboard/place/place.definition';
 import { dataSourceConfigTemplate } from '@/app/(dashboard)/dashboard/template/template.definition';
-import { dataSourceConfigUser } from '@/app/(dashboard)/dashboard/user/user.definition';
+// import { dataSourceConfigUser } from '@/app/(dashboard)/dashboard/user/user.definition';
 import { dataSourceConfigVehicle } from '@/app/(dashboard)/dashboard/vehicle/vehicle.definition';
 import { dataSourceConfigWorkSession } from '@/app/(dashboard)/dashboard/work-session/work-session.definition';
 import { dataSourceConfigWorkSessionVehicle } from '@/app/(dashboard)/dashboard/work-session-vehicle/work-session-vehicle.definition';
-import { registerDataSource } from '@/config/data-source.config';
+import {
+	DataSourceSectionEnum,
+	loadDataSource,
+} from '@/config/data-source.config';
 
 /**
  * Register all data sources for the dashboard
  * This avoids circular dependencies
  */
-export function registerDashboardDataSource() {
-	registerDataSource('brand', dataSourceConfigBrand);
-	registerDataSource('cash-flow', dataSourceConfigCashFlow);
-	registerDataSource('client-address', dataSourceConfigClientAddress);
-	registerDataSource('client', dataSourceConfigClient);
-	registerDataSource('cron-history', dataSourceConfigCronHistory);
-	registerDataSource('log-data', dataSourceConfigLogData);
-	registerDataSource('log-history', dataSourceConfigLogHistory);
-	registerDataSource('mail-queue', dataSourceConfigMailQueue);
-	registerDataSource('permission', dataSourceConfigPermission);
-	registerDataSource('place', dataSourceConfigPlace);
-	registerDataSource('template', dataSourceConfigTemplate);
-	registerDataSource('user', dataSourceConfigUser);
-	registerDataSource('vehicle', dataSourceConfigVehicle);
-	registerDataSource('company-vehicle', dataSourceConfigCompanyVehicle);
-	registerDataSource('work-session', dataSourceConfigWorkSession);
-	registerDataSource(
+export function registerDataSource() {
+	loadDataSource(
+		DataSourceSectionEnum.DASHBOARD,
+		'brand',
+		dataSourceConfigBrand,
+	);
+	loadDataSource(
+		DataSourceSectionEnum.DASHBOARD,
+		'cash-flow',
+		dataSourceConfigCashFlow,
+	);
+	loadDataSource(
+		DataSourceSectionEnum.DASHBOARD,
+		'client-address',
+		dataSourceConfigClientAddress,
+	);
+	loadDataSource(
+		DataSourceSectionEnum.DASHBOARD,
+		'client',
+		dataSourceConfigClient,
+	);
+	loadDataSource(
+		DataSourceSectionEnum.DASHBOARD,
+		'cron-history',
+		dataSourceConfigCronHistory,
+	);
+	loadDataSource(
+		DataSourceSectionEnum.DASHBOARD,
+		'log-data',
+		dataSourceConfigLogData,
+	);
+	loadDataSource(
+		DataSourceSectionEnum.DASHBOARD,
+		'log-history',
+		dataSourceConfigLogHistory,
+	);
+	loadDataSource(
+		DataSourceSectionEnum.DASHBOARD,
+		'mail-queue',
+		dataSourceConfigMailQueue,
+	);
+	loadDataSource(
+		DataSourceSectionEnum.DASHBOARD,
+		'permission',
+		dataSourceConfigPermission,
+	);
+	loadDataSource(
+		DataSourceSectionEnum.DASHBOARD,
+		'place',
+		dataSourceConfigPlace,
+	);
+	loadDataSource(
+		DataSourceSectionEnum.DASHBOARD,
+		'template',
+		dataSourceConfigTemplate,
+	);
+	// loadDataSource(
+	// 	DataSourceSectionEnum.DASHBOARD,
+	// 	'user',
+	// 	dataSourceConfigUser,
+	// );
+	loadDataSource(
+		DataSourceSectionEnum.DASHBOARD,
+		'vehicle',
+		dataSourceConfigVehicle,
+	);
+	loadDataSource(
+		DataSourceSectionEnum.DASHBOARD,
+		'company-vehicle',
+		dataSourceConfigCompanyVehicle,
+	);
+	loadDataSource(
+		DataSourceSectionEnum.DASHBOARD,
+		'work-session',
+		dataSourceConfigWorkSession,
+	);
+	loadDataSource(
+		DataSourceSectionEnum.DASHBOARD,
 		'work-session-vehicle',
 		dataSourceConfigWorkSessionVehicle,
 	);

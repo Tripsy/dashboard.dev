@@ -237,7 +237,7 @@ class MiddlewareContext {
  *
  * @param token
  */
-async function fetchAuthModel(token: string): Promise<AuthModel> {
+async function fetchAuthModel(token: string): Promise<AuthModel | null> {
 	try {
 		const fetchResponse: ApiResponseFetch<AuthModel> =
 			await new ApiRequest()

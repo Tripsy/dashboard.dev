@@ -93,8 +93,6 @@ export const DataTableFiltersWorkSession = (): JSX.Element => {
 		onReset: resetCallbacks,
 	});
 
-	console.log(filters);
-
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
 			<FormFiltersAutoComplete<WorkSessionDataTableFiltersType, UserModel>

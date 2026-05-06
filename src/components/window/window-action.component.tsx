@@ -6,7 +6,10 @@ import { ActionButton } from '@/components/action-button.component';
 import { Icons } from '@/components/icon.component';
 import { LoadingComponent } from '@/components/status.component';
 import { Button } from '@/components/ui/button';
-import type { DataSourceKey } from '@/config/data-source.config';
+import {
+	type DataSourceKey,
+	DataSourceSectionEnum,
+} from '@/config/data-source.config';
 import { ApiError } from '@/exceptions/api.error';
 import ValueError from '@/exceptions/value.error';
 import { replaceVars } from '@/helpers/string.helper';
@@ -113,7 +116,7 @@ export function WindowAction<WindowEntry extends WindowEntryType>({
 					detail: fetchResponse?.message,
 				});
 
-				if (windowConfig.section === 'dashboard') {
+				if (windowConfig.section === DataSourceSectionEnum.DASHBOARD) {
 					dispatchFilterReset(
 						windowConfig.dataSource as DataSourceKey,
 					);

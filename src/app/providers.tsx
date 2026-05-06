@@ -11,7 +11,7 @@ export async function Providers({ children }: { children: React.ReactNode }) {
 	const headersList = await headers();
 	const authHeader = headersList.get('x-auth-data');
 
-	let initAuth: AuthModel = null;
+	let initAuth: AuthModel | null = null;
 
 	try {
 		initAuth = authHeader ? JSON.parse(authHeader) : null;

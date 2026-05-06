@@ -15,6 +15,7 @@ import { useStore } from 'zustand/react';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
 import { LoadingComponent } from '@/components/status.component';
 import {
+	DataSourceSectionEnum,
 	type DataTableFiltersType,
 	getDataSourceConfig,
 } from '@/config/data-source.config';
@@ -86,7 +87,12 @@ export default function DataTableList<Model extends DataTableValue>(props: {
 		useTranslation(translationsKeys);
 
 	const dataTable = useMemo(
-		() => getDataSourceConfig(dataSource, 'dataTable'),
+		() =>
+			getDataSourceConfig(
+				DataSourceSectionEnum.DASHBOARD,
+				dataSource,
+				'dataTable',
+			),
 		[dataSource],
 	);
 
@@ -143,7 +149,7 @@ export default function DataTableList<Model extends DataTableValue>(props: {
 	});
 
 	const entries = data?.entries ?? [];
-	const totalRecords = data?.pagination.total ?? 0;
+	const totalRecords = data?.pagination?.total ?? 0;
 
 	const onPage = useCallback(
 		(event: DataTablePageEvent) => {

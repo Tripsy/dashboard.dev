@@ -4,6 +4,7 @@ import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import {
 	type DataSourceKey,
+	type DataSourceSection,
 	type DataTableFiltersType,
 	type DataTableStateType,
 	getDataSourceConfig,
@@ -20,6 +21,7 @@ export interface DataTableSlice {
 
 export const createDataTableSlice =
 	<K extends DataSourceKey>(
+		section: DataSourceSection,
 		dataSource: K,
 	): StateCreator<
 		DataTableStore,
@@ -29,7 +31,7 @@ export const createDataTableSlice =
 	> =>
 	(set) => ({
 		tableState: structuredClone(
-			getDataSourceConfig(dataSource, 'dataTable').state,
+			getDataSourceConfig(section, dataSource, 'dataTable').state,
 		),
 
 		updateTableState: (newState) =>
@@ -87,13 +89,18 @@ export type DataTableStore<Model = any> = DataTableSlice &
 	};
 
 export const createDataTableStore = <K extends DataSourceKey, Model>(
+	section: DataSourceSection,
 	dataSource: K,
 ) =>
 	create<DataTableStore<Model>>()(
 		devtools(
 			persist(
 				immer((set, get, store) => ({
-					...createDataTableSlice<K>(dataSource)(set, get, store),
+					...createDataTableSlice<K>(section, dataSource)(
+						set,
+						get,
+						store,
+					),
 					...createDataTableSelectionSlice<Model>()(set, get, store),
 
 					isLoading: false,
@@ -104,7 +111,7 @@ export const createDataTableStore = <K extends DataSourceKey, Model>(
 					},
 				})),
 				{
-					name: `datatable-store-${String(dataSource)}`,
+					name: `datatable-store-${String(section)}-${String(dataSource)}`,
 					partialize: (state) => ({
 						tableState: state.tableState,
 						selectedEntries: state.selectedEntries,

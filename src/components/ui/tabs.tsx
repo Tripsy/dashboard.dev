@@ -29,9 +29,10 @@ const TabsTrigger = React.forwardRef<
 		className={cn(
 			'inline-flex items-center justify-center whitespace-nowrap rounded-sm p-2 transition-all',
 			// Active state styles
-			'data-[state=active]:font-bold data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm',
+			'data-[state=active]:bg-accent data-[state=active]:text-foreground data-[state=active]:shadow-sm',
+			'data-[state=active]:before:content-["↓"] data-[state=active]:before:mr-2 data-[state=active]:before:opacity-50 data-[state=active]:before:inline-block',
 			// Inactive state hover styles
-			'data-[state=inactive]:hover:bg-accent data-[state=inactive]:hover:text-accent-foreground data-[state=inactive]:shadow-sm data-[state=inactive]:hover:cursor-pointer ',
+			'data-[state=inactive]:hover:bg-accent/70 data-[state=inactive]:hover:text-accent-foreground data-[state=inactive]:shadow-sm data-[state=inactive]:hover:cursor-pointer ',
 			// Common styles
 			'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
 			className,

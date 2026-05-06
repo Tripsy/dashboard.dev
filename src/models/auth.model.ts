@@ -1,25 +1,30 @@
 import { normalizeDates } from '@/helpers/model.helper';
 import { type UserModel, UserRoleEnum } from '@/models/user.model';
 
-export type AuthModel =
-	| (UserModel<Date> & {
-			permissions: string[];
-	  })
-	| null;
+export type AuthModel = UserModel<Date> & {
+	permissions: string[];
+};
 
-export function isAdmin(data: AuthModel): boolean {
+export function isAdmin(data: AuthModel | null): boolean {
 	return data?.role === UserRoleEnum.ADMIN;
 }
 
-export function isOperator(data: AuthModel): boolean {
+export function isOperator(data: AuthModel | null): boolean {
 	return data?.role === UserRoleEnum.OPERATOR;
 }
 
-export function isAuthenticated(auth: AuthModel): boolean {
+export function isDriver(data: AuthModel | null): boolean {
+	return data?.role === UserRoleEnum.DRIVER;
+}
+
+export function isAuthenticated(auth: AuthModel | null): boolean {
 	return auth !== null;
 }
 
-export function hasPermission(auth: AuthModel, permission?: string): boolean {
+export function hasPermission(
+	auth: AuthModel | null,
+	permission?: string,
+): boolean {
 	if (!isAuthenticated(auth)) {
 		return false;
 	}
@@ -40,5 +45,5 @@ export function hasPermission(auth: AuthModel, permission?: string): boolean {
 }
 
 export function prepareAuthModel(data: AuthModel): AuthModel {
-	return normalizeDates(data) as AuthModel;
+	return normalizeDates(data) as unknown as AuthModel;
 }

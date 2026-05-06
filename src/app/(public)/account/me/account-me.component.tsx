@@ -238,7 +238,7 @@ export default function AccountMe() {
 				{/* Sessions Management */}
 				<div className="bg-card border border-border rounded-xl p-6 shadow-xl space-y-4 w-full max-w-md">
 					<h2 className="text-lg font-bold flex items-center gap-2">
-						<Icons.Session />
+						<Icons.Sessions />
 						Sessions
 					</h2>
 

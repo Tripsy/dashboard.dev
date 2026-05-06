@@ -8,6 +8,7 @@ import {
 	LoadingComponent,
 } from '@/components/status.component';
 import { Button } from '@/components/ui/button';
+import { DataSourceSectionEnum } from '@/config/data-source.config';
 import { DisplayStatus } from '@/helpers/display.helper';
 import { requestFind } from '@/helpers/services.helper';
 import { getCompanyVehicleDisplayName } from '@/models/company-vehicle.model';
@@ -29,7 +30,6 @@ export function SetupWorkSessionVehicles({
 	const windowConfig = getCurrentWindow();
 
 	const queryClient = useQueryClient();
-	const queryKeyLabel = 'work-session-vehicle';
 
 	const workSessionModel = entries[0] as WorkSessionModel | undefined;
 	const workSessionId = workSessionModel?.id;
@@ -39,7 +39,7 @@ export function SetupWorkSessionVehicles({
 		isLoading: isLoadingWorkSessionVehicle,
 		error: errorWorkSessionVehicle,
 	} = useQuery({
-		queryKey: [queryKeyLabel, workSessionModel?.id],
+		queryKey: ['work-session-vehicle', workSessionModel?.id],
 		queryFn: () =>
 			requestFind<WorkSessionVehicleModel>('work-session-vehicle', {
 				filter: {
@@ -52,7 +52,7 @@ export function SetupWorkSessionVehicles({
 	const invalidateWorkSessionVehicle = useCallback(
 		() =>
 			queryClient.invalidateQueries({
-				queryKey: [queryKeyLabel, workSessionModel?.id],
+				queryKey: ['work-session-vehicle', workSessionModel?.id],
 			}),
 		[queryClient, workSessionModel?.id],
 	);
@@ -60,7 +60,7 @@ export function SetupWorkSessionVehicles({
 	const openCreate = useCallback(() => {
 		open({
 			minimized: false,
-			section: 'dashboard',
+			section: DataSourceSectionEnum.DASHBOARD,
 			dataSource: 'work-session-vehicle',
 			action: 'create',
 			data: {
@@ -97,7 +97,7 @@ export function SetupWorkSessionVehicles({
 		(entry: WorkSessionVehicleModel) => {
 			open({
 				minimized: false,
-				section: 'dashboard',
+				section: DataSourceSectionEnum.DASHBOARD,
 				dataSource: 'work-session-vehicle',
 				action: 'update',
 				data: {
@@ -128,7 +128,7 @@ export function SetupWorkSessionVehicles({
 		(entry: WorkSessionVehicleModel) => {
 			open({
 				minimized: false,
-				section: 'dashboard',
+				section: DataSourceSectionEnum.DASHBOARD,
 				dataSource: 'work-session-vehicle',
 				action: 'delete',
 				data: {
@@ -154,7 +154,7 @@ export function SetupWorkSessionVehicles({
 		(entry: WorkSessionVehicleModel) => {
 			open({
 				minimized: false,
-				section: 'dashboard',
+				section: DataSourceSectionEnum.DASHBOARD,
 				dataSource: 'work-session-vehicle',
 				action: 'return',
 				data: {

@@ -65,6 +65,7 @@ import {
 	TextSearch,
 	ThumbsUp,
 	TicketCheck,
+	Timer,
 	Trash2,
 	TrendingUp,
 	TriangleAlert,
@@ -102,7 +103,7 @@ export const Icons = {
 	Calendar: createIcon(Calendar),
 	Settings: createIcon(Settings),
 	Security: createIcon(Shield),
-	Session: createIcon(FileStack),
+	Sessions: createIcon(FileStack),
 	User: createIcon(UserRound),
 	Users: createIcon(Users),
 	HardDrive: createIcon(HardDrive),
@@ -130,6 +131,7 @@ export const Icons = {
 	Document: createIcon(FileText),
 	Driver: createIcon(ShieldUser),
 	Clock: createIcon(Clock),
+	WorkSession: createIcon(Timer),
 
 	Status: {
 		Active: createIcon(CircleCheck),

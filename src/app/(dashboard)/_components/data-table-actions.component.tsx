@@ -8,6 +8,7 @@ import { ActionButton } from '@/components/action-button.component';
 import {
 	type ActionConfigType,
 	type DataSourceKey,
+	DataSourceSectionEnum,
 	getDataSourceConfig,
 } from '@/config/data-source.config';
 import { getErrorMessage } from '@/helpers/objects.helper';
@@ -106,7 +107,12 @@ export function DataTableActions<
 	);
 
 	const actions = useMemo(
-		() => getDataSourceConfig(dataSource, 'actions'),
+		() =>
+			getDataSourceConfig(
+				DataSourceSectionEnum.DASHBOARD,
+				dataSource,
+				'actions',
+			),
 		[dataSource],
 	);
 
@@ -151,7 +157,11 @@ export function DataTableActions<
 		async (action, targetDataSource, entries, actionConfig) => {
 			const resolvedActionConfig: ActionConfigType | undefined =
 				actionConfig ??
-				getDataSourceConfig(targetDataSource, 'actions')?.[action];
+				getDataSourceConfig(
+					DataSourceSectionEnum.DASHBOARD,
+					targetDataSource,
+					'actions',
+				)?.[action];
 
 			if (!resolvedActionConfig) {
 				throw new Error(`Action "${action}" is not defined`);
@@ -177,7 +187,7 @@ export function DataTableActions<
 
 			open({
 				minimized: false,
-				section: 'dashboard',
+				section: DataSourceSectionEnum.DASHBOARD,
 				dataSource: targetDataSource,
 				action: action,
 				data: {

@@ -203,6 +203,14 @@ export type ActionsType<
 // Data Source
 // ============================================================================
 
+export const DataSourceSectionEnum = {
+	DASHBOARD: 'dashboard',
+	PUBLIC: 'public',
+} as const;
+
+export type DataSourceSection =
+	(typeof DataSourceSectionEnum)[keyof typeof DataSourceSectionEnum];
+
 export type DataSourceKey =
 	| 'brand'
 	| 'cash-flow'
@@ -241,38 +249,51 @@ export type DataSourceConfigType<
 	actions?: ActionsType<Entry, FormValues, ValidatedValues>;
 };
 
-const registry: Partial<
+const registry: Record<
+	DataSourceSection,
 	// biome-ignore lint/suspicious/noExplicitAny: It's fine
-	Record<DataSourceKey, DataSourceConfigType<any, any, any>>
-> = {};
+	Partial<Record<DataSourceKey, DataSourceConfigType<any, any, any>>>
+> = {
+	dashboard: {},
+	public: {},
+};
 
-export function registerDataSource<
-	K extends DataSourceKey,
-	Entry extends WindowEntryType,
-	FormValues extends FormValuesType,
-	ValidatedValues = FormValues,
->(key: K, config: DataSourceConfigType<Entry, FormValues, ValidatedValues>) {
-	if (hasDataSourceConfig(key)) {
+export function loadDataSource(
+	section: DataSourceSection,
+	key: DataSourceKey,
+	// biome-ignore lint/suspicious/noExplicitAny: It's fine
+	config: DataSourceConfigType<any, any, any>,
+) {
+	if (hasDataSourceConfig(section, key)) {
 		return;
 	}
 
-	registry[key] = config;
+	registry[section][key] = config;
 }
 
-export function hasDataSourceConfig<K extends DataSourceKey>(key: K): boolean {
-	return !!registry[key];
+export function hasDataSourceConfig<K extends DataSourceKey>(
+	section: DataSourceSection,
+	key: K,
+): boolean {
+	return !!registry[section][key];
 }
 
 export function getDataSourceConfig<
 	K extends DataSourceKey,
 	// biome-ignore lint/suspicious/noExplicitAny: It's fine
 	P extends keyof DataSourceConfigType<any, any, any>,
-	// biome-ignore lint/suspicious/noExplicitAny: It's fine
->(key: K, prop: P): DataSourceConfigType<any, any, any>[P] {
-	const config = registry[key];
+>(
+	section: DataSourceSection,
+	key: K,
+	prop: P,
+): // biome-ignore lint/suspicious/noExplicitAny: It's fine
+DataSourceConfigType<any, any, any>[P] {
+	const config = registry[section][key];
 
 	if (!config) {
-		throw new Error(`DataSource "${key}" is not registered`);
+		throw new Error(
+			`DataSource "${key}" is not registered for section "${section}"`,
+		);
 	}
 
 	return config[prop];

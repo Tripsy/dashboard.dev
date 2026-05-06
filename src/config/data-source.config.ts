@@ -12,6 +12,7 @@ import type {
 	ReloadEntryFnType,
 	UpdateFunctionType,
 } from '@/types/action.type';
+import type { DataSourceSection } from '@/types/data-source.type';
 import type {
 	FormValuesType,
 	GetFormStateFnType,
@@ -202,14 +203,6 @@ export type ActionsType<
 // ============================================================================
 // Data Source
 // ============================================================================
-
-export const DataSourceSectionEnum = {
-	DASHBOARD: 'dashboard',
-	PUBLIC: 'public',
-} as const;
-
-export type DataSourceSection =
-	(typeof DataSourceSectionEnum)[keyof typeof DataSourceSectionEnum];
 
 export type DataSourceKey =
 	| 'brand'

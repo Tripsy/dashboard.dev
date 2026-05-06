@@ -2,11 +2,11 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import {
 	type DataSourceKey,
-	DataSourceSectionEnum,
 	getDataSourceConfig,
 } from '@/config/data-source.config';
 import ValueError from '@/exceptions/value.error';
 import { generateWindowUid } from '@/helpers/window.helper';
+import { DataSourceSectionEnum } from '@/types/data-source.type';
 import type {
 	WindowConfig,
 	WindowCreateConfig,

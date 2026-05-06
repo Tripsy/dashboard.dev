@@ -21,10 +21,10 @@ import {
 import {
 	END_AT_MAX_FUTURE_SECONDS,
 	START_AT_MAX_PAST_SECONDS,
-	type WorkSessionFormValuesType,
 } from '@/models/work-session.model';
 import { useWindowForm } from '@/providers/window-form.provider';
 import type { FindFunctionResponseType } from '@/types/action.type';
+import {WorkSessionFormValuesType} from "@/app/(dashboard)/dashboard/work-session/work-session.definition";
 
 export function FormManageWorkSession() {
 	const { formValues, errors, handleChange, pending } =

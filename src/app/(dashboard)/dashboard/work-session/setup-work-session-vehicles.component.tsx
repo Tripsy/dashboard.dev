@@ -8,7 +8,6 @@ import {
 	LoadingComponent,
 } from '@/components/status.component';
 import { Button } from '@/components/ui/button';
-import { DataSourceSectionEnum } from '@/config/data-source.config';
 import { DisplayStatus } from '@/helpers/display.helper';
 import { requestFind } from '@/helpers/services.helper';
 import { getCompanyVehicleDisplayName } from '@/models/company-vehicle.model';
@@ -18,6 +17,7 @@ import {
 	WorkSessionVehicleStatusEnum,
 } from '@/models/work-session-vehicle.model';
 import { useModalStore } from '@/stores/window.store';
+import { DataSourceSectionEnum } from '@/types/data-source.type';
 import type { WindowEntryType } from '@/types/window.type';
 
 export function SetupWorkSessionVehicles({

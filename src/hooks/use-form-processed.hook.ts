@@ -1,15 +1,13 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo } from 'react';
 import { dispatchFilterReset } from '@/app/(dashboard)/_events/data-table-filter-reset.event';
-import {
-	type DataSourceKey,
-	DataSourceSectionEnum,
-} from '@/config/data-source.config';
+import type { DataSourceKey } from '@/config/data-source.config';
 import { WINDOW_CACHE_LABEL } from '@/helpers/window.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { useToast } from '@/providers/toast.provider';
 import { useModalStore } from '@/stores/window.store';
 import type { ActionEventType } from '@/types/action.type';
+import { DataSourceSectionEnum } from '@/types/data-source.type';
 import type { FormStateType, FormValuesType } from '@/types/form.type';
 import type { WindowConfig, WindowEntryType } from '@/types/window.type';
 

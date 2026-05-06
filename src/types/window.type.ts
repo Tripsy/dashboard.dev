@@ -1,6 +1,5 @@
 import type React from 'react';
 import type { ModalSizeType } from '@/components/ui/modal';
-import type { DataSourceSection } from '@/config/data-source.config';
 import type {
 	ActionEventType,
 	DisplayEntryLabelFnType,
@@ -9,6 +8,7 @@ import type {
 	PrepareEntryFnType,
 	ReloadEntryFnType,
 } from '@/types/action.type';
+import type { DataSourceSection } from '@/types/data-source.type';
 import type {
 	FormValuesType,
 	GetFormStateFnType,

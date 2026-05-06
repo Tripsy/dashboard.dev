@@ -4,11 +4,11 @@ import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import {
 	type DataSourceKey,
-	type DataSourceSection,
 	type DataTableFiltersType,
 	type DataTableStateType,
 	getDataSourceConfig,
 } from '@/config/data-source.config';
+import type { DataSourceSection } from '@/types/data-source.type';
 
 // ============================================================================
 // TABLE SLICE

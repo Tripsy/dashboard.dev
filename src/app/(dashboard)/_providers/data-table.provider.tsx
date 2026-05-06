@@ -11,7 +11,6 @@ import {
 import { useStore } from 'zustand/react';
 import {
 	type DataSourceKey,
-	DataSourceSectionEnum,
 	type DataTableSelectionModeType,
 	type DataTableStateType,
 	getDataSourceConfig,
@@ -21,6 +20,7 @@ import {
 	createDataTableStore,
 	type DataTableStoreType,
 } from '@/stores/data-table.store';
+import { DataSourceSectionEnum } from '@/types/data-source.type';
 
 type DataTableContextType<K extends DataSourceKey, Model> = {
 	dataSource: K;

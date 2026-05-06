@@ -15,7 +15,6 @@ import { useStore } from 'zustand/react';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
 import { LoadingComponent } from '@/components/status.component';
 import {
-	DataSourceSectionEnum,
 	type DataTableFiltersType,
 	getDataSourceConfig,
 } from '@/config/data-source.config';
@@ -23,6 +22,7 @@ import { toUTCISOString } from '@/helpers/date.helper';
 import { replaceVars } from '@/helpers/string.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import type { QueryFiltersType } from '@/types/api.type';
+import { DataSourceSectionEnum } from '@/types/data-source.type';
 
 function findFunctionFilter(filters: DataTableFiltersType): QueryFiltersType {
 	return Object.entries(filters).reduce((acc, [key, filter]) => {

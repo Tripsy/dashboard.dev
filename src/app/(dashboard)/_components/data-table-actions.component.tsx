@@ -8,7 +8,6 @@ import { ActionButton } from '@/components/action-button.component';
 import {
 	type ActionConfigType,
 	type DataSourceKey,
-	DataSourceSectionEnum,
 	getDataSourceConfig,
 } from '@/config/data-source.config';
 import { getErrorMessage } from '@/helpers/objects.helper';
@@ -18,6 +17,7 @@ import { useAuth } from '@/providers/auth.provider';
 import { useToast } from '@/providers/toast.provider';
 import { useModalStore } from '@/stores/window.store';
 import type { EntriesSelectionType } from '@/types/action.type';
+import { DataSourceSectionEnum } from '@/types/data-source.type';
 import type { WindowEntryType } from '@/types/window.type';
 
 type HandleActionType = (

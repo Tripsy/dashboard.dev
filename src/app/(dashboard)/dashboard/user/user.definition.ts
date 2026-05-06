@@ -1,6 +1,9 @@
 import { z } from 'zod';
 import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
-import { FormManageUser } from '@/app/(dashboard)/dashboard/user/form-manage-user.component';
+import {
+	FormManageUser,
+	type UserFormValuesType,
+} from '@/app/(dashboard)/dashboard/user/form-manage-user.component';
 import { SetupPermissionsUser } from '@/app/(dashboard)/dashboard/user/setup-user-permissions.component';
 import { ViewUser } from '@/app/(dashboard)/dashboard/user/view-user.component';
 import type {
@@ -21,7 +24,6 @@ import {
 } from '@/helpers/services.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import {
-	type UserFormValuesType,
 	type UserModel,
 	UserOperatorTypeEnum,
 	type UserRole,

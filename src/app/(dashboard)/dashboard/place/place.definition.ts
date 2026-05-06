@@ -1,6 +1,9 @@
 import { z } from 'zod';
 import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
-import { FormManagePlace } from '@/app/(dashboard)/dashboard/place/form-manage-place.component';
+import {
+	FormManagePlace,
+	type PlaceFormValuesType,
+} from '@/app/(dashboard)/dashboard/place/form-manage-place.component';
 import { ViewPlace } from '@/app/(dashboard)/dashboard/place/view-place.component';
 import type {
 	DataSourceConfigType,
@@ -26,7 +29,6 @@ import {
 	displayPlaceLabel,
 	getPlaceContentProp,
 	type PlaceContent,
-	type PlaceFormValuesType,
 	type PlaceModel,
 	type PlaceType,
 	PlaceTypeEnum,

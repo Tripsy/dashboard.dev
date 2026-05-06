@@ -5,12 +5,28 @@ import {
 } from '@/components/form/form-element.component';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
-import {
-	type ClientFormValuesType,
-	type ClientType,
-	ClientTypeEnum,
-} from '@/models/client.model';
+import { type ClientType, ClientTypeEnum } from '@/models/client.model';
 import { useWindowForm } from '@/providers/window-form.provider';
+
+export type ClientFormValuesType = {
+	client_type: ClientType;
+
+	company_name?: string | null;
+	company_cui?: string | null;
+	company_reg_com?: string | null;
+
+	person_name?: string | null;
+	person_identification_number?: string | null;
+
+	iban: string | null;
+	bank_name: string | null;
+
+	contact_name: string | null;
+	contact_email: string | null;
+	contact_phone: string | null;
+
+	notes: string | null;
+};
 
 const clientTypes = Object.values(ClientTypeEnum).map((v) => ({
 	label: formatEnumLabel(v),

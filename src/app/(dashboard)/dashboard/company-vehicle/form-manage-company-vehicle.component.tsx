@@ -11,7 +11,6 @@ import { formatEnumLabel } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useRemoteAutocomplete } from '@/hooks/use-remote-autocomplete';
 import {
-	type CompanyVehicleFormValuesType,
 	type CompanyVehicleScope,
 	CompanyVehicleScopeEnum,
 } from '@/models/company-vehicle.model';
@@ -20,6 +19,15 @@ import { useWindowForm } from '@/providers/window-form.provider';
 import { useModalStore } from '@/stores/window.store';
 import type { FindFunctionResponseType } from '@/types/action.type';
 import { DataSourceSectionEnum } from '@/types/data-source.type';
+
+export type CompanyVehicleFormValuesType = {
+	vehicle_id: number | null;
+	vehicle: string | null;
+	scope: CompanyVehicleScope;
+	license_plate: string | null;
+	vin: string | null;
+	notes: string | null;
+};
 
 const scopes = toOptionsFromEnum(CompanyVehicleScopeEnum, {
 	formatter: formatEnumLabel,

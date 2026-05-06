@@ -53,15 +53,6 @@ export type CompanyVehicleModel<D = Date | string> = {
 	deleted_at: D;
 };
 
-export type CompanyVehicleFormValuesType = {
-	vehicle_id: number | null;
-	vehicle: string | null;
-	scope: CompanyVehicleScope;
-	license_plate: string | null;
-	vin: string | null;
-	notes: string | null;
-};
-
 export function getCompanyVehicleDisplayName(
 	entry: CompanyVehicleModel,
 ): string {

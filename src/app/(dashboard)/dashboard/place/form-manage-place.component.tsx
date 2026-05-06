@@ -16,7 +16,6 @@ import {
 	displayPlaceLabel,
 	getParentPlaceType,
 	type PlaceContent,
-	type PlaceFormValuesType,
 	type PlaceModel,
 	type PlaceType,
 	PlaceTypeEnum,
@@ -24,6 +23,14 @@ import {
 import { useWindowForm } from '@/providers/window-form.provider';
 import type { FindFunctionResponseType } from '@/types/action.type';
 import { type Language, LanguageEnum } from '@/types/common.type';
+
+export type PlaceFormValuesType = {
+	place_type: PlaceType;
+	code: string | null;
+	parent_id: number | null;
+	parent: string | null;
+	contents: PlaceContent[];
+};
 
 const languages = Object.values(LanguageEnum);
 

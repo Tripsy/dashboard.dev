@@ -13,9 +13,20 @@ import {
 	CompanyVehicleStatusEnum,
 	getCompanyVehicleDisplayName,
 } from '@/models/company-vehicle.model';
-import type { WorkSessionVehicleFormValuesType } from '@/models/work-session-vehicle.model';
 import { useWindowForm } from '@/providers/window-form.provider';
 import type { FindFunctionResponseType } from '@/types/action.type';
+
+export type WorkSessionVehicleFormValuesType = {
+	work_session_id: number | null;
+
+	company_vehicle_id: number | null;
+	company_vehicle: string | null;
+
+	vehicle_km_start: number | null;
+	vehicle_km_end: number | null;
+
+	notes: string | null;
+};
 
 export function FormManageWorkSessionVehicle() {
 	const { formValues, errors, handleChange, pending } =

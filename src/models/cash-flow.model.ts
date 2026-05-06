@@ -221,23 +221,3 @@ export type CashFlowModel<D = Date | string> = {
 	updated_at: D;
 	deleted_at: D;
 };
-
-export type CashFlowFormValuesType = {
-	category: CashFlowCategory;
-	method: CashFlowMethod;
-
-	amount: number | null;
-	vat_rate: number | null;
-	currency: Currency;
-
-	external_reference: string | null;
-
-	parent_id: number | null;
-
-	notes: string | null;
-};
-
-export type CashFlowParamsType = CashFlowFormValuesType & {
-	direction: CashFlowDirection;
-	category_type: CashFlowCategoryType;
-};

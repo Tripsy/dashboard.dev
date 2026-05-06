@@ -1,6 +1,9 @@
 import { z } from 'zod';
 import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
-import { FormManageClientAddress } from '@/app/(dashboard)/dashboard/client-address/form-manage-client-address.component';
+import {
+	type ClientAddressFormValuesType,
+	FormManageClientAddress,
+} from '@/app/(dashboard)/dashboard/client-address/form-manage-client-address.component';
 import { ViewClientAddress } from '@/app/(dashboard)/dashboard/client-address/view-client-address.component';
 import type {
 	DataSourceConfigType,
@@ -18,7 +21,6 @@ import { formatEnumLabel } from '@/helpers/string.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import { getClientDisplayName } from '@/models/client.model';
 import {
-	type ClientAddressFormValuesType,
 	type ClientAddressModel,
 	type ClientAddressType,
 	ClientAddressTypeEnum,

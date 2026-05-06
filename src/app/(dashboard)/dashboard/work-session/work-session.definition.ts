@@ -1,6 +1,9 @@
 import { z } from 'zod';
 import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
-import { FormManageWorkSession } from '@/app/(dashboard)/dashboard/work-session/form-manage-work-session.component';
+import {
+	FormManageWorkSession,
+	type WorkSessionFormValuesType,
+} from '@/app/(dashboard)/dashboard/work-session/form-manage-work-session.component';
 import { SetupWorkSessionVehicles } from '@/app/(dashboard)/dashboard/work-session/setup-work-session-vehicles.component';
 import { ViewWorkSession } from '@/app/(dashboard)/dashboard/work-session/view-work-session.component';
 import type {
@@ -9,11 +12,7 @@ import type {
 	DataTableValueOptionsType,
 } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
-import {
-	combineDateAndTime,
-	formatDate,
-	stringToDate,
-} from '@/helpers/date.helper';
+import { formatDate, stringToDate } from '@/helpers/date.helper';
 import {
 	getFormDataAsNumber,
 	getFormDataAsString,
@@ -29,10 +28,11 @@ import {
 } from '@/helpers/services.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import {
+	determineEndAt,
+	determineStartAt,
 	displayWorkSessionDuration,
 	getWorkSessionDisplayName,
 	START_AT_MAX_PAST_SECONDS,
-	type WorkSessionFormValuesType,
 	type WorkSessionModel,
 	type WorkSessionStatus,
 	WorkSessionStatusEnum,
@@ -183,26 +183,6 @@ function getFormState(
 			end_at_time: formatDate(data?.end_at, 'time') ?? null,
 		},
 	};
-}
-
-function determineStartAt(start_at: Date, start_at_time: string) {
-	return combineDateAndTime(start_at, start_at_time);
-}
-
-function determineEndAt(
-	start_at: Date,
-	start_at_time: string,
-	end_at_time: string,
-) {
-	const isOverMidnight = end_at_time < start_at_time;
-
-	const end_at = new Date(start_at);
-
-	if (isOverMidnight) {
-		end_at.setDate(end_at.getDate() + 1);
-	}
-
-	return combineDateAndTime(end_at, end_at_time);
 }
 
 type WorkSessionCreateOutput = ValidatorOutput<WorkSessionValidator, 'create'>;

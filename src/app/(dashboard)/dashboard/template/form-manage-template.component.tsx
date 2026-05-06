@@ -8,7 +8,6 @@ import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import {
-	type TemplateFormValuesType,
 	type TemplateLayoutEmail,
 	TemplateLayoutEmailEnum,
 	type TemplateLayoutPage,
@@ -17,6 +16,19 @@ import {
 } from '@/models/template.model';
 import { useWindowForm } from '@/providers/window-form.provider';
 import { type Language, LanguageEnum } from '@/types/common.type';
+
+export type TemplateFormValuesType = {
+	language: Language;
+	type: TemplateType;
+	label: string | null;
+	content: {
+		subject?: string | null; // Email specific
+		title?: string | null; // Page specific
+		layout: TemplateLayoutEmail | TemplateLayoutPage;
+		html: string | null;
+		text?: string | null;
+	};
+};
 
 const languages = toOptionsFromEnum(LanguageEnum, {
 	formatter: formatEnumLabel,

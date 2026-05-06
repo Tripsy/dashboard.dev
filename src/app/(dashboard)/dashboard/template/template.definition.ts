@@ -1,6 +1,9 @@
 import { z } from 'zod';
 import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
-import { FormManageTemplate } from '@/app/(dashboard)/dashboard/template/form-manage-template.component';
+import {
+	FormManageTemplate,
+	type TemplateFormValuesType,
+} from '@/app/(dashboard)/dashboard/template/form-manage-template.component';
 import { ViewTemplate } from '@/app/(dashboard)/dashboard/template/view-template.component';
 import type {
 	DataSourceConfigType,
@@ -19,7 +22,6 @@ import {
 import { parseJson, toKebabCase } from '@/helpers/string.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import {
-	type TemplateFormValuesType,
 	type TemplateLayoutEmail,
 	TemplateLayoutEmailEnum,
 	type TemplateLayoutPage,

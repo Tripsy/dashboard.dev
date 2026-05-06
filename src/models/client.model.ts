@@ -64,20 +64,6 @@ export type ClientModel<D = Date | string> = ClientBase<D> &
 	ClientFinancial &
 	ClientContact;
 
-export type ClientFormValuesType = {
-	client_type: ClientType;
-
-	company_name?: string | null;
-	company_cui?: string | null;
-	company_reg_com?: string | null;
-
-	person_name?: string | null;
-	person_identification_number?: string | null;
-} & ClientFinancial &
-	ClientContact & {
-		notes: string | null;
-	};
-
 export function getClientDisplayName(client: ClientModel): string {
 	if (client.client_type === ClientTypeEnum.COMPANY) {
 		return client.company_name ?? '';

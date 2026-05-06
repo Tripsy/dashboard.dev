@@ -25,8 +25,8 @@ export type BrandContent = {
 	meta: PageMeta;
 };
 
-// Brand base type without relations
-type BrandBase<D = Date | string> = {
+// Full brand model with relations
+export type BrandModel<D = Date | string> = {
 	id: number;
 	name: string;
 	slug: string;
@@ -39,21 +39,9 @@ type BrandBase<D = Date | string> = {
 	created_at: D;
 	updated_at: D;
 	deleted_at: D;
-};
 
-// Full brand model with relations
-export type BrandModel<D = Date | string> = BrandBase<D> & {
 	// Content translations
 	contents?: BrandContent[];
-};
-
-// Form values type for creating/editing a brand
-export type BrandFormValuesType = {
-	name: string | null;
-	slug: string | null;
-	brand_type: BrandType;
-
-	contents: BrandContent[];
 };
 
 // Helpers

@@ -1,15 +1,12 @@
 import { resolveRequestPath } from '@/config/data-source.config';
 import { ApiRequest } from '@/helpers/api.helper';
-import type {
-	WorkSessionVehicleFormValuesType,
-	WorkSessionVehicleModel,
-} from '@/models/work-session-vehicle.model';
+import type { WorkSessionVehicleModel } from '@/models/work-session-vehicle.model';
 import type { ApiResponseFetch } from '@/types/api.type';
 
-export const createWorkSessionVehicle = async (
-	params: Partial<WorkSessionVehicleFormValuesType>,
+export async function createWorkSessionVehicle<P>(
+	params: Partial<P>,
 	work_session_id: number | null,
-): Promise<ApiResponseFetch<WorkSessionVehicleModel>> => {
+): Promise<ApiResponseFetch<WorkSessionVehicleModel>> {
 	return await new ApiRequest().doFetch(
 		`/${resolveRequestPath('work-session-vehicle')}/${work_session_id}`,
 		{
@@ -17,10 +14,10 @@ export const createWorkSessionVehicle = async (
 			body: JSON.stringify(params),
 		},
 	);
-};
+}
 
-export async function updateWorkSessionVehicle(
-	params: Partial<WorkSessionVehicleFormValuesType>,
+export async function updateWorkSessionVehicle<P>(
+	params: Partial<P>,
 	id: number,
 	work_session_id: number | null,
 ): Promise<ApiResponseFetch<WorkSessionVehicleModel>> {

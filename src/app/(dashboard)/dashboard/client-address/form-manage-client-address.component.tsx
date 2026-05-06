@@ -18,7 +18,6 @@ import {
 	getClientDisplayName,
 } from '@/models/client.model';
 import {
-	type ClientAddressFormValuesType,
 	type ClientAddressType,
 	ClientAddressTypeEnum,
 } from '@/models/client-address.model';
@@ -33,6 +32,17 @@ import { useModalStore } from '@/stores/window.store';
 import type { FindFunctionResponseType } from '@/types/action.type';
 import type { ApiResponseFetch } from '@/types/api.type';
 import { DataSourceSectionEnum } from '@/types/data-source.type';
+
+export type ClientAddressFormValuesType = {
+	address_type: ClientAddressType;
+	client_id: number | null;
+	client: string | null;
+	city_id: number | null;
+	city: string | null;
+	details: string | null;
+	postal_code: string | null;
+	notes: string | null;
+};
 
 const language = await getLanguage();
 const addressTypes = toOptionsFromEnum(ClientAddressTypeEnum, {

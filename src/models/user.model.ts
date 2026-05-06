@@ -39,13 +39,3 @@ export type UserModel<D = Date | string> = {
 	updated_at: D;
 	deleted_at: D;
 };
-
-export type UserFormValuesType = Pick<
-	UserModel,
-	'language' | 'role' | 'operator_type'
-> & {
-	name: string | null;
-	email: string | null;
-	password: string | null;
-	password_confirm: string | null;
-};

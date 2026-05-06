@@ -1,6 +1,10 @@
-import { dateDiff, formatDate } from '@/helpers/date.helper';
+import {
+	combineDateAndTime,
+	createCurrentDate,
+	dateDiff,
+	formatDate,
+} from '@/helpers/date.helper';
 import type { UserModel } from '@/models/user.model';
-import type { WorkSessionVehicleModel } from '@/models/work-session-vehicle.model';
 import type { StatusTransitions } from '@/types/common.type';
 
 export const WorkSessionStatusEnum = {
@@ -30,29 +34,39 @@ export type WorkSessionModel<D = Date | string> = {
 	created_at: D;
 	updated_at: D;
 	deleted_at: D;
-
-	work_session_vehicle?: WorkSessionVehicleModel[];
-};
-
-export type WorkSessionFormValuesType = {
-	user_id: number | null;
-	user: string | null;
-	start_at: string | null;
-	start_at_time: string | null;
-	end_at_time: string | null;
 };
 
 export const START_AT_MAX_PAST_SECONDS = 1800;
 export const END_AT_MAX_FUTURE_SECONDS = 1800;
 
 export function displayWorkSessionDuration(entry: WorkSessionModel) {
-	if (!entry.end_at) {
-		return 'n/a';
-	}
-
-	return dateDiff(entry.start_at, entry.end_at, 'display');
+	return dateDiff(
+		entry.start_at,
+		entry.end_at ?? createCurrentDate(),
+		'display',
+	);
 }
 
 export function getWorkSessionDisplayName(entry: WorkSessionModel) {
 	return `${entry.user.name} ${formatDate(entry.start_at, 'date-time')}`;
+}
+
+export function determineStartAt(start_at: Date, start_at_time: string) {
+	return combineDateAndTime(start_at, start_at_time);
+}
+
+export function determineEndAt(
+	start_at: Date,
+	start_at_time: string,
+	end_at_time: string,
+) {
+	const isOverMidnight = end_at_time < start_at_time;
+
+	const end_at = new Date(start_at);
+
+	if (isOverMidnight) {
+		end_at.setDate(end_at.getDate() + 1);
+	}
+
+	return combineDateAndTime(end_at, end_at_time);
 }

@@ -1,6 +1,9 @@
 import { z } from 'zod';
 import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
-import { FormManageCashFlow } from '@/app/(dashboard)/dashboard/cash-flow/form-manage-cash-flow.component';
+import {
+	type CashFlowFormValuesType,
+	FormManageCashFlow,
+} from '@/app/(dashboard)/dashboard/cash-flow/form-manage-cash-flow.component';
 import { ViewCashFlow } from '@/app/(dashboard)/dashboard/cash-flow/view-cash-flow.component';
 import type {
 	DataSourceConfigType,
@@ -30,7 +33,6 @@ import {
 	CashFlowCategoryEnum,
 	type CashFlowDirection,
 	CashFlowDirectionEnum,
-	type CashFlowFormValuesType,
 	type CashFlowMethod,
 	CashFlowMethodEnum,
 	type CashFlowModel,

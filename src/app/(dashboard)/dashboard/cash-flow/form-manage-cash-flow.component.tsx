@@ -10,13 +10,27 @@ import { useElementIds } from '@/hooks/use-element-ids.hook';
 import {
 	type CashFlowCategory,
 	CashFlowCategoryEnum,
-	type CashFlowFormValuesType,
 	type CashFlowMethod,
 	CashFlowMethodEnum,
 	filterGroupedCategories,
 } from '@/models/cash-flow.model';
 import { useWindowForm } from '@/providers/window-form.provider';
 import { type Currency, CurrencyEnum } from '@/types/common.type';
+
+export type CashFlowFormValuesType = {
+	category: CashFlowCategory;
+	method: CashFlowMethod;
+
+	amount: number | null;
+	vat_rate: number | null;
+	currency: Currency;
+
+	external_reference: string | null;
+
+	parent_id: number | null;
+
+	notes: string | null;
+};
 
 const groupedCategories = filterGroupedCategories([
 	CashFlowCategoryEnum.REFUND,

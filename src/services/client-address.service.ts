@@ -1,15 +1,12 @@
 import { resolveRequestPath } from '@/config/data-source.config';
 import { ApiRequest } from '@/helpers/api.helper';
-import type {
-	ClientAddressFormValuesType,
-	ClientAddressModel,
-} from '@/models/client-address.model';
+import type { ClientAddressModel } from '@/models/client-address.model';
 import type { ApiResponseFetch } from '@/types/api.type';
 
-export const createClientAddress = async (
-	params: Partial<ClientAddressFormValuesType>,
+export async function createClientAddress<P>(
+	params: Partial<P>,
 	client_id: number | null,
-): Promise<ApiResponseFetch<ClientAddressModel>> => {
+): Promise<ApiResponseFetch<ClientAddressModel>> {
 	return await new ApiRequest().doFetch(
 		`/${resolveRequestPath('client-address')}/${client_id}`,
 		{
@@ -17,10 +14,10 @@ export const createClientAddress = async (
 			body: JSON.stringify(params),
 		},
 	);
-};
+}
 
-export async function updateClientAddress(
-	params: Partial<ClientAddressFormValuesType>,
+export async function updateClientAddress<P>(
+	params: Partial<P>,
 	id: number,
 	client_id: number | null,
 ): Promise<ApiResponseFetch<ClientAddressModel>> {

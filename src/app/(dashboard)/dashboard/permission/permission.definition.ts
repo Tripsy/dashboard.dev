@@ -1,6 +1,9 @@
 import { z } from 'zod';
 import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
-import { FormManagePermission } from '@/app/(dashboard)/dashboard/permission/form-manage-permission.component';
+import {
+	FormManagePermission,
+	type PermissionFormValuesType,
+} from '@/app/(dashboard)/dashboard/permission/form-manage-permission.component';
 import type {
 	DataSourceConfigType,
 	DataTableColumnType,
@@ -15,10 +18,7 @@ import {
 	requestUpdate,
 } from '@/helpers/services.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
-import type {
-	PermissionFormValuesType,
-	PermissionModel,
-} from '@/models/permission.model';
+import type { PermissionModel } from '@/models/permission.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
 import type { FormStateType } from '@/types/form.type';
 

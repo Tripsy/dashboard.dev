@@ -11,13 +11,20 @@ import { formatEnumLabel } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import {
 	type BrandContent,
-	type BrandFormValuesType,
 	type BrandType,
 	BrandTypeEnum,
 } from '@/models/brand.model';
 import { useWindowForm } from '@/providers/window-form.provider';
 import { type Language, LanguageEnum } from '@/types/common.type';
 import type { PageMeta } from '@/types/page-meta.type';
+
+export type BrandFormValuesType = {
+	name: string | null;
+	slug: string | null;
+	brand_type: BrandType;
+
+	contents: BrandContent[];
+};
 
 const languages = Object.values(LanguageEnum);
 

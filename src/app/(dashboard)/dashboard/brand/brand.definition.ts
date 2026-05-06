@@ -1,6 +1,9 @@
 import { z } from 'zod';
 import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
-import { FormManageBrand } from '@/app/(dashboard)/dashboard/brand/form-manage-brand.component';
+import {
+	type BrandFormValuesType,
+	FormManageBrand,
+} from '@/app/(dashboard)/dashboard/brand/form-manage-brand.component';
 import { ViewBrand } from '@/app/(dashboard)/dashboard/brand/view-brand.component';
 import type {
 	DataSourceConfigType,
@@ -22,7 +25,6 @@ import { BaseValidator } from '@/helpers/validator.helper';
 import {
 	BRAND_DEFAULT_TYPE,
 	type BrandContent,
-	type BrandFormValuesType,
 	type BrandModel,
 	type BrandStatus,
 	BrandStatusEnum,

@@ -11,15 +11,22 @@ import { formatEnumLabel } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useRemoteAutocomplete } from '@/hooks/use-remote-autocomplete';
 import { type BrandModel, BrandTypeEnum } from '@/models/brand.model';
-import {
-	type VehicleFormValuesType,
-	type VehicleType,
-	VehicleTypeEnum,
-} from '@/models/vehicle.model';
+import { type VehicleType, VehicleTypeEnum } from '@/models/vehicle.model';
 import { useWindowForm } from '@/providers/window-form.provider';
 import { useModalStore } from '@/stores/window.store';
 import type { FindFunctionResponseType } from '@/types/action.type';
 import { DataSourceSectionEnum } from '@/types/data-source.type';
+
+export type VehicleFormValuesType = {
+	brand_id: number | null;
+	brand: string | null;
+	vehicle_type: VehicleType;
+	model: string | null;
+	length: number | null;
+	width: number | null;
+	height: number | null;
+	weight: number | null;
+};
 
 const vehicleTypes = toOptionsFromEnum(VehicleTypeEnum, {
 	formatter: formatEnumLabel,

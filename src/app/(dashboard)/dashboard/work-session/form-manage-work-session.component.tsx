@@ -24,7 +24,14 @@ import {
 } from '@/models/work-session.model';
 import { useWindowForm } from '@/providers/window-form.provider';
 import type { FindFunctionResponseType } from '@/types/action.type';
-import {WorkSessionFormValuesType} from "@/app/(dashboard)/dashboard/work-session/work-session.definition";
+
+export type WorkSessionFormValuesType = {
+	user_id: number | null;
+	user: string | null;
+	start_at: string | null;
+	start_at_time: string | null;
+	end_at_time: string | null;
+};
 
 export function FormManageWorkSession() {
 	const { formValues, errors, handleChange, pending } =

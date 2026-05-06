@@ -36,14 +36,3 @@ export type VehicleModel<D = Date | string> = {
 	updated_at: D;
 	deleted_at: D;
 };
-
-export type VehicleFormValuesType = {
-	brand_id: number | null;
-	brand: string | null;
-	vehicle_type: VehicleType;
-	model: string | null;
-	length: number | null;
-	width: number | null;
-	height: number | null;
-	weight: number | null;
-};

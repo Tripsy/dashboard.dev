@@ -1,6 +1,9 @@
 import { z } from 'zod';
 import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
-import { FormManageCompanyVehicle } from '@/app/(dashboard)/dashboard/company-vehicle/form-manage-company-vehicle.component';
+import {
+	type CompanyVehicleFormValuesType,
+	FormManageCompanyVehicle,
+} from '@/app/(dashboard)/dashboard/company-vehicle/form-manage-company-vehicle.component';
 import { StatusTransitionCompanyVehicle } from '@/app/(dashboard)/dashboard/company-vehicle/status-transition-company-vehicle.component';
 import { ViewCompanyVehicle } from '@/app/(dashboard)/dashboard/company-vehicle/view-company-vehicle.component';
 import type {
@@ -24,7 +27,6 @@ import {
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import {
-	type CompanyVehicleFormValuesType,
 	type CompanyVehicleModel,
 	type CompanyVehicleScope,
 	CompanyVehicleScopeEnum,

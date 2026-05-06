@@ -1,6 +1,9 @@
 import { z } from 'zod';
 import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
-import { FormManageVehicle } from '@/app/(dashboard)/dashboard/vehicle/form-manage-vehicle.component';
+import {
+	FormManageVehicle,
+	type VehicleFormValuesType,
+} from '@/app/(dashboard)/dashboard/vehicle/form-manage-vehicle.component';
 import { ViewVehicle } from '@/app/(dashboard)/dashboard/vehicle/view-vehicle.component';
 import type {
 	DataSourceConfigType,
@@ -24,7 +27,6 @@ import {
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import {
-	type VehicleFormValuesType,
 	type VehicleModel,
 	type VehicleStatus,
 	VehicleStatusEnum,

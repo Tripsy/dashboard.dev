@@ -10,7 +10,6 @@ import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import {
-	type UserFormValuesType,
 	type UserOperatorType,
 	UserOperatorTypeEnum,
 	type UserRole,
@@ -18,6 +17,16 @@ import {
 } from '@/models/user.model';
 import { useWindowForm } from '@/providers/window-form.provider';
 import { type Language, LanguageEnum } from '@/types/common.type';
+
+export type UserFormValuesType = {
+	name: string | null;
+	email: string | null;
+	password: string | null;
+	password_confirm: string | null;
+	language: Language;
+	role: UserRole;
+	operator_type: UserOperatorType | null;
+};
 
 const roles = toOptionsFromEnum(UserRoleEnum, {
 	formatter: formatEnumLabel,

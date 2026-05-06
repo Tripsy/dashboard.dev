@@ -1,6 +1,9 @@
 import { z } from 'zod';
 import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
-import { FormManageClient } from '@/app/(dashboard)/dashboard/client/form-manage-client.component';
+import {
+	type ClientFormValuesType,
+	FormManageClient,
+} from '@/app/(dashboard)/dashboard/client/form-manage-client.component';
 import { ViewClient } from '@/app/(dashboard)/dashboard/client/view-client.component';
 import type {
 	DataSourceConfigType,
@@ -19,7 +22,6 @@ import {
 } from '@/helpers/services.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import {
-	type ClientFormValuesType,
 	type ClientModel,
 	type ClientStatus,
 	ClientStatusEnum,

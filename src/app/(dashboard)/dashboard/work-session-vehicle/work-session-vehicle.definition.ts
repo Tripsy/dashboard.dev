@@ -1,6 +1,9 @@
 import { z } from 'zod';
 import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
-import { FormManageWorkSessionVehicle } from '@/app/(dashboard)/dashboard/work-session-vehicle/form-manage-work-session-vehicle.component';
+import {
+	FormManageWorkSessionVehicle,
+	type WorkSessionVehicleFormValuesType,
+} from '@/app/(dashboard)/dashboard/work-session-vehicle/form-manage-work-session-vehicle.component';
 import { ViewWorkSessionVehicle } from '@/app/(dashboard)/dashboard/work-session-vehicle/view-work-session-vehicle.component';
 import type {
 	DataSourceConfigType,
@@ -21,7 +24,6 @@ import {
 } from '@/models/work-session.model';
 import {
 	getWorkSessionVehicleDisplayName,
-	type WorkSessionVehicleFormValuesType,
 	type WorkSessionVehicleModel,
 	type WorkSessionVehicleStatus,
 	WorkSessionVehicleStatusEnum,

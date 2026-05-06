@@ -4,10 +4,14 @@ import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useLocalAutocomplete } from '@/hooks/use-local-autocomplete';
 import {
 	PermissionEntitiesSuggestions,
-	type PermissionFormValuesType,
 	PermissionOperationSuggestions,
 } from '@/models/permission.model';
 import { useWindowForm } from '@/providers/window-form.provider';
+
+export type PermissionFormValuesType = {
+	entity: string | null;
+	operation: string | null;
+};
 
 export function FormManagePermission() {
 	const { formValues, errors, handleChange, pending } =

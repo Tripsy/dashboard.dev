@@ -37,14 +37,6 @@ export type PlaceModel<D = Date | string> = {
 	deleted_at: D;
 };
 
-export type PlaceFormValuesType = {
-	place_type: PlaceType;
-	code: string | null;
-	parent_id: number | null;
-	parent: string | null;
-	contents: PlaceContent[];
-};
-
 // Helpers
 export function getPlaceContentProp(
 	place: PlaceModel,

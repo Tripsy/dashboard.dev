@@ -172,7 +172,7 @@ export function FormManageClientAddress() {
 						allowCreate: true,
 
 						onCreate: (value) => {
-							open<ClientModel>({
+							open({
 								section: DataSourceSectionEnum.DASHBOARD,
 								dataSource: 'client',
 								action: 'create',

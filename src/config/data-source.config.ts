@@ -231,7 +231,7 @@ export type DataSourceConfigType<
 	FormValues extends FormValuesType = FormValuesType,
 	ValidatedValues = FormValues,
 > = {
-	dataTable: {
+	dataTable?: {
 		state: DataTableStateType;
 		columns: DataTableColumnType<Entry>[];
 		find: FindFunctionType<Entry>;

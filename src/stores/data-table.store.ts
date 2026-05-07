@@ -8,6 +8,7 @@ import {
 	type DataTableStateType,
 	getDataSourceConfig,
 } from '@/config/data-source.config';
+import { assertDefined } from '@/helpers/types.helper';
 import type { DataSourceSection } from '@/types/data-source.type';
 
 // ============================================================================
@@ -31,7 +32,10 @@ export const createDataTableSlice =
 	> =>
 	(set) => ({
 		tableState: structuredClone(
-			getDataSourceConfig(section, dataSource, 'dataTable').state,
+			assertDefined(
+				getDataSourceConfig(section, dataSource, 'dataTable'),
+				`dataTable config not defined for ${dataSource}`,
+			).state,
 		),
 
 		updateTableState: (newState) =>

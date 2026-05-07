@@ -12,6 +12,7 @@ import client_address from '@/locales/en/client-address.json';
 import company_vehicle from '@/locales/en/company-vehicle.json';
 import cron_history from '@/locales/en/cron-history.json';
 import dashboard from '@/locales/en/dashboard.json';
+import driver_panel from '@/locales/en/driver-panel.json';
 import email_confirm from '@/locales/en/email-confirm.json';
 import email_confirm_send from '@/locales/en/email-confirm-send.json';
 import home from '@/locales/en/home.json';
@@ -32,6 +33,7 @@ import work_session from '@/locales/en/work-session.json';
 import work_session_vehicle from '@/locales/en/work-session-vehicle.json';
 
 const en = {
+	// BE
 	'account-delete': account_delete,
 	'account-edit': account_edit,
 	'account-email-update': account_email_update,
@@ -65,6 +67,9 @@ const en = {
 	'company-vehicle': company_vehicle,
 	'work-session': work_session,
 	'work-session-vehicle': work_session_vehicle,
+
+	// FE
+	'driver-panel': driver_panel,
 };
 
 export default en;

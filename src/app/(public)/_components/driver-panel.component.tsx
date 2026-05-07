@@ -1,24 +1,35 @@
 'use client';
 
 import { useQueryClient } from '@tanstack/react-query';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
+import {
+	prepareParamsFromFormValues,
+	type WorkSessionCreateOutput,
+} from '@/app/(public)/_components/work-session/work-session.definition';
+import { useWorkSession } from '@/app/(public)/_providers/work-session.provider';
 import { Icons } from '@/components/icon.component';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Routes from '@/config/routes.setup';
-import { createCurrentDate, dateDiff, formatDate } from '@/helpers/date.helper';
+import { createCurrentDate, formatDate } from '@/helpers/date.helper';
 import { DisplayStatus } from '@/helpers/display.helper';
+import { requestCreate } from '@/helpers/services.helper';
 import { getCompanyVehicleDisplayName } from '@/models/company-vehicle.model';
-import type { WorkSessionModel } from '@/models/work-session.model';
+import {
+	displayWorkSessionDuration,
+	type WorkSessionModel,
+} from '@/models/work-session.model';
 import {
 	type WorkSessionVehicleModel,
 	WorkSessionVehicleStatusEnum,
 } from '@/models/work-session-vehicle.model';
-import { useWorkSession } from '@/providers/work-session.provider';
+import { useAuth } from '@/providers/auth.provider';
 import { useModalStore } from '@/stores/window.store';
+import type { WorkSessionType } from '@/types/auth.type';
+import type { WindowDefinition } from '@/types/window.type';
 
-export function DriverPanelSession({ session }: { session: WorkSessionModel }) {
+export function DriverPanelSession({ session }: { session: WorkSessionType }) {
 	const { open } = useModalStore();
 
 	const queryClient = useQueryClient();
@@ -42,6 +53,7 @@ export function DriverPanelSession({ session }: { session: WorkSessionModel }) {
 			},
 			events: {
 				success: async () => {
+					console.log('doing things');
 					await invalidateWorkSessionVehicle();
 				},
 			},
@@ -68,7 +80,7 @@ export function DriverPanelSession({ session }: { session: WorkSessionModel }) {
 				</div>
 				<div className="px-4 py-3 text-sm whitespace-nowrap flex items-center">
 					<Icons.Clock className="mr-2 h-4 w-4" />
-					{dateDiff(session.start_at, createCurrentDate(), 'display')}
+					{displayWorkSessionDuration(session)}
 				</div>
 			</div>
 
@@ -89,10 +101,8 @@ export function DriverPanelSession({ session }: { session: WorkSessionModel }) {
 
 export function DriverPanelSessionVehicles({
 	session,
-	sessionVehicles,
 }: {
-	session: WorkSessionModel;
-	sessionVehicles?: WorkSessionVehicleModel[];
+	session: WorkSessionType;
 }) {
 	const { open } = useModalStore();
 
@@ -168,7 +178,7 @@ export function DriverPanelSessionVehicles({
 
 	return (
 		<div>
-			{sessionVehicles?.map((m) => (
+			{session.work_session_vehicle?.map((m) => (
 				<div
 					key={m.id}
 					className="bg-card border border-border rounded-lg p-4 mb-3"
@@ -234,40 +244,49 @@ export function DriverPanelSessionVehicles({
 export function DriverPanel() {
 	const { activeSession, recentSessions } = useWorkSession();
 
-	// const { open } = useModalStore();
-	//
-	// const queryClient = useQueryClient();
-	//
-	// const invalidateWorkSessionVehicle = useCallback(
-	// 	() =>
-	// 		queryClient.invalidateQueries({
-	// 			queryKey: ['work-session-vehicle', activeSession.id],
-	// 		}),
-	// 	[queryClient, activeSession],
-	// );
-	//
-	// const openCreate = useCallback(() => {
-	// 	open({
-	// 		minimized: false,
-	// 		section: 'public',
-	// 		dataSource: 'work-session-vehicle',
-	// 		action: 'create',
-	// 		data: {
-	// 			prefillEntry: {
-	// 				work_session: activeSession,
-	// 			},
-	// 		},
-	// 		events: {
-	// 			success: async () => {
-	// 				await invalidateWorkSessionVehicle();
-	// 			},
-	// 		},
-	// 	});
-	// }, [
-	// 	open,
-	// 	activeSession,
-	// 	invalidateWorkSessionVehicle,
-	// ]);
+	const { auth } = useAuth();
+	const router = useRouter();
+	const { open } = useModalStore();
+	const { refreshSession } = useWorkSession();
+
+	const handleStartSession = useCallback(() => {
+		if (!auth) {
+			throw new Error('Not authenticated');
+		}
+
+		open({
+			minimized: false,
+			section: 'public',
+			dataSource: 'work-session',
+			action: 'create',
+			data: {
+				prefillEntry: {
+					start_at: createCurrentDate(),
+				},
+			},
+			definition: {
+				operationFunction: (values: WorkSessionCreateOutput) => {
+					const params = prepareParamsFromFormValues(auth, values);
+
+					return requestCreate<WorkSessionModel, typeof params>(
+						'work-session',
+						params,
+					);
+				},
+			} as WindowDefinition<WorkSessionCreateOutput, WorkSessionModel>,
+			events: {
+				success: async () => {
+					console.log('doing things after handleStartSession');
+					await refreshSession();
+				},
+			},
+		});
+	}, [open, refreshSession, auth]);
+
+	if (!auth) {
+		router.replace(Routes.get('login'));
+		return null;
+	}
 
 	return (
 		<section className="py-12 md:py-20">
@@ -301,9 +320,6 @@ export function DriverPanel() {
 								<TabsContent value="sessionVehicles">
 									<DriverPanelSessionVehicles
 										session={activeSession}
-										sessionVehicles={
-											activeSession.work_session_vehicle
-										}
 									/>
 								</TabsContent>
 							</Tabs>
@@ -316,6 +332,7 @@ export function DriverPanel() {
 							<Button
 								size="lg"
 								className="h-12 px-8 text-base max-w-48"
+								onClick={handleStartSession}
 							>
 								Start session
 								<Icons.Clock className="ml-2 h-5 w-5" />

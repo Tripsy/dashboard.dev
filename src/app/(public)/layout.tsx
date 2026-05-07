@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { DataSourceRegistrar } from '@/app/(dashboard)/_components/data-source-registrar.component';
+import { DataSourceRegistrar } from '@/app/(public)/_components/data-source-registrar.component';
 import { Footer } from '@/components/layout/footer.default';
 import { Header } from '@/components/layout/header.default';
 import { WindowContainer } from '@/components/window/window-container.component';

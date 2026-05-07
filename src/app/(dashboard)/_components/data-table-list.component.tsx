@@ -20,6 +20,7 @@ import {
 } from '@/config/data-source.config';
 import { toUTCISOString } from '@/helpers/date.helper';
 import { replaceVars } from '@/helpers/string.helper';
+import { assertDefined } from '@/helpers/types.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import type { QueryFiltersType } from '@/types/api.type';
 import { DataSourceSectionEnum } from '@/types/data-source.type';
@@ -88,10 +89,13 @@ export default function DataTableList<Model extends DataTableValue>(props: {
 
 	const dataTable = useMemo(
 		() =>
-			getDataSourceConfig(
-				DataSourceSectionEnum.DASHBOARD,
-				dataSource,
-				'dataTable',
+			assertDefined(
+				getDataSourceConfig(
+					DataSourceSectionEnum.DASHBOARD,
+					dataSource,
+					'dataTable',
+				),
+				`dataTable config not defined for ${dataSource}`,
 			),
 		[dataSource],
 	);

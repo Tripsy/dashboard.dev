@@ -7,6 +7,7 @@ import {
 import ValueError from '@/exceptions/value.error';
 import { generateWindowUid } from '@/helpers/window.helper';
 import { DataSourceSectionEnum } from '@/types/data-source.type';
+import type { FormValuesType } from '@/types/form.type';
 import type {
 	WindowConfig,
 	WindowCreateConfig,
@@ -16,8 +17,8 @@ import type {
 
 type WindowStore = {
 	stack: WindowConfig[];
-	open: <Entry extends WindowEntryType>(
-		config: WindowCreateConfig<Entry>,
+	open: <FormValues extends FormValuesType, Entry extends WindowEntryType>(
+		config: WindowCreateConfig<FormValues, Entry>,
 		replacedUid?: string,
 	) => string; // If argument `replacedUid` is provided and a window exists it will be closed
 	close: (uid?: string) => void; // Removes from stack
@@ -29,8 +30,8 @@ type WindowStore = {
 };
 
 // Helper to prepare config on create
-const prepareConfigOnCreate = <Entry extends WindowEntryType>(
-	config: WindowCreateConfig<Entry>,
+const prepareConfigOnCreate = (
+	config: WindowCreateConfig<FormValuesType, WindowEntryType>,
 ): WindowConfig => {
 	const enrichedConfig = { ...config };
 
@@ -63,7 +64,8 @@ const prepareConfigOnCreate = <Entry extends WindowEntryType>(
 				windowTitle: actionConfig.windowTitle,
 				windowComponent: actionConfig.windowComponent,
 				entriesSelection: actionConfig.entriesSelection,
-				operationFunction: actionConfig.operationFunction,
+				operationFunction:
+					actionConfig.operationFunction as WindowDefinition['operationFunction'],
 				button: actionConfig.button,
 				validateForm: actionConfig.validateForm,
 				getFormValues: actionConfig.getFormValues,
@@ -75,7 +77,7 @@ const prepareConfigOnCreate = <Entry extends WindowEntryType>(
 					enrichedConfig.dataSource as DataSourceKey,
 					'displayEntryLabel',
 				),
-			};
+			} as WindowDefinition;
 
 			// Return complete WindowConfig
 			return {
@@ -88,7 +90,10 @@ const prepareConfigOnCreate = <Entry extends WindowEntryType>(
 						entriesSelection: actionConfig.entriesSelection,
 						entries: enrichedConfig.data?.entries,
 					}),
-				definition,
+				definition: {
+					...definition,
+					...enrichedConfig.definition,
+				},
 				props: {
 					...actionConfig.windowConfigProps,
 					...enrichedConfig.props,
@@ -114,11 +119,6 @@ export const useModalStore = create<WindowStore>()(
 					return get().stack.some((window) => window.uid === uid);
 				};
 
-				// // Private helper to get focused (top) window
-				// const getFocusedWindow = (): WindowConfig | undefined => {
-				// 	return get().stack.find((m) => !m.minimized);
-				// };
-
 				const minimizeAll = (stack: WindowConfig[]): WindowConfig[] =>
 					stack.map((m) =>
 						m.minimized ? m : { ...m, minimized: true },
@@ -133,7 +133,12 @@ export const useModalStore = create<WindowStore>()(
 							get().close(replacedUid);
 						}
 
-						const preparedConfig = prepareConfigOnCreate(config);
+						const preparedConfig = prepareConfigOnCreate(
+							config as WindowCreateConfig<
+								FormValuesType,
+								WindowEntryType
+							>,
+						);
 						const alreadyExists = windowExists(preparedConfig.uid);
 
 						set((state) => {
@@ -223,7 +228,12 @@ export const useModalStore = create<WindowStore>()(
 					}
 
 					const serializedStack =
-						state.stack as unknown as WindowCreateConfig[];
+						state.stack as unknown as WindowCreateConfig<
+							// biome-ignore lint/suspicious/noExplicitAny: ok
+							any,
+							// biome-ignore lint/suspicious/noExplicitAny: ok
+							any
+						>[];
 
 					state.stack = serializedStack
 						.map((window) => {

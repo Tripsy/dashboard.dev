@@ -15,6 +15,7 @@ import {
 	type DataTableStateType,
 	getDataSourceConfig,
 } from '@/config/data-source.config';
+import { assertDefined } from '@/helpers/types.helper';
 import { useDebouncedEffect } from '@/hooks/use-debounced-effect.hook';
 import {
 	createDataTableStore,
@@ -53,10 +54,13 @@ function DataTableProvider<K extends DataSourceKey, Model>({
 
 	const dataTable = useMemo(
 		() =>
-			getDataSourceConfig(
-				DataSourceSectionEnum.DASHBOARD,
-				dataSource,
-				'dataTable',
+			assertDefined(
+				getDataSourceConfig(
+					DataSourceSectionEnum.DASHBOARD,
+					dataSource,
+					'dataTable',
+				),
+				`dataTable config not defined for ${dataSource}`,
 			),
 		[dataSource],
 	);

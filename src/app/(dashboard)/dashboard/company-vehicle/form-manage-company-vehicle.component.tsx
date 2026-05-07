@@ -118,7 +118,7 @@ export function FormManageCompanyVehicle() {
 					allowCreate: true,
 
 					onCreate: (value) => {
-						open<VehicleModel>({
+						open({
 							section: DataSourceSectionEnum.DASHBOARD,
 							dataSource: 'vehicle',
 							action: 'create',

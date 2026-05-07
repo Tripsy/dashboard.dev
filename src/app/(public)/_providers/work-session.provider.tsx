@@ -18,6 +18,7 @@ import {
 } from '@/models/work-session.model';
 import type { WorkSessionVehicleModel } from '@/models/work-session-vehicle.model';
 import { useAuth } from '@/providers/auth.provider';
+import type { WorkSessionType } from '@/types/auth.type';
 
 type SessionStatus =
 	| 'loading'
@@ -28,7 +29,7 @@ type SessionStatus =
 
 type WorkSessionContextType = {
 	recentSessions: WorkSessionModel[];
-	activeSession: WorkSessionModel | null;
+	activeSession: WorkSessionType | null;
 	sessionStatus: SessionStatus;
 	refreshSession: () => Promise<void>;
 };
@@ -127,7 +128,10 @@ const WorkSessionProvider = ({
 	});
 
 	const activeSessionWithVehicles = useMemo(() => {
-		if (!activeSession) return null;
+		if (!activeSession) {
+			return null;
+		}
+
 		return {
 			...activeSession,
 			work_session_vehicle: vehiclesData?.entries ?? [],

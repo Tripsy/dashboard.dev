@@ -1,0 +1,22 @@
+{
+	"meta": {
+		"title": "My session | {{app_name}}"
+	},
+	"work-session": {
+		"validation": {
+			"invalid_start_at": "Invalid start date",
+			"invalid_start_at_time": "Invalid start time"
+		},
+		"action": {
+			"create": {
+				"title": "Start session",
+				"success": "New session started successfully"
+			},
+			"close": {
+				"title": "Close session",
+				"success": "Session marked as closed successfully",
+				"confirmText": "Are you sure you want to mark this session as closed?"
+			}
+		}
+	}
+}

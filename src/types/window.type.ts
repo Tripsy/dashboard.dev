@@ -40,12 +40,13 @@ export type WindowDefinition<
 	FormValues extends FormValuesType = FormValuesType,
 	Entry extends WindowEntryType = WindowEntryType,
 	T extends EntriesSelectionType = EntriesSelectionType,
+	Params extends Record<string, unknown> = Record<string, unknown>,
 > = {
 	entriesSelection: T;
 	windowType?: WindowType<T>;
 	windowTitle?: string;
 	windowComponent?: WindowComponent;
-	operationFunction?: OperationFunctionType<Entry, FormValues>;
+	operationFunction?: OperationFunctionType<Entry, Params>;
 	button?: ActionButtonPropsType;
 	validateForm?: ValidateFormFnType<FormValues>;
 	getFormValues?: GetFormValuesFnType<FormValues>;
@@ -77,7 +78,9 @@ export type WindowConfig<
 };
 
 export type WindowCreateConfig<
-	Entry extends WindowEntryType = WindowEntryType,
+	FormValues extends FormValuesType,
+	Entry extends WindowEntryType,
 > = Omit<WindowConfig<FormValuesType, Entry>, 'uid' | 'definition'> & {
 	uid?: string;
+	definition?: Partial<WindowDefinition<FormValues, Entry>>;
 };

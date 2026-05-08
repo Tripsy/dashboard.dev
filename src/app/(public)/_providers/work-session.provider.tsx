@@ -10,17 +10,14 @@ import {
 	useMemo,
 	useRef,
 } from 'react';
-import { requestFind } from '@/helpers/services.helper';
 import { isDriver } from '@/models/auth.model';
-import {
-	type WorkSessionModel,
-	WorkSessionStatusEnum,
-} from '@/models/work-session.model';
+import type { WorkSessionModel } from '@/models/work-session.model';
 import type { WorkSessionVehicleModel } from '@/models/work-session-vehicle.model';
 import { useAuth } from '@/providers/auth.provider';
+import { requestWorkSession } from '@/services/account.service';
 import type { WorkSessionType } from '@/types/auth.type';
 
-type SessionStatus =
+type SessionSituation =
 	| 'loading'
 	| 'active'
 	| 'missing'
@@ -28,9 +25,9 @@ type SessionStatus =
 	| 'error';
 
 type WorkSessionContextType = {
-	recentSessions: WorkSessionModel[];
-	activeSession: WorkSessionType | null;
-	sessionStatus: SessionStatus;
+	sessionSituation: SessionSituation;
+	activeSession: WorkSessionModel | null;
+	activeSessionVehicles: WorkSessionVehicleModel[];
 	refreshSession: () => Promise<void>;
 };
 
@@ -40,27 +37,11 @@ const WorkSessionContext = createContext<WorkSessionContextType | undefined>(
 	undefined,
 );
 
-function getActiveSession(
-	sessions: WorkSessionModel[],
-): WorkSessionModel | null {
-	return (
-		sessions.find(
-			(session) => session.status === WorkSessionStatusEnum.ACTIVE,
-		) || null
-	);
-}
-
-function getRecentSessions(sessions: WorkSessionModel[]): WorkSessionModel[] {
-	return sessions.filter(
-		(session) => session.status !== WorkSessionStatusEnum.ACTIVE,
-	);
-}
-
-function getSessionStatus(
+function getSessionSituation(
 	auth: ReturnType<typeof useAuth>['auth'],
 	isLoading: boolean,
-	activeSession: WorkSessionModel | null,
-): SessionStatus {
+	workSession: WorkSessionModel | null,
+): SessionSituation {
 	if (!isDriver(auth)) {
 		return 'not-applicable';
 	}
@@ -69,22 +50,22 @@ function getSessionStatus(
 		return 'loading';
 	}
 
-	return activeSession ? 'active' : 'missing';
+	return workSession ? 'active' : 'missing';
 }
 
 const WorkSessionProvider = ({
 	children,
-	initSessions = [],
+	initSession,
 }: {
 	children: ReactNode;
-	initSessions?: WorkSessionModel[];
+	initSession?: WorkSessionType;
 }) => {
 	const { auth } = useAuth();
 
 	const {
-		data: sessionsData,
-		isLoading: isSessionsLoading,
-		refetch: refetchSessions,
+		data: sessionData,
+		isLoading: isSessionLoading,
+		refetch: refetchSession,
 	} = useQuery({
 		queryKey: ['work-session', auth?.id],
 		queryFn: () => {
@@ -92,80 +73,38 @@ const WorkSessionProvider = ({
 				throw new Error('No auth');
 			}
 
-			return requestFind<WorkSessionModel>('work-session', {
-				filter: { user_id: auth.id },
-				limit: 10,
-				order_by: 'id',
-				direction: 'DESC',
-			});
+			return requestWorkSession();
 		},
 		enabled: isDriver(auth),
-		initialData:
-			initSessions.length > 0 ? { entries: initSessions } : undefined,
+		initialData: initSession,
 		staleTime: REFRESH_INTERVAL,
 	});
 
-	const sessions = sessionsData?.entries ?? [];
-	const activeSession = getActiveSession(sessions);
-	const recentSessions = getRecentSessions(sessions);
-
-	const { data: vehiclesData, refetch: refetchVehicles } = useQuery({
-		queryKey: ['work-session-vehicle', activeSession?.id],
-		queryFn: () => {
-			if (!activeSession?.id) {
-				throw new Error('No active session');
-			}
-
-			return requestFind<WorkSessionVehicleModel>(
-				'work-session-vehicle',
-				{
-					filter: { work_session_id: activeSession.id },
-				},
-			);
-		},
-		enabled: !!activeSession?.id,
-		staleTime: REFRESH_INTERVAL,
-	});
-
-	const activeSessionWithVehicles = useMemo(() => {
-		if (!activeSession) {
-			return null;
-		}
-
-		return {
-			...activeSession,
-			work_session_vehicle: vehiclesData?.entries ?? [],
-		};
-	}, [activeSession, vehiclesData]);
-
-	const sessionStatus = getSessionStatus(
+	const sessionSituation = getSessionSituation(
 		auth,
-		isSessionsLoading,
-		activeSession,
+		isSessionLoading,
+		sessionData?.workSession || null,
 	);
 
 	const sessionRefreshingRef = useRef(false);
 
 	const refreshSession = useCallback(
 		async ({ silent: _silent = false } = {}) => {
-			if (sessionRefreshingRef.current) return;
+			if (sessionRefreshingRef.current) {
+				return;
+			}
 
 			try {
 				sessionRefreshingRef.current = true;
 
-				const { data } = await refetchSessions();
-				const active = getActiveSession(data?.entries ?? []);
-
-				if (active?.id) {
-					await refetchVehicles();
-				}
+				await refetchSession();
 			} catch {
-				// sessionStatus is derived, error surfaces via query state
+				// Error surfaces via query state
 			} finally {
 				sessionRefreshingRef.current = false;
 			}
 		},
-		[refetchSessions, refetchVehicles],
+		[refetchSession],
 	);
 
 	useEffect(() => {
@@ -201,17 +140,12 @@ const WorkSessionProvider = ({
 
 	const contextValue = useMemo(
 		() => ({
-			recentSessions,
-			activeSession: activeSessionWithVehicles,
-			sessionStatus,
+			sessionSituation,
+			activeSession: sessionData?.workSession || null,
+			activeSessionVehicles: sessionData?.workSessionVehicles || [],
 			refreshSession,
 		}),
-		[
-			recentSessions,
-			activeSessionWithVehicles,
-			sessionStatus,
-			refreshSession,
-		],
+		[sessionSituation, sessionData, refreshSession],
 	);
 
 	return (

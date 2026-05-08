@@ -13,7 +13,7 @@ import type { RegisterFormValuesType } from '@/app/(public)/account/register/reg
 import { ApiRequest } from '@/helpers/api.helper';
 import type { UserModel } from '@/models/user.model';
 import type { ApiResponseFetch } from '@/types/api.type';
-import type { AuthTokenType } from '@/types/auth.type';
+import type { AuthTokenType, WorkSessionType } from '@/types/auth.type';
 
 export async function requestRegister(
 	params: RegisterFormValuesType,
@@ -143,4 +143,21 @@ export async function requestDeleteAccount(
 		method: 'DELETE',
 		body: JSON.stringify(params),
 	});
+}
+
+export async function requestWorkSession(): Promise<WorkSessionType | null> {
+	try {
+		const fetchResponse: ApiResponseFetch<WorkSessionType> =
+			await new ApiRequest().doFetch('/account/me/work-session', {
+				method: 'GET',
+			});
+
+		if (fetchResponse?.success) {
+			return fetchResponse.data || null;
+		}
+	} catch (error: unknown) {
+		console.error(error);
+	}
+
+	return null;
 }

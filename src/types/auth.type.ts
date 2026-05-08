@@ -8,6 +8,7 @@ export type AuthTokenType = {
 	used_now: boolean; // true - if is a match for the current session
 };
 
-export type WorkSessionType = WorkSessionModel & {
-	work_session_vehicle?: WorkSessionVehicleModel[];
+export type WorkSessionType = {
+	workSession: WorkSessionModel | null;
+	workSessionVehicles: WorkSessionVehicleModel[];
 };

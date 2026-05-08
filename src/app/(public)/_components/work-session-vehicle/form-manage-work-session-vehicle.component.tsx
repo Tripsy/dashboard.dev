@@ -13,12 +13,12 @@ import {
 	CompanyVehicleStatusEnum,
 	getCompanyVehicleDisplayName,
 } from '@/models/company-vehicle.model';
+import { type VehicleType, VehicleTypeEnum } from '@/models/vehicle.model';
 import { useWindowForm } from '@/providers/window-form.provider';
+import { useModalStore } from '@/stores/window.store';
 import type { FindFunctionResponseType } from '@/types/action.type';
 
 export type WorkSessionVehicleFormValuesType = {
-	work_session_id: number | null;
-
 	company_vehicle_id: number | null;
 	company_vehicle: string | null;
 
@@ -29,6 +29,13 @@ export type WorkSessionVehicleFormValuesType = {
 };
 
 export function FormManageWorkSessionVehicle() {
+	const { getCurrentWindow } = useModalStore();
+
+	const windowConfig = getCurrentWindow();
+	const windowConfigAction = windowConfig?.action;
+
+	const [vehicleType, setVehicleType] = useState<VehicleType | null>(null);
+
 	const { formValues, errors, handleChange, pending } =
 		useWindowForm<WorkSessionVehicleFormValuesType>();
 
@@ -68,11 +75,6 @@ export function FormManageWorkSessionVehicle() {
 		<>
 			<input
 				type="hidden"
-				name="work_session_id"
-				value={formValues.work_session_id ?? ''}
-			/>
-			<input
-				type="hidden"
 				name="company_vehicle_id"
 				value={formValues.company_vehicle_id ?? ''}
 			/>
@@ -103,6 +105,7 @@ export function FormManageWorkSessionVehicle() {
 							getCompanyVehicleDisplayName(m),
 						);
 						handleChange('company_vehicle_id', m.id);
+						setVehicleType(m.vehicle.vehicle_type);
 					},
 					getOptionLabel: (m) => getCompanyVehicleDisplayName(m),
 					getOptionKey: (m) => m.id,
@@ -114,32 +117,56 @@ export function FormManageWorkSessionVehicle() {
 				}}
 			/>
 
-			<div className="flex flex-wrap gap-2">
-				<FormComponentInput<WorkSessionVehicleFormValuesType>
-					labelText="Start Km"
-					id={elementIds.vehicle_km_start}
-					fieldName="vehicle_km_start"
-					fieldType="number"
-					fieldValue={formValues.vehicle_km_start ?? null}
-					disabled={pending}
-					onChange={(e) =>
-						handleChange('vehicle_km_start', Number(e.target.value))
-					}
-					error={errors.vehicle_km_start}
-				/>
-				<FormComponentInput<WorkSessionVehicleFormValuesType>
-					labelText="End Km"
-					id={elementIds.vehicle_km_end}
-					fieldName="vehicle_km_end"
-					fieldType="number"
-					fieldValue={formValues.vehicle_km_end ?? null}
-					disabled={pending}
-					onChange={(e) =>
-						handleChange('vehicle_km_end', Number(e.target.value))
-					}
-					error={errors.vehicle_km_end}
-				/>
-			</div>
+			{vehicleType !== VehicleTypeEnum.TRAILER && (
+				<div className="flex flex-wrap gap-2">
+					<FormComponentInput<WorkSessionVehicleFormValuesType>
+						labelText="Start Km"
+						id={elementIds.vehicle_km_start}
+						fieldName="vehicle_km_start"
+						fieldType="number"
+						fieldValue={formValues.vehicle_km_start ?? null}
+						disabled={pending}
+						onChange={(e) =>
+							handleChange(
+								'vehicle_km_start',
+								e.target.value === ''
+									? null
+									: Number(e.target.value),
+							)
+						}
+						error={errors.vehicle_km_start}
+					/>
+					{windowConfigAction === 'update' && (
+						<FormComponentInput<WorkSessionVehicleFormValuesType>
+							labelText="End Km"
+							id={elementIds.vehicle_km_end}
+							fieldName="vehicle_km_end"
+							fieldType="number"
+							fieldValue={formValues.vehicle_km_end ?? null}
+							disabled={pending}
+							onChange={(e) =>
+								handleChange(
+									'vehicle_km_end',
+									e.target.value === ''
+										? null
+										: Number(e.target.value),
+								)
+							}
+							error={errors.vehicle_km_end}
+						/>
+					)}
+				</div>
+			)}
+
+			<FormComponentInput<WorkSessionVehicleFormValuesType>
+				labelText="Notes"
+				id={elementIds.notes}
+				fieldName="notes"
+				fieldValue={formValues.notes ?? ''}
+				disabled={pending}
+				onChange={(e) => handleChange('notes', e.target.value)}
+				error={errors.notes}
+			/>
 		</>
 	);
 }

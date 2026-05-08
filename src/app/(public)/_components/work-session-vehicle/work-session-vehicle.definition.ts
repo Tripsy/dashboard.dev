@@ -1,4 +1,8 @@
 import { z } from 'zod';
+import {
+	FormManageWorkSessionVehicle,
+	type WorkSessionVehicleFormValuesType,
+} from '@/app/(public)/_components/work-session-vehicle/form-manage-work-session-vehicle.component';
 import type { DataSourceConfigType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import {
@@ -13,10 +17,8 @@ import {
 	WorkSessionVehicleStatusEnum,
 } from '@/models/work-session-vehicle.model';
 import {
-	createWorkSessionVehicle,
 	deleteWorkSessionVehicle,
 	updateStatusWorkSessionVehicle,
-	updateWorkSessionVehicle,
 } from '@/services/work-session-vehicle.service';
 import type { FormStateType } from '@/types/form.type';
 
@@ -42,9 +44,6 @@ class WorkSessionVehicleValidator extends BaseValidator<
 	manage = (isSubmit: boolean = true) =>
 		z
 			.object({
-				work_session_id: this.validateId(
-					this.getMessage('invalid_work_session_id'),
-				),
 				company_vehicle_id: this.validateId(
 					this.getMessage('invalid_company_vehicle_id'),
 					{
@@ -56,6 +55,9 @@ class WorkSessionVehicleValidator extends BaseValidator<
 				),
 				vehicle_km_start: this.validateNumber(
 					this.getMessage('invalid_vehicle_km_start'),
+					{
+						required: false,
+					},
 				),
 				vehicle_km_end: this.validateNumber(
 					this.getMessage('invalid_vehicle_km_end'),
@@ -93,7 +95,6 @@ function validateForm(
 
 function getFormValues(formData: FormData): WorkSessionVehicleFormValuesType {
 	return {
-		work_session_id: getFormDataAsNumber(formData, 'work_session_id'),
 		company_vehicle_id: getFormDataAsNumber(formData, 'company_vehicle_id'),
 		company_vehicle: getFormDataAsString(formData, 'company_vehicle'),
 		vehicle_km_start: getFormDataAsNumber(formData, 'vehicle_km_start'),
@@ -110,7 +111,6 @@ function getFormState(
 		message: null,
 		situation: null,
 		values: {
-			work_session_id: data?.work_session?.id ?? null,
 			company_vehicle_id: data?.company_vehicle?.id ?? null,
 			company_vehicle: data?.company_vehicle
 				? getCompanyVehicleDisplayName(data.company_vehicle)
@@ -139,11 +139,9 @@ export const dataSourceConfigWorkSessionVehicle: Omit<
 			windowComponent: FormManageWorkSessionVehicle,
 			permission: 'work-session-vehicle.create',
 			entriesSelection: 'free',
-			operationFunction: (params: WorkSessionVehicleFormValuesType) => {
-				const { work_session_id, company_vehicle, ...prepareParams } =
-					params;
-
-				return createWorkSessionVehicle(prepareParams, work_session_id);
+			operationFunction: () => {
+				// It is overridden in the component
+				throw new Error('Not defined here');
 			},
 			buttonPosition: 'hidden',
 			getFormValues: getFormValues,
@@ -156,18 +154,9 @@ export const dataSourceConfigWorkSessionVehicle: Omit<
 			windowComponent: FormManageWorkSessionVehicle,
 			permission: 'work-session-vehicle.update',
 			entriesSelection: 'single',
-			operationFunction: (
-				params: WorkSessionVehicleFormValuesType,
-				id: number,
-			) => {
-				const { work_session_id, company_vehicle, ...prepareParams } =
-					params;
-
-				return updateWorkSessionVehicle(
-					prepareParams,
-					id,
-					work_session_id,
-				);
+			operationFunction: () => {
+				// It is overridden in the component
+				throw new Error('Not defined here');
 			},
 			buttonPosition: 'left',
 			button: {

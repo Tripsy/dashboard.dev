@@ -6,6 +6,7 @@ export type FormSituationType =
 	| 'failedValidation'
 	| 'serverError'
 	| null;
+
 type FormValueType =
 	| string
 	| number
@@ -14,6 +15,7 @@ type FormValueType =
 	| PageMeta
 	| null
 	| undefined;
+
 export type FormValuesType = {
 	[key: string]:
 		| FormValueType

@@ -1039,12 +1039,12 @@ type FormComponentSubmitButtonType = {
 export const FormComponentSubmit = ({
 	pending,
 	submitted,
-	errors,
+	error,
 	button,
 }: {
 	pending: boolean;
 	submitted: boolean;
-	errors: Record<string, string[]>;
+	error: boolean;
 	button: FormComponentSubmitButtonType;
 }) => {
 	const translationsKeys = useMemo(
@@ -1060,7 +1060,7 @@ export const FormComponentSubmit = ({
 			type="submit"
 			variant={button.variant}
 			className={button.className}
-			disabled={pending || (submitted && Object.keys(errors).length > 0)}
+			disabled={pending || (submitted && error)}
 			aria-busy={pending}
 		>
 			{pending ? (
@@ -1068,7 +1068,7 @@ export const FormComponentSubmit = ({
 					<LoadingIcon />
 					{translations['app.text.please_wait']}
 				</span>
-			) : submitted && Object.keys(errors).length > 0 ? (
+			) : submitted && error ? (
 				<span className="flex items-center gap-1.5">
 					<Icons.Status.Error className="animate-pulse" />
 					{button.label}

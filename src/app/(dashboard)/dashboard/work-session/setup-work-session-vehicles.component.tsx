@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { DisplayStatus } from '@/helpers/display.helper';
 import { requestFind } from '@/helpers/services.helper';
 import { getCompanyVehicleDisplayName } from '@/models/company-vehicle.model';
+import { VehicleTypeEnum } from '@/models/vehicle.model';
 import type { WorkSessionModel } from '@/models/work-session.model';
 import {
 	type WorkSessionVehicleModel,
@@ -226,7 +227,7 @@ export function SetupWorkSessionVehicles({
 				<div className="text-center py-8 px-4 bg-muted rounded-lg border border-border">
 					<Icons.Vehicle className="mx-auto h-12 w-12 text-muted-foreground" />
 					<p className="mt-2 text-sm text-muted-foreground">
-						No vehicle set
+						No vehicles set
 					</p>
 				</div>
 			)}
@@ -279,9 +280,22 @@ function WorkSessionVehicleEntry({
 				)}
 			</td>
 			<td className="px-4 py-4 whitespace-nowrap text-sm text-card-foreground">
-				<span className="font-mono">{m.vehicle_km_start || '-'}</span>
-				<span className="mx-1 text-muted-foreground">→</span>
-				<span className="font-mono">{m.vehicle_km_end || '-'}</span>
+				{m.company_vehicle.vehicle.vehicle_type ===
+				VehicleTypeEnum.TRAILER ? (
+					<span className="mx-1 text-muted-foreground italic">
+						n/a
+					</span>
+				) : (
+					<div>
+						<span className="font-mono">
+							{m.vehicle_km_start || '-'}
+						</span>
+						<span className="mx-1 text-muted-foreground">→</span>
+						<span className="font-mono">
+							{m.vehicle_km_end || '-'}
+						</span>
+					</div>
+				)}
 			</td>
 			<td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
 				<div className="flex gap-3 items-center justify-end">

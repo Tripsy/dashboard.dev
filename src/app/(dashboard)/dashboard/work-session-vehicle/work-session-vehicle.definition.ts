@@ -80,6 +80,9 @@ class WorkSessionVehicleValidator extends BaseValidator<
 				),
 				vehicle_km_start: this.validateNumber(
 					this.getMessage('invalid_vehicle_km_start'),
+					{
+						required: false,
+					},
 				),
 				vehicle_km_end: this.validateNumber(
 					this.getMessage('invalid_vehicle_km_end'),

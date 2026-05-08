@@ -68,7 +68,7 @@ export default function AccountDelete() {
 		return null;
 	}
 
-	if (state.situation === 'csrf_error') {
+	if (state.situation === 'csrfError') {
 		throw new Error(state.message as string);
 	}
 
@@ -114,7 +114,7 @@ export default function AccountDelete() {
 					<FormComponentSubmit
 						pending={pending}
 						submitted={submitted}
-						errors={errors}
+						error={!!errors}
 						button={{
 							variant: 'error',
 							label: 'Delete account',
@@ -123,7 +123,7 @@ export default function AccountDelete() {
 					/>
 				</div>
 
-				{state.situation === 'error' && state.message && (
+				{state.situation !== 'success' && state.message && (
 					<FormError>
 						<div className="flex items-center gap-1.5">
 							<Icons.Status.Error />

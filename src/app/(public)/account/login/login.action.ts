@@ -21,7 +21,7 @@ export async function loginAction(
 		return {
 			...formState,
 			message: await translate('app.error.csrf'),
-			situation: 'csrf_error',
+			situation: 'csrfError',
 		};
 	}
 
@@ -36,7 +36,7 @@ export async function loginAction(
 		return {
 			...formState,
 			values: formValues,
-			situation: 'error',
+			situation: 'failedValidation',
 			message: await translate('app.error.validation'),
 			errors,
 		};
@@ -56,19 +56,19 @@ export async function loginAction(
 				...formState,
 				values: validated.data,
 				message: authResponse?.message || null,
-				situation: authResponse?.success ? 'success' : 'error',
+				situation: authResponse?.success ? 'success' : 'serverError',
 			};
 		} else {
 			return {
 				...formState,
 				values: validated.data,
 				message: requestResponse?.message || null,
-				situation: 'error',
+				situation: 'serverError',
 			};
 		}
 	} catch (error: unknown) {
 		let message: string = '';
-		let situation: LoginSituationType = 'error';
+		let situation: LoginSituationType = 'serverError';
 		let resultData: LoginApiResponseType | undefined;
 
 		if (error instanceof ApiError) {
@@ -80,7 +80,7 @@ export async function loginAction(
 					message = await translate(
 						'login.message.max_active_sessions',
 					);
-					situation = 'max_active_sessions';
+					situation = 'maxActiveSession';
 					resultData = error.body?.data;
 					break;
 				case 406:
@@ -88,7 +88,7 @@ export async function loginAction(
 					break;
 				case 409:
 					message = await translate('login.message.pending_account');
-					situation = 'pending_account';
+					situation = 'pendingAccount';
 					break;
 				case 429:
 					message = await translate(

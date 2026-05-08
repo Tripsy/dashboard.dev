@@ -11,9 +11,9 @@ export type LoginFormValuesType = {
 
 export type LoginSituationType =
 	| FormSituationType
-	| 'csrf_error'
-	| 'max_active_sessions'
-	| 'pending_account';
+	| 'csrfError'
+	| 'maxActiveSession'
+	| 'pendingAccount';
 
 export type LoginApiResponseType =
 	| { token: string }

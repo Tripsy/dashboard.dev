@@ -10,7 +10,7 @@ export type AccountEditFormValuesType = {
 	language: Language;
 };
 
-export type AccountEditSituationType = FormSituationType | 'csrf_error';
+export type AccountEditSituationType = FormSituationType | 'csrfError';
 
 export type AccountEditStateType = {
 	values: AccountEditFormValuesType;

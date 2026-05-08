@@ -1,7 +1,11 @@
 import type { ZodSafeParseError, ZodSafeParseSuccess, z } from 'zod';
 import type { PageMeta } from '@/types/page-meta.type';
 
-export type FormSituationType = 'success' | 'error' | null;
+export type FormSituationType =
+	| 'success'
+	| 'failedValidation'
+	| 'serverError'
+	| null;
 type FormValueType =
 	| string
 	| number

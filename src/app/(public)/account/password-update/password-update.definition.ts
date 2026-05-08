@@ -10,7 +10,7 @@ export type PasswordUpdateFormValuesType = {
 	password_confirm: string | null;
 };
 
-export type PasswordUpdateSituationType = FormSituationType | 'csrf_error';
+export type PasswordUpdateSituationType = FormSituationType | 'csrfError';
 
 export type PasswordUpdateStateType = {
 	values: PasswordUpdateFormValuesType;

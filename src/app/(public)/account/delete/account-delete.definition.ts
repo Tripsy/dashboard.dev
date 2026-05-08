@@ -7,7 +7,7 @@ export type AccountDeleteFormValuesType = {
 	password_current: string | null;
 };
 
-export type AccountDeleteSituationType = FormSituationType | 'csrf_error';
+export type AccountDeleteSituationType = FormSituationType | 'csrfError';
 
 export type AccountDeleteStateType = {
 	values: AccountDeleteFormValuesType;

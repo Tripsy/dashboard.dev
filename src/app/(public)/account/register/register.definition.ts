@@ -20,8 +20,8 @@ export type RegisterFormValuesType = {
 
 export type RegisterSituationType =
 	| FormSituationType
-	| 'csrf_error'
-	| 'pending_account';
+	| 'csrfError'
+	| 'pendingAccount';
 
 export type RegisterStateType = {
 	values: RegisterFormValuesType;

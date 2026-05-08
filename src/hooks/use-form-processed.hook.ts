@@ -98,7 +98,7 @@ export function useWindowFormProcessed<
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: Fire on situation transitions, not when handleFormProcessed re-creates due to translation reloads or config changes.
 	useEffect(() => {
-		if (state.situation === 'success' || state.situation === 'error') {
+		if (state.situation === 'success') {
 			handleFormProcessed(
 				state.situation,
 				state.resultData as Entry,

@@ -80,7 +80,7 @@ export default function AccountEdit() {
 		return null;
 	}
 
-	if (state.situation === 'csrf_error') {
+	if (state.situation === 'csrfError') {
 		throw new Error(state.message as string);
 	}
 
@@ -130,7 +130,7 @@ export default function AccountEdit() {
 					<FormComponentSubmit
 						pending={pending}
 						submitted={submitted}
-						errors={errors}
+						error={!!errors}
 						button={{
 							label: 'Save',
 							iconLabel: 'save',
@@ -138,7 +138,7 @@ export default function AccountEdit() {
 					/>
 				</div>
 
-				{state.situation === 'error' && state.message && (
+				{state.situation !== 'success' && state.message && (
 					<FormError>
 						<div className="flex items-center gap-1.5">
 							<Icons.Status.Error />

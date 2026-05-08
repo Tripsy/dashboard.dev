@@ -19,7 +19,7 @@ export async function passwordRecoverChangeAction(
 		return {
 			...formState,
 			message: await translate('app.error.csrf'),
-			situation: 'csrf_error',
+			situation: 'csrfError',
 		};
 	}
 
@@ -34,7 +34,7 @@ export async function passwordRecoverChangeAction(
 		return {
 			...formState,
 			values: formValues,
-			situation: 'error',
+			situation: 'failedValidation',
 			message: await translate('app.error.validation'),
 			errors,
 		};
@@ -50,11 +50,11 @@ export async function passwordRecoverChangeAction(
 			...formState,
 			values: validated.data,
 			message: requestResponse?.message || null,
-			situation: requestResponse?.success ? 'success' : 'error',
+			situation: requestResponse?.success ? 'success' : 'serverError',
 		};
 	} catch (error: unknown) {
 		let message: string = '';
-		const situation: PasswordRecoverChangeSituationType = 'error';
+		const situation: PasswordRecoverChangeSituationType = 'serverError';
 
 		if (error instanceof ApiError) {
 			message = error.message;

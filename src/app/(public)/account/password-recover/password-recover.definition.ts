@@ -7,7 +7,7 @@ export type PasswordRecoverFormValuesType = {
 	email: string | null;
 };
 
-export type PasswordRecoverSituationType = FormSituationType | 'csrf_error';
+export type PasswordRecoverSituationType = FormSituationType | 'csrfError';
 
 export type PasswordRecoverStateType = {
 	values: PasswordRecoverFormValuesType;

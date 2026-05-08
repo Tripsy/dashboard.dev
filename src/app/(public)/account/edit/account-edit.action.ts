@@ -17,7 +17,7 @@ export async function accountEditAction(
 		return {
 			...formState,
 			message: await translate('app.error.csrf'),
-			situation: 'csrf_error',
+			situation: 'csrfError',
 		};
 	}
 
@@ -32,7 +32,7 @@ export async function accountEditAction(
 		return {
 			...formState,
 			values: formValues,
-			situation: 'error',
+			situation: 'failedValidation',
 			message: await translate('app.error.validation'),
 			errors,
 		};
@@ -45,14 +45,14 @@ export async function accountEditAction(
 			...formState,
 			values: validated.data,
 			message: requestResponse?.message || null,
-			situation: requestResponse?.success ? 'success' : 'error',
+			situation: requestResponse?.success ? 'success' : 'serverError',
 		};
 	} catch {
 		return {
 			...formState,
 			values: validated.data,
 			message: await translate('app.error.form'),
-			situation: 'error',
+			situation: 'serverError',
 		};
 	}
 }

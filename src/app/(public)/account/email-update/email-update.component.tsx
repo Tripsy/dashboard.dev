@@ -65,7 +65,7 @@ export default function EmailUpdate() {
 		return null;
 	}
 
-	if (state.situation === 'csrf_error') {
+	if (state.situation === 'csrfError') {
 		throw new Error(state.message as string);
 	}
 

@@ -67,11 +67,11 @@ export default function Register() {
 		'terms',
 	] as const);
 
-	if (state.situation === 'csrf_error') {
+	if (state.situation === 'csrfError') {
 		throw new Error(state.message as string);
 	}
 
-	if (state.situation === 'pending_account') {
+	if (state.situation === 'pendingAccount') {
 		return (
 			<ErrorComponent
 				title="Create Account"

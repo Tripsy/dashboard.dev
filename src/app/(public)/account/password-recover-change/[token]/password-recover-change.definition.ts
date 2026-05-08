@@ -11,7 +11,7 @@ export type PasswordRecoverChangeFormValuesType = {
 
 export type PasswordRecoverChangeSituationType =
 	| FormSituationType
-	| 'csrf_error';
+	| 'csrfError';
 
 export type PasswordRecoverChangeStateType = {
 	token: string;

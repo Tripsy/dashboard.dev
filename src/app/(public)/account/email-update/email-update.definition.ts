@@ -7,7 +7,7 @@ export type EmailUpdateFormValuesType = {
 	email_new: string | null;
 };
 
-export type EmailUpdateSituationType = FormSituationType | 'csrf_error';
+export type EmailUpdateSituationType = FormSituationType | 'csrfError';
 
 export type EmailUpdateStateType = {
 	values: EmailUpdateFormValuesType;

@@ -43,7 +43,7 @@ export default function EmailConfirmSend() {
 
 	const elementIds = useElementIds(['email'] as const);
 
-	if (state.situation === 'csrf_error') {
+	if (state.situation === 'csrfError') {
 		throw new Error(state.message as string);
 	}
 

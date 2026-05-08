@@ -19,7 +19,7 @@ export async function emailUpdateAction(
 		return {
 			...formState,
 			message: await translate('app.error.csrf'),
-			situation: 'csrf_error',
+			situation: 'csrfError',
 		};
 	}
 
@@ -34,7 +34,7 @@ export async function emailUpdateAction(
 		return {
 			...formState,
 			values: formValues,
-			situation: 'error',
+			situation: 'failedValidation',
 			message: await translate('app.error.validation'),
 			errors,
 		};
@@ -47,11 +47,11 @@ export async function emailUpdateAction(
 			...formState,
 			values: validated.data,
 			message: requestResponse?.message || null,
-			situation: requestResponse?.success ? 'success' : 'error',
+			situation: requestResponse?.success ? 'success' : 'serverError',
 		};
 	} catch (error: unknown) {
 		let message: string = '';
-		const situation: EmailUpdateSituationType = 'error';
+		const situation: EmailUpdateSituationType = 'serverError';
 
 		if (error instanceof ApiError) {
 			switch (error.status) {

@@ -35,7 +35,7 @@ export async function processForm<Entry, FormValues extends FormValuesType>(
 			return {
 				...formState,
 				values: formValues,
-				situation: 'error',
+				situation: 'failedValidation',
 				message: await translate('app.error.validation'),
 				errors,
 			};
@@ -61,7 +61,7 @@ export async function processForm<Entry, FormValues extends FormValuesType>(
 			...formState,
 			values: validated.data,
 			message: fetchResponse?.message || null,
-			situation: fetchResponse?.success ? 'success' : 'error',
+			situation: fetchResponse?.success ? 'success' : 'serverError',
 			resultData: fetchResponse?.data,
 		};
 	} catch (error) {
@@ -73,8 +73,9 @@ export async function processForm<Entry, FormValues extends FormValuesType>(
 
 		return {
 			...formState,
-			message: message,
-			situation: 'error',
+			message,
+			situation: 'serverError',
+			errors: {},
 		};
 	}
 }

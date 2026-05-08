@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useActionState } from 'react';
+import React, { useActionState, useCallback, useRef, useState } from 'react';
 import { FormComponentSubmit } from '@/components/form/form-element.component';
 import { FormError } from '@/components/form/form-error.component';
 import { Icons } from '@/components/icon.component';
@@ -12,7 +12,11 @@ import { useFormValues } from '@/hooks/use-form-values.hook';
 import { WindowFormProvider } from '@/providers/window-form.provider';
 import { useModalStore } from '@/stores/window.store';
 import type { FormOperationFunctionType } from '@/types/action.type';
-import type { FormStateType, FormValuesType } from '@/types/form.type';
+import type {
+	FormErrorsType,
+	FormStateType,
+	FormValuesType,
+} from '@/types/form.type';
 import type { WindowConfig, WindowEntryType } from '@/types/window.type';
 
 type WindowFormType<WindowEntry> = {
@@ -96,8 +100,48 @@ export function WindowForm<
 
 	const [formValues, setFormValues] = useFormValues<FormValues>(state.values);
 
-	const { errors, submitted, markSubmit, markFieldAsTouched } =
-		useFormValidation({ formValues, validateForm, debounceDelay: 800 });
+	const [formSituation, setFormSituation] = useState(state.situation);
+	const [formMessage, setFormMessage] = useState(state.message);
+
+	// Reset when a new server response comes in
+	const prevStateRef = useRef(state);
+
+	if (prevStateRef.current !== state) {
+		prevStateRef.current = state;
+		setFormSituation(state.situation);
+		setFormMessage(state.message);
+	}
+
+	const handleValidation = useCallback(
+		(errors: FormErrorsType<FormValues>) => {
+			const hasErrors = Object.keys(errors ?? {}).length > 0;
+
+			if (hasErrors) {
+				setFormSituation('failedValidation');
+				setFormMessage(
+					`${Object.keys(errors).length} field(s) need attention`,
+				);
+			} else {
+				setFormSituation((prev) =>
+					prev === 'failedValidation' ? null : prev,
+				);
+				setFormMessage((prev) => (prev === formMessage ? null : prev));
+			}
+		},
+		[formMessage],
+	);
+
+	const {
+		errors: formErrors,
+		submitted,
+		markSubmit,
+		markFieldAsTouched,
+	} = useFormValidation({
+		formValues,
+		validateForm,
+		debounceDelay: 800,
+		onValidation: handleValidation,
+	});
 
 	useWindowFormProcessed({
 		state,
@@ -121,7 +165,7 @@ export function WindowForm<
 			value={{
 				formOperation: windowConfig.action,
 				formValues,
-				errors,
+				errors: formErrors,
 				handleChange,
 				pending,
 			}}
@@ -147,7 +191,7 @@ export function WindowForm<
 					<FormComponentSubmit
 						pending={pending}
 						submitted={submitted}
-						errors={errors as Record<string, string[]>} // remove `as`
+						error={formSituation === 'failedValidation'}
 						button={{
 							variant: buttonSubmit?.variant || 'info',
 							label: (buttonSubmit?.label as string) || 'Submit',
@@ -156,27 +200,13 @@ export function WindowForm<
 					/>
 				</div>
 
-				{state.situation === 'error' && state.message && (
+				{formSituation && formSituation !== 'success' && (
 					<FormError>
 						<React.Fragment key="form-error-content">
 							<div className="flex items-center gap-1.5 mb-2">
 								<Icons.Status.Error />
-								<div>{state.message}</div>
+								<div>{formMessage}</div>
 							</div>
-							{Object.entries(state.errors ?? {}).length > 0 && (
-								<ul className="list-disc ml-8 text-sm">
-									{Object.entries(state.errors ?? {}).flatMap(
-										([_field, messages]) =>
-											Array.isArray(messages)
-												? messages.map((message) => (
-														<li key={`${message}`}>
-															{message}
-														</li>
-													))
-												: [],
-									)}
-								</ul>
-							)}
 						</React.Fragment>
 					</FormError>
 				)}

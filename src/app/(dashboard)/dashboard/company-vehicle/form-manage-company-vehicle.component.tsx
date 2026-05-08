@@ -173,7 +173,6 @@ export function FormManageCompanyVehicle() {
 				id={elementIds.vin}
 				fieldName="vin"
 				fieldValue={formValues.vin ?? ''}
-				isRequired={true}
 				placeholderText="e.g.: 1FABP34A5DF123456"
 				disabled={pending}
 				onChange={(e) => handleChange('vin', e.target.value)}

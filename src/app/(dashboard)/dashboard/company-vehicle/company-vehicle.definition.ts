@@ -209,6 +209,19 @@ export const dataSourceConfigCompanyVehicle: DataSourceConfigType<
 					}),
 			},
 			{
+				field: 'vehicle_type',
+				header: 'Type',
+				body: (
+					entry: CompanyVehicleModel,
+					column: DataTableColumnType<CompanyVehicleModel>,
+				) =>
+					DataTableValue(entry, column, {
+						customValue: formatEnumLabel(
+							entry.vehicle.vehicle_type,
+						),
+					}),
+			},
+			{
 				field: 'license_plate',
 				header: 'License Plate',
 			},

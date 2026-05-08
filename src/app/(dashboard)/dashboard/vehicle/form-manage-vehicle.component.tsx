@@ -175,7 +175,12 @@ export function FormManageVehicle() {
 					fieldValue={formValues.length ?? null}
 					disabled={pending}
 					onChange={(e) =>
-						handleChange('length', Number(e.target.value))
+						handleChange(
+							'length',
+							e.target.value === ''
+								? null
+								: Number(e.target.value),
+						)
 					}
 					error={errors.length}
 				/>
@@ -187,7 +192,12 @@ export function FormManageVehicle() {
 					fieldValue={formValues.width ?? null}
 					disabled={pending}
 					onChange={(e) =>
-						handleChange('width', Number(e.target.value))
+						handleChange(
+							'width',
+							e.target.value === ''
+								? null
+								: Number(e.target.value),
+						)
 					}
 					error={errors.width}
 				/>
@@ -201,7 +211,12 @@ export function FormManageVehicle() {
 					fieldValue={formValues.height ?? null}
 					disabled={pending}
 					onChange={(e) =>
-						handleChange('height', Number(e.target.value))
+						handleChange(
+							'height',
+							e.target.value === ''
+								? null
+								: Number(e.target.value),
+						)
 					}
 					error={errors.height}
 				/>
@@ -213,7 +228,12 @@ export function FormManageVehicle() {
 					fieldValue={formValues.weight ?? null}
 					disabled={pending}
 					onChange={(e) =>
-						handleChange('weight', Number(e.target.value))
+						handleChange(
+							'weight',
+							e.target.value === ''
+								? null
+								: Number(e.target.value),
+						)
 					}
 					error={errors.weight}
 				/>

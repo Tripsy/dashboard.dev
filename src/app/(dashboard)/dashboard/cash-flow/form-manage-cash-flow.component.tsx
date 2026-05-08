@@ -115,7 +115,12 @@ export function FormManageCashFlow({ action }: { action: string }) {
 					disabled={pending}
 					isRequired={true}
 					onChange={(e) =>
-						handleChange('amount', Number(e.target.value))
+						handleChange(
+							'amount',
+							e.target.value === ''
+								? null
+								: Number(e.target.value),
+						)
 					}
 					error={errors.amount}
 				/>
@@ -129,7 +134,12 @@ export function FormManageCashFlow({ action }: { action: string }) {
 					disabled={pending}
 					isRequired={true}
 					onChange={(e) =>
-						handleChange('vat_rate', Number(e.target.value))
+						handleChange(
+							'vat_rate',
+							e.target.value === ''
+								? null
+								: Number(e.target.value),
+						)
 					}
 					error={errors.vat_rate}
 				/>

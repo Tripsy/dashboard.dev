@@ -6,6 +6,7 @@ import { useActionState, useState } from 'react';
 import { passwordRecoverChangeAction } from '@/app/(public)/account/password-recover-change/[token]/password-recover-change.action';
 import {
 	type PasswordRecoverChangeFormValuesType,
+	type PasswordRecoverChangeSituationType,
 	PasswordRecoverChangeState,
 	validateFormPasswordRecoverChange,
 } from '@/app/(public)/account/password-recover-change/[token]/password-recover-change.definition';
@@ -16,11 +17,11 @@ import {
 } from '@/components/form/form-element.component';
 import { FormError } from '@/components/form/form-error.component';
 import { FormWrapperComponent } from '@/components/form/form-wrapper';
-import { Icons } from '@/components/icon.component';
 import { SuccessComponent } from '@/components/status.component';
 import Routes from '@/config/routes.setup';
 import { createHandleChange } from '@/helpers/form.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
+import { useFormSituation } from '@/hooks/use-form-situation.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
 
@@ -42,22 +43,28 @@ export default function PasswordRecoverChange() {
 	const [formValues, setFormValues] =
 		useFormValues<PasswordRecoverChangeFormValuesType>(state.values);
 
+	const { formSituation, formMessage, handleValidation } = useFormSituation<
+		PasswordRecoverChangeFormValuesType,
+		PasswordRecoverChangeSituationType
+	>(state.situation, state.message);
+
 	const { errors, submitted, markSubmit, markFieldAsTouched } =
 		useFormValidation({
 			formValues: formValues,
 			validateForm: validateFormPasswordRecoverChange,
 			debounceDelay: 800,
+			onValidation: handleValidation,
 		});
 
 	const handleChange = createHandleChange(setFormValues, markFieldAsTouched);
 
 	const elementIds = useElementIds(['password', 'passwordConfirm'] as const);
 
-	if (state.situation === 'csrfError') {
-		throw new Error(state.message as string);
+	if (formSituation === 'csrfError') {
+		throw new Error(formMessage as string);
 	}
 
-	if (state.situation === 'success') {
+	if (formSituation === 'success') {
 		return (
 			<SuccessComponent
 				title="Recover Password"
@@ -118,21 +125,17 @@ export default function PasswordRecoverChange() {
 				<FormComponentSubmit
 					pending={pending}
 					submitted={submitted}
-					errors={errors}
+					error={formSituation === 'failedValidation'}
 					button={{
 						label: 'Set password',
 						iconLabel: 'submit',
 					}}
 				/>
 
-				{state.situation === 'error' && state.message && (
-					<FormError>
-						<div className="flex items-center gap-1.5">
-							<Icons.Status.Error />
-							<div>{state.message}</div>
-						</div>
-					</FormError>
-				)}
+				<FormError
+					formSituation={formSituation}
+					formMessage={formMessage}
+				/>
 			</form>
 		</FormWrapperComponent>
 	);

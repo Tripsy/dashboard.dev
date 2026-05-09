@@ -5,6 +5,7 @@ import { useActionState } from 'react';
 import { emailConfirmSendAction } from '@/app/(public)/account/email-confirm-send/email-confirm-send.action';
 import {
 	type EmailConfirmSendFormValuesType,
+	type EmailConfirmSendSituationType,
 	EmailConfirmSendState,
 	validateFormEmailConfirmSend,
 } from '@/app/(public)/account/email-confirm-send/email-confirm-send.definition';
@@ -15,11 +16,11 @@ import {
 } from '@/components/form/form-element.component';
 import { FormError } from '@/components/form/form-error.component';
 import { FormWrapperComponent } from '@/components/form/form-wrapper';
-import { Icons } from '@/components/icon.component';
 import { SuccessComponent } from '@/components/status.component';
 import Routes from '@/config/routes.setup';
 import { createHandleChange } from '@/helpers/form.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
+import { useFormSituation } from '@/hooks/use-form-situation.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
 
@@ -32,22 +33,28 @@ export default function EmailConfirmSend() {
 	const [formValues, setFormValues] =
 		useFormValues<EmailConfirmSendFormValuesType>(state.values);
 
+	const { formSituation, formMessage, handleValidation } = useFormSituation<
+		EmailConfirmSendFormValuesType,
+		EmailConfirmSendSituationType
+	>(state.situation, state.message);
+
 	const { errors, submitted, markSubmit, markFieldAsTouched } =
 		useFormValidation({
 			formValues: formValues,
 			validateForm: validateFormEmailConfirmSend,
 			debounceDelay: 800,
+			onValidation: handleValidation,
 		});
 
 	const handleChange = createHandleChange(setFormValues, markFieldAsTouched);
 
 	const elementIds = useElementIds(['email'] as const);
 
-	if (state.situation === 'csrfError') {
-		throw new Error(state.message as string);
+	if (formSituation === 'csrfError') {
+		throw new Error(formMessage as string);
 	}
 
-	if (state.situation === 'success') {
+	if (formSituation === 'success') {
 		return (
 			<SuccessComponent
 				title="Email Confirmation Sent"
@@ -92,21 +99,17 @@ export default function EmailConfirmSend() {
 				<FormComponentSubmit
 					pending={pending}
 					submitted={submitted}
-					errors={errors}
+					error={formSituation === 'failedValidation'}
 					button={{
 						label: 'Get confirmation',
 						iconLabel: 'submit',
 					}}
 				/>
 
-				{state.situation === 'error' && state.message && (
-					<FormError>
-						<div className="flex items-center gap-1.5">
-							<Icons.Status.Error />
-							<div>{state.message}</div>
-						</div>
-					</FormError>
-				)}
+				<FormError
+					formSituation={formSituation}
+					formMessage={formMessage}
+				/>
 
 				<div className="text-center space-y-2">
 					<p className="text-sm text-muted-foreground">

@@ -5,6 +5,7 @@ import { useActionState, useEffect, useState } from 'react';
 import { passwordUpdateAction } from '@/app/(public)/account/password-update/password-update.action';
 import {
 	type PasswordUpdateFormValuesType,
+	type PasswordUpdateSituationType,
 	PasswordUpdateState,
 	validateFormPasswordUpdate,
 } from '@/app/(public)/account/password-update/password-update.definition';
@@ -21,6 +22,7 @@ import { Link } from '@/components/ui/link';
 import Routes from '@/config/routes.setup';
 import { createHandleChange } from '@/helpers/form.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
+import { useFormSituation } from '@/hooks/use-form-situation.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
 import { useAuth } from '@/providers/auth.provider';
@@ -38,11 +40,17 @@ export default function PasswordUpdate() {
 	const [formValues, setFormValues] =
 		useFormValues<PasswordUpdateFormValuesType>(state.values);
 
+	const { formSituation, formMessage, handleValidation } = useFormSituation<
+		PasswordUpdateFormValuesType,
+		PasswordUpdateSituationType
+	>(state.situation, state.message);
+
 	const { errors, submitted, markSubmit, markFieldAsTouched } =
 		useFormValidation({
 			formValues: formValues,
 			validateForm: validateFormPasswordUpdate,
 			debounceDelay: 800,
+			onValidation: handleValidation,
 		});
 
 	const handleChange = createHandleChange(setFormValues, markFieldAsTouched);
@@ -51,10 +59,10 @@ export default function PasswordUpdate() {
 
 	// Refresh auth & redirect to `/account/me`
 	useEffect(() => {
-		if (state.situation === 'success') {
+		if (formSituation === 'success') {
 			router.replace(`${Routes.get('account-me')}?from=passwordUpdate`);
 		}
-	}, [state.situation, router]);
+	}, [formSituation, router]);
 
 	const elementIds = useElementIds([
 		'passwordCurrent',
@@ -71,8 +79,8 @@ export default function PasswordUpdate() {
 		return null;
 	}
 
-	if (state.situation === 'csrfError') {
-		throw new Error(state.message as string);
+	if (formSituation === 'csrfError') {
+		throw new Error(formMessage as string);
 	}
 
 	return (
@@ -143,7 +151,7 @@ export default function PasswordUpdate() {
 					<FormComponentSubmit
 						pending={pending}
 						submitted={submitted}
-						errors={errors}
+						error={formSituation === 'failedValidation'}
 						button={{
 							label: 'Update password',
 							iconLabel: 'save',
@@ -151,14 +159,10 @@ export default function PasswordUpdate() {
 					/>
 				</div>
 
-				{state.situation === 'error' && state.message && (
-					<FormError>
-						<div className="flex items-center gap-1.5">
-							<Icons.Status.Error />
-							<div>{state.message}</div>
-						</div>
-					</FormError>
-				)}
+				<FormError
+					formSituation={formSituation}
+					formMessage={formMessage}
+				/>
 			</form>
 		</FormWrapperComponent>
 	);

@@ -14,6 +14,7 @@ import {
 	getCompanyVehicleDisplayName,
 } from '@/models/company-vehicle.model';
 import { type VehicleType, VehicleTypeEnum } from '@/models/vehicle.model';
+import { useAuth } from '@/providers/auth.provider';
 import { useWindowForm } from '@/providers/window-form.provider';
 import { useModalStore } from '@/stores/window.store';
 import type { FindFunctionResponseType } from '@/types/action.type';
@@ -29,7 +30,8 @@ export type WorkSessionVehicleFormValuesType = {
 };
 
 export function FormManageWorkSessionVehicle() {
-	const { getCurrentWindow } = useModalStore();
+	const { auth } = useAuth();
+	const { getCurrentWindow, close } = useModalStore();
 
 	const windowConfig = getCurrentWindow();
 	const windowConfigAction = windowConfig?.action;
@@ -70,6 +72,12 @@ export function FormManageWorkSessionVehicle() {
 		},
 		minLength: 3,
 	});
+
+	if (!auth) {
+		close(windowConfig?.uid);
+
+		return null;
+	}
 
 	return (
 		<>

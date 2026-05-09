@@ -5,6 +5,7 @@ import { useActionState, useState } from 'react';
 import { registerAction } from '@/app/(public)/account/register/register.action';
 import {
 	type RegisterFormValuesType,
+	type RegisterSituationType,
 	RegisterState,
 	validateFormRegister,
 } from '@/app/(public)/account/register/register.definition';
@@ -19,7 +20,6 @@ import {
 } from '@/components/form/form-element.component';
 import { FormError } from '@/components/form/form-error.component';
 import { FormWrapperComponent } from '@/components/form/form-wrapper';
-import { Icons } from '@/components/icon.component';
 import {
 	ErrorComponent,
 	SuccessComponent,
@@ -29,6 +29,7 @@ import Routes from '@/config/routes.setup';
 import { createHandleChange, toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
+import { useFormSituation } from '@/hooks/use-form-situation.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
 import { type Language, LanguageEnum } from '@/types/common.type';
@@ -49,11 +50,17 @@ export default function Register() {
 		state.values,
 	);
 
+	const { formSituation, formMessage, handleValidation } = useFormSituation<
+		RegisterFormValuesType,
+		RegisterSituationType
+	>(state.situation, state.message);
+
 	const { errors, submitted, markSubmit, markFieldAsTouched } =
 		useFormValidation({
 			formValues: formValues,
 			validateForm: validateFormRegister,
 			debounceDelay: 800,
+			onValidation: handleValidation,
 		});
 
 	const handleChange = createHandleChange(setFormValues, markFieldAsTouched);
@@ -67,15 +74,15 @@ export default function Register() {
 		'terms',
 	] as const);
 
-	if (state.situation === 'csrfError') {
-		throw new Error(state.message as string);
+	if (formSituation === 'csrfError') {
+		throw new Error(formMessage as string);
 	}
 
-	if (state.situation === 'pendingAccount') {
+	if (formSituation === 'pendingAccount') {
 		return (
 			<ErrorComponent
 				title="Create Account"
-				description={state.message as string}
+				description={formMessage as string}
 			>
 				<div className="text-center mt-6">
 					<span className="text-muted-foreground">
@@ -93,7 +100,7 @@ export default function Register() {
 		);
 	}
 
-	if (state.situation === 'success') {
+	if (formSituation === 'success') {
 		return (
 			<SuccessComponent
 				title="Create Account"
@@ -239,21 +246,17 @@ export default function Register() {
 				<FormComponentSubmit
 					pending={pending}
 					submitted={submitted}
-					errors={errors}
+					error={formSituation === 'failedValidation'}
 					button={{
 						label: 'Create account',
 						iconLabel: 'submit',
 					}}
 				/>
 
-				{state.situation === 'error' && state.message && (
-					<FormError>
-						<div className="flex items-center gap-1.5">
-							<Icons.Status.Error />
-							<div>{state.message}</div>
-						</div>
-					</FormError>
-				)}
+				<FormError
+					formSituation={formSituation}
+					formMessage={formMessage}
+				/>
 
 				<div className="text-center space-y-2">
 					<p className="text-sm text-muted-foreground">

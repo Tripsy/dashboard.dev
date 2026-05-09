@@ -5,6 +5,7 @@ import { useActionState } from 'react';
 import { passwordRecoverAction } from '@/app/(public)/account/password-recover/password-recover.action';
 import {
 	type PasswordRecoverFormValuesType,
+	type PasswordRecoverSituationType,
 	PasswordRecoverState,
 	validateFormPasswordRecover,
 } from '@/app/(public)/account/password-recover/password-recover.definition';
@@ -15,11 +16,11 @@ import {
 } from '@/components/form/form-element.component';
 import { FormError } from '@/components/form/form-error.component';
 import { FormWrapperComponent } from '@/components/form/form-wrapper';
-import { Icons } from '@/components/icon.component';
 import { SuccessComponent } from '@/components/status.component';
 import Routes from '@/config/routes.setup';
 import { createHandleChange } from '@/helpers/form.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
+import { useFormSituation } from '@/hooks/use-form-situation.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
 
@@ -32,22 +33,28 @@ export default function PasswordRecover() {
 	const [formValues, setFormValues] =
 		useFormValues<PasswordRecoverFormValuesType>(state.values);
 
+	const { formSituation, formMessage, handleValidation } = useFormSituation<
+		PasswordRecoverFormValuesType,
+		PasswordRecoverSituationType
+	>(state.situation, state.message);
+
 	const { errors, submitted, markSubmit, markFieldAsTouched } =
 		useFormValidation({
 			formValues: formValues,
 			validateForm: validateFormPasswordRecover,
 			debounceDelay: 800,
+			onValidation: handleValidation,
 		});
 
 	const handleChange = createHandleChange(setFormValues, markFieldAsTouched);
 
 	const elementIds = useElementIds(['email'] as const);
 
-	if (state.situation === 'csrfError') {
-		throw new Error(state.message as string);
+	if (formSituation === 'csrfError') {
+		throw new Error(formMessage as string);
 	}
 
-	if (state.situation === 'success') {
+	if (formSituation === 'success') {
 		return (
 			<SuccessComponent
 				title="Recover Password"
@@ -92,21 +99,17 @@ export default function PasswordRecover() {
 				<FormComponentSubmit
 					pending={pending}
 					submitted={submitted}
-					errors={errors}
+					error={formSituation === 'failedValidation'}
 					button={{
 						label: 'Recover password',
 						iconLabel: 'submit',
 					}}
 				/>
 
-				{state.situation === 'error' && state.message && (
-					<FormError>
-						<div className="flex items-center gap-1.5">
-							<Icons.Status.Error />
-							<div>{state.message}</div>
-						</div>
-					</FormError>
-				)}
+				<FormError
+					formSituation={formSituation}
+					formMessage={formMessage}
+				/>
 
 				<div className="text-center space-y-2">
 					<p className="text-sm text-muted-foreground">

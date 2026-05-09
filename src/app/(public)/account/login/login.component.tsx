@@ -8,6 +8,7 @@ import { loginAction } from '@/app/(public)/account/login/login.action';
 import {
 	isLoginResponseMaxActiveSessions,
 	type LoginFormValuesType,
+	type LoginSituationType,
 	LoginState,
 	validateFormLogin,
 } from '@/app/(public)/account/login/login.definition';
@@ -19,11 +20,11 @@ import {
 } from '@/components/form/form-element.component';
 import { FormError } from '@/components/form/form-error.component';
 import { FormWrapperComponent } from '@/components/form/form-wrapper';
-import { Icons } from '@/components/icon.component';
 import { ErrorComponent, ErrorIcon } from '@/components/status.component';
 import Routes, { isExcludedRoute } from '@/config/routes.setup';
 import { createHandleChange } from '@/helpers/form.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
+import { useFormSituation } from '@/hooks/use-form-situation.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
@@ -44,11 +45,17 @@ export default function Login() {
 		state.values,
 	);
 
+	const { formSituation, formMessage, handleValidation } = useFormSituation<
+		LoginFormValuesType,
+		LoginSituationType
+	>(state.situation, state.message);
+
 	const { errors, submitted, markSubmit, markFieldAsTouched } =
 		useFormValidation({
 			formValues: formValues,
 			validateForm: validateFormLogin,
 			debounceDelay: 800,
+			onValidation: handleValidation,
 		});
 
 	const translationsKeys = useMemo(
@@ -65,7 +72,7 @@ export default function Login() {
 	const handleChange = createHandleChange(setFormValues, markFieldAsTouched);
 
 	useEffect(() => {
-		if (state.situation === 'success') {
+		if (formSituation === 'success') {
 			(async () => {
 				await refreshAuth();
 			})();
@@ -90,17 +97,17 @@ export default function Login() {
 
 			router.replace(redirectUrl);
 		}
-	}, [state.situation, router, refreshAuth, searchParams]);
+	}, [formSituation, router, refreshAuth, searchParams]);
 
 	const elementIds = useElementIds(['email', 'password'] as const);
 
-	if (state.situation === 'csrfError') {
-		throw new Error(state.message as string);
+	if (formSituation === 'csrfError') {
+		throw new Error(formMessage as string);
 	}
 
-	if (state.situation === 'pendingAccount') {
+	if (formSituation === 'pendingAccount') {
 		return (
-			<ErrorComponent title="Login" description={state.message as string}>
+			<ErrorComponent title="Login" description={formMessage as string}>
 				<div className="text-center mt-6">
 					<span className="text-muted-foreground">
 						Have you confirmed your email? If you’ve lost the
@@ -159,50 +166,43 @@ export default function Login() {
 				<FormComponentSubmit
 					pending={pending}
 					submitted={submitted}
-					errors={errors}
+					error={formSituation === 'failedValidation'}
 					button={{
 						label: 'Login',
 						iconLabel: 'login',
 					}}
 				/>
 
-				{state.situation === 'error' && state.message && (
-					<FormError>
-						<div className="flex items-center gap-1.5">
-							<Icons.Status.Error />
-							<div>{state.message}</div>
+				<FormError
+					formSituation={formSituation}
+					formMessage={formMessage}
+				/>
+
+				{formSituation === 'maxActiveSession' && authTokens && (
+					<div className="space-y-4">
+						<div className="text-error text-sm">
+							<ErrorIcon /> {formMessage}
 						</div>
-					</FormError>
+
+						<AuthTokenList
+							tokens={authTokens}
+							onResult={(success, message) => {
+								showToast({
+									severity: success ? 'success' : 'error',
+									summary: success ? 'Success' : 'Error',
+									detail:
+										message === 'session_destroy_success'
+											? translations[
+													'login.message.session_destroy_success'
+												]
+											: translations[
+													`login.message.session_destroy_error`
+												],
+								});
+							}}
+						/>
+					</div>
 				)}
-
-				{state.situation === 'maxActiveSession' &&
-					state.message &&
-					authTokens && (
-						<div className="space-y-4">
-							<div className="text-error text-sm">
-								<ErrorIcon /> {state.message}
-							</div>
-
-							<AuthTokenList
-								tokens={authTokens}
-								onResult={(success, message) => {
-									showToast({
-										severity: success ? 'success' : 'error',
-										summary: success ? 'Success' : 'Error',
-										detail:
-											message ===
-											'session_destroy_success'
-												? translations[
-														'login.message.session_destroy_success'
-													]
-												: translations[
-														`login.message.session_destroy_error`
-													],
-									});
-								}}
-							/>
-						</div>
-					)}
 
 				<div className="text-center space-y-2">
 					<p className="text-sm text-muted-foreground">

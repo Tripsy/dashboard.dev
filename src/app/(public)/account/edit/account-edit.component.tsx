@@ -6,6 +6,7 @@ import { type Language, LanguageEnum } from '@//types/common.type';
 import { accountEditAction } from '@/app/(public)/account/edit/account-edit.action';
 import {
 	type AccountEditFormValuesType,
+	type AccountEditSituationType,
 	AccountEditState,
 	validateFormAccountEdit,
 } from '@/app/(public)/account/edit/account-edit.definition';
@@ -25,6 +26,7 @@ import { Configuration } from '@/config/settings.config';
 import { createHandleChange, toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
+import { useFormSituation } from '@/hooks/use-form-situation.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
 import { useAuth } from '@/providers/auth.provider';
@@ -47,11 +49,17 @@ export default function AccountEdit() {
 	const [formValues, setFormValues] =
 		useFormValues<AccountEditFormValuesType>(state.values);
 
+	const { formSituation, formMessage, handleValidation } = useFormSituation<
+		AccountEditFormValuesType,
+		AccountEditSituationType
+	>(state.situation, state.message);
+
 	const { errors, submitted, markSubmit, markFieldAsTouched } =
 		useFormValidation({
 			formValues: formValues,
 			validateForm: validateFormAccountEdit,
 			debounceDelay: 800,
+			onValidation: handleValidation,
 		});
 
 	const handleChange = createHandleChange(setFormValues, markFieldAsTouched);
@@ -60,14 +68,14 @@ export default function AccountEdit() {
 
 	// Refresh auth & redirect to `/account/me`
 	useEffect(() => {
-		if (state.situation === 'success') {
+		if (formSituation === 'success') {
 			(async () => {
 				await refreshAuth();
 			})();
 
 			router.replace(`${Routes.get('account-me')}?from=edit`);
 		}
-	}, [state.situation, router, refreshAuth]);
+	}, [formSituation, router, refreshAuth]);
 
 	const elementIds = useElementIds(['name', 'language'] as const);
 
@@ -80,8 +88,8 @@ export default function AccountEdit() {
 		return null;
 	}
 
-	if (state.situation === 'csrfError') {
-		throw new Error(state.message as string);
+	if (formSituation === 'csrfError') {
+		throw new Error(formMessage as string);
 	}
 
 	return (
@@ -130,7 +138,7 @@ export default function AccountEdit() {
 					<FormComponentSubmit
 						pending={pending}
 						submitted={submitted}
-						error={!!errors}
+						error={formSituation === 'failedValidation'}
 						button={{
 							label: 'Save',
 							iconLabel: 'save',
@@ -138,14 +146,10 @@ export default function AccountEdit() {
 					/>
 				</div>
 
-				{state.situation !== 'success' && state.message && (
-					<FormError>
-						<div className="flex items-center gap-1.5">
-							<Icons.Status.Error />
-							<div>{state.message}</div>
-						</div>
-					</FormError>
-				)}
+				<FormError
+					formSituation={formSituation}
+					formMessage={formMessage}
+				/>
 			</form>
 		</FormWrapperComponent>
 	);

@@ -12,7 +12,9 @@ import {
 	END_AT_MAX_FUTURE_SECONDS,
 	START_AT_MAX_PAST_SECONDS,
 } from '@/models/work-session.model';
+import { useAuth } from '@/providers/auth.provider';
 import { useWindowForm } from '@/providers/window-form.provider';
+import { useModalStore } from '@/stores/window.store';
 
 export type WorkSessionFormValuesType = {
 	start_at: string | null;
@@ -20,6 +22,11 @@ export type WorkSessionFormValuesType = {
 };
 
 export function FormManageWorkSession() {
+	const { auth } = useAuth();
+	const { getCurrentWindow, close } = useModalStore();
+
+	const windowConfig = getCurrentWindow();
+
 	const { formValues, errors, handleChange, pending } =
 		useWindowForm<WorkSessionFormValuesType>();
 
@@ -29,6 +36,12 @@ export function FormManageWorkSession() {
 	const minTime = formatDate(minDate, 'time');
 
 	const maxDate = createFutureDate(END_AT_MAX_FUTURE_SECONDS);
+
+	if (!auth) {
+		close(windowConfig?.uid);
+
+		return null;
+	}
 
 	return (
 		<div className="flex flex-wrap gap-2">

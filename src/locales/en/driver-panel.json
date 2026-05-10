@@ -18,5 +18,39 @@
 				"confirmText": "Are you sure you want to mark this session as closed?"
 			}
 		}
+	},
+	"work-session-vehicle": {
+		"validation": {
+			"invalid_company_vehicle_id": "Invalid company vehicle; Pick vehicle from select",
+			"invalid_company_vehicle": "Invalid company vehicle",
+			"invalid_vehicle_type": "Invalid vehicle type",
+			"invalid_vehicle_km_start": "Invalid start km",
+			"invalid_vehicle_km_end": "Invalid end km",
+			"invalid_notes": "Invalid notes"
+		},
+		"action": {
+			"create": {
+				"title": "Add work session vehicle",
+				"label": "Add",
+				"success": "New vehicle added successfully"
+			},
+			"update": {
+				"title": "Update vehicle - {{entry}}",
+				"label": "Update",
+				"success": "Vehicle updated successfully"
+			},
+			"delete": {
+				"title": "Delete vehicle - {{entry}}",
+				"label": "Delete",
+				"success": "Vehicle deleted successfully",
+				"confirmText": "Are you sure you want to delete this vehicle?"
+			},
+			"return": {
+				"title": "Mark vehicle as returned - {{entry}}",
+				"label": "Return",
+				"success": "Vehicle status marked as returned",
+				"confirmText": "Are you sure you want to mark this vehicle as returned?"
+			}
+		}
 	}
 }

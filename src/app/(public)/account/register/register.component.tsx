@@ -53,7 +53,7 @@ export default function Register() {
 	const { formSituation, formMessage, handleValidation } = useFormSituation<
 		RegisterFormValuesType,
 		RegisterSituationType
-	>(state.situation, state.message);
+	>(state);
 
 	const { errors, submitted, markSubmit, markFieldAsTouched } =
 		useFormValidation({

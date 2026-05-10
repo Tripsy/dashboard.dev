@@ -43,7 +43,7 @@ export default function PasswordUpdate() {
 	const { formSituation, formMessage, handleValidation } = useFormSituation<
 		PasswordUpdateFormValuesType,
 		PasswordUpdateSituationType
-	>(state.situation, state.message);
+	>(state);
 
 	const { errors, submitted, markSubmit, markFieldAsTouched } =
 		useFormValidation({

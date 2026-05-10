@@ -46,7 +46,7 @@ export default function PasswordRecoverChange() {
 	const { formSituation, formMessage, handleValidation } = useFormSituation<
 		PasswordRecoverChangeFormValuesType,
 		PasswordRecoverChangeSituationType
-	>(state.situation, state.message);
+	>(state);
 
 	const { errors, submitted, markSubmit, markFieldAsTouched } =
 		useFormValidation({

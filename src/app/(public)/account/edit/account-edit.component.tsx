@@ -52,7 +52,7 @@ export default function AccountEdit() {
 	const { formSituation, formMessage, handleValidation } = useFormSituation<
 		AccountEditFormValuesType,
 		AccountEditSituationType
-	>(state.situation, state.message);
+	>(state);
 
 	const { errors, submitted, markSubmit, markFieldAsTouched } =
 		useFormValidation({

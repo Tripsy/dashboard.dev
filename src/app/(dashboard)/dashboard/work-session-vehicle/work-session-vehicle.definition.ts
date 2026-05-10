@@ -11,6 +11,7 @@ import type {
 } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import {
+	getFormDataAsEnum,
 	getFormDataAsNumber,
 	getFormDataAsString,
 } from '@/helpers/form.helper';
@@ -18,6 +19,7 @@ import { requestFind } from '@/helpers/services.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import { getCompanyVehicleDisplayName } from '@/models/company-vehicle.model';
+import { VehicleTypeEnum } from '@/models/vehicle.model';
 import {
 	getWorkSessionDisplayName,
 	type WorkSessionStatus,
@@ -53,6 +55,7 @@ const validatorMessages = await BaseValidator.getValidatorMessages(
 		'invalid_work_session_id',
 		'invalid_company_vehicle_id',
 		'invalid_company_vehicle',
+		'invalid_vehicle_type',
 		'invalid_vehicle_km_start',
 		'invalid_vehicle_km_end',
 		'invalid_notes',
@@ -78,6 +81,13 @@ class WorkSessionVehicleValidator extends BaseValidator<
 				company_vehicle: this.validateString(
 					this.getMessage('invalid_company_vehicle'),
 				),
+				vehicle_type: this.validateEnum(
+					VehicleTypeEnum,
+					this.getMessage('invalid_vehicle_type'),
+					{
+						required: false,
+					},
+				),
 				vehicle_km_start: this.validateNumber(
 					this.getMessage('invalid_vehicle_km_start'),
 					{
@@ -101,8 +111,20 @@ class WorkSessionVehicleValidator extends BaseValidator<
 					!data.company_vehicle_id
 				) {
 					ctx.addIssue({
-						path: ['brand'],
+						path: ['company_vehicle'],
 						message: this.getMessage('invalid_company_vehicle_id'),
+						code: 'custom',
+					});
+				}
+
+				if (
+					data.vehicle_type &&
+					data.vehicle_type !== VehicleTypeEnum.TRAILER &&
+					!data.vehicle_km_start
+				) {
+					ctx.addIssue({
+						path: ['vehicle_km_start'],
+						message: this.getMessage('invalid_vehicle_km_start'),
 						code: 'custom',
 					});
 				}
@@ -123,6 +145,11 @@ function getFormValues(formData: FormData): WorkSessionVehicleFormValuesType {
 		work_session_id: getFormDataAsNumber(formData, 'work_session_id'),
 		company_vehicle_id: getFormDataAsNumber(formData, 'company_vehicle_id'),
 		company_vehicle: getFormDataAsString(formData, 'company_vehicle'),
+		vehicle_type: getFormDataAsEnum(
+			formData,
+			'vehicle_type',
+			VehicleTypeEnum,
+		),
 		vehicle_km_start: getFormDataAsNumber(formData, 'vehicle_km_start'),
 		vehicle_km_end: getFormDataAsNumber(formData, 'vehicle_km_end'),
 		notes: getFormDataAsString(formData, 'notes'),
@@ -142,6 +169,7 @@ function getFormState(
 			company_vehicle: data?.company_vehicle
 				? getCompanyVehicleDisplayName(data.company_vehicle)
 				: null,
+			vehicle_type: data?.company_vehicle.vehicle.vehicle_type ?? null,
 			vehicle_km_start: data?.vehicle_km_start ?? null,
 			vehicle_km_end: data?.vehicle_km_end ?? null,
 			notes: data?.notes ?? null,

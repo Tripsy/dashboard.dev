@@ -22,6 +22,7 @@ export type WorkSessionVehicleFormValuesType = {
 
 	company_vehicle_id: number | null;
 	company_vehicle: string | null;
+	vehicle_type: VehicleType | null;
 
 	vehicle_km_start: number | null;
 	vehicle_km_end: number | null;
@@ -30,8 +31,6 @@ export type WorkSessionVehicleFormValuesType = {
 };
 
 export function FormManageWorkSessionVehicle() {
-	const [vehicleType, setVehicleType] = useState<VehicleType | null>(null);
-
 	const { formValues, errors, handleChange, pending } =
 		useWindowForm<WorkSessionVehicleFormValuesType>();
 
@@ -74,10 +73,17 @@ export function FormManageWorkSessionVehicle() {
 				name="work_session_id"
 				value={formValues.work_session_id ?? ''}
 			/>
+
 			<input
 				type="hidden"
 				name="company_vehicle_id"
 				value={formValues.company_vehicle_id ?? ''}
+			/>
+
+			<input
+				type="hidden"
+				name="vehicle_type"
+				value={formValues.vehicle_type ?? ''}
 			/>
 
 			<FormComponentAutoComplete<
@@ -106,7 +112,7 @@ export function FormManageWorkSessionVehicle() {
 							getCompanyVehicleDisplayName(m),
 						);
 						handleChange('company_vehicle_id', m.id);
-						setVehicleType(m.vehicle.vehicle_type);
+						handleChange('vehicle_type', m.vehicle.vehicle_type);
 					},
 					getOptionLabel: (m) => getCompanyVehicleDisplayName(m),
 					getOptionKey: (m) => m.id,
@@ -118,7 +124,7 @@ export function FormManageWorkSessionVehicle() {
 				}}
 			/>
 
-			{vehicleType !== VehicleTypeEnum.TRAILER && (
+			{formValues.vehicle_type !== VehicleTypeEnum.TRAILER && (
 				<div className="flex flex-wrap gap-2">
 					<FormComponentInput<WorkSessionVehicleFormValuesType>
 						labelText="Start Km"

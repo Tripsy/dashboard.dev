@@ -3,6 +3,7 @@ import sanitizeHtml from 'sanitize-html';
 import type { z } from 'zod';
 import { translate } from '@/config/translate.setup';
 import { ApiError } from '@/exceptions/api.error';
+import { ExecutionError } from '@/exceptions/execution.error';
 import type {
 	CreateFunctionType,
 	FormOperationFunctionType,
@@ -68,6 +69,8 @@ export async function processForm<Entry, FormValues extends FormValuesType>(
 		let message: string = await translate('app.error.form');
 
 		if (error instanceof ApiError && error.status === 409) {
+			message = error.message;
+		} else if (error instanceof ExecutionError) {
 			message = error.message;
 		}
 

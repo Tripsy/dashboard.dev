@@ -42,7 +42,7 @@ export default function AccountDelete() {
 	const { formSituation, formMessage, handleValidation } = useFormSituation<
 		AccountDeleteFormValuesType,
 		AccountDeleteSituationType
-	>(state.situation, state.message);
+	>(state);
 
 	const { errors, submitted, markSubmit, markFieldAsTouched } =
 		useFormValidation({

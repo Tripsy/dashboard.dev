@@ -27,7 +27,10 @@ import {
 	WorkSessionVehicleStatusEnum,
 } from '@/models/work-session-vehicle.model';
 import { useAuth } from '@/providers/auth.provider';
-import { createWorkSessionVehicle } from '@/services/work-session-vehicle.service';
+import {
+	createWorkSessionVehicle,
+	updateWorkSessionVehicle,
+} from '@/services/work-session-vehicle.service';
 import { useModalStore } from '@/stores/window.store';
 import type { WindowDefinition } from '@/types/window.type';
 
@@ -99,7 +102,7 @@ export function DriverPanelSessionVehicles({
 	const { open } = useModalStore();
 	const { refreshSession } = useWorkSession();
 
-	const onUpdate = useCallback(
+	const handleUpdateSessionVehicle = useCallback(
 		(entry: WorkSessionVehicleModel) => {
 			open({
 				minimized: false,
@@ -109,6 +112,15 @@ export function DriverPanelSessionVehicles({
 				data: {
 					entries: [entry],
 				},
+				definition: {
+					operationFunction: (values: WorkSessionVehicleFormValuesType) => {
+						return updateWorkSessionVehicle(
+							values,
+							entry.id,
+							entry.work_session.id,
+						);
+					},
+				} as WindowDefinition<WorkSessionVehicleFormValuesType, WorkSessionVehicleModel>,
 				events: {
 					success: async () => {
 						await refreshSession();
@@ -119,7 +131,7 @@ export function DriverPanelSessionVehicles({
 		[open, refreshSession],
 	);
 
-	const onDelete = useCallback(
+	const handleDeleteSessionVehicle = useCallback(
 		(entry: WorkSessionVehicleModel) => {
 			open({
 				minimized: false,
@@ -139,7 +151,7 @@ export function DriverPanelSessionVehicles({
 		[open, refreshSession],
 	);
 
-	const onStatusReturn = useCallback(
+	const handleStatusReturnSessionVehicle = useCallback(
 		(entry: WorkSessionVehicleModel) => {
 			open({
 				minimized: false,
@@ -164,7 +176,7 @@ export function DriverPanelSessionVehicles({
 			{sessionVehicles.map((m) => (
 				<div
 					key={m.id}
-					className="bg-card border border-border rounded-lg p-4 mb-3"
+					className="bg-card border border-border rounded-lg p-4"
 				>
 					<div className="flex justify-between">
 						<div className="flex flex-col justify-between items-start self-stretch">
@@ -189,7 +201,9 @@ export function DriverPanelSessionVehicles({
 									WorkSessionVehicleStatusEnum.ASSIGNED && (
 									<button
 										type="button"
-										onClick={() => onStatusReturn(m)}
+										onClick={() =>
+											handleStatusReturnSessionVehicle(m)
+										}
 										className="cursor-pointer text-primary hover:text-primary-hover transition-colors"
 										title="Mark as returned"
 									>
@@ -198,7 +212,9 @@ export function DriverPanelSessionVehicles({
 								)}
 								<button
 									type="button"
-									onClick={() => onUpdate(m)}
+									onClick={() =>
+										handleUpdateSessionVehicle(m)
+									}
 									className="cursor-pointer text-primary hover:text-primary-hover transition-colors"
 									title="Update vehicle"
 								>
@@ -206,7 +222,9 @@ export function DriverPanelSessionVehicles({
 								</button>
 								<button
 									type="button"
-									onClick={() => onDelete(m)}
+									onClick={() =>
+										handleDeleteSessionVehicle(m)
+									}
 									className="cursor-pointer text-destructive hover:text-destructive/80 transition-colors"
 									title="Delete vehicle"
 								>
@@ -348,6 +366,7 @@ export function DriverPanel() {
 									)}
 									<Button
 										variant="success"
+										className="mt-4"
 										onClick={() =>
 											handleCreateSessionVehicle(
 												activeSession,
@@ -363,13 +382,16 @@ export function DriverPanel() {
 						</div>
 					) : (
 						<div>
-							<p className="mb-4">
-								There is no work session active at the moment!
-							</p>
+							<div className="text-center py-8 px-4 bg-muted rounded-lg border border-border">
+								<Icons.WorkSession className="mx-auto h-12 w-12 text-muted-foreground" />
+								<p className="mt-2 text-sm text-muted-foreground">
+									There is no work session active at the moment!
+								</p>
+							</div>
 							<Button
-								size="lg"
-								className="h-12 px-8 text-base max-w-48"
+								className="mt-4 max-w-48"
 								onClick={handleStartSession}
+								title="Start session"
 							>
 								Start session
 								<Icons.Clock className="ml-2 h-5 w-5" />

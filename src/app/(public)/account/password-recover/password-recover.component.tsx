@@ -36,7 +36,7 @@ export default function PasswordRecover() {
 	const { formSituation, formMessage, handleValidation } = useFormSituation<
 		PasswordRecoverFormValuesType,
 		PasswordRecoverSituationType
-	>(state.situation, state.message);
+	>(state);
 
 	const { errors, submitted, markSubmit, markFieldAsTouched } =
 		useFormValidation({

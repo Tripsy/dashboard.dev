@@ -41,7 +41,7 @@ export default function EmailUpdate() {
 	const { formSituation, formMessage, handleValidation } = useFormSituation<
 		EmailUpdateFormValuesType,
 		EmailUpdateSituationType
-	>(state.situation, state.message);
+	>(state);
 
 	const { errors, submitted, markSubmit, markFieldAsTouched } =
 		useFormValidation({

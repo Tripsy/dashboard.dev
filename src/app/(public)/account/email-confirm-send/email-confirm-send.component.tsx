@@ -36,7 +36,7 @@ export default function EmailConfirmSend() {
 	const { formSituation, formMessage, handleValidation } = useFormSituation<
 		EmailConfirmSendFormValuesType,
 		EmailConfirmSendSituationType
-	>(state.situation, state.message);
+	>(state);
 
 	const { errors, submitted, markSubmit, markFieldAsTouched } =
 		useFormValidation({

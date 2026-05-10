@@ -48,7 +48,7 @@ export default function Login() {
 	const { formSituation, formMessage, handleValidation } = useFormSituation<
 		LoginFormValuesType,
 		LoginSituationType
-	>(state.situation, state.message);
+	>(state);
 
 	const { errors, submitted, markSubmit, markFieldAsTouched } =
 		useFormValidation({

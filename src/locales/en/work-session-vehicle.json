@@ -7,6 +7,7 @@
 		"invalid_work_session_id": "Invalid work session",
 		"invalid_company_vehicle_id": "Invalid company vehicle; Pick vehicle from select",
 		"invalid_company_vehicle": "Invalid company vehicle",
+		"invalid_vehicle_type": "Invalid vehicle type",
 		"invalid_vehicle_km_start": "Invalid start km",
 		"invalid_vehicle_km_end": "Invalid end km",
 		"invalid_notes": "Invalid notes"
@@ -29,7 +30,7 @@
 			"title": "Delete vehicle - {{entry}}",
 			"label": "Delete",
 			"success": "Vehicle deleted successfully",
-			"confirmText": "Are you sure you want to delete this company vehicle?"
+			"confirmText": "Are you sure you want to delete this vehicle?"
 		},
 		"return": {
 			"title": "Mark vehicle as returned - {{entry}}",

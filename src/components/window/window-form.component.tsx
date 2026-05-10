@@ -32,6 +32,7 @@ export function WindowForm<
 	const windowConfig = getWindow(uid) as
 		| WindowConfig<FormValues, WindowEntry>
 		| undefined;
+
 	const windowDefinition = windowConfig?.definition;
 
 	// Guards
@@ -78,7 +79,7 @@ export function WindowForm<
 		>;
 
 	const initState = getFormState(entry);
-	const entryId = entry && 'id' in entry ? (entry.id as number) : undefined; // Present for update, undefined for create
+	const entryId = entry && 'id' in entry ? (entry.id as number) : undefined; // Undefined for create
 
 	const [state, action, pending] = useActionState<
 		FormStateType<FormValues>,
@@ -99,7 +100,7 @@ export function WindowForm<
 	const [formValues, setFormValues] = useFormValues<FormValues>(state.values);
 
 	const { formSituation, formMessage, handleValidation } =
-		useFormSituation<FormValues>(state.situation, state.message);
+		useFormSituation<FormValues>(state);
 
 	const {
 		errors: formErrors,

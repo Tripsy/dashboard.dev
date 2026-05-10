@@ -5,22 +5,25 @@ import {
 } from '@/app/(public)/_components/work-session-vehicle/form-manage-work-session-vehicle.component';
 import type { DataSourceConfigType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
+import { ExecutionError } from '@/exceptions/execution.error';
 import {
+	getFormDataAsEnum,
 	getFormDataAsNumber,
 	getFormDataAsString,
 } from '@/helpers/form.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import { getCompanyVehicleDisplayName } from '@/models/company-vehicle.model';
+import { VehicleTypeEnum } from '@/models/vehicle.model';
 import {
 	getWorkSessionVehicleDisplayName,
 	type WorkSessionVehicleModel,
-	WorkSessionVehicleStatusEnum,
 } from '@/models/work-session-vehicle.model';
-import {
-	deleteWorkSessionVehicle,
-	updateStatusWorkSessionVehicle,
-} from '@/services/work-session-vehicle.service';
+import {deleteWorkSessionVehicle} from '@/services/work-session-vehicle.service';
 import type { FormStateType } from '@/types/form.type';
+import {
+	FormReturnWorkSessionVehicle,
+	WorkSessionVehicleFormReturnValuesType
+} from "@/app/(public)/_components/work-session-vehicle/form-return-work-session-vehicle.component";
 
 const translations = await translateBatch(
 	['create.title', 'update.title', 'delete.title', 'return.title'] as const,
@@ -33,9 +36,10 @@ const validatorMessages = await BaseValidator.getValidatorMessages(
 		'invalid_company_vehicle',
 		'invalid_vehicle_km_start',
 		'invalid_vehicle_km_end',
+		'invalid_vehicle_type',
 		'invalid_notes',
 	] as const,
-	'work-session-vehicle.validation',
+	'driver-panel.work-session-vehicle.validation',
 );
 
 class WorkSessionVehicleValidator extends BaseValidator<
@@ -52,6 +56,13 @@ class WorkSessionVehicleValidator extends BaseValidator<
 				),
 				company_vehicle: this.validateString(
 					this.getMessage('invalid_company_vehicle'),
+				),
+				vehicle_type: this.validateEnum(
+					VehicleTypeEnum,
+					this.getMessage('invalid_vehicle_type'),
+					{
+						required: false,
+					},
 				),
 				vehicle_km_start: this.validateNumber(
 					this.getMessage('invalid_vehicle_km_start'),
@@ -76,8 +87,54 @@ class WorkSessionVehicleValidator extends BaseValidator<
 					!data.company_vehicle_id
 				) {
 					ctx.addIssue({
-						path: ['brand'],
+						path: ['company_vehicle'],
 						message: this.getMessage('invalid_company_vehicle_id'),
+						code: 'custom',
+					});
+				}
+
+				if (
+					data.vehicle_type &&
+					data.vehicle_type !== VehicleTypeEnum.TRAILER &&
+					!data.vehicle_km_start
+				) {
+					ctx.addIssue({
+						path: ['vehicle_km_start'],
+						message: this.getMessage('invalid_vehicle_km_start'),
+						code: 'custom',
+					});
+				}
+			});
+
+	return = () =>
+		z
+			.object({
+				vehicle_type: this.validateEnum(
+					VehicleTypeEnum,
+					this.getMessage('invalid_vehicle_type'),
+					{
+						required: false,
+					},
+				),
+				vehicle_km_end: this.validateNumber(
+					this.getMessage('invalid_vehicle_km_end'),
+					{
+						required: false,
+					},
+				),
+				notes: this.validateString(this.getMessage('invalid_notes'), {
+					required: false,
+				}),
+			})
+			.superRefine((data, ctx) => {
+				if (
+					data.vehicle_type &&
+					data.vehicle_type !== VehicleTypeEnum.TRAILER &&
+					!data.vehicle_km_end
+				) {
+					ctx.addIssue({
+						path: ['vehicle_km_end'],
+						message: this.getMessage('invalid_vehicle_km_end'),
 						code: 'custom',
 					});
 				}
@@ -97,6 +154,11 @@ function getFormValues(formData: FormData): WorkSessionVehicleFormValuesType {
 	return {
 		company_vehicle_id: getFormDataAsNumber(formData, 'company_vehicle_id'),
 		company_vehicle: getFormDataAsString(formData, 'company_vehicle'),
+		vehicle_type: getFormDataAsEnum(
+			formData,
+			'vehicle_type',
+			VehicleTypeEnum,
+		),
 		vehicle_km_start: getFormDataAsNumber(formData, 'vehicle_km_start'),
 		vehicle_km_end: getFormDataAsNumber(formData, 'vehicle_km_end'),
 		notes: getFormDataAsString(formData, 'notes'),
@@ -115,12 +177,49 @@ function getFormState(
 			company_vehicle: data?.company_vehicle
 				? getCompanyVehicleDisplayName(data.company_vehicle)
 				: null,
+			vehicle_type: data?.company_vehicle.vehicle.vehicle_type ?? null,
 			vehicle_km_start: data?.vehicle_km_start ?? null,
 			vehicle_km_end: data?.vehicle_km_end ?? null,
 			notes: data?.notes ?? null,
 		},
 	};
 }
+
+function validateReturnForm(
+	values: WorkSessionVehicleFormReturnValuesType,
+) {
+	const validator = new WorkSessionVehicleValidator(validatorMessages);
+
+	return validator.return().safeParse(values);
+}
+
+function getFormReturnValues(formData: FormData): WorkSessionVehicleFormReturnValuesType {
+	return {
+		vehicle_type: getFormDataAsEnum(
+			formData,
+			'vehicle_type',
+			VehicleTypeEnum,
+		),
+		vehicle_km_end: getFormDataAsNumber(formData, 'vehicle_km_end'),
+		notes: getFormDataAsString(formData, 'notes'),
+	};
+}
+
+function getFormReturnState(
+	data?: WorkSessionVehicleModel,
+): FormStateType<WorkSessionVehicleFormReturnValuesType> {
+	return {
+		errors: {},
+		message: null,
+		situation: null,
+		values: {
+			vehicle_type: data?.company_vehicle.vehicle.vehicle_type ?? null,
+			vehicle_km_end: data?.vehicle_km_end ?? null,
+			notes: data?.notes ?? null,
+		},
+	};
+}
+
 
 export const dataSourceConfigWorkSessionVehicle: Omit<
 	DataSourceConfigType<
@@ -141,7 +240,7 @@ export const dataSourceConfigWorkSessionVehicle: Omit<
 			entriesSelection: 'free',
 			operationFunction: () => {
 				// It is overridden in the component
-				throw new Error('Not defined here');
+				throw new ExecutionError('Not defined here');
 			},
 			buttonPosition: 'hidden',
 			getFormValues: getFormValues,
@@ -156,9 +255,9 @@ export const dataSourceConfigWorkSessionVehicle: Omit<
 			entriesSelection: 'single',
 			operationFunction: () => {
 				// It is overridden in the component
-				throw new Error('Not defined here');
+				throw new ExecutionError('Not defined here');
 			},
-			buttonPosition: 'left',
+			buttonPosition: 'hidden',
 			button: {
 				variant: 'outline',
 				hover: 'success',
@@ -182,19 +281,23 @@ export const dataSourceConfigWorkSessionVehicle: Omit<
 			},
 		},
 		return: {
-			windowType: 'action',
+			windowType: 'form',
 			windowTitle: translations['return.title'],
+			windowComponent: FormReturnWorkSessionVehicle,
 			permission: 'work-session-vehicle.update',
 			entriesSelection: 'single',
-			customEntryCheck: (entry: WorkSessionVehicleModel) =>
-				entry.status === WorkSessionVehicleStatusEnum.ASSIGNED,
-			operationFunction: (entry: WorkSessionVehicleModel) =>
-				updateStatusWorkSessionVehicle(entry, 'returned'),
+			operationFunction: () => {
+				// It is overridden in the component
+				throw new ExecutionError('Not defined here');
+			},
 			buttonPosition: 'left',
 			button: {
 				variant: 'outline',
-				hover: 'info',
+				hover: 'success',
 			},
+			getFormValues: getFormReturnValues,
+			validateForm: validateReturnForm,
+			getFormState: getFormReturnState,
 		},
 	},
 };

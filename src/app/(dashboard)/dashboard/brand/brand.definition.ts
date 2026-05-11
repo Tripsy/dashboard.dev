@@ -161,10 +161,7 @@ export type BrandDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
-export const dataSourceConfigBrand: DataSourceConfigType<
-	BrandModel,
-	BrandFormValuesType
-> = {
+export const dataSourceConfigBrand: DataSourceConfigType<BrandModel> = {
 	dataTable: {
 		state: {
 			first: 0,

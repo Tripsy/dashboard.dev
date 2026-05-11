@@ -258,10 +258,7 @@ export type UserDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
-export const dataSourceConfigUser: DataSourceConfigType<
-	UserModel,
-	UserFormValuesType
-> = {
+export const dataSourceConfigUser: DataSourceConfigType<UserModel> = {
 	dataTable: {
 		state: {
 			first: 0,

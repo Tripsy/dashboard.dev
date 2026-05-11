@@ -150,10 +150,7 @@ export type VehicleDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
-export const dataSourceConfigVehicle: DataSourceConfigType<
-	VehicleModel,
-	VehicleFormValuesType
-> = {
+export const dataSourceConfigVehicle: DataSourceConfigType<VehicleModel> = {
 	dataTable: {
 		state: {
 			first: 0,

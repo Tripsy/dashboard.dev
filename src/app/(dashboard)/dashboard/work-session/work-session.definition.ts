@@ -232,250 +232,249 @@ function displayButtonViewUser(
 	};
 }
 
-export const dataSourceConfigWorkSession: DataSourceConfigType<
-	WorkSessionModel,
-	WorkSessionFormValuesType,
-	WorkSessionCreateOutput | WorkSessionUpdateOutput
-> = {
-	dataTable: {
-		state: {
-			first: 0,
-			rows: 10,
-			sortField: 'id',
-			sortOrder: -1 as const,
-			filters: {
-				global: { value: null, matchMode: 'contains' },
-				user: { value: '', matchMode: 'equals' },
-				user_id: { value: null, matchMode: 'equals' },
-				status: { value: null, matchMode: 'equals' },
-				start_at_start: { value: null, matchMode: 'equals' },
-				start_at_end: { value: null, matchMode: 'equals' },
-				is_deleted: { value: false, matchMode: 'equals' },
-			} satisfies WorkSessionDataTableFiltersType,
-		},
-		columns: [
-			{
-				field: 'id',
-				header: 'ID',
-				sortable: true,
-				body: (
-					entry: WorkSessionModel,
-					column: DataTableColumnType<WorkSessionModel>,
-				) =>
-					DataTableValue(entry, column, {
-						markDeleted: true,
-						displayButton: {
-							action: 'view',
-							dataSource: 'work-session',
-						},
-					}),
+export const dataSourceConfigWorkSession: DataSourceConfigType<WorkSessionModel> =
+	{
+		dataTable: {
+			state: {
+				first: 0,
+				rows: 10,
+				sortField: 'id',
+				sortOrder: -1 as const,
+				filters: {
+					global: { value: null, matchMode: 'contains' },
+					user: { value: '', matchMode: 'equals' },
+					user_id: { value: null, matchMode: 'equals' },
+					status: { value: null, matchMode: 'equals' },
+					start_at_start: { value: null, matchMode: 'equals' },
+					start_at_end: { value: null, matchMode: 'equals' },
+					is_deleted: { value: false, matchMode: 'equals' },
+				} satisfies WorkSessionDataTableFiltersType,
 			},
-			{
-				field: 'user',
-				header: 'User',
-				body: (
-					entry: WorkSessionModel,
-					column: DataTableColumnType<WorkSessionModel>,
-				) =>
-					DataTableValue(entry, column, {
-						customValue: entry.user.name,
-						displayButton: displayButtonViewUser(entry),
-					}),
-			},
-			{
-				field: 'start_at',
-				header: 'Start At',
-				body: (
-					entry: WorkSessionModel,
-					column: DataTableColumnType<WorkSessionModel>,
-				) =>
-					DataTableValue(entry, column, {
-						displayDate: true,
-					}),
-			},
-			{
-				field: 'end_at',
-				header: 'End At',
-				body: (
-					entry: WorkSessionModel,
-					column: DataTableColumnType<WorkSessionModel>,
-				) =>
-					DataTableValue(entry, column, {
-						displayDate: true,
-					}),
-			},
-			{
-				field: 'duration',
-				header: 'Duration',
-				body: (
-					entry: WorkSessionModel,
-					column: DataTableColumnType<WorkSessionModel>,
-				) =>
-					DataTableValue(entry, column, {
-						customValue: displayWorkSessionDuration(entry),
-					}),
-			},
-			{
-				field: 'status',
-				header: 'Status',
-				body: (
-					entry: WorkSessionModel,
-					column: DataTableColumnType<WorkSessionModel>,
-				) =>
-					DataTableValue(entry, column, {
-						isStatus: true,
-						markDeleted: true,
-						displayButton: {
-							action: (entry: WorkSessionModel) => {
-								if (entry.deleted_at) {
-									return 'restore';
-								}
-
-								if (
-									entry.status ===
-									WorkSessionStatusEnum.ACTIVE
-								) {
-									return 'close';
-								}
-
-								return undefined;
+			columns: [
+				{
+					field: 'id',
+					header: 'ID',
+					sortable: true,
+					body: (
+						entry: WorkSessionModel,
+						column: DataTableColumnType<WorkSessionModel>,
+					) =>
+						DataTableValue(entry, column, {
+							markDeleted: true,
+							displayButton: {
+								action: 'view',
+								dataSource: 'work-session',
 							},
-							dataSource: 'work-session',
-						},
-					}),
-				style: {
-					minWidth: '8rem',
-					maxWidth: '8rem',
+						}),
+				},
+				{
+					field: 'user',
+					header: 'User',
+					body: (
+						entry: WorkSessionModel,
+						column: DataTableColumnType<WorkSessionModel>,
+					) =>
+						DataTableValue(entry, column, {
+							customValue: entry.user.name,
+							displayButton: displayButtonViewUser(entry),
+						}),
+				},
+				{
+					field: 'start_at',
+					header: 'Start At',
+					body: (
+						entry: WorkSessionModel,
+						column: DataTableColumnType<WorkSessionModel>,
+					) =>
+						DataTableValue(entry, column, {
+							displayDate: true,
+						}),
+				},
+				{
+					field: 'end_at',
+					header: 'End At',
+					body: (
+						entry: WorkSessionModel,
+						column: DataTableColumnType<WorkSessionModel>,
+					) =>
+						DataTableValue(entry, column, {
+							displayDate: true,
+						}),
+				},
+				{
+					field: 'duration',
+					header: 'Duration',
+					body: (
+						entry: WorkSessionModel,
+						column: DataTableColumnType<WorkSessionModel>,
+					) =>
+						DataTableValue(entry, column, {
+							customValue: displayWorkSessionDuration(entry),
+						}),
+				},
+				{
+					field: 'status',
+					header: 'Status',
+					body: (
+						entry: WorkSessionModel,
+						column: DataTableColumnType<WorkSessionModel>,
+					) =>
+						DataTableValue(entry, column, {
+							isStatus: true,
+							markDeleted: true,
+							displayButton: {
+								action: (entry: WorkSessionModel) => {
+									if (entry.deleted_at) {
+										return 'restore';
+									}
+
+									if (
+										entry.status ===
+										WorkSessionStatusEnum.ACTIVE
+									) {
+										return 'close';
+									}
+
+									return undefined;
+								},
+								dataSource: 'work-session',
+							},
+						}),
+					style: {
+						minWidth: '8rem',
+						maxWidth: '8rem',
+					},
+				},
+			],
+			find: (params: FindFunctionParamsType) =>
+				requestFind<WorkSessionModel>('work-session', params),
+		},
+		displayEntryLabel: (entry: WorkSessionModel) => {
+			return getWorkSessionDisplayName(entry);
+		},
+		actions: {
+			create: {
+				windowType: 'form',
+				windowTitle: translations['create.title'],
+				windowComponent: FormManageWorkSession,
+				permission: 'work-session.create',
+				entriesSelection: 'free',
+				operationFunction: (values: WorkSessionCreateOutput) => {
+					const params = prepareParamsFromFormValues(values);
+
+					return requestCreate<WorkSessionModel, typeof params>(
+						'work-session',
+						params,
+					);
+				},
+				buttonPosition: 'right',
+				button: {
+					variant: 'info',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateFormCreate,
+				getFormState: getFormState,
+			},
+			update: {
+				windowType: 'form',
+				windowTitle: translations['update.title'],
+				windowComponent: FormManageWorkSession,
+				permission: 'work-session.update',
+				entriesSelection: 'single',
+				operationFunction: (
+					values: WorkSessionUpdateOutput,
+					id: number,
+				) => {
+					const params = prepareParamsFromFormValues(values);
+
+					return requestUpdate<WorkSessionModel, typeof params>(
+						'work-session',
+						params,
+						id,
+					);
+				},
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'success',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateFormUpdate,
+				getFormState: getFormState,
+			},
+			delete: {
+				windowType: 'action',
+				windowTitle: translations['delete.title'],
+				permission: 'work-session.delete',
+				entriesSelection: 'single',
+				customEntryCheck: (entry: WorkSessionModel) =>
+					!entry.deleted_at, // Return true if the entry is not deleted
+				operationFunction: (entry: WorkSessionModel) =>
+					requestDelete('work-session', entry),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'error',
 				},
 			},
-		],
-		find: (params: FindFunctionParamsType) =>
-			requestFind<WorkSessionModel>('work-session', params),
-	},
-	displayEntryLabel: (entry: WorkSessionModel) => {
-		return getWorkSessionDisplayName(entry);
-	},
-	actions: {
-		create: {
-			windowType: 'form',
-			windowTitle: translations['create.title'],
-			windowComponent: FormManageWorkSession,
-			permission: 'work-session.create',
-			entriesSelection: 'free',
-			operationFunction: (values: WorkSessionCreateOutput) => {
-				const params = prepareParamsFromFormValues(values);
-
-				return requestCreate<WorkSessionModel, typeof params>(
-					'work-session',
-					params,
-				);
+			restore: {
+				windowType: 'action',
+				windowTitle: translations['restore.title'],
+				permission: 'work-session.delete',
+				entriesSelection: 'single',
+				customEntryCheck: (entry: WorkSessionModel) =>
+					!!entry.deleted_at, // Return true if the entry is deleted
+				operationFunction: (entry: WorkSessionModel) =>
+					requestRestore('work-session', entry),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'info',
+				},
 			},
-			buttonPosition: 'right',
-			button: {
-				variant: 'info',
+			close: {
+				windowType: 'action',
+				windowTitle: translations['close.title'],
+				permission: 'work-session.update',
+				entriesSelection: 'single',
+				customEntryCheck: (entry: WorkSessionModel) =>
+					!entry.deleted_at &&
+					arrayHasValue(entry.status, [WorkSessionStatusEnum.ACTIVE]),
+				operationFunction: (entry: WorkSessionModel) =>
+					requestUpdateStatus('work-session', entry, 'closed'),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'error',
+				},
 			},
-			getFormValues: getFormValues,
-			validateForm: validateFormCreate,
-			getFormState: getFormState,
-		},
-		update: {
-			windowType: 'form',
-			windowTitle: translations['update.title'],
-			windowComponent: FormManageWorkSession,
-			permission: 'work-session.update',
-			entriesSelection: 'single',
-			operationFunction: (
-				values: WorkSessionUpdateOutput,
-				id: number,
-			) => {
-				const params = prepareParamsFromFormValues(values);
-
-				return requestUpdate<WorkSessionModel, typeof params>(
-					'work-session',
-					params,
-					id,
-				);
+			view: {
+				windowType: 'view',
+				windowTitle: translations['view.title'],
+				windowComponent: ViewWorkSession,
+				windowConfigProps: {
+					size: 'xl',
+				},
+				permission: 'work-session.read',
+				entriesSelection: 'single',
+				buttonPosition: 'hidden',
 			},
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'success',
-			},
-			getFormValues: getFormValues,
-			validateForm: validateFormUpdate,
-			getFormState: getFormState,
-		},
-		delete: {
-			windowType: 'action',
-			windowTitle: translations['delete.title'],
-			permission: 'work-session.delete',
-			entriesSelection: 'single',
-			customEntryCheck: (entry: WorkSessionModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			operationFunction: (entry: WorkSessionModel) =>
-				requestDelete('work-session', entry),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'error',
+			setupVehicles: {
+				windowType: 'other',
+				windowTitle: translations['setupVehicles.title'],
+				windowComponent: SetupWorkSessionVehicles,
+				windowConfigProps: {
+					size: 'x2l',
+				},
+				permission: 'work-session-vehicle.update',
+				entriesSelection: 'single',
+				customEntryCheck: (entry: WorkSessionModel) =>
+					entry.status === WorkSessionStatusEnum.ACTIVE,
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'info',
+				},
 			},
 		},
-		restore: {
-			windowType: 'action',
-			windowTitle: translations['restore.title'],
-			permission: 'work-session.delete',
-			entriesSelection: 'single',
-			customEntryCheck: (entry: WorkSessionModel) => !!entry.deleted_at, // Return true if the entry is deleted
-			operationFunction: (entry: WorkSessionModel) =>
-				requestRestore('work-session', entry),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'info',
-			},
-		},
-		close: {
-			windowType: 'action',
-			windowTitle: translations['close.title'],
-			permission: 'work-session.update',
-			entriesSelection: 'single',
-			customEntryCheck: (entry: WorkSessionModel) =>
-				!entry.deleted_at &&
-				arrayHasValue(entry.status, [WorkSessionStatusEnum.ACTIVE]),
-			operationFunction: (entry: WorkSessionModel) =>
-				requestUpdateStatus('work-session', entry, 'closed'),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'error',
-			},
-		},
-		view: {
-			windowType: 'view',
-			windowTitle: translations['view.title'],
-			windowComponent: ViewWorkSession,
-			windowConfigProps: {
-				size: 'xl',
-			},
-			permission: 'work-session.read',
-			entriesSelection: 'single',
-			buttonPosition: 'hidden',
-		},
-		setupVehicles: {
-			windowType: 'other',
-			windowTitle: translations['setupVehicles.title'],
-			windowComponent: SetupWorkSessionVehicles,
-			windowConfigProps: {
-				size: 'x2l',
-			},
-			permission: 'work-session-vehicle.update',
-			entriesSelection: 'single',
-			customEntryCheck: (entry: WorkSessionModel) =>
-				entry.status === WorkSessionStatusEnum.ACTIVE,
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'info',
-			},
-		},
-	},
-};
+	};

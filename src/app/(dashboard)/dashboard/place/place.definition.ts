@@ -178,10 +178,7 @@ export type PlaceDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
-export const dataSourceConfigPlace: DataSourceConfigType<
-	PlaceModel,
-	PlaceFormValuesType
-> = {
+export const dataSourceConfigPlace: DataSourceConfigType<PlaceModel> = {
 	dataTable: {
 		state: {
 			first: 0,

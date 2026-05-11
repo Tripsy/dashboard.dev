@@ -235,10 +235,7 @@ export type TemplateDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
-export const dataSourceConfigTemplate: DataSourceConfigType<
-	TemplateModel,
-	TemplateFormValuesType
-> = {
+export const dataSourceConfigTemplate: DataSourceConfigType<TemplateModel> = {
 	dataTable: {
 		state: {
 			first: 0,

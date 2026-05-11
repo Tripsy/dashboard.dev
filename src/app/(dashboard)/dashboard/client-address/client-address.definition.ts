@@ -182,165 +182,167 @@ function displayButtonViewClient(
 	};
 }
 
-export const dataSourceConfigClientAddress: DataSourceConfigType<
-	ClientAddressModel,
-	ClientAddressFormValuesType
-> = {
-	dataTable: {
-		state: {
-			first: 0,
-			rows: 10,
-			sortField: 'id',
-			sortOrder: -1 as const,
-			filters: {
-				global: { value: null, matchMode: 'contains' },
-				address_type: { value: null, matchMode: 'equals' },
-				is_deleted: { value: false, matchMode: 'equals' },
-			} satisfies ClientAddressDataTableFiltersType,
+export const dataSourceConfigClientAddress: DataSourceConfigType<ClientAddressModel> =
+	{
+		dataTable: {
+			state: {
+				first: 0,
+				rows: 10,
+				sortField: 'id',
+				sortOrder: -1 as const,
+				filters: {
+					global: { value: null, matchMode: 'contains' },
+					address_type: { value: null, matchMode: 'equals' },
+					is_deleted: { value: false, matchMode: 'equals' },
+				} satisfies ClientAddressDataTableFiltersType,
+			},
+			columns: [
+				{
+					field: 'id',
+					header: 'ID',
+					sortable: true,
+					body: (
+						entry: ClientAddressModel,
+						column: DataTableColumnType<ClientAddressModel>,
+					) =>
+						DataTableValue(entry, column, {
+							markDeleted: true,
+							displayButton: {
+								action: 'view',
+								dataSource: 'client-address',
+							},
+						}),
+				},
+				{
+					field: 'client',
+					header: 'Client',
+					body: (
+						entry: ClientAddressModel,
+						column: DataTableColumnType<ClientAddressModel>,
+					) =>
+						DataTableValue(entry, column, {
+							customValue: getClientDisplayName(entry.client),
+							displayButton: displayButtonViewClient(entry),
+						}),
+				},
+				{
+					field: 'address_type',
+					header: 'Type',
+					body: (
+						entry: ClientAddressModel,
+						column: DataTableColumnType<ClientAddressModel>,
+					) =>
+						DataTableValue(entry, column, {
+							customValue: formatEnumLabel(entry.address_type),
+						}),
+				},
+				{
+					field: 'city',
+					header: 'City',
+					body: (
+						entry: ClientAddressModel,
+						column: DataTableColumnType<ClientAddressModel>,
+					) =>
+						DataTableValue(entry, column, {
+							customValue: entry.city
+								? getPlaceContentProp(entry.city, 'name')
+								: undefined,
+						}),
+				},
+				{
+					field: 'details',
+					header: 'Address',
+					sortable: true,
+				},
+			],
+			find: (params: FindFunctionParamsType) =>
+				requestFind<ClientAddressModel>('client-address', params),
 		},
-		columns: [
-			{
-				field: 'id',
-				header: 'ID',
-				sortable: true,
-				body: (
-					entry: ClientAddressModel,
-					column: DataTableColumnType<ClientAddressModel>,
-				) =>
-					DataTableValue(entry, column, {
-						markDeleted: true,
-						displayButton: {
-							action: 'view',
-							dataSource: 'client-address',
-						},
-					}),
-			},
-			{
-				field: 'client',
-				header: 'Client',
-				body: (
-					entry: ClientAddressModel,
-					column: DataTableColumnType<ClientAddressModel>,
-				) =>
-					DataTableValue(entry, column, {
-						customValue: getClientDisplayName(entry.client),
-						displayButton: displayButtonViewClient(entry),
-					}),
-			},
-			{
-				field: 'address_type',
-				header: 'Type',
-				body: (
-					entry: ClientAddressModel,
-					column: DataTableColumnType<ClientAddressModel>,
-				) =>
-					DataTableValue(entry, column, {
-						customValue: formatEnumLabel(entry.address_type),
-					}),
-			},
-			{
-				field: 'city',
-				header: 'City',
-				body: (
-					entry: ClientAddressModel,
-					column: DataTableColumnType<ClientAddressModel>,
-				) =>
-					DataTableValue(entry, column, {
-						customValue: entry.city
-							? getPlaceContentProp(entry.city, 'name')
-							: undefined,
-					}),
-			},
-			{
-				field: 'details',
-				header: 'Address',
-				sortable: true,
-			},
-		],
-		find: (params: FindFunctionParamsType) =>
-			requestFind<ClientAddressModel>('client-address', params),
-	},
-	displayEntryLabel: (entry: ClientAddressModel) => {
-		return `${getClientDisplayName(entry.client)} - ${entry.details}`;
-	},
-	actions: {
-		create: {
-			windowType: 'form',
-			windowTitle: translations['create.title'],
-			windowComponent: FormManageClientAddress,
-			permission: 'client-address.create',
-			entriesSelection: 'free',
-			operationFunction: (params: ClientAddressFormValuesType) => {
-				const { client_id, client, city, ...prepareParams } = params;
+		displayEntryLabel: (entry: ClientAddressModel) => {
+			return `${getClientDisplayName(entry.client)} - ${entry.details}`;
+		},
+		actions: {
+			create: {
+				windowType: 'form',
+				windowTitle: translations['create.title'],
+				windowComponent: FormManageClientAddress,
+				permission: 'client-address.create',
+				entriesSelection: 'free',
+				operationFunction: (params: ClientAddressFormValuesType) => {
+					const { client_id, client, city, ...prepareParams } =
+						params;
 
-				return createClientAddress(prepareParams, client_id);
+					return createClientAddress(prepareParams, client_id);
+				},
+				buttonPosition: 'right',
+				button: {
+					variant: 'info',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateForm,
+				getFormState: getFormState,
 			},
-			buttonPosition: 'right',
-			button: {
-				variant: 'info',
-			},
-			getFormValues: getFormValues,
-			validateForm: validateForm,
-			getFormState: getFormState,
-		},
-		update: {
-			windowType: 'form',
-			windowTitle: translations['update.title'],
-			windowComponent: FormManageClientAddress,
-			permission: 'client-address.update',
-			entriesSelection: 'single',
-			operationFunction: (
-				params: ClientAddressFormValuesType,
-				id: number,
-			) => {
-				const { client_id, client, city, ...prepareParams } = params;
+			update: {
+				windowType: 'form',
+				windowTitle: translations['update.title'],
+				windowComponent: FormManageClientAddress,
+				permission: 'client-address.update',
+				entriesSelection: 'single',
+				operationFunction: (
+					params: ClientAddressFormValuesType,
+					id: number,
+				) => {
+					const { client_id, client, city, ...prepareParams } =
+						params;
 
-				return updateClientAddress(prepareParams, id, client_id);
+					return updateClientAddress(prepareParams, id, client_id);
+				},
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'success',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateForm,
+				getFormState: getFormState,
 			},
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'success',
+			delete: {
+				windowType: 'action',
+				windowTitle: translations['delete.title'],
+				permission: 'client-address.delete',
+				entriesSelection: 'single',
+				customEntryCheck: (entry: ClientAddressModel) =>
+					!entry.deleted_at, // Return true if the entry is not deleted
+				operationFunction: (entry: ClientAddressModel) =>
+					deleteClientAddress(entry),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'error',
+				},
 			},
-			getFormValues: getFormValues,
-			validateForm: validateForm,
-			getFormState: getFormState,
-		},
-		delete: {
-			windowType: 'action',
-			windowTitle: translations['delete.title'],
-			permission: 'client-address.delete',
-			entriesSelection: 'single',
-			customEntryCheck: (entry: ClientAddressModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			operationFunction: (entry: ClientAddressModel) =>
-				deleteClientAddress(entry),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'error',
+			restore: {
+				windowType: 'action',
+				windowTitle: translations['restore.title'],
+				permission: 'client-address.delete',
+				entriesSelection: 'single',
+				customEntryCheck: (entry: ClientAddressModel) =>
+					!!entry.deleted_at, // Return true if the entry is deleted
+				operationFunction: (entry: ClientAddressModel) =>
+					restoreClientAddress(entry),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'info',
+				},
+			},
+			view: {
+				windowType: 'view',
+				windowTitle: translations['view.title'],
+				windowComponent: ViewClientAddress,
+				permission: 'client-address.read',
+				entriesSelection: 'single',
+				buttonPosition: 'hidden',
 			},
 		},
-		restore: {
-			windowType: 'action',
-			windowTitle: translations['restore.title'],
-			permission: 'client-address.delete',
-			entriesSelection: 'single',
-			customEntryCheck: (entry: ClientAddressModel) => !!entry.deleted_at, // Return true if the entry is deleted
-			operationFunction: (entry: ClientAddressModel) =>
-				restoreClientAddress(entry),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'info',
-			},
-		},
-		view: {
-			windowType: 'view',
-			windowTitle: translations['view.title'],
-			windowComponent: ViewClientAddress,
-			permission: 'client-address.read',
-			entriesSelection: 'single',
-			buttonPosition: 'hidden',
-		},
-	},
-};
+	};

@@ -152,232 +152,232 @@ export type CompanyVehicleDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
-export const dataSourceConfigCompanyVehicle: DataSourceConfigType<
-	CompanyVehicleModel,
-	CompanyVehicleFormValuesType
-> = {
-	dataTable: {
-		state: {
-			first: 0,
-			rows: 10,
-			sortField: 'id',
-			sortOrder: -1 as const,
-			filters: {
-				global: { value: null, matchMode: 'contains' },
-				scope: { value: null, matchMode: 'equals' },
-				status: { value: null, matchMode: 'equals' },
-				is_deleted: { value: false, matchMode: 'equals' },
-			} satisfies CompanyVehicleDataTableFiltersType,
-		},
-		columns: [
-			{
-				field: 'id',
-				header: 'ID',
-				sortable: true,
-				body: (
-					entry: CompanyVehicleModel,
-					column: DataTableColumnType<CompanyVehicleModel>,
-				) =>
-					DataTableValue(entry, column, {
-						markDeleted: true,
-						displayButton: {
-							action: 'view',
-							dataSource: 'company-vehicle',
-						},
-					}),
+export const dataSourceConfigCompanyVehicle: DataSourceConfigType<CompanyVehicleModel> =
+	{
+		dataTable: {
+			state: {
+				first: 0,
+				rows: 10,
+				sortField: 'id',
+				sortOrder: -1 as const,
+				filters: {
+					global: { value: null, matchMode: 'contains' },
+					scope: { value: null, matchMode: 'equals' },
+					status: { value: null, matchMode: 'equals' },
+					is_deleted: { value: false, matchMode: 'equals' },
+				} satisfies CompanyVehicleDataTableFiltersType,
 			},
-			{
-				field: 'brand',
-				header: 'Brand',
-				body: (
-					entry: CompanyVehicleModel,
-					column: DataTableColumnType<CompanyVehicleModel>,
-				) =>
-					DataTableValue(entry, column, {
-						customValue: entry.vehicle.brand?.name || 'n/a',
-					}),
-			},
-			{
-				field: 'model',
-				header: 'Model',
-				body: (
-					entry: CompanyVehicleModel,
-					column: DataTableColumnType<CompanyVehicleModel>,
-				) =>
-					DataTableValue(entry, column, {
-						customValue: entry.vehicle.model,
-					}),
-			},
-			{
-				field: 'vehicle_type',
-				header: 'Type',
-				body: (
-					entry: CompanyVehicleModel,
-					column: DataTableColumnType<CompanyVehicleModel>,
-				) =>
-					DataTableValue(entry, column, {
-						customValue: formatEnumLabel(
-							entry.vehicle.vehicle_type,
-						),
-					}),
-			},
-			{
-				field: 'license_plate',
-				header: 'License Plate',
-			},
-			{
-				field: 'scope',
-				header: 'Scope',
-				body: (
-					entry: CompanyVehicleModel,
-					column: DataTableColumnType<CompanyVehicleModel>,
-				) =>
-					DataTableValue(entry, column, {
-						customValue: formatEnumLabel(entry.scope),
-					}),
-			},
-			{
-				field: 'status',
-				header: 'Status',
-				body: (
-					entry: CompanyVehicleModel,
-					column: DataTableColumnType<CompanyVehicleModel>,
-				) =>
-					DataTableValue(entry, column, {
-						isStatus: true,
-						markDeleted: true,
-						displayButton: {
-							action: (entry: CompanyVehicleModel) => {
-								if (entry.deleted_at) {
-									return undefined;
-								}
-
-								const statusTransitions = getStatusTransitions(
-									entry.status,
-									STATUS_TRANSITIONS,
-								);
-
-								if (statusTransitions.length === 0) {
-									return undefined;
-								}
-
-								return 'statusTransition';
+			columns: [
+				{
+					field: 'id',
+					header: 'ID',
+					sortable: true,
+					body: (
+						entry: CompanyVehicleModel,
+						column: DataTableColumnType<CompanyVehicleModel>,
+					) =>
+						DataTableValue(entry, column, {
+							markDeleted: true,
+							displayButton: {
+								action: 'view',
+								dataSource: 'company-vehicle',
 							},
-							dataSource: 'company-vehicle',
-						},
-					}),
-				style: {
-					minWidth: '8rem',
-					maxWidth: '8rem',
+						}),
+				},
+				{
+					field: 'brand',
+					header: 'Brand',
+					body: (
+						entry: CompanyVehicleModel,
+						column: DataTableColumnType<CompanyVehicleModel>,
+					) =>
+						DataTableValue(entry, column, {
+							customValue: entry.vehicle.brand?.name || 'n/a',
+						}),
+				},
+				{
+					field: 'model',
+					header: 'Model',
+					body: (
+						entry: CompanyVehicleModel,
+						column: DataTableColumnType<CompanyVehicleModel>,
+					) =>
+						DataTableValue(entry, column, {
+							customValue: entry.vehicle.model,
+						}),
+				},
+				{
+					field: 'vehicle_type',
+					header: 'Type',
+					body: (
+						entry: CompanyVehicleModel,
+						column: DataTableColumnType<CompanyVehicleModel>,
+					) =>
+						DataTableValue(entry, column, {
+							customValue: formatEnumLabel(
+								entry.vehicle.vehicle_type,
+							),
+						}),
+				},
+				{
+					field: 'license_plate',
+					header: 'License Plate',
+				},
+				{
+					field: 'scope',
+					header: 'Scope',
+					body: (
+						entry: CompanyVehicleModel,
+						column: DataTableColumnType<CompanyVehicleModel>,
+					) =>
+						DataTableValue(entry, column, {
+							customValue: formatEnumLabel(entry.scope),
+						}),
+				},
+				{
+					field: 'status',
+					header: 'Status',
+					body: (
+						entry: CompanyVehicleModel,
+						column: DataTableColumnType<CompanyVehicleModel>,
+					) =>
+						DataTableValue(entry, column, {
+							isStatus: true,
+							markDeleted: true,
+							displayButton: {
+								action: (entry: CompanyVehicleModel) => {
+									if (entry.deleted_at) {
+										return undefined;
+									}
+
+									const statusTransitions =
+										getStatusTransitions(
+											entry.status,
+											STATUS_TRANSITIONS,
+										);
+
+									if (statusTransitions.length === 0) {
+										return undefined;
+									}
+
+									return 'statusTransition';
+								},
+								dataSource: 'company-vehicle',
+							},
+						}),
+					style: {
+						minWidth: '8rem',
+						maxWidth: '8rem',
+					},
+				},
+			],
+			find: (params: FindFunctionParamsType) =>
+				requestFind<CompanyVehicleModel>('company-vehicle', params),
+		},
+		displayEntryLabel: (entry: CompanyVehicleModel) => {
+			return getCompanyVehicleDisplayName(entry);
+		},
+		actions: {
+			create: {
+				windowType: 'form',
+				windowTitle: translations['create.title'],
+				windowComponent: FormManageCompanyVehicle,
+				permission: 'company-vehicle.create',
+				entriesSelection: 'free',
+				operationFunction: (params: CompanyVehicleFormValuesType) =>
+					requestCreate<
+						CompanyVehicleModel,
+						CompanyVehicleFormValuesType
+					>('company-vehicle', params),
+				buttonPosition: 'right',
+				button: {
+					variant: 'info',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateForm,
+				getFormState: getFormState,
+			},
+			update: {
+				windowType: 'form',
+				windowTitle: translations['update.title'],
+				windowComponent: FormManageCompanyVehicle,
+				permission: 'company-vehicle.update',
+				entriesSelection: 'single',
+				operationFunction: (
+					params: CompanyVehicleFormValuesType,
+					id: number,
+				) =>
+					requestUpdate<
+						CompanyVehicleModel,
+						CompanyVehicleFormValuesType
+					>('company-vehicle', params, id),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'success',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateForm,
+				getFormState: getFormState,
+			},
+			delete: {
+				windowType: 'action',
+				windowTitle: translations['delete.title'],
+				permission: 'company-vehicle.delete',
+				entriesSelection: 'single',
+				customEntryCheck: (entry: CompanyVehicleModel) =>
+					!entry.deleted_at, // Return true if the entry is not deleted
+				operationFunction: (entry: CompanyVehicleModel) =>
+					requestDelete('company-vehicle', entry),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'error',
 				},
 			},
-		],
-		find: (params: FindFunctionParamsType) =>
-			requestFind<CompanyVehicleModel>('company-vehicle', params),
-	},
-	displayEntryLabel: (entry: CompanyVehicleModel) => {
-		return getCompanyVehicleDisplayName(entry);
-	},
-	actions: {
-		create: {
-			windowType: 'form',
-			windowTitle: translations['create.title'],
-			windowComponent: FormManageCompanyVehicle,
-			permission: 'company-vehicle.create',
-			entriesSelection: 'free',
-			operationFunction: (params: CompanyVehicleFormValuesType) =>
-				requestCreate<
-					CompanyVehicleModel,
-					CompanyVehicleFormValuesType
-				>('company-vehicle', params),
-			buttonPosition: 'right',
-			button: {
-				variant: 'info',
+			restore: {
+				windowType: 'action',
+				windowTitle: translations['restore.title'],
+				permission: 'company-vehicle.delete',
+				entriesSelection: 'single',
+				customEntryCheck: (entry: CompanyVehicleModel) =>
+					!!entry.deleted_at, // Return true if the entry is deleted
+				operationFunction: (entry: CompanyVehicleModel) =>
+					requestRestore('company-vehicle', entry),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'info',
+				},
 			},
-			getFormValues: getFormValues,
-			validateForm: validateForm,
-			getFormState: getFormState,
-		},
-		update: {
-			windowType: 'form',
-			windowTitle: translations['update.title'],
-			windowComponent: FormManageCompanyVehicle,
-			permission: 'company-vehicle.update',
-			entriesSelection: 'single',
-			operationFunction: (
-				params: CompanyVehicleFormValuesType,
-				id: number,
-			) =>
-				requestUpdate<
-					CompanyVehicleModel,
-					CompanyVehicleFormValuesType
-				>('company-vehicle', params, id),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'success',
+			view: {
+				windowType: 'view',
+				windowTitle: translations['view.title'],
+				windowComponent: ViewCompanyVehicle,
+				windowConfigProps: {
+					size: 'xl',
+				},
+				permission: 'company-vehicle.read',
+				entriesSelection: 'single',
+				buttonPosition: 'hidden',
 			},
-			getFormValues: getFormValues,
-			validateForm: validateForm,
-			getFormState: getFormState,
-		},
-		delete: {
-			windowType: 'action',
-			windowTitle: translations['delete.title'],
-			permission: 'company-vehicle.delete',
-			entriesSelection: 'single',
-			customEntryCheck: (entry: CompanyVehicleModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			operationFunction: (entry: CompanyVehicleModel) =>
-				requestDelete('company-vehicle', entry),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'error',
+			statusTransition: {
+				windowType: 'other',
+				windowTitle: translations['statusTransition.title'],
+				windowComponent: StatusTransitionCompanyVehicle,
+				windowConfigProps: {
+					size: 'lg',
+				},
+				permission: 'company-vehicle.update',
+				entriesSelection: 'single',
+				customEntryCheck: (entry: CompanyVehicleModel) =>
+					getStatusTransitions(entry.status, STATUS_TRANSITIONS)
+						.length > 0,
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'info',
+				},
 			},
 		},
-		restore: {
-			windowType: 'action',
-			windowTitle: translations['restore.title'],
-			permission: 'company-vehicle.delete',
-			entriesSelection: 'single',
-			customEntryCheck: (entry: CompanyVehicleModel) =>
-				!!entry.deleted_at, // Return true if the entry is deleted
-			operationFunction: (entry: CompanyVehicleModel) =>
-				requestRestore('company-vehicle', entry),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'info',
-			},
-		},
-		view: {
-			windowType: 'view',
-			windowTitle: translations['view.title'],
-			windowComponent: ViewCompanyVehicle,
-			windowConfigProps: {
-				size: 'xl',
-			},
-			permission: 'company-vehicle.read',
-			entriesSelection: 'single',
-			buttonPosition: 'hidden',
-		},
-		statusTransition: {
-			windowType: 'other',
-			windowTitle: translations['statusTransition.title'],
-			windowComponent: StatusTransitionCompanyVehicle,
-			windowConfigProps: {
-				size: 'lg',
-			},
-			permission: 'company-vehicle.update',
-			entriesSelection: 'single',
-			customEntryCheck: (entry: CompanyVehicleModel) =>
-				getStatusTransitions(entry.status, STATUS_TRANSITIONS).length >
-				0,
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'info',
-			},
-		},
-	},
-};
+	};

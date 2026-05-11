@@ -183,11 +183,7 @@ export type CashFlowDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
-export const dataSourceConfigCashFlow: DataSourceConfigType<
-	CashFlowModel,
-	CashFlowFormValuesType,
-	CashFlowManageOutput
-> = {
+export const dataSourceConfigCashFlow: DataSourceConfigType<CashFlowModel> = {
 	dataTable: {
 		state: {
 			first: 0,

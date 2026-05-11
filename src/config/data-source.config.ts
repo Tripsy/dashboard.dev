@@ -183,21 +183,18 @@ export type ActionConfigType<
 	| ViewActionConfig<Entry, FormValues>
 	| OtherActionConfig<Entry, FormValues>;
 
-export type ActionsType<
-	Entry extends WindowEntryType,
-	FormValues extends FormValuesType = FormValuesType,
-	ValidatedValues = FormValues,
-> = {
-	[key: string]: ActionConfigType<Entry, FormValues, ValidatedValues>;
+export type ActionsType<Entry extends WindowEntryType> = {
+	// biome-ignore lint/suspicious/noExplicitAny: It's fine
+	[key: string]: ActionConfigType<Entry, any, any>;
 } & {
-	create?: FormCreateActionConfig<Entry, FormValues, ValidatedValues>;
-	update?: FormUpdateActionConfig<Entry, FormValues, ValidatedValues>;
-	delete?:
-		| SingleActionConfig<Entry, FormValues>
-		| MultipleActionConfig<Entry, FormValues>;
-	restore?:
-		| SingleActionConfig<Entry, FormValues>
-		| MultipleActionConfig<Entry, FormValues>;
+	// biome-ignore lint/suspicious/noExplicitAny: It's fine
+	create?: FormCreateActionConfig<Entry, any, any>;
+	// biome-ignore lint/suspicious/noExplicitAny: It's fine
+	update?: FormUpdateActionConfig<Entry, any, any>;
+	// biome-ignore lint/suspicious/noExplicitAny: It's fine
+	delete?: SingleActionConfig<Entry, any> | MultipleActionConfig<Entry, any>;
+	// biome-ignore lint/suspicious/noExplicitAny: It's fine
+	restore?: SingleActionConfig<Entry, any> | MultipleActionConfig<Entry, any>;
 };
 
 // ============================================================================
@@ -226,11 +223,7 @@ export type DataSourceKey =
 	| 'work-session'
 	| 'work-session-vehicle';
 
-export type DataSourceConfigType<
-	Entry extends WindowEntryType,
-	FormValues extends FormValuesType = FormValuesType,
-	ValidatedValues = FormValues,
-> = {
+export type DataSourceConfigType<Entry extends WindowEntryType> = {
 	dataTable?: {
 		state: DataTableStateType;
 		columns: DataTableColumnType<Entry>[];
@@ -239,13 +232,13 @@ export type DataSourceConfigType<
 		onRowUnselect?: (entry: Entry) => void;
 	};
 	displayEntryLabel?: DisplayEntryLabelFnType<Entry>;
-	actions?: ActionsType<Entry, FormValues, ValidatedValues>;
+	actions?: ActionsType<Entry>;
 };
 
 const registry: Record<
 	DataSourceSection,
 	// biome-ignore lint/suspicious/noExplicitAny: It's fine
-	Partial<Record<DataSourceKey, DataSourceConfigType<any, any, any>>>
+	Partial<Record<DataSourceKey, DataSourceConfigType<any>>>
 > = {
 	dashboard: {},
 	public: {},
@@ -255,7 +248,7 @@ export function loadDataSource(
 	section: DataSourceSection,
 	key: DataSourceKey,
 	// biome-ignore lint/suspicious/noExplicitAny: It's fine
-	config: DataSourceConfigType<any, any, any>,
+	config: DataSourceConfigType<any>,
 ) {
 	if (hasDataSourceConfig(section, key)) {
 		return;
@@ -274,13 +267,13 @@ export function hasDataSourceConfig<K extends DataSourceKey>(
 export function getDataSourceConfig<
 	K extends DataSourceKey,
 	// biome-ignore lint/suspicious/noExplicitAny: It's fine
-	P extends keyof DataSourceConfigType<any, any, any>,
+	P extends keyof DataSourceConfigType<any>,
 >(
 	section: DataSourceSection,
 	key: K,
 	prop: P,
 ): // biome-ignore lint/suspicious/noExplicitAny: It's fine
-DataSourceConfigType<any, any, any>[P] {
+DataSourceConfigType<any>[P] {
 	const config = registry[section][key];
 
 	if (!config) {

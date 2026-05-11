@@ -187,231 +187,242 @@ export type WorkSessionVehicleDataTableFiltersType = {
 	status: { value: WorkSessionVehicleStatus | null; matchMode: 'equals' };
 };
 
-export const dataSourceConfigWorkSessionVehicle: DataSourceConfigType<
-	WorkSessionVehicleModel,
-	WorkSessionVehicleFormValuesType
-> = {
-	dataTable: {
-		state: {
-			first: 0,
-			rows: 10,
-			sortField: 'id',
-			sortOrder: -1 as const,
-			filters: {
-				company_vehicle: { value: '', matchMode: 'equals' },
-				company_vehicle_id: { value: null, matchMode: 'equals' },
-				work_session_status: { value: null, matchMode: 'equals' },
-				status: { value: null, matchMode: 'equals' },
-			} satisfies WorkSessionVehicleDataTableFiltersType,
-		},
-		columns: [
-			{
-				field: 'id',
-				header: 'ID',
-				sortable: true,
-				body: (
-					entry: WorkSessionVehicleModel,
-					column: DataTableColumnType<WorkSessionVehicleModel>,
-				) =>
-					DataTableValue(entry, column, {
-						markDeleted: true,
-						displayButton: {
-							action: 'view',
-							dataSource: 'work-session-vehicle',
-						},
-					}),
+export const dataSourceConfigWorkSessionVehicle: DataSourceConfigType<WorkSessionVehicleModel> =
+	{
+		dataTable: {
+			state: {
+				first: 0,
+				rows: 10,
+				sortField: 'id',
+				sortOrder: -1 as const,
+				filters: {
+					company_vehicle: { value: '', matchMode: 'equals' },
+					company_vehicle_id: { value: null, matchMode: 'equals' },
+					work_session_status: { value: null, matchMode: 'equals' },
+					status: { value: null, matchMode: 'equals' },
+				} satisfies WorkSessionVehicleDataTableFiltersType,
 			},
-			{
-				field: 'work_session',
-				header: 'Session ID',
-				body: (
-					entry: WorkSessionVehicleModel,
-					column: DataTableColumnType<WorkSessionVehicleModel>,
-				) =>
-					DataTableValue(entry, column, {
-						customValue: entry.work_session.id.toString(),
-					}),
-			},
-			{
-				field: 'work_session',
-				header: 'Session',
-				body: (
-					entry: WorkSessionVehicleModel,
-					column: DataTableColumnType<WorkSessionVehicleModel>,
-				) =>
-					DataTableValue(entry, column, {
-						customValue: getWorkSessionDisplayName(
-							entry.work_session,
-						),
-					}),
-			},
-			{
-				field: 'work_session',
-				header: 'Session Status',
-				body: (entry, column) =>
-					DataTableValue(entry, column, {
-						isStatus: true,
-						customValue: formatEnumLabel(entry.work_session.status),
-					}),
-				style: { minWidth: '8rem', maxWidth: '8rem' },
-			},
-			{
-				field: 'company_vehicle',
-				header: 'Vehicle',
-				body: (
-					entry: WorkSessionVehicleModel,
-					column: DataTableColumnType<WorkSessionVehicleModel>,
-				) =>
-					DataTableValue(entry, column, {
-						customValue: getCompanyVehicleDisplayName(
-							entry.company_vehicle,
-						),
-					}),
-			},
-			{
-				field: 'status',
-				header: 'Status',
-				body: (
-					entry: WorkSessionVehicleModel,
-					column: DataTableColumnType<WorkSessionVehicleModel>,
-				) =>
-					DataTableValue(entry, column, {
-						isStatus: true,
-						markDeleted: true,
-						displayButton: {
-							action: (entry: WorkSessionVehicleModel) => {
-								return entry.status ===
-									WorkSessionVehicleStatusEnum.ASSIGNED
-									? 'return'
-									: undefined;
+			columns: [
+				{
+					field: 'id',
+					header: 'ID',
+					sortable: true,
+					body: (
+						entry: WorkSessionVehicleModel,
+						column: DataTableColumnType<WorkSessionVehicleModel>,
+					) =>
+						DataTableValue(entry, column, {
+							markDeleted: true,
+							displayButton: {
+								action: 'view',
+								dataSource: 'work-session-vehicle',
 							},
-							dataSource: 'work-session-vehicle',
-						},
-					}),
-				style: {
-					minWidth: '8rem',
-					maxWidth: '8rem',
+						}),
+				},
+				{
+					field: 'work_session',
+					header: 'Session ID',
+					body: (
+						entry: WorkSessionVehicleModel,
+						column: DataTableColumnType<WorkSessionVehicleModel>,
+					) =>
+						DataTableValue(entry, column, {
+							customValue: entry.work_session.id.toString(),
+						}),
+				},
+				{
+					field: 'work_session',
+					header: 'Session',
+					body: (
+						entry: WorkSessionVehicleModel,
+						column: DataTableColumnType<WorkSessionVehicleModel>,
+					) =>
+						DataTableValue(entry, column, {
+							customValue: getWorkSessionDisplayName(
+								entry.work_session,
+							),
+						}),
+				},
+				{
+					field: 'work_session',
+					header: 'Session Status',
+					body: (entry, column) =>
+						DataTableValue(entry, column, {
+							isStatus: true,
+							customValue: formatEnumLabel(
+								entry.work_session.status,
+							),
+						}),
+					style: { minWidth: '8rem', maxWidth: '8rem' },
+				},
+				{
+					field: 'company_vehicle',
+					header: 'Vehicle',
+					body: (
+						entry: WorkSessionVehicleModel,
+						column: DataTableColumnType<WorkSessionVehicleModel>,
+					) =>
+						DataTableValue(entry, column, {
+							customValue: getCompanyVehicleDisplayName(
+								entry.company_vehicle,
+							),
+						}),
+				},
+				{
+					field: 'status',
+					header: 'Status',
+					body: (
+						entry: WorkSessionVehicleModel,
+						column: DataTableColumnType<WorkSessionVehicleModel>,
+					) =>
+						DataTableValue(entry, column, {
+							isStatus: true,
+							markDeleted: true,
+							displayButton: {
+								action: (entry: WorkSessionVehicleModel) => {
+									return entry.status ===
+										WorkSessionVehicleStatusEnum.ASSIGNED
+										? 'return'
+										: undefined;
+								},
+								dataSource: 'work-session-vehicle',
+							},
+						}),
+					style: {
+						minWidth: '8rem',
+						maxWidth: '8rem',
+					},
+				},
+				{
+					field: 'assigned_at',
+					header: 'Assigned At',
+					sortable: true,
+					body: (
+						entry: WorkSessionVehicleModel,
+						column: DataTableColumnType<WorkSessionVehicleModel>,
+					) =>
+						DataTableValue(entry, column, {
+							displayDate: true,
+						}),
+				},
+				{
+					field: 'returned_at',
+					header: 'Returned At',
+					sortable: true,
+					body: (
+						entry: WorkSessionVehicleModel,
+						column: DataTableColumnType<WorkSessionVehicleModel>,
+					) =>
+						DataTableValue(entry, column, {
+							displayDate: true,
+						}),
+				},
+			],
+			find: (params: FindFunctionParamsType) =>
+				requestFind<WorkSessionVehicleModel>(
+					'work-session-vehicle',
+					params,
+				),
+		},
+		displayEntryLabel: (entry: WorkSessionVehicleModel) => {
+			return getWorkSessionVehicleDisplayName(entry);
+		},
+		actions: {
+			create: {
+				windowType: 'form',
+				windowTitle: translations['create.title'],
+				windowComponent: FormManageWorkSessionVehicle,
+				permission: 'work-session-vehicle.create',
+				entriesSelection: 'free',
+				operationFunction: (
+					params: WorkSessionVehicleFormValuesType,
+				) => {
+					const {
+						work_session_id,
+						company_vehicle,
+						...prepareParams
+					} = params;
+
+					return createWorkSessionVehicle(
+						prepareParams,
+						work_session_id,
+					);
+				},
+				buttonPosition: 'hidden',
+				getFormValues: getFormValues,
+				validateForm: validateForm,
+				getFormState: getFormState,
+			},
+			update: {
+				windowType: 'form',
+				windowTitle: translations['update.title'],
+				windowComponent: FormManageWorkSessionVehicle,
+				permission: 'work-session-vehicle.update',
+				entriesSelection: 'single',
+				operationFunction: (
+					params: WorkSessionVehicleFormValuesType,
+					id: number,
+				) => {
+					const {
+						work_session_id,
+						company_vehicle,
+						...prepareParams
+					} = params;
+
+					return updateWorkSessionVehicle(
+						prepareParams,
+						id,
+						work_session_id,
+					);
+				},
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'success',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateForm,
+				getFormState: getFormState,
+			},
+			delete: {
+				windowType: 'action',
+				windowTitle: translations['delete.title'],
+				permission: 'work-session-vehicle.delete',
+				entriesSelection: 'single',
+				operationFunction: (entry: WorkSessionVehicleModel) => {
+					return deleteWorkSessionVehicle(entry);
+				},
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'error',
 				},
 			},
-			{
-				field: 'assigned_at',
-				header: 'Assigned At',
-				sortable: true,
-				body: (
-					entry: WorkSessionVehicleModel,
-					column: DataTableColumnType<WorkSessionVehicleModel>,
-				) =>
-					DataTableValue(entry, column, {
-						displayDate: true,
-					}),
+			return: {
+				windowType: 'action',
+				windowTitle: translations['return.title'],
+				permission: 'work-session-vehicle.update',
+				entriesSelection: 'single',
+				customEntryCheck: (entry: WorkSessionVehicleModel) =>
+					entry.status === WorkSessionVehicleStatusEnum.ASSIGNED,
+				operationFunction: (entry: WorkSessionVehicleModel) =>
+					updateStatusWorkSessionVehicle(entry, 'returned'),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'info',
+				},
 			},
-			{
-				field: 'returned_at',
-				header: 'Returned At',
-				sortable: true,
-				body: (
-					entry: WorkSessionVehicleModel,
-					column: DataTableColumnType<WorkSessionVehicleModel>,
-				) =>
-					DataTableValue(entry, column, {
-						displayDate: true,
-					}),
-			},
-		],
-		find: (params: FindFunctionParamsType) =>
-			requestFind<WorkSessionVehicleModel>(
-				'work-session-vehicle',
-				params,
-			),
-	},
-	displayEntryLabel: (entry: WorkSessionVehicleModel) => {
-		return getWorkSessionVehicleDisplayName(entry);
-	},
-	actions: {
-		create: {
-			windowType: 'form',
-			windowTitle: translations['create.title'],
-			windowComponent: FormManageWorkSessionVehicle,
-			permission: 'work-session-vehicle.create',
-			entriesSelection: 'free',
-			operationFunction: (params: WorkSessionVehicleFormValuesType) => {
-				const { work_session_id, company_vehicle, ...prepareParams } =
-					params;
-
-				return createWorkSessionVehicle(prepareParams, work_session_id);
-			},
-			buttonPosition: 'hidden',
-			getFormValues: getFormValues,
-			validateForm: validateForm,
-			getFormState: getFormState,
-		},
-		update: {
-			windowType: 'form',
-			windowTitle: translations['update.title'],
-			windowComponent: FormManageWorkSessionVehicle,
-			permission: 'work-session-vehicle.update',
-			entriesSelection: 'single',
-			operationFunction: (
-				params: WorkSessionVehicleFormValuesType,
-				id: number,
-			) => {
-				const { work_session_id, company_vehicle, ...prepareParams } =
-					params;
-
-				return updateWorkSessionVehicle(
-					prepareParams,
-					id,
-					work_session_id,
-				);
-			},
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'success',
-			},
-			getFormValues: getFormValues,
-			validateForm: validateForm,
-			getFormState: getFormState,
-		},
-		delete: {
-			windowType: 'action',
-			windowTitle: translations['delete.title'],
-			permission: 'work-session-vehicle.delete',
-			entriesSelection: 'single',
-			operationFunction: (entry: WorkSessionVehicleModel) => {
-				return deleteWorkSessionVehicle(entry);
-			},
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'error',
+			view: {
+				windowType: 'view',
+				windowTitle: translations['view.title'],
+				windowComponent: ViewWorkSessionVehicle,
+				windowConfigProps: {
+					size: 'xl',
+				},
+				permission: 'work-session-vehicle.read',
+				entriesSelection: 'single',
+				buttonPosition: 'hidden',
 			},
 		},
-		return: {
-			windowType: 'action',
-			windowTitle: translations['return.title'],
-			permission: 'work-session-vehicle.update',
-			entriesSelection: 'single',
-			customEntryCheck: (entry: WorkSessionVehicleModel) =>
-				entry.status === WorkSessionVehicleStatusEnum.ASSIGNED,
-			operationFunction: (entry: WorkSessionVehicleModel) =>
-				updateStatusWorkSessionVehicle(entry, 'returned'),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'info',
-			},
-		},
-		view: {
-			windowType: 'view',
-			windowTitle: translations['view.title'],
-			windowComponent: ViewWorkSessionVehicle,
-			windowConfigProps: {
-				size: 'xl',
-			},
-			permission: 'work-session-vehicle.read',
-			entriesSelection: 'single',
-			buttonPosition: 'hidden',
-		},
-	},
-};
+	};

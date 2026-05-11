@@ -236,10 +236,7 @@ export type ClientDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
-export const dataSourceConfigClient: DataSourceConfigType<
-	ClientModel,
-	ClientFormValuesType
-> = {
+export const dataSourceConfigClient: DataSourceConfigType<ClientModel> = {
 	dataTable: {
 		state: {
 			first: 0,

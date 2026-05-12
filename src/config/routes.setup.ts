@@ -153,9 +153,10 @@ class RoutesCollection {
 const Routes = new RoutesCollection();
 
 Routes.add('home', '/');
-Routes.add('status', '/status/:type');
-Routes.add('page', '/page/:label');
 Routes.add('docs', '/docs');
+Routes.add('driver-panel', '/driver-panel');
+Routes.add('page', '/page/:label');
+Routes.add('status', '/status/:type');
 
 // API
 Routes.group('api')

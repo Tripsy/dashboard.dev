@@ -4,7 +4,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { AuthTokenList } from '@/app/(public)/_components/auth-token-list.component';
 import { Icons } from '@/components/icon.component';
-import { LogoComponent } from '@/components/layout/logo.default';
 import { LoadingComponent } from '@/components/status.component';
 import { Badge } from '@/components/ui/badge';
 import { Link } from '@/components/ui/link';
@@ -96,9 +95,6 @@ export default function AccountMe() {
 	return (
 		<div className="min-h-[calc(80vh-4rem)] px-4 py-12">
 			<div className="text-center mb-8">
-				<div className="flex justify-center mb-4">
-					<LogoComponent />
-				</div>
 				<h1 className="text-2xl font-bold mb-2">My Account</h1>
 			</div>
 

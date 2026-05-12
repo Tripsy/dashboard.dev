@@ -102,7 +102,9 @@ export default function Login() {
 	const elementIds = useElementIds(['email', 'password'] as const);
 
 	if (formSituation === 'csrfError') {
-		throw new Error(formMessage as string);
+		return (
+			<ErrorComponent title="Login" description={formMessage as string} />
+		);
 	}
 
 	if (formSituation === 'pendingAccount') {
@@ -180,8 +182,9 @@ export default function Login() {
 
 				{formSituation === 'maxActiveSession' && authTokens && (
 					<div className="space-y-4">
-						<div className="text-error text-sm">
-							<ErrorIcon /> {formMessage}
+						<div className="form-error">
+							<ErrorIcon />
+							<div>{formMessage}</div>
 						</div>
 
 						<AuthTokenList

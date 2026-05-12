@@ -168,6 +168,7 @@ export const Icons = {
 		Submit: createIcon(Play),
 		Login: createIcon(LogIn),
 		Create: createIcon(Plus),
+		Add: createIcon(Plus),
 		Update: createIcon(SquarePen),
 		Delete: createIcon(Trash2),
 		Cancel: createIcon(X),

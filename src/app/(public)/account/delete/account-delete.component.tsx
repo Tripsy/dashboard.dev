@@ -17,7 +17,10 @@ import {
 import { FormError } from '@/components/form/form-error.component';
 import { FormWrapperComponent } from '@/components/form/form-wrapper';
 import { Icons } from '@/components/icon.component';
-import { LoadingComponent } from '@/components/status.component';
+import {
+	ErrorComponent,
+	LoadingComponent,
+} from '@/components/status.component';
 import { Link } from '@/components/ui/link';
 import Routes from '@/config/routes.setup';
 import { createHandleChange } from '@/helpers/form.helper';
@@ -77,7 +80,12 @@ export default function AccountDelete() {
 	}
 
 	if (formSituation === 'csrfError') {
-		throw new Error(formMessage as string);
+		return (
+			<ErrorComponent
+				title="My Account - Delete request"
+				description={formMessage as string}
+			/>
+		);
 	}
 
 	return (

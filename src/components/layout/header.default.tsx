@@ -3,32 +3,51 @@
 import { Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { LogoComponent } from '@/components/layout/logo.default';
 import { ToggleTheme } from '@/components/layout/toggle-theme';
 import { UserMenu } from '@/components/layout/user-menu.component';
 import { Button } from '@/components/ui/button';
 import Routes from '@/config/routes.setup';
-import { Configuration } from '@/config/settings.config';
 import { cn } from '@/helpers/css.helper';
+import { UserRoleEnum } from '@/models/user.model';
 import { useAuth } from '@/providers/auth.provider';
-
-const navLinks = [
-	{ href: '/', label: 'Home', hash: 'home' },
-	{ href: '/features', label: 'Features' },
-	{ href: Routes.get('docs'), label: 'Docs' },
-	{ href: Routes.get('dashboard'), label: 'Dashboard' },
-];
 
 export function Header() {
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-	const { authStatus } = useAuth();
+	const { authStatus, auth } = useAuth();
 
 	const pathname = usePathname();
 	const homePath = Routes.get('home');
 	const [activeHash, setActiveHash] = useState('');
 	const observerRef = useRef<IntersectionObserver | null>(null);
+
+	const navLinks = useMemo(() => {
+		if (auth?.role === UserRoleEnum.DRIVER) {
+			return [
+				{
+					href: Routes.get('driver-panel'),
+					label: 'Driver Panel',
+					hash: 'driver-panel',
+				},
+				{
+					href: Routes.get('dashboard'),
+					label: 'Dashboard',
+					hash: 'dashboard',
+				},
+			];
+		}
+
+		return [
+			{ href: Routes.get('home'), label: 'Home', hash: 'home' },
+			{
+				href: Routes.get('dashboard'),
+				label: 'Dashboard',
+				hash: 'dashboard',
+			},
+		];
+	}, [auth]);
 
 	useEffect(() => {
 		if (pathname !== homePath) {
@@ -82,7 +101,7 @@ export function Header() {
 				observerRef.current.disconnect();
 			}
 		};
-	}, [pathname, homePath, activeHash]);
+	}, [pathname, homePath, activeHash, navLinks]);
 
 	const isActive = (path: string, hash?: string) => {
 		if (pathname !== path) {
@@ -97,17 +116,14 @@ export function Header() {
 	};
 
 	return (
-		<header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+		<header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
 			<div className="container-default">
 				<div className="flex h-16 items-center justify-between">
 					<Link
 						href={Routes.get('home')}
 						className="flex items-center gap-2"
 					>
-						<LogoComponent divClass="h-9 w-9" spanClass="text-lg" />
-						<span className="text-xl font-semibold text-foreground">
-							{Configuration.get('app.name')}
-						</span>
+						<LogoComponent />
 					</Link>
 
 					{/* Desktop Navigation */}

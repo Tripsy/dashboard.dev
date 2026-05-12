@@ -91,45 +91,42 @@ export function prepareParamsFromFormValues(
 	};
 }
 
-export const dataSourceConfigWorkSession: DataSourceConfigType<
-	WorkSessionModel,
-	WorkSessionFormValuesType,
-	WorkSessionCreateOutput
-> = {
-	displayEntryLabel: (entry: WorkSessionModel) => {
-		return getWorkSessionDisplayName(entry);
-	},
-	actions: {
-		create: {
-			windowType: 'form',
-			windowTitle: translations['create.title'],
-			windowComponent: FormManageWorkSession,
-			permission: 'work-session.create',
-			entriesSelection: 'free',
-			operationFunction: () => {
-				// It is overridden in the component
-				throw new Error('Not defined here');
-			},
-			buttonPosition: 'right',
-			button: {
-				variant: 'info',
-			},
-			getFormValues: getFormValues,
-			validateForm: validateFormCreate,
-			getFormState: getFormState,
+export const dataSourceConfigWorkSession: DataSourceConfigType<WorkSessionModel> =
+	{
+		displayEntryLabel: (entry: WorkSessionModel) => {
+			return getWorkSessionDisplayName(entry);
 		},
-		close: {
-			windowType: 'action',
-			windowTitle: translations['close.title'],
-			permission: 'work-session.update',
-			entriesSelection: 'single',
-			operationFunction: (entry: WorkSessionModel) =>
-				requestUpdateStatus('work-session', entry, 'closed'),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'error',
+		actions: {
+			create: {
+				windowType: 'form',
+				windowTitle: translations['create.title'],
+				windowComponent: FormManageWorkSession,
+				permission: 'work-session.create',
+				entriesSelection: 'free',
+				operationFunction: () => {
+					// It is overridden in the component
+					throw new Error('Not defined here');
+				},
+				buttonPosition: 'right',
+				button: {
+					variant: 'info',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateFormCreate,
+				getFormState: getFormState,
+			},
+			close: {
+				windowType: 'action',
+				windowTitle: translations['close.title'],
+				permission: 'work-session.update',
+				entriesSelection: 'single',
+				operationFunction: (entry: WorkSessionModel) =>
+					requestUpdateStatus('work-session', entry, 'closed'),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'error',
+				},
 			},
 		},
-	},
-};
+	};

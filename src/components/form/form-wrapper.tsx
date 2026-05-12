@@ -1,5 +1,4 @@
 import type React from 'react';
-import { LogoComponent } from '@/components/layout/logo.default';
 
 type FormWrapperProps = {
 	children: React.ReactNode;
@@ -16,9 +15,6 @@ export function FormWrapperComponent({
 		<div className="min-h-[calc(80vh-4rem)] flex items-center justify-center px-4 py-12">
 			<div className="w-full max-w-md">
 				<div className="text-center mb-8">
-					<div className="flex justify-center mb-4">
-						<LogoComponent />
-					</div>
 					<h1 className="text-2xl font-bold mb-2">{title}</h1>
 					<p className="text-muted-foreground">{description}</p>
 				</div>

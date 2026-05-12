@@ -283,7 +283,7 @@
 	}
 
 	.form-section .form-error {
-		@apply text-error;
+		@apply flex items-center gap-2 mb-2 text-destructive;
 	}
 
 	/* Dashboard related */

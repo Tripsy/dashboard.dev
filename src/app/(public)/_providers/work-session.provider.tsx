@@ -11,10 +11,14 @@ import {
 	useRef,
 } from 'react';
 import { isDriver } from '@/models/auth.model';
+import type { CompanyVehicleModel } from '@/models/company-vehicle.model';
 import type { WorkSessionModel } from '@/models/work-session.model';
 import type { WorkSessionVehicleModel } from '@/models/work-session-vehicle.model';
 import { useAuth } from '@/providers/auth.provider';
-import { requestWorkSession } from '@/services/account.service';
+import {
+	requestActiveWorkSession,
+	requestAvailableCompanyVehicles,
+} from '@/services/driver-session.service';
 import type { WorkSessionType } from '@/types/auth.type';
 
 type SessionSituation =
@@ -28,6 +32,7 @@ type WorkSessionContextType = {
 	sessionSituation: SessionSituation;
 	activeSession: WorkSessionModel | null;
 	activeSessionVehicles: WorkSessionVehicleModel[];
+	availableCompanyVehicles: CompanyVehicleModel[];
 	refreshSession: () => Promise<void>;
 };
 
@@ -64,7 +69,7 @@ const WorkSessionProvider = ({
 
 	const {
 		data: sessionData,
-		isLoading: isSessionLoading,
+		isLoading: isSessionDataLoading,
 		refetch: refetchSession,
 	} = useQuery({
 		queryKey: ['work-session', auth?.id],
@@ -73,16 +78,32 @@ const WorkSessionProvider = ({
 				throw new Error('No auth');
 			}
 
-			return requestWorkSession();
+			return requestActiveWorkSession();
 		},
 		enabled: isDriver(auth),
 		initialData: initSession,
 		staleTime: REFRESH_INTERVAL,
 	});
 
+	const {
+		data: availableCompanyVehicles,
+		refetch: refetchAvailableCompanyVehicles,
+	} = useQuery({
+		queryKey: ['company-vehicle', 'available'],
+		queryFn: () => {
+			if (!auth?.id) {
+				throw new Error('No auth');
+			}
+
+			return requestAvailableCompanyVehicles();
+		},
+		enabled: isDriver(auth),
+		staleTime: REFRESH_INTERVAL,
+	});
+
 	const sessionSituation = getSessionSituation(
 		auth,
-		isSessionLoading,
+		isSessionDataLoading,
 		sessionData?.workSession || null,
 	);
 
@@ -98,13 +119,14 @@ const WorkSessionProvider = ({
 				sessionRefreshingRef.current = true;
 
 				await refetchSession();
+				await refetchAvailableCompanyVehicles();
 			} catch {
 				// Error surfaces via query state
 			} finally {
 				sessionRefreshingRef.current = false;
 			}
 		},
-		[refetchSession],
+		[refetchSession, refetchAvailableCompanyVehicles],
 	);
 
 	useEffect(() => {
@@ -143,9 +165,15 @@ const WorkSessionProvider = ({
 			sessionSituation,
 			activeSession: sessionData?.workSession || null,
 			activeSessionVehicles: sessionData?.workSessionVehicles || [],
+			availableCompanyVehicles: availableCompanyVehicles || [],
 			refreshSession,
 		}),
-		[sessionSituation, sessionData, refreshSession],
+		[
+			sessionSituation,
+			sessionData,
+			availableCompanyVehicles,
+			refreshSession,
+		],
 	);
 
 	return (

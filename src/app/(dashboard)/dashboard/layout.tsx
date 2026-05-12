@@ -24,7 +24,7 @@ function Header() {
 						href={Routes.get('home')}
 						className="flex items-center gap-2"
 					>
-						<LogoComponent divClass="h-9 w-9" spanClass="text-lg" />
+						<LogoComponent />
 						<span className="text-xl font-semibold text-foreground">
 							{Configuration.get('app.name')}
 						</span>

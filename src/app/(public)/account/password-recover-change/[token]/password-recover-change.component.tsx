@@ -17,7 +17,10 @@ import {
 } from '@/components/form/form-element.component';
 import { FormError } from '@/components/form/form-error.component';
 import { FormWrapperComponent } from '@/components/form/form-wrapper';
-import { SuccessComponent } from '@/components/status.component';
+import {
+	ErrorComponent,
+	SuccessComponent,
+} from '@/components/status.component';
 import Routes from '@/config/routes.setup';
 import { createHandleChange } from '@/helpers/form.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
@@ -61,7 +64,12 @@ export default function PasswordRecoverChange() {
 	const elementIds = useElementIds(['password', 'passwordConfirm'] as const);
 
 	if (formSituation === 'csrfError') {
-		throw new Error(formMessage as string);
+		return (
+			<ErrorComponent
+				title="Recover password"
+				description={formMessage as string}
+			/>
+		);
 	}
 
 	if (formSituation === 'success') {

@@ -75,7 +75,12 @@ export default function Register() {
 	] as const);
 
 	if (formSituation === 'csrfError') {
-		throw new Error(formMessage as string);
+		return (
+			<ErrorComponent
+				title="Create Account"
+				description={formMessage as string}
+			/>
+		);
 	}
 
 	if (formSituation === 'pendingAccount') {

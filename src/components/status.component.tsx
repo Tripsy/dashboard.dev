@@ -62,7 +62,7 @@ export function LoadingComponent({
 // Error
 
 export const ErrorIcon = ({ className }: { className?: string }) => (
-	<Icons.Status.Error className={cn('inline-block', className)} />
+	<Icons.Status.Error className={cn('inline-block w-6 h-6', className)} />
 );
 
 export function ErrorComponent({

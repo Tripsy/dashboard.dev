@@ -1,6 +1,4 @@
-import {
-	FormComponentInput,
-} from '@/components/form/form-element.component';
+import { FormComponentInput } from '@/components/form/form-element.component';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { type VehicleType, VehicleTypeEnum } from '@/models/vehicle.model';
 import { useAuth } from '@/providers/auth.provider';
@@ -24,10 +22,7 @@ export function FormReturnWorkSessionVehicle() {
 	const { formValues, errors, handleChange, pending } =
 		useWindowForm<WorkSessionVehicleFormReturnValuesType>();
 
-	const elementIds = useElementIds([
-		'vehicle_km_end',
-		'notes',
-	] as const);
+	const elementIds = useElementIds(['vehicle_km_end', 'notes'] as const);
 
 	if (!auth) {
 		close(windowConfig?.uid);

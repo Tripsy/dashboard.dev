@@ -3,6 +3,10 @@ import {
 	FormManageWorkSessionVehicle,
 	type WorkSessionVehicleFormValuesType,
 } from '@/app/(public)/_components/work-session-vehicle/form-manage-work-session-vehicle.component';
+import {
+	FormReturnWorkSessionVehicle,
+	type WorkSessionVehicleFormReturnValuesType,
+} from '@/app/(public)/_components/work-session-vehicle/form-return-work-session-vehicle.component';
 import type { DataSourceConfigType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import { ExecutionError } from '@/exceptions/execution.error';
@@ -18,12 +22,8 @@ import {
 	getWorkSessionVehicleDisplayName,
 	type WorkSessionVehicleModel,
 } from '@/models/work-session-vehicle.model';
-import {deleteWorkSessionVehicle} from '@/services/work-session-vehicle.service';
+import { deleteWorkSessionVehicle } from '@/services/work-session-vehicle.service';
 import type { FormStateType } from '@/types/form.type';
-import {
-	FormReturnWorkSessionVehicle,
-	WorkSessionVehicleFormReturnValuesType
-} from "@/app/(public)/_components/work-session-vehicle/form-return-work-session-vehicle.component";
 
 const translations = await translateBatch(
 	['create.title', 'update.title', 'delete.title', 'return.title'] as const,
@@ -185,15 +185,15 @@ function getFormState(
 	};
 }
 
-function validateReturnForm(
-	values: WorkSessionVehicleFormReturnValuesType,
-) {
+function validateReturnForm(values: WorkSessionVehicleFormReturnValuesType) {
 	const validator = new WorkSessionVehicleValidator(validatorMessages);
 
 	return validator.return().safeParse(values);
 }
 
-function getFormReturnValues(formData: FormData): WorkSessionVehicleFormReturnValuesType {
+function getFormReturnValues(
+	formData: FormData,
+): WorkSessionVehicleFormReturnValuesType {
 	return {
 		vehicle_type: getFormDataAsEnum(
 			formData,
@@ -220,12 +220,8 @@ function getFormReturnState(
 	};
 }
 
-
 export const dataSourceConfigWorkSessionVehicle: Omit<
-	DataSourceConfigType<
-		WorkSessionVehicleModel,
-		WorkSessionVehicleFormValuesType
-	>,
+	DataSourceConfigType<WorkSessionVehicleModel>,
 	'dataTable'
 > = {
 	displayEntryLabel: (entry: WorkSessionVehicleModel) => {

@@ -1,7 +1,11 @@
 import clsx from 'clsx';
 import { type ComponentType, type JSX, useMemo } from 'react';
 import { Icons } from '@/components/icon.component';
-import { Badge, type BadgeVariant } from '@/components/ui/badge';
+import {
+	Badge,
+	type BadgeSize,
+	type BadgeVariant,
+} from '@/components/ui/badge';
 import { formatAmount } from '@/helpers/string.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 
@@ -105,8 +109,14 @@ export const statusList: Record<
 
 export const DisplayStatus = ({
 	status,
+	variant,
+	size,
+	icon: Icon,
 }: {
 	status: keyof typeof statusList;
+	variant?: BadgeVariant;
+	size?: BadgeSize;
+	icon?: ComponentType<{ className?: string }>;
 }) => {
 	const translationsKeys = useMemo(
 		() => [`app.status.${status}`] as const,
@@ -114,22 +124,21 @@ export const DisplayStatus = ({
 	);
 
 	const { translations } = useTranslation(translationsKeys);
+	const { variant: statusVariant, icon: StatusIcon } =
+		statusList[status] || {};
 
-	const { variant, icon: Icon } = statusList[status] || {};
-
-	// When status props are not defined
-	if (!variant || !Icon) {
-		return <Badge variant="default">{status}</Badge>;
-	}
+	const computedVariant = variant || statusVariant || 'default';
+	const computedSize = size || 'status';
+	const ComputedIcon = Icon || StatusIcon;
 
 	return (
 		<Badge
-			variant={variant}
-			size="status"
+			variant={computedVariant}
+			size={computedSize}
 			className="min-w-28 opacity-70 hover:opacity-100"
 		>
-			<Icon className="w-4 h-4" />
-			{translations[`app.status.${status}`]}
+			{ComputedIcon && <ComputedIcon className="w-4 h-4" />}
+			{translations[`app.status.${status}`] || status}
 		</Badge>
 	);
 };

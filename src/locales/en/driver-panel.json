@@ -48,8 +48,7 @@
 			"return": {
 				"title": "Mark vehicle as returned - {{entry}}",
 				"label": "Return",
-				"success": "Vehicle status marked as returned",
-				"confirmText": "Are you sure you want to mark this vehicle as returned?"
+				"success": "Vehicle status marked as returned"
 			}
 		}
 	}

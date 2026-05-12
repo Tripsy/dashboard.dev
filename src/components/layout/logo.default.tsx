@@ -1,26 +1,8 @@
-import { cn } from '@/helpers/css.helper';
-
-export function LogoComponent({
-	divClass,
-	spanClass,
-}: {
-	divClass?: string;
-	spanClass?: string;
-}) {
+export function LogoComponent() {
 	return (
-		<div
-			className={cn(
-				'flex h-12 w-12 items-center justify-center rounded-xl bg-primary',
-				divClass,
-			)}
-		>
-			<span
-				className={cn(
-					'text-2xl font-bold text-primary-foreground',
-					spanClass,
-				)}
-			>
-				N
+		<div className="flex px-3 py-1 items-center justify-center rounded-xl bg-primary">
+			<span className="text-2xl font-bold text-primary-foreground">
+				StarDMS
 			</span>
 		</div>
 	);

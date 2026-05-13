@@ -12,6 +12,16 @@
 		"invalid_parent_id": "Select a valid parent",
 		"invalid_notes": "Enter a valid notes"
 	},
+	"status": {
+		"pending": "Pending",
+		"authorized": "Authorized",
+		"completed": "Completed",
+		"failed": "Failed",
+		"canceled": "Canceled",
+		"expired": "Expired",
+		"requires_action": "Requires action",
+		"deleted": "Deleted"
+	},
 	"action": {
 		"create": {
 			"title": "Add new cash flow",

@@ -51,10 +51,6 @@ export function getWorkSessionDisplayName(entry: WorkSessionModel) {
 	return `${entry.user.name} ${formatDate(entry.start_at, 'date-time')}`;
 }
 
-export function determineStartAt(start_at: Date, start_at_time: string) {
-	return combineDateAndTime(start_at, start_at_time);
-}
-
 export function determineEndAt(
 	start_at: Date,
 	start_at_time: string,

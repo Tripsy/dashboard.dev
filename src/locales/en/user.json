@@ -20,6 +20,12 @@
 	"error": {
 		"no_permissions_defined": "No permissions defined"
 	},
+	"status": {
+		"active": "Active",
+		"pending": "Pending",
+		"inactive": "Inactive",
+		"deleted": "Deleted"
+	},
 	"action": {
 		"create": {
 			"title": "Add new user",

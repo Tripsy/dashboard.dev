@@ -1,6 +1,6 @@
 import {
 	type CompanyVehicleModel,
-	getCompanyVehicleDisplayName,
+	displayCompanyVehicleLabel,
 } from '@/models/company-vehicle.model';
 import type { WorkSessionModel } from '@/models/work-session.model';
 
@@ -35,5 +35,5 @@ export type WorkSessionVehicleModel<D = Date | string> = {
 export function getWorkSessionVehicleDisplayName(
 	entry: WorkSessionVehicleModel,
 ) {
-	return `#${entry.work_session.id} ${getCompanyVehicleDisplayName(entry.company_vehicle)}`;
+	return `#${entry.work_session.id} ${displayCompanyVehicleLabel(entry.company_vehicle)}`;
 }

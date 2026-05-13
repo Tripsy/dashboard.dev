@@ -68,6 +68,7 @@ export type DataTableValueOptionsType<Entry> = {
 	capitalize?: boolean;
 	markDeleted?: boolean;
 	isStatus?: boolean;
+	dataSourceKey?: DataSourceKey;
 	displayDate?: boolean;
 	displayButton?: {
 		action: string | ((entry: Entry) => string | undefined);
@@ -204,7 +205,7 @@ export type ActionsType<Entry extends WindowEntryType> = {
 export type DataSourceKey =
 	| 'brand'
 	| 'cash-flow'
-	| 'client-address'
+	| 'address'
 	| 'client'
 	| 'cron-history'
 	| 'log-data'
@@ -295,8 +296,6 @@ export function resolveRequestPath(key: DataSourceKey) {
 		'user',
 		'vehicle',
 		'company-vehicle',
-		'cmr',
-		'cmr-driver',
 		'cmr-vehicle',
 		'operational-record',
 		'work-session',

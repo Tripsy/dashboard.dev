@@ -218,6 +218,7 @@ export const dataSourceConfigBrand: DataSourceConfigType<BrandModel> = {
 				) =>
 					DataTableValue(entry, column, {
 						isStatus: true,
+						dataSourceKey: 'brand',
 						markDeleted: true,
 						displayButton: {
 							action: (entry: BrandModel) => {

@@ -2,6 +2,11 @@
 	"meta": {
 		"title": "Mail Queue - Dashboard | {{app_name}}"
 	},
+	"status": {
+		"pending": "Pending",
+		"sent": "Sent",
+		"error": "Error"
+	},
 	"action": {
 		"delete": {
 			"title": "Delete record(s)",

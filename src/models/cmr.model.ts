@@ -1,3 +1,8 @@
+import { formatDate } from '@/helpers/date.helper';
+import type { AddressModel } from '@/models/address.model';
+import { type ClientModel, displayClientLabel } from '@/models/client.model';
+import type { StatusTransitions } from '@/types/common.type';
+
 export const CmrStatusEnum = {
 	ORDERED: 'ordered',
 	PREPARING: 'preparing',
@@ -8,6 +13,36 @@ export const CmrStatusEnum = {
 } as const;
 
 export type CmrStatus = (typeof CmrStatusEnum)[keyof typeof CmrStatusEnum];
+
+// Allowed status transition configuration
+export const STATUS_TRANSITIONS: StatusTransitions<CmrStatus> = {
+	[CmrStatusEnum.ORDERED]: [
+		CmrStatusEnum.PREPARING,
+		CmrStatusEnum.TRANSIT,
+		CmrStatusEnum.DELIVERED,
+		CmrStatusEnum.CANCELLED,
+		CmrStatusEnum.DELAYED,
+	],
+	[CmrStatusEnum.PREPARING]: [
+		CmrStatusEnum.TRANSIT,
+		CmrStatusEnum.DELIVERED,
+		CmrStatusEnum.CANCELLED,
+		CmrStatusEnum.DELAYED,
+	],
+	[CmrStatusEnum.TRANSIT]: [
+		CmrStatusEnum.DELIVERED,
+		CmrStatusEnum.CANCELLED,
+		CmrStatusEnum.DELAYED,
+	],
+	[CmrStatusEnum.DELIVERED]: [],
+	[CmrStatusEnum.CANCELLED]: [],
+	[CmrStatusEnum.DELAYED]: [
+		CmrStatusEnum.PREPARING,
+		CmrStatusEnum.TRANSIT,
+		CmrStatusEnum.DELIVERED,
+		CmrStatusEnum.CANCELLED,
+	],
+};
 
 export const CmrTransportTypeEnum = {
 	DOMESTIC: 'domestic',
@@ -23,9 +58,9 @@ export type CmrModel<D = Date | string> = {
 	status: CmrStatus;
 	transport_type: CmrTransportType;
 
-	client_id: number;
-	pickup_address_id: number;
-	delivery_address_id: number;
+	client: ClientModel;
+	pickup_address: AddressModel;
+	delivery_address: AddressModel;
 
 	// tracking
 	tracking_number: string;
@@ -55,29 +90,6 @@ export type CmrModel<D = Date | string> = {
 	deleted_at: D;
 };
 
-export type CmrFormValuesType = Pick<
-	CmrModel,
-	| 'status'
-	| 'transport_type'
-	| 'client_id'
-	| 'pickup_address_id'
-	| 'delivery_address_id'
-> & {
-	tracking_number: string | null;
-	tracking_url: string | null;
-
-	contact_name: string | null;
-	contact_phone: string | null;
-	contact_email: string | null;
-
-	ordered_at: string | null;
-	pick_scheduled_at: string | null;
-	estimated_delivery_at: string | null;
-	delivered_at: string | null;
-
-	notes: string | null;
-
-	signed_at: string | null;
-	signed_by: string | null;
-	signed_data: string | null;
-};
+export function displayCmrLabel(entry: CmrModel): string {
+	return `${displayClientLabel(entry.client)} ${formatDate(entry.ordered_at, 'default')}`;
+}

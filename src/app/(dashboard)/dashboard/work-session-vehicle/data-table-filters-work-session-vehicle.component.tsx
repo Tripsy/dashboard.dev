@@ -15,7 +15,7 @@ import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import {
 	type CompanyVehicleModel,
-	getCompanyVehicleDisplayName,
+	displayCompanyVehicleLabel,
 } from '@/models/company-vehicle.model';
 import {
 	type WorkSessionStatus,
@@ -125,7 +125,7 @@ export const DataTableFiltersWorkSessionVehicle = (): JSX.Element => {
 				setFilterValues={setFilterValues}
 				setSearch={setSearchCompanyVehicle}
 				dataSourceKey="company-vehicle"
-				getOptionLabel={(m) => getCompanyVehicleDisplayName(m)}
+				getOptionLabel={(m) => displayCompanyVehicleLabel(m)}
 				getOptionKey={(m) => m.id}
 			/>
 

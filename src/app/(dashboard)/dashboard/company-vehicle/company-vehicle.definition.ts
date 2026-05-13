@@ -31,7 +31,7 @@ import {
 	type CompanyVehicleScope,
 	CompanyVehicleScopeEnum,
 	type CompanyVehicleStatus,
-	getCompanyVehicleDisplayName,
+	displayCompanyVehicleLabel,
 	STATUS_TRANSITIONS,
 } from '@/models/company-vehicle.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
@@ -243,6 +243,7 @@ export const dataSourceConfigCompanyVehicle: DataSourceConfigType<CompanyVehicle
 					) =>
 						DataTableValue(entry, column, {
 							isStatus: true,
+							dataSourceKey: 'company-vehicle',
 							markDeleted: true,
 							displayButton: {
 								action: (entry: CompanyVehicleModel) => {
@@ -275,7 +276,7 @@ export const dataSourceConfigCompanyVehicle: DataSourceConfigType<CompanyVehicle
 				requestFind<CompanyVehicleModel>('company-vehicle', params),
 		},
 		displayEntryLabel: (entry: CompanyVehicleModel) => {
-			return getCompanyVehicleDisplayName(entry);
+			return displayCompanyVehicleLabel(entry);
 		},
 		actions: {
 			create: {

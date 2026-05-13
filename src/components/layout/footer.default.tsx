@@ -5,8 +5,8 @@ export function Footer() {
 		<footer className="border-t border-border bg-muted/30">
 			<div className="container-default py-8 md:py-12">
 				<p className="text-sm text-muted-foreground">
-					© {new Date().getFullYear()}{' '}
-					{Configuration.get('app.name')} - Drive Management System. All rights reserved.
+					© {new Date().getFullYear()} {Configuration.get('app.name')}{' '}
+					- Drive Management System. All rights reserved.
 				</p>
 			</div>
 		</footer>

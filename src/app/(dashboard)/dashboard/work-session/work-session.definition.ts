@@ -12,7 +12,11 @@ import type {
 	DataTableValueOptionsType,
 } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
-import { formatDate, stringToDate } from '@/helpers/date.helper';
+import {
+	combineDateAndTime,
+	formatDate,
+	stringToDate,
+} from '@/helpers/date.helper';
 import {
 	getFormDataAsNumber,
 	getFormDataAsString,
@@ -29,7 +33,6 @@ import {
 import { BaseValidator } from '@/helpers/validator.helper';
 import {
 	determineEndAt,
-	determineStartAt,
 	displayWorkSessionDuration,
 	getWorkSessionDisplayName,
 	START_AT_MAX_PAST_SECONDS,
@@ -195,7 +198,10 @@ function prepareParamsFromFormValues(
 		data;
 
 	const date_start_at = stringToDate(start_at);
-	const determined_start_at = determineStartAt(date_start_at, start_at_time);
+	const determined_start_at = combineDateAndTime(
+		date_start_at,
+		start_at_time,
+	);
 	const determined_end_at = end_at_time
 		? determineEndAt(date_start_at, start_at_time, end_at_time)
 		: null;
@@ -321,6 +327,7 @@ export const dataSourceConfigWorkSession: DataSourceConfigType<WorkSessionModel>
 					) =>
 						DataTableValue(entry, column, {
 							isStatus: true,
+							dataSourceKey: 'work-session',
 							markDeleted: true,
 							displayButton: {
 								action: (entry: WorkSessionModel) => {

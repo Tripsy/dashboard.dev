@@ -3,12 +3,13 @@ import account_edit from '@/locales/en/account-edit.json';
 import account_email_update from '@/locales/en/account-email-update.json';
 import account_me from '@/locales/en/account-me.json';
 import account_password_update from '@/locales/en/account-password-update.json';
+import address from '@/locales/en/address.json';
 import app from '@/locales/en/app.json';
 import auth from '@/locales/en/auth.json';
 import brand from '@/locales/en/brand.json';
 import cash_flow from '@/locales/en/cash-flow.json';
 import client from '@/locales/en/client.json';
-import client_address from '@/locales/en/client-address.json';
+import cmr from '@/locales/en/cmr.json';
 import company_vehicle from '@/locales/en/company-vehicle.json';
 import cron_history from '@/locales/en/cron-history.json';
 import dashboard from '@/locales/en/dashboard.json';
@@ -39,13 +40,13 @@ const en = {
 	'account-email-update': account_email_update,
 	'account-me': account_me,
 	'account-password-update': account_password_update,
+	address: address,
 	app,
 	auth,
 	brand,
 	'cash-flow': cash_flow,
-	'cron-history': cron_history,
 	client,
-	'client-address': client_address,
+	'cron-history': cron_history,
 	dashboard,
 	'email-confirm': email_confirm,
 	'email-confirm-send': email_confirm_send,
@@ -67,6 +68,7 @@ const en = {
 	'company-vehicle': company_vehicle,
 	'work-session': work_session,
 	'work-session-vehicle': work_session_vehicle,
+	cmr: cmr,
 
 	// FE
 	'driver-panel': driver_panel,

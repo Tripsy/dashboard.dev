@@ -16,6 +16,12 @@
 		"invalid_person_name": "Invalid person name",
 		"invalid_person_identification_number": "Invalid CNP (it must contain 13 digits)"
 	},
+	"status": {
+		"active": "Active",
+		"pending": "Pending",
+		"inactive": "Inactive",
+		"deleted": "Deleted"
+	},
 	"action": {
 		"create": {
 			"title": "Add new client",

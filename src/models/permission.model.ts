@@ -7,7 +7,7 @@ export const PermissionEntitiesSuggestions = [
 	'template',
 	'user',
 	'client',
-	'client_address',
+	'address',
 	'place',
 	'brand',
 	'cash_flow',

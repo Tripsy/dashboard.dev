@@ -108,6 +108,7 @@ export const dataSourceConfigMailQueue: DataSourceConfigType<MailQueueModel> = {
 				) =>
 					DataTableValue(entry, column, {
 						isStatus: true,
+						dataSourceKey: 'mail-queue',
 					}),
 				style: {
 					minWidth: '6rem',

@@ -16,7 +16,7 @@ import {
 	getFormDataAsString,
 } from '@/helpers/form.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
-import { getCompanyVehicleDisplayName } from '@/models/company-vehicle.model';
+import { displayCompanyVehicleLabel } from '@/models/company-vehicle.model';
 import { VehicleTypeEnum } from '@/models/vehicle.model';
 import {
 	getWorkSessionVehicleDisplayName,
@@ -175,7 +175,7 @@ function getFormState(
 		values: {
 			company_vehicle_id: data?.company_vehicle?.id ?? null,
 			company_vehicle: data?.company_vehicle
-				? getCompanyVehicleDisplayName(data.company_vehicle)
+				? displayCompanyVehicleLabel(data.company_vehicle)
 				: null,
 			vehicle_type: data?.company_vehicle.vehicle.vehicle_type ?? null,
 			vehicle_km_start: data?.vehicle_km_start ?? null,

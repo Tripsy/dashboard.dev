@@ -284,6 +284,7 @@ export const dataSourceConfigCashFlow: DataSourceConfigType<CashFlowModel> = {
 				) =>
 					DataTableValue(entry, column, {
 						isStatus: true,
+						dataSourceKey: 'cash-flow',
 						markDeleted: true,
 						displayButton: {
 							action: (entry: CashFlowModel) => {

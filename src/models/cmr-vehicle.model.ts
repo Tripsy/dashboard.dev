@@ -1,8 +1,11 @@
+import type { CmrModel } from '@/models/cmr.model';
+import type { VehicleModel } from '@/models/vehicle.model';
+
 export type CmrVehicleModel<D = Date | string> = {
 	id: number;
 
-	cmr_id: number;
-	vehicle_id: number;
+	cmr: CmrModel;
+	vehicle: VehicleModel;
 
 	vin: string | null;
 	license_plate: string | null;
@@ -11,13 +14,4 @@ export type CmrVehicleModel<D = Date | string> = {
 
 	created_at: D;
 	updated_at: D | null;
-};
-
-export type CmrVehicleFormValuesType = Pick<
-	CmrVehicleModel,
-	'cmr_id' | 'vehicle_id'
-> & {
-	vin: string | null;
-	license_plate: string | null;
-	notes: string | null;
 };

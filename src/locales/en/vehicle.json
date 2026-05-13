@@ -12,6 +12,10 @@
 		"invalid_height": "Invalid height",
 		"invalid_weight": "Invalid weight"
 	},
+	"status": {
+		"verified": "Verified",
+		"draft": "Draft"
+	},
 	"action": {
 		"create": {
 			"title": "Add new vehicle",

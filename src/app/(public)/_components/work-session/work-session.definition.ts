@@ -5,13 +5,16 @@ import {
 } from '@/app/(public)/_components/work-session/form-manage-work-session.component';
 import type { DataSourceConfigType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
-import { formatDate, stringToDate } from '@/helpers/date.helper';
+import {
+	combineDateAndTime,
+	formatDate,
+	stringToDate,
+} from '@/helpers/date.helper';
 import { getFormDataAsString } from '@/helpers/form.helper';
 import { requestUpdateStatus } from '@/helpers/services.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import type { UserModel } from '@/models/user.model';
 import {
-	determineStartAt,
 	getWorkSessionDisplayName,
 	START_AT_MAX_PAST_SECONDS,
 	type WorkSessionModel,
@@ -81,7 +84,7 @@ export function prepareParamsFromFormValues(
 	data: WorkSessionCreateOutput,
 ) {
 	const date_start_at = stringToDate(data.start_at);
-	const determined_start_at = determineStartAt(
+	const determined_start_at = combineDateAndTime(
 		date_start_at,
 		data.start_at_time,
 	);

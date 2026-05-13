@@ -23,7 +23,10 @@ export function ViewBrand({ entry }: { entry: BrandModel }) {
 				<div className="flex items-center gap-2">
 					<span className="font-semibold">Status</span>{' '}
 					<div className="max-w-60">
-						<DisplayStatus status={entry.status} />
+						<DisplayStatus
+							status={entry.status}
+							dataSourceKey="brand"
+						/>
 					</div>
 				</div>
 			</div>

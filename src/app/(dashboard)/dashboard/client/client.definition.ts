@@ -27,7 +27,7 @@ import {
 	ClientStatusEnum,
 	type ClientType,
 	ClientTypeEnum,
-	getClientDisplayName,
+	displayClientLabel,
 } from '@/models/client.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
 import type { FormStateType } from '@/types/form.type';
@@ -289,7 +289,7 @@ export const dataSourceConfigClient: DataSourceConfigType<ClientModel> = {
 					column: DataTableColumnType<ClientModel>,
 				) =>
 					DataTableValue(entry, column, {
-						customValue: getClientDisplayName(entry),
+						customValue: displayClientLabel(entry),
 					}),
 			},
 			{
@@ -301,6 +301,7 @@ export const dataSourceConfigClient: DataSourceConfigType<ClientModel> = {
 				) =>
 					DataTableValue(entry, column, {
 						isStatus: true,
+						dataSourceKey: 'client',
 						markDeleted: true,
 						displayButton: {
 							action: (entry: ClientModel) => {
@@ -335,7 +336,7 @@ export const dataSourceConfigClient: DataSourceConfigType<ClientModel> = {
 			requestFind<ClientModel>('client', params),
 	},
 	displayEntryLabel: (entry: ClientModel) => {
-		return getClientDisplayName(entry);
+		return displayClientLabel(entry);
 	},
 	actions: {
 		create: {

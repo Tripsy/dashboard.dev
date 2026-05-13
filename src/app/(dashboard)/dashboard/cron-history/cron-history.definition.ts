@@ -82,6 +82,7 @@ export const dataSourceConfigCronHistory: DataSourceConfigType<CronHistoryModel>
 					) =>
 						DataTableValue(entry, column, {
 							isStatus: true,
+							dataSourceKey: 'cron-history',
 						}),
 					style: {
 						minWidth: '6rem',

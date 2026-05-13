@@ -11,7 +11,7 @@ import {
 	type CompanyVehicleModel,
 	CompanyVehicleScopeEnum,
 	CompanyVehicleStatusEnum,
-	getCompanyVehicleDisplayName,
+	displayCompanyVehicleLabel,
 } from '@/models/company-vehicle.model';
 import { type VehicleType, VehicleTypeEnum } from '@/models/vehicle.model';
 import { useWindowForm } from '@/providers/window-form.provider';
@@ -109,12 +109,12 @@ export function FormManageWorkSessionVehicle() {
 					onSelect: (m) => {
 						handleChange(
 							'company_vehicle',
-							getCompanyVehicleDisplayName(m),
+							displayCompanyVehicleLabel(m),
 						);
 						handleChange('company_vehicle_id', m.id);
 						handleChange('vehicle_type', m.vehicle.vehicle_type);
 					},
-					getOptionLabel: (m) => getCompanyVehicleDisplayName(m),
+					getOptionLabel: (m) => displayCompanyVehicleLabel(m),
 					getOptionKey: (m) => m.id,
 				}}
 				icons={{

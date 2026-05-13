@@ -4,13 +4,13 @@ import type { JSX } from 'react';
 import { DataTableActions } from '@/app/(dashboard)/_components/data-table-actions.component';
 import DataTableList from '@/app/(dashboard)/_components/data-table-list.component';
 import { DataTableProvider } from '@/app/(dashboard)/_providers/data-table.provider';
-import { DataTableFiltersClientAddress } from '@/app/(dashboard)/dashboard/client-address/data-table-filters-client-address.component';
+import { DataTableFiltersCmr } from '@/app/(dashboard)/dashboard/cmr/data-table-filters-cmr.component';
 
-export const DataTableClientAddress = (): JSX.Element => {
+export const DataTableCmr = (): JSX.Element => {
 	return (
-		<DataTableProvider dataSource="client-address" selectionMode="checkbox">
+		<DataTableProvider dataSource="cmr" selectionMode="checkbox">
 			<div className="table-container">
-				<DataTableFiltersClientAddress />
+				<DataTableFiltersCmr />
 				<DataTableActions />
 				<DataTableList dataKey="id" />
 			</div>

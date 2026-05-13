@@ -27,6 +27,7 @@ import {
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import {
+	displayVehicleLabel,
 	type VehicleModel,
 	type VehicleStatus,
 	VehicleStatusEnum,
@@ -219,6 +220,7 @@ export const dataSourceConfigVehicle: DataSourceConfigType<VehicleModel> = {
 				) =>
 					DataTableValue(entry, column, {
 						isStatus: true,
+						dataSourceKey: 'vehicle',
 						markDeleted: true,
 						displayButton: {
 							action: (entry: VehicleModel) => {
@@ -252,9 +254,7 @@ export const dataSourceConfigVehicle: DataSourceConfigType<VehicleModel> = {
 		find: (params: FindFunctionParamsType) =>
 			requestFind<VehicleModel>('vehicle', params),
 	},
-	displayEntryLabel: (entry: VehicleModel) => {
-		return `${entry.brand?.name} ${entry.model}`;
-	},
+	displayEntryLabel: (entry: VehicleModel) => displayVehicleLabel(entry),
 	actions: {
 		create: {
 			windowType: 'form',

@@ -102,7 +102,16 @@ export const DataTableValue = <Entry extends Record<string, unknown>>(
 				? 'deleted'
 				: (entry.status as keyof typeof statusList);
 
-		outputValue = <DisplayStatus status={status} />;
+		if (!options.dataSourceKey) {
+			throw new Error('dataSourceKey is required for status display');
+		}
+
+		outputValue = (
+			<DisplayStatus
+				status={status}
+				dataSourceKey={options.dataSourceKey}
+			/>
+		);
 	} else if (options.markDeleted && 'deleted_at' in entry) {
 		outputValue = (
 			<DisplayDeleted

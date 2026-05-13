@@ -9,14 +9,19 @@ export type LogHistorySource =
 	(typeof LogHistorySourceEnum)[keyof typeof LogHistorySourceEnum];
 
 export const LogHistoryEntities = [
-	'permission',
-	'template',
-	'user',
-	'client',
-	'client_address',
-	'place',
+	'address',
 	'brand',
 	'cash_flow',
+	'client',
+	'cmr',
+	'company-vehicle',
+	'permission',
+	'place',
+	'template',
+	'user',
+	'vehicle',
+	'work-session',
+	'work-session-vehicle',
 ];
 export const LogHistoryActions = ['created', 'updated', 'deleted'];
 

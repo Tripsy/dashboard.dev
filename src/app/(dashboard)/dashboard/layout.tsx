@@ -12,7 +12,6 @@ import { UserMenu } from '@/components/layout/user-menu.component';
 import ProtectedRoute from '@/components/protected-route.component';
 import { WindowContainer } from '@/components/window/window-container.component';
 import Routes, { RouteAuthEnum } from '@/config/routes.setup';
-import { Configuration } from '@/config/settings.config';
 
 function Header() {
 	return (
@@ -25,9 +24,6 @@ function Header() {
 						className="flex items-center gap-2"
 					>
 						<LogoComponent />
-						<span className="text-xl font-semibold text-foreground">
-							{Configuration.get('app.name')}
-						</span>
 					</Link>
 
 					<div className="w-full pl-26">

@@ -8,113 +8,98 @@ import {
 	LoadingComponent,
 } from '@/components/status.component';
 import { Button } from '@/components/ui/button';
-import { DisplayStatus } from '@/helpers/display.helper';
 import { requestFind } from '@/helpers/services.helper';
-import { displayCompanyVehicleLabel } from '@/models/company-vehicle.model';
-import { VehicleTypeEnum } from '@/models/vehicle.model';
-import type { WorkSessionModel } from '@/models/work-session.model';
-import {
-	type WorkSessionVehicleModel,
-	WorkSessionVehicleStatusEnum,
-} from '@/models/work-session-vehicle.model';
+import type { CmrModel } from '@/models/cmr.model';
+import type { CmrVehicleModel } from '@/models/cmr-vehicle.model';
+import { displayVehicleLabel, VehicleTypeEnum } from '@/models/vehicle.model';
 import { useModalStore } from '@/stores/window.store';
 import { DataSourceSectionEnum } from '@/types/data-source.type';
 import type { WindowEntryType } from '@/types/window.type';
 
-export function SetupWorkSessionVehicles({
-	entries,
-}: {
-	entries: WindowEntryType[];
-}) {
+export function SetupCmrVehicles({ entries }: { entries: WindowEntryType[] }) {
 	const { open, focus, getCurrentWindow } = useModalStore();
 
 	const windowConfig = getCurrentWindow();
 
 	const queryClient = useQueryClient();
 
-	const workSessionModel = entries[0] as WorkSessionModel | undefined;
-	const workSessionId = workSessionModel?.id;
+	const cmrModel = entries[0] as CmrModel | undefined;
+	const cmrId = cmrModel?.id;
 
 	const {
-		data: workSessionVehicle,
-		isLoading: isLoadingWorkSessionVehicle,
-		error: errorWorkSessionVehicle,
+		data: cmrVehicle,
+		isLoading: isLoadingCmrVehicle,
+		error: errorCmrVehicle,
 	} = useQuery({
-		queryKey: ['work-session-vehicle', workSessionModel?.id],
+		queryKey: ['cmr-vehicle', cmrModel?.id],
 		queryFn: () =>
-			requestFind<WorkSessionVehicleModel>('work-session-vehicle', {
+			requestFind<CmrVehicleModel>('cmr-vehicle', {
 				filter: {
-					work_session_id: workSessionId as number,
+					cmr_id: cmrId as number,
 				},
 			}),
-		enabled: !!workSessionId,
+		enabled: !!cmrId,
 	});
 
-	const invalidateWorkSessionVehicle = useCallback(
+	const invalidateCmrVehicle = useCallback(
 		() =>
 			queryClient.invalidateQueries({
-				queryKey: ['work-session-vehicle', workSessionModel?.id],
+				queryKey: ['cmr-vehicle', cmrModel?.id],
 			}),
-		[queryClient, workSessionModel?.id],
+		[queryClient, cmrModel?.id],
 	);
 
 	const openCreate = useCallback(() => {
 		open({
 			minimized: false,
 			section: DataSourceSectionEnum.DASHBOARD,
-			dataSource: 'work-session-vehicle',
+			dataSource: 'cmr-vehicle',
 			action: 'create',
 			data: {
 				prefillEntry: {
-					work_session: workSessionModel,
+					cmr: cmrModel,
 				},
 			},
 			events: {
 				success: async () => {
-					await invalidateWorkSessionVehicle();
+					await invalidateCmrVehicle();
 
-					// Back to `setup-work-session-vehicle`
+					// Back to `setup-cmr-vehicle`
 					if (windowConfig) {
 						focus(windowConfig.uid);
 					}
 				},
 				close: async () => {
-					// Back to `setup-work-session-vehicle`
+					// Back to `setup-cmr-vehicle`
 					if (windowConfig) {
 						focus(windowConfig.uid);
 					}
 				},
 			},
 		});
-	}, [
-		open,
-		workSessionModel,
-		invalidateWorkSessionVehicle,
-		focus,
-		windowConfig,
-	]);
+	}, [open, cmrModel, invalidateCmrVehicle, focus, windowConfig]);
 
 	const onUpdate = useCallback(
-		(entry: WorkSessionVehicleModel) => {
+		(entry: CmrVehicleModel) => {
 			open({
 				minimized: false,
 				section: DataSourceSectionEnum.DASHBOARD,
-				dataSource: 'work-session-vehicle',
+				dataSource: 'cmr-vehicle',
 				action: 'update',
 				data: {
 					entries: [entry],
 				},
 				events: {
 					success: async () => {
-						await invalidateWorkSessionVehicle();
+						await invalidateCmrVehicle();
 
-						// Back to `setup-work-session-vehicle`
+						// Back to `setup-cmr-vehicle`
 						if (windowConfig) {
 							focus(windowConfig.uid);
 						}
 					},
 					close: async () => {
-						// Back to `setup-work-session-vehicle`
+						// Back to `setup-cmr-vehicle`
 						if (windowConfig) {
 							focus(windowConfig.uid);
 						}
@@ -122,25 +107,25 @@ export function SetupWorkSessionVehicles({
 				},
 			});
 		},
-		[open, invalidateWorkSessionVehicle, focus, windowConfig],
+		[open, invalidateCmrVehicle, focus, windowConfig],
 	);
 
 	const onDelete = useCallback(
-		(entry: WorkSessionVehicleModel) => {
+		(entry: CmrVehicleModel) => {
 			open({
 				minimized: false,
 				section: DataSourceSectionEnum.DASHBOARD,
-				dataSource: 'work-session-vehicle',
+				dataSource: 'cmr-vehicle',
 				action: 'delete',
 				data: {
 					entries: [entry],
 				},
 				events: {
 					success: async () => {
-						await invalidateWorkSessionVehicle();
+						await invalidateCmrVehicle();
 					},
 					close: async () => {
-						// Back to `setup-work-session-vehicle`
+						// Back to `setup-cmr-vehicle`
 						if (windowConfig) {
 							focus(windowConfig.uid);
 						}
@@ -148,50 +133,24 @@ export function SetupWorkSessionVehicles({
 				},
 			});
 		},
-		[open, invalidateWorkSessionVehicle, focus, windowConfig],
+		[open, invalidateCmrVehicle, focus, windowConfig],
 	);
 
-	const onStatusReturn = useCallback(
-		(entry: WorkSessionVehicleModel) => {
-			open({
-				minimized: false,
-				section: DataSourceSectionEnum.DASHBOARD,
-				dataSource: 'work-session-vehicle',
-				action: 'return',
-				data: {
-					entries: [entry],
-				},
-				events: {
-					success: async () => {
-						await invalidateWorkSessionVehicle();
-					},
-					close: async () => {
-						// Back to `setup-work-session-vehicle`
-						if (windowConfig) {
-							focus(windowConfig.uid);
-						}
-					},
-				},
-			});
-		},
-		[open, invalidateWorkSessionVehicle, focus, windowConfig],
-	);
-
-	if (!workSessionModel) {
+	if (!cmrModel) {
 		return <ErrorComponent />;
 	}
 
-	if (errorWorkSessionVehicle) {
-		return <ErrorComponent description={errorWorkSessionVehicle.message} />;
+	if (errorCmrVehicle) {
+		return <ErrorComponent description={errorCmrVehicle.message} />;
 	}
 
-	if (isLoadingWorkSessionVehicle) {
+	if (isLoadingCmrVehicle) {
 		return <LoadingComponent />;
 	}
 
 	return (
 		<div>
-			{(workSessionVehicle?.entries?.length ?? 0) > 0 ? (
+			{(cmrVehicle?.entries?.length ?? 0) > 0 ? (
 				<div className="overflow-x-auto rounded-lg border border-border shadow-sm">
 					<table className="min-w-full divide-y divide-border">
 						<thead className="bg-muted">
@@ -211,13 +170,12 @@ export function SetupWorkSessionVehicles({
 							</tr>
 						</thead>
 						<tbody className="divide-y divide-border bg-card">
-							{workSessionVehicle?.entries.map((v) => (
-								<WorkSessionVehicleEntry
+							{cmrVehicle?.entries.map((v) => (
+								<CmrVehicleEntry
 									key={v.id}
 									m={v}
 									onUpdate={onUpdate}
 									onDelete={onDelete}
-									onStatusReturn={onStatusReturn}
 								/>
 							))}
 						</tbody>
@@ -247,43 +205,17 @@ export function SetupWorkSessionVehicles({
 	);
 }
 
-type WorkSessionVehicleEntryProps = {
-	m: WorkSessionVehicleModel;
-	onUpdate: (entry: WorkSessionVehicleModel) => void;
-	onDelete: (entry: WorkSessionVehicleModel) => void;
-	onStatusReturn: (entry: WorkSessionVehicleModel) => void;
+type CmrVehicleEntryProps = {
+	m: CmrVehicleModel;
+	onUpdate: (entry: CmrVehicleModel) => void;
+	onDelete: (entry: CmrVehicleModel) => void;
 };
 
-function WorkSessionVehicleEntry({
-	m,
-	onUpdate,
-	onDelete,
-	onStatusReturn,
-}: WorkSessionVehicleEntryProps) {
+function CmrVehicleEntry({ m, onUpdate, onDelete }: CmrVehicleEntryProps) {
 	return (
 		<tr className="hover:bg-muted/50 transition-colors duration-150">
 			<td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-card-foreground">
-				{displayCompanyVehicleLabel(m.company_vehicle)}
-			</td>
-			<td className="px-4 py-4 whitespace-nowrap">
-				{m.status === WorkSessionVehicleStatusEnum.ASSIGNED ? (
-					<button
-						type="button"
-						onClick={() => onStatusReturn(m)}
-						title="Mark as returned"
-						className="cursor-pointer"
-					>
-						<DisplayStatus
-							status={m.status}
-							dataSourceKey="work-session-vehicle"
-						/>
-					</button>
-				) : (
-					<DisplayStatus
-						status={m.status}
-						dataSourceKey="work-session-vehicle"
-					/>
-				)}
+				{displayVehicleLabel(m.vehicle)}
 			</td>
 			<td className="px-4 py-4 whitespace-nowrap text-sm text-card-foreground">
 				{m.company_vehicle.vehicle.vehicle_type ===

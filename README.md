@@ -12,7 +12,7 @@
 
 This boilerplate provides an authentication system (login, register, recover password, account pages, etc.)
 and includes an administration dashboard (user, cron-history, log-history, log-data, mail-queue, permission, 
-template, client, client-address, place, brand, cash-flow, etc.)
+template, client, address, place, brand, cash-flow, etc.)
 
 This project is still a work in progress, and the next goals are:
 - Include additional [NReady](https://github.com/Tripsy/nready) features in the administration dashboard
@@ -56,7 +56,7 @@ Meanwhile, we're open to suggestions / feedback, and if you find this project us
     - Auth system: login, register, logout, forgot password, reset password, email confirmation, etc.
 - [x] (Dashboard) 
     - cron-history, log-data, log-history, mail-queue, permission, template, user
-    - brand, cash-flow, client-address, client, place
+    - brand, cash-flow, address, client, place
     - // TODO 
 
 # 🛠 Setup

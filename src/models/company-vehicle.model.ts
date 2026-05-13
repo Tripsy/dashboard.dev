@@ -53,8 +53,6 @@ export type CompanyVehicleModel<D = Date | string> = {
 	deleted_at: D;
 };
 
-export function getCompanyVehicleDisplayName(
-	entry: CompanyVehicleModel,
-): string {
+export function displayCompanyVehicleLabel(entry: CompanyVehicleModel): string {
 	return `${entry.vehicle.model} ${entry.license_plate}`;
 }

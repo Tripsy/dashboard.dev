@@ -6,6 +6,7 @@ import {
 	type BadgeSize,
 	type BadgeVariant,
 } from '@/components/ui/badge';
+import type { DataSourceKey } from '@/config/data-source.config';
 import { formatAmount } from '@/helpers/string.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 
@@ -105,22 +106,48 @@ export const statusList: Record<
 		variant: 'warning',
 		icon: Icons.Status.Returned,
 	},
+	ordered: {
+		variant: 'info',
+		icon: Icons.Status.Ordered,
+	},
+	preparing: {
+		variant: 'info',
+		icon: Icons.Status.Preparing,
+	},
+	transit: {
+		variant: 'info',
+		icon: Icons.Status.Transit,
+	},
+	delivered: {
+		variant: 'success',
+		icon: Icons.Status.Delivered,
+	},
+	cancelled: {
+		variant: 'error',
+		icon: Icons.Status.Canceled,
+	},
+	delayed: {
+		variant: 'warning',
+		icon: Icons.Status.Delayed,
+	},
 };
 
 export const DisplayStatus = ({
 	status,
+	dataSourceKey,
 	variant,
 	size,
 	icon: Icon,
 }: {
 	status: keyof typeof statusList;
+	dataSourceKey: DataSourceKey;
 	variant?: BadgeVariant;
 	size?: BadgeSize;
 	icon?: ComponentType<{ className?: string }>;
 }) => {
 	const translationsKeys = useMemo(
-		() => [`app.status.${status}`] as const,
-		[status],
+		() => [`${dataSourceKey}.status.${status}`] as const,
+		[dataSourceKey, status],
 	);
 
 	const { translations } = useTranslation(translationsKeys);
@@ -138,7 +165,7 @@ export const DisplayStatus = ({
 			className="min-w-28 opacity-70 hover:opacity-100"
 		>
 			{ComputedIcon && <ComputedIcon className="w-4 h-4" />}
-			{translations[`app.status.${status}`] || status}
+			{translations[`${dataSourceKey}.status.${status}`] || status}
 		</Badge>
 	);
 };

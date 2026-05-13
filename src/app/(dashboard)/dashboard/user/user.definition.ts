@@ -328,6 +328,7 @@ export const dataSourceConfigUser: DataSourceConfigType<UserModel> = {
 				) =>
 					DataTableValue(entry, column, {
 						isStatus: true,
+						dataSourceKey: 'user',
 						markDeleted: true,
 						displayButton: {
 							action: (entry: UserModel) => {

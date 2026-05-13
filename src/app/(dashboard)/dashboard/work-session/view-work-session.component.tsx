@@ -21,7 +21,10 @@ export function ViewWorkSession({ entry }: { entry: WorkSessionModel }) {
 				<div className="flex items-center gap-2">
 					<span className="font-semibold">Status</span>{' '}
 					<div className="max-w-60">
-						<DisplayStatus status={entry.status} />
+						<DisplayStatus
+							status={entry.status}
+							dataSourceKey="work-session"
+						/>
 					</div>
 				</div>
 			</div>

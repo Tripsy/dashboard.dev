@@ -18,7 +18,7 @@ import {
 import { requestFind } from '@/helpers/services.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
-import { getCompanyVehicleDisplayName } from '@/models/company-vehicle.model';
+import { displayCompanyVehicleLabel } from '@/models/company-vehicle.model';
 import { VehicleTypeEnum } from '@/models/vehicle.model';
 import {
 	getWorkSessionDisplayName,
@@ -167,7 +167,7 @@ function getFormState(
 			work_session_id: data?.work_session?.id ?? null,
 			company_vehicle_id: data?.company_vehicle?.id ?? null,
 			company_vehicle: data?.company_vehicle
-				? getCompanyVehicleDisplayName(data.company_vehicle)
+				? displayCompanyVehicleLabel(data.company_vehicle)
 				: null,
 			vehicle_type: data?.company_vehicle.vehicle.vehicle_type ?? null,
 			vehicle_km_start: data?.vehicle_km_start ?? null,
@@ -220,7 +220,7 @@ export const dataSourceConfigWorkSessionVehicle: DataSourceConfigType<WorkSessio
 						}),
 				},
 				{
-					field: 'work_session',
+					field: 'work_session_id',
 					header: 'Session ID',
 					body: (
 						entry: WorkSessionVehicleModel,
@@ -244,11 +244,12 @@ export const dataSourceConfigWorkSessionVehicle: DataSourceConfigType<WorkSessio
 						}),
 				},
 				{
-					field: 'work_session',
+					field: 'work_session_status',
 					header: 'Session Status',
 					body: (entry, column) =>
 						DataTableValue(entry, column, {
 							isStatus: true,
+							dataSourceKey: 'work-session',
 							customValue: formatEnumLabel(
 								entry.work_session.status,
 							),
@@ -263,7 +264,7 @@ export const dataSourceConfigWorkSessionVehicle: DataSourceConfigType<WorkSessio
 						column: DataTableColumnType<WorkSessionVehicleModel>,
 					) =>
 						DataTableValue(entry, column, {
-							customValue: getCompanyVehicleDisplayName(
+							customValue: displayCompanyVehicleLabel(
 								entry.company_vehicle,
 							),
 						}),
@@ -277,6 +278,7 @@ export const dataSourceConfigWorkSessionVehicle: DataSourceConfigType<WorkSessio
 					) =>
 						DataTableValue(entry, column, {
 							isStatus: true,
+							dataSourceKey: 'work-session-vehicle',
 							markDeleted: true,
 							displayButton: {
 								action: (entry: WorkSessionVehicleModel) => {

@@ -36,3 +36,7 @@ export type VehicleModel<D = Date | string> = {
 	updated_at: D;
 	deleted_at: D;
 };
+
+export const displayVehicleLabel = (entry: VehicleModel) => {
+	return `${entry.brand?.name} ${entry.model}`;
+};

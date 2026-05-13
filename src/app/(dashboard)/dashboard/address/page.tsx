@@ -1,13 +1,13 @@
 import type { Metadata } from 'next';
 import BreadcrumbSetter from '@/app/(dashboard)/_components/breadcrumb.setter';
 import type { BreadcrumbType } from '@/app/(dashboard)/_providers/breadcrumb.provider';
-import { DataTableClientAddress } from '@/app/(dashboard)/dashboard/client-address/data-table-client-address.component';
+import { DataTableAddress } from '@/app/(dashboard)/dashboard/address/data-table-address.component';
 import { Configuration } from '@/config/settings.config';
 import { translate } from '@/config/translate.setup';
 
 export async function generateMetadata(): Promise<Metadata> {
 	return {
-		title: await translate('client-address.meta.title', {
+		title: await translate('address.meta.title', {
 			app_name: Configuration.get('app.name') as string,
 		}),
 	};
@@ -15,13 +15,13 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Page() {
 	const items: BreadcrumbType[] = [
-		{ label: await translate('dashboard.labels.client-address') },
+		{ label: await translate('dashboard.labels.address') },
 	];
 
 	return (
 		<>
-			<BreadcrumbSetter page="client-address" items={items} />
-			<DataTableClientAddress />
+			<BreadcrumbSetter page="address" items={items} />
+			<DataTableAddress />
 		</>
 	);
 }

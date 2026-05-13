@@ -2,7 +2,7 @@
 
 import { formatDate } from '@/helpers/date.helper';
 import { DisplayStatus } from '@/helpers/display.helper';
-import { getCompanyVehicleDisplayName } from '@/models/company-vehicle.model';
+import { displayCompanyVehicleLabel } from '@/models/company-vehicle.model';
 import type { WorkSessionVehicleModel } from '@/models/work-session-vehicle.model';
 
 export function ViewWorkSessionVehicle({
@@ -18,12 +18,15 @@ export function ViewWorkSessionVehicle({
 				</div>
 				<div>
 					<span className="font-semibold">Vehicle</span>{' '}
-					{getCompanyVehicleDisplayName(entry.company_vehicle)}
+					{displayCompanyVehicleLabel(entry.company_vehicle)}
 				</div>
 				<div className="flex items-center gap-2">
 					<span className="font-semibold">Status</span>{' '}
 					<div className="max-w-60">
-						<DisplayStatus status={entry.status} />
+						<DisplayStatus
+							status={entry.status}
+							dataSourceKey="work-session-vehicle"
+						/>
 					</div>
 				</div>
 			</div>

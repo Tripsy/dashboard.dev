@@ -16,8 +16,3 @@ export type CmrDriverModel<D = Date | string> = {
 
 	created_at: D;
 };
-
-export type CmrDriverFormValuesType = Pick<
-	CmrDriverModel,
-	'cmr_id' | 'work_session_id' | 'role'
->;

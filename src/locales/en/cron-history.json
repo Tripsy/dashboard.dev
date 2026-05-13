@@ -13,5 +13,10 @@
 			"title": "Cron record - {{entry}}",
 			"label": "View"
 		}
+	},
+	"status": {
+		"error": "Error",
+		"ok": "Ok",
+		"warning": "Warning"
 	}
 }

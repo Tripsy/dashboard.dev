@@ -9,6 +9,11 @@
 		"invalid_start_at_time": "Invalid start time",
 		"invalid_end_at_time": "Invalid end time"
 	},
+	"status": {
+		"active": "Active",
+		"closed": "Closed",
+		"deleted": "Deleted"
+	},
 	"action": {
 		"create": {
 			"title": "Add new session",

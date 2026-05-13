@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect } from 'react';
+import { dataSourceConfigAddress } from '@/app/(dashboard)/dashboard/address/address.definition';
 import { dataSourceConfigBrand } from '@/app/(dashboard)/dashboard/brand/brand.definition';
 import { dataSourceConfigCashFlow } from '@/app/(dashboard)/dashboard/cash-flow/cash-flow.definition';
 import { dataSourceConfigClient } from '@/app/(dashboard)/dashboard/client/client.definition';
-import { dataSourceConfigClientAddress } from '@/app/(dashboard)/dashboard/client-address/client-address.definition';
+import { dataSourceConfigCmr } from '@/app/(dashboard)/dashboard/cmr/cmr.definition';
 import { dataSourceConfigCompanyVehicle } from '@/app/(dashboard)/dashboard/company-vehicle/company-vehicle.definition';
 import { dataSourceConfigCronHistory } from '@/app/(dashboard)/dashboard/cron-history/cron-history.definition';
 import { dataSourceConfigLogData } from '@/app/(dashboard)/dashboard/log-data/log-data.definition';
@@ -21,6 +22,11 @@ import { loadDataSource } from '@/config/data-source.config';
 import { useModalStore } from '@/stores/window.store';
 import { DataSourceSectionEnum } from '@/types/data-source.type';
 
+loadDataSource(
+	DataSourceSectionEnum.DASHBOARD,
+	'address',
+	dataSourceConfigAddress,
+);
 loadDataSource(DataSourceSectionEnum.DASHBOARD, 'brand', dataSourceConfigBrand);
 loadDataSource(
 	DataSourceSectionEnum.DASHBOARD,
@@ -29,18 +35,14 @@ loadDataSource(
 );
 loadDataSource(
 	DataSourceSectionEnum.DASHBOARD,
-	'company-vehicle',
-	dataSourceConfigCompanyVehicle,
-);
-loadDataSource(
-	DataSourceSectionEnum.DASHBOARD,
-	'client-address',
-	dataSourceConfigClientAddress,
-);
-loadDataSource(
-	DataSourceSectionEnum.DASHBOARD,
 	'client',
 	dataSourceConfigClient,
+);
+loadDataSource(DataSourceSectionEnum.DASHBOARD, 'cmr', dataSourceConfigCmr);
+loadDataSource(
+	DataSourceSectionEnum.DASHBOARD,
+	'company-vehicle',
+	dataSourceConfigCompanyVehicle,
 );
 loadDataSource(
 	DataSourceSectionEnum.DASHBOARD,

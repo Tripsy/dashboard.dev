@@ -198,8 +198,8 @@ Routes.group('dashboard')
 	.add('client', '/dashboard/client', {
 		permission: 'client.find',
 	})
-	.add('client-address', '/dashboard/client-address', {
-		permission: 'client_address.find',
+	.add('address', '/dashboard/address', {
+		permission: 'address.find',
 	})
 	.add('place', '/dashboard/place', {
 		permission: 'place.find',

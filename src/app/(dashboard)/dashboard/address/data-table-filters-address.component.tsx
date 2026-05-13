@@ -5,35 +5,24 @@ import { useStore } from 'zustand/react';
 import {
 	FormFiltersReset,
 	FormFiltersSearch,
-	FormFiltersSelect,
 	FormFiltersShowDeleted,
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
-import type { ClientAddressDataTableFiltersType } from '@/app/(dashboard)/dashboard/client-address/client-address.definition';
-import { toOptionsFromEnum } from '@/helpers/form.helper';
-import { formatEnumLabel } from '@/helpers/string.helper';
+import type { AddressDataTableFiltersType } from '@/app/(dashboard)/dashboard/address/address.definition';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
-import {
-	type ClientAddressModel,
-	type ClientAddressType,
-	ClientAddressTypeEnum,
-} from '@/models/client-address.model';
+import type { AddressModel } from '@/models/address.model';
 
-const addressTypes = toOptionsFromEnum(ClientAddressTypeEnum, {
-	formatter: formatEnumLabel,
-});
-
-export const DataTableFiltersClientAddress = (): JSX.Element => {
+export const DataTableFiltersAddress = (): JSX.Element => {
 	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
-		'client-address',
-		ClientAddressModel
+		'address',
+		AddressModel
 	>();
 
 	const filters = useStore(
 		dataTableStore,
 		(state) => state.tableState.filters,
-	) as ClientAddressDataTableFiltersType;
+	) as AddressDataTableFiltersType;
 
 	const updateTableState = useStore(
 		dataTableStore,
@@ -41,9 +30,9 @@ export const DataTableFiltersClientAddress = (): JSX.Element => {
 	);
 
 	const setFilterValue = useCallback(
-		<K extends keyof ClientAddressDataTableFiltersType>(
+		<K extends keyof AddressDataTableFiltersType>(
 			key: K,
-			value: ClientAddressDataTableFiltersType[K]['value'],
+			value: AddressDataTableFiltersType[K]['value'],
 		) => {
 			updateTableState({
 				filters: {
@@ -79,21 +68,9 @@ export const DataTableFiltersClientAddress = (): JSX.Element => {
 
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
-			<FormFiltersSearch<ClientAddressDataTableFiltersType>
+			<FormFiltersSearch<AddressDataTableFiltersType>
 				labelText="ID / Address / Postal Code"
 				search={searchGlobal}
-			/>
-
-			{/*TODO ADD CLIENT*/}
-
-			<FormFiltersSelect<ClientAddressDataTableFiltersType>
-				labelText="Address Type"
-				fieldName="address_type"
-				fieldValue={filters.address_type.value}
-				options={addressTypes}
-				onChange={(value) =>
-					setFilterValue('address_type', value as ClientAddressType)
-				}
 			/>
 
 			<FormFiltersShowDeleted
@@ -101,7 +78,7 @@ export const DataTableFiltersClientAddress = (): JSX.Element => {
 				onCheckedChange={(value) => setFilterValue('is_deleted', value)}
 			/>
 
-			<FormFiltersReset dataSource="client-address" />
+			<FormFiltersReset dataSource="address" />
 		</div>
 	);
 };

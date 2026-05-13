@@ -11,15 +11,15 @@ import { getStatusTransitions } from '@/helpers/model.helper';
 import { requestUpdateStatus } from '@/helpers/services.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import {
-	type CompanyVehicleModel,
-	type CompanyVehicleStatus,
+	type CmrModel,
+	type CmrStatus,
 	STATUS_TRANSITIONS,
-} from '@/models/company-vehicle.model';
+} from '@/models/cmr.model';
 import { useToast } from '@/providers/toast.provider';
 import { useModalStore } from '@/stores/window.store';
 import type { WindowEntryType } from '@/types/window.type';
 
-export function StatusTransitionCompanyVehicle({
+export function StatusTransitionCmr({
 	entries,
 }: {
 	entries: WindowEntryType[];
@@ -33,8 +33,8 @@ export function StatusTransitionCompanyVehicle({
 			[
 				'app.text.error_title',
 				'app.text.success_title',
-				'company-vehicle.error.cannot_update_status',
-				'company-vehicle.action.statusTransition.success',
+				'cmr.error.cannot_update_status',
+				'cmr.action.statusTransition.success',
 			] as const,
 		[],
 	);
@@ -42,7 +42,7 @@ export function StatusTransitionCompanyVehicle({
 	const { isTranslationLoading, translations } =
 		useTranslation(translationsKeys);
 
-	const entry = entries[0] as CompanyVehicleModel | undefined;
+	const entry = entries[0] as CmrModel | undefined;
 
 	const statusTransitions = useMemo(
 		() =>
@@ -51,19 +51,17 @@ export function StatusTransitionCompanyVehicle({
 	);
 
 	const handleStatusUpdate = useCallback(
-		async (entry: CompanyVehicleModel, status: CompanyVehicleStatus) => {
+		async (entry: CmrModel, status: CmrStatus) => {
 			try {
-				await requestUpdateStatus('company-vehicle', entry, status);
+				await requestUpdateStatus('cmr', entry, status);
 
 				showToast({
 					severity: 'success',
 					summary: translations['app.text.success_title'],
-					detail: translations[
-						'company-vehicle.action.statusTransition.success'
-					],
+					detail: translations['cmr.action.statusTransition.success'],
 				});
 
-				dispatchFilterReset('company-vehicle');
+				dispatchFilterReset('cmr');
 			} catch (error) {
 				showToast({
 					severity: 'error',
@@ -88,18 +86,14 @@ export function StatusTransitionCompanyVehicle({
 	if (!statusTransitions.length) {
 		return (
 			<ErrorComponent
-				description={
-					translations['company-vehicle.error.cannot_update_status']
-				}
+				description={translations['cmr.error.cannot_update_status']}
 			/>
 		);
 	}
 
 	return (
 		<div>
-			<p className="pb-4 font-semibold">
-				Change company vehicle status to:
-			</p>
+			<p className="pb-4 font-semibold">Change CMR status to:</p>
 			<div className="flex flex-wrap gap-4 items-center">
 				{statusTransitions.map((status) => {
 					return (
@@ -112,7 +106,7 @@ export function StatusTransitionCompanyVehicle({
 						>
 							<DisplayStatus
 								status={status}
-								dataSourceKey="company-vehicle"
+								dataSourceKey="cmr"
 							/>
 						</button>
 					);

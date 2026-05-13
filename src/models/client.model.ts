@@ -64,7 +64,7 @@ export type ClientModel<D = Date | string> = ClientBase<D> &
 	ClientFinancial &
 	ClientContact;
 
-export function getClientDisplayName(client: ClientModel): string {
+export function displayClientLabel(client: ClientModel): string {
 	if (client.client_type === ClientTypeEnum.COMPANY) {
 		return client.company_name ?? '';
 	}

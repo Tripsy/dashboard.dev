@@ -15,6 +15,10 @@
 	"error": {
 		"cannot_update_status": "Cannot update status"
 	},
+	"status": {
+		"assigned": "Assigned",
+		"returned": "Returned"
+	},
 	"action": {
 		"create": {
 			"title": "Add work session vehicle",

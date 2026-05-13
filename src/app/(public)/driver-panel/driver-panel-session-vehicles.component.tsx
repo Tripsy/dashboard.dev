@@ -4,7 +4,7 @@ import { useWorkSession } from '@/app/(public)/_providers/work-session.provider'
 import { Icons } from '@/components/icon.component';
 import { Button } from '@/components/ui/button';
 import { DisplayStatus } from '@/helpers/display.helper';
-import { getCompanyVehicleDisplayName } from '@/models/company-vehicle.model';
+import { displayCompanyVehicleLabel } from '@/models/company-vehicle.model';
 import {
 	type WorkSessionVehicleModel,
 	WorkSessionVehicleStatusEnum,
@@ -119,9 +119,7 @@ export function DriverPanelSessionVehicles({
 					<div className="flex justify-between items-center">
 						<div className="flex flex-col justify-between items-start self-stretch gap-2">
 							<h3 className="font-semibold text-card-foreground">
-								{getCompanyVehicleDisplayName(
-									m.company_vehicle,
-								)}
+								{displayCompanyVehicleLabel(m.company_vehicle)}
 							</h3>
 							<div>
 								<span className="text-muted-foreground">
@@ -132,7 +130,10 @@ export function DriverPanelSessionVehicles({
 								</span>
 							</div>
 							<div>
-								<DisplayStatus status={m.status} />
+								<DisplayStatus
+									status={m.status}
+									dataSourceKey="work-session-vehicle"
+								/>
 							</div>
 						</div>
 

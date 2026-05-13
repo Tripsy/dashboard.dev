@@ -1,24 +1,14 @@
 'use client';
 
 import { formatDate } from '@/helpers/date.helper';
-import { formatEnumLabel } from '@/helpers/string.helper';
-import { getClientDisplayName } from '@/models/client.model';
-import type { ClientAddressModel } from '@/models/client-address.model';
+import type { AddressModel } from '@/models/address.model';
 
-export function ViewClientAddress({ entry }: { entry: ClientAddressModel }) {
+export function ViewAddress({ entry }: { entry: AddressModel }) {
 	return (
 		<div className="space-y-6">
 			<div className="space-y-1">
 				<div>
 					<span className="font-semibold">ID</span> {entry.id}
-				</div>
-				<div>
-					<span className="font-semibold">Client</span>{' '}
-					{getClientDisplayName(entry.client)}
-				</div>
-				<div>
-					<span className="font-semibold">Address Type</span>{' '}
-					{formatEnumLabel(entry.address_type)}
 				</div>
 			</div>
 

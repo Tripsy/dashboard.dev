@@ -26,11 +26,11 @@ function Header() {
 						<LogoComponent />
 					</Link>
 
-					<div className="w-full pl-26">
+					<div className="md:pl-12">
 						<Breadcrumb />
 					</div>
 
-					<div className="flex items-center gap-2">
+					<div className="flex items-center gap-2 ml-auto">
 						<ToggleTheme />
 						<UserMenu />
 					</div>

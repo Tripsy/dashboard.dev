@@ -288,6 +288,10 @@
 
 	/* Dashboard related */
 
+	.dashboard-layout .main-section {
+		@apply min-h-[calc(100vh-4rem)] p-4 sm:p-6 lg:p-8 transition-all duration-300 md:ml-72;
+	}
+
 	.dashboard-layout header .breadcrumb-container {
 		@apply hidden md:block;
 	}
@@ -298,10 +302,6 @@
 
 	.dashboard-layout .main-section .container-dashboard {
 		@apply mx-auto w-full;
-	}
-
-	.dashboard-layout .main-section {
-		@apply min-h-[calc(100vh-4rem)] p-4 sm:p-6 lg:p-8 transition-all duration-300 md:ml-64;
 	}
 
 	.dashboard-layout .main-section.side-menu-closed {

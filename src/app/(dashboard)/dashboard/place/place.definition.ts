@@ -5,10 +5,7 @@ import {
 	type PlaceFormValuesType,
 } from '@/app/(dashboard)/dashboard/place/form-manage-place.component';
 import { ViewPlace } from '@/app/(dashboard)/dashboard/place/view-place.component';
-import type {
-	DataSourceConfigType,
-	DataTableColumnType,
-} from '@/config/data-source.config';
+import type { DataSourceConfigType } from '@/config/data-source.config';
 import { Configuration } from '@/config/settings.config';
 import { translateBatch } from '@/config/translate.setup';
 import {
@@ -197,10 +194,7 @@ export const dataSourceConfigPlace: DataSourceConfigType<PlaceModel> = {
 				field: 'id',
 				header: 'ID',
 				sortable: true,
-				body: (
-					entry: PlaceModel,
-					column: DataTableColumnType<PlaceModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						markDeleted: true,
 						displayButton: {
@@ -213,10 +207,7 @@ export const dataSourceConfigPlace: DataSourceConfigType<PlaceModel> = {
 				field: 'place_type',
 				header: 'Type',
 				sortable: true,
-				body: (
-					entry: PlaceModel,
-					column: DataTableColumnType<PlaceModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						capitalize: true,
 					}),
@@ -229,10 +220,7 @@ export const dataSourceConfigPlace: DataSourceConfigType<PlaceModel> = {
 			{
 				field: 'name',
 				header: 'Name',
-				body: (
-					entry: PlaceModel,
-					column: DataTableColumnType<PlaceModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						customValue: getPlaceContentProp(entry, 'name'),
 					}),
@@ -241,10 +229,7 @@ export const dataSourceConfigPlace: DataSourceConfigType<PlaceModel> = {
 				field: 'created_at',
 				header: 'Created At',
 				sortable: true,
-				body: (
-					entry: PlaceModel,
-					column: DataTableColumnType<PlaceModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						displayDate: true,
 					}),

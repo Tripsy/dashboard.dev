@@ -71,6 +71,10 @@
 		"setupVehicles": {
 			"title": "Setup CMR vehicles",
 			"label": "Setup vehicles"
+		},
+		"setupSessions": {
+			"title": "Setup CMR sessions",
+			"label": "Setup sessions"
 		}
 	}
 }

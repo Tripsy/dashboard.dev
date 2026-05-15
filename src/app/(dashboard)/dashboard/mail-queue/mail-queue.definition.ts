@@ -2,7 +2,6 @@ import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
 import { ViewMailQueue } from '@/app/(dashboard)/dashboard/mail-queue/view-mail-queue.component';
 import type {
 	DataSourceConfigType,
-	DataTableColumnType,
 	DataTableValueOptionsType,
 } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
@@ -64,10 +63,7 @@ export const dataSourceConfigMailQueue: DataSourceConfigType<MailQueueModel> = {
 				field: 'id',
 				header: 'ID',
 				sortable: true,
-				body: (
-					entry: MailQueueModel,
-					column: DataTableColumnType<MailQueueModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						markDeleted: true,
 						displayButton: {
@@ -79,10 +75,7 @@ export const dataSourceConfigMailQueue: DataSourceConfigType<MailQueueModel> = {
 			{
 				field: 'template',
 				header: 'Template',
-				body: (
-					entry: MailQueueModel,
-					column: DataTableColumnType<MailQueueModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						customValue: entry.template?.label || 'n/a',
 						displayButton: displayButtonViewTemplate(entry),
@@ -91,10 +84,7 @@ export const dataSourceConfigMailQueue: DataSourceConfigType<MailQueueModel> = {
 			{
 				field: 'to',
 				header: 'To',
-				body: (
-					entry: MailQueueModel,
-					column: DataTableColumnType<MailQueueModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						customValue: entry.to.address,
 					}),
@@ -102,10 +92,7 @@ export const dataSourceConfigMailQueue: DataSourceConfigType<MailQueueModel> = {
 			{
 				field: 'status',
 				header: 'Status',
-				body: (
-					entry: MailQueueModel,
-					column: DataTableColumnType<MailQueueModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						isStatus: true,
 						dataSourceKey: 'mail-queue',
@@ -119,10 +106,7 @@ export const dataSourceConfigMailQueue: DataSourceConfigType<MailQueueModel> = {
 				field: 'sent_at',
 				header: 'Sent At',
 				sortable: true,
-				body: (
-					entry: MailQueueModel,
-					column: DataTableColumnType<MailQueueModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						displayDate: true,
 					}),

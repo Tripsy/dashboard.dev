@@ -4,10 +4,7 @@ import {
 	FormManagePermission,
 	type PermissionFormValuesType,
 } from '@/app/(dashboard)/dashboard/permission/form-manage-permission.component';
-import type {
-	DataSourceConfigType,
-	DataTableColumnType,
-} from '@/config/data-source.config';
+import type { DataSourceConfigType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import { getFormDataAsString } from '@/helpers/form.helper';
 import {
@@ -89,10 +86,7 @@ export const dataSourceConfigPermission: DataSourceConfigType<PermissionModel> =
 					field: 'id',
 					header: 'ID',
 					sortable: true,
-					body: (
-						entry: PermissionModel,
-						column: DataTableColumnType<PermissionModel>,
-					) =>
+					body: (entry, column) =>
 						DataTableValue(entry, column, {
 							markDeleted: true,
 						}),

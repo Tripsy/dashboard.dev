@@ -5,10 +5,7 @@ import {
 	type VehicleFormValuesType,
 } from '@/app/(dashboard)/dashboard/vehicle/form-manage-vehicle.component';
 import { ViewVehicle } from '@/app/(dashboard)/dashboard/vehicle/view-vehicle.component';
-import type {
-	DataSourceConfigType,
-	DataTableColumnType,
-} from '@/config/data-source.config';
+import type { DataSourceConfigType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import {
 	getFormDataAsEnum,
@@ -172,10 +169,7 @@ export const dataSourceConfigVehicle: DataSourceConfigType<VehicleModel> = {
 				field: 'id',
 				header: 'ID',
 				sortable: true,
-				body: (
-					entry: VehicleModel,
-					column: DataTableColumnType<VehicleModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						markDeleted: true,
 						displayButton: {
@@ -187,10 +181,7 @@ export const dataSourceConfigVehicle: DataSourceConfigType<VehicleModel> = {
 			{
 				field: 'brand',
 				header: 'Brand',
-				body: (
-					entry: VehicleModel,
-					column: DataTableColumnType<VehicleModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						customValue: entry.brand?.name ?? 'n/a',
 					}),
@@ -203,10 +194,7 @@ export const dataSourceConfigVehicle: DataSourceConfigType<VehicleModel> = {
 			{
 				field: 'vehicle_type',
 				header: 'Type',
-				body: (
-					entry: VehicleModel,
-					column: DataTableColumnType<VehicleModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						customValue: formatEnumLabel(entry.vehicle_type),
 					}),
@@ -214,10 +202,7 @@ export const dataSourceConfigVehicle: DataSourceConfigType<VehicleModel> = {
 			{
 				field: 'status',
 				header: 'Status',
-				body: (
-					entry: VehicleModel,
-					column: DataTableColumnType<VehicleModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						isStatus: true,
 						dataSourceKey: 'vehicle',
@@ -242,10 +227,7 @@ export const dataSourceConfigVehicle: DataSourceConfigType<VehicleModel> = {
 				field: 'created_at',
 				header: 'Created At',
 				sortable: true,
-				body: (
-					entry: VehicleModel,
-					column: DataTableColumnType<VehicleModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						displayDate: true,
 					}),

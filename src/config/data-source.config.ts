@@ -218,7 +218,7 @@ export type DataSourceKey =
 	| 'vehicle'
 	| 'company-vehicle'
 	| 'cmr'
-	| 'cmr-driver'
+	| 'cmr-session'
 	| 'cmr-vehicle'
 	| 'operational-record'
 	| 'work-session'
@@ -296,6 +296,7 @@ export function resolveRequestPath(key: DataSourceKey) {
 		'user',
 		'vehicle',
 		'company-vehicle',
+		'cmr-session',
 		'cmr-vehicle',
 		'operational-record',
 		'work-session',

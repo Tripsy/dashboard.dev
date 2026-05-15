@@ -5,10 +5,7 @@ import {
 	FormManageAddress,
 } from '@/app/(dashboard)/dashboard/address/form-manage-address.component';
 import { ViewAddress } from '@/app/(dashboard)/dashboard/address/view-address.component';
-import type {
-	DataSourceConfigType,
-	DataTableColumnType,
-} from '@/config/data-source.config';
+import type { DataSourceConfigType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import {
 	getFormDataAsNumber,
@@ -136,10 +133,7 @@ export const dataSourceConfigAddress: DataSourceConfigType<AddressModel> = {
 				field: 'id',
 				header: 'ID',
 				sortable: true,
-				body: (
-					entry: AddressModel,
-					column: DataTableColumnType<AddressModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						markDeleted: true,
 						displayButton: {
@@ -151,10 +145,7 @@ export const dataSourceConfigAddress: DataSourceConfigType<AddressModel> = {
 			{
 				field: 'city',
 				header: 'City',
-				body: (
-					entry: AddressModel,
-					column: DataTableColumnType<AddressModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						customValue: entry.city
 							? getPlaceContentProp(entry.city, 'name')

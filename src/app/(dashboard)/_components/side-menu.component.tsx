@@ -98,7 +98,7 @@ export function SideMenu() {
 
 				'dashboard.labels.activity',
 				'dashboard.labels.cmr',
-				'dashboard.labels.cmr-driver',
+				'dashboard.labels.cmr-session',
 				'dashboard.labels.cmr-vehicle',
 				'dashboard.labels.work-session',
 				'dashboard.labels.work-session-vehicle',
@@ -152,11 +152,11 @@ export function SideMenu() {
 						permission: hasPermission(auth, 'cmr.find'),
 					},
 					{
-						page: 'cmr-driver',
-						href: Routes.get('cmr-driver'),
-						text: translations['dashboard.labels.cmr-driver'],
-						icon: Icons.Driver,
-						permission: hasPermission(auth, 'cmr-driver.find'),
+						page: 'cmr-session',
+						href: Routes.get('cmr-session'),
+						text: translations['dashboard.labels.cmr-session'],
+						icon: Icons.CmrSession,
+						permission: hasPermission(auth, 'cmr-session.find'),
 					},
 					{
 						page: 'cmr-vehicle',

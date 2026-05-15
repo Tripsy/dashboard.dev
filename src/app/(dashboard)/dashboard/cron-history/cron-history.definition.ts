@@ -1,9 +1,6 @@
 import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
 import { ViewCronHistory } from '@/app/(dashboard)/dashboard/cron-history/view-cron-history.component';
-import type {
-	DataSourceConfigType,
-	DataTableColumnType,
-} from '@/config/data-source.config';
+import type { DataSourceConfigType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import { requestDeleteMultiple, requestFind } from '@/helpers/services.helper';
 import type {
@@ -44,10 +41,7 @@ export const dataSourceConfigCronHistory: DataSourceConfigType<CronHistoryModel>
 					field: 'id',
 					header: 'ID',
 					sortable: true,
-					body: (
-						entry: CronHistoryModel,
-						column: DataTableColumnType<CronHistoryModel>,
-					) =>
+					body: (entry, column) =>
 						DataTableValue(entry, column, {
 							markDeleted: true,
 							displayButton: {
@@ -65,10 +59,7 @@ export const dataSourceConfigCronHistory: DataSourceConfigType<CronHistoryModel>
 					field: 'start_at',
 					header: 'Start At',
 					sortable: true,
-					body: (
-						entry: CronHistoryModel,
-						column: DataTableColumnType<CronHistoryModel>,
-					) =>
+					body: (entry, column) =>
 						DataTableValue(entry, column, {
 							displayDate: true,
 						}),
@@ -76,10 +67,7 @@ export const dataSourceConfigCronHistory: DataSourceConfigType<CronHistoryModel>
 				{
 					field: 'status',
 					header: 'Status',
-					body: (
-						entry: CronHistoryModel,
-						column: DataTableColumnType<CronHistoryModel>,
-					) =>
+					body: (entry, column) =>
 						DataTableValue(entry, column, {
 							isStatus: true,
 							dataSourceKey: 'cron-history',

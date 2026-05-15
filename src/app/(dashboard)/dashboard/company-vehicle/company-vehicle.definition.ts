@@ -6,10 +6,7 @@ import {
 } from '@/app/(dashboard)/dashboard/company-vehicle/form-manage-company-vehicle.component';
 import { StatusTransitionCompanyVehicle } from '@/app/(dashboard)/dashboard/company-vehicle/status-transition-company-vehicle.component';
 import { ViewCompanyVehicle } from '@/app/(dashboard)/dashboard/company-vehicle/view-company-vehicle.component';
-import type {
-	DataSourceConfigType,
-	DataTableColumnType,
-} from '@/config/data-source.config';
+import type { DataSourceConfigType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import {
 	getFormDataAsEnum,
@@ -172,10 +169,7 @@ export const dataSourceConfigCompanyVehicle: DataSourceConfigType<CompanyVehicle
 					field: 'id',
 					header: 'ID',
 					sortable: true,
-					body: (
-						entry: CompanyVehicleModel,
-						column: DataTableColumnType<CompanyVehicleModel>,
-					) =>
+					body: (entry, column) =>
 						DataTableValue(entry, column, {
 							markDeleted: true,
 							displayButton: {
@@ -187,10 +181,7 @@ export const dataSourceConfigCompanyVehicle: DataSourceConfigType<CompanyVehicle
 				{
 					field: 'brand',
 					header: 'Brand',
-					body: (
-						entry: CompanyVehicleModel,
-						column: DataTableColumnType<CompanyVehicleModel>,
-					) =>
+					body: (entry, column) =>
 						DataTableValue(entry, column, {
 							customValue: entry.vehicle.brand?.name || 'n/a',
 						}),
@@ -198,10 +189,7 @@ export const dataSourceConfigCompanyVehicle: DataSourceConfigType<CompanyVehicle
 				{
 					field: 'model',
 					header: 'Model',
-					body: (
-						entry: CompanyVehicleModel,
-						column: DataTableColumnType<CompanyVehicleModel>,
-					) =>
+					body: (entry, column) =>
 						DataTableValue(entry, column, {
 							customValue: entry.vehicle.model,
 						}),
@@ -209,10 +197,7 @@ export const dataSourceConfigCompanyVehicle: DataSourceConfigType<CompanyVehicle
 				{
 					field: 'vehicle_type',
 					header: 'Type',
-					body: (
-						entry: CompanyVehicleModel,
-						column: DataTableColumnType<CompanyVehicleModel>,
-					) =>
+					body: (entry, column) =>
 						DataTableValue(entry, column, {
 							customValue: formatEnumLabel(
 								entry.vehicle.vehicle_type,
@@ -226,10 +211,7 @@ export const dataSourceConfigCompanyVehicle: DataSourceConfigType<CompanyVehicle
 				{
 					field: 'scope',
 					header: 'Scope',
-					body: (
-						entry: CompanyVehicleModel,
-						column: DataTableColumnType<CompanyVehicleModel>,
-					) =>
+					body: (entry, column) =>
 						DataTableValue(entry, column, {
 							customValue: formatEnumLabel(entry.scope),
 						}),
@@ -237,10 +219,7 @@ export const dataSourceConfigCompanyVehicle: DataSourceConfigType<CompanyVehicle
 				{
 					field: 'status',
 					header: 'Status',
-					body: (
-						entry: CompanyVehicleModel,
-						column: DataTableColumnType<CompanyVehicleModel>,
-					) =>
+					body: (entry, column) =>
 						DataTableValue(entry, column, {
 							isStatus: true,
 							dataSourceKey: 'company-vehicle',

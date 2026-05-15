@@ -5,10 +5,7 @@ import {
 	type WorkSessionVehicleFormValuesType,
 } from '@/app/(dashboard)/dashboard/work-session-vehicle/form-manage-work-session-vehicle.component';
 import { ViewWorkSessionVehicle } from '@/app/(dashboard)/dashboard/work-session-vehicle/view-work-session-vehicle.component';
-import type {
-	DataSourceConfigType,
-	DataTableColumnType,
-} from '@/config/data-source.config';
+import type { DataSourceConfigType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import {
 	getFormDataAsEnum,
@@ -16,12 +13,12 @@ import {
 	getFormDataAsString,
 } from '@/helpers/form.helper';
 import { requestFind } from '@/helpers/services.helper';
-import { formatEnumLabel } from '@/helpers/string.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import { displayCompanyVehicleLabel } from '@/models/company-vehicle.model';
 import { VehicleTypeEnum } from '@/models/vehicle.model';
 import {
-	getWorkSessionDisplayName,
+	displayWorkSessionLabel,
+	type WorkSessionModel,
 	type WorkSessionStatus,
 } from '@/models/work-session.model';
 import {
@@ -207,10 +204,7 @@ export const dataSourceConfigWorkSessionVehicle: DataSourceConfigType<WorkSessio
 					field: 'id',
 					header: 'ID',
 					sortable: true,
-					body: (
-						entry: WorkSessionVehicleModel,
-						column: DataTableColumnType<WorkSessionVehicleModel>,
-					) =>
+					body: (entry, column) =>
 						DataTableValue(entry, column, {
 							markDeleted: true,
 							displayButton: {
@@ -222,10 +216,7 @@ export const dataSourceConfigWorkSessionVehicle: DataSourceConfigType<WorkSessio
 				{
 					field: 'work_session_id',
 					header: 'Session ID',
-					body: (
-						entry: WorkSessionVehicleModel,
-						column: DataTableColumnType<WorkSessionVehicleModel>,
-					) =>
+					body: (entry, column) =>
 						DataTableValue(entry, column, {
 							customValue: entry.work_session.id.toString(),
 						}),
@@ -233,12 +224,9 @@ export const dataSourceConfigWorkSessionVehicle: DataSourceConfigType<WorkSessio
 				{
 					field: 'work_session',
 					header: 'Session',
-					body: (
-						entry: WorkSessionVehicleModel,
-						column: DataTableColumnType<WorkSessionVehicleModel>,
-					) =>
+					body: (entry, column) =>
 						DataTableValue(entry, column, {
-							customValue: getWorkSessionDisplayName(
+							customValue: displayWorkSessionLabel(
 								entry.work_session,
 							),
 						}),
@@ -246,23 +234,21 @@ export const dataSourceConfigWorkSessionVehicle: DataSourceConfigType<WorkSessio
 				{
 					field: 'work_session_status',
 					header: 'Session Status',
-					body: (entry, column) =>
-						DataTableValue(entry, column, {
-							isStatus: true,
-							dataSourceKey: 'work-session',
-							customValue: formatEnumLabel(
-								entry.work_session.status,
-							),
-						}),
+					body: (entry) =>
+						DataTableValue<WorkSessionModel>(
+							entry.work_session,
+							'status',
+							{
+								isStatus: true,
+								dataSourceKey: 'work-session',
+							},
+						),
 					style: { minWidth: '8rem', maxWidth: '8rem' },
 				},
 				{
 					field: 'company_vehicle',
 					header: 'Vehicle',
-					body: (
-						entry: WorkSessionVehicleModel,
-						column: DataTableColumnType<WorkSessionVehicleModel>,
-					) =>
+					body: (entry, column) =>
 						DataTableValue(entry, column, {
 							customValue: displayCompanyVehicleLabel(
 								entry.company_vehicle,
@@ -272,10 +258,7 @@ export const dataSourceConfigWorkSessionVehicle: DataSourceConfigType<WorkSessio
 				{
 					field: 'status',
 					header: 'Status',
-					body: (
-						entry: WorkSessionVehicleModel,
-						column: DataTableColumnType<WorkSessionVehicleModel>,
-					) =>
+					body: (entry, column) =>
 						DataTableValue(entry, column, {
 							isStatus: true,
 							dataSourceKey: 'work-session-vehicle',
@@ -299,10 +282,7 @@ export const dataSourceConfigWorkSessionVehicle: DataSourceConfigType<WorkSessio
 					field: 'assigned_at',
 					header: 'Assigned At',
 					sortable: true,
-					body: (
-						entry: WorkSessionVehicleModel,
-						column: DataTableColumnType<WorkSessionVehicleModel>,
-					) =>
+					body: (entry, column) =>
 						DataTableValue(entry, column, {
 							displayDate: true,
 						}),
@@ -311,10 +291,7 @@ export const dataSourceConfigWorkSessionVehicle: DataSourceConfigType<WorkSessio
 					field: 'returned_at',
 					header: 'Returned At',
 					sortable: true,
-					body: (
-						entry: WorkSessionVehicleModel,
-						column: DataTableColumnType<WorkSessionVehicleModel>,
-					) =>
+					body: (entry, column) =>
 						DataTableValue(entry, column, {
 							displayDate: true,
 						}),

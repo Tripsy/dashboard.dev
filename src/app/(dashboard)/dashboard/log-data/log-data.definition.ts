@@ -1,9 +1,6 @@
 import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
 import { ViewLogData } from '@/app/(dashboard)/dashboard/log-data/view-log-data.component';
-import type {
-	DataSourceConfigType,
-	DataTableColumnType,
-} from '@/config/data-source.config';
+import type { DataSourceConfigType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import { requestDeleteMultiple, requestFind } from '@/helpers/services.helper';
 import type {
@@ -46,10 +43,7 @@ export const dataSourceConfigLogData: DataSourceConfigType<LogDataModel> = {
 				field: 'id',
 				header: 'ID',
 				sortable: true,
-				body: (
-					entry: LogDataModel,
-					column: DataTableColumnType<LogDataModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						markDeleted: true,
 						displayButton: {
@@ -62,10 +56,7 @@ export const dataSourceConfigLogData: DataSourceConfigType<LogDataModel> = {
 				field: 'category',
 				header: 'Category',
 				sortable: true,
-				body: (
-					entry: LogDataModel,
-					column: DataTableColumnType<LogDataModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						capitalize: true,
 					}),
@@ -74,10 +65,7 @@ export const dataSourceConfigLogData: DataSourceConfigType<LogDataModel> = {
 				field: 'level',
 				header: 'Level',
 				sortable: true,
-				body: (
-					entry: LogDataModel,
-					column: DataTableColumnType<LogDataModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						capitalize: true,
 					}),
@@ -90,10 +78,7 @@ export const dataSourceConfigLogData: DataSourceConfigType<LogDataModel> = {
 				field: 'created_at',
 				header: 'Created At',
 				sortable: true,
-				body: (
-					entry: LogDataModel,
-					column: DataTableColumnType<LogDataModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						displayDate: true,
 					}),

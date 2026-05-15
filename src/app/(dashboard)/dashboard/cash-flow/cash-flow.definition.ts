@@ -5,10 +5,7 @@ import {
 	FormManageCashFlow,
 } from '@/app/(dashboard)/dashboard/cash-flow/form-manage-cash-flow.component';
 import { ViewCashFlow } from '@/app/(dashboard)/dashboard/cash-flow/view-cash-flow.component';
-import type {
-	DataSourceConfigType,
-	DataTableColumnType,
-} from '@/config/data-source.config';
+import type { DataSourceConfigType } from '@/config/data-source.config';
 import { Configuration } from '@/config/settings.config';
 import { translateBatch } from '@/config/translate.setup';
 import { DisplayAmount } from '@/helpers/display.helper';
@@ -207,10 +204,7 @@ export const dataSourceConfigCashFlow: DataSourceConfigType<CashFlowModel> = {
 				field: 'id',
 				header: 'ID',
 				sortable: true,
-				body: (
-					entry: CashFlowModel,
-					column: DataTableColumnType<CashFlowModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						markDeleted: true,
 						displayButton: {
@@ -222,10 +216,7 @@ export const dataSourceConfigCashFlow: DataSourceConfigType<CashFlowModel> = {
 			{
 				field: 'category_type',
 				header: 'Type',
-				body: (
-					entry: CashFlowModel,
-					column: DataTableColumnType<CashFlowModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						customValue: formatEnumLabel(entry.category_type),
 					}),
@@ -234,10 +225,7 @@ export const dataSourceConfigCashFlow: DataSourceConfigType<CashFlowModel> = {
 				field: 'category',
 				header: 'Category',
 				sortable: true,
-				body: (
-					entry: CashFlowModel,
-					column: DataTableColumnType<CashFlowModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						customValue: formatEnumLabel(entry.category),
 					}),
@@ -245,10 +233,7 @@ export const dataSourceConfigCashFlow: DataSourceConfigType<CashFlowModel> = {
 			{
 				field: 'amount',
 				header: 'Amount',
-				body: (
-					entry: CashFlowModel,
-					column: DataTableColumnType<CashFlowModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						customValue: DisplayAmount({
 							amount: entry.amount,
@@ -263,10 +248,7 @@ export const dataSourceConfigCashFlow: DataSourceConfigType<CashFlowModel> = {
 			{
 				field: 'method',
 				header: 'Method',
-				body: (
-					entry: CashFlowModel,
-					column: DataTableColumnType<CashFlowModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						customValue: formatEnumLabel(entry.method),
 					}),
@@ -278,10 +260,7 @@ export const dataSourceConfigCashFlow: DataSourceConfigType<CashFlowModel> = {
 			{
 				field: 'status',
 				header: 'Status',
-				body: (
-					entry: CashFlowModel,
-					column: DataTableColumnType<CashFlowModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						isStatus: true,
 						dataSourceKey: 'cash-flow',
@@ -321,10 +300,7 @@ export const dataSourceConfigCashFlow: DataSourceConfigType<CashFlowModel> = {
 				field: 'created_at',
 				header: 'Created At',
 				sortable: true,
-				body: (
-					entry: CashFlowModel,
-					column: DataTableColumnType<CashFlowModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						displayDate: true,
 					}),

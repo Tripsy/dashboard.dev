@@ -3,7 +3,7 @@
 		"title": "CMR vehicles - Dashboard | {{app_name}}"
 	},
 	"validation": {
-		"invalid_work_session_id": "Invalid CMR",
+		"invalid_cmr_id": "Invalid CMR",
 		"invalid_vehicle_id": "Invalid company vehicle; Pick vehicle from select",
 		"invalid_vehicle": "Invalid company vehicle",
 		"invalid_license_plate": "Invalid license plate",

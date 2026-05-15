@@ -5,10 +5,7 @@ import {
 	FormManageClient,
 } from '@/app/(dashboard)/dashboard/client/form-manage-client.component';
 import { ViewClient } from '@/app/(dashboard)/dashboard/client/view-client.component';
-import type {
-	DataSourceConfigType,
-	DataTableColumnType,
-} from '@/config/data-source.config';
+import type { DataSourceConfigType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import { getFormDataAsEnum, getFormDataAsString } from '@/helpers/form.helper';
 import { arrayHasValue } from '@/helpers/objects.helper';
@@ -257,10 +254,7 @@ export const dataSourceConfigClient: DataSourceConfigType<ClientModel> = {
 				field: 'id',
 				header: 'ID',
 				sortable: true,
-				body: (
-					entry: ClientModel,
-					column: DataTableColumnType<ClientModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						markDeleted: true,
 						displayButton: {
@@ -273,10 +267,7 @@ export const dataSourceConfigClient: DataSourceConfigType<ClientModel> = {
 				field: 'client_type',
 				header: 'Type',
 				sortable: true,
-				body: (
-					entry: ClientModel,
-					column: DataTableColumnType<ClientModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						capitalize: true,
 					}),
@@ -284,10 +275,7 @@ export const dataSourceConfigClient: DataSourceConfigType<ClientModel> = {
 			{
 				field: 'name',
 				header: 'Name',
-				body: (
-					entry: ClientModel,
-					column: DataTableColumnType<ClientModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						customValue: displayClientLabel(entry),
 					}),
@@ -295,10 +283,7 @@ export const dataSourceConfigClient: DataSourceConfigType<ClientModel> = {
 			{
 				field: 'status',
 				header: 'Status',
-				body: (
-					entry: ClientModel,
-					column: DataTableColumnType<ClientModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						isStatus: true,
 						dataSourceKey: 'client',
@@ -323,10 +308,7 @@ export const dataSourceConfigClient: DataSourceConfigType<ClientModel> = {
 				field: 'created_at',
 				header: 'Created At',
 				sortable: true,
-				body: (
-					entry: ClientModel,
-					column: DataTableColumnType<ClientModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						displayDate: true,
 					}),

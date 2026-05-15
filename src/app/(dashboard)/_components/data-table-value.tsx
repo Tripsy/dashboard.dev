@@ -65,17 +65,17 @@ export const DisplayButton = <Entry,>({
 
 export const DataTableValue = <Entry extends Record<string, unknown>>(
 	entry: Entry,
-	column: DataTableColumnType<Entry>,
+	column: DataTableColumnType<Entry> | keyof Entry,
 	options: DataTableValueOptionsType<Entry>,
 ) => {
 	let outputValue: string | JSX.Element;
 
+	const field = typeof column === 'object' ? column.field : column;
+
 	if (options.customValue) {
 		outputValue = options.customValue;
 	} else {
-		const entryValue: string | object = entry[column.field] as
-			| string
-			| object;
+		const entryValue = entry[field] as string | object;
 
 		if (entryValue == null) {
 			return '-';
@@ -96,7 +96,7 @@ export const DataTableValue = <Entry extends Record<string, unknown>>(
 		outputValue = formatDate(outputValue, 'date-time') || '-';
 	}
 
-	if (options.isStatus && column.field === 'status' && 'status' in entry) {
+	if (options.isStatus && field === 'status' && 'status' in entry) {
 		const status =
 			options.markDeleted && 'deleted_at' in entry && entry?.deleted_at
 				? 'deleted'

@@ -10,6 +10,7 @@ import brand from '@/locales/en/brand.json';
 import cash_flow from '@/locales/en/cash-flow.json';
 import client from '@/locales/en/client.json';
 import cmr from '@/locales/en/cmr.json';
+import cmr_session from '@/locales/en/cmr-session.json';
 import cmr_vehicle from '@/locales/en/cmr-vehicle.json';
 import company_vehicle from '@/locales/en/company-vehicle.json';
 import cron_history from '@/locales/en/cron-history.json';
@@ -71,6 +72,7 @@ const en = {
 	'work-session-vehicle': work_session_vehicle,
 	cmr: cmr,
 	'cmr-vehicle': cmr_vehicle,
+	'cmr-session': cmr_session,
 
 	// FE
 	'driver-panel': driver_panel,

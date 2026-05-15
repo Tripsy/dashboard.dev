@@ -5,10 +5,7 @@ import {
 	FormManageBrand,
 } from '@/app/(dashboard)/dashboard/brand/form-manage-brand.component';
 import { ViewBrand } from '@/app/(dashboard)/dashboard/brand/view-brand.component';
-import type {
-	DataSourceConfigType,
-	DataTableColumnType,
-} from '@/config/data-source.config';
+import type { DataSourceConfigType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import { getFormDataAsEnum, getFormDataAsString } from '@/helpers/form.helper';
 import {
@@ -181,10 +178,7 @@ export const dataSourceConfigBrand: DataSourceConfigType<BrandModel> = {
 				field: 'id',
 				header: 'ID',
 				sortable: true,
-				body: (
-					entry: BrandModel,
-					column: DataTableColumnType<BrandModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						markDeleted: true,
 						displayButton: {
@@ -196,10 +190,7 @@ export const dataSourceConfigBrand: DataSourceConfigType<BrandModel> = {
 			{
 				field: 'brand_type',
 				header: 'Type',
-				body: (
-					entry: BrandModel,
-					column: DataTableColumnType<BrandModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						capitalize: true,
 					}),
@@ -212,10 +203,7 @@ export const dataSourceConfigBrand: DataSourceConfigType<BrandModel> = {
 			{
 				field: 'status',
 				header: 'Status',
-				body: (
-					entry: BrandModel,
-					column: DataTableColumnType<BrandModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						isStatus: true,
 						dataSourceKey: 'brand',

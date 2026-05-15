@@ -239,8 +239,8 @@ Routes.group('dashboard')
 	.add('cmr', '/dashboard/cmr', {
 		permission: 'cmr.find',
 	})
-	.add('cmr-driver', '/dashboard/cmr-driver', {
-		permission: 'cmr-driver.find',
+	.add('cmr-session', '/dashboard/cmr-session', {
+		permission: 'cmr-session.find',
 	})
 	.add('cmr-vehicle', '/dashboard/cmr-vehicle', {
 		permission: 'cmr-vehicle.find',

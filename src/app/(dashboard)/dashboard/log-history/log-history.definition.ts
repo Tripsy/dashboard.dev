@@ -2,7 +2,6 @@ import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
 import { ViewLogHistory } from '@/app/(dashboard)/dashboard/log-history/view-log-history.component';
 import type {
 	DataSourceConfigType,
-	DataTableColumnType,
 	DataTableValueOptionsType,
 } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
@@ -67,10 +66,7 @@ export const dataSourceConfigLogHistory: DataSourceConfigType<LogHistoryModel> =
 					field: 'id',
 					header: 'ID',
 					sortable: true,
-					body: (
-						entry: LogHistoryModel,
-						column: DataTableColumnType<LogHistoryModel>,
-					) =>
+					body: (entry, column) =>
 						DataTableValue(entry, column, {
 							markDeleted: true,
 							displayButton: {
@@ -87,10 +83,7 @@ export const dataSourceConfigLogHistory: DataSourceConfigType<LogHistoryModel> =
 					field: 'entity',
 					header: 'Entity',
 					sortable: true,
-					body: (
-						entry: LogHistoryModel,
-						column: DataTableColumnType<LogHistoryModel>,
-					) =>
+					body: (entry, column) =>
 						DataTableValue(entry, column, {
 							customValue: toTitleCase(entry.entity),
 						}),
@@ -107,10 +100,7 @@ export const dataSourceConfigLogHistory: DataSourceConfigType<LogHistoryModel> =
 				{
 					field: 'performed_by',
 					header: 'Performed By',
-					body: (
-						entry: LogHistoryModel,
-						column: DataTableColumnType<LogHistoryModel>,
-					) =>
+					body: (entry, column) =>
 						DataTableValue(entry, column, {
 							customValue: entry.auth_id
 								? `${entry.performed_by} (#${entry.auth_id})`
@@ -122,10 +112,7 @@ export const dataSourceConfigLogHistory: DataSourceConfigType<LogHistoryModel> =
 					field: 'recorded_at',
 					header: 'Recorded At',
 					sortable: true,
-					body: (
-						entry: LogHistoryModel,
-						column: DataTableColumnType<LogHistoryModel>,
-					) =>
+					body: (entry, column) =>
 						DataTableValue(entry, column, {
 							displayDate: true,
 						}),

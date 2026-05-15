@@ -6,6 +6,7 @@ import { dataSourceConfigBrand } from '@/app/(dashboard)/dashboard/brand/brand.d
 import { dataSourceConfigCashFlow } from '@/app/(dashboard)/dashboard/cash-flow/cash-flow.definition';
 import { dataSourceConfigClient } from '@/app/(dashboard)/dashboard/client/client.definition';
 import { dataSourceConfigCmr } from '@/app/(dashboard)/dashboard/cmr/cmr.definition';
+import { dataSourceConfigCmrSession } from '@/app/(dashboard)/dashboard/cmr-session/cmr-session.definition';
 import { dataSourceConfigCmrVehicle } from '@/app/(dashboard)/dashboard/cmr-vehicle/cmr-vehicle.definition';
 import { dataSourceConfigCompanyVehicle } from '@/app/(dashboard)/dashboard/company-vehicle/company-vehicle.definition';
 import { dataSourceConfigCronHistory } from '@/app/(dashboard)/dashboard/cron-history/cron-history.definition';
@@ -23,83 +24,104 @@ import { loadDataSource } from '@/config/data-source.config';
 import { useModalStore } from '@/stores/window.store';
 import { DataSourceSectionEnum } from '@/types/data-source.type';
 
-loadDataSource(
-	DataSourceSectionEnum.DASHBOARD,
-	'address',
-	dataSourceConfigAddress,
-);
-loadDataSource(DataSourceSectionEnum.DASHBOARD, 'brand', dataSourceConfigBrand);
-loadDataSource(
-	DataSourceSectionEnum.DASHBOARD,
-	'cash-flow',
-	dataSourceConfigCashFlow,
-);
-loadDataSource(
-	DataSourceSectionEnum.DASHBOARD,
-	'client',
-	dataSourceConfigClient,
-);
-loadDataSource(DataSourceSectionEnum.DASHBOARD, 'cmr', dataSourceConfigCmr);
-loadDataSource(
-	DataSourceSectionEnum.DASHBOARD,
-	'cmr-vehicle',
-	dataSourceConfigCmrVehicle,
-);
-loadDataSource(
-	DataSourceSectionEnum.DASHBOARD,
-	'company-vehicle',
-	dataSourceConfigCompanyVehicle,
-);
-loadDataSource(
-	DataSourceSectionEnum.DASHBOARD,
-	'cron-history',
-	dataSourceConfigCronHistory,
-);
-loadDataSource(
-	DataSourceSectionEnum.DASHBOARD,
-	'log-data',
-	dataSourceConfigLogData,
-);
-loadDataSource(
-	DataSourceSectionEnum.DASHBOARD,
-	'log-history',
-	dataSourceConfigLogHistory,
-);
-loadDataSource(
-	DataSourceSectionEnum.DASHBOARD,
-	'mail-queue',
-	dataSourceConfigMailQueue,
-);
-loadDataSource(
-	DataSourceSectionEnum.DASHBOARD,
-	'permission',
-	dataSourceConfigPermission,
-);
-loadDataSource(DataSourceSectionEnum.DASHBOARD, 'place', dataSourceConfigPlace);
-loadDataSource(
-	DataSourceSectionEnum.DASHBOARD,
-	'template',
-	dataSourceConfigTemplate,
-);
-loadDataSource(DataSourceSectionEnum.DASHBOARD, 'user', dataSourceConfigUser);
-loadDataSource(
-	DataSourceSectionEnum.DASHBOARD,
-	'vehicle',
-	dataSourceConfigVehicle,
-);
-loadDataSource(
-	DataSourceSectionEnum.DASHBOARD,
-	'work-session',
-	dataSourceConfigWorkSession,
-);
-loadDataSource(
-	DataSourceSectionEnum.DASHBOARD,
-	'work-session-vehicle',
-	dataSourceConfigWorkSessionVehicle,
-);
-
 export function DataSourceRegistrar() {
 	useEffect(() => {
+		loadDataSource(
+			DataSourceSectionEnum.DASHBOARD,
+			'address',
+			dataSourceConfigAddress,
+		);
+		loadDataSource(
+			DataSourceSectionEnum.DASHBOARD,
+			'brand',
+			dataSourceConfigBrand,
+		);
+		loadDataSource(
+			DataSourceSectionEnum.DASHBOARD,
+			'cash-flow',
+			dataSourceConfigCashFlow,
+		);
+		loadDataSource(
+			DataSourceSectionEnum.DASHBOARD,
+			'client',
+			dataSourceConfigClient,
+		);
+		loadDataSource(
+			DataSourceSectionEnum.DASHBOARD,
+			'cmr',
+			dataSourceConfigCmr,
+		);
+		loadDataSource(
+			DataSourceSectionEnum.DASHBOARD,
+			'cmr-session',
+			dataSourceConfigCmrSession,
+		);
+		loadDataSource(
+			DataSourceSectionEnum.DASHBOARD,
+			'cmr-vehicle',
+			dataSourceConfigCmrVehicle,
+		);
+		loadDataSource(
+			DataSourceSectionEnum.DASHBOARD,
+			'company-vehicle',
+			dataSourceConfigCompanyVehicle,
+		);
+		loadDataSource(
+			DataSourceSectionEnum.DASHBOARD,
+			'cron-history',
+			dataSourceConfigCronHistory,
+		);
+		loadDataSource(
+			DataSourceSectionEnum.DASHBOARD,
+			'log-data',
+			dataSourceConfigLogData,
+		);
+		loadDataSource(
+			DataSourceSectionEnum.DASHBOARD,
+			'log-history',
+			dataSourceConfigLogHistory,
+		);
+		loadDataSource(
+			DataSourceSectionEnum.DASHBOARD,
+			'mail-queue',
+			dataSourceConfigMailQueue,
+		);
+		loadDataSource(
+			DataSourceSectionEnum.DASHBOARD,
+			'permission',
+			dataSourceConfigPermission,
+		);
+		loadDataSource(
+			DataSourceSectionEnum.DASHBOARD,
+			'place',
+			dataSourceConfigPlace,
+		);
+		loadDataSource(
+			DataSourceSectionEnum.DASHBOARD,
+			'template',
+			dataSourceConfigTemplate,
+		);
+		loadDataSource(
+			DataSourceSectionEnum.DASHBOARD,
+			'user',
+			dataSourceConfigUser,
+		);
+		loadDataSource(
+			DataSourceSectionEnum.DASHBOARD,
+			'vehicle',
+			dataSourceConfigVehicle,
+		);
+		loadDataSource(
+			DataSourceSectionEnum.DASHBOARD,
+			'work-session',
+			dataSourceConfigWorkSession,
+		);
+		loadDataSource(
+			DataSourceSectionEnum.DASHBOARD,
+			'work-session-vehicle',
+			dataSourceConfigWorkSessionVehicle,
+		);
+
 		useModalStore.persist.rehydrate();
 	}, []);
 

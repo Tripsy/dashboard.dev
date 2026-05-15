@@ -6,10 +6,7 @@ import {
 } from '@/app/(dashboard)/dashboard/user/form-manage-user.component';
 import { SetupPermissionsUser } from '@/app/(dashboard)/dashboard/user/setup-user-permissions.component';
 import { ViewUser } from '@/app/(dashboard)/dashboard/user/view-user.component';
-import type {
-	DataSourceConfigType,
-	DataTableColumnType,
-} from '@/config/data-source.config';
+import type { DataSourceConfigType } from '@/config/data-source.config';
 import { Configuration } from '@/config/settings.config';
 import { translateBatch } from '@/config/translate.setup';
 import { getFormDataAsEnum, getFormDataAsString } from '@/helpers/form.helper';
@@ -279,10 +276,7 @@ export const dataSourceConfigUser: DataSourceConfigType<UserModel> = {
 				field: 'id',
 				header: 'ID',
 				sortable: true,
-				body: (
-					entry: UserModel,
-					column: DataTableColumnType<UserModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						markDeleted: true,
 						displayButton: {
@@ -303,10 +297,7 @@ export const dataSourceConfigUser: DataSourceConfigType<UserModel> = {
 			{
 				field: 'role',
 				header: 'Role',
-				body: (
-					entry: UserModel,
-					column: DataTableColumnType<UserModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						capitalize: true,
 						displayButton: {
@@ -322,10 +313,7 @@ export const dataSourceConfigUser: DataSourceConfigType<UserModel> = {
 			{
 				field: 'status',
 				header: 'Status',
-				body: (
-					entry: UserModel,
-					column: DataTableColumnType<UserModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						isStatus: true,
 						dataSourceKey: 'user',
@@ -350,10 +338,7 @@ export const dataSourceConfigUser: DataSourceConfigType<UserModel> = {
 				field: 'created_at',
 				header: 'Created At',
 				sortable: true,
-				body: (
-					entry: UserModel,
-					column: DataTableColumnType<UserModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						displayDate: true,
 					}),

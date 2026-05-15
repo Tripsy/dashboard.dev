@@ -5,10 +5,7 @@ import {
 	FormManageCmrVehicle,
 } from '@/app/(dashboard)/dashboard/cmr-vehicle/form-manage-cmr-vehicle.component';
 import { ViewCmrVehicle } from '@/app/(dashboard)/dashboard/cmr-vehicle/view-cmr-vehicle.component';
-import type {
-	DataSourceConfigType,
-	DataTableColumnType,
-} from '@/config/data-source.config';
+import type { DataSourceConfigType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import {
 	getFormDataAsNumber,
@@ -149,7 +146,7 @@ export const dataSourceConfigCmrVehicle: DataSourceConfigType<CmrVehicleModel> =
 				sortOrder: -1 as const,
 				filters: {
 					global: { value: '', matchMode: 'contains' },
-					cmr_id: { value: '', matchMode: 'equals' },
+					cmr_id: { value: null, matchMode: 'equals' },
 					vehicle: { value: '', matchMode: 'equals' },
 					vehicle_id: { value: null, matchMode: 'equals' },
 				} satisfies CmrVehicleDataTableFiltersType,
@@ -159,10 +156,7 @@ export const dataSourceConfigCmrVehicle: DataSourceConfigType<CmrVehicleModel> =
 					field: 'id',
 					header: 'ID',
 					sortable: true,
-					body: (
-						entry: CmrVehicleModel,
-						column: DataTableColumnType<CmrVehicleModel>,
-					) =>
+					body: (entry, column) =>
 						DataTableValue(entry, column, {
 							markDeleted: true,
 							displayButton: {
@@ -174,10 +168,7 @@ export const dataSourceConfigCmrVehicle: DataSourceConfigType<CmrVehicleModel> =
 				{
 					field: 'cmr',
 					header: 'CMR',
-					body: (
-						entry: CmrVehicleModel,
-						column: DataTableColumnType<CmrVehicleModel>,
-					) =>
+					body: (entry, column) =>
 						DataTableValue(entry, column, {
 							customValue: displayCmrLabel(entry.cmr),
 						}),
@@ -190,10 +181,7 @@ export const dataSourceConfigCmrVehicle: DataSourceConfigType<CmrVehicleModel> =
 					field: 'created_at',
 					header: 'Created At',
 					sortable: true,
-					body: (
-						entry: CmrVehicleModel,
-						column: DataTableColumnType<CmrVehicleModel>,
-					) =>
+					body: (entry, column) =>
 						DataTableValue(entry, column, {
 							displayDate: true,
 						}),

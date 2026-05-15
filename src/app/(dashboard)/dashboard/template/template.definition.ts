@@ -5,10 +5,7 @@ import {
 	type TemplateFormValuesType,
 } from '@/app/(dashboard)/dashboard/template/form-manage-template.component';
 import { ViewTemplate } from '@/app/(dashboard)/dashboard/template/view-template.component';
-import type {
-	DataSourceConfigType,
-	DataTableColumnType,
-} from '@/config/data-source.config';
+import type { DataSourceConfigType } from '@/config/data-source.config';
 import { Configuration } from '@/config/settings.config';
 import { translateBatch } from '@/config/translate.setup';
 import { getFormDataAsEnum, getFormDataAsString } from '@/helpers/form.helper';
@@ -254,10 +251,7 @@ export const dataSourceConfigTemplate: DataSourceConfigType<TemplateModel> = {
 				field: 'id',
 				header: 'ID',
 				sortable: true,
-				body: (
-					entry: TemplateModel,
-					column: DataTableColumnType<TemplateModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						markDeleted: true,
 						displayButton: {
@@ -278,10 +272,7 @@ export const dataSourceConfigTemplate: DataSourceConfigType<TemplateModel> = {
 			{
 				field: 'type',
 				header: 'Type',
-				body: (
-					entry: TemplateModel,
-					column: DataTableColumnType<TemplateModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						capitalize: true,
 					}),
@@ -290,10 +281,7 @@ export const dataSourceConfigTemplate: DataSourceConfigType<TemplateModel> = {
 				field: 'created_at',
 				header: 'Created At',
 				sortable: true,
-				body: (
-					entry: TemplateModel,
-					column: DataTableColumnType<TemplateModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						displayDate: true,
 					}),

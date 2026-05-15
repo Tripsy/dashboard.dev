@@ -15,7 +15,7 @@ import { requestUpdateStatus } from '@/helpers/services.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import type { UserModel } from '@/models/user.model';
 import {
-	getWorkSessionDisplayName,
+	displayWorkSessionLabel,
 	START_AT_MAX_PAST_SECONDS,
 	type WorkSessionModel,
 } from '@/models/work-session.model';
@@ -97,7 +97,7 @@ export function prepareParamsFromFormValues(
 export const dataSourceConfigWorkSession: DataSourceConfigType<WorkSessionModel> =
 	{
 		displayEntryLabel: (entry: WorkSessionModel) => {
-			return getWorkSessionDisplayName(entry);
+			return displayWorkSessionLabel(entry);
 		},
 		actions: {
 			create: {

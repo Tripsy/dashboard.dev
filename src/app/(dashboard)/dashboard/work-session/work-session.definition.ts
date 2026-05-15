@@ -8,7 +8,6 @@ import { SetupWorkSessionVehicles } from '@/app/(dashboard)/dashboard/work-sessi
 import { ViewWorkSession } from '@/app/(dashboard)/dashboard/work-session/view-work-session.component';
 import type {
 	DataSourceConfigType,
-	DataTableColumnType,
 	DataTableValueOptionsType,
 } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
@@ -34,7 +33,7 @@ import { BaseValidator } from '@/helpers/validator.helper';
 import {
 	determineEndAt,
 	displayWorkSessionDuration,
-	getWorkSessionDisplayName,
+	displayWorkSessionLabel,
 	START_AT_MAX_PAST_SECONDS,
 	type WorkSessionModel,
 	type WorkSessionStatus,
@@ -261,10 +260,7 @@ export const dataSourceConfigWorkSession: DataSourceConfigType<WorkSessionModel>
 					field: 'id',
 					header: 'ID',
 					sortable: true,
-					body: (
-						entry: WorkSessionModel,
-						column: DataTableColumnType<WorkSessionModel>,
-					) =>
+					body: (entry, column) =>
 						DataTableValue(entry, column, {
 							markDeleted: true,
 							displayButton: {
@@ -276,10 +272,7 @@ export const dataSourceConfigWorkSession: DataSourceConfigType<WorkSessionModel>
 				{
 					field: 'user',
 					header: 'User',
-					body: (
-						entry: WorkSessionModel,
-						column: DataTableColumnType<WorkSessionModel>,
-					) =>
+					body: (entry, column) =>
 						DataTableValue(entry, column, {
 							customValue: entry.user.name,
 							displayButton: displayButtonViewUser(entry),
@@ -288,10 +281,7 @@ export const dataSourceConfigWorkSession: DataSourceConfigType<WorkSessionModel>
 				{
 					field: 'start_at',
 					header: 'Start At',
-					body: (
-						entry: WorkSessionModel,
-						column: DataTableColumnType<WorkSessionModel>,
-					) =>
+					body: (entry, column) =>
 						DataTableValue(entry, column, {
 							displayDate: true,
 						}),
@@ -299,10 +289,7 @@ export const dataSourceConfigWorkSession: DataSourceConfigType<WorkSessionModel>
 				{
 					field: 'end_at',
 					header: 'End At',
-					body: (
-						entry: WorkSessionModel,
-						column: DataTableColumnType<WorkSessionModel>,
-					) =>
+					body: (entry, column) =>
 						DataTableValue(entry, column, {
 							displayDate: true,
 						}),
@@ -310,10 +297,7 @@ export const dataSourceConfigWorkSession: DataSourceConfigType<WorkSessionModel>
 				{
 					field: 'duration',
 					header: 'Duration',
-					body: (
-						entry: WorkSessionModel,
-						column: DataTableColumnType<WorkSessionModel>,
-					) =>
+					body: (entry, column) =>
 						DataTableValue(entry, column, {
 							customValue: displayWorkSessionDuration(entry),
 						}),
@@ -321,10 +305,7 @@ export const dataSourceConfigWorkSession: DataSourceConfigType<WorkSessionModel>
 				{
 					field: 'status',
 					header: 'Status',
-					body: (
-						entry: WorkSessionModel,
-						column: DataTableColumnType<WorkSessionModel>,
-					) =>
+					body: (entry, column) =>
 						DataTableValue(entry, column, {
 							isStatus: true,
 							dataSourceKey: 'work-session',
@@ -357,7 +338,7 @@ export const dataSourceConfigWorkSession: DataSourceConfigType<WorkSessionModel>
 				requestFind<WorkSessionModel>('work-session', params),
 		},
 		displayEntryLabel: (entry: WorkSessionModel) => {
-			return getWorkSessionDisplayName(entry);
+			return displayWorkSessionLabel(entry);
 		},
 		actions: {
 			create: {

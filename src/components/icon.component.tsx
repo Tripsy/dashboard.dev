@@ -29,6 +29,7 @@ import {
 	Expand,
 	Eye,
 	EyeOff,
+	FileCog,
 	FilePenLine,
 	FileSignal,
 	FileStack,
@@ -133,9 +134,9 @@ export const Icons = {
 	Vehicle: createIcon(Car),
 	CompanyVehicle: createIcon(CarFront),
 	Document: createIcon(FileText),
-	Driver: createIcon(ShieldUser),
 	Clock: createIcon(Clock),
 	WorkSession: createIcon(Timer),
+	CmrSession: createIcon(ShieldUser),
 
 	Status: {
 		Active: createIcon(CircleCheck),
@@ -196,7 +197,7 @@ export const Icons = {
 		Draft: createIcon(FilePenLine),
 		StatusTransition: createIcon(TrendingUp),
 		Close: createIcon(Lock),
-		SetupVehicles: createIcon(CarFront),
+		Setup: createIcon(FileCog),
 		Return: createIcon(Undo2),
 	},
 };

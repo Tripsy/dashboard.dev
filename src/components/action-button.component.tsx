@@ -1,4 +1,5 @@
-import { useMemo } from 'react';
+import type { LucideProps } from 'lucide-react';
+import React, { useMemo } from 'react';
 import { getActionIcon } from '@/components/icon.component';
 import { LoadingIcon } from '@/components/status.component';
 import { Button } from '@/components/ui/button';
@@ -29,7 +30,21 @@ export function ActionButton({
 	const { translations, isTranslationLoading } =
 		useTranslation(translationsKeys);
 
-	const ActionIcon = getActionIcon(action);
+	let ActionIcon:
+		| React.ReactElement
+		| React.ComponentType<LucideProps>
+		| null;
+
+	if (buttonProps?.icon) {
+		if (React.isValidElement(buttonProps.icon)) {
+			ActionIcon = buttonProps.icon;
+		} else {
+			// is string - use it as action
+			ActionIcon = getActionIcon(buttonProps.icon);
+		}
+	} else {
+		ActionIcon = getActionIcon(action);
+	}
 
 	if (isTranslationLoading) {
 		return null;
@@ -53,7 +68,9 @@ export function ActionButton({
 				</>
 			) : (
 				<>
-					<ActionIcon />
+					{ActionIcon && React.isValidElement(ActionIcon)
+						? ActionIcon
+						: ActionIcon && <ActionIcon />}
 					{translations[actionLabelKey]}
 				</>
 			)}

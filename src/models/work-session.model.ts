@@ -47,7 +47,7 @@ export function displayWorkSessionDuration(entry: WorkSessionModel) {
 	);
 }
 
-export function getWorkSessionDisplayName(entry: WorkSessionModel) {
+export function displayWorkSessionLabel(entry: WorkSessionModel) {
 	return `${entry.user.name} ${formatDate(entry.start_at, 'date-time')}`;
 }
 

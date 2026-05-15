@@ -4,12 +4,12 @@ import {
 	type CmrFormValuesType,
 	FormManageCmr,
 } from '@/app/(dashboard)/dashboard/cmr/form-manage-cmr.component';
+import { SetupCmrSessions } from '@/app/(dashboard)/dashboard/cmr/setup-cmr-sessions.component';
 import { SetupCmrVehicles } from '@/app/(dashboard)/dashboard/cmr/setup-cmr-vehicles.component';
 import { StatusTransitionCmr } from '@/app/(dashboard)/dashboard/cmr/status-transition-cmr.component';
 import { ViewCmr } from '@/app/(dashboard)/dashboard/cmr/view-cmr.component';
 import type {
 	DataSourceConfigType,
-	DataTableColumnType,
 	DataTableValueOptionsType,
 } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
@@ -24,6 +24,7 @@ import {
 	getFormDataAsString,
 } from '@/helpers/form.helper';
 import { getStatusTransitions } from '@/helpers/model.helper';
+import { arrayHasValue } from '@/helpers/objects.helper';
 import {
 	requestCreate,
 	requestDelete,
@@ -58,6 +59,7 @@ const translations = await translateBatch(
 		'statusTransition.title',
 		'viewClient.title',
 		'setupVehicles.title',
+		'setupSessions.title',
 	] as const,
 	'cmr.action',
 );
@@ -449,10 +451,7 @@ export const dataSourceConfigCmr: DataSourceConfigType<CmrModel> = {
 				field: 'id',
 				header: 'ID',
 				sortable: true,
-				body: (
-					entry: CmrModel,
-					column: DataTableColumnType<CmrModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						markDeleted: true,
 						displayButton: {
@@ -464,10 +463,7 @@ export const dataSourceConfigCmr: DataSourceConfigType<CmrModel> = {
 			{
 				field: 'client',
 				header: 'Client',
-				body: (
-					entry: CmrModel,
-					column: DataTableColumnType<CmrModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						customValue: displayClientLabel(entry.client),
 						displayButton: displayButtonViewClient(entry),
@@ -476,10 +472,7 @@ export const dataSourceConfigCmr: DataSourceConfigType<CmrModel> = {
 			{
 				field: 'transport_type',
 				header: 'Type',
-				body: (
-					entry: CmrModel,
-					column: DataTableColumnType<CmrModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						customValue: formatEnumLabel(entry.transport_type),
 					}),
@@ -487,10 +480,7 @@ export const dataSourceConfigCmr: DataSourceConfigType<CmrModel> = {
 			{
 				field: 'ordered_at',
 				header: 'Ordered At',
-				body: (
-					entry: CmrModel,
-					column: DataTableColumnType<CmrModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						displayDate: true,
 					}),
@@ -498,10 +488,7 @@ export const dataSourceConfigCmr: DataSourceConfigType<CmrModel> = {
 			{
 				field: 'delivered_at',
 				header: 'Delivered At',
-				body: (
-					entry: CmrModel,
-					column: DataTableColumnType<CmrModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						displayDate: true,
 					}),
@@ -509,10 +496,7 @@ export const dataSourceConfigCmr: DataSourceConfigType<CmrModel> = {
 			{
 				field: 'status',
 				header: 'Status',
-				body: (
-					entry: CmrModel,
-					column: DataTableColumnType<CmrModel>,
-				) =>
+				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						isStatus: true,
 						dataSourceKey: 'cmr',
@@ -670,6 +654,29 @@ export const dataSourceConfigCmr: DataSourceConfigType<CmrModel> = {
 			button: {
 				variant: 'outline',
 				hover: 'info',
+				icon: 'Setup',
+			},
+		},
+		setupSessions: {
+			windowType: 'other',
+			windowTitle: translations['setupSessions.title'],
+			windowComponent: SetupCmrSessions,
+			windowConfigProps: {
+				size: 'x2l',
+			},
+			permission: 'cmr-session.update',
+			entriesSelection: 'single',
+			customEntryCheck: (entry: CmrModel) =>
+				arrayHasValue(entry.status, [
+					CmrStatusEnum.ORDERED,
+					CmrStatusEnum.PREPARING,
+					CmrStatusEnum.TRANSIT,
+				]),
+			buttonPosition: 'left',
+			button: {
+				variant: 'outline',
+				hover: 'info',
+				icon: 'Setup',
 			},
 		},
 	},

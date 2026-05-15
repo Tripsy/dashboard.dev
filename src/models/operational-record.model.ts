@@ -1,3 +1,9 @@
+import type { CashFlowModel } from '@/models/cash-flow.model';
+import type { ClientModel } from '@/models/client.model';
+import type { CmrModel } from '@/models/cmr.model';
+import type { CompanyVehicleModel } from '@/models/company-vehicle.model';
+import type { UserModel } from '@/models/user.model';
+
 export const OperationalRecordStatusEnum = {
 	DRAFT: 'draft',
 	RECORDED: 'recorded',
@@ -9,14 +15,14 @@ export type OperationalRecordStatus =
 export type OperationalRecordModel<D = Date | string> = {
 	id: number;
 
-	cash_flow_id: number;
+	cash_flow: CashFlowModel;
 
 	status: OperationalRecordStatus;
 
-	cmr_id: number | null;
-	driver_id: number | null;
-	company_vehicle_id: number | null;
-	client_id: number | null;
+	cmr: CmrModel | null;
+	user: UserModel | null;
+	company_vehicle: CompanyVehicleModel | null;
+	client: ClientModel | null;
 
 	recorded_at: D;
 
@@ -27,15 +33,17 @@ export type OperationalRecordModel<D = Date | string> = {
 	deleted_at: D;
 };
 
-export type OperationalRecordFormValuesType = Pick<
-	OperationalRecordModel,
-	| 'cash_flow_id'
-	| 'status'
-	| 'cmr_id'
-	| 'driver_id'
-	| 'company_vehicle_id'
-	| 'client_id'
-> & {
-	recorded_at: string | null;
-	notes: string | null;
-};
+// export type OperationalRecordFormValuesType = Pick<
+// 	OperationalRecordModel,
+// 	| 'cash_flow_id'
+// 	| 'status'
+// 	| 'cmr_id'
+// 	| 'driver_id'
+// 	| 'company_vehicle_id'
+// 	| 'client_id'
+// > & {
+// 	cash_flow_id: number | null;
+// 	cash_
+// 	recorded_at: string | null;
+// 	notes: string | null;
+// };

@@ -71,7 +71,7 @@ export type WindowConfig<
 	definition: WindowDefinition<FormValues, Entry>;
 	data?: {
 		entries?: Entry[];
-		prefillEntry?: Partial<FormValues>;
+		prefillEntry?: Partial<Entry>;
 	};
 	events?: Record<string, ActionEventType<Entry>>;
 	props?: WindowConfigPropsType;

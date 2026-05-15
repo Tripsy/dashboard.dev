@@ -29,9 +29,7 @@ export function DriverPanelAvailableCompanyVehicles({
 				action: 'create',
 				data: {
 					prefillEntry: {
-						company_vehicle_id: entry.id,
 						company_vehicle: entry,
-						vehicle_type: entry.vehicle.vehicle_type,
 					},
 				},
 				definition: {

@@ -8,8 +8,6 @@ import { displayClientLabel } from '@/models/client.model';
 import type { CmrModel } from '@/models/cmr.model';
 
 export function ViewCmr({ entry }: { entry: CmrModel }) {
-	console.log(entry);
-
 	return (
 		<div className="space-y-6">
 			<div className="space-y-1">
@@ -118,7 +116,7 @@ export function ViewCmr({ entry }: { entry: CmrModel }) {
 					{entry.deleted_at && (
 						<div>
 							<span className="font-semibold">Deleted At</span>{' '}
-							<span className="text-red-500">
+							<span className="text-error">
 								{formatDate(entry.deleted_at, 'date-time')}
 							</span>
 						</div>

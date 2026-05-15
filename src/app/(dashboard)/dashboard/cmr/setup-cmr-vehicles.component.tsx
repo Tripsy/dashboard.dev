@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { requestFind } from '@/helpers/services.helper';
 import type { CmrModel } from '@/models/cmr.model';
 import type { CmrVehicleModel } from '@/models/cmr-vehicle.model';
-import { displayVehicleLabel, VehicleTypeEnum } from '@/models/vehicle.model';
+import { displayVehicleLabel } from '@/models/vehicle.model';
 import { useModalStore } from '@/stores/window.store';
 import { DataSourceSectionEnum } from '@/types/data-source.type';
 import type { WindowEntryType } from '@/types/window.type';
@@ -31,7 +31,7 @@ export function SetupCmrVehicles({ entries }: { entries: WindowEntryType[] }) {
 		isLoading: isLoadingCmrVehicle,
 		error: errorCmrVehicle,
 	} = useQuery({
-		queryKey: ['cmr-vehicle', cmrModel?.id],
+		queryKey: ['cmr-vehicle', cmrId],
 		queryFn: () =>
 			requestFind<CmrVehicleModel>('cmr-vehicle', {
 				filter: {
@@ -44,9 +44,9 @@ export function SetupCmrVehicles({ entries }: { entries: WindowEntryType[] }) {
 	const invalidateCmrVehicle = useCallback(
 		() =>
 			queryClient.invalidateQueries({
-				queryKey: ['cmr-vehicle', cmrModel?.id],
+				queryKey: ['cmr-vehicle', cmrId],
 			}),
-		[queryClient, cmrModel?.id],
+		[queryClient, cmrId],
 	);
 
 	const openCreate = useCallback(() => {
@@ -159,10 +159,10 @@ export function SetupCmrVehicles({ entries }: { entries: WindowEntryType[] }) {
 									Vehicle
 								</th>
 								<th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-									Status
+									Identification
 								</th>
 								<th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-									Range (Km)
+									Notes
 								</th>
 								<th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
 									Actions
@@ -218,22 +218,10 @@ function CmrVehicleEntry({ m, onUpdate, onDelete }: CmrVehicleEntryProps) {
 				{displayVehicleLabel(m.vehicle)}
 			</td>
 			<td className="px-4 py-4 whitespace-nowrap text-sm text-card-foreground">
-				{m.company_vehicle.vehicle.vehicle_type ===
-				VehicleTypeEnum.TRAILER ? (
-					<span className="mx-1 text-muted-foreground italic">
-						n/a
-					</span>
-				) : (
-					<div>
-						<span className="font-mono">
-							{m.vehicle_km_start || '-'}
-						</span>
-						<span className="mx-1 text-muted-foreground">→</span>
-						<span className="font-mono">
-							{m.vehicle_km_end || '-'}
-						</span>
-					</div>
-				)}
+				{m.license_plate} / {m.vin}
+			</td>
+			<td className="px-4 py-4 whitespace-nowrap text-sm text-card-foreground">
+				{m.notes}
 			</td>
 			<td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
 				<div className="flex gap-3 items-center justify-end">

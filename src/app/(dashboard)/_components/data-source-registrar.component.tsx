@@ -6,6 +6,7 @@ import { dataSourceConfigBrand } from '@/app/(dashboard)/dashboard/brand/brand.d
 import { dataSourceConfigCashFlow } from '@/app/(dashboard)/dashboard/cash-flow/cash-flow.definition';
 import { dataSourceConfigClient } from '@/app/(dashboard)/dashboard/client/client.definition';
 import { dataSourceConfigCmr } from '@/app/(dashboard)/dashboard/cmr/cmr.definition';
+import { dataSourceConfigCmrVehicle } from '@/app/(dashboard)/dashboard/cmr-vehicle/cmr-vehicle.definition';
 import { dataSourceConfigCompanyVehicle } from '@/app/(dashboard)/dashboard/company-vehicle/company-vehicle.definition';
 import { dataSourceConfigCronHistory } from '@/app/(dashboard)/dashboard/cron-history/cron-history.definition';
 import { dataSourceConfigLogData } from '@/app/(dashboard)/dashboard/log-data/log-data.definition';
@@ -39,6 +40,11 @@ loadDataSource(
 	dataSourceConfigClient,
 );
 loadDataSource(DataSourceSectionEnum.DASHBOARD, 'cmr', dataSourceConfigCmr);
+loadDataSource(
+	DataSourceSectionEnum.DASHBOARD,
+	'cmr-vehicle',
+	dataSourceConfigCmrVehicle,
+);
 loadDataSource(
 	DataSourceSectionEnum.DASHBOARD,
 	'company-vehicle',

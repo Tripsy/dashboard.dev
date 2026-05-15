@@ -70,7 +70,7 @@ export function ViewCompanyVehicle({ entry }: { entry: CompanyVehicleModel }) {
 					{entry.deleted_at && (
 						<div>
 							<span className="font-semibold">Deleted At</span>{' '}
-							<span className="text-red-500">
+							<span className="text-error">
 								{formatDate(entry.deleted_at, 'date-time')}
 							</span>
 						</div>

@@ -36,6 +36,6 @@ export type UserModel<D = Date | string> = {
 	role: UserRole;
 	operator_type: UserOperatorType | null;
 	created_at: D;
-	updated_at: D;
-	deleted_at: D;
+	updated_at: D | null;
+	deleted_at: D | null;
 };

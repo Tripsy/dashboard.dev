@@ -32,18 +32,3 @@ export type OperationalRecordModel<D = Date | string> = {
 	updated_at: D;
 	deleted_at: D;
 };
-
-// export type OperationalRecordFormValuesType = Pick<
-// 	OperationalRecordModel,
-// 	| 'cash_flow_id'
-// 	| 'status'
-// 	| 'cmr_id'
-// 	| 'driver_id'
-// 	| 'company_vehicle_id'
-// 	| 'client_id'
-// > & {
-// 	cash_flow_id: number | null;
-// 	cash_
-// 	recorded_at: string | null;
-// 	notes: string | null;
-// };

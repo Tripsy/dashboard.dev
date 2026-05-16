@@ -210,6 +210,9 @@ Routes.group('dashboard')
 	.add('cash-flow', '/dashboard/cash-flow', {
 		permission: 'cash_flow.find',
 	})
+	.add('operational-record', '/dashboard/operational-record', {
+		permission: 'operational_record.find',
+	})
 	.add('log-data', '/dashboard/log-data', {
 		permission: 'log_data.find',
 	})

@@ -39,7 +39,7 @@ export function DriverPanelSession({ session }: { session: WorkSessionModel }) {
 				<div className="px-4 py-3 text-sm whitespace-nowrap flex items-center">
 					<Icons.Calendar className="mr-2 h-4 w-4" />
 					{formatDate(session.start_at, undefined, {
-						customFormat: 'd MMMM, hh:mm',
+						customFormat: 'D MMMM, HH:mm',
 					})}
 				</div>
 			</div>

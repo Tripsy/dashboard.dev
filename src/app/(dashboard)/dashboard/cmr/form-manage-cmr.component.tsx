@@ -476,7 +476,7 @@ export function FormManageCmr() {
 						onSelect={(value) =>
 							handleChange('pick_scheduled_at', value)
 						}
-						error={errors.ordered_at}
+						error={errors.pick_scheduled_at}
 					/>
 
 					<FormComponentTime<CmrFormValuesType>
@@ -507,7 +507,7 @@ export function FormManageCmr() {
 						onSelect={(value) =>
 							handleChange('estimated_delivery_at', value)
 						}
-						error={errors.ordered_at}
+						error={errors.estimated_delivery_at}
 					/>
 
 					<FormComponentTime<CmrFormValuesType>
@@ -538,7 +538,7 @@ export function FormManageCmr() {
 						onSelect={(value) =>
 							handleChange('delivered_at', value)
 						}
-						error={errors.ordered_at}
+						error={errors.delivered_at}
 					/>
 
 					<FormComponentTime<CmrFormValuesType>

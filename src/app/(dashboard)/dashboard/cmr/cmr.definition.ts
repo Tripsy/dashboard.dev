@@ -55,7 +55,6 @@ const translations = await translateBatch(
 		'view.title',
 		'delete.title',
 		'restore.title',
-		'close.title',
 		'statusTransition.title',
 		'viewClient.title',
 		'setupVehicles.title',

@@ -91,7 +91,7 @@ export function SideMenu() {
 				'dashboard.labels.user',
 
 				'dashboard.labels.vehicle',
-				'dashboard.labels.operational-records',
+				'dashboard.labels.operational-record',
 
 				'dashboard.labels.assets',
 				'dashboard.labels.company-vehicle',
@@ -136,6 +136,18 @@ export function SideMenu() {
 						icon: Icons.CashFlow,
 						permission: hasPermission(auth, 'cash_flow.find'),
 					},
+					{
+						page: 'operational-record',
+						href: Routes.get('operational-record'),
+						text: translations[
+							'dashboard.labels.operational-record'
+						],
+						icon: Icons.OperationalRecord,
+						permission: hasPermission(
+							auth,
+							'operational_record.find',
+						),
+					},
 				],
 			},
 			{
@@ -148,7 +160,7 @@ export function SideMenu() {
 						page: 'cmr',
 						href: Routes.get('cmr'),
 						text: translations['dashboard.labels.cmr'],
-						icon: Icons.Document,
+						icon: Icons.Cmr,
 						permission: hasPermission(auth, 'cmr.find'),
 					},
 					{

@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useCallback, useState } from 'react';
 import {
 	FormComponentAutoComplete,
 	FormComponentCalendar,
@@ -8,7 +9,7 @@ import {
 	FormComponentTime,
 } from '@/components/form/form-element.component';
 import { Icons } from '@/components/icon.component';
-import { createCurrentDate, formatDate } from '@/helpers/date.helper';
+import { createCurrentDate } from '@/helpers/date.helper';
 import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { requestFind } from '@/helpers/services.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
@@ -60,6 +61,8 @@ export function FormManageCmr() {
 	const { formValues, errors, handleChange, pending } =
 		useWindowForm<CmrFormValuesType>();
 
+	const queryClient = useQueryClient();
+
 	const { open, focus, getCurrentWindow } = useModalStore();
 
 	const windowConfig = getCurrentWindow();
@@ -105,6 +108,14 @@ export function FormManageCmr() {
 			minLength: 3,
 		});
 
+	const invalidateClientSuggestions = useCallback(
+		() =>
+			queryClient.invalidateQueries({
+				queryKey: ['s-client'],
+			}),
+		[queryClient],
+	);
+
 	const [searchPickupAddress, setSearchPickupAddress] = useState('');
 
 	const {
@@ -112,7 +123,7 @@ export function FormManageCmr() {
 		isFetching: isPickupAddressFetching,
 	} = useRemoteAutocomplete<AddressModel>({
 		query: searchPickupAddress,
-		queryKey: ['s-pickup-address'],
+		queryKey: ['s-address'],
 		queryFn: async (q) => {
 			const res: FindFunctionResponseType<AddressModel> | undefined =
 				await requestFind('address', {
@@ -134,7 +145,7 @@ export function FormManageCmr() {
 		isFetching: isDeliveryAddressFetching,
 	} = useRemoteAutocomplete<AddressModel>({
 		query: searchDeliveryAddress,
-		queryKey: ['s-pickup-address'],
+		queryKey: ['s-address'],
 		queryFn: async (q) => {
 			const res: FindFunctionResponseType<AddressModel> | undefined =
 				await requestFind('address', {
@@ -149,8 +160,15 @@ export function FormManageCmr() {
 		minLength: 3,
 	});
 
+	const invalidateAddressSuggestions = useCallback(
+		() =>
+			queryClient.invalidateQueries({
+				queryKey: ['s-address'],
+			}),
+		[queryClient],
+	);
+
 	const maxOrderAtDate = createCurrentDate();
-	const maxOrderAtTime = formatDate(maxOrderAtDate, 'time');
 
 	return (
 		<>
@@ -212,7 +230,7 @@ export function FormManageCmr() {
 								},
 							},
 							events: {
-								success: (client?: ClientModel) => {
+								success: async (client?: ClientModel) => {
 									if (!client) {
 										return;
 									}
@@ -222,6 +240,8 @@ export function FormManageCmr() {
 										displayClientLabel(client),
 									);
 									handleChange('client_id', client.id);
+
+									await invalidateClientSuggestions();
 
 									// Back to form
 									if (windowConfig) {
@@ -285,7 +305,7 @@ export function FormManageCmr() {
 								},
 							},
 							events: {
-								success: (address?: AddressModel) => {
+								success: async (address?: AddressModel) => {
 									if (!address) {
 										return;
 									}
@@ -298,6 +318,8 @@ export function FormManageCmr() {
 										'pickup_address_id',
 										address.id,
 									);
+
+									await invalidateAddressSuggestions();
 
 									// Back to form
 									if (windowConfig) {
@@ -364,7 +386,7 @@ export function FormManageCmr() {
 								},
 							},
 							events: {
-								success: (address?: AddressModel) => {
+								success: async (address?: AddressModel) => {
 									if (!address) {
 										return;
 									}
@@ -377,6 +399,8 @@ export function FormManageCmr() {
 										'delivery_address_id',
 										address.id,
 									);
+
+									await invalidateAddressSuggestions();
 
 									// Back to form
 									if (windowConfig) {
@@ -461,7 +485,6 @@ export function FormManageCmr() {
 							handleChange('ordered_at_time', e.target.value)
 						}
 						error={errors.ordered_at_time}
-						maxTime={maxOrderAtTime ?? ''}
 						minuteInterval={5}
 					/>
 				</div>

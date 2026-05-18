@@ -1,5 +1,5 @@
-import { useMutation } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useCallback, useState } from 'react';
 import {
 	FormComponentAutoComplete,
 	FormComponentInput,
@@ -32,6 +32,8 @@ export function FormManageAddress() {
 	const { formValues, errors, handleChange, pending } =
 		useWindowForm<AddressFormValuesType>();
 
+	const queryClient = useQueryClient();
+
 	const elementIds = useElementIds([
 		'city',
 		'details',
@@ -55,6 +57,14 @@ export function FormManageAddress() {
 			},
 			minLength: 3,
 		});
+
+	const invalidateCitySuggestions = useCallback(
+		() =>
+			queryClient.invalidateQueries({
+				queryKey: ['s-city'],
+			}),
+		[queryClient],
+	);
 
 	const createCityMutation = useMutation({
 		mutationFn: async (name: string) => {
@@ -117,6 +127,8 @@ export function FormManageAddress() {
 
 						handleChange('city', value);
 						handleChange('city_id', newCity.id as number);
+
+						await invalidateCitySuggestions();
 					},
 
 					createLabel: (value) => `Create city "${value}"`,

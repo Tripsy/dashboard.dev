@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useCallback, useState } from 'react';
 import {
 	FormComponentAutoComplete,
 	FormComponentInput,
@@ -36,6 +37,8 @@ export function FormManageVehicle() {
 	const { formValues, errors, handleChange, pending } =
 		useWindowForm<VehicleFormValuesType>();
 
+	const queryClient = useQueryClient();
+
 	const { open, focus, getCurrentWindow } = useModalStore();
 
 	const windowConfig = getCurrentWindow();
@@ -67,6 +70,14 @@ export function FormManageVehicle() {
 			},
 			minLength: 3,
 		});
+
+	const invalidateBrandSuggestions = useCallback(
+		() =>
+			queryClient.invalidateQueries({
+				queryKey: ['s-brand'],
+			}),
+		[queryClient],
+	);
 
 	return (
 		<>
@@ -128,13 +139,15 @@ export function FormManageVehicle() {
 								},
 							},
 							events: {
-								success: (brand?: BrandModel) => {
+								success: async (brand?: BrandModel) => {
 									if (!brand) {
 										return;
 									}
 
 									handleChange('brand', brand.name);
 									handleChange('brand_id', brand.id);
+
+									await invalidateBrandSuggestions();
 
 									// Back to vehicle form
 									if (windowConfig) {

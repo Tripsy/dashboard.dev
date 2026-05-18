@@ -8,6 +8,7 @@ import type { WorkSessionModel } from '@/models/work-session.model';
 import type { WorkSessionVehicleModel } from '@/models/work-session-vehicle.model';
 import { createWorkSessionVehicle } from '@/services/work-session-vehicle.service';
 import { useModalStore } from '@/stores/window.store';
+import { DataSourceSectionEnum } from '@/types/data-source.type';
 import type { WindowDefinition } from '@/types/window.type';
 
 export function DriverPanelAvailableCompanyVehicles({
@@ -24,7 +25,7 @@ export function DriverPanelAvailableCompanyVehicles({
 		(entry: CompanyVehicleModel, workSession: WorkSessionModel) => {
 			open({
 				minimized: false,
-				section: 'public',
+				section: DataSourceSectionEnum.PUBLIC,
 				dataSource: 'work-session-vehicle',
 				action: 'create',
 				data: {
@@ -53,7 +54,7 @@ export function DriverPanelAvailableCompanyVehicles({
 	);
 
 	return (
-		<div>
+		<div className="space-y-4">
 			{availableCompanyVehicles.map((m) => (
 				<div
 					key={m.id}

@@ -1,6 +1,7 @@
 import {
 	Activity,
 	ArchiveRestore,
+	ArrowRight,
 	Ban,
 	BanknoteArrowDown,
 	BanknoteArrowUp,
@@ -22,6 +23,8 @@ import {
 	ClockFading,
 	ClockPlus,
 	Code,
+	Coins,
+	CornerRightDown,
 	Cuboid,
 	Ellipsis,
 	Eraser,
@@ -138,6 +141,11 @@ export const Icons = {
 	WorkSession: createIcon(Timer),
 	Cmr: createIcon(FileText),
 	CmrSession: createIcon(ShieldUser),
+	Payment: createIcon(Coins),
+	MapPin: createIcon(MapPin),
+
+	ArrowRight: createIcon(ArrowRight),
+	ArrowCurvedBottom: createIcon(CornerRightDown),
 
 	Status: {
 		Active: createIcon(CircleCheck),

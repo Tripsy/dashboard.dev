@@ -8,6 +8,7 @@ import {
 	type WorkSessionModel,
 } from '@/models/work-session.model';
 import { useModalStore } from '@/stores/window.store';
+import { DataSourceSectionEnum } from '@/types/data-source.type';
 
 export function DriverPanelSession({ session }: { session: WorkSessionModel }) {
 	const { open } = useModalStore();
@@ -16,7 +17,7 @@ export function DriverPanelSession({ session }: { session: WorkSessionModel }) {
 	const handleCloseSession = useCallback(() => {
 		open({
 			minimized: false,
-			section: 'public',
+			section: DataSourceSectionEnum.PUBLIC,
 			dataSource: 'work-session',
 			action: 'close',
 			data: {

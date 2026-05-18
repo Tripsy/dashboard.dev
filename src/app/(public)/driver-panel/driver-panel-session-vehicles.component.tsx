@@ -11,6 +11,7 @@ import {
 } from '@/models/work-session-vehicle.model';
 import { updateWorkSessionVehicle } from '@/services/work-session-vehicle.service';
 import { useModalStore } from '@/stores/window.store';
+import { DataSourceSectionEnum } from '@/types/data-source.type';
 import type { WindowDefinition } from '@/types/window.type';
 
 export function DriverPanelSessionVehicles({
@@ -25,7 +26,7 @@ export function DriverPanelSessionVehicles({
 		(entry: WorkSessionVehicleModel) => {
 			open({
 				minimized: false,
-				section: 'public',
+				section: DataSourceSectionEnum.PUBLIC,
 				dataSource: 'work-session-vehicle',
 				action: 'update',
 				data: {
@@ -59,7 +60,7 @@ export function DriverPanelSessionVehicles({
 		(entry: WorkSessionVehicleModel) => {
 			open({
 				minimized: false,
-				section: 'public',
+				section: DataSourceSectionEnum.PUBLIC,
 				dataSource: 'work-session-vehicle',
 				action: 'delete',
 				data: {
@@ -79,7 +80,7 @@ export function DriverPanelSessionVehicles({
 		(entry: WorkSessionVehicleModel) => {
 			open({
 				minimized: false,
-				section: 'public',
+				section: DataSourceSectionEnum.PUBLIC,
 				dataSource: 'work-session-vehicle',
 				action: 'return',
 				data: {
@@ -110,7 +111,7 @@ export function DriverPanelSessionVehicles({
 	);
 
 	return (
-		<div>
+		<div className="space-y-4">
 			{sessionVehicles.map((m) => (
 				<div
 					key={m.id}

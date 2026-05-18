@@ -11,6 +11,7 @@ import {
 	useRef,
 } from 'react';
 import { isDriver } from '@/models/auth.model';
+import type { CmrSessionModel } from '@/models/cmr-session.model';
 import type { CompanyVehicleModel } from '@/models/company-vehicle.model';
 import type { WorkSessionModel } from '@/models/work-session.model';
 import type { WorkSessionVehicleModel } from '@/models/work-session-vehicle.model';
@@ -33,6 +34,7 @@ type WorkSessionContextType = {
 	activeSession: WorkSessionModel | null;
 	activeSessionVehicles: WorkSessionVehicleModel[];
 	availableCompanyVehicles: CompanyVehicleModel[];
+	workSessionCmrs: CmrSessionModel[];
 	refreshSession: () => Promise<void>;
 };
 
@@ -166,6 +168,7 @@ const WorkSessionProvider = ({
 			activeSession: sessionData?.workSession || null,
 			activeSessionVehicles: sessionData?.workSessionVehicles || [],
 			availableCompanyVehicles: availableCompanyVehicles || [],
+			workSessionCmrs: sessionData?.workSessionCmrs || [],
 			refreshSession,
 		}),
 		[

@@ -41,3 +41,25 @@ export async function requestAvailableCompanyVehicles(): Promise<
 
 	return null;
 }
+
+// export async function requestSessionCmrs(): Promise<
+// 	CmrSessionModel[] | null
+// > {
+// 	try {
+// 		const fetchResponse: ApiResponseFetch<CompanyVehicleModel[]> =
+// 			await new ApiRequest().doFetch(
+// 				'/driver-session/available-company-vehicles',
+// 				{
+// 					method: 'GET',
+// 				},
+// 			);
+//
+// 		if (fetchResponse?.success) {
+// 			return fetchResponse.data || null;
+// 		}
+// 	} catch (error: unknown) {
+// 		console.error(error);
+// 	}
+//
+// 	return null;
+// }

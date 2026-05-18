@@ -107,7 +107,7 @@ export const statusList: Record<
 		icon: Icons.Status.Returned,
 	},
 	ordered: {
-		variant: 'info',
+		variant: 'default',
 		icon: Icons.Status.Ordered,
 	},
 	preparing: {

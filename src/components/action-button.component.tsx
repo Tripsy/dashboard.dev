@@ -71,7 +71,7 @@ export function ActionButton({
 					{ActionIcon && React.isValidElement(ActionIcon)
 						? ActionIcon
 						: ActionIcon && <ActionIcon />}
-					{translations[actionLabelKey]}
+					{buttonProps?.label || translations[actionLabelKey]}
 				</>
 			)}
 		</Button>

@@ -218,10 +218,10 @@ function CmrVehicleEntry({ m, onUpdate, onDelete }: CmrVehicleEntryProps) {
 				{displayVehicleLabel(m.vehicle)}
 			</td>
 			<td className="px-4 py-4 whitespace-nowrap text-sm text-card-foreground">
-				{m.license_plate} / {m.vin}
+				{m.license_plate} {m.vin && <span>/ {m.vin}</span>}
 			</td>
 			<td className="px-4 py-4 whitespace-nowrap text-sm text-card-foreground">
-				{m.notes}
+				{m.notes ?? '-'}
 			</td>
 			<td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
 				<div className="flex gap-3 items-center justify-end">

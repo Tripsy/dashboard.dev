@@ -124,3 +124,53 @@ export function formatAmount(amount: number, currencyCode: string) {
 		currency,
 	};
 }
+
+export function normalizePhoneNumber(
+	number: string,
+	defaultCountryCode: string = '40',
+): string {
+	let digits = number.replace(/\D/g, '');
+
+	// Already in international format
+	if (number.trimStart().startsWith('+')) {
+		return digits;
+	}
+
+	// International prefix (00...)
+	if (digits.startsWith('00')) {
+		return digits.substring(2);
+	}
+
+	// Has enough digits to already include a country code
+	if (digits.length > 10) {
+		return digits;
+	}
+
+	// Local number — strip trunk prefix (leading 0) and add country code
+	if (digits.startsWith('0')) {
+		digits = digits.substring(1);
+	}
+
+	return defaultCountryCode + digits;
+}
+
+export function whatsAppUrl(number: string, text: string) {
+	// Remove any non-numeric characters from the number and ensure no '+' sign
+	const cleanNumber = normalizePhoneNumber(number);
+
+	// Encode the text for URL
+	const encodedText = encodeURIComponent(text);
+
+	// Build the WhatsApp URL
+	let whatsappUrl: string;
+
+	if (cleanNumber) {
+		// Share to specific number
+		whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodedText}`;
+	} else {
+		// Share without specific number (just pre-filled message)
+		whatsappUrl = `https://wa.me/?text=${encodedText}`;
+	}
+
+	return whatsappUrl;
+}

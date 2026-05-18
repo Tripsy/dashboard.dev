@@ -1,6 +1,6 @@
 import { Icons } from '@/components/icon.component';
 
-export function LocationNavigator({ address }: { address: string }) {
+export function LocationNavigator({ address }: { address: string | null }) {
 	if (!address) {
 		return null;
 	}
@@ -10,7 +10,6 @@ export function LocationNavigator({ address }: { address: string }) {
 
 	return (
 		<div className="flex items-center gap-2">
-			{address}
 			<a
 				href={googleMapsUrl}
 				target="_blank"

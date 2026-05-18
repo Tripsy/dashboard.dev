@@ -64,6 +64,7 @@ import {
 	Search,
 	Settings,
 	Settings2,
+	Share2,
 	Shield,
 	ShieldUser,
 	SquareParkingOff,
@@ -143,6 +144,7 @@ export const Icons = {
 	CmrSession: createIcon(ShieldUser),
 	Payment: createIcon(Coins),
 	MapPin: createIcon(MapPin),
+	Share: createIcon(Share2),
 
 	ArrowRight: createIcon(ArrowRight),
 	ArrowCurvedBottom: createIcon(CornerRightDown),

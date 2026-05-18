@@ -3,15 +3,15 @@ import { useWorkSession } from '@/app/(public)/_providers/work-session.provider'
 import { Icons } from '@/components/icon.component';
 import { LocationNavigator } from '@/components/location-navigator.component';
 import { Button } from '@/components/ui/button';
+import { Link } from '@/components/ui/link';
 import { formatDate } from '@/helpers/date.helper';
 import { DisplayStatus } from '@/helpers/display.helper';
 import { arrayHasValue } from '@/helpers/objects.helper';
-import { formatEnumLabel } from '@/helpers/string.helper';
+import { formatEnumLabel, whatsAppUrl } from '@/helpers/string.helper';
 import { displayAddressLabel } from '@/models/address.model';
 import { displayClientLabel } from '@/models/client.model';
 import { type CmrModel, CmrStatusEnum } from '@/models/cmr.model';
 import type { CmrSessionModel } from '@/models/cmr-session.model';
-import type { WorkSessionModel } from '@/models/work-session.model';
 import { useModalStore } from '@/stores/window.store';
 import { DataSourceSectionEnum } from '@/types/data-source.type';
 
@@ -42,10 +42,7 @@ export function DriverPanelSessionCmrs({
 					key={m.id}
 					className="bg-card border border-border rounded-lg p-4"
 				>
-					<DriverPanelSessionCmrEntry
-						cmr={m.cmr}
-						workSession={m.work_session}
-					/>
+					<DriverPanelSessionCmrEntry cmr={m.cmr} cmrSession={m} />
 				</div>
 			))}
 		</div>
@@ -54,10 +51,10 @@ export function DriverPanelSessionCmrs({
 
 export function DriverPanelSessionCmrEntry({
 	cmr,
-	workSession,
+	cmrSession,
 }: {
 	cmr: CmrModel;
-	workSession: WorkSessionModel;
+	cmrSession: CmrSessionModel;
 }) {
 	const { open } = useModalStore();
 	const { refreshSession } = useWorkSession();
@@ -99,40 +96,66 @@ export function DriverPanelSessionCmrEntry({
 		[open],
 	);
 
-	// const handleUpdateSessionVehicle = useCallback(
-	// 	(entry: WorkSessionVehicleModel) => {
-	// 		open({
-	// 			minimized: false,
-	// 			section: DataSourceSectionEnum.PUBLIC,
-	// 			dataSource: 'work-session-vehicle',
-	// 			action: 'update',
-	// 			data: {
-	// 				entries: [entry],
-	// 			},
-	// 			definition: {
-	// 				operationFunction: (
-	// 					values: WorkSessionVehicleFormValuesType,
-	// 				) => {
-	// 					return updateWorkSessionVehicle(
-	// 						values,
-	// 						entry.id,
-	// 						entry.work_session.id,
-	// 					);
-	// 				},
-	// 			} as WindowDefinition<
-	// 				WorkSessionVehicleFormValuesType,
-	// 				WorkSessionVehicleModel
-	// 			>,
-	// 			events: {
-	// 				success: async () => {
-	// 					await refreshSession();
-	// 				},
-	// 			},
-	// 		});
-	// 	},
-	// 	[open, refreshSession],
-	// );
-	//
+	const handleUpdateCmr = useCallback(
+		(entry: CmrModel) => {
+			open({
+				minimized: false,
+				section: DataSourceSectionEnum.PUBLIC,
+				dataSource: 'cmr',
+				action: 'update',
+				data: {
+					entries: [entry],
+				},
+				events: {
+					success: async () => {
+						await refreshSession();
+					},
+				},
+			});
+		},
+		[open, refreshSession],
+	);
+
+	const handleDeleteCmr = useCallback(
+		(entry: CmrModel) => {
+			open({
+				minimized: false,
+				section: DataSourceSectionEnum.PUBLIC,
+				dataSource: 'cmr',
+				action: 'delete',
+				data: {
+					entries: [entry],
+				},
+				events: {
+					success: async () => {
+						await refreshSession();
+					},
+				},
+			});
+		},
+		[open, refreshSession],
+	);
+
+	const handleDropCmr = useCallback(
+		(entry: CmrSessionModel) => {
+			open({
+				minimized: false,
+				section: DataSourceSectionEnum.PUBLIC,
+				dataSource: 'cmr-session',
+				action: 'drop',
+				data: {
+					entries: [entry],
+				},
+				events: {
+					success: async () => {
+						await refreshSession();
+					},
+				},
+			});
+		},
+		[open, refreshSession],
+	);
+
 	// const handleDeleteSessionVehicle = useCallback(
 	// 	(entry: WorkSessionVehicleModel) => {
 	// 		open({
@@ -152,6 +175,14 @@ export function DriverPanelSessionCmrEntry({
 	// 	},
 	// 	[open, refreshSession],
 	// );
+
+	const deliveryAddress = cmr.delivery_address
+		? displayAddressLabel(cmr.delivery_address)
+		: null;
+	const pickupAddress = cmr.pickup_address
+		? displayAddressLabel(cmr.pickup_address)
+		: null;
+	const contactPhone = cmr.contact_phone;
 
 	return (
 		<div className="flex justify-between">
@@ -221,12 +252,14 @@ export function DriverPanelSessionCmrEntry({
 						<span className="ml-2 font-mono">{cmr.notes}</span>
 					</div>
 				)}
-				<div>
-					<span className="text-muted-foreground">Tracking:</span>
-					<span className="ml-2 font-mono">
-						{cmr.tracking_number}
-					</span>
-				</div>
+				{withDetails && (
+					<div>
+						<span className="text-muted-foreground">Tracking:</span>
+						<span className="ml-2 font-mono">
+							{cmr.tracking_number}
+						</span>
+					</div>
+				)}
 				{withDetails && (
 					<div className="flex">
 						<div className="text-muted-foreground">Transport:</div>
@@ -276,16 +309,11 @@ export function DriverPanelSessionCmrEntry({
 				)}
 				{(withDetails || cmr.status === CmrStatusEnum.ORDERED) && (
 					<div className="flex flex-col">
-						<div className="text-muted-foreground">
+						<div className="text-muted-foreground flex items-center gap-2">
 							Pickup address:
+							<LocationNavigator address={pickupAddress} />
 						</div>
-						<div className="ml-4 font-mono">
-							<LocationNavigator
-								address={displayAddressLabel(
-									cmr.pickup_address,
-								)}
-							/>
-						</div>
+						<div className="ml-4 font-mono">{pickupAddress}</div>
 					</div>
 				)}
 				{arrayHasValue(cmr.status, [
@@ -305,20 +333,13 @@ export function DriverPanelSessionCmrEntry({
 						</span>
 					</div>
 				)}
-				{(withDetails || cmr.status !== CmrStatusEnum.ORDERED) && (
-					<div className="flex flex-col">
-						<div className="text-muted-foreground">
-							Delivery address:
-						</div>
-						<div className="ml-4 font-mono">
-							<LocationNavigator
-								address={displayAddressLabel(
-									cmr.delivery_address,
-								)}
-							/>
-						</div>
+				<div className="flex flex-col">
+					<div className="text-muted-foreground flex items-center gap-2">
+						Delivery address:
+						<LocationNavigator address={deliveryAddress} />
 					</div>
-				)}
+					<div className="ml-4 font-mono">{deliveryAddress}</div>
+				</div>
 				{cmr.status === CmrStatusEnum.DELIVERED && (
 					<div className="flex items-center">
 						<span className="text-muted-foreground">
@@ -403,13 +424,27 @@ export function DriverPanelSessionCmrEntry({
 					<Button
 						variant="secondary"
 						hover="error"
-						onClick={() => handleDropCmr(cmr, workSession)}
+						onClick={() => handleDropCmr(cmrSession)}
 						className="cursor-pointer"
 						title="Drop CMR"
 					>
 						<Icons.Action.Drop className="h-4 w-4" />
 					</Button>
 				)}
+				{!arrayHasValue(cmr.status, [CmrStatusEnum.CANCELLED]) &&
+					contactPhone && (
+						<Link
+							href={whatsAppUrl(contactPhone, 'Here is the CMR')}
+							variant="secondary"
+							hover="success"
+							className="cursor-pointer"
+							title="Send CMR"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							<Icons.Share className="h-4 w-4" />
+						</Link>
+					)}
 			</div>
 		</div>
 	);

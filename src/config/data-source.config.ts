@@ -12,7 +12,10 @@ import type {
 	ReloadEntryFnType,
 	UpdateFunctionType,
 } from '@/types/action.type';
-import type { DataSourceSection } from '@/types/data-source.type';
+import {
+	type DataSourceSection,
+	DataSourceSectionEnum,
+} from '@/types/data-source.type';
 import type {
 	FormValuesType,
 	GetFormStateFnType,
@@ -24,6 +27,121 @@ import type {
 	WindowConfigPropsType,
 	WindowEntryType,
 } from '@/types/window.type';
+
+const LOADERS: Record<
+	DataSourceSection,
+	// biome-ignore lint/suspicious/noExplicitAny: It's fine
+	Partial<Record<string, () => Promise<DataSourceConfigType<any>>>>
+> = {
+	[DataSourceSectionEnum.DASHBOARD]: {
+		address: () =>
+			import(
+				'@/app/(dashboard)/dashboard/address/address.definition'
+			).then((m) => m.dataSourceConfigAddress),
+		brand: () =>
+			import('@/app/(dashboard)/dashboard/brand/brand.definition').then(
+				(m) => m.dataSourceConfigBrand,
+			),
+		'cash-flow': () =>
+			import(
+				'@/app/(dashboard)/dashboard/cash-flow/cash-flow.definition'
+			).then((m) => m.dataSourceConfigCashFlow),
+		client: () =>
+			import('@/app/(dashboard)/dashboard/client/client.definition').then(
+				(m) => m.dataSourceConfigClient,
+			),
+		cmr: () =>
+			import('@/app/(dashboard)/dashboard/cmr/cmr.definition').then(
+				(m) => m.dataSourceConfigCmr,
+			),
+		'cmr-session': () =>
+			import(
+				'@/app/(dashboard)/dashboard/cmr-session/cmr-session.definition'
+			).then((m) => m.dataSourceConfigCmrSession),
+		'cmr-vehicle': () =>
+			import(
+				'@/app/(dashboard)/dashboard/cmr-vehicle/cmr-vehicle.definition'
+			).then((m) => m.dataSourceConfigCmrVehicle),
+		'company-vehicle': () =>
+			import(
+				'@/app/(dashboard)/dashboard/company-vehicle/company-vehicle.definition'
+			).then((m) => m.dataSourceConfigCompanyVehicle),
+		'cron-history': () =>
+			import(
+				'@/app/(dashboard)/dashboard/cron-history/cron-history.definition'
+			).then((m) => m.dataSourceConfigCronHistory),
+		'log-data': () =>
+			import(
+				'@/app/(dashboard)/dashboard/log-data/log-data.definition'
+			).then((m) => m.dataSourceConfigLogData),
+		'log-history': () =>
+			import(
+				'@/app/(dashboard)/dashboard/log-history/log-history.definition'
+			).then((m) => m.dataSourceConfigLogHistory),
+		'mail-queue': () =>
+			import(
+				'@/app/(dashboard)/dashboard/mail-queue/mail-queue.definition'
+			).then((m) => m.dataSourceConfigMailQueue),
+		permission: () =>
+			import(
+				'@/app/(dashboard)/dashboard/permission/permission.definition'
+			).then((m) => m.dataSourceConfigPermission),
+		place: () =>
+			import('@/app/(dashboard)/dashboard/place/place.definition').then(
+				(m) => m.dataSourceConfigPlace,
+			),
+		template: () =>
+			import(
+				'@/app/(dashboard)/dashboard/template/template.definition'
+			).then((m) => m.dataSourceConfigTemplate),
+		user: () =>
+			import('@/app/(dashboard)/dashboard/user/user.definition').then(
+				(m) => m.dataSourceConfigUser,
+			),
+		vehicle: () =>
+			import(
+				'@/app/(dashboard)/dashboard/vehicle/vehicle.definition'
+			).then((m) => m.dataSourceConfigVehicle),
+		'work-session': () =>
+			import(
+				'@/app/(dashboard)/dashboard/work-session/work-session.definition'
+			).then((m) => m.dataSourceConfigWorkSession),
+		'work-session-vehicle': () =>
+			import(
+				'@/app/(dashboard)/dashboard/work-session-vehicle/work-session-vehicle.definition'
+			).then((m) => m.dataSourceConfigWorkSessionVehicle),
+	},
+	[DataSourceSectionEnum.PUBLIC]: {
+		address: () =>
+			import(
+				'@/app/(public)/_components/address/address.definition'
+			).then((m) => m.dataSourceConfigAddress),
+		client: () =>
+			import('@/app/(public)/_components/client/client.definition').then(
+				(m) => m.dataSourceConfigClient,
+			),
+		cmr: () =>
+			import('@/app/(public)/_components/cmr/cmr.definition').then(
+				(m) => m.dataSourceConfigCmr,
+			),
+		'cmr-session': () =>
+			import(
+				'@/app/(public)/_components/cmr-session/cmr-session.definition'
+			).then((m) => m.dataSourceConfigCmrSession),
+		'cmr-vehicle': () =>
+			import(
+				'@/app/(public)/_components/cmr-vehicle/cmr-vehicle.definition'
+			).then((m) => m.dataSourceConfigCmrVehicle),
+		'work-session': () =>
+			import(
+				'@/app/(public)/_components/work-session/work-session.definition'
+			).then((m) => m.dataSourceConfigWorkSession),
+		'work-session-vehicle': () =>
+			import(
+				'@/app/(public)/_components/work-session-vehicle/work-session-vehicle.definition'
+			).then((m) => m.dataSourceConfigWorkSessionVehicle),
+	},
+};
 
 // ============================================================================
 // Data Table Types
@@ -202,27 +320,11 @@ export type ActionsType<Entry extends WindowEntryType> = {
 // Data Source
 // ============================================================================
 
-export type DataSourceKey =
-	| 'brand'
-	| 'cash-flow'
-	| 'address'
-	| 'client'
-	| 'cron-history'
-	| 'log-data'
-	| 'log-history'
-	| 'mail-queue'
-	| 'permission'
-	| 'place'
-	| 'template'
-	| 'user'
-	| 'vehicle'
-	| 'company-vehicle'
-	| 'cmr'
-	| 'cmr-session'
-	| 'cmr-vehicle'
-	| 'operational-record'
-	| 'work-session'
-	| 'work-session-vehicle';
+type DashboardKeys =
+	keyof (typeof LOADERS)[typeof DataSourceSectionEnum.DASHBOARD];
+type PublicKeys = keyof (typeof LOADERS)[typeof DataSourceSectionEnum.PUBLIC];
+
+export type DataSourceKey = DashboardKeys | PublicKeys;
 
 export type DataSourceConfigType<Entry extends WindowEntryType> = {
 	dataTable?: {
@@ -245,27 +347,7 @@ const registry: Record<
 	public: {},
 };
 
-export function loadDataSource(
-	section: DataSourceSection,
-	key: DataSourceKey,
-	// biome-ignore lint/suspicious/noExplicitAny: It's fine
-	config: DataSourceConfigType<any>,
-) {
-	if (hasDataSourceConfig(section, key)) {
-		return;
-	}
-
-	registry[section][key] = config;
-}
-
-export function hasDataSourceConfig<K extends DataSourceKey>(
-	section: DataSourceSection,
-	key: K,
-): boolean {
-	return !!registry[section][key];
-}
-
-export function getDataSourceConfig<
+export async function getDataSourceConfig<
 	K extends DataSourceKey,
 	// biome-ignore lint/suspicious/noExplicitAny: It's fine
 	P extends keyof DataSourceConfigType<any>,
@@ -273,17 +355,23 @@ export function getDataSourceConfig<
 	section: DataSourceSection,
 	key: K,
 	prop: P,
-): // biome-ignore lint/suspicious/noExplicitAny: It's fine
-DataSourceConfigType<any>[P] {
-	const config = registry[section][key];
+): Promise<
+	// biome-ignore lint/suspicious/noExplicitAny: It's fine
+	DataSourceConfigType<any>[P]
+> {
+	if (!registry[section]?.[key]) {
+		const loader = LOADERS[section]?.[key];
 
-	if (!config) {
-		throw new Error(
-			`DataSource "${key}" is not registered for section "${section}"`,
-		);
+		if (!loader) {
+			throw new Error(
+				`No loader found for "${key}" in section "${section}"`,
+			);
+		}
+
+		registry[section][key] = await loader();
 	}
 
-	return config[prop];
+	return registry[section][key][prop];
 }
 
 export function resolveRequestPath(key: DataSourceKey) {

@@ -2,13 +2,11 @@ import type { Draft } from 'immer';
 import { create, type StateCreator } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import {
-	type DataSourceKey,
-	type DataTableFiltersType,
-	type DataTableStateType,
-	getDataSourceConfig,
+import type {
+	DataSourceKey,
+	DataTableFiltersType,
+	DataTableStateType,
 } from '@/config/data-source.config';
-import { assertDefined } from '@/helpers/types.helper';
 import type { DataSourceSection } from '@/types/data-source.type';
 
 // ============================================================================
@@ -21,9 +19,8 @@ export interface DataTableSlice {
 }
 
 export const createDataTableSlice =
-	<K extends DataSourceKey>(
-		section: DataSourceSection,
-		dataSource: K,
+	(
+		initialState: DataTableStateType,
 	): StateCreator<
 		DataTableStore,
 		[['zustand/immer', never]],
@@ -31,12 +28,7 @@ export const createDataTableSlice =
 		DataTableSlice
 	> =>
 	(set) => ({
-		tableState: structuredClone(
-			assertDefined(
-				getDataSourceConfig(section, dataSource, 'dataTable'),
-				`dataTable config not defined for ${dataSource}`,
-			).state,
-		),
+		tableState: structuredClone(initialState),
 
 		updateTableState: (newState) =>
 			set((state: Draft<DataTableSlice>) => {
@@ -95,16 +87,13 @@ export type DataTableStore<Model = any> = DataTableSlice &
 export const createDataTableStore = <K extends DataSourceKey, Model>(
 	section: DataSourceSection,
 	dataSource: K,
+	initialState: DataTableStateType,
 ) =>
 	create<DataTableStore<Model>>()(
 		devtools(
 			persist(
 				immer((set, get, store) => ({
-					...createDataTableSlice<K>(section, dataSource)(
-						set,
-						get,
-						store,
-					),
+					...createDataTableSlice(initialState)(set, get, store),
 					...createDataTableSelectionSlice<Model>()(set, get, store),
 
 					isLoading: false,

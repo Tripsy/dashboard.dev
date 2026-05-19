@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useStore } from 'zustand/react';
 import { addDataTableActionListener } from '@/app/(dashboard)/_events/data-table-action.event';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
@@ -106,15 +106,17 @@ export function DataTableActions<
 		(state) => state.selectedEntries,
 	);
 
-	const actions = useMemo(
-		() =>
-			getDataSourceConfig(
-				DataSourceSectionEnum.DASHBOARD,
-				dataSource,
-				'actions',
-			),
-		[dataSource],
-	);
+	const [actions, setActions] = useState<
+		Record<string, ActionConfigType> | undefined
+	>(undefined);
+
+	useEffect(() => {
+		getDataSourceConfig(
+			DataSourceSectionEnum.DASHBOARD,
+			dataSource,
+			'actions',
+		).then(setActions);
+	}, [dataSource]);
 
 	const translationsKeys = useMemo(
 		() =>
@@ -157,10 +159,12 @@ export function DataTableActions<
 		async (action, targetDataSource, entries, actionConfig) => {
 			const resolvedActionConfig: ActionConfigType | undefined =
 				actionConfig ??
-				getDataSourceConfig(
-					DataSourceSectionEnum.DASHBOARD,
-					targetDataSource,
-					'actions',
+				(
+					await getDataSourceConfig(
+						DataSourceSectionEnum.DASHBOARD,
+						targetDataSource,
+						'actions',
+					)
 				)?.[action];
 
 			if (!resolvedActionConfig) {

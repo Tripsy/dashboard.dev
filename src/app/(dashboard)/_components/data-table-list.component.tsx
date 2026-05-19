@@ -10,11 +10,12 @@ import {
 } from 'primereact/datatable';
 import type { PaginatorCurrentPageReportOptions } from 'primereact/paginator';
 import type React from 'react';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useStore } from 'zustand/react';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
 import { LoadingComponent } from '@/components/status.component';
 import {
+	type DataSourceConfigType,
 	type DataTableFiltersType,
 	getDataSourceConfig,
 } from '@/config/data-source.config';
@@ -87,18 +88,24 @@ export default function DataTableList<Model extends DataTableValue>(props: {
 	const { isTranslationLoading, translations } =
 		useTranslation(translationsKeys);
 
-	const dataTable = useMemo(
-		() =>
-			assertDefined(
-				getDataSourceConfig(
-					DataSourceSectionEnum.DASHBOARD,
-					dataSource,
-					'dataTable',
+	const [dataTable, setDataTable] = useState<
+		DataSourceConfigType<Model>['dataTable'] | null
+	>(null);
+
+	useEffect(() => {
+		getDataSourceConfig(
+			DataSourceSectionEnum.DASHBOARD,
+			dataSource,
+			'dataTable',
+		).then((config) =>
+			setDataTable(
+				assertDefined(
+					config,
+					`dataTable config not defined for ${dataSource}`,
 				),
-				`dataTable config not defined for ${dataSource}`,
 			),
-		[dataSource],
-	);
+		);
+	}, [dataSource]);
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: Reset to first page when filters change
 	useEffect(() => {
@@ -132,7 +139,7 @@ export default function DataTableList<Model extends DataTableValue>(props: {
 	const { data, isLoading } = useQuery({
 		queryKey,
 		queryFn: async () => {
-			const response = await dataTable.find({
+			const response = await dataTable?.find({
 				order_by: tableState.sortField,
 				direction: tableState.sortOrder === 1 ? 'ASC' : 'DESC',
 				limit: tableState.rows,
@@ -189,7 +196,7 @@ export default function DataTableList<Model extends DataTableValue>(props: {
 
 	const tableColumns = useMemo(
 		() =>
-			dataTable.columns.map((column) => (
+			dataTable?.columns.map((column) => (
 				<Column
 					key={column.field}
 					field={column.field}
@@ -203,7 +210,7 @@ export default function DataTableList<Model extends DataTableValue>(props: {
 					}
 				/>
 			)),
-		[dataTable.columns],
+		[dataTable?.columns],
 	);
 
 	const paginatorTemplate = useMemo(
@@ -229,6 +236,10 @@ export default function DataTableList<Model extends DataTableValue>(props: {
 		return <LoadingComponent />;
 	}
 
+	if (!dataTable) {
+		return <LoadingComponent />;
+	}
+
 	return (
 		<DataTable
 			emptyMessage={translations['dashboard.text.no_entries']}
@@ -236,7 +247,7 @@ export default function DataTableList<Model extends DataTableValue>(props: {
 			lazy
 			dataKey={props.dataKey}
 			selectionMode={selectionMode}
-			selection={selectedEntries}
+			selection={selectedEntries as Model[]}
 			metaKeySelection={false}
 			selectionPageOnly={true}
 			onSelectionChange={onSelectionChange}

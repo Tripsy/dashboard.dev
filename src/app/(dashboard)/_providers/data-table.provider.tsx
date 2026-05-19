@@ -4,24 +4,26 @@ import {
 	createContext,
 	type ReactNode,
 	useContext,
+	useEffect,
 	useMemo,
 	useRef,
 	useState,
 } from 'react';
-import { useStore } from 'zustand/react';
+import { LoadingComponent } from '@/components/status.component';
 import {
+	type DataSourceConfigType,
 	type DataSourceKey,
 	type DataTableSelectionModeType,
 	type DataTableStateType,
 	getDataSourceConfig,
 } from '@/config/data-source.config';
 import { assertDefined } from '@/helpers/types.helper';
-import { useDebouncedEffect } from '@/hooks/use-debounced-effect.hook';
 import {
 	createDataTableStore,
 	type DataTableStoreType,
 } from '@/stores/data-table.store';
 import { DataSourceSectionEnum } from '@/types/data-source.type';
+import type { WindowEntryType } from '@/types/window.type';
 
 type DataTableContextType<K extends DataSourceKey, Model> = {
 	dataSource: K;
@@ -35,7 +37,10 @@ const DataTableContext = createContext<
 	DataTableContextType<any, any> | undefined
 >(undefined);
 
-function DataTableProvider<K extends DataSourceKey, Model>({
+function DataTableProvider<
+	K extends DataSourceKey,
+	Entry extends WindowEntryType,
+>({
 	dataSource,
 	selectionMode,
 	children,
@@ -44,68 +49,79 @@ function DataTableProvider<K extends DataSourceKey, Model>({
 	selectionMode: DataTableSelectionModeType;
 	children: ReactNode;
 }) {
-	const [dataTableStore] = useState<DataTableStoreType<K, Model>>(
-		() =>
-			createDataTableStore(
+	const [dataTable, setDataTable] = useState<
+		DataSourceConfigType<Entry>['dataTable'] | null
+	>(null);
+	const dataTableStoreRef = useRef<DataTableStoreType<K, Entry> | null>(null);
+
+	useEffect(() => {
+		getDataSourceConfig(
+			DataSourceSectionEnum.DASHBOARD,
+			dataSource,
+			'dataTable',
+		).then((config) => {
+			const dt = assertDefined(
+				config,
+				`dataTable config not defined for ${dataSource}`,
+			);
+
+			dataTableStoreRef.current = createDataTableStore<K, Entry>(
 				DataSourceSectionEnum.DASHBOARD,
 				dataSource,
-			) as DataTableStoreType<K, Model>,
-	);
+				dt.state,
+			);
 
-	const dataTable = useMemo(
-		() =>
-			assertDefined(
-				getDataSourceConfig(
-					DataSourceSectionEnum.DASHBOARD,
-					dataSource,
-					'dataTable',
-				),
-				`dataTable config not defined for ${dataSource}`,
-			),
-		[dataSource],
-	);
+			setDataTable(dt); // triggers re-render, ref is already set
+		});
+	}, [dataSource]);
 
-	const selectedEntries = useStore(
-		dataTableStore,
-		(state) => state.selectedEntries,
-	);
+	// const selectedEntries = useStore(
+	// 	dataTableStore,
+	// 	(state) => state.selectedEntries,
+	// );
 
-	const prevSelectedEntriesRef = useRef<Model[]>([]);
-
-	useDebouncedEffect(
-		() => {
-			const prev = prevSelectedEntriesRef.current;
-			const { onRowSelect, onRowUnselect } = dataTable;
-
-			if (onRowSelect) {
-				const added = selectedEntries.filter(
-					(e) => !prev.some((p) => p === e),
-				);
-				added.forEach(onRowSelect);
-			}
-
-			if (onRowUnselect) {
-				const removed = prev.filter(
-					(e) => !selectedEntries.some((s) => s === e),
-				);
-				removed.forEach(onRowUnselect);
-			}
-
-			prevSelectedEntriesRef.current = selectedEntries;
-		},
-		[dataTable, selectedEntries],
-		500,
-	);
+	// const prevSelectedEntriesRef = useRef<Model[]>([]);
+	//
+	// useDebouncedEffect(
+	// 	() => {
+	// 		const prev = prevSelectedEntriesRef.current;
+	// 		const { onRowSelect, onRowUnselect } = dataTable;
+	//
+	// 		if (onRowSelect) {
+	// 			const added = selectedEntries.filter(
+	// 				(e) => !prev.some((p) => p === e),
+	// 			);
+	// 			added.forEach(onRowSelect);
+	// 		}
+	//
+	// 		if (onRowUnselect) {
+	// 			const removed = prev.filter(
+	// 				(e) => !selectedEntries.some((s) => s === e),
+	// 			);
+	// 			removed.forEach(onRowUnselect);
+	// 		}
+	//
+	// 		prevSelectedEntriesRef.current = selectedEntries;
+	// 	},
+	// 	[dataTable, selectedEntries],
+	// 	500,
+	// );
 
 	const contextValue = useMemo(
 		() => ({
 			dataSource,
 			selectionMode,
-			dataTableStateDefault: dataTable.state,
-			dataTableStore,
+			dataTableStateDefault:
+				dataTable?.state ?? ({} as DataTableStateType),
+			// biome-ignore lint/style/noNonNullAssertion: It's fine
+			dataTableStore: dataTableStoreRef.current!,
 		}),
-		[dataSource, selectionMode, dataTable.state, dataTableStore],
+		[dataSource, selectionMode, dataTable?.state],
 	);
+
+	if (!dataTable || !dataTableStoreRef.current) {
+		return <LoadingComponent />;
+	}
 
 	return (
 		<DataTableContext.Provider value={contextValue}>

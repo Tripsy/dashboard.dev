@@ -17,6 +17,6 @@ export type CmrVehicleModel<D = Date | string> = {
 	deleted_at: D | null;
 };
 
-export function getCmrVehicleDisplayName(entry: CmrVehicleModel) {
+export function displayCmrVehicleLabel(entry: CmrVehicleModel) {
 	return `#${entry.cmr.id} ${displayVehicleLabel(entry.vehicle)}`;
 }

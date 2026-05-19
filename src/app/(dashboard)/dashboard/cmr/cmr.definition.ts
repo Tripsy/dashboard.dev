@@ -421,7 +421,7 @@ function displayButtonViewClient(
 ): DataTableValueOptionsType<CmrModel>['displayButton'] {
 	return {
 		action: 'view',
-		dataSource: 'user',
+		dataSource: 'client',
 		altTitle: translations['viewClient.title'],
 		alternateEntryId: entry.client.id,
 	};

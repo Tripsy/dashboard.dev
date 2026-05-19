@@ -8,42 +8,32 @@ import {
 	FormFiltersSelect,
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
-import type { WorkSessionVehicleDataTableFiltersType } from '@/app/(dashboard)/dashboard/work-session-vehicle/work-session-vehicle.definition';
+import type { OperationalRecordDataTableFiltersType } from '@/app/(dashboard)/dashboard/operational-record/operational-record.definition';
 import { Icons } from '@/components/icon.component';
 import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
+import { CashFlowStatusEnum } from '@/models/cash-flow.model';
 import {
 	type CompanyVehicleModel,
 	displayCompanyVehicleLabel,
 } from '@/models/company-vehicle.model';
-import {
-	type WorkSessionStatus,
-	WorkSessionStatusEnum,
-} from '@/models/work-session.model';
-import {
-	type WorkSessionVehicleModel,
-	type WorkSessionVehicleStatus,
-	WorkSessionVehicleStatusEnum,
-} from '@/models/work-session-vehicle.model';
+import type { OperationalRecordModel } from '@/models/operational-record.model';
 
-const workSessionStatuses = toOptionsFromEnum(WorkSessionStatusEnum, {
-	formatter: formatEnumLabel,
-});
-const statuses = toOptionsFromEnum(WorkSessionVehicleStatusEnum, {
+const cashFlowStatuses = toOptionsFromEnum(CashFlowStatusEnum, {
 	formatter: formatEnumLabel,
 });
 
-export const DataTableFiltersWorkSessionVehicle = (): JSX.Element => {
+export const DataTableFiltersOperationalRecord = (): JSX.Element => {
 	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
-		'work-session-vehicle',
-		WorkSessionVehicleModel
+		'operational-record',
+		OperationalRecordModel
 	>();
 
 	const filters = useStore(
 		dataTableStore,
 		(state) => state.tableState.filters,
-	) as WorkSessionVehicleDataTableFiltersType;
+	) as OperationalRecordDataTableFiltersType;
 
 	const updateTableState = useStore(
 		dataTableStore,
@@ -53,16 +43,16 @@ export const DataTableFiltersWorkSessionVehicle = (): JSX.Element => {
 	const setFilterValues = useCallback(
 		(
 			updates: Partial<{
-				[K in keyof WorkSessionVehicleDataTableFiltersType]: WorkSessionVehicleDataTableFiltersType[K]['value'];
+				[K in keyof OperationalRecordDataTableFiltersType]: OperationalRecordDataTableFiltersType[K]['value'];
 			}>,
 		) => {
 			const updatedFilters = { ...filters };
 
 			function applyUpdate<
-				K extends keyof WorkSessionVehicleDataTableFiltersType,
+				K extends keyof OperationalRecordDataTableFiltersType,
 			>(
 				key: K,
-				value: WorkSessionVehicleDataTableFiltersType[K]['value'],
+				value: OperationalRecordDataTableFiltersType[K]['value'],
 			): void {
 				updatedFilters[key] = {
 					...filters[key],
@@ -71,13 +61,13 @@ export const DataTableFiltersWorkSessionVehicle = (): JSX.Element => {
 			}
 
 			for (const key of Object.keys(updates) as Array<
-				keyof WorkSessionVehicleDataTableFiltersType
+				keyof OperationalRecordDataTableFiltersType
 			>) {
 				applyUpdate(
 					key,
 					updates[
 						key
-					] as WorkSessionVehicleDataTableFiltersType[typeof key]['value'],
+					] as OperationalRecordDataTableFiltersType[typeof key]['value'],
 				);
 			}
 
@@ -109,7 +99,7 @@ export const DataTableFiltersWorkSessionVehicle = (): JSX.Element => {
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
 			<FormFiltersAutoComplete<
-				WorkSessionVehicleDataTableFiltersType,
+				OperationalRecordDataTableFiltersType,
 				CompanyVehicleModel
 			>
 				labelText="Vehicle"
@@ -129,31 +119,31 @@ export const DataTableFiltersWorkSessionVehicle = (): JSX.Element => {
 				getOptionKey={(m) => m.id}
 			/>
 
-			<FormFiltersSelect<WorkSessionVehicleDataTableFiltersType>
+			<FormFiltersSelect<OperationalRecordDataTableFiltersType>
 				labelText="Session Status"
 				fieldName="status"
 				fieldValue={filters.work_session_status.value}
 				options={workSessionStatuses}
 				onChange={(value) =>
 					setFilterValues({
-						work_session_status: value as WorkSessionStatus,
+						work_session_status: value as OperationalRecordStatus,
 					})
 				}
 			/>
 
-			<FormFiltersSelect<WorkSessionVehicleDataTableFiltersType>
+			<FormFiltersSelect<OperationalRecordDataTableFiltersType>
 				labelText="Vehicle Status"
 				fieldName="status"
 				fieldValue={filters.status.value}
 				options={statuses}
 				onChange={(value) =>
 					setFilterValues({
-						status: value as WorkSessionVehicleStatus,
+						status: value as OperationalRecordStatus,
 					})
 				}
 			/>
 
-			<FormFiltersReset dataSource="work-session-vehicle" />
+			<FormFiltersReset dataSource="operational-record" />
 		</div>
 	);
 };

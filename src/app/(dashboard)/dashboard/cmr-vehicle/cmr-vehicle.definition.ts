@@ -16,7 +16,7 @@ import { BaseValidator } from '@/helpers/validator.helper';
 import { displayCmrLabel } from '@/models/cmr.model';
 import {
 	type CmrVehicleModel,
-	getCmrVehicleDisplayName,
+	displayCmrVehicleLabel,
 } from '@/models/cmr-vehicle.model';
 import { displayVehicleLabel } from '@/models/vehicle.model';
 import {
@@ -191,7 +191,7 @@ export const dataSourceConfigCmrVehicle: DataSourceConfigType<CmrVehicleModel> =
 				requestFind<CmrVehicleModel>('cmr-vehicle', params),
 		},
 		displayEntryLabel: (entry: CmrVehicleModel) => {
-			return getCmrVehicleDisplayName(entry);
+			return displayCmrVehicleLabel(entry);
 		},
 		actions: {
 			create: {

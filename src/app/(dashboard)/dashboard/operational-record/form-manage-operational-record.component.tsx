@@ -13,31 +13,36 @@ import {
 	CompanyVehicleStatusEnum,
 	displayCompanyVehicleLabel,
 } from '@/models/company-vehicle.model';
-import { type VehicleType, VehicleTypeEnum } from '@/models/vehicle.model';
 import { useWindowForm } from '@/providers/window-form.provider';
 import type { FindFunctionResponseType } from '@/types/action.type';
 
-export type WorkSessionVehicleFormValuesType = {
-	work_session_id: number | null;
+export type OperationalRecordFormValuesType = {
+	cash_flow_id: number | null;
+
+	client_id: number | null;
+	client: string | null;
+
+	user_id: number | null;
+	user: string | null;
 
 	company_vehicle_id: number | null;
 	company_vehicle: string | null;
-	vehicle_type: VehicleType | null;
 
-	vehicle_km_start: number | null;
-	vehicle_km_end: number | null;
+	cmr_id: number | null;
+	cmr: string | null;
 
 	notes: string | null;
 };
 
-export function FormManageWorkSessionVehicle() {
+export function FormManageOperationalRecord() {
 	const { formValues, errors, handleChange, pending } =
-		useWindowForm<WorkSessionVehicleFormValuesType>();
+		useWindowForm<OperationalRecordFormValuesType>();
 
 	const elementIds = useElementIds([
+		'client',
+		'user',
 		'company_vehicle',
-		'vehicle_km_start',
-		'vehicle_km_end',
+		'cmr',
 		'notes',
 	] as const);
 
@@ -87,7 +92,7 @@ export function FormManageWorkSessionVehicle() {
 			/>
 
 			<FormComponentAutoComplete<
-				WorkSessionVehicleFormValuesType,
+				OperationalRecordFormValuesType,
 				CompanyVehicleModel
 			>
 				labelText="Vehicle"
@@ -126,7 +131,7 @@ export function FormManageWorkSessionVehicle() {
 
 			{formValues.vehicle_type !== VehicleTypeEnum.TRAILER && (
 				<div className="flex flex-wrap gap-2">
-					<FormComponentInput<WorkSessionVehicleFormValuesType>
+					<FormComponentInput<OperationalRecordFormValuesType>
 						labelText="Start Km"
 						id={elementIds.vehicle_km_start}
 						fieldName="vehicle_km_start"
@@ -143,7 +148,7 @@ export function FormManageWorkSessionVehicle() {
 						}
 						error={errors.vehicle_km_start}
 					/>
-					<FormComponentInput<WorkSessionVehicleFormValuesType>
+					<FormComponentInput<OperationalRecordFormValuesType>
 						labelText="End Km"
 						id={elementIds.vehicle_km_end}
 						fieldName="vehicle_km_end"

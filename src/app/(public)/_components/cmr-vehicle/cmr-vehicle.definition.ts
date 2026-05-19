@@ -12,7 +12,7 @@ import {
 import { BaseValidator } from '@/helpers/validator.helper';
 import {
 	type CmrVehicleModel,
-	getCmrVehicleDisplayName,
+	displayCmrVehicleLabel,
 } from '@/models/cmr-vehicle.model';
 import { displayVehicleLabel } from '@/models/vehicle.model';
 import {
@@ -121,7 +121,7 @@ function getFormState(
 export const dataSourceConfigCmrVehicle: DataSourceConfigType<CmrVehicleModel> =
 	{
 		displayEntryLabel: (entry: CmrVehicleModel) => {
-			return getCmrVehicleDisplayName(entry);
+			return displayCmrVehicleLabel(entry);
 		},
 		actions: {
 			create: {

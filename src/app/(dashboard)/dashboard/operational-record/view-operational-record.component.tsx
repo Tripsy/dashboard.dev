@@ -3,12 +3,12 @@
 import { formatDate } from '@/helpers/date.helper';
 import { DisplayStatus } from '@/helpers/display.helper';
 import { displayCompanyVehicleLabel } from '@/models/company-vehicle.model';
-import type { WorkSessionVehicleModel } from '@/models/work-session-vehicle.model';
+import type { OperationalRecordModel } from '@/models/operational-record.model';
 
-export function ViewWorkSessionVehicle({
+export function ViewOperationalRecord({
 	entry,
 }: {
-	entry: WorkSessionVehicleModel;
+	entry: OperationalRecordModel;
 }) {
 	return (
 		<div className="space-y-6">
@@ -25,7 +25,7 @@ export function ViewWorkSessionVehicle({
 					<div className="max-w-60">
 						<DisplayStatus
 							status={entry.status}
-							dataSourceKey="work-session-vehicle"
+							dataSourceKey="operational-record"
 						/>
 					</div>
 				</div>

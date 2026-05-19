@@ -1,0 +1,60 @@
+{
+	"meta": {
+		"title": "Operational Records - Dashboard | {{app_name}}"
+	},
+	"validation": {
+		"invalid_cash_flow_id": "Enter a name",
+		"invalid_client_id": "Invalid client id",
+		"invalid_client": "Invalid client",
+		"invalid_user_id": "Invalid user id",
+		"invalid_user": "Invalid user",
+		"invalid_company_vehicle_id": "Invalid company vehicle id",
+		"invalid_company_vehicle": "Invalid company vehicle",
+		"invalid_cmr_id": "Invalid cmr id",
+		"invalid_cmr": "Invalid cmr",
+		"invalid_notes": "Invalid notes"
+	},
+	"action": {
+		"create": {
+			"title": "Add new operational record",
+			"label": "Add",
+			"success": "New operational record added successfully"
+		},
+		"update": {
+			"title": "Update operational record - {{entry}}",
+			"label": "Update",
+			"success": "Operational record updated successfully"
+		},
+		"delete": {
+			"title": "Delete operational record - {{entry}}",
+			"label": "Delete",
+			"success": "Operational record deleted successfully",
+			"confirmText": "Are you sure you want to delete this operational record?"
+		},
+		"restore": {
+			"title": "Restore operational record - {{entry}}",
+			"label": "Restore",
+			"success": "Operational record restored successfully",
+			"confirmText": "Are you sure you want to restore this operational record?"
+		},
+		"view": {
+			"title": "Operational record details - {{entry}}",
+			"label": "View details"
+		},
+		"viewCashFlow": {
+			"title": "View cash flow"
+		},
+		"viewClient": {
+			"title": "View client"
+		},
+		"viewUser": {
+			"title": "View user"
+		},
+		"viewCompanyVehicle": {
+			"title": "View company vehicle"
+		},
+		"viewCmr": {
+			"title": "View cmr"
+		}
+	}
+}

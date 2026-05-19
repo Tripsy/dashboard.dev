@@ -19,7 +19,7 @@ import { BaseValidator } from '@/helpers/validator.helper';
 import { displayCompanyVehicleLabel } from '@/models/company-vehicle.model';
 import { VehicleTypeEnum } from '@/models/vehicle.model';
 import {
-	getWorkSessionVehicleDisplayName,
+	displayWorkSessionVehicleLabel,
 	type WorkSessionVehicleModel,
 } from '@/models/work-session-vehicle.model';
 import { deleteWorkSessionVehicle } from '@/services/work-session-vehicle.service';
@@ -225,7 +225,7 @@ export const dataSourceConfigWorkSessionVehicle: Omit<
 	'dataTable'
 > = {
 	displayEntryLabel: (entry: WorkSessionVehicleModel) => {
-		return getWorkSessionVehicleDisplayName(entry);
+		return displayWorkSessionVehicleLabel(entry);
 	},
 	actions: {
 		create: {

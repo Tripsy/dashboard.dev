@@ -32,8 +32,6 @@ export type WorkSessionVehicleModel<D = Date | string> = {
 	updated_at: D | null;
 };
 
-export function getWorkSessionVehicleDisplayName(
-	entry: WorkSessionVehicleModel,
-) {
+export function displayWorkSessionVehicleLabel(entry: WorkSessionVehicleModel) {
 	return `#${entry.work_session.id} ${displayCompanyVehicleLabel(entry.company_vehicle)}`;
 }

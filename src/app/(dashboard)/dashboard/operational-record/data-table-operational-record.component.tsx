@@ -4,16 +4,16 @@ import type { JSX } from 'react';
 import { DataTableActions } from '@/app/(dashboard)/_components/data-table-actions.component';
 import DataTableList from '@/app/(dashboard)/_components/data-table-list.component';
 import { DataTableProvider } from '@/app/(dashboard)/_providers/data-table.provider';
-import { DataTableFiltersWorkSessionVehicle } from '@/app/(dashboard)/dashboard/work-session-vehicle/data-table-filters-work-session-vehicle.component';
+import { DataTableFiltersOperationalRecord } from '@/app/(dashboard)/dashboard/operational-record/data-table-filters-operational-record.component';
 
-export const DataTableWorkSessionVehicle = (): JSX.Element => {
+export const DataTableOperationalRecord = (): JSX.Element => {
 	return (
 		<DataTableProvider
-			dataSource="work-session-vehicle"
+			dataSource="operational-record"
 			selectionMode="checkbox"
 		>
 			<div className="table-container">
-				<DataTableFiltersWorkSessionVehicle />
+				<DataTableFiltersOperationalRecord />
 				<DataTableActions />
 				<DataTableList dataKey="id" />
 			</div>

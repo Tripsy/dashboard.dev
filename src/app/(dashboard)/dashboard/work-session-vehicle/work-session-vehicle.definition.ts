@@ -22,7 +22,7 @@ import {
 	type WorkSessionStatus,
 } from '@/models/work-session.model';
 import {
-	getWorkSessionVehicleDisplayName,
+	displayWorkSessionVehicleLabel,
 	type WorkSessionVehicleModel,
 	type WorkSessionVehicleStatus,
 	WorkSessionVehicleStatusEnum,
@@ -304,7 +304,7 @@ export const dataSourceConfigWorkSessionVehicle: DataSourceConfigType<WorkSessio
 				),
 		},
 		displayEntryLabel: (entry: WorkSessionVehicleModel) => {
-			return getWorkSessionVehicleDisplayName(entry);
+			return displayWorkSessionVehicleLabel(entry);
 		},
 		actions: {
 			create: {

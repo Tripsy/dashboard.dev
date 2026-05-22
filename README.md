@@ -210,8 +210,6 @@ pnpm run build    # Production build
 
 # 📌 TODO
 
-1. cmr-driver -> cmr-session
-2. operational-record
 
 ---------- 
 1. Add section "documentation"

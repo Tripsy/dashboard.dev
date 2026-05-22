@@ -74,27 +74,8 @@ export function SideMenu() {
 		() =>
 			[
 				'dashboard.labels.financial',
-				'dashboard.labels.content',
-				'dashboard.labels.settings',
-				'dashboard.labels.logs',
-				'dashboard.labels.template',
 				'dashboard.labels.client',
-				'dashboard.labels.address',
-				'dashboard.labels.place',
-				'dashboard.labels.brand',
 				'dashboard.labels.cash-flow',
-				'dashboard.labels.log-data',
-				'dashboard.labels.log-history',
-				'dashboard.labels.cron-history',
-				'dashboard.labels.mail-queue',
-				'dashboard.labels.permission',
-				'dashboard.labels.user',
-
-				'dashboard.labels.vehicle',
-				'dashboard.labels.operational-record',
-
-				'dashboard.labels.assets',
-				'dashboard.labels.company-vehicle',
 
 				'dashboard.labels.activity',
 				'dashboard.labels.cmr',
@@ -102,6 +83,28 @@ export function SideMenu() {
 				'dashboard.labels.cmr-vehicle',
 				'dashboard.labels.work-session',
 				'dashboard.labels.work-session-vehicle',
+
+				'dashboard.labels.assets',
+				'dashboard.labels.company-vehicle',
+
+				'dashboard.labels.content',
+				'dashboard.labels.address',
+				'dashboard.labels.place',
+				'dashboard.labels.brand',
+				'dashboard.labels.vehicle',
+				'dashboard.labels.vendor',
+
+				'dashboard.labels.settings',
+				'dashboard.labels.template',
+
+				'dashboard.labels.logs',
+				'dashboard.labels.log-data',
+				'dashboard.labels.log-history',
+				'dashboard.labels.cron-history',
+				'dashboard.labels.mail-queue',
+
+				'dashboard.labels.user',
+				'dashboard.labels.permission',
 			] as const,
 		[],
 	);
@@ -135,18 +138,6 @@ export function SideMenu() {
 						text: translations['dashboard.labels.cash-flow'],
 						icon: Icons.CashFlow,
 						permission: hasPermission(auth, 'cash_flow.find'),
-					},
-					{
-						page: 'operational-record',
-						href: Routes.get('operational-record'),
-						text: translations[
-							'dashboard.labels.operational-record'
-						],
-						icon: Icons.OperationalRecord,
-						permission: hasPermission(
-							auth,
-							'operational_record.find',
-						),
 					},
 				],
 			},
@@ -246,6 +237,13 @@ export function SideMenu() {
 						text: translations['dashboard.labels.vehicle'],
 						icon: Icons.Vehicle,
 						permission: hasPermission(auth, 'vehicle.find'),
+					},
+					{
+						page: 'vendor',
+						href: Routes.get('vendor'),
+						text: translations['dashboard.labels.vendor'],
+						icon: Icons.Vendor,
+						permission: hasPermission(auth, 'vendor.find'),
 					},
 				],
 			},

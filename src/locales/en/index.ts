@@ -32,6 +32,7 @@ import register from '@/locales/en/register.json';
 import template from '@/locales/en/template.json';
 import user from '@/locales/en/user.json';
 import vehicle from '@/locales/en/vehicle.json';
+import vendor from '@/locales/en/vendor.json';
 import work_session from '@/locales/en/work-session.json';
 import work_session_vehicle from '@/locales/en/work-session-vehicle.json';
 
@@ -67,6 +68,7 @@ const en = {
 	user,
 
 	vehicle,
+	vendor,
 	'company-vehicle': company_vehicle,
 	'work-session': work_session,
 	'work-session-vehicle': work_session_vehicle,

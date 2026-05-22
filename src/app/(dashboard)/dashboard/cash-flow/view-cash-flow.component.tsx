@@ -12,6 +12,13 @@ import {
 	type CashFlowModel,
 	CashFlowStatusEnum,
 } from '@/models/cash-flow.model';
+import { displayClientLabel } from '@/models/client.model';
+import { displayCmrLabel } from '@/models/cmr.model';
+import { displayCompanyVehicleLabel } from '@/models/company-vehicle.model';
+import type { OperationalRecordModel } from '@/models/operational-record.model';
+import { displayUserLabel } from '@/models/user.model';
+import { displayVendorLabel } from '@/models/vendor.model';
+import { requestOperationalRecords } from '@/services/cash-flow.service';
 
 function ViewCashFlowRefunds({ refunds }: { refunds: CashFlowModel[] }) {
 	return (
@@ -61,9 +68,80 @@ function ViewCashFlowRefunds({ refunds }: { refunds: CashFlowModel[] }) {
 	);
 }
 
+function ViewCashFlowOperationalRecords({
+	operationalRecords,
+}: {
+	operationalRecords: OperationalRecordModel[];
+}) {
+	return (
+		<div className="overflow-x-auto">
+			<table className="w-full text-sm">
+				<thead>
+					<tr>
+						<th className="text-left py-2 px-2 font-medium">ID</th>
+						<th className="text-left py-2 px-2 font-medium">
+							Type
+						</th>
+						<th className="text-left py-2 px-2 font-medium">
+							Reference
+						</th>
+						<th className="text-left py-2 px-2 font-medium">
+							Date
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					{operationalRecords.map((m) => (
+						<tr
+							key={`operational-record-${m.id}`}
+							className="border-t border-line hover:bg-muted/30"
+						>
+							<td className="py-2 px-3">#{m.id}</td>
+							<td className="py-2 px-3">
+								{formatEnumLabel(m.operational_record_type)}
+							</td>
+							<td className="py-2 px-3">
+								{(() => {
+									switch (m.operational_record_type) {
+										case 'client':
+											return m.client
+												? displayClientLabel(m.client)
+												: '-';
+										case 'vendor':
+											return m.vendor
+												? displayVendorLabel(m.vendor)
+												: '-';
+										case 'employee':
+											return m.employee
+												? displayUserLabel(m.employee)
+												: '-';
+										case 'company_vehicle':
+											return m.company_vehicle
+												? displayCompanyVehicleLabel(
+														m.company_vehicle,
+													)
+												: '-';
+										case 'cmr':
+											return m.cmr
+												? displayCmrLabel(m.cmr)
+												: '-';
+									}
+								})()}
+							</td>
+							<td className="py-2 px-3">
+								{formatDate(m.created_at, 'date-time')}
+							</td>
+						</tr>
+					))}
+				</tbody>
+			</table>
+		</div>
+	);
+}
+
 export function ViewCashFlow({ entry }: { entry: CashFlowModel }) {
 	const { data: refunds, isLoading: isRefundsLoading } = useQuery({
-		queryKey: ['refunds', entry.id],
+		queryKey: ['cash-flow', 'refunds', entry.id],
 		queryFn: () => {
 			if (
 				entry.status !== CashFlowStatusEnum.COMPLETED ||
@@ -82,6 +160,14 @@ export function ViewCashFlow({ entry }: { entry: CashFlowModel }) {
 			entry.status === CashFlowStatusEnum.COMPLETED &&
 			entry.category !== CashFlowCategoryEnum.REFUND,
 	});
+
+	const { data: operationalRecords, isLoading: isOperationalRecordsLoading } =
+		useQuery({
+			queryKey: ['cash-flow', 'operational-records', entry.id],
+			queryFn: () => {
+				return requestOperationalRecords(entry.id);
+			},
+		});
 
 	return (
 		<div className="space-y-6">
@@ -175,7 +261,23 @@ export function ViewCashFlow({ entry }: { entry: CashFlowModel }) {
 			</div>
 
 			{!isRefundsLoading && refunds && (
-				<ViewCashFlowRefunds refunds={refunds.entries} />
+				<div>
+					<h3 className="font-bold border-b border-line pb-2 mb-3">
+						Operational Records
+					</h3>
+					<ViewCashFlowRefunds refunds={refunds.entries} />
+				</div>
+			)}
+
+			{!isOperationalRecordsLoading && operationalRecords && (
+				<div>
+					<h3 className="font-bold border-b border-line pb-2 mb-3">
+						Operational Records
+					</h3>
+					<ViewCashFlowOperationalRecords
+						operationalRecords={operationalRecords}
+					/>
+				</div>
 			)}
 		</div>
 	);

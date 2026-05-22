@@ -1,8 +1,9 @@
 'use client';
 
-import { type JSX, useCallback, useMemo } from 'react';
+import { type JSX, useCallback, useMemo, useState } from 'react';
 import { useStore } from 'zustand/react';
 import {
+	FormFiltersAutoComplete,
 	FormFiltersDateRange,
 	FormFiltersReset,
 	FormFiltersSearch,
@@ -11,6 +12,7 @@ import {
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
 import type { CashFlowDataTableFiltersType } from '@/app/(dashboard)/dashboard/cash-flow/cash-flow.definition';
+import { Icons } from '@/components/icon.component';
 import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
@@ -26,6 +28,13 @@ import {
 	CashFlowStatusEnum,
 	GroupedCategories,
 } from '@/models/cash-flow.model';
+import { type ClientModel, displayClientLabel } from '@/models/client.model';
+import {
+	type CompanyVehicleModel,
+	displayCompanyVehicleLabel,
+} from '@/models/company-vehicle.model';
+import { displayUserLabel, type UserModel } from '@/models/user.model';
+import { displayVendorLabel, type VendorModel } from '@/models/vendor.model';
 import { type Currency, CurrencyEnum } from '@/types/common.type';
 
 const statuses = toOptionsFromEnum(CashFlowStatusEnum, {
@@ -60,20 +69,36 @@ export const DataTableFiltersCashFlow = (): JSX.Element => {
 		(state) => state.updateTableState,
 	);
 
-	const setFilterValue = useCallback(
-		<K extends keyof CashFlowDataTableFiltersType>(
-			key: K,
-			value: CashFlowDataTableFiltersType[K]['value'],
+	const setFilterValues = useCallback(
+		(
+			updates: Partial<{
+				[K in keyof CashFlowDataTableFiltersType]: CashFlowDataTableFiltersType[K]['value'];
+			}>,
 		) => {
-			updateTableState({
-				filters: {
-					...filters,
-					[key]: {
-						...filters[key],
-						value,
-					},
-				},
-			});
+			const updatedFilters = { ...filters };
+
+			function applyUpdate<K extends keyof CashFlowDataTableFiltersType>(
+				key: K,
+				value: CashFlowDataTableFiltersType[K]['value'],
+			): void {
+				updatedFilters[key] = {
+					...filters[key],
+					value,
+				};
+			}
+
+			for (const key of Object.keys(updates) as Array<
+				keyof CashFlowDataTableFiltersType
+			>) {
+				applyUpdate(
+					key,
+					updates[
+						key
+					] as CashFlowDataTableFiltersType[typeof key]['value'],
+				);
+			}
+
+			updateTableState({ filters: updatedFilters });
 		},
 		[filters, updateTableState],
 	);
@@ -82,12 +107,59 @@ export const DataTableFiltersCashFlow = (): JSX.Element => {
 		initialValue: filters.global.value ?? '',
 		debounceDelay: 1000,
 		minLength: 3,
-		onSearch: (value) => setFilterValue('global', value),
+		onSearch: (value) =>
+			setFilterValues({
+				global: value,
+			}),
 	});
 
+	const [searchClient, setSearchClient] = useState(
+		filters.client?.value ?? '',
+	);
+
+	const onResetClient = useCallback(() => {
+		setSearchClient('');
+	}, []);
+
+	const [searchEmployee, setSearchEmployee] = useState(
+		filters.employee?.value ?? '',
+	);
+
+	const onResetEmployee = useCallback(() => {
+		setSearchEmployee('');
+	}, []);
+
+	const [searchVendor, setSearchVendor] = useState(
+		filters.vendor?.value ?? '',
+	);
+
+	const onResetVendor = useCallback(() => {
+		setSearchVendor('');
+	}, []);
+
+	const [searchCompanyVehicle, setSearchCompanyVehicle] = useState(
+		filters.company_vehicle?.value ?? '',
+	);
+
+	const onResetCompanyVehicle = useCallback(() => {
+		setSearchCompanyVehicle('');
+	}, []);
+
 	const resetCallbacks = useMemo(
-		() => [searchGlobal.onReset],
-		[searchGlobal.onReset],
+		() => [
+			searchGlobal.onReset,
+			onResetClient,
+			onResetEmployee,
+			onResetVendor,
+			onResetCompanyVehicle,
+		],
+		[
+			searchGlobal.onReset,
+			onResetClient,
+			onResetEmployee,
+			onResetVendor,
+			onResetCompanyVehicle,
+		],
 	);
 
 	useDataTableFilterReset({
@@ -110,7 +182,9 @@ export const DataTableFiltersCashFlow = (): JSX.Element => {
 				fieldValue={filters.direction.value}
 				options={directions}
 				onChange={(value) =>
-					setFilterValue('direction', value as CashFlowDirection)
+					setFilterValues({
+						direction: value as CashFlowDirection,
+					})
 				}
 			/>
 
@@ -120,7 +194,9 @@ export const DataTableFiltersCashFlow = (): JSX.Element => {
 				fieldValue={filters.category.value}
 				options={GroupedCategories}
 				onChange={(value) =>
-					setFilterValue('category', value as CashFlowCategory)
+					setFilterValues({
+						category: value as CashFlowCategory,
+					})
 				}
 			/>
 
@@ -130,7 +206,9 @@ export const DataTableFiltersCashFlow = (): JSX.Element => {
 				fieldValue={filters.method?.value ?? null}
 				options={methods}
 				onChange={(value) =>
-					setFilterValue('method', value as CashFlowMethod)
+					setFilterValues({
+						method: value as CashFlowMethod,
+					})
 				}
 			/>
 
@@ -140,7 +218,9 @@ export const DataTableFiltersCashFlow = (): JSX.Element => {
 				fieldValue={filters.currency.value}
 				options={currencies}
 				onChange={(value) =>
-					setFilterValue('currency', value as Currency)
+					setFilterValues({
+						currency: value as Currency,
+					})
 				}
 			/>
 
@@ -150,7 +230,9 @@ export const DataTableFiltersCashFlow = (): JSX.Element => {
 				fieldValue={filters.status.value}
 				options={statuses}
 				onChange={(value) =>
-					setFilterValue('status', value as CashFlowStatus)
+					setFilterValues({
+						status: value as CashFlowStatus,
+					})
 				}
 			/>
 
@@ -160,18 +242,96 @@ export const DataTableFiltersCashFlow = (): JSX.Element => {
 					fieldName: 'create_at_start',
 					fieldValue: filters.create_at_start.value,
 					onSelect: (value) =>
-						setFilterValue('create_at_start', value),
+						setFilterValues({
+							create_at_start: value,
+						}),
 				}}
 				end={{
 					fieldName: 'create_at_end',
 					fieldValue: filters.create_at_end.value,
-					onSelect: (value) => setFilterValue('create_at_end', value),
+					onSelect: (value) =>
+						setFilterValues({
+							create_at_end: value,
+						}),
 				}}
+			/>
+
+			<FormFiltersAutoComplete<CashFlowDataTableFiltersType, ClientModel>
+				labelText="Client"
+				fieldName="client"
+				fieldNameId="client_id"
+				fieldValue={searchClient}
+				className="pl-8"
+				icons={{
+					left: <Icons.Client className="opacity-40 h-4.5 w-4.5" />,
+				}}
+				setFilterValues={setFilterValues}
+				setSearch={setSearchClient}
+				dataSourceKey="client"
+				getOptionLabel={(m) => displayClientLabel(m)}
+				getOptionKey={(m) => m.id}
+			/>
+
+			<FormFiltersAutoComplete<CashFlowDataTableFiltersType, UserModel>
+				labelText="Employee"
+				fieldName="employee"
+				fieldNameId="employee_id"
+				fieldValue={searchEmployee}
+				className="pl-8"
+				icons={{
+					left: <Icons.User className="opacity-40 h-4.5 w-4.5" />,
+				}}
+				setFilterValues={setFilterValues}
+				setSearch={setSearchEmployee}
+				dataSourceKey="user"
+				getOptionLabel={(m) => displayUserLabel(m)}
+				getOptionKey={(m) => m.id}
+			/>
+
+			<FormFiltersAutoComplete<CashFlowDataTableFiltersType, VendorModel>
+				labelText="Vendor"
+				fieldName="vendor"
+				fieldNameId="vendor_id"
+				fieldValue={searchVendor}
+				className="pl-8"
+				icons={{
+					left: <Icons.Vendor className="opacity-40 h-4.5 w-4.5" />,
+				}}
+				setFilterValues={setFilterValues}
+				setSearch={setSearchVendor}
+				dataSourceKey="vendor"
+				getOptionLabel={(m) => displayVendorLabel(m)}
+				getOptionKey={(m) => m.id}
+			/>
+
+			<FormFiltersAutoComplete<
+				CashFlowDataTableFiltersType,
+				CompanyVehicleModel
+			>
+				labelText="Vehicle"
+				fieldName="company_vehicle"
+				fieldNameId="company_vehicle_id"
+				fieldValue={searchCompanyVehicle}
+				className="pl-8"
+				icons={{
+					left: (
+						<Icons.CompanyVehicle className="opacity-40 h-4.5 w-4.5" />
+					),
+				}}
+				setFilterValues={setFilterValues}
+				setSearch={setSearchCompanyVehicle}
+				dataSourceKey="company-vehicle"
+				getOptionLabel={(m) => displayCompanyVehicleLabel(m)}
+				getOptionKey={(m) => m.id}
 			/>
 
 			<FormFiltersShowDeleted
 				checked={filters.is_deleted.value ?? false}
-				onCheckedChange={(value) => setFilterValue('is_deleted', value)}
+				onCheckedChange={(value) =>
+					setFilterValues({
+						is_deleted: value,
+					})
+				}
 			/>
 
 			<FormFiltersReset dataSource="cash-flow" />

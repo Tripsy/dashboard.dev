@@ -23,7 +23,11 @@ import {
 	requestUpdate,
 	requestUpdateStatus,
 } from '@/helpers/services.helper';
-import { formatAmount, formatEnumLabel } from '@/helpers/string.helper';
+import {
+	formatAmount,
+	formatEnumLabel,
+	replaceVars,
+} from '@/helpers/string.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import {
 	type CashFlowCategory,
@@ -37,7 +41,10 @@ import {
 	CashFlowStatusEnum,
 	getExpectedCategoryType,
 	getExpectedDirection,
+	getOperationalRecordOptions,
 	MUTABLE_STATUSES,
+	type OperationalRecordType,
+	OperationalRecordTypeEnum,
 	REFUNDABLE_STATUSES,
 	STATUS_TRANSITIONS,
 } from '@/models/cash-flow.model';
@@ -53,7 +60,7 @@ const translations = await translateBatch(
 		'view.title',
 		'delete.title',
 		'complete.title',
-		'drop.title',
+		'cancel.title',
 	] as const,
 	'cash-flow.action',
 );
@@ -68,45 +75,103 @@ const validatorMessages = await BaseValidator.getValidatorMessages(
 		'invalid_external_reference',
 		'invalid_parent_id',
 		'invalid_notes',
+		'invalid_client',
+		'invalid_vendor',
+		'invalid_employee',
+		'invalid_company_vehicle',
+		'invalid_cmr',
+		'required_operational_record_type',
 	] as const,
 	'cash-flow.validation',
 );
 
 class CashFlowValidator extends BaseValidator<typeof validatorMessages> {
-	manage = z.object({
-		category: this.validateEnum(
-			CashFlowCategoryEnum,
-			this.getMessage('invalid_category'),
-		),
-		method: this.validateEnum(
-			CashFlowMethodEnum,
-			this.getMessage('invalid_method'),
-		),
-		amount: this.validateNumber(this.getMessage('invalid_amount'), {
-			required: true,
-			onlyPositive: false,
-			allowDecimals: 2,
-		}),
-		vat_rate: this.validateNumber(this.getMessage('invalid_vat_rate'), {
-			required: true,
-			onlyPositive: true,
-			allowDecimals: 2,
-		}),
-		currency: this.validateEnum(
-			CurrencyEnum,
-			this.getMessage('invalid_currency'),
-		),
-		external_reference: this.validateString(
-			this.getMessage('invalid_external_reference'),
-			{ required: false },
-		),
-		parent_id: this.validateId(this.getMessage('invalid_parent_id'), {
-			required: false,
-		}),
-		notes: this.validateString(this.getMessage('invalid_notes'), {
-			required: false,
-		}),
-	});
+	readonly operationalRecords = z
+		.object({
+			[OperationalRecordTypeEnum.CLIENT]: this.validateId(
+				this.getMessage('invalid_client'),
+				{ required: false },
+			),
+			[OperationalRecordTypeEnum.VENDOR]: this.validateId(
+				this.getMessage('invalid_vendor'),
+				{ required: false },
+			),
+			[OperationalRecordTypeEnum.EMPLOYEE]: this.validateId(
+				this.getMessage('invalid_employee'),
+				{ required: false },
+			),
+			[OperationalRecordTypeEnum.COMPANY_VEHICLE]: this.validateId(
+				this.getMessage('invalid_company_vehicle'),
+				{ required: false },
+			),
+			[OperationalRecordTypeEnum.CMR]: this.validateId(
+				this.getMessage('invalid_cmr'),
+				{ required: false },
+			),
+		})
+		.optional();
+
+	manage = z
+		.object({
+			category: this.validateEnum(
+				CashFlowCategoryEnum,
+				this.getMessage('invalid_category'),
+			),
+			method: this.validateEnum(
+				CashFlowMethodEnum,
+				this.getMessage('invalid_method'),
+			),
+			amount: this.validateNumber(this.getMessage('invalid_amount'), {
+				required: true,
+				onlyPositive: false,
+				allowDecimals: 2,
+			}),
+			vat_rate: this.validateNumber(this.getMessage('invalid_vat_rate'), {
+				required: true,
+				onlyPositive: true,
+				allowDecimals: 2,
+			}),
+			currency: this.validateEnum(
+				CurrencyEnum,
+				this.getMessage('invalid_currency'),
+			),
+			external_reference: this.validateString(
+				this.getMessage('invalid_external_reference'),
+				{ required: false },
+			),
+			parent_id: this.validateId(this.getMessage('invalid_parent_id'), {
+				required: false,
+			}),
+			notes: this.validateString(this.getMessage('invalid_notes'), {
+				required: false,
+			}),
+			operational_records: this.operationalRecords,
+		})
+		.superRefine((data, ctx) => {
+			const requiredOptions = getOperationalRecordOptions(
+				data.category,
+				'required',
+			);
+
+			if (!requiredOptions) {
+				return; // Category has no operational record required options
+			}
+
+			for (const [type] of Object.entries(requiredOptions)) {
+				if (
+					!data.operational_records?.[type as OperationalRecordType]
+				) {
+					ctx.addIssue({
+						path: ['operational_records', type],
+						message: replaceVars(
+							this.getMessage('required_operational_record_type'),
+							{ type },
+						),
+						code: 'custom',
+					});
+				}
+			}
+		});
 }
 
 function validateForm(values: CashFlowFormValuesType) {
@@ -131,6 +196,35 @@ function getFormValues(formData: FormData): CashFlowFormValuesType {
 		external_reference: getFormDataAsString(formData, 'external_reference'),
 		parent_id: getFormDataAsNumber(formData, 'parent_id'),
 		notes: getFormDataAsString(formData, 'notes'),
+		// Operational records
+		operational_records: {
+			[OperationalRecordTypeEnum.CLIENT]: getFormDataAsNumber(
+				formData,
+				'operational_records.client',
+			),
+			[OperationalRecordTypeEnum.EMPLOYEE]: getFormDataAsNumber(
+				formData,
+				'operational_records.employee',
+			),
+			[OperationalRecordTypeEnum.VENDOR]: getFormDataAsNumber(
+				formData,
+				'operational_records.vendor',
+			),
+			[OperationalRecordTypeEnum.COMPANY_VEHICLE]: getFormDataAsNumber(
+				formData,
+				'operational_records.company_vehicle',
+			),
+			[OperationalRecordTypeEnum.CMR]: getFormDataAsNumber(
+				formData,
+				'operational_records.cmr',
+			),
+		},
+		// display-only, not submitted to validator
+		client: getFormDataAsString(formData, 'client'),
+		employee: getFormDataAsString(formData, 'employee'),
+		company_vehicle: getFormDataAsString(formData, 'company_vehicle'),
+		vendor: getFormDataAsString(formData, 'vendor'),
+		cmr: getFormDataAsString(formData, 'cmr'),
 	};
 }
 
@@ -151,6 +245,14 @@ function getFormState(
 			external_reference: data?.external_reference ?? null,
 			parent_id: data?.parent_id ?? null,
 			notes: data?.notes ?? null,
+
+			// Operational records - Data is selected via form component
+			operational_records: undefined,
+			client: null,
+			employee: null,
+			company_vehicle: null,
+			vendor: null,
+			cmr: null,
 		},
 	};
 }
@@ -178,6 +280,17 @@ export type CashFlowDataTableFiltersType = {
 	create_at_start: { value: string | null; matchMode: 'equals' };
 	create_at_end: { value: string | null; matchMode: 'equals' };
 	is_deleted: { value: boolean; matchMode: 'equals' };
+
+	client: { value: string | null; matchMode: 'equals' };
+	client_id: { value: number | null; matchMode: 'equals' };
+	employee: { value: string | null; matchMode: 'equals' };
+	employee_id: { value: number | null; matchMode: 'equals' };
+	vendor: { value: string | null; matchMode: 'equals' };
+	vendor_id: { value: number | null; matchMode: 'equals' };
+	company_vehicle: { value: string | null; matchMode: 'equals' };
+	company_vehicle_id: { value: number | null; matchMode: 'equals' };
+	cmr: { value: string | null; matchMode: 'equals' };
+	cmr_id: { value: number | null; matchMode: 'equals' };
 };
 
 export const dataSourceConfigCashFlow: DataSourceConfigType<CashFlowModel> = {
@@ -197,6 +310,16 @@ export const dataSourceConfigCashFlow: DataSourceConfigType<CashFlowModel> = {
 				create_at_start: { value: null, matchMode: 'equals' },
 				create_at_end: { value: null, matchMode: 'equals' },
 				is_deleted: { value: false, matchMode: 'equals' },
+				client: { value: '', matchMode: 'equals' },
+				client_id: { value: null, matchMode: 'equals' },
+				employee: { value: '', matchMode: 'equals' },
+				employee_id: { value: null, matchMode: 'equals' },
+				vendor: { value: '', matchMode: 'equals' },
+				vendor_id: { value: null, matchMode: 'equals' },
+				company_vehicle: { value: '', matchMode: 'equals' },
+				company_vehicle_id: { value: null, matchMode: 'equals' },
+				cmr: { value: '', matchMode: 'equals' },
+				cmr_id: { value: null, matchMode: 'equals' },
 			} satisfies CashFlowDataTableFiltersType,
 		},
 		columns: [
@@ -286,7 +409,7 @@ export const dataSourceConfigCashFlow: DataSourceConfigType<CashFlowModel> = {
 									return 'complete';
 								}
 
-								return 'drop';
+								return 'cancel';
 							},
 							dataSource: 'cash-flow',
 						},
@@ -441,9 +564,9 @@ export const dataSourceConfigCashFlow: DataSourceConfigType<CashFlowModel> = {
 				hover: 'info',
 			},
 		},
-		drop: {
+		cancel: {
 			windowType: 'action',
-			windowTitle: translations['drop.title'],
+			windowTitle: translations['cancel.title'],
 			permission: 'cash-flow.update',
 			entriesSelection: 'single',
 			customEntryCheck: (entry: CashFlowModel) => {

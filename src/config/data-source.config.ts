@@ -12,10 +12,7 @@ import type {
 	ReloadEntryFnType,
 	UpdateFunctionType,
 } from '@/types/action.type';
-import {
-	type DataSourceSection,
-	DataSourceSectionEnum,
-} from '@/types/data-source.type';
+import type { DataSourceSection } from '@/types/data-source.type';
 import type {
 	FormValuesType,
 	GetFormStateFnType,
@@ -27,121 +24,7 @@ import type {
 	WindowConfigPropsType,
 	WindowEntryType,
 } from '@/types/window.type';
-
-const LOADERS: Record<
-	DataSourceSection,
-	// biome-ignore lint/suspicious/noExplicitAny: It's fine
-	Partial<Record<string, () => Promise<DataSourceConfigType<any>>>>
-> = {
-	[DataSourceSectionEnum.DASHBOARD]: {
-		address: () =>
-			import(
-				'@/app/(dashboard)/dashboard/address/address.definition'
-			).then((m) => m.dataSourceConfigAddress),
-		brand: () =>
-			import('@/app/(dashboard)/dashboard/brand/brand.definition').then(
-				(m) => m.dataSourceConfigBrand,
-			),
-		'cash-flow': () =>
-			import(
-				'@/app/(dashboard)/dashboard/cash-flow/cash-flow.definition'
-			).then((m) => m.dataSourceConfigCashFlow),
-		client: () =>
-			import('@/app/(dashboard)/dashboard/client/client.definition').then(
-				(m) => m.dataSourceConfigClient,
-			),
-		cmr: () =>
-			import('@/app/(dashboard)/dashboard/cmr/cmr.definition').then(
-				(m) => m.dataSourceConfigCmr,
-			),
-		'cmr-session': () =>
-			import(
-				'@/app/(dashboard)/dashboard/cmr-session/cmr-session.definition'
-			).then((m) => m.dataSourceConfigCmrSession),
-		'cmr-vehicle': () =>
-			import(
-				'@/app/(dashboard)/dashboard/cmr-vehicle/cmr-vehicle.definition'
-			).then((m) => m.dataSourceConfigCmrVehicle),
-		'company-vehicle': () =>
-			import(
-				'@/app/(dashboard)/dashboard/company-vehicle/company-vehicle.definition'
-			).then((m) => m.dataSourceConfigCompanyVehicle),
-		'cron-history': () =>
-			import(
-				'@/app/(dashboard)/dashboard/cron-history/cron-history.definition'
-			).then((m) => m.dataSourceConfigCronHistory),
-		'log-data': () =>
-			import(
-				'@/app/(dashboard)/dashboard/log-data/log-data.definition'
-			).then((m) => m.dataSourceConfigLogData),
-		'log-history': () =>
-			import(
-				'@/app/(dashboard)/dashboard/log-history/log-history.definition'
-			).then((m) => m.dataSourceConfigLogHistory),
-		'mail-queue': () =>
-			import(
-				'@/app/(dashboard)/dashboard/mail-queue/mail-queue.definition'
-			).then((m) => m.dataSourceConfigMailQueue),
-		permission: () =>
-			import(
-				'@/app/(dashboard)/dashboard/permission/permission.definition'
-			).then((m) => m.dataSourceConfigPermission),
-		place: () =>
-			import('@/app/(dashboard)/dashboard/place/place.definition').then(
-				(m) => m.dataSourceConfigPlace,
-			),
-		template: () =>
-			import(
-				'@/app/(dashboard)/dashboard/template/template.definition'
-			).then((m) => m.dataSourceConfigTemplate),
-		user: () =>
-			import('@/app/(dashboard)/dashboard/user/user.definition').then(
-				(m) => m.dataSourceConfigUser,
-			),
-		vehicle: () =>
-			import(
-				'@/app/(dashboard)/dashboard/vehicle/vehicle.definition'
-			).then((m) => m.dataSourceConfigVehicle),
-		'work-session': () =>
-			import(
-				'@/app/(dashboard)/dashboard/work-session/work-session.definition'
-			).then((m) => m.dataSourceConfigWorkSession),
-		'work-session-vehicle': () =>
-			import(
-				'@/app/(dashboard)/dashboard/work-session-vehicle/work-session-vehicle.definition'
-			).then((m) => m.dataSourceConfigWorkSessionVehicle),
-	},
-	[DataSourceSectionEnum.PUBLIC]: {
-		address: () =>
-			import(
-				'@/app/(public)/_components/address/address.definition'
-			).then((m) => m.dataSourceConfigAddress),
-		client: () =>
-			import('@/app/(public)/_components/client/client.definition').then(
-				(m) => m.dataSourceConfigClient,
-			),
-		cmr: () =>
-			import('@/app/(public)/_components/cmr/cmr.definition').then(
-				(m) => m.dataSourceConfigCmr,
-			),
-		'cmr-session': () =>
-			import(
-				'@/app/(public)/_components/cmr-session/cmr-session.definition'
-			).then((m) => m.dataSourceConfigCmrSession),
-		'cmr-vehicle': () =>
-			import(
-				'@/app/(public)/_components/cmr-vehicle/cmr-vehicle.definition'
-			).then((m) => m.dataSourceConfigCmrVehicle),
-		'work-session': () =>
-			import(
-				'@/app/(public)/_components/work-session/work-session.definition'
-			).then((m) => m.dataSourceConfigWorkSession),
-		'work-session-vehicle': () =>
-			import(
-				'@/app/(public)/_components/work-session-vehicle/work-session-vehicle.definition'
-			).then((m) => m.dataSourceConfigWorkSessionVehicle),
-	},
-};
+import {DATA_LOADERS} from "@/config/data-loaders.config";
 
 // ============================================================================
 // Data Table Types
@@ -320,11 +203,27 @@ export type ActionsType<Entry extends WindowEntryType> = {
 // Data Source
 // ============================================================================
 
-type DashboardKeys =
-	keyof (typeof LOADERS)[typeof DataSourceSectionEnum.DASHBOARD];
-type PublicKeys = keyof (typeof LOADERS)[typeof DataSourceSectionEnum.PUBLIC];
-
-export type DataSourceKey = DashboardKeys | PublicKeys;
+export type DataSourceKey =
+	| 'address'
+	| 'brand'
+	| 'cash-flow'
+	| 'client'
+	| 'cmr'
+	| 'cmr-session'
+	| 'cmr-vehicle'
+	| 'company-vehicle'
+	| 'cron-history'
+	| 'log-data'
+	| 'log-history'
+	| 'mail-queue'
+	| 'permission'
+	| 'place'
+	| 'template'
+	| 'user'
+	| 'vehicle'
+	| 'vendor'
+	| 'work-session'
+	| 'work-session-vehicle';
 
 export type DataSourceConfigType<Entry extends WindowEntryType> = {
 	dataTable?: {
@@ -360,7 +259,7 @@ export async function getDataSourceConfig<
 	DataSourceConfigType<any>[P]
 > {
 	if (!registry[section]?.[key]) {
-		const loader = LOADERS[section]?.[key];
+		const loader = DATA_LOADERS[section]?.[key];
 
 		if (!loader) {
 			throw new Error(
@@ -368,7 +267,8 @@ export async function getDataSourceConfig<
 			);
 		}
 
-		registry[section][key] = await loader();
+		// biome-ignore lint/suspicious/noExplicitAny: It's fine
+		registry[section][key] = await loader() as DataSourceConfigType<any>;
 	}
 
 	return registry[section][key][prop];
@@ -383,10 +283,10 @@ export function resolveRequestPath(key: DataSourceKey) {
 		'template',
 		'user',
 		'vehicle',
+		'vendor',
 		'company-vehicle',
 		'cmr-session',
 		'cmr-vehicle',
-		'operational-record',
 		'work-session',
 		'work-session-vehicle',
 	];

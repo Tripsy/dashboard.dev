@@ -1,13 +1,13 @@
 import type { Metadata } from 'next';
 import BreadcrumbSetter from '@/app/(dashboard)/_components/breadcrumb.setter';
 import type { BreadcrumbType } from '@/app/(dashboard)/_providers/breadcrumb.provider';
-import { DataTableOperationalRecord } from '@/app/(dashboard)/dashboard/operational-record/data-table-operational-record.component';
+import { DataTableVendor } from '@/app/(dashboard)/dashboard/vendor/data-table-vendor.component';
 import { Configuration } from '@/config/settings.config';
 import { translate } from '@/config/translate.setup';
 
 export async function generateMetadata(): Promise<Metadata> {
 	return {
-		title: await translate('operational-record.meta.title', {
+		title: await translate('vendor.meta.title', {
 			app_name: Configuration.get('app.name') as string,
 		}),
 	};
@@ -15,13 +15,13 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Page() {
 	const items: BreadcrumbType[] = [
-		{ label: await translate('dashboard.labels.operational-record') },
+		{ label: await translate('dashboard.labels.vendor') },
 	];
 
 	return (
 		<>
-			<BreadcrumbSetter page="operational-record" items={items} />
-			<DataTableOperationalRecord />
+			<BreadcrumbSetter page="vendor" items={items} />
+			<DataTableVendor />
 		</>
 	);
 }

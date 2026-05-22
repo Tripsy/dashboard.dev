@@ -10,7 +10,13 @@
 		"invalid_currency": "Select a valid currency",
 		"invalid_external_reference": "Enter a valid external reference",
 		"invalid_parent_id": "Select a valid parent",
-		"invalid_notes": "Enter a valid notes"
+		"invalid_notes": "Enter a valid notes",
+		"invalid_client": "Select a valid client",
+		"invalid_vendor": "Select a valid vendor",
+		"invalid_employee": "Select a valid employee",
+		"invalid_company_vehicle": "Select a valid company vehicle",
+		"invalid_cmr": "Select a valid CMR",
+		"required_operational_record_type": "For selected category operational record is required (e.g.: {{type}})"
 	},
 	"status": {
 		"pending": "Pending",
@@ -56,9 +62,9 @@
 			"success": "Cash flow status marked as completed",
 			"confirmText": "Are you sure you want to mark this cash flow as completed?"
 		},
-		"drop": {
+		"cancel": {
 			"title": "Mark as canceled: {{entry}}",
-			"label": "Drop",
+			"label": "Cancel",
 			"success": "Cash flow status marked as cancelled",
 			"confirmText": "Are you sure you want to mark this cash flow as cancelled?"
 		},

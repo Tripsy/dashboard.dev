@@ -85,16 +85,16 @@ export const DataTableFiltersVehicle = (): JSX.Element => {
 
 	const [searchBrand, setSearchBrand] = useState(filters.brand?.value ?? '');
 
+	const onResetBrand = useCallback(() => {
+		setSearchBrand('');
+	}, []);
+
 	const searchGlobal = useSearchFilter({
 		initialValue: filters.global.value ?? '',
 		debounceDelay: 1000,
 		minLength: 3,
 		onSearch: (value) => setFilterValues({ global: value }),
 	});
-
-	const onResetBrand = useCallback(() => {
-		setSearchBrand('');
-	}, []);
 
 	const resetCallbacks = useMemo(
 		() => [searchGlobal.onReset, onResetBrand],

@@ -210,9 +210,6 @@ Routes.group('dashboard')
 	.add('cash-flow', '/dashboard/cash-flow', {
 		permission: 'cash_flow.find',
 	})
-	.add('operational-record', '/dashboard/operational-record', {
-		permission: 'operational_record.find',
-	})
 	.add('log-data', '/dashboard/log-data', {
 		permission: 'log_data.find',
 	})
@@ -234,6 +231,9 @@ Routes.group('dashboard')
 
 	.add('vehicle', '/dashboard/vehicle', {
 		permission: 'vehicle.find',
+	})
+	.add('vendor', '/dashboard/vendor', {
+		permission: 'vendor.find',
 	})
 	.add('company-vehicle', '/dashboard/company-vehicle', {
 		permission: 'company-vehicle.find',

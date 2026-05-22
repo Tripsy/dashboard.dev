@@ -8,7 +8,6 @@
 		"financial": "Financial",
 		"cash-flow": "Cash Flow",
 		"client": "Clients",
-		"operational-record": "Operational Records",
 
 		"content": "Content",
 		"brand": "Brands",
@@ -28,7 +27,8 @@
 		"user": "Users",
 		"permission": "Permissions",
 
-		"vehicle": "Vehicle",
+		"vehicle": "Vehicles",
+		"vendor": "Vendors",
 
 		"assets": "Company Assets",
 		"company-vehicle": "Company Vehicle",

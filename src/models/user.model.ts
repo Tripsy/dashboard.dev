@@ -39,3 +39,7 @@ export type UserModel<D = Date | string> = {
 	updated_at: D | null;
 	deleted_at: D | null;
 };
+
+export const displayUserLabel = (entry: UserModel) => {
+	return entry.name;
+};

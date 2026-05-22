@@ -14,7 +14,8 @@
 	},
 	"status": {
 		"verified": "Verified",
-		"draft": "Draft"
+		"draft": "Draft",
+		"deleted": "Deleted"
 	},
 	"action": {
 		"create": {

@@ -13,7 +13,6 @@ import {
 } from '@/helpers/form.helper';
 import { requestFind, requestRestore } from '@/helpers/services.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
-import { displayCmrLabel } from '@/models/cmr.model';
 import {
 	type CmrVehicleModel,
 	displayCmrVehicleLabel,
@@ -64,6 +63,11 @@ class CmrVehicleValidator extends BaseValidator<typeof validatorMessages> {
 				vehicle: this.validateString(
 					this.getMessage('invalid_vehicle'),
 				),
+				vin: this.validateString(this.getMessage('invalid_vin'), {
+					required: true,
+					minChars: 17,
+					maxChars: 17,
+				}),
 				license_plate: this.validateString(
 					this.getMessage('invalid_license_plate'),
 					{
@@ -71,11 +75,6 @@ class CmrVehicleValidator extends BaseValidator<typeof validatorMessages> {
 						minChars: 8,
 					},
 				),
-				vin: this.validateString(this.getMessage('invalid_vin'), {
-					required: false,
-					minChars: 17,
-					maxChars: 17,
-				}),
 				notes: this.validateString(this.getMessage('invalid_notes'), {
 					required: false,
 				}),
@@ -167,10 +166,10 @@ export const dataSourceConfigCmrVehicle: DataSourceConfigType<CmrVehicleModel> =
 				},
 				{
 					field: 'cmr',
-					header: 'CMR',
+					header: 'CMR ID',
 					body: (entry, column) =>
 						DataTableValue(entry, column, {
-							customValue: displayCmrLabel(entry.cmr),
+							customValue: entry.cmr.id.toString(),
 						}),
 				},
 				{

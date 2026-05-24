@@ -5,7 +5,6 @@ import {
 	type TemplateFormValuesType,
 } from '@/app/(dashboard)/dashboard/template/form-manage-template.component';
 import { ViewTemplate } from '@/app/(dashboard)/dashboard/template/view-template.component';
-import type { DataSourceConfigType } from '@/config/data-source.config';
 import { Configuration } from '@/config/settings.config';
 import { translateBatch } from '@/config/translate.setup';
 import { getFormDataAsEnum, getFormDataAsString } from '@/helpers/form.helper';
@@ -29,6 +28,7 @@ import {
 } from '@/models/template.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
 import { LanguageEnum } from '@/types/common.type';
+import type { DataSourceConfigType } from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(

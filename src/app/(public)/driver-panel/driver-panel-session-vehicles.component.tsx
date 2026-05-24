@@ -12,7 +12,6 @@ import {
 import { updateWorkSessionVehicle } from '@/services/work-session-vehicle.service';
 import { useModalStore } from '@/stores/window.store';
 import { DataSourceSectionEnum } from '@/types/data-source.type';
-import type { WindowDefinition } from '@/types/window.type';
 
 export function DriverPanelSessionVehicles({
 	sessionVehicles,
@@ -42,10 +41,7 @@ export function DriverPanelSessionVehicles({
 							entry.work_session.id,
 						);
 					},
-				} as WindowDefinition<
-					WorkSessionVehicleFormValuesType,
-					WorkSessionVehicleModel
-				>,
+				},
 				events: {
 					success: async () => {
 						await refreshSession();
@@ -96,10 +92,7 @@ export function DriverPanelSessionVehicles({
 							entry.work_session.id,
 						);
 					},
-				} as WindowDefinition<
-					WorkSessionVehicleFormValuesType,
-					WorkSessionVehicleModel
-				>,
+				},
 				events: {
 					success: async () => {
 						await refreshSession();

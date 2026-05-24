@@ -22,13 +22,11 @@ import { createCurrentDate } from '@/helpers/date.helper';
 import { requestCreate } from '@/helpers/services.helper';
 import type { CmrModel } from '@/models/cmr.model';
 import type { WorkSessionModel } from '@/models/work-session.model';
-import type { WorkSessionVehicleModel } from '@/models/work-session-vehicle.model';
 import { useAuth } from '@/providers/auth.provider';
 import { createCmrSession } from '@/services/cmr-session.service';
 import { createWorkSessionVehicle } from '@/services/work-session-vehicle.service';
 import { useModalStore } from '@/stores/window.store';
 import { DataSourceSectionEnum } from '@/types/data-source.type';
-import type { WindowDefinition } from '@/types/window.type';
 
 export function DriverPanel() {
 	const {
@@ -68,7 +66,7 @@ export function DriverPanel() {
 						params,
 					);
 				},
-			} as WindowDefinition<WorkSessionCreateOutput, WorkSessionModel>,
+			},
 			events: {
 				success: async () => {
 					await refreshSession();
@@ -90,10 +88,7 @@ export function DriverPanel() {
 					) => {
 						return createWorkSessionVehicle(params, session.id);
 					},
-				} as WindowDefinition<
-					WorkSessionVehicleFormValuesType,
-					WorkSessionVehicleModel
-				>,
+				},
 				events: {
 					success: async () => {
 						await refreshSession();

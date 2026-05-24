@@ -17,12 +17,11 @@ import {
 } from '@/models/company-vehicle.model';
 import { useToast } from '@/providers/toast.provider';
 import { useModalStore } from '@/stores/window.store';
-import type { WindowEntryType } from '@/types/window.type';
 
 export function StatusTransitionCompanyVehicle({
 	entries,
 }: {
-	entries: WindowEntryType[];
+	entries: CompanyVehicleModel[];
 }) {
 	const { close } = useModalStore();
 
@@ -42,7 +41,7 @@ export function StatusTransitionCompanyVehicle({
 	const { isTranslationLoading, translations } =
 		useTranslation(translationsKeys);
 
-	const entry = entries[0] as CompanyVehicleModel | undefined;
+	const entry = entries[0];
 
 	const statusTransitions = useMemo(
 		() =>

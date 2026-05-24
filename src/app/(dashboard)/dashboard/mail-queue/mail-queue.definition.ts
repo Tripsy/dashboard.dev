@@ -1,9 +1,5 @@
 import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
 import { ViewMailQueue } from '@/app/(dashboard)/dashboard/mail-queue/view-mail-queue.component';
-import type {
-	DataSourceConfigType,
-	DataTableValueOptionsType,
-} from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import { formatDate } from '@/helpers/date.helper';
 import { requestDeleteMultiple, requestFind } from '@/helpers/services.helper';
@@ -12,6 +8,10 @@ import type {
 	MailQueueStatus,
 } from '@/models/mail-queue.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
+import type {
+	DataSourceConfigType,
+	DataTableValueOptionsType,
+} from '@/types/data-source.type';
 
 const translations = await translateBatch(
 	['delete.title', 'view.title', 'viewTemplate.label'] as const,

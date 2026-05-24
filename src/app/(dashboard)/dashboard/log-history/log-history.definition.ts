@@ -1,9 +1,5 @@
 import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
 import { ViewLogHistory } from '@/app/(dashboard)/dashboard/log-history/view-log-history.component';
-import type {
-	DataSourceConfigType,
-	DataTableValueOptionsType,
-} from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import { requestDeleteMultiple, requestFind } from '@/helpers/services.helper';
 import { toTitleCase } from '@/helpers/string.helper';
@@ -12,6 +8,10 @@ import type {
 	LogHistorySource,
 } from '@/models/log-history.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
+import type {
+	DataSourceConfigType,
+	DataTableValueOptionsType,
+} from '@/types/data-source.type';
 
 const translations = await translateBatch(
 	['delete.title', 'view.title', 'viewUser.title'] as const,

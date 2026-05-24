@@ -15,24 +15,20 @@ import { WindowFormProvider } from '@/providers/window-form.provider';
 import { useModalStore } from '@/stores/window.store';
 import type { FormOperationFunctionType } from '@/types/action.type';
 import type { FormStateType, FormValuesType } from '@/types/form.type';
-import type { WindowConfig, WindowEntryType } from '@/types/window.type';
 
-type WindowFormType<WindowEntry> = {
+type WindowFormType<Entry> = {
 	uid: string;
-	entry?: WindowEntry;
+	entry?: Entry;
 	children: React.ReactElement<unknown>;
 };
 
 export function WindowForm<
 	FormValues extends FormValuesType,
-	WindowEntry extends WindowEntryType,
->({ uid, entry, children }: WindowFormType<WindowEntry>) {
+	Entry extends Record<string, unknown>,
+>({ uid, entry, children }: WindowFormType<Entry>) {
 	const { getWindow, close } = useModalStore();
 
-	const windowConfig = getWindow(uid) as
-		| WindowConfig<FormValues, WindowEntry>
-		| undefined;
-
+	const windowConfig = getWindow(uid);
 	const windowDefinition = windowConfig?.definition;
 
 	// Guards
@@ -73,10 +69,7 @@ export function WindowForm<
 
 	// WindowForm only handles form operations.
 	const operationFunction =
-		formOperationFunction as FormOperationFunctionType<
-			WindowEntry,
-			FormValues
-		>;
+		formOperationFunction as FormOperationFunctionType<Entry, FormValues>;
 
 	const initState = getFormState(entry);
 	const entryId = entry && 'id' in entry ? (entry.id as number) : undefined; // Undefined for create

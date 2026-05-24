@@ -6,7 +6,6 @@ import {
 	DataTable,
 	type DataTablePageEvent,
 	type DataTableSortEvent,
-	type DataTableValue,
 } from 'primereact/datatable';
 import type { PaginatorCurrentPageReportOptions } from 'primereact/paginator';
 import type React from 'react';
@@ -14,17 +13,17 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useStore } from 'zustand/react';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
 import { LoadingComponent } from '@/components/status.component';
-import {
-	type DataSourceConfigType,
-	type DataTableFiltersType,
-	getDataSourceConfig,
-} from '@/config/data-source.config';
+import { getDataSourceConfig } from '@/config/data-source.config';
 import { toUTCISOString } from '@/helpers/date.helper';
 import { replaceVars } from '@/helpers/string.helper';
 import { assertDefined } from '@/helpers/types.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import type { QueryFiltersType } from '@/types/api.type';
-import { DataSourceSectionEnum } from '@/types/data-source.type';
+import {
+	type DataSourceConfigType,
+	DataSourceSectionEnum,
+	type DataTableFiltersType,
+} from '@/types/data-source.type';
 
 function findFunctionFilter(filters: DataTableFiltersType): QueryFiltersType {
 	return Object.entries(filters).reduce((acc, [key, filter]) => {
@@ -55,7 +54,7 @@ type SelectionChangeEvent<T> = {
 	value: T[];
 };
 
-export default function DataTableList<Model extends DataTableValue>(props: {
+export default function DataTableList(props: {
 	dataKey: string;
 	scrollHeight?: string;
 }) {
@@ -89,7 +88,8 @@ export default function DataTableList<Model extends DataTableValue>(props: {
 		useTranslation(translationsKeys);
 
 	const [dataTable, setDataTable] = useState<
-		DataSourceConfigType<Model>['dataTable'] | null
+		// biome-ignore lint/suspicious/noExplicitAny: It's fine
+		DataSourceConfigType<any>['dataTable'] | null
 	>(null);
 
 	useEffect(() => {
@@ -188,7 +188,8 @@ export default function DataTableList<Model extends DataTableValue>(props: {
 	);
 
 	const onSelectionChange = useCallback(
-		(event: SelectionChangeEvent<Model>) => {
+		// biome-ignore lint/suspicious/noExplicitAny: It's fine
+		(event: SelectionChangeEvent<any>) => {
 			setSelectedEntries(event.value);
 		},
 		[setSelectedEntries],
@@ -247,7 +248,7 @@ export default function DataTableList<Model extends DataTableValue>(props: {
 			lazy
 			dataKey={props.dataKey}
 			selectionMode={selectionMode}
-			selection={selectedEntries as Model[]}
+			selection={selectedEntries}
 			metaKeySelection={false}
 			selectionPageOnly={true}
 			onSelectionChange={onSelectionChange}

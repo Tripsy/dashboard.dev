@@ -14,16 +14,15 @@ import { type CmrModel, displayCmrLabel } from '@/models/cmr.model';
 import type { CmrSessionModel } from '@/models/cmr-session.model';
 import { useModalStore } from '@/stores/window.store';
 import { DataSourceSectionEnum } from '@/types/data-source.type';
-import type { WindowEntryType } from '@/types/window.type';
 
-export function SetupCmrSessions({ entries }: { entries: WindowEntryType[] }) {
+export function SetupCmrSessions({ entries }: { entries: CmrModel[] }) {
 	const { open, focus, getCurrentWindow } = useModalStore();
 
 	const windowConfig = getCurrentWindow();
 
 	const queryClient = useQueryClient();
 
-	const cmrModel = entries[0] as CmrModel | undefined;
+	const cmrModel = entries[0];
 	const cmrId = cmrModel?.id;
 
 	const {
@@ -34,6 +33,7 @@ export function SetupCmrSessions({ entries }: { entries: WindowEntryType[] }) {
 		queryKey: ['cmr-session', cmrId],
 		queryFn: () =>
 			requestFind<CmrSessionModel>('cmr-session', {
+				// TODO why not requestView
 				filter: {
 					cmr_id: cmrId as number,
 				},

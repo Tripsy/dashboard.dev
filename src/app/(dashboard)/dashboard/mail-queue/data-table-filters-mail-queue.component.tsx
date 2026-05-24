@@ -15,7 +15,6 @@ import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import {
-	type MailQueueModel,
 	type MailQueueStatus,
 	MailQueueStatusEnum,
 } from '@/models/mail-queue.model';
@@ -25,10 +24,8 @@ const statuses = toOptionsFromEnum(MailQueueStatusEnum, {
 });
 
 export const DataTableFiltersMailQueue = (): JSX.Element => {
-	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
-		'mail-queue',
-		MailQueueModel
-	>();
+	const { dataSource, dataTableStateDefault, dataTableStore } =
+		useDataTable<'mail-queue'>();
 
 	const filters = useStore(
 		dataTableStore,

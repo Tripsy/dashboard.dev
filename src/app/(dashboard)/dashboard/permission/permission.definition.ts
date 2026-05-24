@@ -4,7 +4,6 @@ import {
 	FormManagePermission,
 	type PermissionFormValuesType,
 } from '@/app/(dashboard)/dashboard/permission/form-manage-permission.component';
-import type { DataSourceConfigType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import { getFormDataAsString } from '@/helpers/form.helper';
 import {
@@ -17,6 +16,7 @@ import {
 import { BaseValidator } from '@/helpers/validator.helper';
 import type { PermissionModel } from '@/models/permission.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
+import type { DataSourceConfigType } from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(

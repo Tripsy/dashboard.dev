@@ -5,7 +5,6 @@ import {
 	FormManageCashFlow,
 } from '@/app/(dashboard)/dashboard/cash-flow/form-manage-cash-flow.component';
 import { ViewCashFlow } from '@/app/(dashboard)/dashboard/cash-flow/view-cash-flow.component';
-import type { DataSourceConfigType } from '@/config/data-source.config';
 import { Configuration } from '@/config/settings.config';
 import { translateBatch } from '@/config/translate.setup';
 import { DisplayAmount } from '@/helpers/display.helper';
@@ -50,6 +49,7 @@ import {
 } from '@/models/cash-flow.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
 import { type Currency, CurrencyEnum } from '@/types/common.type';
+import type { DataSourceConfigType } from '@/types/data-source.type';
 import type { FormStateType, ValidatorOutput } from '@/types/form.type';
 
 const translations = await translateBatch(

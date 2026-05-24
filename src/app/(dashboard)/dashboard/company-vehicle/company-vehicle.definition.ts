@@ -6,7 +6,6 @@ import {
 } from '@/app/(dashboard)/dashboard/company-vehicle/form-manage-company-vehicle.component';
 import { StatusTransitionCompanyVehicle } from '@/app/(dashboard)/dashboard/company-vehicle/status-transition-company-vehicle.component';
 import { ViewCompanyVehicle } from '@/app/(dashboard)/dashboard/company-vehicle/view-company-vehicle.component';
-import type { DataSourceConfigType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import {
 	getFormDataAsEnum,
@@ -32,6 +31,7 @@ import {
 	STATUS_TRANSITIONS,
 } from '@/models/company-vehicle.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
+import type { DataSourceConfigType } from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(

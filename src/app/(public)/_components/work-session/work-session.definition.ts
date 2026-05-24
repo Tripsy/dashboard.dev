@@ -3,7 +3,6 @@ import {
 	FormManageWorkSession,
 	type WorkSessionFormValuesType,
 } from '@/app/(public)/_components/work-session/form-manage-work-session.component';
-import type { DataSourceConfigType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import {
 	combineDateAndTime,
@@ -19,6 +18,7 @@ import {
 	START_AT_MAX_PAST_SECONDS,
 	type WorkSessionModel,
 } from '@/models/work-session.model';
+import type { DataSourceConfigType } from '@/types/data-source.type';
 import type { FormStateType, ValidatorOutput } from '@/types/form.type';
 
 const translations = await translateBatch(

@@ -3,12 +3,12 @@ import {
 	type ClientFormValuesType,
 	FormManageClient,
 } from '@/app/(public)/_components/client/form-manage-client.component';
-import type { DataSourceConfigType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import { getFormDataAsEnum, getFormDataAsString } from '@/helpers/form.helper';
 import { requestCreate } from '@/helpers/services.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import { type ClientModel, ClientTypeEnum } from '@/models/client.model';
+import type { DataSourceConfigType } from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(

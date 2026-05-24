@@ -18,7 +18,6 @@ import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hoo
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import type { BrandModel } from '@/models/brand.model';
 import {
-	type VehicleModel,
 	type VehicleStatus,
 	VehicleStatusEnum,
 	type VehicleType,
@@ -34,10 +33,8 @@ const vehicleTypes = toOptionsFromEnum(VehicleTypeEnum, {
 });
 
 export const DataTableFiltersVehicle = (): JSX.Element => {
-	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
-		'vehicle',
-		VehicleModel
-	>();
+	const { dataSource, dataTableStateDefault, dataTableStore } =
+		useDataTable<'vehicle'>();
 
 	const filters = useStore(
 		dataTableStore,

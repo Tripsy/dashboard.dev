@@ -14,10 +14,6 @@ import {
 import { Icons } from '@/components/icon.component';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import type {
-	DataSourceKey,
-	DataTableFiltersType,
-} from '@/config/data-source.config';
 import { cn } from '@/helpers/css.helper';
 import { stringToDate } from '@/helpers/date.helper';
 import { requestFind } from '@/helpers/services.helper';
@@ -26,6 +22,8 @@ import { useRemoteAutocomplete } from '@/hooks/use-remote-autocomplete';
 import type { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import type { FindFunctionResponseType } from '@/types/action.type';
+import type { DataSourceKey } from '@/types/data-source.key';
+import type { DataTableFiltersType } from '@/types/data-source.type';
 
 export function FormFiltersAutoComplete<
 	Fields extends DataTableFiltersType,

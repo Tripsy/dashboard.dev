@@ -1,241 +1,13 @@
-import type React from 'react';
-import type { JSX } from 'react';
+import { toCamelCase } from '@/helpers/string.helper';
 import type {
-	ActionEventType,
-	ActionOperationMultipleFunctionType,
-	ActionOperationSingleFunctionType,
-	CreateFunctionType,
-	DisplayEntryLabelFnType,
-	EntriesSelectionType,
-	FindFunctionType,
-	PrepareEntryFnType,
-	ReloadEntryFnType,
-	UpdateFunctionType,
-} from '@/types/action.type';
-import type { DataSourceSection } from '@/types/data-source.type';
-import type {
-	FormValuesType,
-	GetFormStateFnType,
-	GetFormValuesFnType,
-	ValidateFormFnType,
-} from '@/types/form.type';
-import type { ActionButtonPropsType } from '@/types/html.type';
-import type {
-	WindowConfigPropsType,
-	WindowEntryType,
-} from '@/types/window.type';
-import {DATA_LOADERS} from "@/config/data-loaders.config";
-
-// ============================================================================
-// Data Table Types
-// ============================================================================
-
-export type DataTableSelectionModeType = 'checkbox' | 'multiple' | null;
-
-export type DataTableFiltersType = {
-	[key: string]: {
-		value: string | number | boolean | Date | null;
-		matchMode:
-			| 'contains'
-			| 'equals'
-			| 'startsWith'
-			| 'endsWith'
-			| 'gt'
-			| 'lt';
-	};
-};
-
-export type DataTableStateType = {
-	first: number;
-	rows: number;
-	sortField: string;
-	sortOrder: 1 | 0 | -1 | null | undefined;
-	filters: DataTableFiltersType;
-};
-
-export type DataTableColumnType<Entry> = {
-	field: string;
-	header: string;
-	sortable?: boolean;
-	body?: (
-		entry: Entry,
-		column: DataTableColumnType<Entry>,
-	) => JSX.Element | string;
-	style?: React.CSSProperties;
-};
-
-export type DataTableValueOptionsType<Entry> = {
-	customValue?: string | JSX.Element;
-	capitalize?: boolean;
-	markDeleted?: boolean;
-	isStatus?: boolean;
-	dataSourceKey?: DataSourceKey;
-	displayDate?: boolean;
-	displayButton?: {
-		action: string | ((entry: Entry) => string | undefined);
-		dataSource: DataSourceKey;
-		altTitle?: string;
-		alternateEntryId?: number;
-	};
-};
-
-// ============================================================================
-// Action Types
-// ============================================================================
-
-type ActionConfigBase<
-	Entry extends WindowEntryType,
-	FormValues extends FormValuesType,
-> = {
-	windowTitle: string;
-	// biome-ignore lint/suspicious/noExplicitAny: It's fine
-	windowComponent?: React.ComponentType<any>; // e.g: ViewUser, FormManageUser, SetupPermissionsUser, etc.
-	windowConfigProps?: WindowConfigPropsType;
-
-	permission: string; // Related to auth policy (e.g.: 'user.create')
-	customEntryCheck?: (entry: Entry) => boolean; // Additional function to check if the action is available (hint: active user cannot have `active` action)
-	buttonPosition: 'left' | 'right' | 'hidden'; // Describe where the action button should be placed in data-table
-	button?: ActionButtonPropsType; // Action button configuration
-
-	reloadEntry?: ReloadEntryFnType<Entry>; // Used to reload entry data for form and view; the entry passed from the list may not have all the data
-	prepareEntry?: PrepareEntryFnType<Entry>; // Prepare entry before passing to renderer; Note: this run after reloadEntry if present
-
-	// Form-related
-	validateForm?: ValidateFormFnType<FormValues>;
-	getFormValues?: GetFormValuesFnType<FormValues>;
-	getFormState?: GetFormStateFnType<FormValues, Entry>;
-
-	events?: Partial<Record<'success' | 'error', ActionEventType<Entry>>>;
-};
-
-// Each variant enforces the valid windowType <-> entriesSelection correlation
-type FormCreateActionConfig<
-	Entry extends WindowEntryType,
-	FormValues extends FormValuesType,
-	ValidatedValues = FormValues,
-> = ActionConfigBase<Entry, FormValues> & {
-	windowType: 'form';
-	entriesSelection: 'free';
-	operationFunction: CreateFunctionType<Entry, ValidatedValues>;
-	validateForm: ValidateFormFnType<FormValues>;
-	getFormValues: GetFormValuesFnType<FormValues>;
-	getFormState: GetFormStateFnType<FormValues, Entry>;
-};
-
-type FormUpdateActionConfig<
-	Entry extends WindowEntryType,
-	FormValues extends FormValuesType,
-	ValidatedValues = FormValues,
-> = ActionConfigBase<Entry, FormValues> & {
-	windowType: 'form';
-	entriesSelection: 'single';
-	operationFunction: UpdateFunctionType<Entry, ValidatedValues>;
-	validateForm: ValidateFormFnType<FormValues>;
-	getFormValues: GetFormValuesFnType<FormValues>;
-	getFormState: GetFormStateFnType<FormValues, Entry>;
-	reloadEntry?: ReloadEntryFnType<Entry>;
-};
-
-type SingleActionConfig<
-	Entry extends WindowEntryType,
-	FormValues extends FormValuesType,
-> = ActionConfigBase<Entry, FormValues> & {
-	windowType: 'action';
-	entriesSelection: 'single';
-	operationFunction: ActionOperationSingleFunctionType<Entry>;
-};
-
-type MultipleActionConfig<
-	Entry extends WindowEntryType,
-	FormValues extends FormValuesType,
-> = ActionConfigBase<Entry, FormValues> & {
-	windowType: 'action';
-	entriesSelection: 'multiple';
-	operationFunction: ActionOperationMultipleFunctionType;
-};
-
-type ViewActionConfig<
-	Entry extends WindowEntryType,
-	FormValues extends FormValuesType,
-> = ActionConfigBase<Entry, FormValues> & {
-	windowType: 'view';
-	entriesSelection: 'single';
-	operationFunction?: never;
-	reloadEntry?: ReloadEntryFnType<Entry>;
-};
-
-type OtherActionConfig<
-	Entry extends WindowEntryType,
-	FormValues extends FormValuesType,
-> = ActionConfigBase<Entry, FormValues> & {
-	windowType: 'other';
-	entriesSelection: EntriesSelectionType;
-	operationFunction?: never;
-};
-
-export type ActionConfigType<
-	Entry extends WindowEntryType = WindowEntryType,
-	FormValues extends FormValuesType = FormValuesType,
-	ValidatedValues = FormValues,
-> =
-	| FormCreateActionConfig<Entry, FormValues, ValidatedValues>
-	| FormUpdateActionConfig<Entry, FormValues, ValidatedValues>
-	| SingleActionConfig<Entry, FormValues>
-	| MultipleActionConfig<Entry, FormValues>
-	| ViewActionConfig<Entry, FormValues>
-	| OtherActionConfig<Entry, FormValues>;
-
-export type ActionsType<Entry extends WindowEntryType> = {
-	// biome-ignore lint/suspicious/noExplicitAny: It's fine
-	[key: string]: ActionConfigType<Entry, any, any>;
-} & {
-	// biome-ignore lint/suspicious/noExplicitAny: It's fine
-	create?: FormCreateActionConfig<Entry, any, any>;
-	// biome-ignore lint/suspicious/noExplicitAny: It's fine
-	update?: FormUpdateActionConfig<Entry, any, any>;
-	// biome-ignore lint/suspicious/noExplicitAny: It's fine
-	delete?: SingleActionConfig<Entry, any> | MultipleActionConfig<Entry, any>;
-	// biome-ignore lint/suspicious/noExplicitAny: It's fine
-	restore?: SingleActionConfig<Entry, any> | MultipleActionConfig<Entry, any>;
-};
-
-// ============================================================================
-// Data Source
-// ============================================================================
-
-export type DataSourceKey =
-	| 'address'
-	| 'brand'
-	| 'cash-flow'
-	| 'client'
-	| 'cmr'
-	| 'cmr-session'
-	| 'cmr-vehicle'
-	| 'company-vehicle'
-	| 'cron-history'
-	| 'log-data'
-	| 'log-history'
-	| 'mail-queue'
-	| 'permission'
-	| 'place'
-	| 'template'
-	| 'user'
-	| 'vehicle'
-	| 'vendor'
-	| 'work-session'
-	| 'work-session-vehicle';
-
-export type DataSourceConfigType<Entry extends WindowEntryType> = {
-	dataTable?: {
-		state: DataTableStateType;
-		columns: DataTableColumnType<Entry>[];
-		find: FindFunctionType<Entry>;
-		onRowSelect?: (entry: Entry) => void;
-		onRowUnselect?: (entry: Entry) => void;
-	};
-	displayEntryLabel?: DisplayEntryLabelFnType<Entry>;
-	actions?: ActionsType<Entry>;
-};
+	DataSourceKey,
+	DataSourceModelMap,
+} from '@/types/data-source.key';
+import {
+	type DataSourceConfigType,
+	type DataSourceSection,
+	DataSourceSectionEnum,
+} from '@/types/data-source.type';
 
 const registry: Record<
 	DataSourceSection,
@@ -248,52 +20,33 @@ const registry: Record<
 
 export async function getDataSourceConfig<
 	K extends DataSourceKey,
-	// biome-ignore lint/suspicious/noExplicitAny: It's fine
-	P extends keyof DataSourceConfigType<any>,
+	P extends keyof DataSourceConfigType<DataSourceModelMap[K]>,
 >(
 	section: DataSourceSection,
 	key: K,
 	prop: P,
-): Promise<
-	// biome-ignore lint/suspicious/noExplicitAny: It's fine
-	DataSourceConfigType<any>[P]
-> {
+): Promise<DataSourceConfigType<DataSourceModelMap[K]>[P]> {
 	if (!registry[section]?.[key]) {
-		const loader = DATA_LOADERS[section]?.[key];
+		const defKey = toCamelCase(key, {
+			capitalizeFirst: true,
+		});
 
-		if (!loader) {
-			throw new Error(
-				`No loader found for "${key}" in section "${section}"`,
+		// biome-ignore lint/suspicious/noExplicitAny: It's fine
+		let defModule: Record<string, DataSourceConfigType<any>>;
+
+		if (section === DataSourceSectionEnum.DASHBOARD) {
+			defModule = await import(
+				`../app/(dashboard)/dashboard/${key}/${key}.definition`
+			);
+		} else {
+			defModule = await import(
+				`../app/(public)/_components/${key}/${key}.definition`
 			);
 		}
 
-		// biome-ignore lint/suspicious/noExplicitAny: It's fine
-		registry[section][key] = await loader() as DataSourceConfigType<any>;
+		registry[section][key] = defModule[`dataSourceConfig${defKey}`];
 	}
 
-	return registry[section][key][prop];
-}
-
-export function resolveRequestPath(key: DataSourceKey) {
-	const withSuffixList: DataSourceKey[] = [
-		'brand',
-		'client',
-		'permission',
-		'place',
-		'template',
-		'user',
-		'vehicle',
-		'vendor',
-		'company-vehicle',
-		'cmr-session',
-		'cmr-vehicle',
-		'work-session',
-		'work-session-vehicle',
-	];
-
-	if (withSuffixList.includes(key)) {
-		return `${key}s`;
-	}
-
-	return key;
+	// biome-ignore lint/style/noNonNullAssertion: registry[section][key] is guaranteed to be set above
+	return registry[section][key]![prop];
 }

@@ -11,13 +11,10 @@ import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
 import type { PermissionDataTableFiltersType } from '@/app/(dashboard)/dashboard/permission/permission.definition';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
-import type { PermissionModel } from '@/models/permission.model';
 
 export const DataTableFiltersPermission = (): JSX.Element => {
-	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
-		'permission',
-		PermissionModel
-	>();
+	const { dataSource, dataTableStateDefault, dataTableStore } =
+		useDataTable<'permission'>();
 
 	const filters = useStore(
 		dataTableStore,

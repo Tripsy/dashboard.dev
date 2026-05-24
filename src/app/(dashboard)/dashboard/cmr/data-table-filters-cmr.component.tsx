@@ -17,7 +17,6 @@ import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { type ClientModel, displayClientLabel } from '@/models/client.model';
 import {
-	type CmrModel,
 	type CmrStatus,
 	CmrStatusEnum,
 	type CmrTransportType,
@@ -33,10 +32,8 @@ const transportTypes = toOptionsFromEnum(CmrTransportTypeEnum, {
 });
 
 export const DataTableFiltersCmr = (): JSX.Element => {
-	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
-		'cmr',
-		CmrModel
-	>();
+	const { dataSource, dataTableStateDefault, dataTableStore } =
+		useDataTable<'cmr'>();
 
 	const filters = useStore(
 		dataTableStore,

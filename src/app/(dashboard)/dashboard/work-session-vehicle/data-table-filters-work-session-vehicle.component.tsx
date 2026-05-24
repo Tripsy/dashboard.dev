@@ -22,7 +22,6 @@ import {
 	WorkSessionStatusEnum,
 } from '@/models/work-session.model';
 import {
-	type WorkSessionVehicleModel,
 	type WorkSessionVehicleStatus,
 	WorkSessionVehicleStatusEnum,
 } from '@/models/work-session-vehicle.model';
@@ -35,10 +34,8 @@ const statuses = toOptionsFromEnum(WorkSessionVehicleStatusEnum, {
 });
 
 export const DataTableFiltersWorkSessionVehicle = (): JSX.Element => {
-	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
-		'work-session-vehicle',
-		WorkSessionVehicleModel
-	>();
+	const { dataSource, dataTableStateDefault, dataTableStore } =
+		useDataTable<'work-session-vehicle'>();
 
 	const filters = useStore(
 		dataTableStore,

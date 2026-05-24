@@ -1,17 +1,15 @@
 import {
-	type DataSourceKey,
-	resolveRequestPath,
-} from '@/config/data-source.config';
-import {
 	ApiRequest,
 	buildQueryString,
 	getResponseData,
+	resolveRequestPath,
 } from '@/helpers/api.helper';
 import type {
 	FindFunctionParamsType,
 	FindFunctionResponseType,
 } from '@/types/action.type';
 import type { ApiResponseFetch, QueryFiltersType } from '@/types/api.type';
+import type { DataSourceKey } from '@/types/data-source.key';
 
 export async function requestView<Entry>(
 	dataSource: DataSourceKey,

@@ -1,6 +1,5 @@
 import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
 import { ViewLogData } from '@/app/(dashboard)/dashboard/log-data/view-log-data.component';
-import type { DataSourceConfigType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import { requestDeleteMultiple, requestFind } from '@/helpers/services.helper';
 import type {
@@ -9,6 +8,7 @@ import type {
 	LogLevel,
 } from '@/models/log-data.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
+import type { DataSourceConfigType } from '@/types/data-source.type';
 
 const translations = await translateBatch(
 	['view.title', 'delete.title'] as const,

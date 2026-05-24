@@ -5,11 +5,9 @@ import { Icons } from '@/components/icon.component';
 import { Button } from '@/components/ui/button';
 import type { CompanyVehicleModel } from '@/models/company-vehicle.model';
 import type { WorkSessionModel } from '@/models/work-session.model';
-import type { WorkSessionVehicleModel } from '@/models/work-session-vehicle.model';
 import { createWorkSessionVehicle } from '@/services/work-session-vehicle.service';
 import { useModalStore } from '@/stores/window.store';
 import { DataSourceSectionEnum } from '@/types/data-source.type';
-import type { WindowDefinition } from '@/types/window.type';
 
 export function DriverPanelAvailableCompanyVehicles({
 	activeSession,
@@ -39,10 +37,7 @@ export function DriverPanelAvailableCompanyVehicles({
 					) => {
 						return createWorkSessionVehicle(values, workSession.id);
 					},
-				} as WindowDefinition<
-					WorkSessionVehicleFormValuesType,
-					WorkSessionVehicleModel
-				>,
+				},
 				events: {
 					success: async () => {
 						await refreshSession();

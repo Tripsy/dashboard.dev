@@ -3,7 +3,6 @@ import {
 	type AddressFormValuesType,
 	FormManageAddress,
 } from '@/app/(public)/_components/address/form-manage-address.component';
-import type { DataSourceConfigType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import {
 	getFormDataAsNumber,
@@ -13,6 +12,7 @@ import { requestCreate } from '@/helpers/services.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import type { AddressModel } from '@/models/address.model';
 import { getPlaceContentProp } from '@/models/place.model';
+import type { DataSourceConfigType } from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(

@@ -1,11 +1,11 @@
 import { useEffect, useRef } from 'react';
 import { addFilterResetListener } from '@/app/(dashboard)/_events/data-table-filter-reset.event';
+import { useRefreshDataTable } from '@/hooks/use-refresh-data-table.hook';
+import type { DataSourceKey } from '@/types/data-source.key';
 import type {
-	DataSourceKey,
 	DataTableFiltersType,
 	DataTableStateType,
-} from '@/config/data-source.config';
-import { useRefreshDataTable } from '@/hooks/use-refresh-data-table.hook';
+} from '@/types/data-source.type';
 
 type UseDataTableFilterResetOptions = {
 	dataSource: DataSourceKey;

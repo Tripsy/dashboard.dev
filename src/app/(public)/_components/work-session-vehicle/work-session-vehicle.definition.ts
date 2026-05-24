@@ -7,7 +7,6 @@ import {
 	FormReturnWorkSessionVehicle,
 	type WorkSessionVehicleFormReturnValuesType,
 } from '@/app/(public)/_components/work-session-vehicle/form-return-work-session-vehicle.component';
-import type { DataSourceConfigType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import { ExecutionError } from '@/exceptions/execution.error';
 import {
@@ -23,6 +22,7 @@ import {
 	type WorkSessionVehicleModel,
 } from '@/models/work-session-vehicle.model';
 import { deleteWorkSessionVehicle } from '@/services/work-session-vehicle.service';
+import type { DataSourceConfigType } from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(

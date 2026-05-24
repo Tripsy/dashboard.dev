@@ -12,14 +12,11 @@ import type { CmrVehicleDataTableFiltersType } from '@/app/(dashboard)/dashboard
 import { Icons } from '@/components/icon.component';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
-import type { CmrVehicleModel } from '@/models/cmr-vehicle.model';
 import { displayVehicleLabel, type VehicleModel } from '@/models/vehicle.model';
 
 export const DataTableFiltersCmrVehicle = (): JSX.Element => {
-	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
-		'cmr-vehicle',
-		CmrVehicleModel
-	>();
+	const { dataSource, dataTableStateDefault, dataTableStore } =
+		useDataTable<'cmr-vehicle'>();
 
 	const filters = useStore(
 		dataTableStore,

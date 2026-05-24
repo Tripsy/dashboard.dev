@@ -5,7 +5,6 @@ import {
 } from '@/app/(public)/_components/cmr/form-manage-cmr.component';
 import { SetupCmrVehicles } from '@/app/(public)/_components/cmr/setup-cmr-vehicles.component';
 import { StatusTransitionCmr } from '@/app/(public)/_components/cmr/status-transition-cmr.component';
-import type { DataSourceConfigType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import {
 	combineDateAndTime,
@@ -33,6 +32,7 @@ import {
 	displayCmrLabel,
 	STATUS_TRANSITIONS,
 } from '@/models/cmr.model';
+import type { DataSourceConfigType } from '@/types/data-source.type';
 import type { FormStateType, ValidatorOutput } from '@/types/form.type';
 
 const translations = await translateBatch(

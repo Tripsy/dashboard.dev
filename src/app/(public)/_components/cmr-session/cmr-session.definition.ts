@@ -1,7 +1,7 @@
-import type { DataSourceConfigType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import type { CmrSessionModel } from '@/models/cmr-session.model';
 import { deleteCmrSession } from '@/services/cmr-session.service';
+import type { DataSourceConfigType } from '@/types/data-source.type';
 
 const translations = await translateBatch(
 	['drop.title'] as const,

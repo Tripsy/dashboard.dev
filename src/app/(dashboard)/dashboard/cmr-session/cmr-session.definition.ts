@@ -5,10 +5,6 @@ import {
 	FormManageCmrSession,
 } from '@/app/(dashboard)/dashboard/cmr-session/form-manage-cmr-session.component';
 import { ViewCmrSession } from '@/app/(dashboard)/dashboard/cmr-session/view-cmr-session.component';
-import type {
-	DataSourceConfigType,
-	DataTableValueOptionsType,
-} from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import {
 	getFormDataAsNumber,
@@ -35,6 +31,10 @@ import {
 	deleteCmrSession,
 } from '@/services/cmr-session.service';
 import type { FindFunctionParamsType } from '@/types/action.type';
+import type {
+	DataSourceConfigType,
+	DataTableValueOptionsType,
+} from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(

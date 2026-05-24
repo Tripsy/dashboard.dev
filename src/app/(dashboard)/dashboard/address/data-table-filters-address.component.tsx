@@ -11,13 +11,10 @@ import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
 import type { AddressDataTableFiltersType } from '@/app/(dashboard)/dashboard/address/address.definition';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
-import type { AddressModel } from '@/models/address.model';
 
 export const DataTableFiltersAddress = (): JSX.Element => {
-	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
-		'address',
-		AddressModel
-	>();
+	const { dataSource, dataTableStateDefault, dataTableStore } =
+		useDataTable<'address'>();
 
 	const filters = useStore(
 		dataTableStore,

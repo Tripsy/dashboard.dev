@@ -5,7 +5,6 @@ import {
 	FormManageBrand,
 } from '@/app/(dashboard)/dashboard/brand/form-manage-brand.component';
 import { ViewBrand } from '@/app/(dashboard)/dashboard/brand/view-brand.component';
-import type { DataSourceConfigType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import { getFormDataAsEnum, getFormDataAsString } from '@/helpers/form.helper';
 import {
@@ -31,6 +30,7 @@ import {
 } from '@/models/brand.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
 import type { Language } from '@/types/common.type';
+import type { DataSourceConfigType } from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(

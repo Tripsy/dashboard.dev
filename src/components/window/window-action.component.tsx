@@ -6,7 +6,6 @@ import { ActionButton } from '@/components/action-button.component';
 import { Icons } from '@/components/icon.component';
 import { LoadingComponent } from '@/components/status.component';
 import { Button } from '@/components/ui/button';
-import type { DataSourceKey } from '@/config/data-source.config';
 import { ApiError } from '@/exceptions/api.error';
 import ValueError from '@/exceptions/value.error';
 import { replaceVars } from '@/helpers/string.helper';
@@ -17,9 +16,9 @@ import type {
 	ActionOperationMultipleFunctionType,
 	ActionOperationSingleFunctionType,
 } from '@/types/action.type';
+import type { DataSourceKey } from '@/types/data-source.key';
 import { DataSourceSectionEnum } from '@/types/data-source.type';
-import type { FormValuesType } from '@/types/form.type';
-import type { WindowConfig, WindowEntryType } from '@/types/window.type';
+import type { WindowEntryType } from '@/types/window.type';
 
 export function WindowAction<WindowEntry extends WindowEntryType>({
 	uid,
@@ -33,9 +32,7 @@ export function WindowAction<WindowEntry extends WindowEntryType>({
 
 	const { getWindow, close } = useModalStore();
 
-	const windowConfig = getWindow(uid) as
-		| WindowConfig<FormValuesType, WindowEntry>
-		| undefined;
+	const windowConfig = getWindow(uid);
 	const windowDefinition = windowConfig?.definition;
 
 	// Guards

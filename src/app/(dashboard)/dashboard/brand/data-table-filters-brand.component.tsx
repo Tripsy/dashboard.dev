@@ -16,11 +16,7 @@ import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
-import {
-	type BrandModel,
-	type BrandType,
-	BrandTypeEnum,
-} from '@/models/brand.model';
+import { type BrandType, BrandTypeEnum } from '@/models/brand.model';
 import { type Language, LanguageEnum } from '@/types/common.type';
 
 const brandTypes = toOptionsFromEnum(BrandTypeEnum, {
@@ -32,10 +28,8 @@ const languages = toOptionsFromEnum(LanguageEnum, {
 });
 
 export const DataTableFiltersBrand = (): JSX.Element => {
-	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
-		'brand',
-		BrandModel
-	>();
+	const { dataSource, dataTableStateDefault, dataTableStore } =
+		useDataTable<'brand'>();
 
 	const filters = useStore(
 		dataTableStore,

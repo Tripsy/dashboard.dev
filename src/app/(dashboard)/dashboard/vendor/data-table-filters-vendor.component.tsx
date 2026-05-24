@@ -14,21 +14,15 @@ import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
-import {
-	type VendorModel,
-	type VendorStatus,
-	VendorStatusEnum,
-} from '@/models/vendor.model';
+import { type VendorStatus, VendorStatusEnum } from '@/models/vendor.model';
 
 const statuses = toOptionsFromEnum(VendorStatusEnum, {
 	formatter: formatEnumLabel,
 });
 
 export const DataTableFiltersVendor = (): JSX.Element => {
-	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
-		'vendor',
-		VendorModel
-	>();
+	const { dataSource, dataTableStateDefault, dataTableStore } =
+		useDataTable<'vendor'>();
 
 	const filters = useStore(
 		dataTableStore,

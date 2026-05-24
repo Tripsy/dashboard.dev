@@ -1,7 +1,10 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { resolveRequestPath } from '@/config/data-source.config';
-import { ApiRequest, getResponseData } from '@/helpers/api.helper';
+import {
+	ApiRequest,
+	getResponseData,
+	resolveRequestPath,
+} from '@/helpers/api.helper';
 import { formatDate } from '@/helpers/date.helper';
 import type {
 	TemplateContentPageType,

@@ -17,7 +17,6 @@ import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import {
 	type LogCategory,
 	LogCategoryEnum,
-	type LogDataModel,
 	type LogLevel,
 	LogLevelEnum,
 } from '@/models/log-data.model';
@@ -31,10 +30,8 @@ const logCategories = toOptionsFromEnum(LogCategoryEnum, {
 });
 
 export const DataTableFiltersLogData = (): JSX.Element => {
-	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
-		'log-data',
-		LogDataModel
-	>();
+	const { dataSource, dataTableStateDefault, dataTableStore } =
+		useDataTable<'log-data'>();
 
 	const filters = useStore(
 		dataTableStore,

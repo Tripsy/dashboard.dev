@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, type ReactNode, useContext, useState } from 'react';
-import type { DataSourceKey } from '@/config/data-source.config';
+import type { DataSourceKey } from '@/types/data-source.key';
 
 export type BreadcrumbType = { label: string; href?: string };
 export type SelectedPageType = DataSourceKey | null;

@@ -303,8 +303,6 @@ export function FormManageCashFlow({ action }: { action: string }) {
 		handleChange('operational_records', updatedOperationalRecords);
 	}, [operationalRecords, formValues.operational_records, handleChange]);
 
-	console.log(errors, 'errors');
-
 	return (
 		<>
 			{action === 'refund' && (

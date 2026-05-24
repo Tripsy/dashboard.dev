@@ -3,7 +3,6 @@ import {
 	type CmrVehicleFormValuesType,
 	FormManageCmrVehicle,
 } from '@/app/(public)/_components/cmr-vehicle/form-manage-cmr-vehicle.component';
-import type { DataSourceConfigType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import {
 	getFormDataAsNumber,
@@ -20,6 +19,7 @@ import {
 	deleteCmrVehicle,
 	updateCmrVehicle,
 } from '@/services/cmr-vehicle.service';
+import type { DataSourceConfigType } from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(

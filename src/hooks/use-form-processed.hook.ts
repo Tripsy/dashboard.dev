@@ -1,29 +1,26 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo } from 'react';
 import { dispatchFilterReset } from '@/app/(dashboard)/_events/data-table-filter-reset.event';
-import type { DataSourceKey } from '@/config/data-source.config';
 import { WINDOW_CACHE_LABEL } from '@/helpers/window.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { useToast } from '@/providers/toast.provider';
 import { useModalStore } from '@/stores/window.store';
 import type { ActionEventType } from '@/types/action.type';
+import type { DataSourceKey } from '@/types/data-source.key';
 import { DataSourceSectionEnum } from '@/types/data-source.type';
 import type { FormStateType, FormValuesType } from '@/types/form.type';
-import type { WindowConfig, WindowEntryType } from '@/types/window.type';
+import type { WindowConfig } from '@/types/window.type';
 
-type UseWindowFormProcessedParams<
-	FormValues extends FormValuesType,
-	Entry extends WindowEntryType,
-> = {
+type UseWindowFormProcessedParams<FormValues extends FormValuesType, Entry> = {
 	state: FormStateType<FormValues>;
-	windowConfig: WindowConfig<FormValues, Entry>;
+	windowConfig: WindowConfig;
 	windowEvents?: Record<string, ActionEventType<Entry>>;
 	entryId?: number;
 };
 
 export function useWindowFormProcessed<
 	FormValues extends FormValuesType,
-	Entry extends WindowEntryType,
+	Entry,
 >({
 	state,
 	windowConfig,

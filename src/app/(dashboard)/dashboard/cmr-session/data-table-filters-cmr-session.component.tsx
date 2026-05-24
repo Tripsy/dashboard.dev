@@ -16,7 +16,6 @@ import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import { type CmrStatus, CmrStatusEnum } from '@/models/cmr.model';
-import type { CmrSessionModel } from '@/models/cmr-session.model';
 import type { UserModel } from '@/models/user.model';
 import {
 	type WorkSessionStatus,
@@ -32,10 +31,8 @@ const workSessionStatuses = toOptionsFromEnum(WorkSessionStatusEnum, {
 });
 
 export const DataTableFiltersCmrSession = (): JSX.Element => {
-	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
-		'cmr-session',
-		CmrSessionModel
-	>();
+	const { dataSource, dataTableStateDefault, dataTableStore } =
+		useDataTable<'cmr-session'>();
 
 	const filters = useStore(
 		dataTableStore,

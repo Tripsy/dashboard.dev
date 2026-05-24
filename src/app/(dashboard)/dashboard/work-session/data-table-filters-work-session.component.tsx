@@ -17,7 +17,6 @@ import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import type { UserModel } from '@/models/user.model';
 import {
-	type WorkSessionModel,
 	type WorkSessionStatus,
 	WorkSessionStatusEnum,
 } from '@/models/work-session.model';
@@ -27,10 +26,8 @@ const statuses = toOptionsFromEnum(WorkSessionStatusEnum, {
 });
 
 export const DataTableFiltersWorkSession = (): JSX.Element => {
-	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
-		'work-session',
-		WorkSessionModel
-	>();
+	const { dataSource, dataTableStateDefault, dataTableStore } =
+		useDataTable<'work-session'>();
 
 	const filters = useStore(
 		dataTableStore,

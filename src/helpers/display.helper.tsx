@@ -6,9 +6,9 @@ import {
 	type BadgeSize,
 	type BadgeVariant,
 } from '@/components/ui/badge';
-import type { DataSourceKey } from '@/config/data-source.config';
 import { formatAmount } from '@/helpers/string.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
+import type { DataSourceKey } from '@/types/data-source.key';
 
 export const statusList: Record<
 	string,

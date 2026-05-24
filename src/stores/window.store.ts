@@ -1,26 +1,22 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import {
-	type DataSourceKey,
-	getDataSourceConfig,
-} from '@/config/data-source.config';
+import { getDataSourceConfig } from '@/config/data-source.config';
 import ValueError from '@/exceptions/value.error';
 import { generateWindowUid } from '@/helpers/window.helper';
+import type { DataSourceKey } from '@/types/data-source.key';
 import { DataSourceSectionEnum } from '@/types/data-source.type';
-import type { FormValuesType } from '@/types/form.type';
 import type {
 	WindowConfig,
 	WindowCreateConfig,
 	WindowDefinition,
-	WindowEntryType,
 } from '@/types/window.type';
 
 type WindowStore = {
 	stack: WindowConfig[];
-	open: <FormValues extends FormValuesType, Entry extends WindowEntryType>(
-		config: WindowCreateConfig<FormValues, Entry>,
-		replacedUid?: string,
-	) => Promise<string>; // If argument `replacedUid` is provided and a window exists it will be closed
+	open: (
+		config: WindowCreateConfig,
+		replacedUid?: string, // If argument `replacedUid` is provided and a window exists it will be closed
+	) => void;
 	close: (uid?: string) => void; // Removes from stack
 	closeAll: () => void; // Clear stack
 	minimize: (uid: string) => void; // Still in stack, hidden
@@ -31,7 +27,7 @@ type WindowStore = {
 
 // Helper to prepare config on create
 const prepareConfigOnCreate = async (
-	config: WindowCreateConfig<FormValuesType, WindowEntryType>,
+	config: WindowCreateConfig,
 ): Promise<WindowConfig> => {
 	const enrichedConfig = { ...config };
 
@@ -127,41 +123,40 @@ export const useModalStore = create<WindowStore>()(
 				return {
 					stack: [],
 
-					open: async (config, replacedUid) => {
+					open: (config, replacedUid) => {
 						if (replacedUid) {
 							get().close(replacedUid);
 						}
 
-						const preparedConfig = await prepareConfigOnCreate(
-							config as WindowCreateConfig<
-								FormValuesType,
-								WindowEntryType
-							>,
-						);
-						const alreadyExists = windowExists(preparedConfig.uid);
+						prepareConfigOnCreate(config).then((preparedConfig) => {
+							const alreadyExists = windowExists(
+								preparedConfig.uid,
+							);
 
-						set((state) => {
-							const minimizedStack = minimizeAll(state.stack);
+							set((state) => {
+								const minimizedStack = minimizeAll(state.stack);
 
-							if (!alreadyExists) {
+								if (!alreadyExists) {
+									return {
+										stack: [
+											...minimizedStack,
+											preparedConfig,
+										],
+									};
+								}
+
 								return {
-									stack: [...minimizedStack, preparedConfig],
+									stack: minimizedStack.map((w) =>
+										w.uid === preparedConfig.uid
+											? {
+													...preparedConfig,
+													minimized: false,
+												}
+											: w,
+									),
 								};
-							}
-
-							return {
-								stack: minimizedStack.map((w) =>
-									w.uid === preparedConfig.uid
-										? {
-												...preparedConfig,
-												minimized: false,
-											}
-										: w,
-								),
-							};
+							});
 						});
-
-						return preparedConfig.uid;
 					},
 
 					close: (uid) =>
@@ -224,13 +219,7 @@ export const useModalStore = create<WindowStore>()(
 						return;
 					}
 
-					const serializedStack =
-						state.stack as unknown as WindowCreateConfig<
-							// biome-ignore lint/suspicious/noExplicitAny: ok
-							any,
-							// biome-ignore lint/suspicious/noExplicitAny: ok
-							any
-						>[];
+					const serializedStack = state.stack;
 
 					const results = await Promise.allSettled(
 						serializedStack.map((window) =>

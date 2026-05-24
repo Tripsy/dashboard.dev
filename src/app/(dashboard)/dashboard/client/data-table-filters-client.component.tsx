@@ -16,7 +16,6 @@ import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import {
-	type ClientModel,
 	type ClientStatus,
 	ClientStatusEnum,
 	type ClientType,
@@ -32,10 +31,8 @@ const clientTypes = toOptionsFromEnum(ClientTypeEnum, {
 });
 
 export const DataTableFiltersClient = (): JSX.Element => {
-	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
-		'client',
-		ClientModel
-	>();
+	const { dataSource, dataTableStateDefault, dataTableStore } =
+		useDataTable<'client'>();
 
 	const filters = useStore(
 		dataTableStore,

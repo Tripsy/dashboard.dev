@@ -8,10 +8,6 @@ import { SetupCmrSessions } from '@/app/(dashboard)/dashboard/cmr/setup-cmr-sess
 import { SetupCmrVehicles } from '@/app/(dashboard)/dashboard/cmr/setup-cmr-vehicles.component';
 import { StatusTransitionCmr } from '@/app/(dashboard)/dashboard/cmr/status-transition-cmr.component';
 import { ViewCmr } from '@/app/(dashboard)/dashboard/cmr/view-cmr.component';
-import type {
-	DataSourceConfigType,
-	DataTableValueOptionsType,
-} from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import {
 	combineDateAndTime,
@@ -46,6 +42,10 @@ import {
 	STATUS_TRANSITIONS,
 } from '@/models/cmr.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
+import type {
+	DataSourceConfigType,
+	DataTableValueOptionsType,
+} from '@/types/data-source.type';
 import type { FormStateType, ValidatorOutput } from '@/types/form.type';
 
 const translations = await translateBatch(

@@ -1,8 +1,8 @@
-import { resolveRequestPath } from '@/config/data-source.config';
 import {
 	ApiRequest,
 	buildQueryString,
 	getResponseData,
+	resolveRequestPath,
 } from '@/helpers/api.helper';
 import type { UserPermissionModel } from '@/models/user-permission.model';
 import type {

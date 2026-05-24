@@ -15,7 +15,6 @@ import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import {
-	type CompanyVehicleModel,
 	type CompanyVehicleScope,
 	CompanyVehicleScopeEnum,
 	type CompanyVehicleStatus,
@@ -31,10 +30,8 @@ const scopes = toOptionsFromEnum(CompanyVehicleScopeEnum, {
 });
 
 export const DataTableFiltersCompanyVehicle = (): JSX.Element => {
-	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
-		'company-vehicle',
-		CompanyVehicleModel
-	>();
+	const { dataSource, dataTableStateDefault, dataTableStore } =
+		useDataTable<'company-vehicle'>();
 
 	const filters = useStore(
 		dataTableStore,

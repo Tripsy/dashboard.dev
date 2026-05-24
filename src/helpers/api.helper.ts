@@ -6,6 +6,7 @@ import type {
 	ApiResponseFetch,
 	QueryFiltersType,
 } from '@/types/api.type';
+import type { DataSourceKey } from '@/types/data-source.key';
 
 /**
  * Build a query string from an object
@@ -203,4 +204,28 @@ export class ApiRequest {
 			return undefined;
 		}
 	}
+}
+
+export function resolveRequestPath(key: DataSourceKey) {
+	const withSuffixList: DataSourceKey[] = [
+		'brand',
+		'client',
+		'permission',
+		'place',
+		'template',
+		'user',
+		'vehicle',
+		'vendor',
+		'company-vehicle',
+		'cmr-session',
+		'cmr-vehicle',
+		'work-session',
+		'work-session-vehicle',
+	];
+
+	if (withSuffixList.includes(key)) {
+		return `${key}s`;
+	}
+
+	return key;
 }

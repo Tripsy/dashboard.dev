@@ -6,10 +6,6 @@ import {
 } from '@/app/(dashboard)/dashboard/work-session/form-manage-work-session.component';
 import { SetupWorkSessionVehicles } from '@/app/(dashboard)/dashboard/work-session/setup-work-session-vehicles.component';
 import { ViewWorkSession } from '@/app/(dashboard)/dashboard/work-session/view-work-session.component';
-import type {
-	DataSourceConfigType,
-	DataTableValueOptionsType,
-} from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import {
 	combineDateAndTime,
@@ -40,6 +36,10 @@ import {
 	WorkSessionStatusEnum,
 } from '@/models/work-session.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
+import type {
+	DataSourceConfigType,
+	DataTableValueOptionsType,
+} from '@/types/data-source.type';
 import type { FormStateType, ValidatorOutput } from '@/types/form.type';
 
 const translations = await translateBatch(

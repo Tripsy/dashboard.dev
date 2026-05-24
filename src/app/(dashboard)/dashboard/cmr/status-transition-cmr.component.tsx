@@ -17,13 +17,8 @@ import {
 } from '@/models/cmr.model';
 import { useToast } from '@/providers/toast.provider';
 import { useModalStore } from '@/stores/window.store';
-import type { WindowEntryType } from '@/types/window.type';
 
-export function StatusTransitionCmr({
-	entries,
-}: {
-	entries: WindowEntryType[];
-}) {
+export function StatusTransitionCmr({ entries }: { entries: CmrModel[] }) {
 	const { close } = useModalStore();
 
 	const { showToast } = useToast();
@@ -42,7 +37,7 @@ export function StatusTransitionCmr({
 	const { isTranslationLoading, translations } =
 		useTranslation(translationsKeys);
 
-	const entry = entries[0] as CmrModel | undefined;
+	const entry = entries[0];
 
 	const statusTransitions = useMemo(
 		() =>

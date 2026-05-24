@@ -6,7 +6,6 @@ import {
 } from '@/app/(dashboard)/dashboard/user/form-manage-user.component';
 import { SetupPermissionsUser } from '@/app/(dashboard)/dashboard/user/setup-user-permissions.component';
 import { ViewUser } from '@/app/(dashboard)/dashboard/user/view-user.component';
-import type { DataSourceConfigType } from '@/config/data-source.config';
 import { Configuration } from '@/config/settings.config';
 import { translateBatch } from '@/config/translate.setup';
 import { getFormDataAsEnum, getFormDataAsString } from '@/helpers/form.helper';
@@ -30,6 +29,7 @@ import {
 } from '@/models/user.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
 import { LanguageEnum } from '@/types/common.type';
+import type { DataSourceConfigType } from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(

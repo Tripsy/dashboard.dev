@@ -23,7 +23,6 @@ import {
 	CashFlowDirectionEnum,
 	type CashFlowMethod,
 	CashFlowMethodEnum,
-	type CashFlowModel,
 	type CashFlowStatus,
 	CashFlowStatusEnum,
 	GroupedCategories,
@@ -54,10 +53,8 @@ const methods = toOptionsFromEnum(CashFlowMethodEnum, {
 });
 
 export const DataTableFiltersCashFlow = (): JSX.Element => {
-	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
-		'cash-flow',
-		CashFlowModel
-	>();
+	const { dataSource, dataTableStateDefault, dataTableStore } =
+		useDataTable<'cash-flow'>();
 
 	const filters = useStore(
 		dataTableStore,

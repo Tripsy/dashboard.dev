@@ -21,7 +21,6 @@ import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import {
 	LogHistoryActions,
 	LogHistoryEntities,
-	type LogHistoryModel,
 	type LogHistorySource,
 	LogHistorySourceEnum,
 } from '@/models/log-history.model';
@@ -41,10 +40,8 @@ const sources = toOptionsFromEnum(LogHistorySourceEnum, {
 });
 
 export const DataTableFiltersLogHistory = (): JSX.Element => {
-	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
-		'log-history',
-		LogHistoryModel
-	>();
+	const { dataSource, dataTableStateDefault, dataTableStore } =
+		useDataTable<'log-history'>();
 
 	const filters = useStore(
 		dataTableStore,

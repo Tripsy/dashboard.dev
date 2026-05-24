@@ -15,11 +15,7 @@ import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
-import {
-	type TemplateModel,
-	type TemplateType,
-	TemplateTypeEnum,
-} from '@/models/template.model';
+import { type TemplateType, TemplateTypeEnum } from '@/models/template.model';
 import { LanguageEnum } from '@/types/common.type';
 
 const languages = toOptionsFromEnum(LanguageEnum, {
@@ -31,10 +27,8 @@ const types = toOptionsFromEnum(TemplateTypeEnum, {
 });
 
 export const DataTableFiltersTemplate = (): React.JSX.Element => {
-	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
-		'template',
-		TemplateModel
-	>();
+	const { dataSource, dataTableStateDefault, dataTableStore } =
+		useDataTable<'template'>();
 
 	const filters = useStore(
 		dataTableStore,

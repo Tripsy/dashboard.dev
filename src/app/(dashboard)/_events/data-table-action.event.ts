@@ -1,4 +1,4 @@
-import type { DataSourceKey } from '@/config/data-source.config';
+import type { DataSourceKey } from '@/types/data-source.key';
 
 const DATA_TABLE_ACTION_EVENT = 'useDataTableAction' as const;
 

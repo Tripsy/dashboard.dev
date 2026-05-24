@@ -5,7 +5,6 @@ import {
 	type PlaceFormValuesType,
 } from '@/app/(dashboard)/dashboard/place/form-manage-place.component';
 import { ViewPlace } from '@/app/(dashboard)/dashboard/place/view-place.component';
-import type { DataSourceConfigType } from '@/config/data-source.config';
 import { Configuration } from '@/config/settings.config';
 import { translateBatch } from '@/config/translate.setup';
 import {
@@ -32,6 +31,7 @@ import {
 } from '@/models/place.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
 import type { Language } from '@/types/common.type';
+import type { DataSourceConfigType } from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(

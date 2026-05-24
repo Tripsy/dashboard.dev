@@ -8,7 +8,8 @@ import {
 	resolveWindowEntries,
 } from '@/helpers/window.helper';
 import { useModalStore } from '@/stores/window.store';
-import type { WindowConfig } from '@/types/window.type';
+import type { EntriesSelectionType } from '@/types/action.type';
+import type { WindowConfig, WindowType } from '@/types/window.type';
 
 export function WindowMinimizedInstance({
 	current,
@@ -25,7 +26,7 @@ export function WindowMinimizedInstance({
 	const windowProps = current.props;
 	const definition = current.definition;
 
-	const type = definition.windowType || 'other';
+	const type = definition.windowType as WindowType<EntriesSelectionType>;
 
 	const { entry, entries } = resolveWindowEntries(current, type);
 

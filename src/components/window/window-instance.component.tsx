@@ -100,7 +100,7 @@ export function WindowInstance({
 	const modalSize = windowProps?.size || 'md';
 	const modalClassName = windowProps?.className;
 
-	const type = definition.windowType || 'other';
+	const type = definition.windowType as WindowType<EntriesSelectionType>;
 	const WindowComponent = definition?.windowComponent;
 
 	const { entry: rawEntry, entries: rawEntries } = resolveWindowEntries(

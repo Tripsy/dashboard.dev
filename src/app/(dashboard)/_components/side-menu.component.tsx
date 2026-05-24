@@ -21,13 +21,13 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from '@/components/ui/tooltip';
-import type { DataSourceKey } from '@/config/data-source.config';
 import Routes from '@/config/routes.setup';
 import { cn } from '@/helpers/css.helper';
 import { useDebouncedEffect } from '@/hooks/use-debounced-effect.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { hasPermission } from '@/models/auth.model';
 import { useAuth } from '@/providers/auth.provider';
+import type { DataSourceKey } from '@/types/data-source.key';
 
 type SideMenuSectionProps = {
 	isExpanded?: boolean;

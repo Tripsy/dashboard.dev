@@ -5,7 +5,6 @@ import {
 	FormManageCmrVehicle,
 } from '@/app/(dashboard)/dashboard/cmr-vehicle/form-manage-cmr-vehicle.component';
 import { ViewCmrVehicle } from '@/app/(dashboard)/dashboard/cmr-vehicle/view-cmr-vehicle.component';
-import type { DataSourceConfigType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import {
 	getFormDataAsNumber,
@@ -24,6 +23,7 @@ import {
 	updateCmrVehicle,
 } from '@/services/cmr-vehicle.service';
 import type { FindFunctionParamsType } from '@/types/action.type';
+import type { DataSourceConfigType } from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(

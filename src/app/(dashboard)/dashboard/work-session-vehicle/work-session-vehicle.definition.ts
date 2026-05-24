@@ -5,7 +5,6 @@ import {
 	type WorkSessionVehicleFormValuesType,
 } from '@/app/(dashboard)/dashboard/work-session-vehicle/form-manage-work-session-vehicle.component';
 import { ViewWorkSessionVehicle } from '@/app/(dashboard)/dashboard/work-session-vehicle/view-work-session-vehicle.component';
-import type { DataSourceConfigType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import {
 	getFormDataAsEnum,
@@ -34,6 +33,7 @@ import {
 	updateWorkSessionVehicle,
 } from '@/services/work-session-vehicle.service';
 import type { FindFunctionParamsType } from '@/types/action.type';
+import type { DataSourceConfigType } from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(

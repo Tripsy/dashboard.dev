@@ -10,20 +10,22 @@ import {
 	useState,
 } from 'react';
 import { LoadingComponent } from '@/components/status.component';
-import {
-	type DataSourceConfigType,
-	type DataSourceKey,
-	type DataTableSelectionModeType,
-	type DataTableStateType,
-	getDataSourceConfig,
-} from '@/config/data-source.config';
+import { getDataSourceConfig } from '@/config/data-source.config';
 import { assertDefined } from '@/helpers/types.helper';
 import {
 	createDataTableStore,
 	type DataTableStoreType,
 } from '@/stores/data-table.store';
-import { DataSourceSectionEnum } from '@/types/data-source.type';
-import type { WindowEntryType } from '@/types/window.type';
+import type {
+	DataSourceKey,
+	DataSourceModelMap,
+} from '@/types/data-source.key';
+import {
+	type DataSourceConfigType,
+	DataSourceSectionEnum,
+	type DataTableSelectionModeType,
+	type DataTableStateType,
+} from '@/types/data-source.type';
 
 type DataTableContextType<K extends DataSourceKey, Model> = {
 	dataSource: K;
@@ -37,10 +39,7 @@ const DataTableContext = createContext<
 	DataTableContextType<any, any> | undefined
 >(undefined);
 
-function DataTableProvider<
-	K extends DataSourceKey,
-	Entry extends WindowEntryType,
->({
+function DataTableProvider<K extends DataSourceKey>({
 	dataSource,
 	selectionMode,
 	children,
@@ -49,6 +48,8 @@ function DataTableProvider<
 	selectionMode: DataTableSelectionModeType;
 	children: ReactNode;
 }) {
+	type Entry = DataSourceModelMap[K];
+
 	const [dataTable, setDataTable] = useState<
 		DataSourceConfigType<Entry>['dataTable'] | null
 	>(null);
@@ -130,14 +131,16 @@ function DataTableProvider<
 	);
 }
 
-function useDataTable<K extends DataSourceKey, Model>() {
+function useDataTable<K extends DataSourceKey>() {
 	const context = useContext(DataTableContext);
 
 	if (!context) {
 		throw new Error('useDataTable must be used within a DataTableProvider');
 	}
 
-	return context as DataTableContextType<K, Model>;
+	type Entry = DataSourceModelMap[K];
+
+	return context as DataTableContextType<K, Entry>;
 }
 
 export { DataTableProvider, useDataTable };

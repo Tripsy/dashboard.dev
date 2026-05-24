@@ -16,7 +16,6 @@ import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import {
-	type UserModel,
 	type UserRole,
 	UserRoleEnum,
 	type UserStatus,
@@ -32,10 +31,8 @@ const roles = toOptionsFromEnum(UserRoleEnum, {
 });
 
 export const DataTableFiltersUser = (): JSX.Element => {
-	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
-		'user',
-		UserModel
-	>();
+	const { dataSource, dataTableStateDefault, dataTableStore } =
+		useDataTable<'user'>();
 
 	const filters = useStore(
 		dataTableStore,

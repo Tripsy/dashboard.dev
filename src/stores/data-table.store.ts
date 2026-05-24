@@ -2,12 +2,12 @@ import type { Draft } from 'immer';
 import { create, type StateCreator } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
+import type { DataSourceKey } from '@/types/data-source.key';
 import type {
-	DataSourceKey,
+	DataSourceSection,
 	DataTableFiltersType,
 	DataTableStateType,
-} from '@/config/data-source.config';
-import type { DataSourceSection } from '@/types/data-source.type';
+} from '@/types/data-source.type';
 
 // ============================================================================
 // TABLE SLICE

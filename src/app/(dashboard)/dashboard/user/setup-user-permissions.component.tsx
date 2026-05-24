@@ -18,14 +18,9 @@ import {
 	deleteUserPermission,
 	getUserPermissions,
 } from '@/services/user.service';
-import type { WindowEntryType } from '@/types/window.type';
 
-export function SetupPermissionsUser({
-	entries,
-}: {
-	entries: WindowEntryType[];
-}) {
-	const entry = entries[0] as UserModel;
+export function SetupPermissionsUser({ entries }: { entries: UserModel[] }) {
+	const entry = entries[0];
 
 	const translationsKeys = useMemo(
 		() =>

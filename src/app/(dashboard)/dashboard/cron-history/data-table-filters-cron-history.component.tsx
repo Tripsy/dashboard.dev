@@ -15,7 +15,6 @@ import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import {
-	type CronHistoryModel,
 	type CronHistoryStatus,
 	CronHistoryStatusEnum,
 } from '@/models/cron-history.model';
@@ -25,10 +24,8 @@ const statuses = toOptionsFromEnum(CronHistoryStatusEnum, {
 });
 
 export const DataTableFiltersCronHistory = (): JSX.Element => {
-	const { dataSource, dataTableStateDefault, dataTableStore } = useDataTable<
-		'cron-history',
-		CronHistoryModel
-	>();
+	const { dataSource, dataTableStateDefault, dataTableStore } =
+		useDataTable<'cron-history'>();
 
 	const filters = useStore(
 		dataTableStore,

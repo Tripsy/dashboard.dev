@@ -5,7 +5,6 @@ import {
 	type VendorFormValuesType,
 } from '@/app/(dashboard)/dashboard/vendor/form-manage-vendor.component';
 import { ViewVendor } from '@/app/(dashboard)/dashboard/vendor/view-vendor.component';
-import type { DataSourceConfigType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import { getFormDataAsString } from '@/helpers/form.helper';
 import { arrayHasValue } from '@/helpers/objects.helper';
@@ -25,6 +24,7 @@ import {
 	VendorStatusEnum,
 } from '@/models/vendor.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
+import type { DataSourceConfigType } from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(

@@ -5,7 +5,6 @@ import {
 	FormManageClient,
 } from '@/app/(dashboard)/dashboard/client/form-manage-client.component';
 import { ViewClient } from '@/app/(dashboard)/dashboard/client/view-client.component';
-import type { DataSourceConfigType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import { getFormDataAsEnum, getFormDataAsString } from '@/helpers/form.helper';
 import { arrayHasValue } from '@/helpers/objects.helper';
@@ -27,6 +26,7 @@ import {
 	displayClientLabel,
 } from '@/models/client.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
+import type { DataSourceConfigType } from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(

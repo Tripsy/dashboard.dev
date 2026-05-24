@@ -5,7 +5,6 @@ import {
 	FormManageAddress,
 } from '@/app/(dashboard)/dashboard/address/form-manage-address.component';
 import { ViewAddress } from '@/app/(dashboard)/dashboard/address/view-address.component';
-import type { DataSourceConfigType } from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import {
 	getFormDataAsNumber,
@@ -22,6 +21,7 @@ import { BaseValidator } from '@/helpers/validator.helper';
 import { type AddressModel, displayAddressLabel } from '@/models/address.model';
 import { getPlaceContentProp } from '@/models/place.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
+import type { DataSourceConfigType } from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(

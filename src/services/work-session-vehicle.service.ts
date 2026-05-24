@@ -1,5 +1,4 @@
-import { resolveRequestPath } from '@/config/data-source.config';
-import { ApiRequest } from '@/helpers/api.helper';
+import { ApiRequest, resolveRequestPath } from '@/helpers/api.helper';
 import type { WorkSessionVehicleModel } from '@/models/work-session-vehicle.model';
 import type { ApiResponseFetch } from '@/types/api.type';
 

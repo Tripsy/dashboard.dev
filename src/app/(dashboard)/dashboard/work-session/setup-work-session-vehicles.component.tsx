@@ -19,12 +19,11 @@ import {
 } from '@/models/work-session-vehicle.model';
 import { useModalStore } from '@/stores/window.store';
 import { DataSourceSectionEnum } from '@/types/data-source.type';
-import type { WindowEntryType } from '@/types/window.type';
 
 export function SetupWorkSessionVehicles({
 	entries,
 }: {
-	entries: WindowEntryType[];
+	entries: WorkSessionModel[];
 }) {
 	const { open, focus, getCurrentWindow } = useModalStore();
 
@@ -32,7 +31,7 @@ export function SetupWorkSessionVehicles({
 
 	const queryClient = useQueryClient();
 
-	const workSessionModel = entries[0] as WorkSessionModel | undefined;
+	const workSessionModel = entries[0];
 	const workSessionId = workSessionModel?.id;
 
 	const {
@@ -43,6 +42,7 @@ export function SetupWorkSessionVehicles({
 		queryKey: ['work-session-vehicle', workSessionModel?.id],
 		queryFn: () =>
 			requestFind<WorkSessionVehicleModel>('work-session-vehicle', {
+				// TODO why not requestView
 				filter: {
 					work_session_id: workSessionId as number,
 				},

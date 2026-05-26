@@ -116,7 +116,7 @@ export const dataSourceConfigPermission: DataSourceConfigType<PermissionModel> =
 				windowConfigProps: {
 					size: 'xl',
 				},
-				permission: 'permission.create',
+				permission: ['permission', 'create'],
 				entriesSelection: 'free',
 				operationFunction: (params: PermissionFormValuesType) =>
 					requestCreate<PermissionModel, PermissionFormValuesType>(
@@ -138,7 +138,7 @@ export const dataSourceConfigPermission: DataSourceConfigType<PermissionModel> =
 				windowConfigProps: {
 					size: 'xl',
 				},
-				permission: 'permission.update',
+				permission: ['permission', 'update'],
 				entriesSelection: 'single',
 				operationFunction: (
 					params: PermissionFormValuesType,
@@ -161,7 +161,7 @@ export const dataSourceConfigPermission: DataSourceConfigType<PermissionModel> =
 			delete: {
 				windowType: 'action',
 				windowTitle: translations['delete.title'],
-				permission: 'permission.delete',
+				permission: ['permission', 'delete'],
 				entriesSelection: 'single',
 				customEntryCheck: (entry: PermissionModel) => !entry.deleted_at, // Return true if the entry is not deleted
 				operationFunction: (entry: PermissionModel) =>
@@ -175,7 +175,7 @@ export const dataSourceConfigPermission: DataSourceConfigType<PermissionModel> =
 			restore: {
 				windowType: 'action',
 				windowTitle: translations['restore.title'],
-				permission: 'permission.delete',
+				permission: ['permission', 'delete'],
 				entriesSelection: 'single',
 				customEntryCheck: (entry: PermissionModel) =>
 					!!entry.deleted_at, // Return true if the entry is deleted

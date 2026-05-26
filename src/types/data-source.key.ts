@@ -19,7 +19,7 @@ import type { VendorModel } from '@/models/vendor.model';
 import type { WorkSessionModel } from '@/models/work-session.model';
 import type { WorkSessionVehicleModel } from '@/models/work-session-vehicle.model';
 
-export type DataSourceModelMap = {
+export type DatasourceModels = {
 	address: AddressModel;
 	brand: BrandModel;
 	'cash-flow': CashFlowModel;
@@ -42,4 +42,4 @@ export type DataSourceModelMap = {
 	'work-session-vehicle': WorkSessionVehicleModel;
 };
 
-export type DataSourceKey = keyof DataSourceModelMap;
+export type DataSourceKey = keyof DatasourceModels;

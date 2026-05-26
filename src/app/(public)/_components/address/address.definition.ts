@@ -102,7 +102,7 @@ export const dataSourceConfigAddress: DataSourceConfigType<AddressModel> = {
 			windowType: 'form',
 			windowTitle: translations['create.title'],
 			windowComponent: FormManageAddress,
-			permission: 'address.create',
+			permission: ['address', 'create'],
 			entriesSelection: 'free',
 			operationFunction: (params: AddressFormValuesType) =>
 				requestCreate<AddressModel, AddressFormValuesType>(

@@ -29,6 +29,7 @@ import password_recover_change from '@/locales/en/password-recover-change.json';
 import permission from '@/locales/en/permission.json';
 import place from '@/locales/en/place.json';
 import register from '@/locales/en/register.json';
+import status from '@/locales/en/status.json';
 import template from '@/locales/en/template.json';
 import user from '@/locales/en/user.json';
 import vehicle from '@/locales/en/vehicle.json';
@@ -66,6 +67,7 @@ const en = {
 	register,
 	template,
 	user,
+	status,
 
 	vehicle,
 	vendor,

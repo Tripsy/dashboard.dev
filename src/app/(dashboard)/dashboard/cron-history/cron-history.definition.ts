@@ -92,7 +92,7 @@ export const dataSourceConfigCronHistory: DataSourceConfigType<CronHistoryModel>
 			delete: {
 				windowType: 'action',
 				windowTitle: translations['delete.title'],
-				permission: 'cron-history.delete',
+				permission: ['cron-history', 'delete'],
 				entriesSelection: 'multiple',
 				operationFunction: (ids: number[]) =>
 					requestDeleteMultiple('cron-history', ids),
@@ -109,7 +109,7 @@ export const dataSourceConfigCronHistory: DataSourceConfigType<CronHistoryModel>
 				windowConfigProps: {
 					size: 'x2l',
 				},
-				permission: 'cron-history.read',
+				permission: ['cron-history', 'read'],
 				entriesSelection: 'single',
 				buttonPosition: 'hidden',
 			},

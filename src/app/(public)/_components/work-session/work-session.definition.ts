@@ -104,7 +104,7 @@ export const dataSourceConfigWorkSession: DataSourceConfigType<WorkSessionModel>
 				windowType: 'form',
 				windowTitle: translations['create.title'],
 				windowComponent: FormManageWorkSession,
-				permission: 'work-session.create',
+				permission: ['work-session', 'create'],
 				entriesSelection: 'free',
 				operationFunction: () => {
 					// It is overridden in the component
@@ -121,7 +121,7 @@ export const dataSourceConfigWorkSession: DataSourceConfigType<WorkSessionModel>
 			close: {
 				windowType: 'action',
 				windowTitle: translations['close.title'],
-				permission: 'work-session.update',
+				permission: ['work-session', 'update'],
 				entriesSelection: 'single',
 				operationFunction: (entry: WorkSessionModel) =>
 					requestUpdateStatus('work-session', entry, 'closed'),

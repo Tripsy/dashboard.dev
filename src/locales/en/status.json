@@ -1,0 +1,17 @@
+{
+	"error": {
+		"meta": {
+			"title": "Error | {{app_name}}"
+		}
+	},
+	"success": {
+		"meta": {
+			"title": "Success | {{app_name}}"
+		}
+	},
+	"info": {
+		"meta": {
+			"title": "Info | {{app_name}}"
+		}
+	}
+}

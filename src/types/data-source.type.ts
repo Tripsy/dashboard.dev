@@ -2,6 +2,10 @@ import type React from 'react';
 import type { JSX } from 'react';
 import type { ModalSizeType } from '@/components/ui/modal';
 import type {
+	PermissionEntityType,
+	PermissionOperationType,
+} from '@/models/permission.model';
+import type {
 	ActionEventType,
 	ActionOperationMultipleFunctionType,
 	ActionOperationSingleFunctionType,
@@ -87,6 +91,11 @@ export type DataTableValueOptionsType<Entry> = {
 // Action Types
 // ============================================================================
 
+export type ActionConfigPermission = [
+	PermissionEntityType,
+	PermissionOperationType,
+];
+
 type ActionConfigBase<Entry, FormValues extends FormValuesType> = {
 	windowTitle: string;
 	// biome-ignore lint/suspicious/noExplicitAny: It's fine
@@ -97,7 +106,7 @@ type ActionConfigBase<Entry, FormValues extends FormValuesType> = {
 		className?: string;
 	};
 
-	permission: string; // Related to auth policy (e.g.: 'user.create')
+	permission: ActionConfigPermission;
 	customEntryCheck?: (entry: Entry) => boolean; // Additional function to check if the action is available (hint: active user cannot have `active` action)
 	buttonPosition: 'left' | 'right' | 'hidden'; // Describe where the action button should be placed in data-table
 	button?: ActionButtonPropsType; // Action button configuration

@@ -1,88 +1,36 @@
-'use client';
+import type { Metadata } from 'next';
+import StatusComponent from '@/app/(public)/status/status.component';
+import { Configuration } from '@/config/settings.config';
+import { translate } from '@/config/translate.setup';
 
-import Link from 'next/link';
-import { useParams, useSearchParams } from 'next/navigation';
-import { useMemo } from 'react';
-import {
-	ErrorComponent,
-	InfoComponent,
-	LoadingComponent,
-	SuccessComponent,
-} from '@/components/status.component';
-import Routes from '@/config/routes.setup';
-import { useTranslation } from '@/hooks/use-translation.hook';
+export type ParamsType = 'error' | 'info' | 'success';
 
-type ParamsType = 'error' | 'info' | 'success';
+const VALID_TYPES = new Set<ParamsType>(['error', 'info', 'success']);
+
+interface PageProps {
+	params: Promise<{ type: string }>;
+}
+
+export async function generateMetadata({
+	params,
+}: PageProps): Promise<Metadata> {
+	const { type } = await params;
+
+	const validType: ParamsType = VALID_TYPES.has(type as ParamsType)
+		? (type as ParamsType)
+		: 'info';
+
+	const appName = Configuration.get('app.name') as string;
+	const title = await translate(`status.${validType}.meta.title`, {
+		app_name: appName,
+	});
+
+	return {
+		title,
+		...(validType === 'error' && { robots: { index: false } }),
+	};
+}
 
 export default function Page() {
-	const params = useParams<{ type: ParamsType }>();
-	const searchParams = useSearchParams();
-
-	const type = params.type;
-	const r = searchParams.get('r') || 'generic';
-
-	const messageKey = `app.${type}.${r}`;
-
-	const translationsKeys = useMemo(() => [messageKey] as const, [messageKey]);
-
-	const { translations, isTranslationLoading } =
-		useTranslation(translationsKeys);
-
-	if (isTranslationLoading) {
-		return <LoadingComponent />;
-	}
-
-	switch (type) {
-		case 'error':
-			return (
-				<ErrorComponent
-					title="Error"
-					description={translations[messageKey]}
-				>
-					<div className="text-center mt-6">
-						Go back to{' '}
-						<Link
-							href={Routes.get('home')}
-							className="text-primary font-medium hover:underline"
-						>
-							home page
-						</Link>
-					</div>
-				</ErrorComponent>
-			);
-		case 'success':
-			return (
-				<SuccessComponent
-					title="Success"
-					description={translations[messageKey]}
-				>
-					<div className="text-center mt-6">
-						Go back to{' '}
-						<Link
-							href={Routes.get('home')}
-							className="text-primary font-medium hover:underline"
-						>
-							home page
-						</Link>
-					</div>
-				</SuccessComponent>
-			);
-		case 'info':
-			return (
-				<InfoComponent
-					title="Info"
-					description={translations[messageKey]}
-				>
-					<div className="text-center mt-6">
-						Go back to{' '}
-						<Link
-							href={Routes.get('home')}
-							className="text-primary font-medium hover:underline"
-						>
-							home page
-						</Link>
-					</div>
-				</InfoComponent>
-			);
-	}
+	return <StatusComponent />;
 }

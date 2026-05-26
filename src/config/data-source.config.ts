@@ -1,8 +1,5 @@
 import { toCamelCase } from '@/helpers/string.helper';
-import type {
-	DataSourceKey,
-	DataSourceModelMap,
-} from '@/types/data-source.key';
+import type { DataSourceKey, DatasourceModels } from '@/types/data-source.key';
 import {
 	type DataSourceConfigType,
 	type DataSourceSection,
@@ -20,12 +17,12 @@ const registry: Record<
 
 export async function getDataSourceConfig<
 	K extends DataSourceKey,
-	P extends keyof DataSourceConfigType<DataSourceModelMap[K]>,
+	P extends keyof DataSourceConfigType<DatasourceModels[K]>,
 >(
 	section: DataSourceSection,
 	key: K,
 	prop: P,
-): Promise<DataSourceConfigType<DataSourceModelMap[K]>[P]> {
+): Promise<DataSourceConfigType<DatasourceModels[K]>[P]> {
 	if (!registry[section]?.[key]) {
 		const defKey = toCamelCase(key, {
 			capitalizeFirst: true,

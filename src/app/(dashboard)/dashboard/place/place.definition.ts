@@ -246,7 +246,7 @@ export const dataSourceConfigPlace: DataSourceConfigType<PlaceModel> = {
 			windowType: 'form',
 			windowTitle: translations['create.title'],
 			windowComponent: FormManagePlace,
-			permission: 'place.create',
+			permission: ['place', 'create'],
 			entriesSelection: 'free',
 			operationFunction: (params: PlaceFormValuesType) =>
 				requestCreate<PlaceModel, PlaceFormValuesType>('place', params),
@@ -262,7 +262,7 @@ export const dataSourceConfigPlace: DataSourceConfigType<PlaceModel> = {
 			windowType: 'form',
 			windowTitle: translations['update.title'],
 			windowComponent: FormManagePlace,
-			permission: 'place.update',
+			permission: ['place', 'update'],
 			entriesSelection: 'single',
 			operationFunction: (params: PlaceFormValuesType, id: number) =>
 				requestUpdate<PlaceModel, PlaceFormValuesType>(
@@ -283,7 +283,7 @@ export const dataSourceConfigPlace: DataSourceConfigType<PlaceModel> = {
 		delete: {
 			windowType: 'action',
 			windowTitle: translations['delete.title'],
-			permission: 'place.delete',
+			permission: ['place', 'delete'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: PlaceModel) => !entry.deleted_at, // Return true if the entry is not deleted
 			operationFunction: (entry: PlaceModel) =>
@@ -297,7 +297,7 @@ export const dataSourceConfigPlace: DataSourceConfigType<PlaceModel> = {
 		restore: {
 			windowType: 'action',
 			windowTitle: translations['restore.title'],
-			permission: 'place.delete',
+			permission: ['place', 'delete'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: PlaceModel) => !!entry.deleted_at, // Return true if the entry is deleted
 			operationFunction: (entry: PlaceModel) =>
@@ -315,7 +315,7 @@ export const dataSourceConfigPlace: DataSourceConfigType<PlaceModel> = {
 			windowConfigProps: {
 				size: 'xl',
 			},
-			permission: 'place.read',
+			permission: ['place', 'read'],
 			entriesSelection: 'single',
 			buttonPosition: 'hidden',
 			reloadEntry: (id: number) => requestView<PlaceModel>('place', id),

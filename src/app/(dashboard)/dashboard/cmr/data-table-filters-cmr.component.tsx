@@ -22,6 +22,7 @@ import {
 	type CmrTransportType,
 	CmrTransportTypeEnum,
 } from '@/models/cmr.model';
+import { displayUserLabel, type UserModel } from '@/models/user.model';
 
 const statuses = toOptionsFromEnum(CmrStatusEnum, {
 	formatter: formatEnumLabel,
@@ -87,7 +88,16 @@ export const DataTableFiltersCmr = (): JSX.Element => {
 		setSearchClient('');
 	}, []);
 
-	const resetCallbacks = useMemo(() => [onResetClient], [onResetClient]);
+	const [searchUser, setSearchUser] = useState(filters.user?.value ?? '');
+
+	const onResetUser = useCallback(() => {
+		setSearchUser('');
+	}, []);
+
+	const resetCallbacks = useMemo(
+		() => [onResetClient, onResetUser],
+		[onResetClient, onResetUser],
+	);
 
 	useDataTableFilterReset({
 		dataSource,
@@ -111,6 +121,22 @@ export const DataTableFiltersCmr = (): JSX.Element => {
 				setSearch={setSearchClient}
 				dataSourceKey="client"
 				getOptionLabel={(m) => displayClientLabel(m)}
+				getOptionKey={(m) => m.id}
+			/>
+
+			<FormFiltersAutoComplete<CmrDataTableFiltersType, UserModel>
+				labelText="Assigned Driver"
+				fieldName="user_id"
+				fieldNameId="user_id"
+				fieldValue={searchUser}
+				className="pl-8"
+				icons={{
+					left: <Icons.User className="opacity-40 h-4.5 w-4.5" />,
+				}}
+				setFilterValues={setFilterValues}
+				setSearch={setSearchUser}
+				dataSourceKey="user"
+				getOptionLabel={(m) => displayUserLabel(m)}
 				getOptionKey={(m) => m.id}
 			/>
 

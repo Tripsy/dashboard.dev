@@ -139,11 +139,15 @@ class MiddlewareContext {
 			Configuration.get('user.sessionToken') as string,
 		);
 
-		const { auth: routeAuth, permission: routePermission } =
-			routeMatch?.props || {
-				auth: RouteAuthEnum.PUBLIC,
-				permission: undefined,
-			};
+		const {
+			auth: routeAuth,
+			permissionEntity,
+			permissionOperation,
+		} = routeMatch?.props || {
+			auth: RouteAuthEnum.PUBLIC,
+			permissionEntity: undefined,
+			permissionOperation: undefined,
+		};
 
 		if (!sessionToken.value) {
 			switch (routeAuth) {
@@ -189,7 +193,12 @@ class MiddlewareContext {
 		}
 
 		if (routeAuth === RouteAuthEnum.PROTECTED) {
-			if (!hasPermission(authModel, routePermission)) {
+
+			console.log(permissionEntity)
+			if (
+				!permissionEntity ||
+				!hasPermission(authModel, permissionEntity, permissionOperation)
+			) {
 				return this.redirectToError('unauthorized');
 			}
 		}

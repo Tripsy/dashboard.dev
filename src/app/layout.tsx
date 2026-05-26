@@ -12,7 +12,7 @@ export default async function RootLayout({
 
 	return (
 		<Providers>
-			<html lang={language}>
+			<html lang={language} data-scroll-behavior="smooth">
 				<body>{children}</body>
 			</html>
 		</Providers>

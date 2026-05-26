@@ -328,7 +328,7 @@ export const dataSourceConfigClient: DataSourceConfigType<ClientModel> = {
 			windowConfigProps: {
 				size: 'x2l',
 			},
-			permission: 'client.create',
+			permission: ['client', 'create'],
 			entriesSelection: 'free',
 			operationFunction: (params: ClientFormValuesType) =>
 				requestCreate<ClientModel, ClientFormValuesType>(
@@ -350,7 +350,7 @@ export const dataSourceConfigClient: DataSourceConfigType<ClientModel> = {
 			windowConfigProps: {
 				size: 'x2l',
 			},
-			permission: 'client.update',
+			permission: ['client', 'update'],
 			entriesSelection: 'single',
 			operationFunction: (params: ClientFormValuesType, id: number) =>
 				requestUpdate<ClientModel, ClientFormValuesType>(
@@ -370,7 +370,7 @@ export const dataSourceConfigClient: DataSourceConfigType<ClientModel> = {
 		delete: {
 			windowType: 'action',
 			windowTitle: translations['delete.title'],
-			permission: 'client.delete',
+			permission: ['client', 'delete'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: ClientModel) => !entry.deleted_at, // Return true if the entry is not deleted
 			operationFunction: (entry: ClientModel) =>
@@ -384,7 +384,7 @@ export const dataSourceConfigClient: DataSourceConfigType<ClientModel> = {
 		restore: {
 			windowType: 'action',
 			windowTitle: translations['restore.title'],
-			permission: 'client.delete',
+			permission: ['client', 'delete'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: ClientModel) => !!entry.deleted_at, // Return true if the entry is deleted
 			operationFunction: (entry: ClientModel) =>
@@ -398,7 +398,7 @@ export const dataSourceConfigClient: DataSourceConfigType<ClientModel> = {
 		enable: {
 			windowType: 'action',
 			windowTitle: translations['enable.title'],
-			permission: 'client.update',
+			permission: ['client', 'update'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: ClientModel) =>
 				!entry.deleted_at &&
@@ -417,7 +417,7 @@ export const dataSourceConfigClient: DataSourceConfigType<ClientModel> = {
 		disable: {
 			windowType: 'action',
 			windowTitle: translations['disable.title'],
-			permission: 'client.update',
+			permission: ['client', 'update'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: ClientModel) =>
 				!entry.deleted_at &&
@@ -440,7 +440,7 @@ export const dataSourceConfigClient: DataSourceConfigType<ClientModel> = {
 			windowConfigProps: {
 				size: 'x4l',
 			},
-			permission: 'client.read',
+			permission: ['client', 'read'],
 			entriesSelection: 'single',
 			buttonPosition: 'hidden',
 		},

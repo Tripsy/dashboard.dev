@@ -1,17 +1,25 @@
 export const PermissionEntitiesSuggestions = [
-	'cron_history',
-	'log_data',
-	'log_history',
-	'mail_queue',
+	'address',
+	'brand',
+	'cash-flow',
+	'client',
+	'cmr',
+	'cmr-session',
+	'cmr-vehicle',
+	'company-vehicle',
+	'cron-history',
+	'log-data',
+	'log-history',
+	'mail-queue',
 	'permission',
+	'place',
 	'template',
 	'user',
-	'client',
-	'address',
-	'place',
-	'brand',
-	'cash_flow',
-];
+	'vehicle',
+	'vendor',
+	'work-session',
+	'work-session-vehicle',
+] as const;
 
 export const PermissionOperationSuggestions = [
 	'create',
@@ -19,11 +27,17 @@ export const PermissionOperationSuggestions = [
 	'read',
 	'find',
 	'delete',
-];
+	'refund',
+] as const;
+
+export type PermissionEntityType =
+	(typeof PermissionEntitiesSuggestions)[number] | 'dashboard';
+export type PermissionOperationType =
+	(typeof PermissionOperationSuggestions)[number];
 
 export type PermissionModel<D = Date | string> = {
 	id: number;
-	entity: string;
-	operation: string;
+	entity: PermissionEntityType;
+	operation: PermissionOperationType;
 	deleted_at: D | undefined;
 };

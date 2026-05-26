@@ -203,13 +203,19 @@ pnpm run build    # Production build
 5. Add `cars.json` to `src/locales/[language]` & update src/locales/en/index.ts
 6. Update `Routes.group('dashboard')` in `src/config/routes.setup.ts`
 7. Update `src/app/(dashboard)/_components/side-menu.component.tsx`
-8. Update `src/models/permission.model.ts`
-    - PermissionEntitiesSuggestions
-9. Update `src/models/log-history.model.ts`
+8. Update `src/models/log-history.model.ts`
     - LogHistoryEntities
 
 # 📌 TODO
 
+1. 
+http://dashboard.test/dashboard/brand
+- status buttons seem to be active - even though operation is not allowed
+
+
+"message": "syntax error at or near \"WHERE\"",
+"request": {
+"url": "/cmr?order_by=id&direction=DESC&limit=10&page=1&filter%5Bis_deleted%5D=false"
 
 ---------- 
 1. Add section "documentation"

@@ -13,11 +13,9 @@ import { useAuth } from '@/providers/auth.provider';
 import { useToast } from '@/providers/toast.provider';
 import { useModalStore } from '@/stores/window.store';
 import type { EntriesSelectionType } from '@/types/action.type';
-import type {
-	DataSourceKey,
-	DataSourceModelMap,
-} from '@/types/data-source.key';
+import type { DataSourceKey, DatasourceModels } from '@/types/data-source.key';
 import {
+	type ActionConfigPermission,
 	type ActionConfigType,
 	DataSourceSectionEnum,
 } from '@/types/data-source.type';
@@ -25,22 +23,22 @@ import {
 type HandleActionType<K extends DataSourceKey> = (
 	action: string,
 	dataSource: DataSourceKey,
-	entries: DataSourceModelMap[K][],
-	actionConfig?: ActionConfigType<DataSourceModelMap[K]>,
+	entries: DatasourceModels[K][],
+	actionConfig?: ActionConfigType<DatasourceModels[K]>,
 ) => void;
 
 type AllowActionType<K extends DataSourceKey> = (
-	entries: DataSourceModelMap[K][],
-	permission: string,
+	entries: DatasourceModels[K][],
+	permission: ActionConfigPermission,
 	entriesSelection: EntriesSelectionType,
-	customEntryCheck?: (entry: DataSourceModelMap[K]) => boolean,
+	customEntryCheck?: (entry: DatasourceModels[K]) => boolean,
 ) => boolean;
 
 function buildActionButtons<K extends DataSourceKey>(
 	position: 'left' | 'right',
-	actions: Record<string, ActionConfigType<DataSourceModelMap[K]>>,
+	actions: Record<string, ActionConfigType<DatasourceModels[K]>>,
 	dataSource: DataSourceKey,
-	selectedEntries: DataSourceModelMap[K][],
+	selectedEntries: DatasourceModels[K][],
 	allowAction: AllowActionType<K>,
 	handleAction: HandleActionType<K>,
 ) {
@@ -76,9 +74,9 @@ function buildActionButtons<K extends DataSourceKey>(
 }
 
 function resolveActionEntries<K extends DataSourceKey>(
-	entries: DataSourceModelMap[K][],
+	entries: DatasourceModels[K][],
 	entriesSelection: EntriesSelectionType,
-): DataSourceModelMap[K][] {
+): DatasourceModels[K][] {
 	if (entriesSelection === 'free') {
 		return [];
 	}
@@ -91,7 +89,7 @@ function resolveActionEntries<K extends DataSourceKey>(
 }
 
 export function DataTableActions<K extends DataSourceKey>() {
-	type Entry = DataSourceModelMap[K];
+	type Entry = DatasourceModels[K];
 
 	const { dataSource, selectionMode, dataTableStore } = useDataTable<K>();
 	const { auth } = useAuth();
@@ -129,7 +127,7 @@ export function DataTableActions<K extends DataSourceKey>() {
 	const allowAction: AllowActionType<K> = useCallback(
 		(
 			entries: Entry[],
-			permission: string,
+			permission: ActionConfigPermission,
 			entriesSelection: EntriesSelectionType,
 			customEntryCheck?: (entry: Entry) => boolean,
 		) => {
@@ -147,7 +145,9 @@ export function DataTableActions<K extends DataSourceKey>() {
 				return false;
 			}
 
-			return hasPermission(auth, permission);
+			const [permissionEntity, permissionOperation] = permission;
+
+			return hasPermission(auth, permissionEntity, permissionOperation);
 		},
 		[auth],
 	);
@@ -166,17 +166,7 @@ export function DataTableActions<K extends DataSourceKey>() {
 	const handleAction: HandleActionType<K> = useCallback(
 		(action, targetDataSource, entries, actionConfig) => {
 			const execute = async () => {
-				const resolvedActionConfig =
-					actionConfig ??
-					(
-						(await getDataSourceConfig(
-							DataSourceSectionEnum.DASHBOARD,
-							targetDataSource,
-							'actions',
-						)) as
-							| Record<string, ActionConfigType<Entry>>
-							| undefined
-					)?.[action];
+				const resolvedActionConfig = actionConfig ?? actions?.[action];
 
 				if (!resolvedActionConfig) {
 					throw new Error(`Action "${action}" is not defined`);
@@ -211,7 +201,7 @@ export function DataTableActions<K extends DataSourceKey>() {
 
 			execute().catch(handleActionError);
 		},
-		[allowAction, open, translations, handleActionError],
+		[actions, allowAction, open, translations, handleActionError],
 	);
 
 	useEffect(() => {
@@ -222,33 +212,28 @@ export function DataTableActions<K extends DataSourceKey>() {
 		);
 	}, [handleAction]);
 
-	const leftActions = useMemo(
+	const [leftActions, rightActions] = useMemo(
 		() =>
 			actions
-				? buildActionButtons(
-						'left',
-						actions,
-						dataSource,
-						selectedEntries,
-						allowAction,
-						handleAction,
-					)
-				: null,
-		[actions, dataSource, selectedEntries, allowAction, handleAction],
-	);
-
-	const rightActions = useMemo(
-		() =>
-			actions
-				? buildActionButtons(
-						'right',
-						actions,
-						dataSource,
-						selectedEntries,
-						allowAction,
-						handleAction,
-					)
-				: null,
+				? [
+						buildActionButtons(
+							'left',
+							actions,
+							dataSource,
+							selectedEntries,
+							allowAction,
+							handleAction,
+						),
+						buildActionButtons(
+							'right',
+							actions,
+							dataSource,
+							selectedEntries,
+							allowAction,
+							handleAction,
+						),
+					]
+				: [null, null],
 		[actions, dataSource, selectedEntries, allowAction, handleAction],
 	);
 

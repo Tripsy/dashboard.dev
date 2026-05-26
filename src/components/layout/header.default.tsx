@@ -24,30 +24,34 @@ export function Header() {
 	const observerRef = useRef<IntersectionObserver | null>(null);
 
 	const navLinks = useMemo(() => {
-		if (auth?.role === UserRoleEnum.DRIVER) {
-			return [
-				{
-					href: Routes.get('driver-panel'),
-					label: 'Driver Panel',
-					hash: 'driver-panel',
-				},
-				{
-					href: Routes.get('dashboard'),
-					label: 'Dashboard',
-					hash: 'dashboard',
-				},
-			];
+		if (authStatus !== 'authenticated') {
+			return [];
 		}
 
-		return [
-			{ href: Routes.get('home'), label: 'Home', hash: 'home' },
-			{
-				href: Routes.get('dashboard'),
-				label: 'Dashboard',
-				hash: 'dashboard',
-			},
-		];
-	}, [auth]);
+		const result = [];
+
+		result.push({
+			href: Routes.get('home'),
+			label: 'Home',
+			hash: 'home',
+		});
+
+		result.push({
+			href: Routes.get('dashboard'),
+			label: 'Dashboard',
+			hash: 'dashboard',
+		});
+
+		if (auth?.role === UserRoleEnum.DRIVER) {
+			result.push({
+				href: Routes.get('driver-panel'),
+				label: 'Driver Panel',
+				hash: 'driver-panel',
+			});
+		}
+
+		return result;
+	}, [authStatus, auth]);
 
 	useEffect(() => {
 		if (pathname !== homePath) {

@@ -770,7 +770,7 @@ export const FormComponentAutoComplete = <Fields, T>({
 	icons?: { left?: JSX.Element };
 	onInputChange?: (value: string) => void;
 	autoCompleteProps: {
-		suggestions: T[];
+		suggestions: readonly T[];
 		onSelect?: (item: T) => void;
 
 		getOptionLabel: (item: T) => string;

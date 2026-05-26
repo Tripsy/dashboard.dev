@@ -128,7 +128,7 @@ export const dataSourceConfigLogHistory: DataSourceConfigType<LogHistoryModel> =
 			delete: {
 				windowType: 'action',
 				windowTitle: translations['delete.title'],
-				permission: 'log-history.delete',
+				permission: ['log-history', 'delete'],
 				entriesSelection: 'multiple',
 				operationFunction: (ids: number[]) =>
 					requestDeleteMultiple('log-history', ids),
@@ -145,7 +145,7 @@ export const dataSourceConfigLogHistory: DataSourceConfigType<LogHistoryModel> =
 				windowConfigProps: {
 					size: 'x2l',
 				},
-				permission: 'log-history.read',
+				permission: ['log-history', 'read'],
 				entriesSelection: 'single',
 				buttonPosition: 'hidden',
 			},

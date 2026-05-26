@@ -242,7 +242,7 @@ export const dataSourceConfigVehicle: DataSourceConfigType<VehicleModel> = {
 			windowType: 'form',
 			windowTitle: translations['create.title'],
 			windowComponent: FormManageVehicle,
-			permission: 'vehicle.create',
+			permission: ['vehicle', 'create'],
 			entriesSelection: 'free',
 			operationFunction: (params: VehicleFormValuesType) =>
 				requestCreate<VehicleModel, VehicleFormValuesType>(
@@ -261,7 +261,7 @@ export const dataSourceConfigVehicle: DataSourceConfigType<VehicleModel> = {
 			windowType: 'form',
 			windowTitle: translations['update.title'],
 			windowComponent: FormManageVehicle,
-			permission: 'vehicle.update',
+			permission: ['vehicle', 'update'],
 			entriesSelection: 'single',
 			operationFunction: (params: VehicleFormValuesType, id: number) =>
 				requestUpdate<VehicleModel, VehicleFormValuesType>(
@@ -281,7 +281,7 @@ export const dataSourceConfigVehicle: DataSourceConfigType<VehicleModel> = {
 		delete: {
 			windowType: 'action',
 			windowTitle: translations['delete.title'],
-			permission: 'vehicle.delete',
+			permission: ['vehicle', 'delete'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: VehicleModel) => !entry.deleted_at, // Return true if the entry is not deleted
 			operationFunction: (entry: VehicleModel) =>
@@ -295,7 +295,7 @@ export const dataSourceConfigVehicle: DataSourceConfigType<VehicleModel> = {
 		restore: {
 			windowType: 'action',
 			windowTitle: translations['restore.title'],
-			permission: 'vehicle.delete',
+			permission: ['vehicle', 'delete'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: VehicleModel) => !!entry.deleted_at, // Return true if the entry is deleted
 			operationFunction: (entry: VehicleModel) =>
@@ -309,7 +309,7 @@ export const dataSourceConfigVehicle: DataSourceConfigType<VehicleModel> = {
 		verified: {
 			windowType: 'action',
 			windowTitle: translations['verified.title'],
-			permission: 'vehicle.update',
+			permission: ['vehicle', 'update'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: VehicleModel) =>
 				!entry.deleted_at &&
@@ -325,7 +325,7 @@ export const dataSourceConfigVehicle: DataSourceConfigType<VehicleModel> = {
 		draft: {
 			windowType: 'action',
 			windowTitle: translations['draft.title'],
-			permission: 'vehicle.update',
+			permission: ['vehicle', 'update'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: VehicleModel) =>
 				!entry.deleted_at &&
@@ -345,7 +345,7 @@ export const dataSourceConfigVehicle: DataSourceConfigType<VehicleModel> = {
 			windowConfigProps: {
 				size: 'xl',
 			},
-			permission: 'vehicle.read',
+			permission: ['vehicle', 'read'],
 			entriesSelection: 'single',
 			buttonPosition: 'hidden',
 		},

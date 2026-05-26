@@ -1,8 +1,17 @@
 import { normalizeDates } from '@/helpers/model.helper';
+import type {
+	PermissionEntityType,
+	PermissionOperationType,
+} from '@/models/permission.model';
 import { type UserModel, UserRoleEnum } from '@/models/user.model';
 
+export type AuthModelPermissions = Record<
+	PermissionEntityType,
+	PermissionOperationType[]
+>;
+
 export type AuthModel = UserModel<Date> & {
-	permissions: string[];
+	permissions: AuthModelPermissions;
 };
 
 export function isAdmin(data: AuthModel | null): boolean {
@@ -23,7 +32,8 @@ export function isAuthenticated(auth: AuthModel | null): boolean {
 
 export function hasPermission(
 	auth: AuthModel | null,
-	permission?: string,
+	entity: PermissionEntityType,
+	operation?: PermissionOperationType,
 ): boolean {
 	if (!isAuthenticated(auth)) {
 		return false;
@@ -33,15 +43,17 @@ export function hasPermission(
 		return true;
 	}
 
-	if (isOperator(auth)) {
-		if (permission) {
-			return auth?.permissions.includes(permission) || false;
-		} else {
-			return true;
-		}
+	if (!isDriver(auth) && !isOperator(auth)) {
+		return false;
 	}
 
-	return false;
+	if (!operation) {
+		const entityPermissions = auth?.permissions?.[entity];
+
+		return Array.isArray(entityPermissions) && entityPermissions.length > 0;
+	}
+
+	return auth?.permissions?.[entity]?.includes(operation) || false;
 }
 
 export function prepareAuthModel(data: AuthModel): AuthModel {

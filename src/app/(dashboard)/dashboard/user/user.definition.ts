@@ -357,7 +357,7 @@ export const dataSourceConfigUser: DataSourceConfigType<UserModel> = {
 			windowType: 'form',
 			windowTitle: translations['create.title'],
 			windowComponent: FormManageUser,
-			permission: 'user.create',
+			permission: ['user', 'create'],
 			entriesSelection: 'free',
 			operationFunction: (params: UserFormValuesType) =>
 				requestCreate<UserModel, UserFormValuesType>('user', params),
@@ -378,7 +378,7 @@ export const dataSourceConfigUser: DataSourceConfigType<UserModel> = {
 			windowType: 'form',
 			windowTitle: translations['update.title'],
 			windowComponent: FormManageUser,
-			permission: 'user.update',
+			permission: ['user', 'update'],
 			entriesSelection: 'single',
 			operationFunction: (params: UserFormValuesType, id: number) =>
 				requestUpdate<UserModel, UserFormValuesType>(
@@ -398,7 +398,7 @@ export const dataSourceConfigUser: DataSourceConfigType<UserModel> = {
 		delete: {
 			windowType: 'action',
 			windowTitle: translations['delete.title'],
-			permission: 'user.delete',
+			permission: ['user', 'delete'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: UserModel) => !entry.deleted_at, // Return true if the entry is not deleted
 			operationFunction: (entry: UserModel) =>
@@ -412,7 +412,7 @@ export const dataSourceConfigUser: DataSourceConfigType<UserModel> = {
 		restore: {
 			windowType: 'action',
 			windowTitle: translations['restore.title'],
-			permission: 'user.delete',
+			permission: ['user', 'delete'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: UserModel) => !!entry.deleted_at, // Return true if the entry is deleted
 			operationFunction: (entry: UserModel) =>
@@ -426,7 +426,7 @@ export const dataSourceConfigUser: DataSourceConfigType<UserModel> = {
 		enable: {
 			windowType: 'action',
 			windowTitle: translations['enable.title'],
-			permission: 'user.update',
+			permission: ['user', 'update'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: UserModel) =>
 				!entry.deleted_at &&
@@ -445,7 +445,7 @@ export const dataSourceConfigUser: DataSourceConfigType<UserModel> = {
 		disable: {
 			windowType: 'action',
 			windowTitle: translations['disable.title'],
-			permission: 'user.update',
+			permission: ['user', 'update'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: UserModel) =>
 				!entry.deleted_at &&
@@ -468,7 +468,7 @@ export const dataSourceConfigUser: DataSourceConfigType<UserModel> = {
 			windowConfigProps: {
 				size: 'xl',
 			},
-			permission: 'user.read',
+			permission: ['user', 'read'],
 			entriesSelection: 'single',
 			buttonPosition: 'hidden',
 		},
@@ -479,7 +479,7 @@ export const dataSourceConfigUser: DataSourceConfigType<UserModel> = {
 			windowConfigProps: {
 				size: 'lg',
 			},
-			permission: 'permission.update',
+			permission: ['permission', 'update'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: UserModel) =>
 				entry.role === UserRoleEnum.OPERATOR,

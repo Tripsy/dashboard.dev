@@ -262,7 +262,7 @@ export const dataSourceConfigCompanyVehicle: DataSourceConfigType<CompanyVehicle
 				windowType: 'form',
 				windowTitle: translations['create.title'],
 				windowComponent: FormManageCompanyVehicle,
-				permission: 'company-vehicle.create',
+				permission: ['company-vehicle', 'create'],
 				entriesSelection: 'free',
 				operationFunction: (params: CompanyVehicleFormValuesType) =>
 					requestCreate<
@@ -281,7 +281,7 @@ export const dataSourceConfigCompanyVehicle: DataSourceConfigType<CompanyVehicle
 				windowType: 'form',
 				windowTitle: translations['update.title'],
 				windowComponent: FormManageCompanyVehicle,
-				permission: 'company-vehicle.update',
+				permission: ['company-vehicle', 'update'],
 				entriesSelection: 'single',
 				operationFunction: (
 					params: CompanyVehicleFormValuesType,
@@ -303,7 +303,7 @@ export const dataSourceConfigCompanyVehicle: DataSourceConfigType<CompanyVehicle
 			delete: {
 				windowType: 'action',
 				windowTitle: translations['delete.title'],
-				permission: 'company-vehicle.delete',
+				permission: ['company-vehicle', 'delete'],
 				entriesSelection: 'single',
 				customEntryCheck: (entry: CompanyVehicleModel) =>
 					!entry.deleted_at, // Return true if the entry is not deleted
@@ -318,7 +318,7 @@ export const dataSourceConfigCompanyVehicle: DataSourceConfigType<CompanyVehicle
 			restore: {
 				windowType: 'action',
 				windowTitle: translations['restore.title'],
-				permission: 'company-vehicle.delete',
+				permission: ['company-vehicle', 'delete'],
 				entriesSelection: 'single',
 				customEntryCheck: (entry: CompanyVehicleModel) =>
 					!!entry.deleted_at, // Return true if the entry is deleted
@@ -337,7 +337,7 @@ export const dataSourceConfigCompanyVehicle: DataSourceConfigType<CompanyVehicle
 				windowConfigProps: {
 					size: 'xl',
 				},
-				permission: 'company-vehicle.read',
+				permission: ['company-vehicle', 'read'],
 				entriesSelection: 'single',
 				buttonPosition: 'hidden',
 			},
@@ -348,7 +348,7 @@ export const dataSourceConfigCompanyVehicle: DataSourceConfigType<CompanyVehicle
 				windowConfigProps: {
 					size: 'lg',
 				},
-				permission: 'company-vehicle.update',
+				permission: ['company-vehicle', 'update'],
 				entriesSelection: 'single',
 				customEntryCheck: (entry: CompanyVehicleModel) =>
 					getStatusTransitions(entry.status, STATUS_TRANSITIONS)

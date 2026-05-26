@@ -301,7 +301,7 @@ export const dataSourceConfigTemplate: DataSourceConfigType<TemplateModel> = {
 			windowConfigProps: {
 				size: 'x4l',
 			},
-			permission: 'template.create',
+			permission: ['template', 'create'],
 			entriesSelection: 'free',
 			operationFunction: (params: TemplateFormValuesType) =>
 				requestCreate<TemplateModel, TemplateFormValuesType>(
@@ -323,7 +323,7 @@ export const dataSourceConfigTemplate: DataSourceConfigType<TemplateModel> = {
 			windowConfigProps: {
 				size: 'x4l',
 			},
-			permission: 'template.update',
+			permission: ['template', 'update'],
 			entriesSelection: 'single',
 			operationFunction: (params: TemplateFormValuesType, id: number) =>
 				requestUpdate<TemplateModel, TemplateFormValuesType>(
@@ -343,7 +343,7 @@ export const dataSourceConfigTemplate: DataSourceConfigType<TemplateModel> = {
 		delete: {
 			windowType: 'action',
 			windowTitle: translations['delete.title'],
-			permission: 'template.delete',
+			permission: ['template', 'delete'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: TemplateModel) => !entry.deleted_at, // Return true if the entry is not deleted
 			operationFunction: (entry: TemplateModel) =>
@@ -357,7 +357,7 @@ export const dataSourceConfigTemplate: DataSourceConfigType<TemplateModel> = {
 		restore: {
 			windowType: 'action',
 			windowTitle: translations['restore.title'],
-			permission: 'template.delete',
+			permission: ['template', 'delete'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: TemplateModel) => !!entry.deleted_at, // Return true if the entry is deleted
 			operationFunction: (entry: TemplateModel) =>
@@ -375,7 +375,7 @@ export const dataSourceConfigTemplate: DataSourceConfigType<TemplateModel> = {
 			windowConfigProps: {
 				size: 'x4l',
 			},
-			permission: 'template.read',
+			permission: ['template', 'read'],
 			entriesSelection: 'single',
 			buttonPosition: 'hidden',
 		},

@@ -442,7 +442,7 @@ export const dataSourceConfigCashFlow: DataSourceConfigType<CashFlowModel> = {
 			windowType: 'form',
 			windowTitle: translations['create.title'],
 			windowComponent: FormManageCashFlow,
-			permission: 'cash-flow.create',
+			permission: ['cash-flow', 'create'],
 			entriesSelection: 'free',
 			operationFunction: (values: CashFlowManageOutput) => {
 				const params = prepareParamsFromFormValues(values);
@@ -464,7 +464,7 @@ export const dataSourceConfigCashFlow: DataSourceConfigType<CashFlowModel> = {
 			windowType: 'form',
 			windowTitle: translations['refund.title'],
 			windowComponent: FormManageCashFlow,
-			permission: 'cash-flow.refund',
+			permission: ['cash-flow', 'refund'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: CashFlowModel) =>
 				arrayHasValue(entry.status, REFUNDABLE_STATUSES),
@@ -501,7 +501,7 @@ export const dataSourceConfigCashFlow: DataSourceConfigType<CashFlowModel> = {
 			windowType: 'form',
 			windowTitle: translations['update.title'],
 			windowComponent: FormManageCashFlow,
-			permission: 'cash-flow.update',
+			permission: ['cash-flow', 'update'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: CashFlowModel) =>
 				arrayHasValue(entry.status, MUTABLE_STATUSES),
@@ -526,7 +526,7 @@ export const dataSourceConfigCashFlow: DataSourceConfigType<CashFlowModel> = {
 		delete: {
 			windowType: 'action',
 			windowTitle: translations['delete.title'],
-			permission: 'cash-flow.delete',
+			permission: ['cash-flow', 'delete'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: CashFlowModel) => !entry.deleted_at, // Return true if the entry is not deleted
 			operationFunction: (entry: CashFlowModel) =>
@@ -540,7 +540,7 @@ export const dataSourceConfigCashFlow: DataSourceConfigType<CashFlowModel> = {
 		complete: {
 			windowType: 'action',
 			windowTitle: translations['complete.title'],
-			permission: 'cash-flow.update',
+			permission: ['cash-flow', 'update'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: CashFlowModel) => {
 				const statusTransitions = getStatusTransitions(
@@ -567,7 +567,7 @@ export const dataSourceConfigCashFlow: DataSourceConfigType<CashFlowModel> = {
 		cancel: {
 			windowType: 'action',
 			windowTitle: translations['cancel.title'],
-			permission: 'cash-flow.update',
+			permission: ['cash-flow', 'update'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: CashFlowModel) => {
 				const statusTransitions = getStatusTransitions(
@@ -598,7 +598,7 @@ export const dataSourceConfigCashFlow: DataSourceConfigType<CashFlowModel> = {
 			windowConfigProps: {
 				size: 'xl',
 			},
-			permission: 'cash-flow.read',
+			permission: ['cash-flow', 'read'],
 			entriesSelection: 'single',
 			buttonPosition: 'hidden',
 		},

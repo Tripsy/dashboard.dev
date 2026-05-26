@@ -122,7 +122,7 @@ export const dataSourceConfigMailQueue: DataSourceConfigType<MailQueueModel> = {
 		delete: {
 			windowType: 'action',
 			windowTitle: translations['delete.title'],
-			permission: 'mail-queue.delete',
+			permission: ['mail-queue', 'delete'],
 			entriesSelection: 'multiple',
 			operationFunction: (ids: number[]) =>
 				requestDeleteMultiple('mail-queue', ids),
@@ -139,7 +139,7 @@ export const dataSourceConfigMailQueue: DataSourceConfigType<MailQueueModel> = {
 			windowConfigProps: {
 				size: 'x4l',
 			},
-			permission: 'mail-queue.read',
+			permission: ['mail-queue', 'read'],
 			entriesSelection: 'single',
 			buttonPosition: 'hidden',
 		},

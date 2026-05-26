@@ -193,7 +193,7 @@ export const dataSourceConfigClient: DataSourceConfigType<ClientModel> = {
 			windowConfigProps: {
 				size: 'x2l',
 			},
-			permission: 'client.create',
+			permission: ['client', 'create'],
 			entriesSelection: 'free',
 			operationFunction: (params: ClientFormValuesType) =>
 				requestCreate<ClientModel, ClientFormValuesType>(

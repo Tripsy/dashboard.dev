@@ -232,7 +232,7 @@ export const dataSourceConfigWorkSessionVehicle: Omit<
 			windowType: 'form',
 			windowTitle: translations['create.title'],
 			windowComponent: FormManageWorkSessionVehicle,
-			permission: 'work-session-vehicle.create',
+			permission: ['work-session-vehicle', 'create'],
 			entriesSelection: 'free',
 			operationFunction: () => {
 				// It is overridden in the component
@@ -247,7 +247,7 @@ export const dataSourceConfigWorkSessionVehicle: Omit<
 			windowType: 'form',
 			windowTitle: translations['update.title'],
 			windowComponent: FormManageWorkSessionVehicle,
-			permission: 'work-session-vehicle.update',
+			permission: ['work-session-vehicle', 'update'],
 			entriesSelection: 'single',
 			operationFunction: () => {
 				// It is overridden in the component
@@ -265,7 +265,7 @@ export const dataSourceConfigWorkSessionVehicle: Omit<
 		delete: {
 			windowType: 'action',
 			windowTitle: translations['delete.title'],
-			permission: 'work-session-vehicle.delete',
+			permission: ['work-session-vehicle', 'delete'],
 			entriesSelection: 'single',
 			operationFunction: (entry: WorkSessionVehicleModel) => {
 				return deleteWorkSessionVehicle(entry);
@@ -280,7 +280,7 @@ export const dataSourceConfigWorkSessionVehicle: Omit<
 			windowType: 'form',
 			windowTitle: translations['return.title'],
 			windowComponent: FormReturnWorkSessionVehicle,
-			permission: 'work-session-vehicle.update',
+			permission: ['work-session-vehicle', 'update'],
 			entriesSelection: 'single',
 			operationFunction: () => {
 				// It is overridden in the component

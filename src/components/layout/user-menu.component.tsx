@@ -20,7 +20,6 @@ import {
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import Routes from '@/config/routes.setup';
-import { UserRoleEnum } from '@/models/user.model';
 import { useAuth } from '@/providers/auth.provider';
 
 export function UserMenu() {
@@ -39,7 +38,7 @@ export function UserMenu() {
 		);
 	}
 
-	if (!auth || authStatus === 'unauthenticated') {
+	if (authStatus === 'unauthenticated') {
 		return (
 			<>
 				{/* Desktop version */}
@@ -97,7 +96,7 @@ export function UserMenu() {
 		);
 	}
 
-	if (authStatus === 'authenticated') {
+	if (authStatus === 'authenticated' && auth) {
 		return (
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
@@ -115,7 +114,7 @@ export function UserMenu() {
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent align="end" className="w-48">
-					<DropdownMenuItem>
+					<DropdownMenuItem asChild>
 						<Link
 							href={Routes.get('account-me')}
 							className="flex items-center gap-2"
@@ -126,24 +125,18 @@ export function UserMenu() {
 						</Link>
 					</DropdownMenuItem>
 					<DropdownMenuSeparator />
-					{auth?.role &&
-						(auth.role === UserRoleEnum.ADMIN ||
-							auth.role === UserRoleEnum.OPERATOR) && (
-							<>
-								<DropdownMenuItem>
-									<Link
-										href={Routes.get('dashboard')}
-										className="flex items-center gap-2"
-										title="Go to administration"
-									>
-										<LayoutDashboard className="h-4 w-4" />
-										Dashboard
-									</Link>
-								</DropdownMenuItem>
-								<DropdownMenuSeparator />
-							</>
-						)}
-					<DropdownMenuItem className="text-error">
+					<DropdownMenuItem asChild>
+						<Link
+							href={Routes.get('dashboard')}
+							className="flex items-center gap-2"
+							title="Go to administration"
+						>
+							<LayoutDashboard className="h-4 w-4" />
+							Dashboard
+						</Link>
+					</DropdownMenuItem>
+					<DropdownMenuSeparator />
+					<DropdownMenuItem asChild className="text-error">
 						<Link
 							href={Routes.get('logout')}
 							className="flex items-center gap-2"

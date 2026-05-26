@@ -236,7 +236,7 @@ export const dataSourceConfigBrand: DataSourceConfigType<BrandModel> = {
 			windowType: 'form',
 			windowTitle: translations['create.title'],
 			windowComponent: FormManageBrand,
-			permission: 'brand.create',
+			permission: ['brand', 'create'],
 			entriesSelection: 'free',
 			operationFunction: (params: BrandFormValuesType) =>
 				requestCreate<BrandModel, BrandFormValuesType>('brand', params),
@@ -252,7 +252,7 @@ export const dataSourceConfigBrand: DataSourceConfigType<BrandModel> = {
 			windowType: 'form',
 			windowTitle: translations['update.title'],
 			windowComponent: FormManageBrand,
-			permission: 'brand.update',
+			permission: ['brand', 'update'],
 			entriesSelection: 'single',
 			operationFunction: (params: BrandFormValuesType, id: number) =>
 				requestUpdate<BrandModel, BrandFormValuesType>(
@@ -273,7 +273,7 @@ export const dataSourceConfigBrand: DataSourceConfigType<BrandModel> = {
 		delete: {
 			windowType: 'action',
 			windowTitle: translations['delete.title'],
-			permission: 'brand.delete',
+			permission: ['brand', 'delete'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: BrandModel) => !entry.deleted_at, // Return true if the entry is not deleted
 			operationFunction: (entry: BrandModel) =>
@@ -287,7 +287,7 @@ export const dataSourceConfigBrand: DataSourceConfigType<BrandModel> = {
 		restore: {
 			windowType: 'action',
 			windowTitle: translations['restore.title'],
-			permission: 'brand.delete',
+			permission: ['brand', 'delete'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: BrandModel) => !!entry.deleted_at, // Return true if the entry is deleted
 			operationFunction: (entry: BrandModel) =>
@@ -301,7 +301,7 @@ export const dataSourceConfigBrand: DataSourceConfigType<BrandModel> = {
 		enable: {
 			windowType: 'action',
 			windowTitle: translations['enable.title'],
-			permission: 'brand.update',
+			permission: ['brand', 'update'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: BrandModel) =>
 				!entry.deleted_at && entry.status === BrandStatusEnum.INACTIVE,
@@ -316,7 +316,7 @@ export const dataSourceConfigBrand: DataSourceConfigType<BrandModel> = {
 		disable: {
 			windowType: 'action',
 			windowTitle: translations['disable.title'],
-			permission: 'brand.update',
+			permission: ['brand', 'update'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: BrandModel) =>
 				!entry.deleted_at && entry.status === BrandStatusEnum.ACTIVE,
@@ -335,7 +335,7 @@ export const dataSourceConfigBrand: DataSourceConfigType<BrandModel> = {
 			windowConfigProps: {
 				size: 'xl',
 			},
-			permission: 'brand.read',
+			permission: ['brand', 'read'],
 			entriesSelection: 'single',
 			buttonPosition: 'hidden',
 			reloadEntry: (id: number) => requestView<BrandModel>('brand', id),

@@ -94,7 +94,7 @@ export const dataSourceConfigLogData: DataSourceConfigType<LogDataModel> = {
 		delete: {
 			windowType: 'action',
 			windowTitle: translations['delete.title'],
-			permission: 'log-data.delete',
+			permission: ['log-data', 'delete'],
 			entriesSelection: 'multiple',
 			operationFunction: (ids: number[]) =>
 				requestDeleteMultiple('log-data', ids),
@@ -111,7 +111,7 @@ export const dataSourceConfigLogData: DataSourceConfigType<LogDataModel> = {
 			windowConfigProps: {
 				size: 'x3l',
 			},
-			permission: 'log-data.read',
+			permission: ['log-data', 'read'],
 			entriesSelection: 'single',
 			buttonPosition: 'hidden',
 		},

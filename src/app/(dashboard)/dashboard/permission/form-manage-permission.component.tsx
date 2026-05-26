@@ -4,7 +4,9 @@ import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useLocalAutocomplete } from '@/hooks/use-local-autocomplete';
 import {
 	PermissionEntitiesSuggestions,
+	type PermissionEntityType,
 	PermissionOperationSuggestions,
+	type PermissionOperationType,
 } from '@/models/permission.model';
 import { useWindowForm } from '@/providers/window-form.provider';
 
@@ -19,19 +21,21 @@ export function FormManagePermission() {
 
 	const elementIds = useElementIds(['entity', 'operation'] as const);
 
-	const entityAutocomplete = useLocalAutocomplete({
+	const entityAutocomplete = useLocalAutocomplete<PermissionEntityType>({
 		source: PermissionEntitiesSuggestions,
 		filter: (item, query) =>
 			item.toLowerCase().startsWith(query.toLowerCase()),
 		minLength: 1,
 	});
 
-	const operationAutocomplete = useLocalAutocomplete({
-		source: PermissionOperationSuggestions,
-		filter: (item, query) =>
-			item.toLowerCase().startsWith(query.toLowerCase()),
-		minLength: 1,
-	});
+	const operationAutocomplete = useLocalAutocomplete<PermissionOperationType>(
+		{
+			source: PermissionOperationSuggestions,
+			filter: (item, query) =>
+				item.toLowerCase().startsWith(query.toLowerCase()),
+			minLength: 1,
+		},
+	);
 
 	return (
 		<>

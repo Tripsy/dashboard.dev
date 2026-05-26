@@ -156,7 +156,7 @@ export const dataSourceConfigVendor: DataSourceConfigType<VendorModel> = {
 			windowType: 'form',
 			windowTitle: translations['create.title'],
 			windowComponent: FormManageVendor,
-			permission: 'vendor.create',
+			permission: ['vendor', 'create'],
 			entriesSelection: 'free',
 			operationFunction: (params: VendorFormValuesType) =>
 				requestCreate<VendorModel, VendorFormValuesType>(
@@ -175,7 +175,7 @@ export const dataSourceConfigVendor: DataSourceConfigType<VendorModel> = {
 			windowType: 'form',
 			windowTitle: translations['update.title'],
 			windowComponent: FormManageVendor,
-			permission: 'vendor.update',
+			permission: ['vendor', 'update'],
 			entriesSelection: 'single',
 			operationFunction: (params: VendorFormValuesType, id: number) =>
 				requestUpdate<VendorModel, VendorFormValuesType>(
@@ -195,7 +195,7 @@ export const dataSourceConfigVendor: DataSourceConfigType<VendorModel> = {
 		delete: {
 			windowType: 'action',
 			windowTitle: translations['delete.title'],
-			permission: 'vendor.delete',
+			permission: ['vendor', 'delete'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: VendorModel) => !entry.deleted_at, // Return true if the entry is not deleted
 			operationFunction: (entry: VendorModel) =>
@@ -209,7 +209,7 @@ export const dataSourceConfigVendor: DataSourceConfigType<VendorModel> = {
 		restore: {
 			windowType: 'action',
 			windowTitle: translations['restore.title'],
-			permission: 'vendor.delete',
+			permission: ['vendor', 'delete'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: VendorModel) => !!entry.deleted_at, // Return true if the entry is deleted
 			operationFunction: (entry: VendorModel) =>
@@ -223,7 +223,7 @@ export const dataSourceConfigVendor: DataSourceConfigType<VendorModel> = {
 		enable: {
 			windowType: 'action',
 			windowTitle: translations['enable.title'],
-			permission: 'vendor.update',
+			permission: ['vendor', 'update'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: VendorModel) =>
 				!entry.deleted_at &&
@@ -242,7 +242,7 @@ export const dataSourceConfigVendor: DataSourceConfigType<VendorModel> = {
 		disable: {
 			windowType: 'action',
 			windowTitle: translations['disable.title'],
-			permission: 'vendor.update',
+			permission: ['vendor', 'update'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: VendorModel) =>
 				!entry.deleted_at &&
@@ -265,7 +265,7 @@ export const dataSourceConfigVendor: DataSourceConfigType<VendorModel> = {
 			windowConfigProps: {
 				size: 'xl',
 			},
-			permission: 'vendor.read',
+			permission: ['vendor', 'read'],
 			entriesSelection: 'single',
 			buttonPosition: 'hidden',
 		},

@@ -16,10 +16,7 @@ import {
 	createDataTableStore,
 	type DataTableStoreType,
 } from '@/stores/data-table.store';
-import type {
-	DataSourceKey,
-	DataSourceModelMap,
-} from '@/types/data-source.key';
+import type { DataSourceKey, DatasourceModels } from '@/types/data-source.key';
 import {
 	type DataSourceConfigType,
 	DataSourceSectionEnum,
@@ -48,7 +45,7 @@ function DataTableProvider<K extends DataSourceKey>({
 	selectionMode: DataTableSelectionModeType;
 	children: ReactNode;
 }) {
-	type Entry = DataSourceModelMap[K];
+	type Entry = DatasourceModels[K];
 
 	const [dataTable, setDataTable] = useState<
 		DataSourceConfigType<Entry>['dataTable'] | null
@@ -138,7 +135,7 @@ function useDataTable<K extends DataSourceKey>() {
 		throw new Error('useDataTable must be used within a DataTableProvider');
 	}
 
-	type Entry = DataSourceModelMap[K];
+	type Entry = DatasourceModels[K];
 
 	return context as DataTableContextType<K, Entry>;
 }

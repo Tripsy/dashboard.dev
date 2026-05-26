@@ -371,7 +371,7 @@ export const dataSourceConfigCmr: DataSourceConfigType<CmrModel> = {
 			windowConfigProps: {
 				size: 'x3l',
 			},
-			permission: 'cmr.create',
+			permission: ['cmr', 'create'],
 			entriesSelection: 'free',
 			operationFunction: (values: CmrManageOutput) => {
 				const params = prepareParamsFromFormValues(values);
@@ -393,7 +393,7 @@ export const dataSourceConfigCmr: DataSourceConfigType<CmrModel> = {
 			windowConfigProps: {
 				size: 'x3l',
 			},
-			permission: 'cmr.update',
+			permission: ['cmr', 'update'],
 			entriesSelection: 'single',
 			operationFunction: (values: CmrManageOutput, id: number) => {
 				const params = prepareParamsFromFormValues(values);
@@ -416,7 +416,7 @@ export const dataSourceConfigCmr: DataSourceConfigType<CmrModel> = {
 		delete: {
 			windowType: 'action',
 			windowTitle: translations['delete.title'],
-			permission: 'cmr.delete',
+			permission: ['cmr', 'delete'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: CmrModel) => !entry.deleted_at, // Return true if the entry is not deleted
 			operationFunction: (entry: CmrModel) => requestDelete('cmr', entry),
@@ -433,7 +433,7 @@ export const dataSourceConfigCmr: DataSourceConfigType<CmrModel> = {
 			windowConfigProps: {
 				size: 'lg',
 			},
-			permission: 'cmr.update',
+			permission: ['cmr', 'update'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: CmrModel) =>
 				getStatusTransitions(entry.status, STATUS_TRANSITIONS).length >
@@ -451,7 +451,7 @@ export const dataSourceConfigCmr: DataSourceConfigType<CmrModel> = {
 			windowConfigProps: {
 				size: 'x2l',
 			},
-			permission: 'cmr-vehicle.update',
+			permission: ['cmr-vehicle', 'update'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: CmrModel) =>
 				entry.status === CmrStatusEnum.PREPARING,

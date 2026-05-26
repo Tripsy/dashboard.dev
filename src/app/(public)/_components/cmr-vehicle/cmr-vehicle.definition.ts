@@ -128,7 +128,7 @@ export const dataSourceConfigCmrVehicle: DataSourceConfigType<CmrVehicleModel> =
 				windowType: 'form',
 				windowTitle: translations['create.title'],
 				windowComponent: FormManageCmrVehicle,
-				permission: 'cmr-vehicle.create',
+				permission: ['cmr-vehicle', 'create'],
 				entriesSelection: 'free',
 				operationFunction: (params: CmrVehicleFormValuesType) => {
 					const { cmr_id, vehicle, ...prepareParams } = params;
@@ -144,7 +144,7 @@ export const dataSourceConfigCmrVehicle: DataSourceConfigType<CmrVehicleModel> =
 				windowType: 'form',
 				windowTitle: translations['update.title'],
 				windowComponent: FormManageCmrVehicle,
-				permission: 'cmr-vehicle.update',
+				permission: ['cmr-vehicle', 'update'],
 				entriesSelection: 'single',
 				operationFunction: (
 					params: CmrVehicleFormValuesType,
@@ -166,7 +166,7 @@ export const dataSourceConfigCmrVehicle: DataSourceConfigType<CmrVehicleModel> =
 			delete: {
 				windowType: 'action',
 				windowTitle: translations['delete.title'],
-				permission: 'cmr-vehicle.delete',
+				permission: ['cmr-vehicle', 'delete'],
 				entriesSelection: 'single',
 				operationFunction: (entry: CmrVehicleModel) => {
 					return deleteCmrVehicle(entry);

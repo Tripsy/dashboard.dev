@@ -311,7 +311,7 @@ export const dataSourceConfigWorkSessionVehicle: DataSourceConfigType<WorkSessio
 				windowType: 'form',
 				windowTitle: translations['create.title'],
 				windowComponent: FormManageWorkSessionVehicle,
-				permission: 'work-session-vehicle.create',
+				permission: ['work-session-vehicle', 'create'],
 				entriesSelection: 'free',
 				operationFunction: (
 					params: WorkSessionVehicleFormValuesType,
@@ -336,7 +336,7 @@ export const dataSourceConfigWorkSessionVehicle: DataSourceConfigType<WorkSessio
 				windowType: 'form',
 				windowTitle: translations['update.title'],
 				windowComponent: FormManageWorkSessionVehicle,
-				permission: 'work-session-vehicle.update',
+				permission: ['work-session-vehicle', 'update'],
 				entriesSelection: 'single',
 				operationFunction: (
 					params: WorkSessionVehicleFormValuesType,
@@ -366,7 +366,7 @@ export const dataSourceConfigWorkSessionVehicle: DataSourceConfigType<WorkSessio
 			delete: {
 				windowType: 'action',
 				windowTitle: translations['delete.title'],
-				permission: 'work-session-vehicle.delete',
+				permission: ['work-session-vehicle', 'delete'],
 				entriesSelection: 'single',
 				operationFunction: (entry: WorkSessionVehicleModel) => {
 					return deleteWorkSessionVehicle(entry);
@@ -380,7 +380,7 @@ export const dataSourceConfigWorkSessionVehicle: DataSourceConfigType<WorkSessio
 			return: {
 				windowType: 'action',
 				windowTitle: translations['return.title'],
-				permission: 'work-session-vehicle.update',
+				permission: ['work-session-vehicle', 'update'],
 				entriesSelection: 'single',
 				customEntryCheck: (entry: WorkSessionVehicleModel) =>
 					entry.status === WorkSessionVehicleStatusEnum.ASSIGNED,
@@ -399,7 +399,7 @@ export const dataSourceConfigWorkSessionVehicle: DataSourceConfigType<WorkSessio
 				windowConfigProps: {
 					size: 'xl',
 				},
-				permission: 'work-session-vehicle.read',
+				permission: ['work-session-vehicle', 'read'],
 				entriesSelection: 'single',
 				buttonPosition: 'hidden',
 			},

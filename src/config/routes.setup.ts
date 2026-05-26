@@ -1,4 +1,8 @@
 import ValueError from '@/exceptions/value.error';
+import type {
+	PermissionEntityType,
+	PermissionOperationType,
+} from '@/models/permission.model';
 
 export const RouteAuthEnum = {
 	PUBLIC: 'public',
@@ -12,7 +16,8 @@ export type RouteAuth = (typeof RouteAuthEnum)[keyof typeof RouteAuthEnum];
 type RouteProps = {
 	type?: string;
 	auth?: RouteAuth;
-	permission?: string;
+	permissionEntity?: PermissionEntityType;
+	permissionOperation?: PermissionOperationType;
 };
 
 type RoutesData = {
@@ -191,68 +196,70 @@ Routes.group('account')
 // Dashboard
 Routes.group('dashboard')
 	.auth(RouteAuthEnum.PROTECTED)
-	.add('dashboard', '/dashboard')
+	.add('dashboard', '/dashboard', {
+		permissionEntity: 'dashboard',
+	})
 	.add('template', '/dashboard/template', {
-		permission: 'template.find',
+		permissionEntity: 'template',
 	})
 	.add('client', '/dashboard/client', {
-		permission: 'client.find',
+		permissionEntity: 'client',
 	})
 	.add('address', '/dashboard/address', {
-		permission: 'address.find',
+		permissionEntity: 'address',
 	})
 	.add('place', '/dashboard/place', {
-		permission: 'place.find',
+		permissionEntity: 'place',
 	})
 	.add('brand', '/dashboard/brand', {
-		permission: 'brand.find',
+		permissionEntity: 'brand',
 	})
 	.add('cash-flow', '/dashboard/cash-flow', {
-		permission: 'cash_flow.find',
+		permissionEntity: 'cash-flow',
 	})
 	.add('log-data', '/dashboard/log-data', {
-		permission: 'log_data.find',
+		permissionEntity: 'log-data',
 	})
 	.add('log-history', '/dashboard/log-history', {
-		permission: 'log_history.find',
+		permissionEntity: 'log-history',
 	})
 	.add('cron-history', '/dashboard/cron-history', {
-		permission: 'cron_history.find',
+		permissionEntity: 'cron-history',
 	})
 	.add('mail-queue', '/dashboard/mail-queue', {
-		permission: 'mail_queue.find',
+		permissionEntity: 'mail-queue',
 	})
 	.add('user', '/dashboard/user', {
-		permission: 'user.find',
+		permissionEntity: 'user',
 	})
 	.add('permission', '/dashboard/permission', {
-		permission: 'permission.find',
+		permissionEntity: 'permission',
 	})
 
 	.add('vehicle', '/dashboard/vehicle', {
-		permission: 'vehicle.find',
+		permissionEntity: 'vehicle',
 	})
 	.add('vendor', '/dashboard/vendor', {
-		permission: 'vendor.find',
+		permissionEntity: 'vendor',
 	})
 	.add('company-vehicle', '/dashboard/company-vehicle', {
-		permission: 'company-vehicle.find',
+		permissionEntity: 'company-vehicle',
 	})
 
 	.add('cmr', '/dashboard/cmr', {
-		permission: 'cmr.find',
+		permissionEntity: 'cmr',
 	})
 	.add('cmr-session', '/dashboard/cmr-session', {
-		permission: 'cmr-session.find',
+		permissionEntity: 'cmr-session',
 	})
 	.add('cmr-vehicle', '/dashboard/cmr-vehicle', {
-		permission: 'cmr-vehicle.find',
+		permissionEntity: 'cmr-vehicle',
 	})
 	.add('work-session', '/dashboard/work-session', {
-		permission: 'work-session.find',
+		permissionEntity: 'work-session',
 	})
 	.add('work-session-vehicle', '/dashboard/work-session-vehicle', {
-		permission: 'work-session-vehicle.find',
+		permissionEntity: 'work-session-vehicle',
 	});
 
 /**

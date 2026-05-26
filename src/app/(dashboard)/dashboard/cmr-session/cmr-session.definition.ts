@@ -253,7 +253,7 @@ export const dataSourceConfigCmrSession: DataSourceConfigType<CmrSessionModel> =
 				windowType: 'form',
 				windowTitle: translations['create.title'],
 				windowComponent: FormManageCmrSession,
-				permission: 'cmr-session.create',
+				permission: ['cmr-session', 'create'],
 				entriesSelection: 'free',
 				operationFunction: (params: CmrSessionFormValuesType) => {
 					const { cmr_id, work_session, ...prepareParams } = params;
@@ -271,7 +271,7 @@ export const dataSourceConfigCmrSession: DataSourceConfigType<CmrSessionModel> =
 			delete: {
 				windowType: 'action',
 				windowTitle: translations['delete.title'],
-				permission: 'cmr-session.delete',
+				permission: ['cmr-session', 'delete'],
 				entriesSelection: 'single',
 				operationFunction: (entry: CmrSessionModel) =>
 					deleteCmrSession(entry),
@@ -288,7 +288,7 @@ export const dataSourceConfigCmrSession: DataSourceConfigType<CmrSessionModel> =
 				windowConfigProps: {
 					size: 'xl',
 				},
-				permission: 'cmr-session.read',
+				permission: ['cmr-session', 'read'],
 				entriesSelection: 'single',
 				buttonPosition: 'hidden',
 			},

@@ -17,7 +17,7 @@ export const dataSourceConfigCmrSession: DataSourceConfigType<CmrSessionModel> =
 			drop: {
 				windowType: 'action',
 				windowTitle: translations['drop.title'],
-				permission: 'cmr-session.delete',
+				permission: ['cmr-session', 'delete'],
 				entriesSelection: 'single',
 				operationFunction: (entry: CmrSessionModel) =>
 					deleteCmrSession(entry),

@@ -167,7 +167,7 @@ export const dataSourceConfigAddress: DataSourceConfigType<AddressModel> = {
 			windowType: 'form',
 			windowTitle: translations['create.title'],
 			windowComponent: FormManageAddress,
-			permission: 'address.create',
+			permission: ['address', 'create'],
 			entriesSelection: 'free',
 			operationFunction: (params: AddressFormValuesType) =>
 				requestCreate<AddressModel, AddressFormValuesType>(
@@ -186,7 +186,7 @@ export const dataSourceConfigAddress: DataSourceConfigType<AddressModel> = {
 			windowType: 'form',
 			windowTitle: translations['update.title'],
 			windowComponent: FormManageAddress,
-			permission: 'address.update',
+			permission: ['address', 'update'],
 			entriesSelection: 'single',
 			operationFunction: (params: AddressFormValuesType, id: number) =>
 				requestUpdate<AddressModel, AddressFormValuesType>(
@@ -206,7 +206,7 @@ export const dataSourceConfigAddress: DataSourceConfigType<AddressModel> = {
 		delete: {
 			windowType: 'action',
 			windowTitle: translations['delete.title'],
-			permission: 'address.delete',
+			permission: ['address', 'delete'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: AddressModel) => !entry.deleted_at, // Return true if the entry is not deleted
 			operationFunction: (entry: AddressModel) =>
@@ -220,7 +220,7 @@ export const dataSourceConfigAddress: DataSourceConfigType<AddressModel> = {
 		restore: {
 			windowType: 'action',
 			windowTitle: translations['restore.title'],
-			permission: 'address.delete',
+			permission: ['address', 'delete'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: AddressModel) => !!entry.deleted_at, // Return true if the entry is deleted
 			operationFunction: (entry: AddressModel) =>
@@ -235,7 +235,7 @@ export const dataSourceConfigAddress: DataSourceConfigType<AddressModel> = {
 			windowType: 'view',
 			windowTitle: translations['view.title'],
 			windowComponent: ViewAddress,
-			permission: 'address.read',
+			permission: ['address', 'read'],
 			entriesSelection: 'single',
 			buttonPosition: 'hidden',
 		},

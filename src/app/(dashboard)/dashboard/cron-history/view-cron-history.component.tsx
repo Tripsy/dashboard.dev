@@ -28,7 +28,7 @@ export function ViewCronHistory({ entry }: { entry: CronHistoryModel }) {
 					<div className="max-w-60">
 						<DisplayStatus
 							status={entry.status}
-							dataSourceKey="cron-history"
+							dataSource="cron-history"
 						/>
 					</div>
 				</div>

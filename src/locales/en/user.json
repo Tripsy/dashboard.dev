@@ -37,11 +37,6 @@
 			"label": "Update",
 			"success": "User updated successfully"
 		},
-		"permissions": {
-			"title": "Setup permissions - {{entry}}",
-			"label": "Permissions",
-			"success": "Permissions updated successfully"
-		},
 		"delete": {
 			"title": "Delete user - {{entry}}",
 			"label": "Delete",
@@ -69,6 +64,11 @@
 		"view": {
 			"title": "User details - {{entry}}",
 			"label": "View details"
+		},
+		"setupPermissions": {
+			"title": "Setup permissions - {{entry}}",
+			"label": "Permissions",
+			"success": "Permissions updated successfully"
 		}
 	}
 }

@@ -19,9 +19,13 @@ import {
 } from '@/helpers/services.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import { type AddressModel, displayAddressLabel } from '@/models/address.model';
+import { type AuthModel, hasPermission } from '@/models/auth.model';
 import { getPlaceContentProp } from '@/models/place.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
-import type { DataSourceConfigType } from '@/types/data-source.type';
+import type {
+	DataSourceConfigType,
+	DataTableValueOptionsType,
+} from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(
@@ -116,6 +120,15 @@ export type AddressDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
+function displayButtonView(
+	auth: AuthModel | null,
+): DataTableValueOptionsType<AddressModel>['displayButton'] {
+	return {
+		action: () =>
+			hasPermission(auth, 'address', 'read') ? 'view' : undefined,
+	};
+}
+
 export const dataSourceConfigAddress: DataSourceConfigType<AddressModel> = {
 	dataTable: {
 		state: {
@@ -133,13 +146,11 @@ export const dataSourceConfigAddress: DataSourceConfigType<AddressModel> = {
 				field: 'id',
 				header: 'ID',
 				sortable: true,
-				body: (entry, column) =>
+				body: (entry, column, auth) =>
 					DataTableValue(entry, column, {
+						dataSource: 'address',
 						markDeleted: true,
-						displayButton: {
-							action: 'view',
-							dataSource: 'address',
-						},
+						displayButton: displayButtonView(auth),
 					}),
 			},
 			{

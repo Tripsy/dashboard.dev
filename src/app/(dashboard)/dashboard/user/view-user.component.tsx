@@ -44,7 +44,7 @@ export function ViewUser({ entry }: { entry: UserModel }) {
 						<div className="max-w-60">
 							<DisplayStatus
 								status={entry.status}
-								dataSourceKey="user"
+								dataSource="user"
 							/>
 						</div>
 					</div>

@@ -2,13 +2,17 @@ import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
 import { ViewLogData } from '@/app/(dashboard)/dashboard/log-data/view-log-data.component';
 import { translateBatch } from '@/config/translate.setup';
 import { requestDeleteMultiple, requestFind } from '@/helpers/services.helper';
+import { type AuthModel, hasPermission } from '@/models/auth.model';
 import type {
 	LogCategory,
 	LogDataModel,
 	LogLevel,
 } from '@/models/log-data.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
-import type { DataSourceConfigType } from '@/types/data-source.type';
+import type {
+	DataSourceConfigType,
+	DataTableValueOptionsType,
+} from '@/types/data-source.type';
 
 const translations = await translateBatch(
 	['view.title', 'delete.title'] as const,
@@ -22,6 +26,16 @@ export type LogDataDataTableFiltersType = {
 	create_at_start: { value: string | null; matchMode: 'equals' };
 	create_at_end: { value: string | null; matchMode: 'equals' };
 };
+
+function displayButtonView(
+	auth: AuthModel | null,
+): DataTableValueOptionsType<LogDataModel>['displayButton'] {
+	return {
+		action: () =>
+			hasPermission(auth, 'log-data', 'read') ? 'view' : undefined,
+		dataSource: 'log-data',
+	};
+}
 
 export const dataSourceConfigLogData: DataSourceConfigType<LogDataModel> = {
 	dataTable: {
@@ -43,13 +57,9 @@ export const dataSourceConfigLogData: DataSourceConfigType<LogDataModel> = {
 				field: 'id',
 				header: 'ID',
 				sortable: true,
-				body: (entry, column) =>
+				body: (entry, column, auth) =>
 					DataTableValue(entry, column, {
-						markDeleted: true,
-						displayButton: {
-							action: 'view',
-							dataSource: 'log-data',
-						},
+						displayButton: displayButtonView(auth),
 					}),
 			},
 			{

@@ -31,7 +31,8 @@ export const PermissionOperationSuggestions = [
 ] as const;
 
 export type PermissionEntityType =
-	(typeof PermissionEntitiesSuggestions)[number] | 'dashboard';
+	| (typeof PermissionEntitiesSuggestions)[number]
+	| 'dashboard';
 export type PermissionOperationType =
 	(typeof PermissionOperationSuggestions)[number];
 

@@ -3,6 +3,7 @@ import { ViewLogHistory } from '@/app/(dashboard)/dashboard/log-history/view-log
 import { translateBatch } from '@/config/translate.setup';
 import { requestDeleteMultiple, requestFind } from '@/helpers/services.helper';
 import { toTitleCase } from '@/helpers/string.helper';
+import { type AuthModel, hasPermission } from '@/models/auth.model';
 import type {
 	LogHistoryModel,
 	LogHistorySource,
@@ -28,7 +29,18 @@ export type LogHistoryDataTableFiltersType = {
 	recorded_at_end: { value: string | null; matchMode: 'equals' };
 };
 
+function displayButtonView(
+	auth: AuthModel | null,
+): DataTableValueOptionsType<LogHistoryModel>['displayButton'] {
+	return {
+		action: () =>
+			hasPermission(auth, 'log-history', 'read') ? 'view' : undefined,
+		dataSource: 'log-history',
+	};
+}
+
 function displayButtonViewUser(
+	auth: AuthModel | null,
 	entry: LogHistoryModel,
 ): DataTableValueOptionsType<LogHistoryModel>['displayButton'] {
 	if (!entry.auth_id) {
@@ -36,9 +48,10 @@ function displayButtonViewUser(
 	}
 
 	return {
-		action: 'view',
+		action: () =>
+			hasPermission(auth, 'user', 'read') ? 'view' : undefined,
 		dataSource: 'user',
-		altTitle: translations['viewUser.title'],
+		title: translations['viewUser.title'],
 		alternateEntryId: entry.auth_id,
 	};
 }
@@ -66,13 +79,9 @@ export const dataSourceConfigLogHistory: DataSourceConfigType<LogHistoryModel> =
 					field: 'id',
 					header: 'ID',
 					sortable: true,
-					body: (entry, column) =>
+					body: (entry, column, auth) =>
 						DataTableValue(entry, column, {
-							markDeleted: true,
-							displayButton: {
-								action: 'view',
-								dataSource: 'log-history',
-							},
+							displayButton: displayButtonView(auth),
 						}),
 				},
 				{
@@ -100,12 +109,12 @@ export const dataSourceConfigLogHistory: DataSourceConfigType<LogHistoryModel> =
 				{
 					field: 'performed_by',
 					header: 'Performed By',
-					body: (entry, column) =>
+					body: (entry, column, auth) =>
 						DataTableValue(entry, column, {
 							customValue: entry.auth_id
 								? `${entry.performed_by} (#${entry.auth_id})`
 								: entry.performed_by,
-							displayButton: displayButtonViewUser(entry),
+							displayButton: displayButtonViewUser(auth, entry),
 						}),
 				},
 				{

@@ -28,6 +28,7 @@ import {
 	replaceVars,
 } from '@/helpers/string.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
+import { type AuthModel, hasPermission } from '@/models/auth.model';
 import {
 	type CashFlowCategory,
 	CashFlowCategoryEnum,
@@ -49,7 +50,10 @@ import {
 } from '@/models/cash-flow.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
 import { type Currency, CurrencyEnum } from '@/types/common.type';
-import type { DataSourceConfigType } from '@/types/data-source.type';
+import type {
+	DataSourceConfigType,
+	DataTableValueOptionsType,
+} from '@/types/data-source.type';
 import type { FormStateType, ValidatorOutput } from '@/types/form.type';
 
 const translations = await translateBatch(
@@ -293,6 +297,46 @@ export type CashFlowDataTableFiltersType = {
 	cmr_id: { value: number | null; matchMode: 'equals' };
 };
 
+function displayButtonView(
+	auth: AuthModel | null,
+): DataTableValueOptionsType<CashFlowModel>['displayButton'] {
+	return {
+		action: () =>
+			hasPermission(auth, 'cash-flow', 'read') ? 'view' : undefined,
+	};
+}
+
+function displayButtonStatus(
+	auth: AuthModel | null,
+): DataTableValueOptionsType<CashFlowModel>['displayButton'] {
+	return {
+		action: (entry: CashFlowModel) => {
+			if (entry.deleted_at) {
+				return undefined;
+			}
+
+			const statusTransitions = getStatusTransitions(
+				entry.status,
+				STATUS_TRANSITIONS,
+			);
+
+			if (statusTransitions.length === 0) {
+				return undefined;
+			}
+
+			if (!hasPermission(auth, 'cash-flow', 'update')) {
+				return undefined;
+			}
+
+			if (entry.status === CashFlowStatusEnum.PENDING) {
+				return 'complete';
+			}
+
+			return 'cancel';
+		},
+	};
+}
+
 export const dataSourceConfigCashFlow: DataSourceConfigType<CashFlowModel> = {
 	dataTable: {
 		state: {
@@ -327,13 +371,11 @@ export const dataSourceConfigCashFlow: DataSourceConfigType<CashFlowModel> = {
 				field: 'id',
 				header: 'ID',
 				sortable: true,
-				body: (entry, column) =>
+				body: (entry, column, auth) =>
 					DataTableValue(entry, column, {
+						dataSource: 'cash-flow',
 						markDeleted: true,
-						displayButton: {
-							action: 'view',
-							dataSource: 'cash-flow',
-						},
+						displayButton: displayButtonView(auth),
 					}),
 			},
 			{
@@ -383,36 +425,12 @@ export const dataSourceConfigCashFlow: DataSourceConfigType<CashFlowModel> = {
 			{
 				field: 'status',
 				header: 'Status',
-				body: (entry, column) =>
+				body: (entry, column, auth) =>
 					DataTableValue(entry, column, {
+						dataSource: 'cash-flow',
 						isStatus: true,
-						dataSourceKey: 'cash-flow',
 						markDeleted: true,
-						displayButton: {
-							action: (entry: CashFlowModel) => {
-								if (entry.deleted_at) {
-									return undefined;
-								}
-
-								const statusTransitions = getStatusTransitions(
-									entry.status,
-									STATUS_TRANSITIONS,
-								);
-
-								if (statusTransitions.length === 0) {
-									return undefined;
-								}
-
-								if (
-									entry.status === CashFlowStatusEnum.PENDING
-								) {
-									return 'complete';
-								}
-
-								return 'cancel';
-							},
-							dataSource: 'cash-flow',
-						},
+						displayButton: displayButtonStatus(auth),
 					}),
 				style: {
 					minWidth: '10rem',

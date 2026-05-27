@@ -3,6 +3,7 @@ import { ViewMailQueue } from '@/app/(dashboard)/dashboard/mail-queue/view-mail-
 import { translateBatch } from '@/config/translate.setup';
 import { formatDate } from '@/helpers/date.helper';
 import { requestDeleteMultiple, requestFind } from '@/helpers/services.helper';
+import { type AuthModel, hasPermission } from '@/models/auth.model';
 import type {
 	MailQueueModel,
 	MailQueueStatus,
@@ -27,7 +28,18 @@ export type MailQueueDataTableFiltersType = {
 	sent_at_end: { value: string | null; matchMode: 'equals' };
 };
 
+function displayButtonView(
+	auth: AuthModel | null,
+): DataTableValueOptionsType<MailQueueModel>['displayButton'] {
+	return {
+		action: () =>
+			hasPermission(auth, 'mail-queue', 'read') ? 'view' : undefined,
+		dataSource: 'mail-queue',
+	};
+}
+
 function displayButtonViewTemplate(
+	auth: AuthModel | null,
 	entry: MailQueueModel,
 ): DataTableValueOptionsType<MailQueueModel>['displayButton'] {
 	if (!entry.template) {
@@ -35,9 +47,10 @@ function displayButtonViewTemplate(
 	}
 
 	return {
-		action: 'view',
+		action: () =>
+			hasPermission(auth, 'template', 'read') ? 'view' : undefined,
 		dataSource: 'template',
-		altTitle: translations['viewTemplate.label'],
+		title: translations['viewTemplate.label'],
 		alternateEntryId: entry.template.id,
 	};
 }
@@ -63,22 +76,19 @@ export const dataSourceConfigMailQueue: DataSourceConfigType<MailQueueModel> = {
 				field: 'id',
 				header: 'ID',
 				sortable: true,
-				body: (entry, column) =>
+				body: (entry, column, auth) =>
 					DataTableValue(entry, column, {
 						markDeleted: true,
-						displayButton: {
-							action: 'view',
-							dataSource: 'mail-queue',
-						},
+						displayButton: displayButtonView(auth),
 					}),
 			},
 			{
 				field: 'template',
 				header: 'Template',
-				body: (entry, column) =>
+				body: (entry, column, auth) =>
 					DataTableValue(entry, column, {
 						customValue: entry.template?.label || 'n/a',
-						displayButton: displayButtonViewTemplate(entry),
+						displayButton: displayButtonViewTemplate(auth, entry),
 					}),
 			},
 			{
@@ -95,7 +105,7 @@ export const dataSourceConfigMailQueue: DataSourceConfigType<MailQueueModel> = {
 				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						isStatus: true,
-						dataSourceKey: 'mail-queue',
+						dataSource: 'mail-queue',
 					}),
 				style: {
 					minWidth: '6rem',

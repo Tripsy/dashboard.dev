@@ -48,9 +48,9 @@ export function hasPermission(
 	}
 
 	if (!operation) {
-		const entityPermissions = auth?.permissions?.[entity];
+		const permissions = auth?.permissions?.[entity];
 
-		return Array.isArray(entityPermissions) && entityPermissions.length > 0;
+		return Array.isArray(permissions) && permissions.length > 0;
 	}
 
 	return auth?.permissions?.[entity]?.includes(operation) || false;

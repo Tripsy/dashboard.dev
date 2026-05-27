@@ -22,6 +22,7 @@ import {
 } from '@/helpers/services.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
+import { type AuthModel, hasPermission } from '@/models/auth.model';
 import {
 	displayVehicleLabel,
 	type VehicleModel,
@@ -31,7 +32,10 @@ import {
 	VehicleTypeEnum,
 } from '@/models/vehicle.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
-import type { DataSourceConfigType } from '@/types/data-source.type';
+import type {
+	DataSourceConfigType,
+	DataTableValueOptionsType,
+} from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(
@@ -148,6 +152,38 @@ export type VehicleDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
+function displayButtonView(
+	auth: AuthModel | null,
+): DataTableValueOptionsType<VehicleModel>['displayButton'] {
+	return {
+		action: () =>
+			hasPermission(auth, 'vehicle', 'read') ? 'view' : undefined,
+		dataSource: 'vehicle',
+	};
+}
+
+function displayButtonStatus(
+	auth: AuthModel | null,
+): DataTableValueOptionsType<VehicleModel>['displayButton'] {
+	return {
+		action: (entry: VehicleModel) => {
+			if (entry.deleted_at) {
+				return hasPermission(auth, 'vehicle', 'delete')
+					? 'restore'
+					: undefined;
+			}
+
+			if (!hasPermission(auth, 'vehicle', 'update')) {
+				return undefined;
+			}
+
+			return entry.status === VehicleStatusEnum.DRAFT
+				? 'verified'
+				: 'draft';
+		},
+	};
+}
+
 export const dataSourceConfigVehicle: DataSourceConfigType<VehicleModel> = {
 	dataTable: {
 		state: {
@@ -169,13 +205,10 @@ export const dataSourceConfigVehicle: DataSourceConfigType<VehicleModel> = {
 				field: 'id',
 				header: 'ID',
 				sortable: true,
-				body: (entry, column) =>
+				body: (entry, column, auth) =>
 					DataTableValue(entry, column, {
 						markDeleted: true,
-						displayButton: {
-							action: 'view',
-							dataSource: 'vehicle',
-						},
+						displayButton: displayButtonView(auth),
 					}),
 			},
 			{
@@ -202,21 +235,12 @@ export const dataSourceConfigVehicle: DataSourceConfigType<VehicleModel> = {
 			{
 				field: 'status',
 				header: 'Status',
-				body: (entry, column) =>
+				body: (entry, column, auth) =>
 					DataTableValue(entry, column, {
+						dataSource: 'vehicle',
 						isStatus: true,
-						dataSourceKey: 'vehicle',
 						markDeleted: true,
-						displayButton: {
-							action: (entry: VehicleModel) => {
-								return entry.deleted_at
-									? 'restore'
-									: entry.status === VehicleStatusEnum.DRAFT
-										? 'verified'
-										: 'draft';
-							},
-							dataSource: 'vehicle',
-						},
+						displayButton: displayButtonStatus(auth),
 					}),
 				style: {
 					minWidth: '8rem',

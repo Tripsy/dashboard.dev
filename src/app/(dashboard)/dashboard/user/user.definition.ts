@@ -4,7 +4,7 @@ import {
 	FormManageUser,
 	type UserFormValuesType,
 } from '@/app/(dashboard)/dashboard/user/form-manage-user.component';
-import { SetupPermissionsUser } from '@/app/(dashboard)/dashboard/user/setup-user-permissions.component';
+import { SetupUserPermissions } from '@/app/(dashboard)/dashboard/user/setup-user-permissions.component';
 import { ViewUser } from '@/app/(dashboard)/dashboard/user/view-user.component';
 import { Configuration } from '@/config/settings.config';
 import { translateBatch } from '@/config/translate.setup';
@@ -19,6 +19,7 @@ import {
 	requestUpdateStatus,
 } from '@/helpers/services.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
+import { type AuthModel, hasPermission } from '@/models/auth.model';
 import {
 	type UserModel,
 	UserOperatorTypeEnum,
@@ -29,7 +30,10 @@ import {
 } from '@/models/user.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
 import { LanguageEnum } from '@/types/common.type';
-import type { DataSourceConfigType } from '@/types/data-source.type';
+import type {
+	DataSourceConfigType,
+	DataTableValueOptionsType,
+} from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(
@@ -41,7 +45,7 @@ const translations = await translateBatch(
 		'restore.title',
 		'enable.title',
 		'disable.title',
-		'permission.title',
+		'setupPermissions.title',
 	] as const,
 	'user.action',
 );
@@ -255,6 +259,52 @@ export type UserDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
+function displayButtonView(
+	auth: AuthModel | null,
+): DataTableValueOptionsType<UserModel>['displayButton'] {
+	return {
+		action: () =>
+			hasPermission(auth, 'user', 'read') ? 'view' : undefined,
+		dataSource: 'user',
+	};
+}
+
+function displayButtonStatus(
+	auth: AuthModel | null,
+): DataTableValueOptionsType<UserModel>['displayButton'] {
+	return {
+		action: (entry: UserModel) => {
+			if (entry.deleted_at) {
+				return hasPermission(auth, 'user', 'delete')
+					? 'restore'
+					: undefined;
+			}
+
+			if (!hasPermission(auth, 'user', 'update')) {
+				return undefined;
+			}
+
+			return entry.status === UserStatusEnum.ACTIVE
+				? 'disable'
+				: 'enable';
+		},
+	};
+}
+
+function displayButtonSetupPermissions(
+	auth: AuthModel | null,
+	entry: UserModel,
+): DataTableValueOptionsType<UserModel>['displayButton'] {
+	return {
+		action: () =>
+			entry.role === UserRoleEnum.OPERATOR &&
+			hasPermission(auth, 'permission', 'update')
+				? 'setupPermissions'
+				: undefined,
+		dataSource: 'user',
+	};
+}
+
 export const dataSourceConfigUser: DataSourceConfigType<UserModel> = {
 	dataTable: {
 		state: {
@@ -276,13 +326,10 @@ export const dataSourceConfigUser: DataSourceConfigType<UserModel> = {
 				field: 'id',
 				header: 'ID',
 				sortable: true,
-				body: (entry, column) =>
+				body: (entry, column, auth) =>
 					DataTableValue(entry, column, {
 						markDeleted: true,
-						displayButton: {
-							action: 'view',
-							dataSource: 'user',
-						},
+						displayButton: displayButtonView(auth),
 					}),
 			},
 			{
@@ -297,37 +344,24 @@ export const dataSourceConfigUser: DataSourceConfigType<UserModel> = {
 			{
 				field: 'role',
 				header: 'Role',
-				body: (entry, column) =>
+				body: (entry, column, auth) =>
 					DataTableValue(entry, column, {
 						capitalize: true,
-						displayButton: {
-							action: (entry: UserModel) => {
-								return entry.role === UserRoleEnum.OPERATOR
-									? 'permissions'
-									: undefined;
-							},
-							dataSource: 'user',
-						},
+						displayButton: displayButtonSetupPermissions(
+							auth,
+							entry,
+						),
 					}),
 			},
 			{
 				field: 'status',
 				header: 'Status',
-				body: (entry, column) =>
+				body: (entry, column, auth) =>
 					DataTableValue(entry, column, {
+						dataSource: 'user',
 						isStatus: true,
-						dataSourceKey: 'user',
 						markDeleted: true,
-						displayButton: {
-							action: (entry: UserModel) => {
-								return entry.deleted_at
-									? 'restore'
-									: entry.status === UserStatusEnum.ACTIVE
-										? 'disable'
-										: 'enable';
-							},
-							dataSource: 'user',
-						},
+						displayButton: displayButtonStatus(auth),
 					}),
 				style: {
 					minWidth: '8rem',
@@ -472,10 +506,10 @@ export const dataSourceConfigUser: DataSourceConfigType<UserModel> = {
 			entriesSelection: 'single',
 			buttonPosition: 'hidden',
 		},
-		permissions: {
+		setupPermissions: {
 			windowType: 'other',
-			windowTitle: translations['permission.title'],
-			windowComponent: SetupPermissionsUser,
+			windowTitle: translations['setupPermissions.title'],
+			windowComponent: SetupUserPermissions,
 			windowConfigProps: {
 				size: 'lg',
 			},

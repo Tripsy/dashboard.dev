@@ -43,7 +43,10 @@ type SideMenuSectionProps = {
 	}[];
 };
 
-type SideMenuOpenSectionProps = Omit<SideMenuSectionProps, 'items' | 'icon'> & {
+type SideMenuOpenSectionProps = Omit<
+	SideMenuSectionProps,
+	'items' | 'icon' | 'permission'
+> & {
 	selectedPage: SelectedPageType;
 	items: {
 		page: DataSourceKey;
@@ -53,7 +56,10 @@ type SideMenuOpenSectionProps = Omit<SideMenuSectionProps, 'items' | 'icon'> & {
 	}[];
 };
 
-type SideMenuClosedSectionProps = Omit<SideMenuSectionProps, 'items'> & {
+type SideMenuClosedSectionProps = Omit<
+	SideMenuSectionProps,
+	'items' | 'permission'
+> & {
 	selectedPage: SelectedPageType;
 	items: {
 		page: DataSourceKey;
@@ -318,9 +324,12 @@ export function SideMenu() {
 			},
 		];
 
-		const displaySections = sections.filter((section) =>
-			section.items.some((item) => item.permission),
-		);
+		const displaySections = sections
+			.map((section) => ({
+				...section,
+				items: section.items.filter((item) => item.permission),
+			}))
+			.filter((section) => section.items.length > 0);
 
 		if (menuState === 'open') {
 			return displaySections.map((section) => (
@@ -391,6 +400,7 @@ function SideMenuOpenSection({
 	items,
 	selectedPage,
 }: SideMenuOpenSectionProps) {
+	console.log(items);
 	const keyStorageSectionState = `side-menu-section-state-${label}`;
 
 	const [sectionState, setSectionState] = useState<SectionStateType>(() =>

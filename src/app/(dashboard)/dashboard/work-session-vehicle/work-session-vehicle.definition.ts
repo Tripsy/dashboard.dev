@@ -13,6 +13,7 @@ import {
 } from '@/helpers/form.helper';
 import { requestFind } from '@/helpers/services.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
+import { type AuthModel, hasPermission } from '@/models/auth.model';
 import { displayCompanyVehicleLabel } from '@/models/company-vehicle.model';
 import { VehicleTypeEnum } from '@/models/vehicle.model';
 import {
@@ -33,7 +34,10 @@ import {
 	updateWorkSessionVehicle,
 } from '@/services/work-session-vehicle.service';
 import type { FindFunctionParamsType } from '@/types/action.type';
-import type { DataSourceConfigType } from '@/types/data-source.type';
+import type {
+	DataSourceConfigType,
+	DataTableValueOptionsType,
+} from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(
@@ -184,6 +188,31 @@ export type WorkSessionVehicleDataTableFiltersType = {
 	status: { value: WorkSessionVehicleStatus | null; matchMode: 'equals' };
 };
 
+function displayButtonView(
+	auth: AuthModel | null,
+): DataTableValueOptionsType<WorkSessionVehicleModel>['displayButton'] {
+	return {
+		action: () =>
+			hasPermission(auth, 'work-session-vehicle', 'read')
+				? 'view'
+				: undefined,
+		dataSource: 'work-session-vehicle',
+	};
+}
+
+function displayButtonReturn(
+	auth: AuthModel | null,
+	entry: WorkSessionVehicleModel,
+): DataTableValueOptionsType<WorkSessionVehicleModel>['displayButton'] {
+	return {
+		action: () =>
+			entry.status === WorkSessionVehicleStatusEnum.ASSIGNED &&
+			hasPermission(auth, 'work-session-vehicle', 'update')
+				? 'return'
+				: undefined,
+	};
+}
+
 export const dataSourceConfigWorkSessionVehicle: DataSourceConfigType<WorkSessionVehicleModel> =
 	{
 		dataTable: {
@@ -204,13 +233,9 @@ export const dataSourceConfigWorkSessionVehicle: DataSourceConfigType<WorkSessio
 					field: 'id',
 					header: 'ID',
 					sortable: true,
-					body: (entry, column) =>
+					body: (entry, column, auth) =>
 						DataTableValue(entry, column, {
-							markDeleted: true,
-							displayButton: {
-								action: 'view',
-								dataSource: 'work-session-vehicle',
-							},
+							displayButton: displayButtonView(auth),
 						}),
 				},
 				{
@@ -239,8 +264,8 @@ export const dataSourceConfigWorkSessionVehicle: DataSourceConfigType<WorkSessio
 							entry.work_session,
 							'status',
 							{
+								dataSource: 'work-session',
 								isStatus: true,
-								dataSourceKey: 'work-session',
 							},
 						),
 					style: { minWidth: '8rem', maxWidth: '8rem' },
@@ -258,20 +283,12 @@ export const dataSourceConfigWorkSessionVehicle: DataSourceConfigType<WorkSessio
 				{
 					field: 'status',
 					header: 'Status',
-					body: (entry, column) =>
+					body: (entry, column, auth) =>
 						DataTableValue(entry, column, {
+							dataSource: 'work-session-vehicle',
 							isStatus: true,
-							dataSourceKey: 'work-session-vehicle',
 							markDeleted: true,
-							displayButton: {
-								action: (entry: WorkSessionVehicleModel) => {
-									return entry.status ===
-										WorkSessionVehicleStatusEnum.ASSIGNED
-										? 'return'
-										: undefined;
-								},
-								dataSource: 'work-session-vehicle',
-							},
+							displayButton: displayButtonReturn(auth, entry),
 						}),
 					style: {
 						minWidth: '8rem',

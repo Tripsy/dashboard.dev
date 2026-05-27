@@ -18,6 +18,7 @@ import {
 } from '@/helpers/services.helper';
 import { toKebabCase } from '@/helpers/string.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
+import { type AuthModel, hasPermission } from '@/models/auth.model';
 import {
 	BRAND_DEFAULT_TYPE,
 	type BrandContent,
@@ -30,7 +31,10 @@ import {
 } from '@/models/brand.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
 import type { Language } from '@/types/common.type';
-import type { DataSourceConfigType } from '@/types/data-source.type';
+import type {
+	DataSourceConfigType,
+	DataTableValueOptionsType,
+} from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(
@@ -158,6 +162,39 @@ export type BrandDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
+function displayButtonView(
+	auth: AuthModel | null,
+): DataTableValueOptionsType<BrandModel>['displayButton'] {
+	return {
+		action: () =>
+			hasPermission(auth, 'brand', 'read') ? 'view' : undefined,
+		dataSource: 'brand',
+	};
+}
+
+function displayButtonStatus(
+	auth: AuthModel | null,
+): DataTableValueOptionsType<BrandModel>['displayButton'] {
+	return {
+		action: (entry: BrandModel) => {
+			if (entry.deleted_at) {
+				return hasPermission(auth, 'brand', 'delete')
+					? 'restore'
+					: undefined;
+			}
+
+			if (!hasPermission(auth, 'brand', 'update')) {
+				return undefined;
+			}
+
+			return entry.status === BrandStatusEnum.ACTIVE
+				? 'disable'
+				: 'enable';
+		},
+		dataSource: 'brand',
+	};
+}
+
 export const dataSourceConfigBrand: DataSourceConfigType<BrandModel> = {
 	dataTable: {
 		state: {
@@ -178,13 +215,10 @@ export const dataSourceConfigBrand: DataSourceConfigType<BrandModel> = {
 				field: 'id',
 				header: 'ID',
 				sortable: true,
-				body: (entry, column) =>
+				body: (entry, column, auth) =>
 					DataTableValue(entry, column, {
 						markDeleted: true,
-						displayButton: {
-							action: 'view',
-							dataSource: 'brand',
-						},
+						displayButton: displayButtonView(auth),
 					}),
 			},
 			{
@@ -203,21 +237,12 @@ export const dataSourceConfigBrand: DataSourceConfigType<BrandModel> = {
 			{
 				field: 'status',
 				header: 'Status',
-				body: (entry, column) =>
+				body: (entry, column, auth) =>
 					DataTableValue(entry, column, {
+						dataSource: 'brand',
 						isStatus: true,
-						dataSourceKey: 'brand',
 						markDeleted: true,
-						displayButton: {
-							action: (entry: BrandModel) => {
-								return entry.deleted_at
-									? 'restore'
-									: entry.status === BrandStatusEnum.ACTIVE
-										? 'disable'
-										: 'enable';
-							},
-							dataSource: 'brand',
-						},
+						displayButton: displayButtonStatus(auth),
 					}),
 				style: {
 					minWidth: '8rem',

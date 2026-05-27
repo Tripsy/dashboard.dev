@@ -111,7 +111,7 @@ export function StatusTransitionCompanyVehicle({
 						>
 							<DisplayStatus
 								status={status}
-								dataSourceKey="company-vehicle"
+								dataSource="company-vehicle"
 							/>
 						</button>
 					);

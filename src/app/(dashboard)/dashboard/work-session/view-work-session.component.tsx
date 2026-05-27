@@ -23,7 +23,7 @@ export function ViewWorkSession({ entry }: { entry: WorkSessionModel }) {
 					<div className="max-w-60">
 						<DisplayStatus
 							status={entry.status}
-							dataSourceKey="work-session"
+							dataSource="work-session"
 						/>
 					</div>
 				</div>

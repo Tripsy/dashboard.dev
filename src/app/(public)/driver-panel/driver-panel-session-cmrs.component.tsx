@@ -217,7 +217,7 @@ export function DriverPanelSessionCmrEntry({
 						]) ? (
 							<DisplayStatus
 								status={cmr.status}
-								dataSourceKey="cmr"
+								dataSource="cmr"
 							/>
 						) : (
 							<button
@@ -228,7 +228,7 @@ export function DriverPanelSessionCmrEntry({
 							>
 								<DisplayStatus
 									status={cmr.status}
-									dataSourceKey="cmr"
+									dataSource="cmr"
 								/>
 							</button>
 						)}

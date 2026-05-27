@@ -19,7 +19,7 @@ import {
 	getUserPermissions,
 } from '@/services/user.service';
 
-export function SetupPermissionsUser({ entries }: { entries: UserModel[] }) {
+export function SetupUserPermissions({ entries }: { entries: UserModel[] }) {
 	const entry = entries[0];
 
 	const translationsKeys = useMemo(

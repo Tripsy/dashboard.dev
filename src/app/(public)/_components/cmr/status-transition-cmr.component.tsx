@@ -101,10 +101,7 @@ export function StatusTransitionCmr({ entries }: { entries: CmrModel[] }) {
 							aria-label={`Set status to ${status}`}
 							onClick={() => handleStatusUpdate(entry, status)}
 						>
-							<DisplayStatus
-								status={status}
-								dataSourceKey="cmr"
-							/>
+							<DisplayStatus status={status} dataSource="cmr" />
 						</button>
 					);
 				})}

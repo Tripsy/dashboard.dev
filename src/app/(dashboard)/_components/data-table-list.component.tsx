@@ -18,6 +18,7 @@ import { toUTCISOString } from '@/helpers/date.helper';
 import { replaceVars } from '@/helpers/string.helper';
 import { assertDefined } from '@/helpers/types.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
+import { useAuth } from '@/providers/auth.provider';
 import type { QueryFiltersType } from '@/types/api.type';
 import {
 	type DataSourceConfigType,
@@ -59,6 +60,7 @@ export default function DataTableList(props: {
 	scrollHeight?: string;
 }) {
 	const { dataSource, selectionMode, dataTableStore } = useDataTable();
+	const { auth } = useAuth();
 
 	const tableState = useStore(dataTableStore, (s) => s.tableState);
 	const selectedEntries = useStore(dataTableStore, (s) => s.selectedEntries);
@@ -206,12 +208,12 @@ export default function DataTableList(props: {
 					sortable={column.sortable ?? false}
 					body={(rowData) =>
 						column.body
-							? column.body(rowData, column)
+							? column.body(rowData, column, auth)
 							: rowData[column.field]
 					}
 				/>
 			)),
-		[dataTable?.columns],
+		[dataTable?.columns, auth],
 	);
 
 	const paginatorTemplate = useMemo(

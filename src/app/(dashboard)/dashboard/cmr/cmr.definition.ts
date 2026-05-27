@@ -31,6 +31,7 @@ import {
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import { displayAddressLabel } from '@/models/address.model';
+import { type AuthModel, hasPermission } from '@/models/auth.model';
 import { displayClientLabel } from '@/models/client.model';
 import {
 	type CmrModel,
@@ -418,13 +419,51 @@ export type CmrDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
+function displayButtonView(
+	auth: AuthModel | null,
+): DataTableValueOptionsType<CmrModel>['displayButton'] {
+	return {
+		action: () => (hasPermission(auth, 'cmr', 'read') ? 'view' : undefined),
+		dataSource: 'cmr',
+	};
+}
+
+function displayButtonStatus(
+	auth: AuthModel | null,
+): DataTableValueOptionsType<CmrModel>['displayButton'] {
+	return {
+		action: (entry: CmrModel) => {
+			if (entry.deleted_at) {
+				return undefined;
+			}
+
+			const statusTransitions = getStatusTransitions(
+				entry.status,
+				STATUS_TRANSITIONS,
+			);
+
+			if (statusTransitions.length === 0) {
+				return undefined;
+			}
+
+			if (!hasPermission(auth, 'cmr', 'update')) {
+				return undefined;
+			}
+
+			return 'statusTransition';
+		},
+	};
+}
+
 function displayButtonViewClient(
+	auth: AuthModel | null,
 	entry: CmrModel,
 ): DataTableValueOptionsType<CmrModel>['displayButton'] {
 	return {
-		action: 'view',
+		action: () =>
+			hasPermission(auth, 'client', 'read') ? 'view' : undefined,
 		dataSource: 'client',
-		altTitle: translations['viewClient.title'],
+		title: translations['viewClient.title'],
 		alternateEntryId: entry.client.id,
 	};
 }
@@ -454,22 +493,19 @@ export const dataSourceConfigCmr: DataSourceConfigType<CmrModel> = {
 				field: 'id',
 				header: 'ID',
 				sortable: true,
-				body: (entry, column) =>
+				body: (entry, column, auth) =>
 					DataTableValue(entry, column, {
 						markDeleted: true,
-						displayButton: {
-							action: 'view',
-							dataSource: 'cmr',
-						},
+						displayButton: displayButtonView(auth),
 					}),
 			},
 			{
 				field: 'client',
 				header: 'Client',
-				body: (entry, column) =>
+				body: (entry, column, auth) =>
 					DataTableValue(entry, column, {
 						customValue: displayClientLabel(entry.client),
-						displayButton: displayButtonViewClient(entry),
+						displayButton: displayButtonViewClient(auth, entry),
 					}),
 			},
 			{
@@ -499,30 +535,12 @@ export const dataSourceConfigCmr: DataSourceConfigType<CmrModel> = {
 			{
 				field: 'status',
 				header: 'Status',
-				body: (entry, column) =>
+				body: (entry, column, auth) =>
 					DataTableValue(entry, column, {
+						dataSource: 'cmr',
 						isStatus: true,
-						dataSourceKey: 'cmr',
 						markDeleted: true,
-						displayButton: {
-							action: (entry: CmrModel) => {
-								if (entry.deleted_at) {
-									return undefined;
-								}
-
-								const statusTransitions = getStatusTransitions(
-									entry.status,
-									STATUS_TRANSITIONS,
-								);
-
-								if (statusTransitions.length === 0) {
-									return undefined;
-								}
-
-								return 'statusTransition';
-							},
-							dataSource: 'cmr',
-						},
+						displayButton: displayButtonStatus(auth),
 					}),
 				style: {
 					minWidth: '8rem',

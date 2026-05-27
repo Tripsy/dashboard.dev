@@ -17,6 +17,7 @@ import {
 	requestUpdateStatus,
 } from '@/helpers/services.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
+import { type AuthModel, hasPermission } from '@/models/auth.model';
 import {
 	type ClientModel,
 	type ClientStatus,
@@ -26,7 +27,10 @@ import {
 	displayClientLabel,
 } from '@/models/client.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
-import type { DataSourceConfigType } from '@/types/data-source.type';
+import type {
+	DataSourceConfigType,
+	DataTableValueOptionsType,
+} from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(
@@ -233,6 +237,38 @@ export type ClientDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
+function displayButtonView(
+	auth: AuthModel | null,
+): DataTableValueOptionsType<ClientModel>['displayButton'] {
+	return {
+		action: () =>
+			hasPermission(auth, 'client', 'read') ? 'view' : undefined,
+		dataSource: 'client',
+	};
+}
+
+function displayButtonStatus(
+	auth: AuthModel | null,
+): DataTableValueOptionsType<ClientModel>['displayButton'] {
+	return {
+		action: (entry: ClientModel) => {
+			if (entry.deleted_at) {
+				return hasPermission(auth, 'client', 'delete')
+					? 'restore'
+					: undefined;
+			}
+
+			if (!hasPermission(auth, 'client', 'update')) {
+				return undefined;
+			}
+
+			return entry.status === ClientStatusEnum.ACTIVE
+				? 'disable'
+				: 'enable';
+		},
+	};
+}
+
 export const dataSourceConfigClient: DataSourceConfigType<ClientModel> = {
 	dataTable: {
 		state: {
@@ -254,13 +290,10 @@ export const dataSourceConfigClient: DataSourceConfigType<ClientModel> = {
 				field: 'id',
 				header: 'ID',
 				sortable: true,
-				body: (entry, column) =>
+				body: (entry, column, auth) =>
 					DataTableValue(entry, column, {
 						markDeleted: true,
-						displayButton: {
-							action: 'view',
-							dataSource: 'client',
-						},
+						displayButton: displayButtonView(auth),
 					}),
 			},
 			{
@@ -283,21 +316,12 @@ export const dataSourceConfigClient: DataSourceConfigType<ClientModel> = {
 			{
 				field: 'status',
 				header: 'Status',
-				body: (entry, column) =>
+				body: (entry, column, auth) =>
 					DataTableValue(entry, column, {
+						dataSource: 'client',
 						isStatus: true,
-						dataSourceKey: 'client',
 						markDeleted: true,
-						displayButton: {
-							action: (entry: ClientModel) => {
-								return entry.deleted_at
-									? 'restore'
-									: entry.status === ClientStatusEnum.ACTIVE
-										? 'disable'
-										: 'enable';
-							},
-							dataSource: 'client',
-						},
+						displayButton: displayButtonStatus(auth),
 					}),
 				style: {
 					minWidth: '8rem',

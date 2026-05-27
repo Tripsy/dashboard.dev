@@ -19,7 +19,7 @@ export function ViewVendor({ entry }: { entry: VendorModel }) {
 					<div className="max-w-60">
 						<DisplayStatus
 							status={entry.status}
-							dataSourceKey="vendor"
+							dataSource="vendor"
 						/>
 					</div>
 				</div>

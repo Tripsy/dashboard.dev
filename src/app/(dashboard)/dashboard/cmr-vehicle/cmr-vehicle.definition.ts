@@ -12,6 +12,7 @@ import {
 } from '@/helpers/form.helper';
 import { requestFind, requestRestore } from '@/helpers/services.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
+import { type AuthModel, hasPermission } from '@/models/auth.model';
 import {
 	type CmrVehicleModel,
 	displayCmrVehicleLabel,
@@ -23,7 +24,10 @@ import {
 	updateCmrVehicle,
 } from '@/services/cmr-vehicle.service';
 import type { FindFunctionParamsType } from '@/types/action.type';
-import type { DataSourceConfigType } from '@/types/data-source.type';
+import type {
+	DataSourceConfigType,
+	DataTableValueOptionsType,
+} from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(
@@ -135,6 +139,16 @@ export type CmrVehicleDataTableFiltersType = {
 	vehicle_id: { value: number | null; matchMode: 'equals' };
 };
 
+function displayButtonView(
+	auth: AuthModel | null,
+): DataTableValueOptionsType<CmrVehicleModel>['displayButton'] {
+	return {
+		action: () =>
+			hasPermission(auth, 'cmr-vehicle', 'read') ? 'view' : undefined,
+		dataSource: 'cmr-vehicle',
+	};
+}
+
 export const dataSourceConfigCmrVehicle: DataSourceConfigType<CmrVehicleModel> =
 	{
 		dataTable: {
@@ -155,13 +169,10 @@ export const dataSourceConfigCmrVehicle: DataSourceConfigType<CmrVehicleModel> =
 					field: 'id',
 					header: 'ID',
 					sortable: true,
-					body: (entry, column) =>
+					body: (entry, column, auth) =>
 						DataTableValue(entry, column, {
 							markDeleted: true,
-							displayButton: {
-								action: 'view',
-								dataSource: 'cmr-vehicle',
-							},
+							displayButton: displayButtonView(auth),
 						}),
 				},
 				{

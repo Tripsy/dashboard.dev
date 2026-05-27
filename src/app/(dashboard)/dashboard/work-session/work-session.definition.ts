@@ -26,6 +26,7 @@ import {
 	requestUpdateStatus,
 } from '@/helpers/services.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
+import { type AuthModel, hasPermission } from '@/models/auth.model';
 import {
 	determineEndAt,
 	displayWorkSessionDuration,
@@ -222,7 +223,40 @@ export type WorkSessionDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
+function displayButtonView(
+	auth: AuthModel | null,
+): DataTableValueOptionsType<WorkSessionModel>['displayButton'] {
+	return {
+		action: () =>
+			hasPermission(auth, 'work-session', 'read') ? 'view' : undefined,
+		dataSource: 'work-session',
+	};
+}
+
+function displayButtonStatus(
+	auth: AuthModel | null,
+): DataTableValueOptionsType<WorkSessionModel>['displayButton'] {
+	return {
+		action: (entry: WorkSessionModel) => {
+			if (entry.deleted_at) {
+				return hasPermission(auth, 'work-session', 'delete')
+					? 'restore'
+					: undefined;
+			}
+
+			if (!hasPermission(auth, 'work-session', 'update')) {
+				return undefined;
+			}
+
+			return entry.status === WorkSessionStatusEnum.ACTIVE
+				? 'close'
+				: undefined;
+		},
+	};
+}
+
 function displayButtonViewUser(
+	auth: AuthModel | null,
 	entry: WorkSessionModel,
 ): DataTableValueOptionsType<WorkSessionModel>['displayButton'] {
 	if (!entry.user) {
@@ -230,9 +264,10 @@ function displayButtonViewUser(
 	}
 
 	return {
-		action: 'view',
+		action: () =>
+			hasPermission(auth, 'user', 'read') ? 'view' : undefined,
 		dataSource: 'user',
-		altTitle: translations['viewUser.title'],
+		title: translations['viewUser.title'],
 		alternateEntryId: entry.user.id,
 	};
 }
@@ -260,22 +295,19 @@ export const dataSourceConfigWorkSession: DataSourceConfigType<WorkSessionModel>
 					field: 'id',
 					header: 'ID',
 					sortable: true,
-					body: (entry, column) =>
+					body: (entry, column, auth) =>
 						DataTableValue(entry, column, {
 							markDeleted: true,
-							displayButton: {
-								action: 'view',
-								dataSource: 'work-session',
-							},
+							displayButton: displayButtonView(auth),
 						}),
 				},
 				{
 					field: 'user',
 					header: 'User',
-					body: (entry, column) =>
+					body: (entry, column, auth) =>
 						DataTableValue(entry, column, {
 							customValue: entry.user.name,
-							displayButton: displayButtonViewUser(entry),
+							displayButton: displayButtonViewUser(auth, entry),
 						}),
 				},
 				{
@@ -305,28 +337,12 @@ export const dataSourceConfigWorkSession: DataSourceConfigType<WorkSessionModel>
 				{
 					field: 'status',
 					header: 'Status',
-					body: (entry, column) =>
+					body: (entry, column, auth) =>
 						DataTableValue(entry, column, {
+							dataSource: 'work-session',
 							isStatus: true,
-							dataSourceKey: 'work-session',
 							markDeleted: true,
-							displayButton: {
-								action: (entry: WorkSessionModel) => {
-									if (entry.deleted_at) {
-										return 'restore';
-									}
-
-									if (
-										entry.status ===
-										WorkSessionStatusEnum.ACTIVE
-									) {
-										return 'close';
-									}
-
-									return undefined;
-								},
-								dataSource: 'work-session',
-							},
+							displayButton: displayButtonStatus(auth),
 						}),
 					style: {
 						minWidth: '8rem',

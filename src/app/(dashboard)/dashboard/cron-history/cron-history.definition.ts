@@ -2,12 +2,16 @@ import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
 import { ViewCronHistory } from '@/app/(dashboard)/dashboard/cron-history/view-cron-history.component';
 import { translateBatch } from '@/config/translate.setup';
 import { requestDeleteMultiple, requestFind } from '@/helpers/services.helper';
+import { type AuthModel, hasPermission } from '@/models/auth.model';
 import type {
 	CronHistoryModel,
 	CronHistoryStatus,
 } from '@/models/cron-history.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
-import type { DataSourceConfigType } from '@/types/data-source.type';
+import type {
+	DataSourceConfigType,
+	DataTableValueOptionsType,
+} from '@/types/data-source.type';
 
 const translations = await translateBatch(
 	['view.title', 'delete.title'] as const,
@@ -20,6 +24,16 @@ export type CronHistoryDataTableFiltersType = {
 	start_at_start: { value: string | null; matchMode: 'equals' };
 	start_at_end: { value: string | null; matchMode: 'equals' };
 };
+
+function displayButtonView(
+	auth: AuthModel | null,
+): DataTableValueOptionsType<CronHistoryModel>['displayButton'] {
+	return {
+		action: () =>
+			hasPermission(auth, 'cron-history', 'read') ? 'view' : undefined,
+		dataSource: 'cron-history',
+	};
+}
 
 export const dataSourceConfigCronHistory: DataSourceConfigType<CronHistoryModel> =
 	{
@@ -41,13 +55,9 @@ export const dataSourceConfigCronHistory: DataSourceConfigType<CronHistoryModel>
 					field: 'id',
 					header: 'ID',
 					sortable: true,
-					body: (entry, column) =>
+					body: (entry, column, auth) =>
 						DataTableValue(entry, column, {
-							markDeleted: true,
-							displayButton: {
-								action: 'view',
-								dataSource: 'cron-history',
-							},
+							displayButton: displayButtonView(auth),
 						}),
 				},
 				{
@@ -70,7 +80,7 @@ export const dataSourceConfigCronHistory: DataSourceConfigType<CronHistoryModel>
 					body: (entry, column) =>
 						DataTableValue(entry, column, {
 							isStatus: true,
-							dataSourceKey: 'cron-history',
+							dataSource: 'cron-history',
 						}),
 					style: {
 						minWidth: '6rem',

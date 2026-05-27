@@ -10,7 +10,8 @@
 		"unauthorized": "Access denied. Please check your permissions",
 		"already_logged_in": "You're already signed in",
 		"operation_not_allowed": "Operation not allowed",
-		"entry_required": "Entry is required"
+		"entry_required": "Entry is required",
+		"service_unavailable": "Service unavailable"
 	},
 	"info": {
 		"account_delete": "Hey ..I don't know your name anymore! Thank you for being with us for a while. Your account has been marked for deletion. All data associated with your account will be removed from our database within 5–30 days. You’re always welcome to create a new account anytime."

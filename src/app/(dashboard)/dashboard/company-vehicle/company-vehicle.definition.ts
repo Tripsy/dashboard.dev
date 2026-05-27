@@ -22,6 +22,7 @@ import {
 } from '@/helpers/services.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
+import { type AuthModel, hasPermission } from '@/models/auth.model';
 import {
 	type CompanyVehicleModel,
 	type CompanyVehicleScope,
@@ -31,7 +32,10 @@ import {
 	STATUS_TRANSITIONS,
 } from '@/models/company-vehicle.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
-import type { DataSourceConfigType } from '@/types/data-source.type';
+import type {
+	DataSourceConfigType,
+	DataTableValueOptionsType,
+} from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(
@@ -149,6 +153,46 @@ export type CompanyVehicleDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
+function displayButtonView(
+	auth: AuthModel | null,
+): DataTableValueOptionsType<CompanyVehicleModel>['displayButton'] {
+	return {
+		action: () =>
+			hasPermission(auth, 'company-vehicle', 'read') ? 'view' : undefined,
+		dataSource: 'company-vehicle',
+	};
+}
+
+function displayButtonStatus(
+	auth: AuthModel | null,
+): DataTableValueOptionsType<CompanyVehicleModel>['displayButton'] {
+	return {
+		action: (entry: CompanyVehicleModel) => {
+			if (entry.deleted_at) {
+				return hasPermission(auth, 'company-vehicle', 'delete')
+					? 'restore'
+					: undefined;
+			}
+
+			const statusTransitions = getStatusTransitions(
+				entry.status,
+				STATUS_TRANSITIONS,
+			);
+
+			if (statusTransitions.length === 0) {
+				return undefined;
+			}
+
+			if (!hasPermission(auth, 'company-vehicle', 'update')) {
+				return undefined;
+			}
+
+			return 'statusTransition';
+		},
+		dataSource: 'company-vehicle',
+	};
+}
+
 export const dataSourceConfigCompanyVehicle: DataSourceConfigType<CompanyVehicleModel> =
 	{
 		dataTable: {
@@ -169,13 +213,10 @@ export const dataSourceConfigCompanyVehicle: DataSourceConfigType<CompanyVehicle
 					field: 'id',
 					header: 'ID',
 					sortable: true,
-					body: (entry, column) =>
+					body: (entry, column, auth) =>
 						DataTableValue(entry, column, {
 							markDeleted: true,
-							displayButton: {
-								action: 'view',
-								dataSource: 'company-vehicle',
-							},
+							displayButton: displayButtonView(auth),
 						}),
 				},
 				{
@@ -219,31 +260,11 @@ export const dataSourceConfigCompanyVehicle: DataSourceConfigType<CompanyVehicle
 				{
 					field: 'status',
 					header: 'Status',
-					body: (entry, column) =>
+					body: (entry, column, auth) =>
 						DataTableValue(entry, column, {
 							isStatus: true,
-							dataSourceKey: 'company-vehicle',
 							markDeleted: true,
-							displayButton: {
-								action: (entry: CompanyVehicleModel) => {
-									if (entry.deleted_at) {
-										return undefined;
-									}
-
-									const statusTransitions =
-										getStatusTransitions(
-											entry.status,
-											STATUS_TRANSITIONS,
-										);
-
-									if (statusTransitions.length === 0) {
-										return undefined;
-									}
-
-									return 'statusTransition';
-								},
-								dataSource: 'company-vehicle',
-							},
+							displayButton: displayButtonStatus(auth),
 						}),
 					style: {
 						minWidth: '8rem',

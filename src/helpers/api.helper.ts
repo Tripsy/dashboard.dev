@@ -98,8 +98,14 @@ export class ApiRequest {
 	}
 
 	private async handleJsonResponse(res: Response) {
+		const text = await res.text();
+
+		if (!text) {
+			return null;
+		}
+
 		try {
-			return await res.json();
+			return JSON.parse(text);
 		} catch {
 			if (res.ok) {
 				throw new Error('Invalid JSON response');
@@ -190,9 +196,8 @@ export class ApiRequest {
 					res.status,
 					jsonResponse,
 				);
-				this.handleError(error);
 
-				return undefined;
+				this.handleError(error);
 			}
 
 			return jsonResponse;
@@ -200,8 +205,6 @@ export class ApiRequest {
 			clearTimeout(timeout);
 
 			this.handleError(error);
-
-			return undefined;
 		}
 	}
 }

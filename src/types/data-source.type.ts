@@ -1,6 +1,7 @@
 import type React from 'react';
 import type { JSX } from 'react';
 import type { ModalSizeType } from '@/components/ui/modal';
+import type { AuthModel } from '@/models/auth.model';
 import type {
 	PermissionEntityType,
 	PermissionOperationType,
@@ -68,6 +69,7 @@ export type DataTableColumnType<Entry> = {
 	body?: (
 		entry: Entry,
 		column: DataTableColumnType<Entry>,
+		auth: AuthModel | null,
 	) => JSX.Element | string;
 	style?: React.CSSProperties;
 };
@@ -77,12 +79,12 @@ export type DataTableValueOptionsType<Entry> = {
 	capitalize?: boolean;
 	markDeleted?: boolean;
 	isStatus?: boolean;
-	dataSourceKey?: DataSourceKey;
+	dataSource?: DataSourceKey;
 	displayDate?: boolean;
 	displayButton?: {
+		dataSource?: DataSourceKey; // If present will override the dataSource passed in the main options
 		action: string | ((entry: Entry) => string | undefined);
-		dataSource: DataSourceKey;
-		altTitle?: string;
+		title?: string;
 		alternateEntryId?: number;
 	};
 };
@@ -99,7 +101,7 @@ export type ActionConfigPermission = [
 type ActionConfigBase<Entry, FormValues extends FormValuesType> = {
 	windowTitle: string;
 	// biome-ignore lint/suspicious/noExplicitAny: It's fine
-	windowComponent?: React.ComponentType<any>; // e.g: ViewUser, FormManageUser, SetupPermissionsUser, etc.
+	windowComponent?: React.ComponentType<any>; // e.g: ViewUser, FormManageUser, SetupUserPermissions, etc.
 	windowConfigProps?: {
 		title?: string;
 		size?: ModalSizeType;

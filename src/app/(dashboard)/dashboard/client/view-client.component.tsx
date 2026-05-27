@@ -21,7 +21,7 @@ export function ViewClient({ entry }: { entry: ClientModel }) {
 					<div className="max-w-60">
 						<DisplayStatus
 							status={entry.status}
-							dataSourceKey="user"
+							dataSource="user"
 						/>
 					</div>
 				</div>

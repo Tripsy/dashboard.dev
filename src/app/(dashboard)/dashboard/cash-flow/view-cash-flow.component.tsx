@@ -180,7 +180,7 @@ export function ViewCashFlow({ entry }: { entry: CashFlowModel }) {
 					<div className="max-w-60">
 						<DisplayStatus
 							status={entry.status}
-							dataSourceKey="cash-flow"
+							dataSource="cash-flow"
 						/>
 					</div>
 				</div>

@@ -17,6 +17,7 @@ import {
 } from '@/helpers/services.helper';
 import { parseJson, toKebabCase } from '@/helpers/string.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
+import { type AuthModel, hasPermission } from '@/models/auth.model';
 import {
 	type TemplateLayoutEmail,
 	TemplateLayoutEmailEnum,
@@ -28,7 +29,10 @@ import {
 } from '@/models/template.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
 import { LanguageEnum } from '@/types/common.type';
-import type { DataSourceConfigType } from '@/types/data-source.type';
+import type {
+	DataSourceConfigType,
+	DataTableValueOptionsType,
+} from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(
@@ -232,6 +236,16 @@ export type TemplateDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
+function displayButtonView(
+	auth: AuthModel | null,
+): DataTableValueOptionsType<TemplateModel>['displayButton'] {
+	return {
+		action: () =>
+			hasPermission(auth, 'template', 'read') ? 'view' : undefined,
+		dataSource: 'template',
+	};
+}
+
 export const dataSourceConfigTemplate: DataSourceConfigType<TemplateModel> = {
 	dataTable: {
 		state: {
@@ -251,13 +265,10 @@ export const dataSourceConfigTemplate: DataSourceConfigType<TemplateModel> = {
 				field: 'id',
 				header: 'ID',
 				sortable: true,
-				body: (entry, column) =>
+				body: (entry, column, auth) =>
 					DataTableValue(entry, column, {
 						markDeleted: true,
-						displayButton: {
-							action: 'view',
-							dataSource: 'template',
-						},
+						displayButton: displayButtonView(auth),
 					}),
 			},
 			{

@@ -190,7 +190,7 @@ function CmrSessionEntry({ m, onDelete }: CmrSessionEntryProps) {
 			<td className="px-4 py-4 whitespace-nowrap text-sm text-card-foreground">
 				<DisplayStatus
 					status={m.work_session.status}
-					dataSourceKey="work-session"
+					dataSource="work-session"
 				/>
 			</td>
 			<td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">

@@ -134,20 +134,20 @@ export const statusList: Record<
 
 export const DisplayStatus = ({
 	status,
-	dataSourceKey,
+	dataSource,
 	variant,
 	size,
 	icon: Icon,
 }: {
 	status: keyof typeof statusList;
-	dataSourceKey: DataSourceKey;
+	dataSource: DataSourceKey;
 	variant?: BadgeVariant;
 	size?: BadgeSize;
 	icon?: ComponentType<{ className?: string }>;
 }) => {
 	const translationsKeys = useMemo(
-		() => [`${dataSourceKey}.status.${status}`] as const,
-		[dataSourceKey, status],
+		() => [`${dataSource}.status.${status}`] as const,
+		[dataSource, status],
 	);
 
 	const { translations } = useTranslation(translationsKeys);
@@ -165,7 +165,7 @@ export const DisplayStatus = ({
 			className="min-w-28 opacity-70 hover:opacity-100"
 		>
 			{ComputedIcon && <ComputedIcon className="w-4 h-4" />}
-			{translations[`${dataSourceKey}.status.${status}`] || status}
+			{translations[`${dataSource}.status.${status}`] || status}
 		</Badge>
 	);
 };

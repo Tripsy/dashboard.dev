@@ -29,7 +29,7 @@ export function ViewMailQueue({ entry }: { entry: MailQueueModel }) {
 						<div className="max-w-60">
 							<DisplayStatus
 								status={entry.status}
-								dataSourceKey="mail-queue"
+								dataSource="mail-queue"
 							/>
 						</div>
 					</div>

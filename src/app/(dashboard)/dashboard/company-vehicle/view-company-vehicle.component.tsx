@@ -25,7 +25,7 @@ export function ViewCompanyVehicle({ entry }: { entry: CompanyVehicleModel }) {
 					<div className="max-w-60">
 						<DisplayStatus
 							status={entry.status}
-							dataSourceKey="company-vehicle"
+							dataSource="company-vehicle"
 						/>
 					</div>
 				</div>

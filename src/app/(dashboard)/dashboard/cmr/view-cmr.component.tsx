@@ -21,10 +21,7 @@ export function ViewCmr({ entry }: { entry: CmrModel }) {
 				<div className="flex items-center gap-2">
 					<span className="font-semibold">Status</span>{' '}
 					<div className="max-w-60">
-						<DisplayStatus
-							status={entry.status}
-							dataSourceKey="cmr"
-						/>
+						<DisplayStatus status={entry.status} dataSource="cmr" />
 					</div>
 				</div>
 

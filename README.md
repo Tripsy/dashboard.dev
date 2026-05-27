@@ -208,15 +208,6 @@ pnpm run build    # Production build
 
 # 📌 TODO
 
-1. 
-http://dashboard.test/dashboard/brand
-- status buttons seem to be active - even though operation is not allowed
-
-
-"message": "syntax error at or near \"WHERE\"",
-"request": {
-"url": "/cmr?order_by=id&direction=DESC&limit=10&page=1&filter%5Bis_deleted%5D=false"
-
 ---------- 
 1. Add section "documentation"
 2. login with google / facebook

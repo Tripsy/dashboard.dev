@@ -17,6 +17,7 @@ import {
 	requestUpdateStatus,
 } from '@/helpers/services.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
+import { type AuthModel, hasPermission } from '@/models/auth.model';
 import {
 	displayVendorLabel,
 	type VendorModel,
@@ -24,7 +25,10 @@ import {
 	VendorStatusEnum,
 } from '@/models/vendor.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
-import type { DataSourceConfigType } from '@/types/data-source.type';
+import type {
+	DataSourceConfigType,
+	DataTableValueOptionsType,
+} from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
 const translations = await translateBatch(
@@ -81,6 +85,38 @@ export type VendorDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
+function displayButtonView(
+	auth: AuthModel | null,
+): DataTableValueOptionsType<VendorModel>['displayButton'] {
+	return {
+		action: () =>
+			hasPermission(auth, 'vendor', 'read') ? 'view' : undefined,
+		dataSource: 'vendor',
+	};
+}
+
+function displayButtonStatus(
+	auth: AuthModel | null,
+): DataTableValueOptionsType<VendorModel>['displayButton'] {
+	return {
+		action: (entry: VendorModel) => {
+			if (entry.deleted_at) {
+				return hasPermission(auth, 'vendor', 'delete')
+					? 'restore'
+					: undefined;
+			}
+
+			if (!hasPermission(auth, 'vendor', 'update')) {
+				return undefined;
+			}
+
+			return entry.status === VendorStatusEnum.ACTIVE
+				? 'disable'
+				: 'enable';
+		},
+	};
+}
+
 export const dataSourceConfigVendor: DataSourceConfigType<VendorModel> = {
 	dataTable: {
 		state: {
@@ -99,13 +135,10 @@ export const dataSourceConfigVendor: DataSourceConfigType<VendorModel> = {
 				field: 'id',
 				header: 'ID',
 				sortable: true,
-				body: (entry, column) =>
+				body: (entry, column, auth) =>
 					DataTableValue(entry, column, {
 						markDeleted: true,
-						displayButton: {
-							action: 'view',
-							dataSource: 'vendor',
-						},
+						displayButton: displayButtonView(auth),
 					}),
 			},
 			{
@@ -116,21 +149,12 @@ export const dataSourceConfigVendor: DataSourceConfigType<VendorModel> = {
 			{
 				field: 'status',
 				header: 'Status',
-				body: (entry, column) =>
+				body: (entry, column, auth) =>
 					DataTableValue(entry, column, {
+						dataSource: 'vendor',
 						isStatus: true,
-						dataSourceKey: 'vendor',
 						markDeleted: true,
-						displayButton: {
-							action: (entry: VendorModel) => {
-								return entry.deleted_at
-									? 'restore'
-									: entry.status === VendorStatusEnum.ACTIVE
-										? 'disable'
-										: 'enable';
-							},
-							dataSource: 'vendor',
-						},
+						displayButton: displayButtonStatus(auth),
 					}),
 				style: {
 					minWidth: '8rem',

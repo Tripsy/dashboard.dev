@@ -102,15 +102,12 @@ export const DataTableValue = <Entry extends Record<string, unknown>>(
 				? 'deleted'
 				: (entry.status as keyof typeof statusList);
 
-		if (!options.dataSourceKey) {
-			throw new Error('dataSourceKey is required for status display');
+		if (!options.dataSource) {
+			throw new Error('dataSource is required for `DisplayStatus`');
 		}
 
 		outputValue = (
-			<DisplayStatus
-				status={status}
-				dataSourceKey={options.dataSourceKey}
-			/>
+			<DisplayStatus status={status} dataSource={options.dataSource} />
 		);
 	} else if (options.markDeleted && 'deleted_at' in entry) {
 		outputValue = (
@@ -122,21 +119,34 @@ export const DataTableValue = <Entry extends Record<string, unknown>>(
 	}
 
 	if (options.displayButton) {
-		const { action, dataSource } = options.displayButton;
+		const {
+			action,
+			title,
+			alternateEntryId,
+			dataSource: displayButtonDataSource,
+		} = options.displayButton;
 
 		const resolvedAction =
 			typeof action === 'function' ? action(entry) : action;
 
 		if (resolvedAction) {
+			// If displayButtonDataSource is provided, use it, otherwise use options.dataSource
+			const displayButtonDataSourceValue =
+				displayButtonDataSource || options.dataSource;
+
+			if (!displayButtonDataSourceValue) {
+				throw new Error('dataSource is required for `DisplayButton`');
+			}
+
 			outputValue = (
 				<DisplayButton
 					buttonProps={{
 						label: outputValue,
-						title: options.displayButton.altTitle,
+						title: title,
 					}}
 					action={resolvedAction}
-					dataSource={dataSource}
-					entryOrId={options.displayButton.alternateEntryId ?? entry}
+					dataSource={displayButtonDataSourceValue}
+					entryOrId={alternateEntryId ?? entry}
 				/>
 			);
 		}

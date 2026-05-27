@@ -25,7 +25,7 @@ export function ViewCmrSession({ entry }: { entry: CmrSessionModel }) {
 					<div className="max-w-60">
 						<DisplayStatus
 							status={entry.work_session.status}
-							dataSourceKey="work-session"
+							dataSource="work-session"
 						/>
 					</div>
 				</div>

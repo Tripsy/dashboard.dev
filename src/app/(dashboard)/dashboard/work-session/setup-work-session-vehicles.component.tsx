@@ -275,13 +275,13 @@ function WorkSessionVehicleEntry({
 					>
 						<DisplayStatus
 							status={m.status}
-							dataSourceKey="work-session-vehicle"
+							dataSource="work-session-vehicle"
 						/>
 					</button>
 				) : (
 					<DisplayStatus
 						status={m.status}
-						dataSourceKey="work-session-vehicle"
+						dataSource="work-session-vehicle"
 					/>
 				)}
 			</td>

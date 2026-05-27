@@ -25,7 +25,7 @@ export function ViewBrand({ entry }: { entry: BrandModel }) {
 					<div className="max-w-60">
 						<DisplayStatus
 							status={entry.status}
-							dataSourceKey="brand"
+							dataSource="brand"
 						/>
 					</div>
 				</div>

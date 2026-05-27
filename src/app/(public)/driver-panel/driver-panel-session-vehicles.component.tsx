@@ -126,7 +126,7 @@ export function DriverPanelSessionVehicles({
 							<div>
 								<DisplayStatus
 									status={m.status}
-									dataSourceKey="work-session-vehicle"
+									dataSource="work-session-vehicle"
 								/>
 							</div>
 						</div>

@@ -25,7 +25,7 @@ export function ViewWorkSessionVehicle({
 					<div className="max-w-60">
 						<DisplayStatus
 							status={entry.status}
-							dataSourceKey="work-session-vehicle"
+							dataSource="work-session-vehicle"
 						/>
 					</div>
 				</div>

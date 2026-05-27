@@ -12,6 +12,7 @@ import {
 } from '@/helpers/form.helper';
 import { requestFind } from '@/helpers/services.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
+import { type AuthModel, hasPermission } from '@/models/auth.model';
 import {
 	type CmrModel,
 	type CmrStatus,
@@ -130,7 +131,18 @@ export type CmrSessionDataTableFiltersType = {
 	};
 };
 
+function displayButtonView(
+	auth: AuthModel | null,
+): DataTableValueOptionsType<CmrSessionModel>['displayButton'] {
+	return {
+		action: () =>
+			hasPermission(auth, 'cmr-session', 'read') ? 'view' : undefined,
+		dataSource: 'cmr-session',
+	};
+}
+
 function displayButtonViewWorkSession(
+	auth: AuthModel | null,
 	entry: CmrSessionModel,
 ): DataTableValueOptionsType<CmrSessionModel>['displayButton'] {
 	if (!entry.work_session) {
@@ -138,14 +150,16 @@ function displayButtonViewWorkSession(
 	}
 
 	return {
-		action: 'view',
+		action: () =>
+			hasPermission(auth, 'work-session', 'read') ? 'view' : undefined,
 		dataSource: 'work-session',
-		altTitle: translations['viewWorkSession.title'],
+		title: translations['viewWorkSession.title'],
 		alternateEntryId: entry.work_session.id,
 	};
 }
 
 function displayButtonViewCmr(
+	auth: AuthModel | null,
 	entry: CmrSessionModel,
 ): DataTableValueOptionsType<CmrSessionModel>['displayButton'] {
 	if (!entry.cmr) {
@@ -153,9 +167,9 @@ function displayButtonViewCmr(
 	}
 
 	return {
-		action: 'view',
+		action: () => (hasPermission(auth, 'cmr', 'read') ? 'view' : undefined),
 		dataSource: 'cmr',
-		altTitle: translations['viewCmr.title'],
+		title: translations['viewCmr.title'],
 		alternateEntryId: entry.cmr.id,
 	};
 }
@@ -182,24 +196,45 @@ export const dataSourceConfigCmrSession: DataSourceConfigType<CmrSessionModel> =
 					field: 'id',
 					header: 'ID',
 					sortable: true,
-					body: (entry, column) =>
+					body: (entry, column, auth) =>
 						DataTableValue(entry, column, {
-							markDeleted: true,
-							displayButton: {
-								action: 'view',
-								dataSource: 'cmr-session',
-							},
+							displayButton: displayButtonView(auth),
 						}),
+				},
+				{
+					field: 'cmr',
+					header: 'CMR',
+					body: (entry, column, auth) =>
+						DataTableValue(entry, column, {
+							customValue: displayCmrLabel(entry.cmr),
+							displayButton: displayButtonViewCmr(auth, entry),
+						}),
+				},
+				{
+					field: 'cmr_status',
+					header: 'CMR Status',
+					body: (entry) =>
+						DataTableValue<CmrModel>(entry.cmr, 'status', {
+							isStatus: true,
+							dataSource: 'cmr',
+						}),
+					style: {
+						minWidth: '8rem',
+						maxWidth: '8rem',
+					},
 				},
 				{
 					field: 'work_session',
 					header: 'Work Session',
-					body: (entry, column) =>
+					body: (entry, column, auth) =>
 						DataTableValue(entry, column, {
 							customValue: displayWorkSessionLabel(
 								entry.work_session,
 							),
-							displayButton: displayButtonViewWorkSession(entry),
+							displayButton: displayButtonViewWorkSession(
+								auth,
+								entry,
+							),
 						}),
 				},
 				{
@@ -211,31 +246,9 @@ export const dataSourceConfigCmrSession: DataSourceConfigType<CmrSessionModel> =
 							'status',
 							{
 								isStatus: true,
-								dataSourceKey: 'work-session',
+								dataSource: 'work-session',
 							},
 						),
-					style: {
-						minWidth: '8rem',
-						maxWidth: '8rem',
-					},
-				},
-				{
-					field: 'cmr',
-					header: 'CMR',
-					body: (entry, column) =>
-						DataTableValue(entry, column, {
-							customValue: displayCmrLabel(entry.cmr),
-							displayButton: displayButtonViewCmr(entry),
-						}),
-				},
-				{
-					field: 'cmr_status',
-					header: 'CMR Status',
-					body: (entry) =>
-						DataTableValue<CmrModel>(entry.cmr, 'status', {
-							isStatus: true,
-							dataSourceKey: 'cmr',
-						}),
 					style: {
 						minWidth: '8rem',
 						maxWidth: '8rem',

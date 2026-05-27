@@ -2,6 +2,7 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import Routes, { RouteAuthEnum, type RouteMatch } from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
+import { ApiError } from '@/exceptions/api.error';
 import { ApiRequest, getResponseData } from '@/helpers/api.helper';
 import { getTrackedCookie } from '@/helpers/session.helper';
 import { apiHeaders } from '@/helpers/system.helper';
@@ -127,9 +128,11 @@ class MiddlewareContext {
 	}
 
 	destroySession() {
-		this.res.cookies.delete(
-			Configuration.get('user.sessionToken') as string,
-		);
+		if (Configuration.isEnvironment('production')) {
+			this.res.cookies.delete(
+				Configuration.get('user.sessionToken') as string,
+			);
+		}
 	}
 
 	async handleAuth(
@@ -162,9 +165,9 @@ class MiddlewareContext {
 			}
 		}
 
-		const authModel = await fetchAuthModel(sessionToken.value);
+		const authResult = await fetchAuthModel(sessionToken.value); // null = invalid token, false = server error
 
-		if (!authModel) {
+		if (authResult === null) {
 			switch (routeAuth) {
 				case RouteAuthEnum.UNAUTHENTICATED:
 				case RouteAuthEnum.PUBLIC: {
@@ -186,6 +189,9 @@ class MiddlewareContext {
 					return this.redirectToError('undefined_route');
 				}
 			}
+		} else if (authResult === false) {
+			// server is down, don't punish the user's session
+			return this.redirectToError('service_unavailable');
 		}
 
 		if (routeAuth === RouteAuthEnum.UNAUTHENTICATED) {
@@ -193,17 +199,20 @@ class MiddlewareContext {
 		}
 
 		if (routeAuth === RouteAuthEnum.PROTECTED) {
-
-			console.log(permissionEntity)
+			console.log(permissionEntity);
 			if (
 				!permissionEntity ||
-				!hasPermission(authModel, permissionEntity, permissionOperation)
+				!hasPermission(
+					authResult,
+					permissionEntity,
+					permissionOperation,
+				)
 			) {
 				return this.redirectToError('unauthorized');
 			}
 		}
 
-		this.res.headers.set('x-auth-data', JSON.stringify(authModel));
+		this.res.headers.set('x-auth-data', JSON.stringify(authResult));
 
 		if (sessionToken.action === 'set' && sessionToken.value) {
 			const cookieName = Configuration.get('user.sessionToken') as string;
@@ -246,7 +255,9 @@ class MiddlewareContext {
  *
  * @param token
  */
-async function fetchAuthModel(token: string): Promise<AuthModel | null> {
+async function fetchAuthModel(
+	token: string,
+): Promise<AuthModel | null | false> {
 	try {
 		const fetchResponse: ApiResponseFetch<AuthModel> =
 			await new ApiRequest()
@@ -268,8 +279,12 @@ async function fetchAuthModel(token: string): Promise<AuthModel | null> {
 		}
 
 		return null;
-	} catch {
-		return null;
+	} catch (error) {
+		if (error instanceof ApiError && error.status >= 500) {
+			return false; // Server error, token may still be valid
+		}
+
+		return null; // 401/403/invalid token or anything else
 	}
 }
 

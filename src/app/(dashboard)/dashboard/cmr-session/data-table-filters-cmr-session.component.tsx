@@ -16,11 +16,12 @@ import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import { type CmrStatus, CmrStatusEnum } from '@/models/cmr.model';
-import type { UserModel } from '@/models/user.model';
+import { type UserModel, UserRoleEnum } from '@/models/user.model';
 import {
 	type WorkSessionStatus,
 	WorkSessionStatusEnum,
 } from '@/models/work-session.model';
+import { useAuth } from '@/providers/auth.provider';
 
 const cmrStatuses = toOptionsFromEnum(CmrStatusEnum, {
 	formatter: formatEnumLabel,
@@ -31,6 +32,8 @@ const workSessionStatuses = toOptionsFromEnum(WorkSessionStatusEnum, {
 });
 
 export const DataTableFiltersCmrSession = (): JSX.Element => {
+	const { auth } = useAuth();
+
 	const { dataSource, dataTableStateDefault, dataTableStore } =
 		useDataTable<'cmr-session'>();
 
@@ -145,21 +148,26 @@ export const DataTableFiltersCmrSession = (): JSX.Element => {
 				}
 			/>
 
-			<FormFiltersAutoComplete<CmrSessionDataTableFiltersType, UserModel>
-				labelText="User"
-				fieldName="user"
-				fieldNameId="user_id"
-				fieldValue={searchUser}
-				className="pl-8"
-				icons={{
-					left: <Icons.User className="opacity-40 h-4.5 w-4.5" />,
-				}}
-				setFilterValues={setFilterValues}
-				setSearch={setSearchUser}
-				dataSourceKey="user"
-				getOptionLabel={(m) => m.name}
-				getOptionKey={(m) => m.id}
-			/>
+			{(!auth || auth?.role !== UserRoleEnum.DRIVER) && (
+				<FormFiltersAutoComplete<
+					CmrSessionDataTableFiltersType,
+					UserModel
+				>
+					labelText="User"
+					fieldName="user"
+					fieldNameId="user_id"
+					fieldValue={searchUser}
+					className="pl-8"
+					icons={{
+						left: <Icons.User className="opacity-40 h-4.5 w-4.5" />,
+					}}
+					setFilterValues={setFilterValues}
+					setSearch={setSearchUser}
+					dataSourceKey="user"
+					getOptionLabel={(m) => m.name}
+					getOptionKey={(m) => m.id}
+				/>
+			)}
 
 			<FormFiltersReset dataSource="cmr-session" />
 		</div>

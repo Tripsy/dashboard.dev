@@ -32,8 +32,13 @@ import {
 	type CompanyVehicleModel,
 	displayCompanyVehicleLabel,
 } from '@/models/company-vehicle.model';
-import { displayUserLabel, type UserModel } from '@/models/user.model';
+import {
+	displayUserLabel,
+	type UserModel,
+	UserRoleEnum,
+} from '@/models/user.model';
 import { displayVendorLabel, type VendorModel } from '@/models/vendor.model';
+import { useAuth } from '@/providers/auth.provider';
 import { type Currency, CurrencyEnum } from '@/types/common.type';
 
 const statuses = toOptionsFromEnum(CashFlowStatusEnum, {
@@ -53,6 +58,8 @@ const methods = toOptionsFromEnum(CashFlowMethodEnum, {
 });
 
 export const DataTableFiltersCashFlow = (): JSX.Element => {
+	const { auth } = useAuth();
+
 	const { dataSource, dataTableStateDefault, dataTableStore } =
 		useDataTable<'cash-flow'>();
 
@@ -269,21 +276,26 @@ export const DataTableFiltersCashFlow = (): JSX.Element => {
 				getOptionKey={(m) => m.id}
 			/>
 
-			<FormFiltersAutoComplete<CashFlowDataTableFiltersType, UserModel>
-				labelText="Employee"
-				fieldName="employee"
-				fieldNameId="employee_id"
-				fieldValue={searchEmployee}
-				className="pl-8"
-				icons={{
-					left: <Icons.User className="opacity-40 h-4.5 w-4.5" />,
-				}}
-				setFilterValues={setFilterValues}
-				setSearch={setSearchEmployee}
-				dataSourceKey="user"
-				getOptionLabel={(m) => displayUserLabel(m)}
-				getOptionKey={(m) => m.id}
-			/>
+			{(!auth || auth?.role !== UserRoleEnum.DRIVER) && (
+				<FormFiltersAutoComplete<
+					CashFlowDataTableFiltersType,
+					UserModel
+				>
+					labelText="Employee"
+					fieldName="employee"
+					fieldNameId="employee_id"
+					fieldValue={searchEmployee}
+					className="pl-8"
+					icons={{
+						left: <Icons.User className="opacity-40 h-4.5 w-4.5" />,
+					}}
+					setFilterValues={setFilterValues}
+					setSearch={setSearchEmployee}
+					dataSourceKey="user"
+					getOptionLabel={(m) => displayUserLabel(m)}
+					getOptionKey={(m) => m.id}
+				/>
+			)}
 
 			<FormFiltersAutoComplete<CashFlowDataTableFiltersType, VendorModel>
 				labelText="Vendor"
@@ -323,6 +335,7 @@ export const DataTableFiltersCashFlow = (): JSX.Element => {
 			/>
 
 			<FormFiltersShowDeleted
+				dataSource="cash-flow"
 				checked={filters.is_deleted.value ?? false}
 				onCheckedChange={(value) =>
 					setFilterValues({

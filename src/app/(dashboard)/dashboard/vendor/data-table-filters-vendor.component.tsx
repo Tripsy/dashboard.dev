@@ -105,6 +105,7 @@ export const DataTableFiltersVendor = (): JSX.Element => {
 			/>
 
 			<FormFiltersShowDeleted
+				dataSource="vendor"
 				checked={filters.is_deleted.value ?? false}
 				onCheckedChange={(value) =>
 					setFilterValues({ is_deleted: value })

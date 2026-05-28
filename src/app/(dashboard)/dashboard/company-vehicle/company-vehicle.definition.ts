@@ -262,6 +262,7 @@ export const dataSourceConfigCompanyVehicle: DataSourceConfigType<CompanyVehicle
 					header: 'Status',
 					body: (entry, column, auth) =>
 						DataTableValue(entry, column, {
+							dataSource: 'company-vehicle',
 							isStatus: true,
 							markDeleted: true,
 							displayButton: displayButtonStatus(auth),

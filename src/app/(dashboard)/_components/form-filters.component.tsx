@@ -21,6 +21,8 @@ import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useRemoteAutocomplete } from '@/hooks/use-remote-autocomplete';
 import type { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
+import { hasPermission } from '@/models/auth.model';
+import { useAuth } from '@/providers/auth.provider';
 import type { FindFunctionResponseType } from '@/types/action.type';
 import type { DataSourceKey } from '@/types/data-source.key';
 import type { DataTableFiltersType } from '@/types/data-source.type';
@@ -245,12 +247,16 @@ export function FormFiltersDateRange<Fields>({
 }
 
 export function FormFiltersShowDeleted({
+	dataSource,
 	checked = false,
 	onCheckedChange,
 }: {
+	dataSource: DataSourceKey;
 	checked: boolean;
 	onCheckedChange: (checked: boolean) => void;
 }) {
+	const { auth } = useAuth();
+
 	const elementIds = useElementIds(['search-is-deleted'] as const);
 
 	const translationsKeys = useMemo(
@@ -259,6 +265,10 @@ export function FormFiltersShowDeleted({
 	);
 
 	const { translations } = useTranslation(translationsKeys);
+
+	if (!auth || !hasPermission(auth, dataSource, 'delete')) {
+		return null;
+	}
 
 	return (
 		<div className="flex self-end pb-3">

@@ -15,17 +15,20 @@ import { Icons } from '@/components/icon.component';
 import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
-import type { UserModel } from '@/models/user.model';
+import { type UserModel, UserRoleEnum } from '@/models/user.model';
 import {
 	type WorkSessionStatus,
 	WorkSessionStatusEnum,
 } from '@/models/work-session.model';
+import { useAuth } from '@/providers/auth.provider';
 
 const statuses = toOptionsFromEnum(WorkSessionStatusEnum, {
 	formatter: formatEnumLabel,
 });
 
 export const DataTableFiltersWorkSession = (): JSX.Element => {
+	const { auth } = useAuth();
+
 	const { dataSource, dataTableStateDefault, dataTableStore } =
 		useDataTable<'work-session'>();
 
@@ -92,21 +95,26 @@ export const DataTableFiltersWorkSession = (): JSX.Element => {
 
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
-			<FormFiltersAutoComplete<WorkSessionDataTableFiltersType, UserModel>
-				labelText="User"
-				fieldName="user"
-				fieldNameId="user_id"
-				fieldValue={searchUser}
-				className="pl-8"
-				icons={{
-					left: <Icons.User className="opacity-40 h-4.5 w-4.5" />,
-				}}
-				setFilterValues={setFilterValues}
-				setSearch={setSearchUser}
-				dataSourceKey="user"
-				getOptionLabel={(m) => m.name}
-				getOptionKey={(m) => m.id}
-			/>
+			{(!auth || auth?.role !== UserRoleEnum.DRIVER) && (
+				<FormFiltersAutoComplete<
+					WorkSessionDataTableFiltersType,
+					UserModel
+				>
+					labelText="User"
+					fieldName="user"
+					fieldNameId="user_id"
+					fieldValue={searchUser}
+					className="pl-8"
+					icons={{
+						left: <Icons.User className="opacity-40 h-4.5 w-4.5" />,
+					}}
+					setFilterValues={setFilterValues}
+					setSearch={setSearchUser}
+					dataSourceKey="user"
+					getOptionLabel={(m) => m.name}
+					getOptionKey={(m) => m.id}
+				/>
+			)}
 
 			<FormFiltersSelect<WorkSessionDataTableFiltersType>
 				labelText="Status"
@@ -135,6 +143,7 @@ export const DataTableFiltersWorkSession = (): JSX.Element => {
 			/>
 
 			<FormFiltersShowDeleted
+				dataSource="work-session"
 				checked={filters.is_deleted.value ?? false}
 				onCheckedChange={(value) =>
 					setFilterValues({ is_deleted: value })

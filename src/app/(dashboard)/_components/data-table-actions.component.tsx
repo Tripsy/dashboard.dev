@@ -9,6 +9,7 @@ import { getDataSourceConfig } from '@/config/data-source.config';
 import { getErrorMessage } from '@/helpers/objects.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { hasPermission } from '@/models/auth.model';
+import { UserRoleEnum } from '@/models/user.model';
 import { useAuth } from '@/providers/auth.provider';
 import { useToast } from '@/providers/toast.provider';
 import { useModalStore } from '@/stores/window.store';
@@ -146,6 +147,13 @@ export function DataTableActions<K extends DataSourceKey>() {
 			}
 
 			const [permissionEntity, permissionOperation] = permission;
+
+			if (
+				auth?.role === UserRoleEnum.DRIVER &&
+				permissionOperation !== 'find'
+			) {
+				return false;
+			}
 
 			return hasPermission(auth, permissionEntity, permissionOperation);
 		},

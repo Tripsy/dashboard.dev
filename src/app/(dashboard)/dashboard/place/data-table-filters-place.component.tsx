@@ -106,6 +106,7 @@ export const DataTableFiltersPlace = (): JSX.Element => {
 			/>
 
 			<FormFiltersShowDeleted
+				dataSource="place"
 				checked={filters.is_deleted.value ?? false}
 				onCheckedChange={(value) => setFilterValue('is_deleted', value)}
 			/>

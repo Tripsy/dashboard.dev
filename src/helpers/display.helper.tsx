@@ -122,10 +122,6 @@ export const statusList: Record<
 		variant: 'success',
 		icon: Icons.Status.Delivered,
 	},
-	cancelled: {
-		variant: 'error',
-		icon: Icons.Status.Canceled,
-	},
 	delayed: {
 		variant: 'warning',
 		icon: Icons.Status.Delayed,
@@ -180,20 +176,85 @@ export const DisplayDeleted = ({
 	return <div className={clsx(isDeleted && 'line-through')}>{value}</div>;
 };
 
+/**
+ * Displays a formatted amount with optional VAT calculation and conditional styling for negative values
+ *
+ * @param {Object} props - Component props
+ * @param {number} props.amount
+ * @param {string} props.currencyCode - Currency code (e.g., RON, USD, EUR)
+ * @returns {JSX.Element} Formatted amount span with currency and conditional styling
+ *
+ * @example
+ * // Display positive amount in RON
+ * <DisplayAmount netAmount={100} currencyCode="RON" sign={1} />
+ *
+ * @example
+ * // Display negative amount with error styling
+ * <DisplayAmount netAmount={50} currencyCode="EUR" sign={-1} vat_rate={20} />
+ */
 export function DisplayAmount({
 	amount,
 	currencyCode,
-	sign,
+	classNameNegative = 'text-error dark:text-warning',
+	classNamePositive,
 }: {
 	amount: number;
 	currencyCode: string;
-	sign: 1 | -1;
-}) {
+	classNameNegative?: string;
+	classNamePositive?: string;
+}): JSX.Element {
 	const formatted = formatAmount(amount, currencyCode);
 
 	return (
-		<span className={sign === -1 ? 'text-error dark:text-warning' : ''}>
+		<span className={amount < 0 ? classNameNegative : classNamePositive}>
 			{formatted.value} {formatted.currency}
 		</span>
 	);
+}
+
+/**
+ * Add VAT to a net amount
+ *
+ * @param {number} netAmount - Amount excluding VAT
+ * @param {number} vatRate - VAT rate in percentage (e.g., 20 for 20%)
+ * @returns {number} Total amount including VAT
+ */
+export function calcGrossAmount(netAmount: number, vatRate: number): number {
+	if (vatRate < 0) {
+		throw new Error('VAT rate must be greater or equal to 0');
+	}
+
+	return netAmount * (1 + vatRate / 100);
+}
+
+/**
+ * Remove VAT from a gross amount to get net amount (excl. tax)
+ *
+ * @param {number} grossAmount - Amount including VAT
+ * @param {number} vatRate - VAT rate in percentage (e.g., 20 for 20%)
+ * @returns {number} Net amount excluding VAT
+ */
+export function calcNetAmount(grossAmount: number, vatRate: number): number {
+	if (vatRate < 0) {
+		throw new Error('VAT rate must be greater or equal to 0');
+	}
+
+	const netAmount = grossAmount / (1 + vatRate / 100);
+
+	return parseFloat(netAmount.toFixed(4));
+}
+
+/**
+ * Extract VAT amount from a gross amount
+ *
+ * @param {number} grossAmount - Amount including VAT
+ * @param {number} vatRate - VAT rate in percentage (e.g., 20 for 20%)
+ * @returns {number} VAT amount only
+ */
+export function extractVAT(grossAmount: number, vatRate: number): number {
+	if (vatRate < 0) {
+		throw new Error('VAT rate must be greater or equal to 0');
+	}
+
+	return grossAmount - grossAmount / (1 + vatRate / 100);
 }

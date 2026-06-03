@@ -199,7 +199,6 @@ class MiddlewareContext {
 		}
 
 		if (routeAuth === RouteAuthEnum.PROTECTED) {
-			console.log(permissionEntity);
 			if (
 				!permissionEntity ||
 				!hasPermission(

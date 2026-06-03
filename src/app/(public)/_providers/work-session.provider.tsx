@@ -10,7 +10,9 @@ import {
 	useMemo,
 	useRef,
 } from 'react';
+import { stringToDate } from '@/helpers/date.helper';
 import { isDriver } from '@/models/auth.model';
+import type { CashFlowModel } from '@/models/cash-flow.model';
 import type { CmrSessionModel } from '@/models/cmr-session.model';
 import type { CompanyVehicleModel } from '@/models/company-vehicle.model';
 import type { WorkSessionModel } from '@/models/work-session.model';
@@ -19,6 +21,7 @@ import { useAuth } from '@/providers/auth.provider';
 import {
 	requestActiveWorkSession,
 	requestAvailableCompanyVehicles,
+	requestSessionCashFlowEntries,
 } from '@/services/driver-session.service';
 import type { WorkSessionType } from '@/types/auth.type';
 
@@ -36,9 +39,13 @@ type WorkSessionContextType = {
 	availableCompanyVehicles: CompanyVehicleModel[];
 	workSessionCmrs: CmrSessionModel[];
 	refreshSession: () => Promise<void>;
+	sessionCashFlowEntries: CashFlowModel[];
+	refetchSessionCashFlowEntries: () => Promise<void>;
 };
 
-const REFRESH_INTERVAL = 10 * 60 * 1000; // 10 minutes
+const REFRESH_INTERVAL_SESSION = 10 * 60 * 1000; // 10 minutes
+const REFRESH_INTERVAL_AVAILABLE_COMPANY_VEHICLES = 20 * 60 * 1000; // 20 minutes
+const REFRESH_INTERVAL_SESSION_PAYMENTS = 20 * 60 * 1000; // 20 minutes
 
 const WorkSessionContext = createContext<WorkSessionContextType | undefined>(
 	undefined,
@@ -75,16 +82,10 @@ const WorkSessionProvider = ({
 		refetch: refetchSession,
 	} = useQuery({
 		queryKey: ['work-session', auth?.id],
-		queryFn: () => {
-			if (!auth?.id) {
-				throw new Error('No auth');
-			}
-
-			return requestActiveWorkSession();
-		},
+		queryFn: () => requestActiveWorkSession(),
 		enabled: isDriver(auth),
 		initialData: initSession,
-		staleTime: REFRESH_INTERVAL,
+		staleTime: REFRESH_INTERVAL_SESSION,
 	});
 
 	const {
@@ -92,15 +93,38 @@ const WorkSessionProvider = ({
 		refetch: refetchAvailableCompanyVehicles,
 	} = useQuery({
 		queryKey: ['company-vehicle', 'available'],
+		queryFn: () => requestAvailableCompanyVehicles(),
+		enabled: isDriver(auth),
+		staleTime: REFRESH_INTERVAL_AVAILABLE_COMPANY_VEHICLES,
+	});
+
+	const sessionCashFlowEntriesCreateAtStart = useMemo(() => {
+		const date = sessionData?.workSession?.created_at;
+
+		if (!date) {
+			return null;
+		}
+
+		return typeof date === 'string' ? stringToDate(date) : date;
+	}, [sessionData?.workSession?.created_at]);
+
+	const {
+		data: sessionCashFlowEntries,
+		refetch: refetchSessionCashFlowEntries,
+	} = useQuery({
+		queryKey: ['cash-flow', 'session', sessionData?.workSession?.id],
 		queryFn: () => {
 			if (!auth?.id) {
 				throw new Error('No auth');
 			}
 
-			return requestAvailableCompanyVehicles();
+			return requestSessionCashFlowEntries({
+				user_id: auth.id,
+				create_at_start: sessionCashFlowEntriesCreateAtStart,
+			});
 		},
-		enabled: isDriver(auth),
-		staleTime: REFRESH_INTERVAL,
+		enabled: isDriver(auth) && !!sessionCashFlowEntriesCreateAtStart,
+		staleTime: REFRESH_INTERVAL_SESSION_PAYMENTS,
 	});
 
 	const sessionSituation = getSessionSituation(
@@ -111,31 +135,28 @@ const WorkSessionProvider = ({
 
 	const sessionRefreshingRef = useRef(false);
 
-	const refreshSession = useCallback(
-		async ({ silent: _silent = false } = {}) => {
-			if (sessionRefreshingRef.current) {
-				return;
-			}
+	const refreshSession = useCallback(async () => {
+		if (sessionRefreshingRef.current) {
+			return;
+		}
 
-			try {
-				sessionRefreshingRef.current = true;
+		try {
+			sessionRefreshingRef.current = true;
 
-				await refetchSession();
-				await refetchAvailableCompanyVehicles();
-			} catch {
-				// Error surfaces via query state
-			} finally {
-				sessionRefreshingRef.current = false;
-			}
-		},
-		[refetchSession, refetchAvailableCompanyVehicles],
-	);
+			await refetchSession();
+			await refetchAvailableCompanyVehicles();
+		} catch {
+			// Error surfaces via query state
+		} finally {
+			sessionRefreshingRef.current = false;
+		}
+	}, [refetchSession, refetchAvailableCompanyVehicles]);
 
 	useEffect(() => {
 		// Interval-based refresh — runs regardless of visibility
 		const intervalId = setInterval(() => {
-			refreshSession({ silent: true }).catch(console.error);
-		}, REFRESH_INTERVAL);
+			refreshSession().catch(console.error);
+		}, REFRESH_INTERVAL_SESSION);
 
 		// Tab visibility refresh — only refresh if tab was hidden long enough
 		let hiddenAt: number | null = null;
@@ -148,7 +169,7 @@ const WorkSessionProvider = ({
 			}
 
 			if (hiddenAt && Date.now() - hiddenAt > HIDDEN_THRESHOLD) {
-				refreshSession({ silent: true }).catch(console.error);
+				refreshSession().catch(console.error);
 			}
 
 			hiddenAt = null;
@@ -170,12 +191,18 @@ const WorkSessionProvider = ({
 			availableCompanyVehicles: availableCompanyVehicles || [],
 			workSessionCmrs: sessionData?.workSessionCmrs || [],
 			refreshSession,
+			sessionCashFlowEntries: sessionCashFlowEntries ?? [],
+			refetchSessionCashFlowEntries: async () => {
+				await refetchSessionCashFlowEntries();
+			},
 		}),
 		[
 			sessionSituation,
 			sessionData,
 			availableCompanyVehicles,
 			refreshSession,
+			sessionCashFlowEntries,
+			refetchSessionCashFlowEntries,
 		],
 	);
 

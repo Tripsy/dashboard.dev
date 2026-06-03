@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
 	FormComponentAutoComplete,
 	FormComponentInput,
@@ -117,15 +117,15 @@ export function FormManageCashFlow({ action }: { action: string }) {
 		  >
 		| undefined;
 
-	const handleOperationalRecordChange = (
-		field: OperationalRecordType,
-		value: number | null,
-	) => {
-		handleChange('operational_records', {
-			...formValues.operational_records,
-			[field]: value,
-		});
-	};
+	const handleOperationalRecordChange = useCallback(
+		(field: OperationalRecordType, value: number | null) => {
+			handleChange('operational_records', {
+				...formValues.operational_records,
+				[field]: value,
+			});
+		},
+		[handleChange, formValues.operational_records],
+	);
 
 	const elementIds = useElementIds([
 		'category',
@@ -233,15 +233,22 @@ export function FormManageCashFlow({ action }: { action: string }) {
 		formValues.category,
 	);
 
+	const isProcessedOperationalRecords = useRef(false);
+
 	useEffect(() => {
-		if (!operationalRecords?.length) {
+		// Skip if not update mode, no records, or already initialized
+		if (
+			!entryId ||
+			!operationalRecords?.length ||
+			isProcessedOperationalRecords.current
+		) {
 			return;
 		}
 
+		isProcessedOperationalRecords.current = true;
+
 		const updatedOperationalRecords: CashFlowFormValuesType['operational_records'] =
-			{
-				...formValues.operational_records,
-			};
+			{};
 
 		for (const record of operationalRecords) {
 			switch (record.operational_record_type) {
@@ -301,7 +308,7 @@ export function FormManageCashFlow({ action }: { action: string }) {
 		}
 
 		handleChange('operational_records', updatedOperationalRecords);
-	}, [operationalRecords, formValues.operational_records, handleChange]);
+	}, [entryId, operationalRecords, handleChange]);
 
 	return (
 		<>
@@ -352,7 +359,7 @@ export function FormManageCashFlow({ action }: { action: string }) {
 
 			<div className="flex flex-wrap gap-2">
 				<FormComponentInput<CashFlowFormValuesType>
-					labelText="Amount"
+					labelText="Net Amount"
 					id={elementIds.amount}
 					fieldName="amount"
 					fieldType="number"

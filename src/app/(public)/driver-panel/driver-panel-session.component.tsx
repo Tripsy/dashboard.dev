@@ -58,7 +58,7 @@ export function DriverPanelSession({ session }: { session: WorkSessionModel }) {
 			<div className="flex-1 flex justify-end min-w-48">
 				<Button
 					size="md"
-					className="h-full w-full md:w-auto px-8 text-base font-bold text-background/90 rounded-none"
+					className="h-full w-full md:w-auto px-8 font-bold rounded-none"
 					variant="error"
 					onClick={handleCloseSession}
 				>

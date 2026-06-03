@@ -4,7 +4,13 @@ import { useWorkSession } from '@/app/(public)/_providers/work-session.provider'
 import { Icons } from '@/components/icon.component';
 import { Button } from '@/components/ui/button';
 import { DisplayStatus } from '@/helpers/display.helper';
+import {
+	CashFlowCategoryEnum,
+	CashFlowMethodEnum,
+	OperationalRecordTypeEnum,
+} from '@/models/cash-flow.model';
 import { displayCompanyVehicleLabel } from '@/models/company-vehicle.model';
+import { VehicleTypeEnum } from '@/models/vehicle.model';
 import {
 	type WorkSessionVehicleModel,
 	WorkSessionVehicleStatusEnum,
@@ -19,7 +25,7 @@ export function DriverPanelSessionVehicles({
 	sessionVehicles: WorkSessionVehicleModel[];
 }) {
 	const { open } = useModalStore();
-	const { refreshSession } = useWorkSession();
+	const { refreshSession, refetchSessionCashFlowEntries } = useWorkSession();
 
 	const handleUpdateSessionVehicle = useCallback(
 		(entry: WorkSessionVehicleModel) => {
@@ -103,6 +109,63 @@ export function DriverPanelSessionVehicles({
 		[open, refreshSession],
 	);
 
+	const handleCreatePaymentFuel = useCallback(
+		(entry: WorkSessionVehicleModel) => {
+			open({
+				minimized: false,
+				section: DataSourceSectionEnum.PUBLIC,
+				dataSource: 'cash-flow',
+				action: 'create',
+				data: {
+					prefillEntry: {
+						category: CashFlowCategoryEnum.FUEL,
+						method: CashFlowMethodEnum.CREDIT_CARD,
+						operational_records: {
+							[OperationalRecordTypeEnum.EMPLOYEE]:
+								entry.work_session.user,
+							[OperationalRecordTypeEnum.COMPANY_VEHICLE]:
+								entry.company_vehicle,
+						},
+					},
+				},
+				events: {
+					success: async () => {
+						await refetchSessionCashFlowEntries();
+					},
+				},
+			});
+		},
+		[open, refetchSessionCashFlowEntries],
+	);
+
+	const handleCreatePaymentToll = useCallback(
+		(entry: WorkSessionVehicleModel) => {
+			open({
+				minimized: false,
+				section: DataSourceSectionEnum.PUBLIC,
+				dataSource: 'cash-flow',
+				action: 'create',
+				data: {
+					prefillEntry: {
+						category: CashFlowCategoryEnum.TOLLS,
+						operational_records: {
+							[OperationalRecordTypeEnum.EMPLOYEE]:
+								entry.work_session.user,
+							[OperationalRecordTypeEnum.COMPANY_VEHICLE]:
+								entry.company_vehicle,
+						},
+					},
+				},
+				events: {
+					success: async () => {
+						await refetchSessionCashFlowEntries();
+					},
+				},
+			});
+		},
+		[open, refetchSessionCashFlowEntries],
+	);
+
 	return (
 		<div className="space-y-4">
 			{sessionVehicles.map((m) => (
@@ -130,39 +193,78 @@ export function DriverPanelSessionVehicles({
 								/>
 							</div>
 						</div>
-
-						<div className="flex flex-wrap justify-end gap-4">
+						<div className="flex gap-x-4">
 							{m.status ===
-								WorkSessionVehicleStatusEnum.ASSIGNED && (
+								WorkSessionVehicleStatusEnum.ASSIGNED &&
+								m.company_vehicle.vehicle.vehicle_type ===
+									VehicleTypeEnum.AUTO && (
+									<div className="flex flex-col justify-start gap-4">
+										<Button
+											variant="default"
+											hover="success"
+											onClick={() =>
+												handleCreatePaymentFuel(m)
+											}
+											className="cursor-pointer"
+											title="Add fuel payment"
+										>
+											<Icons.Fuel className="h-4 w-4" />{' '}
+											Fuel
+										</Button>
+
+										<Button
+											variant="default"
+											hover="success"
+											onClick={() =>
+												handleCreatePaymentToll(m)
+											}
+											className="cursor-pointer"
+											title="Add toll payment"
+										>
+											<Icons.Toll className="h-4 w-4" />{' '}
+											Toll
+										</Button>
+									</div>
+								)}
+
+							<div className="flex flex-col justify-start gap-4">
+								{m.status ===
+									WorkSessionVehicleStatusEnum.ASSIGNED && (
+									<Button
+										variant="secondary"
+										hover="warning"
+										onClick={() =>
+											handleStatusReturnSessionVehicle(m)
+										}
+										className="cursor-pointer"
+										title="Return vehicle"
+									>
+										<Icons.Action.Return className="h-4 w-4" />
+									</Button>
+								)}
 								<Button
 									variant="secondary"
-									hover="warning"
+									hover="info"
 									onClick={() =>
-										handleStatusReturnSessionVehicle(m)
+										handleUpdateSessionVehicle(m)
 									}
 									className="cursor-pointer"
+									title="Update vehicle"
 								>
-									<Icons.Action.Return className="h-4 w-4" />
+									<Icons.Action.Update className="h-4 w-4" />
 								</Button>
-							)}
-							<Button
-								variant="secondary"
-								hover="info"
-								onClick={() => handleUpdateSessionVehicle(m)}
-								className="cursor-pointer"
-								title="Update vehicle"
-							>
-								<Icons.Action.Update className="h-4 w-4" />
-							</Button>
-							<Button
-								variant="secondary"
-								hover="error"
-								onClick={() => handleDeleteSessionVehicle(m)}
-								className="cursor-pointer"
-								title="Delete vehicle"
-							>
-								<Icons.Action.Delete className="h-4 w-4" />
-							</Button>
+								<Button
+									variant="secondary"
+									hover="error"
+									onClick={() =>
+										handleDeleteSessionVehicle(m)
+									}
+									className="cursor-pointer"
+									title="Delete vehicle"
+								>
+									<Icons.Action.Delete className="h-4 w-4" />
+								</Button>
+							</div>
 						</div>
 					</div>
 				</div>

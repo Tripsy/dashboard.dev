@@ -1,5 +1,10 @@
 import { arrayHasValue } from '@/helpers/objects.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
+import type { ClientModel } from '@/models/client.model';
+import type { CmrModel } from '@/models/cmr.model';
+import type { CompanyVehicleModel } from '@/models/company-vehicle.model';
+import type { UserModel } from '@/models/user.model';
+import type { VendorModel } from '@/models/vendor.model';
 import type { Currency, StatusTransitions } from '@/types/common.type';
 
 export const CashFlowDirectionEnum = {
@@ -92,6 +97,7 @@ export const STATUS_TRANSITIONS: StatusTransitions<CashFlowStatus> = {
 export const CashFlowMethodEnum = {
 	CASH: 'cash',
 	BANK_TRANSFER: 'bank_transfer',
+	CREDIT_CARD: 'credit_card',
 } as const;
 
 export type CashFlowMethod =
@@ -320,6 +326,14 @@ export const getOperationalRecordOptions = (
 	return result;
 };
 
+export type CashFlowOperationalRecordsType = Partial<{
+	[OperationalRecordTypeEnum.CLIENT]: ClientModel | null;
+	[OperationalRecordTypeEnum.EMPLOYEE]: UserModel | null;
+	[OperationalRecordTypeEnum.COMPANY_VEHICLE]: CompanyVehicleModel | null;
+	[OperationalRecordTypeEnum.VENDOR]: VendorModel | null;
+	[OperationalRecordTypeEnum.CMR]: CmrModel | null;
+}>;
+
 export type CashFlowModel<D = Date | string> = {
 	id: number;
 
@@ -334,6 +348,8 @@ export type CashFlowModel<D = Date | string> = {
 
 	// Amount data
 	amount: number; // stored in cents
+	netAmount: number; // decimal value (does not include VAT)
+	grossAmount: number; // decimal value (includes VAT)
 	vat_rate: number;
 	currency: Currency;
 	exchange_rate: number;
@@ -348,4 +364,6 @@ export type CashFlowModel<D = Date | string> = {
 	created_at: D;
 	updated_at: D;
 	deleted_at: D;
+
+	operational_records: CashFlowOperationalRecordsType;
 };

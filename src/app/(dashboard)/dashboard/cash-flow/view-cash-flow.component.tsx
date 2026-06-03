@@ -8,7 +8,6 @@ import { requestFind } from '@/helpers/services.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import {
 	CashFlowCategoryEnum,
-	CashFlowDirectionEnum,
 	type CashFlowModel,
 	CashFlowStatusEnum,
 } from '@/models/cash-flow.model';
@@ -30,7 +29,7 @@ function ViewCashFlowRefunds({ refunds }: { refunds: CashFlowModel[] }) {
 							Refund ID
 						</th>
 						<th className="text-left py-2 px-2 font-medium">
-							Amount
+							Net Amount
 						</th>
 						<th className="text-left py-2 px-2 font-medium">
 							Reference
@@ -49,9 +48,8 @@ function ViewCashFlowRefunds({ refunds }: { refunds: CashFlowModel[] }) {
 							<td className="py-2 px-3">#{r.id}</td>
 							<td className="py-2 px-3">
 								<DisplayAmount
-									amount={r.amount}
+									amount={r.netAmount}
 									currencyCode={r.currency}
-									sign={-1}
 								/>
 							</td>
 							<td className="py-2 px-3">
@@ -228,15 +226,17 @@ export function ViewCashFlow({ entry }: { entry: CashFlowModel }) {
 						{formatEnumLabel(entry.category)}
 					</div>
 					<div>
-						<span className="font-semibold">Amount</span>{' '}
+						<span className="font-semibold">Net Amount</span>{' '}
 						<DisplayAmount
-							amount={entry.amount}
+							amount={entry.netAmount}
 							currencyCode={entry.currency}
-							sign={
-								entry.direction === CashFlowDirectionEnum.OUT
-									? -1
-									: 1
-							}
+						/>
+					</div>
+					<div>
+						<span className="font-semibold">Gross Amount</span>{' '}
+						<DisplayAmount
+							amount={entry.grossAmount}
+							currencyCode={entry.currency}
 						/>
 					</div>
 					{entry.currency !== Configuration.currency() && (

@@ -154,26 +154,26 @@ export function FormManageCmrVehicle() {
 			/>
 
 			<FormComponentInput<CmrVehicleFormValuesType>
-				labelText="License Plate"
-				id={elementIds.license_plate}
-				fieldName="license_plate"
-				fieldValue={formValues.license_plate ?? ''}
-				isRequired={true}
-				placeholderText="e.g.: B-123-ABC"
-				disabled={pending}
-				onChange={(e) => handleChange('license_plate', e.target.value)}
-				error={errors.license_plate}
-			/>
-
-			<FormComponentInput<CmrVehicleFormValuesType>
 				labelText="VIN"
 				id={elementIds.vin}
 				fieldName="vin"
 				fieldValue={formValues.vin ?? ''}
+				isRequired={true}
 				placeholderText="e.g.: 1FABP34A5DF123456"
 				disabled={pending}
 				onChange={(e) => handleChange('vin', e.target.value)}
 				error={errors.vin}
+			/>
+
+			<FormComponentInput<CmrVehicleFormValuesType>
+				labelText="License Plate"
+				id={elementIds.license_plate}
+				fieldName="license_plate"
+				fieldValue={formValues.license_plate ?? ''}
+				placeholderText="e.g.: B-123-ABC"
+				disabled={pending}
+				onChange={(e) => handleChange('license_plate', e.target.value)}
+				error={errors.license_plate}
 			/>
 
 			<FormComponentInput<CmrVehicleFormValuesType>

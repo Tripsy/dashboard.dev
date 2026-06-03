@@ -9,6 +9,7 @@ import type { WorkSessionVehicleFormValuesType } from '@/app/(public)/_component
 import { useWorkSession } from '@/app/(public)/_providers/work-session.provider';
 import { DriverPanelAvailableCompanyVehicles } from '@/app/(public)/driver-panel/driver-panel-available-company-vehicles.component';
 import { DriverPanelSession } from '@/app/(public)/driver-panel/driver-panel-session.component';
+import { DriverPanelSessionCashFlow } from '@/app/(public)/driver-panel/driver-panel-session-cash-flow.component';
 import { DriverPanelSessionCmrs } from '@/app/(public)/driver-panel/driver-panel-session-cmrs.component';
 import { DriverPanelSessionVehicles } from '@/app/(public)/driver-panel/driver-panel-session-vehicles.component';
 import { Icons } from '@/components/icon.component';
@@ -21,6 +22,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { createCurrentDate } from '@/helpers/date.helper';
 import { requestCreate } from '@/helpers/services.helper';
 import type { CmrModel } from '@/models/cmr.model';
+import { VehicleTypeEnum } from '@/models/vehicle.model';
 import type { WorkSessionModel } from '@/models/work-session.model';
 import { useAuth } from '@/providers/auth.provider';
 import { createCmrSession } from '@/services/cmr-session.service';
@@ -36,6 +38,7 @@ export function DriverPanel() {
 		availableCompanyVehicles,
 		workSessionCmrs,
 		refreshSession,
+		sessionCashFlowEntries,
 	} = useWorkSession();
 	const { auth } = useAuth();
 	const { open } = useModalStore();
@@ -127,6 +130,12 @@ export function DriverPanel() {
 		[open, refreshSession],
 	);
 
+	const hasAssignedAuto = activeSessionVehicles.some(
+		(item) =>
+			item.status === 'assigned' &&
+			item.company_vehicle.vehicle.vehicle_type === VehicleTypeEnum.AUTO,
+	);
+
 	switch (sessionSituation) {
 		case 'loading':
 			return <LoadingComponent />;
@@ -142,6 +151,13 @@ export function DriverPanel() {
 						<div className="space-y-8">
 							<DriverPanelSession session={activeSession} />
 
+							{!hasAssignedAuto && (
+								<div className="text-destructive py-2">
+									<Icons.Status.Warning className="inline-block" />{' '}
+									No assigned auto vehicles found
+								</div>
+							)}
+
 							<Tabs
 								value={activeTab}
 								onValueChange={setActiveTab}
@@ -154,11 +170,11 @@ export function DriverPanel() {
 									<TabsTrigger value="sessionCmrs">
 										Session CMRs
 									</TabsTrigger>
-									<TabsTrigger value="payments">
-										Payments
+									<TabsTrigger value="sessionCashFlowEntries">
+										Cash Flow
 									</TabsTrigger>
-									<TabsTrigger value="expenses">
-										Expenses
+									<TabsTrigger value="availableCmrs">
+										Available CMRs
 									</TabsTrigger>
 								</TabsList>
 
@@ -233,6 +249,16 @@ export function DriverPanel() {
 											Create CMR
 										</Button>
 									</div>
+								</TabsContent>
+
+								<TabsContent value="sessionCashFlowEntries">
+									<DriverPanelSessionCashFlow
+										entries={sessionCashFlowEntries}
+									/>
+								</TabsContent>
+
+								<TabsContent value="availableCmrs">
+									WIP
 								</TabsContent>
 							</Tabs>
 						</div>

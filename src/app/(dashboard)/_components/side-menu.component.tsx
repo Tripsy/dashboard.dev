@@ -400,7 +400,6 @@ function SideMenuOpenSection({
 	items,
 	selectedPage,
 }: SideMenuOpenSectionProps) {
-	console.log(items);
 	const keyStorageSectionState = `side-menu-section-state-${label}`;
 
 	const [sectionState, setSectionState] = useState<SectionStateType>(() =>

@@ -9,6 +9,10 @@ import { DisplayStatus } from '@/helpers/display.helper';
 import { arrayHasValue } from '@/helpers/objects.helper';
 import { formatEnumLabel, whatsAppUrl } from '@/helpers/string.helper';
 import { displayAddressLabel } from '@/models/address.model';
+import {
+	CashFlowCategoryEnum,
+	OperationalRecordTypeEnum,
+} from '@/models/cash-flow.model';
 import { displayClientLabel } from '@/models/client.model';
 import { type CmrModel, CmrStatusEnum } from '@/models/cmr.model';
 import type { CmrSessionModel } from '@/models/cmr-session.model';
@@ -21,7 +25,7 @@ const STATUS_ORDER: Record<string, number> = {
 	ordered: 2,
 	delayed: 3,
 	delivered: 4,
-	cancelled: 5,
+	canceled: 5,
 };
 
 export function DriverPanelSessionCmrs({
@@ -57,7 +61,8 @@ export function DriverPanelSessionCmrEntry({
 	cmrSession: CmrSessionModel;
 }) {
 	const { open } = useModalStore();
-	const { refreshSession } = useWorkSession();
+	const { activeSession, refreshSession, refetchSessionCashFlowEntries } =
+		useWorkSession();
 
 	const [withDetails, setWithDetails] = useState(false);
 
@@ -156,25 +161,33 @@ export function DriverPanelSessionCmrEntry({
 		[open, refreshSession],
 	);
 
-	// const handleDeleteSessionVehicle = useCallback(
-	// 	(entry: WorkSessionVehicleModel) => {
-	// 		open({
-	// 			minimized: false,
-	// 			section: DataSourceSectionEnum.PUBLIC,
-	// 			dataSource: 'work-session-vehicle',
-	// 			action: 'delete',
-	// 			data: {
-	// 				entries: [entry],
-	// 			},
-	// 			events: {
-	// 				success: async () => {
-	// 					await refreshSession();
-	// 				},
-	// 			},
-	// 		});
-	// 	},
-	// 	[open, refreshSession],
-	// );
+	const handleCreatePaymentCustomer = useCallback(
+		(entry: CmrModel) => {
+			open({
+				minimized: false,
+				section: DataSourceSectionEnum.PUBLIC,
+				dataSource: 'cash-flow',
+				action: 'create',
+				data: {
+					prefillEntry: {
+						category: CashFlowCategoryEnum.CUSTOMER,
+						operational_records: {
+							[OperationalRecordTypeEnum.CLIENT]: entry.client,
+							[OperationalRecordTypeEnum.EMPLOYEE]:
+								activeSession?.user,
+							[OperationalRecordTypeEnum.CMR]: entry,
+						},
+					},
+				},
+				events: {
+					success: async () => {
+						await refetchSessionCashFlowEntries();
+					},
+				},
+			});
+		},
+		[open, activeSession, refetchSessionCashFlowEntries],
+	);
 
 	const deliveryAddress = cmr.delivery_address
 		? displayAddressLabel(cmr.delivery_address)
@@ -383,7 +396,7 @@ export function DriverPanelSessionCmrEntry({
 				<Button
 					variant="secondary"
 					hover="info"
-					onClick={() => handleCreatePayment(cmr)}
+					onClick={() => handleCreatePaymentCustomer(cmr)}
 					className="cursor-pointer"
 					title="Create payment"
 				>

@@ -208,6 +208,16 @@ pnpm run build    # Production build
 
 # 📌 TODO
 
+1. session vehicles - show / hide - returned
+2. put add vehicle and create cmr buttons more visible maybe below the status bar 
+3. merge payments and expenses -> show left / right arrow (green red) for IN OUTs
+4. 4th tab is with "available cmrs"
+5. build cmr html
+6. download as pdf function
+7. dashboard stats
+8. monthly driver report 
+9. deploy
+
 ---------- 
 1. Add section "documentation"
 2. login with google / facebook

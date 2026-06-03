@@ -169,7 +169,7 @@ export function formatAmount(amount: number, currencyCode: string) {
 	const symbolFormatter = new Intl.NumberFormat(undefined, {
 		style: 'currency',
 		currency: currencyCode,
-		currencyDisplay: 'symbol',
+		currencyDisplay: 'narrowSymbol',
 	});
 
 	const parts = symbolFormatter.formatToParts(0);

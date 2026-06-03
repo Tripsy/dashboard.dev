@@ -174,11 +174,11 @@ export function WindowAction<WindowEntry extends WindowEntryType>({
 					variant="outline"
 					hover="warning"
 					onClick={handleClose}
-					title="Cancel"
+					title="Abort"
 					disabled={loading}
 				>
-					<Icons.Action.Cancel />
-					Cancel
+					<Icons.Action.Abort />
+					Abort
 				</Button>
 				<ActionButton
 					dataSource={windowConfig.dataSource}

@@ -29,7 +29,7 @@
 		"preparing": "Preparing",
 		"transit": "In transit",
 		"delivered": "Delivered",
-		"cancelled": "Cancelled",
+		"canceled": "Cancelled",
 		"delayed": "Delayed",
 		"deleted": "Deleted"
 	},

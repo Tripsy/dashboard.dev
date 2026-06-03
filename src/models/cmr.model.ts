@@ -1,6 +1,6 @@
 import { formatDate } from '@/helpers/date.helper';
 import type { AddressModel } from '@/models/address.model';
-import { type ClientModel, displayClientLabel } from '@/models/client.model';
+import type { ClientModel } from '@/models/client.model';
 import type { StatusTransitions } from '@/types/common.type';
 
 export const CmrStatusEnum = {
@@ -8,7 +8,7 @@ export const CmrStatusEnum = {
 	PREPARING: 'preparing',
 	TRANSIT: 'transit',
 	DELIVERED: 'delivered',
-	CANCELLED: 'cancelled',
+	CANCELLED: 'canceled',
 	DELAYED: 'delayed',
 } as const;
 
@@ -91,5 +91,5 @@ export type CmrModel<D = Date | string> = {
 };
 
 export function displayCmrLabel(entry: CmrModel): string {
-	return `${displayClientLabel(entry.client)} ${formatDate(entry.ordered_at, 'default')}`;
+	return `CMR#${entry.id} ${formatDate(entry.ordered_at, 'default')}`;
 }

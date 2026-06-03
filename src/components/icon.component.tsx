@@ -1,6 +1,7 @@
 import {
 	Activity,
 	ArchiveRestore,
+	ArrowLeft,
 	ArrowRight,
 	Ban,
 	BanknoteArrowDown,
@@ -36,6 +37,7 @@ import {
 	FileSignal,
 	FileStack,
 	FileText,
+	Fuel,
 	GalleryVerticalEnd,
 	Hammer,
 	HardDrive,
@@ -70,6 +72,7 @@ import {
 	ShieldUser,
 	SquareParkingOff,
 	SquarePen,
+	SquareX,
 	TableOfContents,
 	Tag,
 	TextSearch,
@@ -147,8 +150,11 @@ export const Icons = {
 	Payment: createIcon(Coins),
 	MapPin: createIcon(MapPin),
 	Share: createIcon(Share2),
+	Fuel: createIcon(Fuel),
+	Toll: createIcon(BanknoteArrowUp),
 
 	ArrowRight: createIcon(ArrowRight),
+	ArrowLeft: createIcon(ArrowLeft),
 	ArrowCurvedBottom: createIcon(CornerRightDown),
 
 	Status: {
@@ -196,7 +202,9 @@ export const Icons = {
 		Update: createIcon(SquarePen),
 		Delete: createIcon(Trash2),
 		Cancel: createIcon(X),
+		Abort: createIcon(SquareX),
 		Destroy: createIcon(CircleX),
+		Confirm: createIcon(CircleCheck),
 		Reset: createIcon(RefreshCcw),
 		Enable: createIcon(CircleCheck),
 		Disable: createIcon(LockKeyhole),

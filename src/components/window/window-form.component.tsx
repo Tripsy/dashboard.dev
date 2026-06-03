@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import { useActionState } from 'react';
+import { useActionState, useMemo } from 'react';
 import { FormComponentSubmit } from '@/components/form/form-element.component';
 import { FormError } from '@/components/form/form-error.component';
 import { Icons } from '@/components/icon.component';
@@ -114,9 +114,9 @@ export function WindowForm<
 		entryId,
 	});
 
-	const handleChange = createHandleChange<FormValues>(
-		setFormValues,
-		markFieldAsTouched,
+	const handleChange = useMemo(
+		() => createHandleChange<FormValues>(setFormValues, markFieldAsTouched),
+		[setFormValues, markFieldAsTouched],
 	);
 
 	const handleClose = () => {

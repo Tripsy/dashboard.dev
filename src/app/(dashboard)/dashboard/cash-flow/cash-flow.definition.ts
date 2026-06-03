@@ -33,7 +33,6 @@ import {
 	type CashFlowCategory,
 	CashFlowCategoryEnum,
 	type CashFlowDirection,
-	CashFlowDirectionEnum,
 	type CashFlowMethod,
 	CashFlowMethodEnum,
 	type CashFlowModel,
@@ -397,16 +396,12 @@ export const dataSourceConfigCashFlow: DataSourceConfigType<CashFlowModel> = {
 			},
 			{
 				field: 'amount',
-				header: 'Amount',
+				header: 'Net Amount',
 				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						customValue: DisplayAmount({
-							amount: entry.amount,
+							amount: entry.netAmount,
 							currencyCode: entry.currency,
-							sign:
-								entry.direction === CashFlowDirectionEnum.OUT
-									? -1
-									: 1,
 						}),
 					}),
 			},
@@ -451,9 +446,9 @@ export const dataSourceConfigCashFlow: DataSourceConfigType<CashFlowModel> = {
 			requestFind<CashFlowModel>('cash-flow', params),
 	},
 	displayEntryLabel: (entry: CashFlowModel) => {
-		const formatted = formatAmount(entry.amount, entry.currency);
+		const formatted = formatAmount(entry.netAmount, entry.currency);
 
-		return `${formatted.value} ${formatted.currency} (#${entry.id})`;
+		return `${formatEnumLabel(entry.category)} ${formatted.value} ${formatted.currency}`;
 	},
 	actions: {
 		create: {

@@ -150,7 +150,7 @@ export function DataTableActions<K extends DataSourceKey>() {
 
 			if (
 				auth?.role === UserRoleEnum.DRIVER &&
-				permissionOperation !== 'find'
+				!['find', 'read'].includes(permissionOperation)
 			) {
 				return false;
 			}

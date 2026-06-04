@@ -1,5 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
-import { useEffect, useRef, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
 	FormComponentAutoComplete,
 	FormComponentInput,
@@ -9,7 +9,7 @@ import {
 } from '@/components/form/form-element.component';
 import { Icons } from '@/components/icon.component';
 import { toOptionsFromEnum } from '@/helpers/form.helper';
-import { requestFind } from '@/helpers/services.helper';
+import { requestCreate, requestFind } from '@/helpers/services.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { resolveWindowEntries } from '@/helpers/window.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
@@ -31,6 +31,7 @@ import { useWindowForm } from '@/providers/window-form.provider';
 import { requestOperationalRecords } from '@/services/cash-flow.service';
 import { useModalStore } from '@/stores/window.store';
 import type { FindFunctionResponseType } from '@/types/action.type';
+import type { ApiResponseFetch } from '@/types/api.type';
 import { type Currency, CurrencyEnum } from '@/types/common.type';
 import type { FormErrorsType } from '@/types/form.type';
 
@@ -62,6 +63,8 @@ const currencies = toOptionsFromEnum(CurrencyEnum, {
 });
 
 export function FormManageCashFlow() {
+	const queryClient = useQueryClient();
+
 	const { getCurrentWindow } = useModalStore();
 
 	const windowConfig = getCurrentWindow();
@@ -128,6 +131,14 @@ export function FormManageCashFlow() {
 			},
 			minLength: 3,
 		});
+
+	const invalidateVendorSuggestions = useCallback(
+		() =>
+			queryClient.invalidateQueries({
+				queryKey: ['s-vendor'],
+			}),
+		[queryClient],
+	);
 
 	const operationalRecordOptions = getOperationalRecordOptions(
 		formValues.category,
@@ -196,6 +207,17 @@ export function FormManageCashFlow() {
 
 		handleChange('operational_records', updatedOperationalRecords);
 	}, [entryId, operationalRecords, handleChange]);
+
+	const createVendorMutation = useMutation({
+		mutationFn: async (name: string) => {
+			const res: ApiResponseFetch<Partial<VendorModel>> =
+				await requestCreate('vendor', {
+					name,
+				});
+
+			return res?.data;
+		},
+	});
 
 	return (
 		<>
@@ -339,6 +361,34 @@ export function FormManageCashFlow() {
 							},
 							getOptionLabel: (m) => displayVendorLabel(m),
 							getOptionKey: (m) => m.id,
+
+							allowCreate: true,
+
+							onCreate: async (value) => {
+								const newVendor =
+									await createVendorMutation.mutateAsync(
+										value,
+									);
+
+								if (!newVendor) {
+									return;
+								}
+
+								handleChange(
+									'vendor',
+									displayVendorLabel(
+										newVendor as VendorModel,
+									),
+								);
+								handleOperationalRecordChange(
+									OperationalRecordTypeEnum.VENDOR,
+									newVendor.id as number,
+								);
+
+								await invalidateVendorSuggestions();
+							},
+
+							createLabel: (value) => `Create vendor "${value}"`,
 						}}
 						icons={{
 							left: (

@@ -61,8 +61,12 @@ export function DriverPanelSessionCmrEntry({
 	cmrSession: CmrSessionModel;
 }) {
 	const { open } = useModalStore();
-	const { activeSession, refreshSession, refetchSessionCashFlowEntries } =
-		useWorkSession();
+	const {
+		setActiveTab,
+		activeSession,
+		refreshSession,
+		refetchSessionCashFlowEntries,
+	} = useWorkSession();
 
 	const [withDetails, setWithDetails] = useState(false);
 
@@ -182,11 +186,13 @@ export function DriverPanelSessionCmrEntry({
 				events: {
 					success: async () => {
 						await refetchSessionCashFlowEntries();
+
+						setActiveTab('sessionCashFlowEntries');
 					},
 				},
 			});
 		},
-		[open, activeSession, refetchSessionCashFlowEntries],
+		[open, activeSession, refetchSessionCashFlowEntries, setActiveTab],
 	);
 
 	const deliveryAddress = cmr.delivery_address
@@ -200,52 +206,47 @@ export function DriverPanelSessionCmrEntry({
 	return (
 		<div className="flex justify-between">
 			<div className="flex flex-col justify-between items-start self-stretch gap-2">
-				<h3 className="font-semibold text-card-foreground flex items-center gap-4">
-					<div className="flex items-center gap-1">
-						{withDetails ? (
-							<button
-								type="button"
-								onClick={() => setWithDetails(false)}
-								title="Show less details"
-								className="cursor-pointer text-muted-foreground"
-							>
-								<Icons.ArrowCurvedBottom className="h-4 w-4" />
-							</button>
-						) : (
-							<button
-								type="button"
-								onClick={() => setWithDetails(true)}
-								title="Show more details"
-								className="cursor-pointer text-muted-foreground"
-							>
-								<Icons.ArrowRight className="h-4 w-4" />
-							</button>
-						)}
+				<h3 className="flex items-center gap-4">
+					{withDetails ? (
+						<Button
+							variant="outline"
+							onClick={() => setWithDetails(false)}
+							title="Show less details"
+							className="cursor-pointer text-muted-foreground"
+						>
+							<Icons.ArrowCurvedBottom className="h-4 w-4" />
+						</Button>
+					) : (
+						<Button
+							variant="outline"
+							onClick={() => setWithDetails(true)}
+							title="Show more details"
+							className="cursor-pointer text-muted-foreground"
+						>
+							<Icons.ArrowRight className="h-4 w-4" />
+						</Button>
+					)}
+					<div className="font-semibold text-card-foreground ">
 						CMR#{cmr.id}
 					</div>
-					<div>
-						{arrayHasValue(cmr.status, [
-							CmrStatusEnum.DELIVERED,
-							CmrStatusEnum.CANCELLED,
-						]) ? (
+					{arrayHasValue(cmr.status, [
+						CmrStatusEnum.DELIVERED,
+						CmrStatusEnum.CANCELLED,
+					]) ? (
+						<DisplayStatus status={cmr.status} dataSource="cmr" />
+					) : (
+						<button
+							type="button"
+							onClick={() => handleStatusTransition(cmr)}
+							title="Update CMR status"
+							className="cursor-pointer "
+						>
 							<DisplayStatus
 								status={cmr.status}
 								dataSource="cmr"
 							/>
-						) : (
-							<button
-								type="button"
-								onClick={() => handleStatusTransition(cmr)}
-								title="Update CMR status"
-								className="cursor-pointer "
-							>
-								<DisplayStatus
-									status={cmr.status}
-									dataSource="cmr"
-								/>
-							</button>
-						)}
-					</div>
+						</button>
+					)}
 				</h3>
 				{withDetails && (
 					<div className="flex items-center">

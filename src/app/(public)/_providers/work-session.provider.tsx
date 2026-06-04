@@ -9,6 +9,7 @@ import {
 	useEffect,
 	useMemo,
 	useRef,
+	useState,
 } from 'react';
 import { stringToDate } from '@/helpers/date.helper';
 import { isDriver } from '@/models/auth.model';
@@ -33,6 +34,8 @@ type SessionSituation =
 	| 'error';
 
 type WorkSessionContextType = {
+	activeTab: string;
+	setActiveTab: (tab: string) => void;
 	sessionSituation: SessionSituation;
 	activeSession: WorkSessionModel | null;
 	activeSessionVehicles: WorkSessionVehicleModel[];
@@ -75,6 +78,8 @@ const WorkSessionProvider = ({
 	initSession?: WorkSessionType;
 }) => {
 	const { auth } = useAuth();
+
+	const [activeTab, setActiveTab] = useState('sessionVehicles');
 
 	const {
 		data: sessionData,
@@ -185,6 +190,8 @@ const WorkSessionProvider = ({
 
 	const contextValue = useMemo(
 		() => ({
+			activeTab,
+			setActiveTab,
 			sessionSituation,
 			activeSession: sessionData?.workSession || null,
 			activeSessionVehicles: sessionData?.workSessionVehicles || [],
@@ -197,6 +204,7 @@ const WorkSessionProvider = ({
 			},
 		}),
 		[
+			activeTab,
 			sessionSituation,
 			sessionData,
 			availableCompanyVehicles,

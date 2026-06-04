@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import {
 	prepareParamsFromFormValues,
 	type WorkSessionCreateOutput,
@@ -32,6 +32,8 @@ import { DataSourceSectionEnum } from '@/types/data-source.type';
 
 export function DriverPanel() {
 	const {
+		activeTab,
+		setActiveTab,
 		sessionSituation,
 		activeSession,
 		activeSessionVehicles,
@@ -42,8 +44,6 @@ export function DriverPanel() {
 	} = useWorkSession();
 	const { auth } = useAuth();
 	const { open } = useModalStore();
-
-	const [activeTab, setActiveTab] = useState('sessionVehicles');
 
 	const handleStartSession = useCallback(() => {
 		if (!auth) {
@@ -95,11 +95,13 @@ export function DriverPanel() {
 				events: {
 					success: async () => {
 						await refreshSession();
+
+						setActiveTab('sessionVehicles');
 					},
 				},
 			});
 		},
-		[open, refreshSession],
+		[open, refreshSession, setActiveTab],
 	);
 
 	const handleCreateCmr = useCallback(
@@ -123,11 +125,13 @@ export function DriverPanel() {
 						);
 
 						await refreshSession();
+
+						setActiveTab('sessionCmrs');
 					},
 				},
 			});
 		},
-		[open, refreshSession],
+		[open, refreshSession, setActiveTab],
 	);
 
 	const hasAssignedAuto = activeSessionVehicles.some(
@@ -148,8 +152,36 @@ export function DriverPanel() {
 			<div className="container-default">
 				<div className="max-w-3xl mx-auto">
 					{sessionSituation === 'active' && activeSession ? (
-						<div className="space-y-8">
+						<div className="space-y-4">
 							<DriverPanelSession session={activeSession} />
+
+							<div className="grid grid-cols-2 gap-4">
+								<Button
+									variant="outline"
+									hover="success"
+									onClick={() =>
+										handleCreateSessionVehicle(
+											activeSession,
+										)
+									}
+									title="Add vehicle"
+								>
+									<Icons.Action.Create className="h-4 w-4" />{' '}
+									Add vehicle
+								</Button>
+
+								<Button
+									variant="outline"
+									hover="success"
+									onClick={() =>
+										handleCreateCmr(activeSession)
+									}
+									title="Add CMR"
+								>
+									<Icons.Action.Create className="h-4 w-4" />{' '}
+									Create CMR
+								</Button>
+							</div>
 
 							{!hasAssignedAuto && (
 								<div className="text-destructive py-2">
@@ -194,20 +226,6 @@ export function DriverPanel() {
 											</p>
 										</div>
 									)}
-									<div className="flex justify-center my-4">
-										<Button
-											variant="success"
-											onClick={() =>
-												handleCreateSessionVehicle(
-													activeSession,
-												)
-											}
-											title="Add vehicle"
-										>
-											<Icons.Action.Create className="h-4 w-4" />{' '}
-											Add vehicle
-										</Button>
-									</div>
 									{availableCompanyVehicles.length > 0 && (
 										<div>
 											<div className="mb-4 inline-flex whitespace-nowrap rounded-sm p-2 transition-all shadow-sm">
@@ -237,18 +255,6 @@ export function DriverPanel() {
 											</p>
 										</div>
 									)}
-									<div className="flex justify-center my-4">
-										<Button
-											variant="success"
-											onClick={() =>
-												handleCreateCmr(activeSession)
-											}
-											title="Add CMR"
-										>
-											<Icons.Action.Create className="h-4 w-4" />{' '}
-											Create CMR
-										</Button>
-									</div>
 								</TabsContent>
 
 								<TabsContent value="sessionCashFlowEntries">

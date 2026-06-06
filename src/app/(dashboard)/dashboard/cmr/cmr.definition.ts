@@ -43,6 +43,7 @@ import {
 	displayCmrLabel,
 	STATUS_TRANSITIONS,
 } from '@/models/cmr.model';
+import type { CmrModelWithSessionModel } from '@/models/cmr-session.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
 import type {
 	DataSourceConfigType,
@@ -469,245 +470,255 @@ function displayButtonViewClient(
 	};
 }
 
-export const dataSourceConfigCmr: DataSourceConfigType<CmrModel> = {
-	dataTable: {
-		state: {
-			first: 0,
-			rows: 10,
-			sortField: 'id',
-			sortOrder: -1 as const,
-			filters: {
-				global: { value: null, matchMode: 'contains' },
-				client: { value: '', matchMode: 'equals' },
-				client_id: { value: null, matchMode: 'equals' },
-				user: { value: '', matchMode: 'equals' },
-				user_id: { value: null, matchMode: 'equals' },
-				transport_type: { value: null, matchMode: 'equals' },
-				status: { value: null, matchMode: 'equals' },
-				pick_scheduled_at_start: { value: null, matchMode: 'equals' },
-				pick_scheduled_at_end: { value: null, matchMode: 'equals' },
-				is_deleted: { value: false, matchMode: 'equals' },
-			} satisfies CmrDataTableFiltersType,
+export const dataSourceConfigCmr: DataSourceConfigType<CmrModelWithSessionModel> =
+	{
+		dataTable: {
+			state: {
+				first: 0,
+				rows: 10,
+				sortField: 'id',
+				sortOrder: -1 as const,
+				filters: {
+					global: { value: null, matchMode: 'contains' },
+					client: { value: '', matchMode: 'equals' },
+					client_id: { value: null, matchMode: 'equals' },
+					user: { value: '', matchMode: 'equals' },
+					user_id: { value: null, matchMode: 'equals' },
+					transport_type: { value: null, matchMode: 'equals' },
+					status: { value: null, matchMode: 'equals' },
+					pick_scheduled_at_start: {
+						value: null,
+						matchMode: 'equals',
+					},
+					pick_scheduled_at_end: { value: null, matchMode: 'equals' },
+					is_deleted: { value: false, matchMode: 'equals' },
+				} satisfies CmrDataTableFiltersType,
+			},
+			columns: [
+				{
+					field: 'id',
+					header: 'ID',
+					sortable: true,
+					body: (entry, column, auth) =>
+						DataTableValue(entry, column, {
+							markDeleted: true,
+							displayButton: displayButtonView(auth),
+						}),
+				},
+				{
+					field: 'client',
+					header: 'Client',
+					body: (entry, column, auth) =>
+						DataTableValue(entry, column, {
+							customValue: displayClientLabel(entry.client),
+							displayButton: displayButtonViewClient(auth, entry),
+						}),
+				},
+				{
+					field: 'transport_type',
+					header: 'Type',
+					body: (entry, column) =>
+						DataTableValue(entry, column, {
+							customValue: formatEnumLabel(entry.transport_type),
+						}),
+				},
+				{
+					field: 'ordered_at',
+					header: 'Ordered At',
+					body: (entry, column) =>
+						DataTableValue(entry, column, {
+							displayDate: true,
+						}),
+				},
+				{
+					field: 'work_session',
+					header: 'Work Session',
+					body: (entry: CmrModelWithSessionModel, column) =>
+						DataTableValue(entry, column, {
+							customValue: displayColumnSession(
+								entry.cmr_sessions,
+							),
+						}),
+				},
+				{
+					field: 'delivered_at',
+					header: 'Delivered At',
+					body: (entry, column) =>
+						DataTableValue(entry, column, {
+							displayDate: true,
+						}),
+				},
+				{
+					field: 'status',
+					header: 'Status',
+					body: (entry, column, auth) =>
+						DataTableValue(entry, column, {
+							dataSource: 'cmr',
+							isStatus: true,
+							markDeleted: true,
+							displayButton: displayButtonStatus(auth),
+						}),
+					style: {
+						minWidth: '8rem',
+						maxWidth: '8rem',
+					},
+				},
+			],
+			find: (params: FindFunctionParamsType) =>
+				requestFind<CmrModelWithSessionModel>('cmr', params),
 		},
-		columns: [
-			{
-				field: 'id',
-				header: 'ID',
-				sortable: true,
-				body: (entry, column, auth) =>
-					DataTableValue(entry, column, {
-						markDeleted: true,
-						displayButton: displayButtonView(auth),
-					}),
+		displayEntryLabel: (entry: CmrModel) => {
+			return displayCmrLabel(entry);
+		},
+		actions: {
+			create: {
+				windowType: 'form',
+				windowTitle: translations['create.title'],
+				windowComponent: FormManageCmr,
+				windowConfigProps: {
+					size: 'x3l',
+				},
+				permission: ['cmr', 'create'],
+				entriesSelection: 'free',
+				operationFunction: (values: CmrManageOutput) => {
+					const params = prepareParamsFromFormValues(values);
+
+					return requestCreate<CmrModel, typeof params>(
+						'cmr',
+						params,
+					);
+				},
+				buttonPosition: 'right',
+				button: {
+					variant: 'info',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateForm,
+				getFormState: getFormState,
 			},
-			{
-				field: 'client',
-				header: 'Client',
-				body: (entry, column, auth) =>
-					DataTableValue(entry, column, {
-						customValue: displayClientLabel(entry.client),
-						displayButton: displayButtonViewClient(auth, entry),
-					}),
+			update: {
+				windowType: 'form',
+				windowTitle: translations['update.title'],
+				windowComponent: FormManageCmr,
+				windowConfigProps: {
+					size: 'x3l',
+				},
+				permission: ['cmr', 'update'],
+				entriesSelection: 'single',
+				operationFunction: (values: CmrManageOutput, id: number) => {
+					const params = prepareParamsFromFormValues(values);
+
+					return requestUpdate<CmrModel, typeof params>(
+						'cmr',
+						params,
+						id,
+					);
+				},
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'success',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateForm,
+				getFormState: getFormState,
 			},
-			{
-				field: 'transport_type',
-				header: 'Type',
-				body: (entry, column) =>
-					DataTableValue(entry, column, {
-						customValue: formatEnumLabel(entry.transport_type),
-					}),
-			},
-			{
-				field: 'ordered_at',
-				header: 'Ordered At',
-				body: (entry, column) =>
-					DataTableValue(entry, column, {
-						displayDate: true,
-					}),
-			},
-			{
-				field: 'work_session',
-				header: 'Work Session',
-				body: (entry, column) =>
-					DataTableValue(entry, column, {
-						customValue: displayColumnSession(entry.cmr_sessions),
-					}),
-			},
-			{
-				field: 'delivered_at',
-				header: 'Delivered At',
-				body: (entry, column) =>
-					DataTableValue(entry, column, {
-						displayDate: true,
-					}),
-			},
-			{
-				field: 'status',
-				header: 'Status',
-				body: (entry, column, auth) =>
-					DataTableValue(entry, column, {
-						dataSource: 'cmr',
-						isStatus: true,
-						markDeleted: true,
-						displayButton: displayButtonStatus(auth),
-					}),
-				style: {
-					minWidth: '8rem',
-					maxWidth: '8rem',
+			delete: {
+				windowType: 'action',
+				windowTitle: translations['delete.title'],
+				permission: ['cmr', 'delete'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: CmrModel) => !entry.deleted_at, // Return true if the entry is not deleted
+				operationFunction: (entry: CmrModel) =>
+					requestDelete('cmr', entry),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'error',
 				},
 			},
-		],
-		find: (params: FindFunctionParamsType) =>
-			requestFind<CmrModel>('cmr', params),
-	},
-	displayEntryLabel: (entry: CmrModel) => {
-		return displayCmrLabel(entry);
-	},
-	actions: {
-		create: {
-			windowType: 'form',
-			windowTitle: translations['create.title'],
-			windowComponent: FormManageCmr,
-			windowConfigProps: {
-				size: 'x3l',
+			restore: {
+				windowType: 'action',
+				windowTitle: translations['restore.title'],
+				permission: ['cmr', 'delete'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: CmrModel) => !!entry.deleted_at, // Return true if the entry is deleted
+				operationFunction: (entry: CmrModel) =>
+					requestRestore('cmr', entry),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'info',
+				},
 			},
-			permission: ['cmr', 'create'],
-			entriesSelection: 'free',
-			operationFunction: (values: CmrManageOutput) => {
-				const params = prepareParamsFromFormValues(values);
-
-				return requestCreate<CmrModel, typeof params>('cmr', params);
+			statusTransition: {
+				windowType: 'other',
+				windowTitle: translations['statusTransition.title'],
+				windowComponent: StatusTransitionCmr,
+				windowConfigProps: {
+					size: 'lg',
+				},
+				permission: ['cmr', 'update'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: CmrModel) =>
+					getStatusTransitions(entry.status, STATUS_TRANSITIONS)
+						.length > 0,
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'info',
+				},
 			},
-			buttonPosition: 'right',
-			button: {
-				variant: 'info',
+			view: {
+				windowType: 'view',
+				windowTitle: translations['view.title'],
+				windowComponent: ViewCmr,
+				windowConfigProps: {
+					size: 'xl',
+				},
+				permission: ['cmr', 'read'],
+				entriesSelection: 'single',
+				buttonPosition: 'hidden',
 			},
-			getFormValues: getFormValues,
-			validateForm: validateForm,
-			getFormState: getFormState,
-		},
-		update: {
-			windowType: 'form',
-			windowTitle: translations['update.title'],
-			windowComponent: FormManageCmr,
-			windowConfigProps: {
-				size: 'x3l',
+			setupVehicles: {
+				windowType: 'other',
+				windowTitle: translations['setupVehicles.title'],
+				windowComponent: SetupCmrVehicles,
+				windowConfigProps: {
+					size: 'x2l',
+				},
+				permission: ['cmr-vehicle', 'update'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: CmrModel) =>
+					entry.status === CmrStatusEnum.PREPARING,
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'info',
+					icon: 'Setup',
+				},
 			},
-			permission: ['cmr', 'update'],
-			entriesSelection: 'single',
-			operationFunction: (values: CmrManageOutput, id: number) => {
-				const params = prepareParamsFromFormValues(values);
-
-				return requestUpdate<CmrModel, typeof params>(
-					'cmr',
-					params,
-					id,
-				);
-			},
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'success',
-			},
-			getFormValues: getFormValues,
-			validateForm: validateForm,
-			getFormState: getFormState,
-		},
-		delete: {
-			windowType: 'action',
-			windowTitle: translations['delete.title'],
-			permission: ['cmr', 'delete'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: CmrModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			operationFunction: (entry: CmrModel) => requestDelete('cmr', entry),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'error',
-			},
-		},
-		restore: {
-			windowType: 'action',
-			windowTitle: translations['restore.title'],
-			permission: ['cmr', 'delete'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: CmrModel) => !!entry.deleted_at, // Return true if the entry is deleted
-			operationFunction: (entry: CmrModel) =>
-				requestRestore('cmr', entry),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'info',
-			},
-		},
-		statusTransition: {
-			windowType: 'other',
-			windowTitle: translations['statusTransition.title'],
-			windowComponent: StatusTransitionCmr,
-			windowConfigProps: {
-				size: 'lg',
-			},
-			permission: ['cmr', 'update'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: CmrModel) =>
-				getStatusTransitions(entry.status, STATUS_TRANSITIONS).length >
-				0,
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'info',
+			setupSessions: {
+				windowType: 'other',
+				windowTitle: translations['setupSessions.title'],
+				windowComponent: SetupCmrSessions,
+				windowConfigProps: {
+					size: 'x2l',
+				},
+				permission: ['cmr-session', 'update'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: CmrModel) =>
+					arrayHasValue(entry.status, [
+						CmrStatusEnum.ORDERED,
+						CmrStatusEnum.PREPARING,
+						CmrStatusEnum.TRANSIT,
+					]),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'info',
+					icon: 'Setup',
+				},
 			},
 		},
-		view: {
-			windowType: 'view',
-			windowTitle: translations['view.title'],
-			windowComponent: ViewCmr,
-			windowConfigProps: {
-				size: 'xl',
-			},
-			permission: ['cmr', 'read'],
-			entriesSelection: 'single',
-			buttonPosition: 'hidden',
-		},
-		setupVehicles: {
-			windowType: 'other',
-			windowTitle: translations['setupVehicles.title'],
-			windowComponent: SetupCmrVehicles,
-			windowConfigProps: {
-				size: 'x2l',
-			},
-			permission: ['cmr-vehicle', 'update'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: CmrModel) =>
-				entry.status === CmrStatusEnum.PREPARING,
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'info',
-				icon: 'Setup',
-			},
-		},
-		setupSessions: {
-			windowType: 'other',
-			windowTitle: translations['setupSessions.title'],
-			windowComponent: SetupCmrSessions,
-			windowConfigProps: {
-				size: 'x2l',
-			},
-			permission: ['cmr-session', 'update'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: CmrModel) =>
-				arrayHasValue(entry.status, [
-					CmrStatusEnum.ORDERED,
-					CmrStatusEnum.PREPARING,
-					CmrStatusEnum.TRANSIT,
-				]),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'info',
-				icon: 'Setup',
-			},
-		},
-	},
-};
+	};

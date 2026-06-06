@@ -1,7 +1,6 @@
 import { formatDate } from '@/helpers/date.helper';
 import type { AddressModel } from '@/models/address.model';
 import type { ClientModel } from '@/models/client.model';
-import type { CmrSessionModel } from '@/models/cmr-session.model';
 import type { StatusTransitions } from '@/types/common.type';
 
 export const CmrStatusEnum = {
@@ -89,9 +88,6 @@ export type CmrModel<D = Date | string> = {
 	created_at: D;
 	updated_at: D;
 	deleted_at: D;
-
-	// relations
-	cmr_sessions: CmrSessionModel[];
 };
 
 export function displayCmrLabel(entry: CmrModel): string {

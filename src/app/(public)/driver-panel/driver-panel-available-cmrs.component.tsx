@@ -17,7 +17,6 @@ import { displayClientLabel } from '@/models/client.model';
 import { type CmrModel, CmrStatusEnum } from '@/models/cmr.model';
 import type { WorkSessionModel } from '@/models/work-session.model';
 import { createCmrSession } from '@/services/cmr-session.service';
-import { useModalStore } from '@/stores/window.store';
 
 export function DriverPanelAvailableCmrs() {
 	const { entries: cmrs, wsStatus } = useAvailableCmrWebSocket();

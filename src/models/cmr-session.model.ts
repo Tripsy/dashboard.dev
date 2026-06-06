@@ -10,6 +10,10 @@ export type CmrSessionModel<D = Date | string> = {
 	created_at: D;
 };
 
+export type CmrModelWithSessionModel<D = Date | string> = CmrModel<D> & {
+	cmr_sessions: CmrSessionModel<D>[];
+};
+
 export function displayCmrSessionLabel(entry: CmrSessionModel) {
 	return `CMR${entry.cmr.id} ${entry.work_session.user.name}`;
 }

@@ -14,6 +14,7 @@ import {
 	formatDate,
 	stringToDate,
 } from '@/helpers/date.helper';
+import { displayColumnSession } from '@/helpers/display.helper';
 import {
 	getFormDataAsEnum,
 	getFormDataAsNumber,
@@ -522,6 +523,14 @@ export const dataSourceConfigCmr: DataSourceConfigType<CmrModel> = {
 				body: (entry, column) =>
 					DataTableValue(entry, column, {
 						displayDate: true,
+					}),
+			},
+			{
+				field: 'work_session',
+				header: 'Work Session',
+				body: (entry, column) =>
+					DataTableValue(entry, column, {
+						customValue: displayColumnSession(entry.cmr_sessions),
 					}),
 			},
 			{

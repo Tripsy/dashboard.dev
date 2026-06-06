@@ -94,7 +94,7 @@ export function DriverPanelSessionCashFlow({
 	);
 }
 
-export function DriverPanelSessionCashFlowEntry({
+function DriverPanelSessionCashFlowEntry({
 	entry,
 	onBalanceInvalidate,
 }: {

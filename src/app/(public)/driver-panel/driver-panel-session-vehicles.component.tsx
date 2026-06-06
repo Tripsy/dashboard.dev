@@ -317,6 +317,7 @@ export function DriverPanelSessionVehicles({
 						<Button
 							variant="ghost"
 							onClick={() => setWithReturned(false)}
+							title="Hide returned vehicles"
 						>
 							<Icons.Obscured className="h-4 w-4" /> Hide returned
 						</Button>
@@ -324,6 +325,7 @@ export function DriverPanelSessionVehicles({
 						<Button
 							variant="ghost"
 							onClick={() => setWithReturned(true)}
+							title="Show returned vehicles"
 						>
 							<Icons.Visible className="h-4 w-4" /> Show returned
 						</Button>

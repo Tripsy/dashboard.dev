@@ -7,6 +7,7 @@ import {
 } from '@/app/(public)/_components/work-session/work-session.definition';
 import type { WorkSessionVehicleFormValuesType } from '@/app/(public)/_components/work-session-vehicle/form-manage-work-session-vehicle.component';
 import { useWorkSession } from '@/app/(public)/_providers/work-session.provider';
+import { DriverPanelAvailableCmrs } from '@/app/(public)/driver-panel/driver-panel-available-cmrs.component';
 import { DriverPanelAvailableCompanyVehicles } from '@/app/(public)/driver-panel/driver-panel-available-company-vehicles.component';
 import { DriverPanelSession } from '@/app/(public)/driver-panel/driver-panel-session.component';
 import { DriverPanelSessionCashFlow } from '@/app/(public)/driver-panel/driver-panel-session-cash-flow.component';
@@ -164,10 +165,10 @@ export function DriverPanel() {
 											activeSession,
 										)
 									}
-									title="Add vehicle"
+									title="Add session vehicle"
 								>
 									<Icons.Action.Create className="h-4 w-4" />{' '}
-									Add vehicle
+									Add session vehicle
 								</Button>
 
 								<Button
@@ -264,7 +265,7 @@ export function DriverPanel() {
 								</TabsContent>
 
 								<TabsContent value="availableCmrs">
-									WIP
+									<DriverPanelAvailableCmrs />
 								</TabsContent>
 							</Tabs>
 						</div>

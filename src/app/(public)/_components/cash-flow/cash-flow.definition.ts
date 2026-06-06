@@ -5,7 +5,6 @@ import {
 } from '@/app/(public)/_components/cash-flow/form-manage-cash-flow.component';
 import { Configuration } from '@/config/settings.config';
 import { translateBatch } from '@/config/translate.setup';
-import { calcNetAmount } from '@/helpers/display.helper';
 import {
 	getFormDataAsEnum,
 	getFormDataAsNumber,
@@ -19,6 +18,7 @@ import {
 	requestUpdateStatus,
 } from '@/helpers/services.helper';
 import {
+	calcNetAmount,
 	formatAmount,
 	formatEnumLabel,
 	replaceVars,

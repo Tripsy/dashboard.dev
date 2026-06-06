@@ -155,6 +155,53 @@ export function parseJson(val: unknown) {
 }
 
 /**
+ * Add VAT to a net amount
+ *
+ * @param {number} netAmount - Amount excluding VAT
+ * @param {number} vatRate - VAT rate in percentage (e.g., 20 for 20%)
+ * @returns {number} Total amount including VAT
+ */
+export function calcGrossAmount(netAmount: number, vatRate: number): number {
+	if (vatRate < 0) {
+		throw new Error('VAT rate must be greater or equal to 0');
+	}
+
+	return netAmount * (1 + vatRate / 100);
+}
+
+/**
+ * Remove VAT from a gross amount to get net amount (excl. tax)
+ *
+ * @param {number} grossAmount - Amount including VAT
+ * @param {number} vatRate - VAT rate in percentage (e.g., 20 for 20%)
+ * @returns {number} Net amount excluding VAT
+ */
+export function calcNetAmount(grossAmount: number, vatRate: number): number {
+	if (vatRate < 0) {
+		throw new Error('VAT rate must be greater or equal to 0');
+	}
+
+	const netAmount = grossAmount / (1 + vatRate / 100);
+
+	return parseFloat(netAmount.toFixed(4));
+}
+
+/**
+ * Extract VAT amount from a gross amount
+ *
+ * @param {number} grossAmount - Amount including VAT
+ * @param {number} vatRate - VAT rate in percentage (e.g., 20 for 20%)
+ * @returns {number} VAT amount only
+ */
+export function extractVAT(grossAmount: number, vatRate: number): number {
+	if (vatRate < 0) {
+		throw new Error('VAT rate must be greater or equal to 0');
+	}
+
+	return grossAmount - grossAmount / (1 + vatRate / 100);
+}
+
+/**
  * Formats an amount
  *
  * @param amount

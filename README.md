@@ -208,12 +208,11 @@ pnpm run build    # Production build
 
 # 📌 TODO
 
-1. 4th tab is with "available cmrs"
-2. build cmr html
-3. download as pdf function
-4. dashboard stats
-5. monthly driver report 
-6. deploy
+1. build cmr html
+2. download as pdf function
+3. dashboard stats
+4. monthly driver report 
+5. deploy
 
 ---------- 
 1. Add section "documentation"

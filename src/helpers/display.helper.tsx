@@ -8,6 +8,8 @@ import {
 } from '@/components/ui/badge';
 import { formatAmount } from '@/helpers/string.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
+import type { CmrSessionModel } from '@/models/cmr-session.model';
+import { displayWorkSessionLabel } from '@/models/work-session.model';
 import type { DataSourceKey } from '@/types/data-source.key';
 
 export const statusList: Record<
@@ -212,49 +214,23 @@ export function DisplayAmount({
 	);
 }
 
-/**
- * Add VAT to a net amount
- *
- * @param {number} netAmount - Amount excluding VAT
- * @param {number} vatRate - VAT rate in percentage (e.g., 20 for 20%)
- * @returns {number} Total amount including VAT
- */
-export function calcGrossAmount(netAmount: number, vatRate: number): number {
-	if (vatRate < 0) {
-		throw new Error('VAT rate must be greater or equal to 0');
+export function displayColumnSession(cmr_sessions: CmrSessionModel[]) {
+	const lastSession = cmr_sessions.reduce(
+		(max, entry) => (entry.id > max.id ? entry : max),
+		cmr_sessions[0],
+	);
+
+	if (!lastSession) {
+		return '-';
 	}
 
-	return netAmount * (1 + vatRate / 100);
-}
-
-/**
- * Remove VAT from a gross amount to get net amount (excl. tax)
- *
- * @param {number} grossAmount - Amount including VAT
- * @param {number} vatRate - VAT rate in percentage (e.g., 20 for 20%)
- * @returns {number} Net amount excluding VAT
- */
-export function calcNetAmount(grossAmount: number, vatRate: number): number {
-	if (vatRate < 0) {
-		throw new Error('VAT rate must be greater or equal to 0');
-	}
-
-	const netAmount = grossAmount / (1 + vatRate / 100);
-
-	return parseFloat(netAmount.toFixed(4));
-}
-
-/**
- * Extract VAT amount from a gross amount
- *
- * @param {number} grossAmount - Amount including VAT
- * @param {number} vatRate - VAT rate in percentage (e.g., 20 for 20%)
- * @returns {number} VAT amount only
- */
-export function extractVAT(grossAmount: number, vatRate: number): number {
-	if (vatRate < 0) {
-		throw new Error('VAT rate must be greater or equal to 0');
-	}
-
-	return grossAmount - grossAmount / (1 + vatRate / 100);
+	return (
+		<div className="flex items-center gap-2">
+			<DisplayStatus
+				status={lastSession.work_session.status}
+				dataSource="work-session"
+			/>
+			{displayWorkSessionLabel(lastSession.work_session)}
+		</div>
+	);
 }

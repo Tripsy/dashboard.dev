@@ -46,6 +46,10 @@ function loadSettings(): Settings {
 		},
 		remoteApi: {
 			url: process.env.REMOTE_API_URL,
+			wsUrl: process.env.NEXT_PUBLIC_REMOTE_API_WS_URL,
+			wsReconnectDelay:
+				Number(process.env.NEXT_PUBLIC_REMOTE_API_WS_RECONNECT_DELAY) ||
+				3000,
 		},
 		middleware: {
 			rate_limit_window: Number(process.env.RATE_LIMIT_WINDOW) || 60, // seconds

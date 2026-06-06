@@ -53,7 +53,7 @@ export function DriverPanelSessionCmrs({
 	);
 }
 
-export function DriverPanelSessionCmrEntry({
+function DriverPanelSessionCmrEntry({
 	cmr,
 	cmrSession,
 }: {
@@ -212,7 +212,7 @@ export function DriverPanelSessionCmrEntry({
 							variant="outline"
 							onClick={() => setWithDetails(false)}
 							title="Show less details"
-							className="cursor-pointer text-muted-foreground"
+							className="text-muted-foreground"
 						>
 							<Icons.ArrowCurvedBottom className="h-4 w-4" />
 						</Button>
@@ -221,7 +221,7 @@ export function DriverPanelSessionCmrEntry({
 							variant="outline"
 							onClick={() => setWithDetails(true)}
 							title="Show more details"
-							className="cursor-pointer text-muted-foreground"
+							className="text-muted-foreground"
 						>
 							<Icons.ArrowRight className="h-4 w-4" />
 						</Button>

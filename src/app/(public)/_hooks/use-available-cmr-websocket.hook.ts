@@ -5,7 +5,7 @@ import type { WsStatus } from '@/types/web-socket.type';
 
 const MAX_RETRIES = 5;
 
-const WS_PATH = '/ws/cmr-available';
+const WS_PATH = '/cmr-available';
 
 function getWebSocketUrl(): string {
 	const base = Configuration.get('remoteApi.wsUrl') as string;
@@ -103,15 +103,22 @@ export function useAvailableCmrWebSocket() {
 				}
 			};
 
-			ws.onerror = (error) => {
+			ws.onerror = () => {
 				if (!isMounted.current) {
 					return;
 				}
 
-				console.error('WebSocket error:', error);
+				// Browser intentionally provides no error details in onerror (security policy)
+				// The onclose handler will fire next and handle reconnect
+				console.debug(
+					'WebSocket connection error — waiting for close event',
+				);
 
-				setWsStatus('error');
-				setErrorMessage('Connection error. Retrying...');
+				// Only update status if we haven't successfully connected yet
+				if (wsStatus !== 'connected') {
+					setWsStatus('error');
+					setErrorMessage('Connection error. Retrying...');
+				}
 			};
 		} catch (err) {
 			console.error('Failed to create WebSocket:', err);
@@ -119,7 +126,7 @@ export function useAvailableCmrWebSocket() {
 			setWsStatus('error');
 			setErrorMessage('Failed to establish connection');
 		}
-	}, []);
+	}, [wsStatus]);
 
 	const connectRef = useRef(connect);
 

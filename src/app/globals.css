@@ -458,11 +458,13 @@
 		background-image: var(--gradient-hero);
 	}
 
-	/*.bg-gradient-lavender {*/
-	/*	background-image: var(--gradient-lavender);*/
-	/*}*/
-
 	.bg-gradient-cream {
 		background-image: var(--gradient-cream);
+	}
+}
+
+@media print {
+	.no-print {
+		display: none;
 	}
 }

@@ -162,6 +162,7 @@ Routes.add('docs', '/docs');
 Routes.add('driver-panel', '/driver-panel');
 Routes.add('page', '/page/:label');
 Routes.add('status', '/status/:type');
+Routes.add('document-cmr', '/document/cmr/:tracking_number');
 
 // API
 Routes.group('api')

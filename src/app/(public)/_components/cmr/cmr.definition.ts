@@ -449,7 +449,7 @@ export const dataSourceConfigCmr: DataSourceConfigType<CmrModel> = {
 			windowTitle: translations['setupVehicles.title'],
 			windowComponent: SetupCmrVehicles,
 			windowConfigProps: {
-				size: 'x2l',
+				size: 'x3l',
 			},
 			permission: ['cmr-vehicle', 'update'],
 			entriesSelection: 'single',

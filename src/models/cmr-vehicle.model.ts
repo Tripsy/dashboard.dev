@@ -7,7 +7,7 @@ export type CmrVehicleModel<D = Date | string> = {
 	cmr: CmrModel;
 	vehicle: VehicleModel;
 
-	vin: string | null;
+	vin: string;
 	license_plate: string | null;
 
 	notes: string | null;

@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { Configuration } from '@/config/settings.config';
+import { translate } from '@/config/translate.setup';
 import {
 	ApiRequest,
 	getResponseData,
@@ -66,7 +68,9 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
 	if (!pageData) {
 		return {
-			title: 'Page Not Found',
+			title: await translate('app.page.not_found', {
+				app_name: Configuration.get('app.name') as string,
+			}),
 		};
 	}
 

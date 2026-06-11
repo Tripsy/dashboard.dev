@@ -23,6 +23,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { createCurrentDate } from '@/helpers/date.helper';
 import { requestCreate } from '@/helpers/services.helper';
 import type { CmrModel } from '@/models/cmr.model';
+import type { CompanyVehicleModel } from '@/models/company-vehicle.model';
 import { VehicleTypeEnum } from '@/models/vehicle.model';
 import type { WorkSessionModel } from '@/models/work-session.model';
 import { useAuth } from '@/providers/auth.provider';
@@ -38,6 +39,8 @@ export function DriverPanel() {
 		sessionSituation,
 		activeSession,
 		activeSessionVehicles,
+		activeSessionVehicleAuto,
+		activeSessionVehicleTrailer,
 		availableCompanyVehicles,
 		workSessionCmrs,
 		refreshSession,
@@ -106,7 +109,11 @@ export function DriverPanel() {
 	);
 
 	const handleCreateCmr = useCallback(
-		(session: WorkSessionModel) => {
+		(
+			session: WorkSessionModel,
+			activeSessionVehicleAuto: CompanyVehicleModel,
+			activeSessionVehicleTrailer: CompanyVehicleModel | null,
+		) => {
 			open({
 				minimized: false,
 				section: DataSourceSectionEnum.PUBLIC,
@@ -121,6 +128,10 @@ export function DriverPanel() {
 						await createCmrSession(
 							{
 								work_session_id: session.id,
+								company_vehicle_id_auto:
+									activeSessionVehicleAuto.id,
+								company_vehicle_id_trailer:
+									activeSessionVehicleTrailer?.id,
 							},
 							cmr.id,
 						);
@@ -171,17 +182,23 @@ export function DriverPanel() {
 									Add session vehicle
 								</Button>
 
-								<Button
-									variant="outline"
-									hover="success"
-									onClick={() =>
-										handleCreateCmr(activeSession)
-									}
-									title="Add CMR"
-								>
-									<Icons.Action.Create className="h-4 w-4" />{' '}
-									Create CMR
-								</Button>
+								{activeSessionVehicleAuto && (
+									<Button
+										variant="outline"
+										hover="success"
+										onClick={() =>
+											handleCreateCmr(
+												activeSession,
+												activeSessionVehicleAuto,
+												activeSessionVehicleTrailer,
+											)
+										}
+										title="Add CMR"
+									>
+										<Icons.Action.Create className="h-4 w-4" />{' '}
+										Create CMR
+									</Button>
+								)}
 							</div>
 
 							{!hasAssignedAuto && (

@@ -2,6 +2,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import type React from 'react';
 import { cn } from '@/helpers/css.helper';
+import type { CompanyVehicleModel } from '@/models/company-vehicle.model';
+import type { UserModel } from '@/models/user.model';
 
 const config = {
 	borderColor: 'border-gray-600',
@@ -14,9 +16,16 @@ export type DocumentCmrProps = {
 		id: string;
 		pickupAddress: string;
 		deliveryAddress: string;
-		auto_license_plate: string;
-		trailer_license_plate?: string;
-		work_session_users: string[];
+		cmrVehicles: {
+			id: number;
+			vehicle: string;
+			vin: string;
+			license_plate: string | null;
+			notes: string | null;
+		}[];
+		workSessionUsers: UserModel[];
+		companyVehicleAuto: CompanyVehicleModel | null;
+		companyVehicleTrailer: CompanyVehicleModel | null;
 	};
 };
 
@@ -332,9 +341,14 @@ export function DocumentCmr({ signed, data }: DocumentCmrProps) {
 										src="/images/star-stamp.png"
 										alt="Star Office Signature"
 										width={280}
-										height={0}
+										height={110}
+										loading="eager"
 										className="mx-auto my-2"
-										style={{ transform: 'rotate(-4deg)' }}
+										style={{
+											width: 'auto',
+											height: 'auto',
+											transform: 'rotate(-4deg)',
+										}}
 									/>
 								</div>
 								<div
@@ -382,34 +396,53 @@ export function DocumentCmr({ signed, data }: DocumentCmrProps) {
 										]}
 									/>
 									<BoxText>
-										<div>
-											<span className="uppercase">
-												Auto
-											</span>
-											:{' '}
-											<span className="font-semibold">
-												{data.auto_license_plate}
-											</span>
-										</div>
-										<div>
-											<span className="uppercase">
-												Remorca
-											</span>
-											:{' '}
-											<span className="font-semibold">
-												{data.trailer_license_plate ||
-													'-'}
-											</span>
-										</div>
+										{data.companyVehicleAuto && (
+											<div>
+												<span className="uppercase">
+													Auto
+												</span>
+												:{' '}
+												<span className="font-semibold">
+													{
+														data.companyVehicleAuto
+															.vehicle.model
+													}{' '}
+													{
+														data.companyVehicleAuto
+															.license_plate
+													}
+												</span>
+											</div>
+										)}
+										{data.companyVehicleTrailer && (
+											<div>
+												<span className="uppercase">
+													Remorca
+												</span>
+												:{' '}
+												<span className="font-semibold">
+													{
+														data
+															.companyVehicleTrailer
+															.vehicle.model
+													}{' '}
+													{
+														data
+															.companyVehicleTrailer
+															.license_plate
+													}
+												</span>
+											</div>
+										)}
 										<div>
 											<span className="uppercase">
 												Conducator/i auto
 											</span>
 											:{' '}
 											<span className="font-semibold">
-												{data.work_session_users.join(
-													', ',
-												)}
+												{data.workSessionUsers
+													.map((user) => user.name)
+													.join(', ')}
 											</span>
 										</div>
 									</BoxText>
@@ -417,7 +450,7 @@ export function DocumentCmr({ signed, data }: DocumentCmrProps) {
 							</div>
 						</div>
 						<div
-							style={{ height: '80mm' }}
+							style={{ height: '84mm' }}
 							className={`p-2 border-${config.borderSize} border-t-0 ${config.borderColor}`}
 						>
 							<div className="grid grid-cols-7">
@@ -532,11 +565,26 @@ export function DocumentCmr({ signed, data }: DocumentCmrProps) {
 									]}
 								/>
 							</div>
+							<ol className="list-decimal ml-12 mt-4 space-y-2">
+								{data.cmrVehicles.map((cmrVehicle) => (
+									<li
+										key={cmrVehicle.id}
+										className="font-mono"
+									>
+										{cmrVehicle.vehicle}, VIN{' '}
+										{cmrVehicle.vin},{' '}
+										{cmrVehicle.license_plate}
+										<div className="text-sm italic">
+											{cmrVehicle.notes}
+										</div>
+									</li>
+								))}
+							</ol>
 						</div>
 						<div className="grid grid-cols-2">
 							<div>
 								<div
-									style={{ height: '28mm' }}
+									style={{ height: '75mm' }}
 									className={`p-2 border-${config.borderSize} border-t-0 ${config.borderColor}`}
 								>
 									<BoxLegend
@@ -558,7 +606,7 @@ export function DocumentCmr({ signed, data }: DocumentCmrProps) {
 									/>
 								</div>
 								<div
-									style={{ height: '30mm' }}
+									style={{ height: '32mm' }}
 									className={`p-2 border-${config.borderSize} border-t-0 ${config.borderColor}`}
 								>
 									<BoxLegend
@@ -586,28 +634,6 @@ export function DocumentCmr({ signed, data }: DocumentCmrProps) {
 									</BoxText>
 								</div>
 								<div
-									style={{ height: '28mm' }}
-									className={`p-2 border-${config.borderSize} border-t-0 ${config.borderColor}`}
-								>
-									<BoxLegend
-										index={19}
-										languages={[
-											{
-												language: 'ro',
-												text: 'Convenții speciale',
-											},
-											{
-												language: 'en',
-												text: 'Special agreesments',
-											},
-											{
-												language: 'fr',
-												text: 'Conventions particulières',
-											},
-										]}
-									/>
-								</div>
-								<div
 									style={{ height: '20.4mm' }}
 									className={`p-2 border-${config.borderSize} border-t-0 ${config.borderColor}`}
 								>
@@ -631,6 +657,28 @@ export function DocumentCmr({ signed, data }: DocumentCmrProps) {
 								</div>
 							</div>
 							<div>
+								<div
+									style={{ height: '30mm' }}
+									className={`p-2 border-${config.borderSize} border-t-0 border-l-0 ${config.borderColor}`}
+								>
+									<BoxLegend
+										index={19}
+										languages={[
+											{
+												language: 'ro',
+												text: 'Convenții speciale',
+											},
+											{
+												language: 'en',
+												text: 'Special agreesments',
+											},
+											{
+												language: 'fr',
+												text: 'Conventions particulières',
+											},
+										]}
+									/>
+								</div>
 								<div className="grid grid-cols-[50mm_1fr_1fr_1fr]">
 									<div
 										className={`p-2 border-${config.borderSize} border-t-0 border-l-0 ${config.borderColor}`}
@@ -803,7 +851,7 @@ export function DocumentCmr({ signed, data }: DocumentCmrProps) {
 								</div>
 
 								<div
-									style={{ height: '27mm' }}
+									style={{ height: '18mm' }}
 									className={`p-2 border-${config.borderSize} border-t-0 border-l-0 ${config.borderColor}`}
 								>
 									<BoxLegend
@@ -875,9 +923,14 @@ export function DocumentCmr({ signed, data }: DocumentCmrProps) {
 									src="/images/star-stamp.png"
 									alt="Star Office Signature"
 									width={220}
-									height={0}
+									height={100}
+									loading="eager"
 									className="mx-auto my-2"
-									style={{ transform: 'rotate(-4deg)' }}
+									style={{
+										width: 'auto',
+										height: 'auto',
+										transform: 'rotate(-4deg)',
+									}}
 								/>
 							</div>
 							<div

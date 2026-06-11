@@ -257,24 +257,3 @@ export function normalizePhoneNumber(
 
 	return defaultCountryCode + digits;
 }
-
-export function whatsAppUrl(number: string, text: string) {
-	// Remove any non-numeric characters from the number and ensure no '+' sign
-	const cleanNumber = normalizePhoneNumber(number);
-
-	// Encode the text for URL
-	const encodedText = encodeURIComponent(text);
-
-	// Build the WhatsApp URL
-	let whatsappUrl: string;
-
-	if (cleanNumber) {
-		// Share to specific number
-		whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodedText}`;
-	} else {
-		// Share without specific number (just pre-filled message)
-		whatsappUrl = `https://wa.me/?text=${encodedText}`;
-	}
-
-	return whatsappUrl;
-}

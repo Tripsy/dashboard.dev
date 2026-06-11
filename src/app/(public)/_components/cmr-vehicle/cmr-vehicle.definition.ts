@@ -53,18 +53,18 @@ class CmrVehicleValidator extends BaseValidator<typeof validatorMessages> {
 				vehicle: this.validateString(
 					this.getMessage('invalid_vehicle'),
 				),
-				license_plate: this.validateString(
-					this.getMessage('invalid_license_plate'),
-					{
-						required: true,
-						minChars: 8,
-					},
-				),
 				vin: this.validateString(this.getMessage('invalid_vin'), {
-					required: false,
+					required: true,
 					minChars: 17,
 					maxChars: 17,
 				}),
+				license_plate: this.validateString(
+					this.getMessage('invalid_license_plate'),
+					{
+						required: false,
+						minChars: 8,
+					},
+				),
 				notes: this.validateString(this.getMessage('invalid_notes'), {
 					required: false,
 				}),

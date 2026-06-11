@@ -5,9 +5,16 @@ import { useRef, useState } from 'react';
 import { useReactToPrint } from 'react-to-print';
 import { Icons } from '@/components/icon.component';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/providers/toast.provider';
 import { DocumentCmr, type DocumentCmrProps } from './document-cmr.component';
 
-export function DocumentCmrPrint({ props }: { props: DocumentCmrProps }) {
+export function DocumentCmrPrint({
+	documentProps,
+}: {
+	documentProps: DocumentCmrProps;
+}) {
+	const { showToast } = useToast();
+
 	const [showSignature, setShowSignature] = useState(false);
 
 	const contentRef = useRef<HTMLDivElement>(null);
@@ -15,10 +22,10 @@ export function DocumentCmrPrint({ props }: { props: DocumentCmrProps }) {
 
 	const handlePrint = useReactToPrint({
 		contentRef,
-		documentTitle: `CMR-${props.data.id}`,
+		documentTitle: `CMR-${documentProps.data.id}`,
 		pageStyle: `
             @page {
-                size: 342.4mm 428mm;
+                size: 342.4mm 438mm;
             }
             @media print {
                 body {
@@ -35,8 +42,26 @@ export function DocumentCmrPrint({ props }: { props: DocumentCmrProps }) {
 
 	const handleSaveSignature = async () => {
 		if (signatureRef.current) {
+			if (!signatureRef.current.hasContent()) {
+				showToast({
+					severity: 'error',
+					summary: 'Error',
+					detail: 'No signature provided',
+				});
+
+				return;
+			}
+
+			showToast({
+				severity: 'success',
+				summary: 'Success',
+				detail: 'CMR has been signed with success',
+			});
+
 			const { dataUrl } = await signatureRef.current.export();
+
 			setShowSignature(false);
+
 			// You can also send this to your backend here
 			console.log('Signature saved:', dataUrl);
 		}
@@ -48,7 +73,7 @@ export function DocumentCmrPrint({ props }: { props: DocumentCmrProps }) {
 
 	return (
 		<div className="relative">
-			{props.signed ? (
+			{documentProps.signed ? (
 				// Print trigger — lives outside the printable area
 				<div className="no-print fixed top-2 left-2 z-20">
 					<Button variant="success" onClick={() => handlePrint()}>
@@ -70,7 +95,7 @@ export function DocumentCmrPrint({ props }: { props: DocumentCmrProps }) {
 			)}
 
 			{showSignature && (
-				<div className="fixed top-20 left-30 z-50 flex items-center justify-center bg-black/50">
+				<div className="fixed top-20 left-20 z-50 flex items-center justify-center bg-black/50">
 					<div className="bg-white rounded-lg shadow-xl p-6">
 						<h3 className="text-lg font-semibold mb-4 text-center">
 							Sign Document
@@ -108,7 +133,10 @@ export function DocumentCmrPrint({ props }: { props: DocumentCmrProps }) {
 			{/* Printable area */}
 			<div ref={contentRef}>
 				<div className="print-scale-wrapper">
-					<DocumentCmr signed={props.signed} data={props.data} />
+					<DocumentCmr
+						signed={documentProps.signed}
+						data={documentProps.data}
+					/>
 				</div>
 			</div>
 		</div>

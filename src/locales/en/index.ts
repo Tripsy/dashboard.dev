@@ -15,6 +15,7 @@ import cmr_vehicle from '@/locales/en/cmr-vehicle.json';
 import company_vehicle from '@/locales/en/company-vehicle.json';
 import cron_history from '@/locales/en/cron-history.json';
 import dashboard from '@/locales/en/dashboard.json';
+import document from '@/locales/en/document.json';
 import driver_panel from '@/locales/en/driver-panel.json';
 import email_confirm from '@/locales/en/email-confirm.json';
 import email_confirm_send from '@/locales/en/email-confirm-send.json';
@@ -52,6 +53,7 @@ const en = {
 	client,
 	'cron-history': cron_history,
 	dashboard,
+	document,
 	'email-confirm': email_confirm,
 	'email-confirm-send': email_confirm_send,
 	home,

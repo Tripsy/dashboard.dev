@@ -16,8 +16,12 @@ import { isDriver } from '@/models/auth.model';
 import type { CashFlowModel } from '@/models/cash-flow.model';
 import type { CmrSessionModel } from '@/models/cmr-session.model';
 import type { CompanyVehicleModel } from '@/models/company-vehicle.model';
+import { VehicleTypeEnum } from '@/models/vehicle.model';
 import type { WorkSessionModel } from '@/models/work-session.model';
-import type { WorkSessionVehicleModel } from '@/models/work-session-vehicle.model';
+import {
+	type WorkSessionVehicleModel,
+	WorkSessionVehicleStatusEnum,
+} from '@/models/work-session-vehicle.model';
 import { useAuth } from '@/providers/auth.provider';
 import {
 	requestActiveWorkSession,
@@ -39,6 +43,8 @@ type WorkSessionContextType = {
 	sessionSituation: SessionSituation;
 	activeSession: WorkSessionModel | null;
 	activeSessionVehicles: WorkSessionVehicleModel[];
+	activeSessionVehicleAuto: CompanyVehicleModel | null;
+	activeSessionVehicleTrailer: CompanyVehicleModel | null;
 	availableCompanyVehicles: CompanyVehicleModel[];
 	workSessionCmrs: CmrSessionModel[];
 	refreshSession: () => Promise<void>;
@@ -103,16 +109,6 @@ const WorkSessionProvider = ({
 		staleTime: REFRESH_INTERVAL_AVAILABLE_COMPANY_VEHICLES,
 	});
 
-	const sessionCashFlowEntriesCreateAtStart = useMemo(() => {
-		const date = sessionData?.workSession?.created_at;
-
-		if (!date) {
-			return null;
-		}
-
-		return typeof date === 'string' ? stringToDate(date) : date;
-	}, [sessionData?.workSession?.created_at]);
-
 	const {
 		data: sessionCashFlowEntries,
 		refetch: refetchSessionCashFlowEntries,
@@ -123,12 +119,19 @@ const WorkSessionProvider = ({
 				throw new Error('No auth');
 			}
 
+			const date = sessionData?.workSession?.created_at;
+			const createAtStart = date
+				? typeof date === 'string'
+					? stringToDate(date)
+					: date
+				: null;
+
 			return requestSessionCashFlowEntries({
 				user_id: auth.id,
-				create_at_start: sessionCashFlowEntriesCreateAtStart,
+				create_at_start: createAtStart,
 			});
 		},
-		enabled: isDriver(auth) && !!sessionCashFlowEntriesCreateAtStart,
+		enabled: isDriver(auth) && !!sessionData?.workSession?.created_at,
 		staleTime: REFRESH_INTERVAL_SESSION_PAYMENTS,
 	});
 
@@ -188,13 +191,31 @@ const WorkSessionProvider = ({
 		};
 	}, [refreshSession]);
 
-	const contextValue = useMemo(
-		() => ({
+	const contextValue = useMemo(() => {
+		const activeSessionVehicleAuto =
+			sessionData?.workSessionVehicles.find(
+				(s) =>
+					s.company_vehicle.vehicle.vehicle_type ===
+						VehicleTypeEnum.AUTO &&
+					s.status === WorkSessionVehicleStatusEnum.ASSIGNED,
+			)?.company_vehicle || null;
+
+		const activeSessionVehicleTrailer =
+			sessionData?.workSessionVehicles.find(
+				(s) =>
+					s.company_vehicle.vehicle.vehicle_type ===
+						VehicleTypeEnum.TRAILER &&
+					s.status === WorkSessionVehicleStatusEnum.ASSIGNED,
+			)?.company_vehicle || null;
+
+		return {
 			activeTab,
 			setActiveTab,
 			sessionSituation,
 			activeSession: sessionData?.workSession || null,
 			activeSessionVehicles: sessionData?.workSessionVehicles || [],
+			activeSessionVehicleAuto,
+			activeSessionVehicleTrailer,
 			availableCompanyVehicles: availableCompanyVehicles || [],
 			workSessionCmrs: sessionData?.workSessionCmrs || [],
 			refreshSession,
@@ -202,17 +223,16 @@ const WorkSessionProvider = ({
 			refetchSessionCashFlowEntries: async () => {
 				await refetchSessionCashFlowEntries();
 			},
-		}),
-		[
-			activeTab,
-			sessionSituation,
-			sessionData,
-			availableCompanyVehicles,
-			refreshSession,
-			sessionCashFlowEntries,
-			refetchSessionCashFlowEntries,
-		],
-	);
+		};
+	}, [
+		activeTab,
+		sessionSituation,
+		sessionData,
+		availableCompanyVehicles,
+		refreshSession,
+		sessionCashFlowEntries,
+		refetchSessionCashFlowEntries,
+	]);
 
 	return (
 		<WorkSessionContext.Provider value={contextValue}>

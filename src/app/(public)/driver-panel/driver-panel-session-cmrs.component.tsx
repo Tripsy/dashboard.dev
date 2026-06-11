@@ -4,10 +4,12 @@ import { Icons } from '@/components/icon.component';
 import { LocationNavigator } from '@/components/location-navigator.component';
 import { Button } from '@/components/ui/button';
 import { Link } from '@/components/ui/link';
+import { WhatsAppContact } from '@/components/whatsapp-contact';
+import Routes from '@/config/routes.setup';
 import { formatDate } from '@/helpers/date.helper';
 import { DisplayStatus } from '@/helpers/display.helper';
 import { arrayHasValue } from '@/helpers/objects.helper';
-import { formatEnumLabel, whatsAppUrl } from '@/helpers/string.helper';
+import { formatEnumLabel } from '@/helpers/string.helper';
 import { displayAddressLabel } from '@/models/address.model';
 import {
 	CashFlowCategoryEnum,
@@ -288,14 +290,24 @@ function DriverPanelSessionCmrEntry({
 						{displayClientLabel(cmr.client)}
 					</span>
 				</div>
-				<div>
-					<span className="text-muted-foreground">Contact:</span>
-					<span className="ml-2 font-mono flex gap-2">
-						{cmr.contact_name}
-						<a href={`tel:${cmr.contact_phone}`}>
-							{cmr.contact_phone}
-						</a>
-					</span>
+				<div className="flex items-center gap-2">
+					<div className="text-muted-foreground">Contact:</div>
+					<div className="font-mono">{cmr.contact_name}</div>
+					{cmr.contact_phone && (
+						<div>
+							<a href={`tel:${cmr.contact_phone}`}>
+								{cmr.contact_phone}
+							</a>
+						</div>
+					)}
+					{cmr.contact_phone && (
+						<div>
+							<WhatsAppContact
+								phone={cmr.contact_phone}
+								message="Here is the CMR"
+							/>
+						</div>
+					)}
 				</div>
 				{withDetails && (
 					<div className="flex items-center">
@@ -448,11 +460,13 @@ function DriverPanelSessionCmrEntry({
 				{!arrayHasValue(cmr.status, [CmrStatusEnum.CANCELLED]) &&
 					contactPhone && (
 						<Link
-							href={whatsAppUrl(contactPhone, 'Here is the CMR')}
+							href={Routes.get('document-cmr', {
+								tracking_number: cmr.tracking_number,
+							})}
 							variant="secondary"
 							hover="success"
 							className="cursor-pointer"
-							title="Send CMR"
+							title="View CMR"
 							target="_blank"
 							rel="noopener noreferrer"
 						>

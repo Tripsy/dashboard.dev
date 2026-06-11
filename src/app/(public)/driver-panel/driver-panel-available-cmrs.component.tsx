@@ -15,6 +15,7 @@ import { formatEnumLabel } from '@/helpers/string.helper';
 import { displayAddressLabel } from '@/models/address.model';
 import { displayClientLabel } from '@/models/client.model';
 import { type CmrModel, CmrStatusEnum } from '@/models/cmr.model';
+import type { CompanyVehicleModel } from '@/models/company-vehicle.model';
 import type { WorkSessionModel } from '@/models/work-session.model';
 import { createCmrSession } from '@/services/cmr-session.service';
 
@@ -66,17 +67,26 @@ export function DriverPanelAvailableCmrs() {
 }
 
 function DriverPanelAvailableCmrEntry({ cmr }: { cmr: CmrModel }) {
-	const { setActiveTab, activeSession, refreshSession } = useWorkSession();
+	const {
+		setActiveTab,
+		activeSession,
+		refreshSession,
+		activeSessionVehicleAuto,
+		activeSessionVehicleTrailer,
+	} = useWorkSession();
 
 	const handleAssignCmr = useCallback(
-		async (cmr: CmrModel, activeSession: WorkSessionModel | null) => {
-			if (!activeSession) {
-				return;
-			}
-
+		async (
+			cmr: CmrModel,
+			activeSession: WorkSessionModel,
+			activeSessionVehicleAuto: CompanyVehicleModel,
+			activeSessionVehicleTrailer: CompanyVehicleModel | null,
+		) => {
 			await createCmrSession(
 				{
 					work_session_id: activeSession.id,
+					company_vehicle_id_auto: activeSessionVehicleAuto?.id,
+					company_vehicle_id_trailer: activeSessionVehicleTrailer?.id,
 				},
 				cmr.id,
 			);
@@ -104,14 +114,23 @@ function DriverPanelAvailableCmrEntry({ cmr }: { cmr: CmrModel }) {
 					</div>
 					<DisplayStatus status={cmr.status} dataSource="cmr" />
 
-					<Button
-						variant="info"
-						onClick={() => handleAssignCmr(cmr, activeSession)}
-						title="Assign CMR to my work session"
-						className="text-sm px-2 py-1.5"
-					>
-						<Icons.Action.Add /> Assign to me
-					</Button>
+					{activeSession && activeSessionVehicleAuto && (
+						<Button
+							variant="info"
+							onClick={() =>
+								handleAssignCmr(
+									cmr,
+									activeSession,
+									activeSessionVehicleAuto,
+									activeSessionVehicleTrailer,
+								)
+							}
+							title="Assign CMR to my work session"
+							className="text-sm px-2 py-1.5"
+						>
+							<Icons.Action.Add /> Assign to me
+						</Button>
+					)}
 				</h3>
 				<div className="flex items-center">
 					<span className="text-muted-foreground">Notes:</span>

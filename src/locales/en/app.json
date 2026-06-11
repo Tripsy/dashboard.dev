@@ -1,6 +1,9 @@
 {
 	"name": "{{app_name}}",
 	"description": "{{app_name}}",
+	"page": {
+		"not_found": "{{app_name}} - Page not found"
+	},
 	"error": {
 		"generic": "Something went wrong",
 		"csrf": "Error occurred while processing your request. Please reload page and try again.",

@@ -25,7 +25,7 @@ import type {
 	GetFormValuesFnType,
 	ValidateFormFnType,
 } from '@/types/form.type';
-import type { ActionButtonPropsType } from '@/types/html.type';
+import type { ButtonAppearanceType } from '@/types/html.type';
 
 export const DataSourceSectionEnum = {
 	DASHBOARD: 'dashboard',
@@ -102,6 +102,7 @@ type ActionConfigBase<Entry, FormValues extends FormValuesType> = {
 	windowTitle: string;
 	// biome-ignore lint/suspicious/noExplicitAny: It's fine
 	windowComponent?: React.ComponentType<any>; // e.g: ViewUser, FormManageUser, SetupUserPermissions, etc.
+	windowTarget?: string; // Used for `link` windowType
 	windowConfigProps?: {
 		title?: string;
 		size?: ModalSizeType;
@@ -111,7 +112,7 @@ type ActionConfigBase<Entry, FormValues extends FormValuesType> = {
 	permission: ActionConfigPermission;
 	customEntryCheck?: (entry: Entry) => boolean; // Additional function to check if the action is available (hint: active user cannot have `active` action)
 	buttonPosition: 'left' | 'right' | 'hidden'; // Describe where the action button should be placed in data-table
-	button?: ActionButtonPropsType; // Action button configuration
+	button?: ButtonAppearanceType; // Action button configuration
 
 	reloadEntry?: ReloadEntryFnType<Entry>; // Used to reload entry data for form and view; the entry passed from the list may not have all the data
 	prepareEntry?: PrepareEntryFnType<Entry>; // Prepare entry before passing to renderer; Note: this run after reloadEntry if present
@@ -189,6 +190,15 @@ type OtherActionConfig<
 	operationFunction?: never;
 };
 
+type LinkActionConfig<
+	Entry,
+	FormValues extends FormValuesType,
+> = ActionConfigBase<Entry, FormValues> & {
+	windowType: 'link';
+	entriesSelection: EntriesSelectionType;
+	operationFunction?: never;
+};
+
 export type ActionConfigType<
 	Entry,
 	FormValues extends FormValuesType = FormValuesType,
@@ -199,7 +209,8 @@ export type ActionConfigType<
 	| SingleActionConfig<Entry, FormValues>
 	| MultipleActionConfig<Entry, FormValues>
 	| ViewActionConfig<Entry, FormValues>
-	| OtherActionConfig<Entry, FormValues>;
+	| OtherActionConfig<Entry, FormValues>
+	| LinkActionConfig<Entry, FormValues>;
 
 export type ActionsType<Entry> = {
 	// biome-ignore lint/suspicious/noExplicitAny: It's fine

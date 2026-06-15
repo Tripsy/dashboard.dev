@@ -5,7 +5,7 @@ import type {
 	ButtonVariant,
 } from '@/components/ui/button';
 
-export type ActionButtonPropsType = {
+export type ButtonAppearanceType = {
 	className?: string;
 	variant?: ButtonVariant;
 	size?: ButtonSize;

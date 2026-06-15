@@ -17,15 +17,15 @@ import type {
 	DataTableColumnType,
 	DataTableValueOptionsType,
 } from '@/types/data-source.type';
-import type { ActionButtonPropsType } from '@/types/html.type';
+import type { ButtonAppearanceType } from '@/types/html.type';
 
 export const DisplayButton = <Entry,>({
-	buttonProps,
+	buttonAppearance,
 	action,
 	dataSource,
 	entryOrId,
 }: {
-	buttonProps: ActionButtonPropsType;
+	buttonAppearance: ButtonAppearanceType;
 	action: string;
 	dataSource: DataSourceKey;
 	entryOrId: Entry | number;
@@ -56,9 +56,9 @@ export const DisplayButton = <Entry,>({
 					});
 				}
 			}}
-			title={buttonProps.title}
+			title={buttonAppearance.title}
 		>
-			{buttonProps.label}
+			{buttonAppearance.label}
 		</button>
 	);
 };
@@ -140,7 +140,7 @@ export const DataTableValue = <Entry extends Record<string, unknown>>(
 
 			outputValue = (
 				<DisplayButton
-					buttonProps={{
+					buttonAppearance={{
 						label: outputValue,
 						title: title,
 					}}

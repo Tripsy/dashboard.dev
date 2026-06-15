@@ -1,23 +1,57 @@
 import type { LucideProps } from 'lucide-react';
-import React, { useMemo } from 'react';
+import Link from 'next/link';
+import React, { type JSX, useMemo } from 'react';
 import { getActionIcon } from '@/components/icon.component';
 import { LoadingIcon } from '@/components/status.component';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/use-translation.hook';
-import type { ActionButtonPropsType } from '@/types/html.type';
+import type { ButtonAppearanceType } from '@/types/html.type';
+
+type ActionCommand = {
+	type: 'action';
+	onClick: () => void;
+};
+
+type LinkCommand = {
+	type: 'link';
+	href: string;
+	target?: string;
+};
+
+export type ButtonCommand = ActionCommand | LinkCommand;
+
+function ActionButtonContent({
+	icon,
+	label,
+}: {
+	icon: React.ReactElement | React.ComponentType<LucideProps> | null;
+	label: string | JSX.Element;
+}) {
+	return (
+		<>
+			{icon && React.isValidElement(icon)
+				? icon
+				: icon &&
+					React.createElement(
+						icon as React.ComponentType<LucideProps>,
+					)}
+			{label}
+		</>
+	);
+}
 
 export function ActionButton({
 	dataSource,
 	action,
-	buttonProps,
-	handleClick,
+	buttonAppearance,
 	disabled = false,
+	command,
 }: {
 	dataSource: string;
 	action: string;
-	buttonProps?: ActionButtonPropsType;
-	handleClick: () => void;
+	buttonAppearance?: ButtonAppearanceType;
 	disabled?: boolean;
+	command: ButtonCommand;
 }) {
 	const actionTitleKey = `${dataSource}.action.${action}.title`;
 	const actionLabelKey = `${dataSource}.action.${action}.label`;
@@ -35,12 +69,11 @@ export function ActionButton({
 		| React.ComponentType<LucideProps>
 		| null;
 
-	if (buttonProps?.icon) {
-		if (React.isValidElement(buttonProps.icon)) {
-			ActionIcon = buttonProps.icon;
+	if (buttonAppearance?.icon) {
+		if (React.isValidElement(buttonAppearance.icon)) {
+			ActionIcon = buttonAppearance.icon;
 		} else {
-			// is string - use it as action
-			ActionIcon = getActionIcon(buttonProps.icon);
+			ActionIcon = getActionIcon(buttonAppearance.icon);
 		}
 	} else {
 		ActionIcon = getActionIcon(action);
@@ -50,29 +83,32 @@ export function ActionButton({
 		return null;
 	}
 
+	const label = buttonAppearance?.label || translations[actionLabelKey];
+	const title = translations[actionTitleKey].replace(' - {{entry}}', '');
+
 	return (
 		<Button
 			type="button"
-			variant={buttonProps?.variant}
-			hover={buttonProps?.hover}
-			size={buttonProps?.size}
-			className={buttonProps?.className}
-			title={translations[actionTitleKey].replace(' - {{entry}}', '')}
-			onClick={handleClick}
+			variant={buttonAppearance?.variant}
+			hover={buttonAppearance?.hover}
+			size={buttonAppearance?.size}
+			className={buttonAppearance?.className}
+			title={title}
+			onClick={command.type === 'action' ? command.onClick : undefined}
 			disabled={disabled}
+			asChild={command.type === 'link'}
 		>
 			{disabled ? (
 				<>
 					<LoadingIcon />
 					{translations['app.text.please_wait']}
 				</>
+			) : command.type === 'link' ? (
+				<Link href={command.href} target={command.target ?? '_self'}>
+					<ActionButtonContent icon={ActionIcon} label={label} />
+				</Link>
 			) : (
-				<>
-					{ActionIcon && React.isValidElement(ActionIcon)
-						? ActionIcon
-						: ActionIcon && <ActionIcon />}
-					{buttonProps?.label || translations[actionLabelKey]}
-				</>
+				<ActionButtonContent icon={ActionIcon} label={label} />
 			)}
 		</Button>
 	);

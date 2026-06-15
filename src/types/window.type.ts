@@ -13,7 +13,7 @@ import type {
 	GetFormValuesFnType,
 	ValidateFormFnType,
 } from '@/types/form.type';
-import type { ActionButtonPropsType } from '@/types/html.type';
+import type { ButtonAppearanceType } from '@/types/html.type';
 
 export type WindowEntryType = Record<string, unknown>;
 export type WindowConfigPropsType = {
@@ -23,7 +23,7 @@ export type WindowConfigPropsType = {
 };
 export type WindowSectionType = 'dashboard' | 'public';
 export type WindowType<T extends EntriesSelectionType> = T extends 'free'
-	? 'form' | 'other'
+	? 'form' | 'other' | 'link'
 	: T extends 'single'
 		? 'view' | 'action' | 'other'
 		: T extends 'multiple'
@@ -37,7 +37,7 @@ export type WindowDefinition = {
 	windowComponent?: WindowComponent;
 	// biome-ignore lint/suspicious/noExplicitAny: It's fine
 	operationFunction?: OperationFunctionType<any, any>;
-	button?: ActionButtonPropsType;
+	button?: ButtonAppearanceType;
 	// biome-ignore lint/suspicious/noExplicitAny: It's fine
 	validateForm?: ValidateFormFnType<any>;
 	// biome-ignore lint/suspicious/noExplicitAny: It's fine

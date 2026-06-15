@@ -4,7 +4,10 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useStore } from 'zustand/react';
 import { addDataTableActionListener } from '@/app/(dashboard)/_events/data-table-action.event';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
-import { ActionButton } from '@/components/action-button.component';
+import {
+	ActionButton,
+	type ButtonCommand,
+} from '@/components/action-button.component';
 import { getDataSourceConfig } from '@/config/data-source.config';
 import { getErrorMessage } from '@/helpers/objects.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
@@ -56,22 +59,37 @@ function buildActionButtons<K extends DataSourceKey>(
 					actionConfig.customEntryCheck,
 				),
 		)
-		.map(([action, actionConfig]) => (
-			<ActionButton
-				key={`button-${dataSource}-${action}`}
-				dataSource={dataSource}
-				action={action}
-				buttonProps={actionConfig.button}
-				handleClick={() =>
-					handleAction(
-						action,
-						dataSource,
-						selectedEntries,
-						actionConfig,
-					)
-				}
-			/>
-		));
+		.map(([action, actionConfig]) => {
+			let command: ButtonCommand;
+
+			if (actionConfig.windowType === 'link') {
+				command = {
+					type: 'link',
+					href: actionConfig.windowTarget ?? '/',
+				};
+			} else {
+				command = {
+					type: 'action',
+					onClick: () =>
+						handleAction(
+							action,
+							dataSource,
+							selectedEntries,
+							actionConfig,
+						),
+				};
+			}
+
+			return (
+				<ActionButton
+					key={`button-${dataSource}-${action}`}
+					dataSource={dataSource}
+					action={action}
+					buttonAppearance={actionConfig.button}
+					command={command}
+				/>
+			);
+		});
 }
 
 function resolveActionEntries<K extends DataSourceKey>(

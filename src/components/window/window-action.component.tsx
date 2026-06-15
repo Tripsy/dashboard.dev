@@ -183,9 +183,12 @@ export function WindowAction<WindowEntry extends WindowEntryType>({
 				<ActionButton
 					dataSource={windowConfig.dataSource}
 					action={windowConfig.action}
-					buttonProps={windowDefinition.button}
-					handleClick={handleAction}
+					buttonAppearance={windowDefinition.button}
 					disabled={loading}
+					command={{
+						type: 'action',
+						onClick: handleAction,
+					}}
 				/>
 			</div>
 		</>

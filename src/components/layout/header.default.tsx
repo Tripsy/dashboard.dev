@@ -12,8 +12,15 @@ import Routes from '@/config/routes.setup';
 import { cn } from '@/helpers/css.helper';
 import { UserRoleEnum } from '@/models/user.model';
 import { useAuth } from '@/providers/auth.provider';
+import {LanguageSwitcher} from "@/components/layout/language-switcher.component";
 
-export function Header() {
+export function Header({
+	currentLanguage,
+	supportedLanguages,
+}: {
+	currentLanguage: string;
+	supportedLanguages: string[];
+}) {
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
 	const { authStatus, auth } = useAuth();
@@ -163,7 +170,10 @@ export function Header() {
 								<Menu className="h-5 w-5" />
 							)}
 						</Button>
-
+						<LanguageSwitcher
+							currentLanguage={currentLanguage}
+							supportedLanguages={supportedLanguages}
+						/>
 						<ToggleTheme />
 						<UserMenu />
 					</div>

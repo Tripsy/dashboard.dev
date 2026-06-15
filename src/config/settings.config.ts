@@ -11,12 +11,6 @@ function loadSettings(): Settings {
 	return {
 		app: {
 			debug: process.env.NEXT_PUBLIC_APP_DEBUG === 'true',
-			language: process.env.NEXT_PUBLIC_APP_LANGUAGE || 'en',
-			languageSupported: (
-				process.env.NEXT_PUBLIC_APP_SUPPORTED_LANGUAGES || 'en'
-			)
-				.trim()
-				.split(','),
 			environment: process.env.NEXT_PUBLIC_NODE_ENV || 'production',
 			url: process.env.NEXT_PUBLIC_APP_URL,
 			name: process.env.NEXT_PUBLIC_APP_NAME,
@@ -24,6 +18,21 @@ function loadSettings(): Settings {
 
 			currency: process.env.NEXT_PUBLIC_APP_CURRENCY || 'RON',
 			vat_rate: process.env.NEXT_PUBLIC_APP_VAT_RATE || 24,
+		},
+		language: {
+			default: process.env.NEXT_PUBLIC_LANGUAGE_DEFAULT || 'ro',
+			supported: (
+				process.env.NEXT_PUBLIC_LANGUAGE_SUPPORTED || 'ro,en'
+			)
+				.trim()
+				.split(','),
+			cookie_name:
+				process.env.NEXT_PUBLIC_LANGUAGE_COOKIE || 'app-language',
+			cookie_max_age:
+				Number(process.env.NEXT_PUBLIC_LANGUAGE_COOKIE_MAX_AGE || 365) *
+				60 *
+				60 *
+				24,
 		},
 		security: {
 			allowedOrigins: process.env.ALLOWED_ORIGINS?.split(',').map((v) =>
@@ -98,7 +107,7 @@ export const Configuration = {
 	},
 
 	isSupportedLanguage: (language: string): boolean => {
-		const languages = Configuration.get<string[]>('app.languageSupported');
+		const languages = Configuration.get<string[]>('language.supported');
 
 		return Array.isArray(languages) && languages.includes(language);
 	},
@@ -112,7 +121,7 @@ export const Configuration = {
 	},
 
 	language: () => {
-		return Configuration.get('app.language') as Language;
+		return Configuration.get('language.default') as Language;
 	},
 
 	currency: () => {

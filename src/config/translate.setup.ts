@@ -1,63 +1,45 @@
 import { Configuration } from '@/config/settings.config';
-import { ApiRequest } from '@/helpers/api.helper';
 import { getObjectValue } from '@/helpers/objects.helper';
 import { replaceVars } from '@/helpers/string.helper';
 
 type TranslationValue = string | { [key: string]: TranslationValue };
 type TranslationResource = Record<string, TranslationValue>;
 
-let languageSelected: string | null = null;
 const languageResources: Record<string, TranslationResource> = {};
 
-async function fetchLanguage() {
+async function fetchLanguage(): Promise<string> {
+	const fallback = Configuration.get('language.default') as string;
+
 	try {
-		const result = await new ApiRequest()
-			.setRequestMode('same-site')
-			.setRequestInit({
-				credentials: 'same-origin',
-			})
-			.doFetch<{ language: string }>('language', {
-				method: 'GET',
-			});
+		const { headers } = await import('next/headers');
+		const headerStore = await headers();
 
-		return (
-			result?.data?.language ||
-			(Configuration.get('app.language') as string)
-		);
+		const fromHeader = headerStore.get('x-language')?.trim().toLowerCase();
+
+		if (fromHeader && Configuration.isSupportedLanguage(fromHeader)) {
+			return fromHeader;
+		}
 	} catch (error) {
-		console.error('Failed to fetch language:', error);
-
-		return Configuration.get('app.language') as string;
+		console.error('Failed to read language header:', error);
 	}
+
+	return fallback;
 }
 
 export async function getLanguage(): Promise<string> {
-	if (languageSelected) {
-		return languageSelected;
+	if (typeof document !== 'undefined') {
+		// Client: read from html[lang] set by RootLayout — always fresh
+		const fromDom = document.documentElement.lang?.toLowerCase();
+
+		if (fromDom && Configuration.isSupportedLanguage(fromDom)) {
+			return fromDom;
+		}
+
+		return Configuration.get('language.default') as string;
 	}
 
-	if (typeof document === 'undefined') {
-		languageSelected = await fetchLanguage();
-	} else {
-		languageSelected =
-			document.documentElement.lang || navigator.language?.split('-')[0];
-		languageSelected = languageSelected.toLowerCase();
-	}
-
-	if (
-		languageSelected &&
-		Configuration.isSupportedLanguage(languageSelected)
-	) {
-		return languageSelected;
-	}
-
-	return Configuration.get('app.language') as string;
-}
-
-export function setLanguage(lang: string) {
-	if (Configuration.isSupportedLanguage(lang)) {
-		languageSelected = lang;
-	}
+	// Server: read cookie directly
+	return fetchLanguage();
 }
 
 async function loadLanguageResource(
@@ -159,3 +141,12 @@ export const translateBatch = async <
 
 	return result;
 };
+
+export async function getLocaleValue<T>(key: string): Promise<T | undefined> {
+	const language = await getLanguage();
+	const resource = await loadLanguageResource(language);
+
+	const value = getObjectValue(resource, key);
+
+	return value as T | undefined;
+}

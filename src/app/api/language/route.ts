@@ -1,52 +1,40 @@
-import { cookies, headers } from 'next/headers';
+import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { Configuration } from '@/config/settings.config';
-import type { ApiResponseFetch } from '@/types/api.type';
 
-type NextResponseLanguage = NextResponse<
-	ApiResponseFetch<{
-		language: string;
-	}>
->;
+export async function POST(req: NextRequest) {
+	const body = await req.json();
+	const language = body?.language as string;
 
-export async function GET(): Promise<NextResponseLanguage> {
-	const headerList = await headers();
-	const cookieStore = await cookies();
+	if (!language || !Configuration.isSupportedLanguage(language)) {
+		return NextResponse.json(
+			{ error: 'Unsupported language' },
+			{ status: 400 },
+		);
+	}
 
-	const fromHeader =
-		headerList.get('x-language') ||
-		headerList.get('accept-language')?.split(',')[0]?.split('-')[0];
-	const fromCookie = cookieStore.get('preferred-language')?.value;
-	const fallback = Configuration.get('app.language') as string;
-
-	const language = fromHeader || fromCookie || fallback;
-
-	const languageSelected = Configuration.isSupportedLanguage(language)
-		? language
-		: (Configuration.get('app.language') as string);
-
-	return NextResponse.json(
-		{
-			data: {
-				language: languageSelected,
-			},
-			success: true,
-			message: '',
+	const response = NextResponse.json({
+		data: {
+			language: language,
 		},
-		{
-			status: 200,
-			headers: {
-				'X-Content-Type-Options': 'nosniff',
-				'X-Frame-Options': 'DENY',
-				'Referrer-Policy': 'strict-origin-when-cross-origin',
-				'Cache-Control': 'no-store, max-age=0',
-				'Content-Type': 'application/json',
-				'Cross-Origin-Resource-Policy': 'same-origin',
-				'Cross-Origin-Opener-Policy': 'same-origin',
-				'Cross-Origin-Embedder-Policy': 'require-corp',
-			},
-		},
-	);
+		success: true,
+		message: '',
+	});
+
+	const languageCookie = Configuration.get('language.cookie_name') as string;
+	const languageCookieMaxAge = Configuration.get(
+		'language.cookie_max_age',
+	) as number;
+
+	response.cookies.set(languageCookie, language, {
+		maxAge: languageCookieMaxAge,
+		path: '/',
+		sameSite: 'lax',
+		secure: Configuration.isEnvironment('production'),
+		httpOnly: true,
+	});
+
+	return response;
 }
 
 export const dynamic = 'force-dynamic'; // Ensure this route is never statically optimize

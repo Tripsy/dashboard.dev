@@ -29,9 +29,6 @@ class MiddlewareContext {
 		// Clickjacking protection
 		this.res.headers.set('X-Frame-Options', 'DENY');
 
-		// Determine language; add it to headers; create the cookie
-		this.setupLanguage();
-
 		return this.res;
 	}
 
@@ -70,7 +67,9 @@ class MiddlewareContext {
 		const queryLang = url.searchParams.get('lang');
 
 		// 2. Check existing cookie
-		const cookieLang = this.req.cookies.get('preferred-language')?.value;
+		const cookieLang = this.req.cookies.get(
+			Configuration.get('language.cookie_name') as string,
+		)?.value;
 
 		// 3. Check Accept-Language header
 		const acceptLanguage = this.req.headers.get('accept-language');
@@ -80,13 +79,20 @@ class MiddlewareContext {
 		const language = queryLang || cookieLang || headerLang;
 
 		if (language && Configuration.isSupportedLanguage(language)) {
+			const languageCookie = Configuration.get(
+				'language.cookie_name',
+			) as string;
+			const languageCookieMaxAge = Configuration.get(
+				'language.cookie_max_age',
+			) as number;
+
 			if (language !== cookieLang) {
-				this.res.cookies.set('preferred-language', language, {
-					httpOnly: true,
-					secure: Configuration.isEnvironment('production'),
+				this.res.cookies.set(languageCookie, language, {
+					maxAge: languageCookieMaxAge,
 					path: '/',
 					sameSite: 'lax',
-					maxAge: 60 * 60 * 24 * 365,
+					secure: Configuration.isEnvironment('production'),
+					httpOnly: true,
 				});
 			}
 
@@ -306,6 +312,8 @@ export async function proxy(req: NextRequest) {
 			status: 403,
 		});
 	}
+
+	ctx.setupLanguage();
 
 	const pathname = req.nextUrl.pathname;
 	const routeMatch = Routes.match(pathname);

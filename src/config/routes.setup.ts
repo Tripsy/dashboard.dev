@@ -215,6 +215,10 @@ Routes.group('dashboard')
 	.add('brand', '/dashboard/brand', {
 		permissionEntity: 'brand',
 	})
+	.add('brand-order', '/dashboard/brand/order', {
+		permissionEntity: 'brand',
+		permissionOperation: 'update',
+	})
 	.add('cash-flow', '/dashboard/cash-flow', {
 		permissionEntity: 'cash-flow',
 	})

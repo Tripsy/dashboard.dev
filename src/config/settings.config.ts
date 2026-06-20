@@ -21,9 +21,7 @@ function loadSettings(): Settings {
 		},
 		language: {
 			default: process.env.NEXT_PUBLIC_LANGUAGE_DEFAULT || 'ro',
-			supported: (
-				process.env.NEXT_PUBLIC_LANGUAGE_SUPPORTED || 'ro,en'
-			)
+			supported: (process.env.NEXT_PUBLIC_LANGUAGE_SUPPORTED || 'ro,en')
 				.trim()
 				.split(','),
 			cookie_name:

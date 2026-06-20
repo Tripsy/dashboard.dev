@@ -174,9 +174,9 @@ function DriverPanelSessionCashFlowEntry({
 				<h3 className="font-semibold text-card-foreground flex items-center gap-4">
 					<div className="flex items-center gap-1">
 						{entry.direction === CashFlowDirectionEnum.IN ? (
-							<Icons.ArrowRight className="h-4 w-4 text-success" />
+							<Icons.Direction.ArrowRight className="h-4 w-4 text-success" />
 						) : (
-							<Icons.ArrowLeft className="h-4 w-4 text-error dark:text-warning" />
+							<Icons.Direction.ArrowLeft className="h-4 w-4 text-error dark:text-warning" />
 						)}
 						{formatEnumLabel(entry.method)} #{entry.id}
 					</div>

@@ -57,6 +57,11 @@
 		"view": {
 			"title": "Brand details - {{entry}}",
 			"label": "View details"
+		},
+		"order": {
+			"title": "Sort brands",
+			"label": "Sort",
+			"success": "Sort order updated successfully"
 		}
 	}
 }

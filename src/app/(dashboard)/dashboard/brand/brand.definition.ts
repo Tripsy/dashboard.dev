@@ -5,6 +5,7 @@ import {
 	FormManageBrand,
 } from '@/app/(dashboard)/dashboard/brand/form-manage-brand.component';
 import { ViewBrand } from '@/app/(dashboard)/dashboard/brand/view-brand.component';
+import Routes from '@/config/routes.setup';
 import { translateBatch } from '@/config/translate.setup';
 import { getFormDataAsEnum, getFormDataAsString } from '@/helpers/form.helper';
 import {
@@ -46,6 +47,7 @@ const translations = await translateBatch(
 		'restore.title',
 		'enable.title',
 		'disable.title',
+		'order.title',
 	] as const,
 	'brand.action',
 );
@@ -364,6 +366,17 @@ export const dataSourceConfigBrand: DataSourceConfigType<BrandModel> = {
 			entriesSelection: 'single',
 			buttonPosition: 'hidden',
 			reloadEntry: (id: number) => requestView<BrandModel>('brand', id),
+		},
+		order: {
+			windowType: 'link',
+			windowTitle: translations['order.title'],
+			windowTarget: Routes.get('brand-order'),
+			permission: ['brand', 'update'],
+			entriesSelection: 'free',
+			buttonPosition: 'right',
+			button: {
+				variant: 'default',
+			},
 		},
 	},
 };

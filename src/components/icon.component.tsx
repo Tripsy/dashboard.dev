@@ -1,8 +1,10 @@
 import {
 	Activity,
 	ArchiveRestore,
+	ArrowDown,
 	ArrowLeft,
 	ArrowRight,
+	ArrowUp,
 	Ban,
 	BanknoteArrowDown,
 	BanknoteArrowUp,
@@ -45,6 +47,7 @@ import {
 	Info,
 	KeyRound,
 	LayoutTemplate,
+	ListOrdered,
 	ListStart,
 	Loader,
 	Lock,
@@ -157,9 +160,13 @@ export const Icons = {
 	Sign: createIcon(PenTool),
 	Print: createIcon(Printer),
 
-	ArrowRight: createIcon(ArrowRight),
-	ArrowLeft: createIcon(ArrowLeft),
-	ArrowCurvedBottom: createIcon(CornerRightDown),
+	Direction: {
+		ArrowUp: createIcon(ArrowUp),
+		ArrowRight: createIcon(ArrowRight),
+		ArrowDown: createIcon(ArrowDown),
+		ArrowLeft: createIcon(ArrowLeft),
+		ArrowCurvedBottom: createIcon(CornerRightDown),
+	},
 
 	Status: {
 		Active: createIcon(CircleCheck),
@@ -224,6 +231,7 @@ export const Icons = {
 		Close: createIcon(Lock),
 		Setup: createIcon(FileCog),
 		Return: createIcon(Undo2),
+		Order: createIcon(ListOrdered),
 	},
 };
 

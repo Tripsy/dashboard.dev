@@ -18,6 +18,7 @@ import type {
 	ReloadEntryFnType,
 	UpdateFunctionType,
 } from '@/types/action.type';
+import type { QueryValueType } from '@/types/api.type';
 import type { DataSourceKey } from '@/types/data-source.key';
 import type {
 	FormValuesType,
@@ -43,7 +44,7 @@ export type DataTableSelectionModeType = 'checkbox' | 'multiple' | null;
 
 export type DataTableFiltersType = {
 	[key: string]: {
-		value: string | number | boolean | Date | null;
+		value: QueryValueType;
 		matchMode:
 			| 'contains'
 			| 'equals'

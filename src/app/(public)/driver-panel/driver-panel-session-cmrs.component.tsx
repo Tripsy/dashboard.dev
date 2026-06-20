@@ -216,7 +216,7 @@ function DriverPanelSessionCmrEntry({
 							title="Show less details"
 							className="text-muted-foreground"
 						>
-							<Icons.ArrowCurvedBottom className="h-4 w-4" />
+							<Icons.Direction.ArrowCurvedBottom className="h-4 w-4" />
 						</Button>
 					) : (
 						<Button
@@ -225,7 +225,7 @@ function DriverPanelSessionCmrEntry({
 							title="Show more details"
 							className="text-muted-foreground"
 						>
-							<Icons.ArrowRight className="h-4 w-4" />
+							<Icons.Direction.ArrowRight className="h-4 w-4" />
 						</Button>
 					)}
 					<div className="font-semibold text-card-foreground ">

@@ -7,6 +7,7 @@ import address from '@/locales/en/address.json';
 import app from '@/locales/en/app.json';
 import auth from '@/locales/en/auth.json';
 import brand from '@/locales/en/brand.json';
+import brand_order from '@/locales/en/brand-order.json';
 import cash_flow from '@/locales/en/cash-flow.json';
 import client from '@/locales/en/client.json';
 import cmr from '@/locales/en/cmr.json';
@@ -49,6 +50,7 @@ const en = {
 	app,
 	auth,
 	brand,
+	'brand-order': brand_order,
 	'cash-flow': cash_flow,
 	client,
 	'cron-history': cron_history,

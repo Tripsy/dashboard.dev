@@ -37,6 +37,10 @@ export function LanguageSwitcher({
 		});
 	};
 
+	if (supportedLanguages.length === 1) {
+		return null;
+	}
+
 	return (
 		<div className="flex items-center gap-2 rounded-lg glass p-1">
 			{supportedLanguages.map((language) => (
@@ -51,7 +55,7 @@ export function LanguageSwitcher({
 						'relative min-w-10 px-2.5 text-xs font-semibold uppercase transition-all duration-200 rounded-md hover:scale-105',
 						currentLanguage === language
 							? 'bg-warning text-warning-foreground shadow-md hover:bg-warning/90 hover:text-warning-foreground'
-							: 'text-muted-foreground hover:bg-secondary hover:text-secondary-foreground hover:shadow-sm'
+							: 'text-muted-foreground hover:bg-secondary hover:text-secondary-foreground hover:shadow-sm',
 					)}
 					aria-label={language.toUpperCase()}
 					aria-current={

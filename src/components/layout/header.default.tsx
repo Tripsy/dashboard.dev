@@ -4,6 +4,7 @@ import { Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { LanguageSwitcher } from '@/components/layout/language-switcher.component';
 import { LogoComponent } from '@/components/layout/logo.default';
 import { ToggleTheme } from '@/components/layout/toggle-theme';
 import { UserMenu } from '@/components/layout/user-menu.component';
@@ -12,7 +13,6 @@ import Routes from '@/config/routes.setup';
 import { cn } from '@/helpers/css.helper';
 import { UserRoleEnum } from '@/models/user.model';
 import { useAuth } from '@/providers/auth.provider';
-import {LanguageSwitcher} from "@/components/layout/language-switcher.component";
 
 export function Header({
 	currentLanguage,

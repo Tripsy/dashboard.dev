@@ -306,11 +306,11 @@ export async function proxy(req: NextRequest) {
 		return ctx.success();
 	}
 
-	// Block suspicious origins
-	if (!ctx.isValidOrigin()) {
-		return new NextResponse('Forbidden', {
-			status: 403,
-		});
+	// Only enforce origin checks on state-changing requests
+	const isMutating = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method);
+
+	if (isMutating && !ctx.isValidOrigin()) {
+		return new NextResponse('Forbidden', { status: 403 });
 	}
 
 	ctx.setupLanguage();

@@ -6,12 +6,14 @@ import {
 	FormFiltersAutoComplete,
 	FormFiltersReset,
 	FormFiltersSearch,
+	FormFiltersShowDeleted,
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
 import type { CmrVehicleDataTableFiltersType } from '@/app/(dashboard)/dashboard/cmr-vehicle/cmr-vehicle.definition';
 import { Icons } from '@/components/icon.component';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
+import { useSetFilterValues } from '@/hooks/use-set-filter-values.hook';
 import { displayVehicleLabel, type VehicleModel } from '@/models/vehicle.model';
 
 export const DataTableFiltersCmrVehicle = (): JSX.Element => {
@@ -28,38 +30,11 @@ export const DataTableFiltersCmrVehicle = (): JSX.Element => {
 		(state) => state.updateTableState,
 	);
 
-	const setFilterValues = useCallback(
-		(
-			updates: Partial<{
-				[K in keyof CmrVehicleDataTableFiltersType]: CmrVehicleDataTableFiltersType[K]['value'];
-			}>,
-		) => {
-			const updatedFilters = { ...filters };
-
-			function applyUpdate<
-				K extends keyof CmrVehicleDataTableFiltersType,
-			>(key: K, value: CmrVehicleDataTableFiltersType[K]['value']): void {
-				updatedFilters[key] = {
-					...filters[key],
-					value,
-				};
-			}
-
-			for (const key of Object.keys(updates) as Array<
-				keyof CmrVehicleDataTableFiltersType
-			>) {
-				applyUpdate(
-					key,
-					updates[
-						key
-					] as CmrVehicleDataTableFiltersType[typeof key]['value'],
-				);
-			}
-
-			updateTableState({ filters: updatedFilters });
-		},
-		[filters, updateTableState],
-	);
+	const { setFilterValues } =
+		useSetFilterValues<CmrVehicleDataTableFiltersType>(
+			dataTableStore,
+			updateTableState,
+		);
 
 	const [searchVehicle, setSearchVehicle] = useState(
 		filters.vehicle?.value ?? '',
@@ -125,6 +100,15 @@ export const DataTableFiltersCmrVehicle = (): JSX.Element => {
 				dataSourceKey="vehicle"
 				getOptionLabel={(m) => displayVehicleLabel(m)}
 				getOptionKey={(m) => m.id}
+			/>
+
+			<FormFiltersShowDeleted
+				dataSource="vehicle"
+				checked={filters.is_deleted.value ?? false}
+				onCheckedChange={(value) => {
+					console.log('is_deleted', value);
+					setFilterValues({ is_deleted: value });
+				}}
 			/>
 
 			<FormFiltersReset dataSource="cmr-vehicle" />

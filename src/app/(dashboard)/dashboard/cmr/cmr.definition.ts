@@ -605,6 +605,7 @@ export const dataSourceConfigCmr: DataSourceConfigType<CmrModelWithSessionModel>
 				},
 				permission: ['cmr', 'update'],
 				entriesSelection: 'single',
+				customEntryCheck: (entry: CmrModel) => !entry.deleted_at, // Return true if the entry is not deleted
 				operationFunction: (values: CmrManageOutput, id: number) => {
 					const params = prepareParamsFromFormValues(values);
 

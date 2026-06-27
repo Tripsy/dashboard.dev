@@ -1,6 +1,6 @@
 'use client';
 
-import { type JSX, useCallback, useMemo } from 'react';
+import { type JSX, useMemo } from 'react';
 import { useStore } from 'zustand/react';
 import {
 	FormFiltersDateRange,
@@ -14,6 +14,7 @@ import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
+import { useSetFilterValues } from '@/hooks/use-set-filter-values.hook';
 import {
 	type LogCategory,
 	LogCategoryEnum,
@@ -43,22 +44,9 @@ export const DataTableFiltersLogData = (): JSX.Element => {
 		(state) => state.updateTableState,
 	);
 
-	const setFilterValue = useCallback(
-		<K extends keyof LogDataDataTableFiltersType>(
-			key: K,
-			value: LogDataDataTableFiltersType[K]['value'],
-		) => {
-			updateTableState({
-				filters: {
-					...filters,
-					[key]: {
-						...filters[key],
-						value,
-					},
-				},
-			});
-		},
-		[filters, updateTableState],
+	const { setFilterValue } = useSetFilterValues<LogDataDataTableFiltersType>(
+		dataTableStore,
+		updateTableState,
 	);
 
 	const searchGlobal = useSearchFilter({

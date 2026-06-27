@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useStore } from 'zustand/react';
 import {
 	FormFiltersReset,
@@ -15,6 +15,7 @@ import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
+import { useSetFilterValues } from '@/hooks/use-set-filter-values.hook';
 import { type TemplateType, TemplateTypeEnum } from '@/models/template.model';
 import { LanguageEnum } from '@/types/common.type';
 
@@ -40,22 +41,9 @@ export const DataTableFiltersTemplate = (): React.JSX.Element => {
 		(state) => state.updateTableState,
 	);
 
-	const setFilterValue = useCallback(
-		<K extends keyof TemplateDataTableFiltersType>(
-			key: K,
-			value: TemplateDataTableFiltersType[K]['value'],
-		) => {
-			updateTableState({
-				filters: {
-					...filters,
-					[key]: {
-						...filters[key],
-						value,
-					},
-				},
-			});
-		},
-		[filters, updateTableState],
+	const { setFilterValue } = useSetFilterValues<TemplateDataTableFiltersType>(
+		dataTableStore,
+		updateTableState,
 	);
 
 	const searchGlobal = useSearchFilter({

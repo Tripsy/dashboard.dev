@@ -1,6 +1,6 @@
 'use client';
 
-import { type JSX, useCallback } from 'react';
+import type { JSX } from 'react';
 import { useStore } from 'zustand/react';
 import { FormFiltersSelect } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
@@ -10,6 +10,7 @@ import { Configuration } from '@/config/settings.config';
 import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
+import { useSetFilterValues } from '@/hooks/use-set-filter-values.hook';
 import { type BrandType, BrandTypeEnum } from '@/models/brand.model';
 import { type Language, LanguageEnum } from '@/types/common.type';
 
@@ -35,22 +36,9 @@ export const DataTableFiltersBrandOrder = (): JSX.Element => {
 		(state) => state.updateTableState,
 	);
 
-	const setFilterValue = useCallback(
-		<K extends keyof BrandDataTableFiltersType>(
-			key: K,
-			value: BrandDataTableFiltersType[K]['value'],
-		) => {
-			updateTableState({
-				filters: {
-					...filters,
-					[key]: {
-						...filters[key],
-						value,
-					},
-				},
-			});
-		},
-		[filters, updateTableState],
+	const { setFilterValue } = useSetFilterValues<BrandDataTableFiltersType>(
+		dataTableStore,
+		updateTableState,
 	);
 
 	useDataTableFilterReset({

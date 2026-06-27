@@ -414,6 +414,7 @@ export const dataSourceConfigUser: DataSourceConfigType<UserModel> = {
 			windowComponent: FormManageUser,
 			permission: ['user', 'update'],
 			entriesSelection: 'single',
+			customEntryCheck: (entry: UserModel) => !entry.deleted_at, // Return true if the entry is not deleted
 			operationFunction: (params: UserFormValuesType, id: number) =>
 				requestUpdate<UserModel, UserFormValuesType>(
 					'user',
@@ -516,7 +517,7 @@ export const dataSourceConfigUser: DataSourceConfigType<UserModel> = {
 			permission: ['permission', 'update'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: UserModel) =>
-				entry.role === UserRoleEnum.OPERATOR,
+				!entry.deleted_at && entry.role === UserRoleEnum.OPERATOR,
 			buttonPosition: 'left',
 			button: {
 				variant: 'outline',

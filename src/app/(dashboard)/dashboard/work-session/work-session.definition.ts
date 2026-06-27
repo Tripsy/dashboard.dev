@@ -385,6 +385,8 @@ export const dataSourceConfigWorkSession: DataSourceConfigType<WorkSessionModel>
 				windowComponent: FormManageWorkSession,
 				permission: ['work-session', 'update'],
 				entriesSelection: 'single',
+				customEntryCheck: (entry: WorkSessionModel) =>
+					!entry.deleted_at, // Return true if the entry is not deleted
 				operationFunction: (
 					values: WorkSessionUpdateOutput,
 					id: number,
@@ -473,6 +475,7 @@ export const dataSourceConfigWorkSession: DataSourceConfigType<WorkSessionModel>
 				permission: ['work-session-vehicle', 'update'],
 				entriesSelection: 'single',
 				customEntryCheck: (entry: WorkSessionModel) =>
+					!entry.deleted_at &&
 					entry.status === WorkSessionStatusEnum.ACTIVE,
 				buttonPosition: 'left',
 				button: {

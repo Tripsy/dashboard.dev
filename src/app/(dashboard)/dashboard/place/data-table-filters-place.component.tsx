@@ -1,6 +1,6 @@
 'use client';
 
-import { type JSX, useCallback, useMemo } from 'react';
+import { type JSX, useMemo } from 'react';
 import { useStore } from 'zustand/react';
 import {
 	FormFiltersReset,
@@ -16,6 +16,7 @@ import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
+import { useSetFilterValues } from '@/hooks/use-set-filter-values.hook';
 import { type PlaceType, PlaceTypeEnum } from '@/models/place.model';
 import { type Language, LanguageEnum } from '@/types/common.type';
 
@@ -41,22 +42,9 @@ export const DataTableFiltersPlace = (): JSX.Element => {
 		(state) => state.updateTableState,
 	);
 
-	const setFilterValue = useCallback(
-		<K extends keyof PlaceDataTableFiltersType>(
-			key: K,
-			value: PlaceDataTableFiltersType[K]['value'],
-		) => {
-			updateTableState({
-				filters: {
-					...filters,
-					[key]: {
-						...filters[key],
-						value,
-					},
-				},
-			});
-		},
-		[filters, updateTableState],
+	const { setFilterValue } = useSetFilterValues<PlaceDataTableFiltersType>(
+		dataTableStore,
+		updateTableState,
 	);
 
 	const searchGlobal = useSearchFilter({

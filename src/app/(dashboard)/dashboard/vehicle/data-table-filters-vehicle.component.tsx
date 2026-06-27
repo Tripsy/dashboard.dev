@@ -16,6 +16,7 @@ import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
+import { useSetFilterValues } from '@/hooks/use-set-filter-values.hook';
 import type { BrandModel } from '@/models/brand.model';
 import {
 	type VehicleStatus,
@@ -46,38 +47,9 @@ export const DataTableFiltersVehicle = (): JSX.Element => {
 		(state) => state.updateTableState,
 	);
 
-	const setFilterValues = useCallback(
-		(
-			updates: Partial<{
-				[K in keyof VehicleDataTableFiltersType]: VehicleDataTableFiltersType[K]['value'];
-			}>,
-		) => {
-			const updatedFilters = { ...filters };
-
-			function applyUpdate<K extends keyof VehicleDataTableFiltersType>(
-				key: K,
-				value: VehicleDataTableFiltersType[K]['value'],
-			): void {
-				updatedFilters[key] = {
-					...filters[key],
-					value,
-				};
-			}
-
-			for (const key of Object.keys(updates) as Array<
-				keyof VehicleDataTableFiltersType
-			>) {
-				applyUpdate(
-					key,
-					updates[
-						key
-					] as VehicleDataTableFiltersType[typeof key]['value'],
-				);
-			}
-
-			updateTableState({ filters: updatedFilters });
-		},
-		[filters, updateTableState],
+	const { setFilterValues } = useSetFilterValues<VehicleDataTableFiltersType>(
+		dataTableStore,
+		updateTableState,
 	);
 
 	const [searchBrand, setSearchBrand] = useState(filters.brand?.value ?? '');

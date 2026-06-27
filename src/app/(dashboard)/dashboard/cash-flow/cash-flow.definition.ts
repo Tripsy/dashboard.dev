@@ -517,7 +517,8 @@ export const dataSourceConfigCashFlow: DataSourceConfigType<CashFlowModel> = {
 			permission: ['cash-flow', 'update'],
 			entriesSelection: 'single',
 			customEntryCheck: (entry: CashFlowModel) =>
-				arrayHasValue(entry.status, MUTABLE_STATUSES),
+				arrayHasValue(entry.status, MUTABLE_STATUSES) &&
+				!entry.deleted_at,
 			operationFunction: (values: CashFlowManageOutput, id: number) => {
 				const params = prepareParamsFromFormValues(values);
 

@@ -287,6 +287,7 @@ export const dataSourceConfigVehicle: DataSourceConfigType<VehicleModel> = {
 			windowComponent: FormManageVehicle,
 			permission: ['vehicle', 'update'],
 			entriesSelection: 'single',
+			customEntryCheck: (entry: VehicleModel) => !entry.deleted_at, // Return true if the entry is not deleted
 			operationFunction: (params: VehicleFormValuesType, id: number) =>
 				requestUpdate<VehicleModel, VehicleFormValuesType>(
 					'vehicle',

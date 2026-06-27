@@ -201,6 +201,7 @@ export const dataSourceConfigVendor: DataSourceConfigType<VendorModel> = {
 			windowComponent: FormManageVendor,
 			permission: ['vendor', 'update'],
 			entriesSelection: 'single',
+			customEntryCheck: (entry: VendorModel) => !entry.deleted_at, // Return true if the entry is not deleted
 			operationFunction: (params: VendorFormValuesType, id: number) =>
 				requestUpdate<VendorModel, VendorFormValuesType>(
 					'vendor',

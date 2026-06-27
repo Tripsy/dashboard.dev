@@ -208,8 +208,8 @@ pnpm run build    # Production build
 
 # 📌 TODO
 
-1. build cmr html
-2. download as pdf function
+1. maybe drop await BaseValidator.getValidatorMessages(
+2. order page ..glitch when moving to order without type (brand)
 3. dashboard stats
 4. monthly driver report 
 5. deploy

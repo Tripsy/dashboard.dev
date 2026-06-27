@@ -1,6 +1,6 @@
 'use client';
 
-import { type JSX, useCallback, useMemo } from 'react';
+import { type JSX, useMemo } from 'react';
 import { useStore } from 'zustand/react';
 import {
 	FormFiltersReset,
@@ -14,6 +14,7 @@ import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
+import { useSetFilterValues } from '@/hooks/use-set-filter-values.hook';
 import { type VendorStatus, VendorStatusEnum } from '@/models/vendor.model';
 
 const statuses = toOptionsFromEnum(VendorStatusEnum, {
@@ -34,38 +35,9 @@ export const DataTableFiltersVendor = (): JSX.Element => {
 		(state) => state.updateTableState,
 	);
 
-	const setFilterValues = useCallback(
-		(
-			updates: Partial<{
-				[K in keyof VendorDataTableFiltersType]: VendorDataTableFiltersType[K]['value'];
-			}>,
-		) => {
-			const updatedFilters = { ...filters };
-
-			function applyUpdate<K extends keyof VendorDataTableFiltersType>(
-				key: K,
-				value: VendorDataTableFiltersType[K]['value'],
-			): void {
-				updatedFilters[key] = {
-					...filters[key],
-					value,
-				};
-			}
-
-			for (const key of Object.keys(updates) as Array<
-				keyof VendorDataTableFiltersType
-			>) {
-				applyUpdate(
-					key,
-					updates[
-						key
-					] as VendorDataTableFiltersType[typeof key]['value'],
-				);
-			}
-
-			updateTableState({ filters: updatedFilters });
-		},
-		[filters, updateTableState],
+	const { setFilterValues } = useSetFilterValues<VendorDataTableFiltersType>(
+		dataTableStore,
+		updateTableState,
 	);
 
 	const searchGlobal = useSearchFilter({

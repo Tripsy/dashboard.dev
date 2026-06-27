@@ -336,6 +336,7 @@ export const dataSourceConfigTemplate: DataSourceConfigType<TemplateModel> = {
 			},
 			permission: ['template', 'update'],
 			entriesSelection: 'single',
+			customEntryCheck: (entry: TemplateModel) => !entry.deleted_at, // Return true if the entry is not deleted
 			operationFunction: (params: TemplateFormValuesType, id: number) =>
 				requestUpdate<TemplateModel, TemplateFormValuesType>(
 					'template',

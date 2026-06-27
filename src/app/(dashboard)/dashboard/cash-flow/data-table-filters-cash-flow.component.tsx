@@ -17,6 +17,7 @@ import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
+import { useSetFilterValues } from '@/hooks/use-set-filter-values.hook';
 import {
 	type CashFlowCategory,
 	type CashFlowDirection,
@@ -73,39 +74,11 @@ export const DataTableFiltersCashFlow = (): JSX.Element => {
 		(state) => state.updateTableState,
 	);
 
-	const setFilterValues = useCallback(
-		(
-			updates: Partial<{
-				[K in keyof CashFlowDataTableFiltersType]: CashFlowDataTableFiltersType[K]['value'];
-			}>,
-		) => {
-			const updatedFilters = { ...filters };
-
-			function applyUpdate<K extends keyof CashFlowDataTableFiltersType>(
-				key: K,
-				value: CashFlowDataTableFiltersType[K]['value'],
-			): void {
-				updatedFilters[key] = {
-					...filters[key],
-					value,
-				};
-			}
-
-			for (const key of Object.keys(updates) as Array<
-				keyof CashFlowDataTableFiltersType
-			>) {
-				applyUpdate(
-					key,
-					updates[
-						key
-					] as CashFlowDataTableFiltersType[typeof key]['value'],
-				);
-			}
-
-			updateTableState({ filters: updatedFilters });
-		},
-		[filters, updateTableState],
-	);
+	const { setFilterValues } =
+		useSetFilterValues<CashFlowDataTableFiltersType>(
+			dataTableStore,
+			updateTableState,
+		);
 
 	const searchGlobal = useSearchFilter({
 		initialValue: filters.global.value ?? '',

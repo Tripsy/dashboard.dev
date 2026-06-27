@@ -1,6 +1,6 @@
 'use client';
 
-import { type JSX, useCallback, useMemo } from 'react';
+import { type JSX, useMemo } from 'react';
 import { useStore } from 'zustand/react';
 import {
 	FormFiltersReset,
@@ -11,6 +11,7 @@ import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
 import type { PermissionDataTableFiltersType } from '@/app/(dashboard)/dashboard/permission/permission.definition';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
+import { useSetFilterValues } from '@/hooks/use-set-filter-values.hook';
 
 export const DataTableFiltersPermission = (): JSX.Element => {
 	const { dataSource, dataTableStateDefault, dataTableStore } =
@@ -26,23 +27,11 @@ export const DataTableFiltersPermission = (): JSX.Element => {
 		(state) => state.updateTableState,
 	);
 
-	const setFilterValue = useCallback(
-		<K extends keyof PermissionDataTableFiltersType>(
-			key: K,
-			value: PermissionDataTableFiltersType[K]['value'],
-		) => {
-			updateTableState({
-				filters: {
-					...filters,
-					[key]: {
-						...filters[key],
-						value,
-					},
-				},
-			});
-		},
-		[filters, updateTableState],
-	);
+	const { setFilterValue } =
+		useSetFilterValues<PermissionDataTableFiltersType>(
+			dataTableStore,
+			updateTableState,
+		);
 
 	const searchGlobal = useSearchFilter({
 		initialValue: filters.global.value ?? '',

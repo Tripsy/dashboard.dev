@@ -376,6 +376,7 @@ export const dataSourceConfigClient: DataSourceConfigType<ClientModel> = {
 			},
 			permission: ['client', 'update'],
 			entriesSelection: 'single',
+			customEntryCheck: (entry: ClientModel) => !entry.deleted_at, // Return true if the entry is not deleted
 			operationFunction: (params: ClientFormValuesType, id: number) =>
 				requestUpdate<ClientModel, ClientFormValuesType>(
 					'client',

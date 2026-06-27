@@ -305,6 +305,8 @@ export const dataSourceConfigCompanyVehicle: DataSourceConfigType<CompanyVehicle
 				windowComponent: FormManageCompanyVehicle,
 				permission: ['company-vehicle', 'update'],
 				entriesSelection: 'single',
+				customEntryCheck: (entry: CompanyVehicleModel) =>
+					!entry.deleted_at, // Return true if the entry is not deleted
 				operationFunction: (
 					params: CompanyVehicleFormValuesType,
 					id: number,
@@ -373,6 +375,7 @@ export const dataSourceConfigCompanyVehicle: DataSourceConfigType<CompanyVehicle
 				permission: ['company-vehicle', 'update'],
 				entriesSelection: 'single',
 				customEntryCheck: (entry: CompanyVehicleModel) =>
+					!entry.deleted_at &&
 					getStatusTransitions(entry.status, STATUS_TRANSITIONS)
 						.length > 0,
 				buttonPosition: 'left',

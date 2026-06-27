@@ -275,6 +275,7 @@ export const dataSourceConfigPlace: DataSourceConfigType<PlaceModel> = {
 			windowComponent: FormManagePlace,
 			permission: ['place', 'update'],
 			entriesSelection: 'single',
+			customEntryCheck: (entry: PlaceModel) => !entry.deleted_at, // Return true if the entry is not deleted
 			operationFunction: (params: PlaceFormValuesType, id: number) =>
 				requestUpdate<PlaceModel, PlaceFormValuesType>(
 					'place',

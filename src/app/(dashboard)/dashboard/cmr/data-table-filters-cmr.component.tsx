@@ -15,6 +15,7 @@ import { Icons } from '@/components/icon.component';
 import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
+import { useSetFilterValues } from '@/hooks/use-set-filter-values.hook';
 import { type ClientModel, displayClientLabel } from '@/models/client.model';
 import {
 	type CmrStatus,
@@ -53,38 +54,9 @@ export const DataTableFiltersCmr = (): JSX.Element => {
 		(state) => state.updateTableState,
 	);
 
-	const setFilterValues = useCallback(
-		(
-			updates: Partial<{
-				[K in keyof CmrDataTableFiltersType]: CmrDataTableFiltersType[K]['value'];
-			}>,
-		) => {
-			const updatedFilters = { ...filters };
-
-			function applyUpdate<K extends keyof CmrDataTableFiltersType>(
-				key: K,
-				value: CmrDataTableFiltersType[K]['value'],
-			): void {
-				updatedFilters[key] = {
-					...filters[key],
-					value,
-				};
-			}
-
-			for (const key of Object.keys(updates) as Array<
-				keyof CmrDataTableFiltersType
-			>) {
-				applyUpdate(
-					key,
-					updates[
-						key
-					] as CmrDataTableFiltersType[typeof key]['value'],
-				);
-			}
-
-			updateTableState({ filters: updatedFilters });
-		},
-		[filters, updateTableState],
+	const { setFilterValues } = useSetFilterValues<CmrDataTableFiltersType>(
+		dataTableStore,
+		updateTableState,
 	);
 
 	const [searchClient, setSearchClient] = useState(

@@ -281,6 +281,7 @@ export const dataSourceConfigBrand: DataSourceConfigType<BrandModel> = {
 			windowComponent: FormManageBrand,
 			permission: ['brand', 'update'],
 			entriesSelection: 'single',
+			customEntryCheck: (entry: BrandModel) => !entry.deleted_at, // Return true if the entry is not deleted
 			operationFunction: (params: BrandFormValuesType, id: number) =>
 				requestUpdate<BrandModel, BrandFormValuesType>(
 					'brand',

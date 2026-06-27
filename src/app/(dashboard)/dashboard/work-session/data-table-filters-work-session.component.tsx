@@ -15,6 +15,7 @@ import { Icons } from '@/components/icon.component';
 import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
+import { useSetFilterValues } from '@/hooks/use-set-filter-values.hook';
 import { type UserModel, UserRoleEnum } from '@/models/user.model';
 import {
 	type WorkSessionStatus,
@@ -42,41 +43,11 @@ export const DataTableFiltersWorkSession = (): JSX.Element => {
 		(state) => state.updateTableState,
 	);
 
-	const setFilterValues = useCallback(
-		(
-			updates: Partial<{
-				[K in keyof WorkSessionDataTableFiltersType]: WorkSessionDataTableFiltersType[K]['value'];
-			}>,
-		) => {
-			const updatedFilters = { ...filters };
-
-			function applyUpdate<
-				K extends keyof WorkSessionDataTableFiltersType,
-			>(
-				key: K,
-				value: WorkSessionDataTableFiltersType[K]['value'],
-			): void {
-				updatedFilters[key] = {
-					...filters[key],
-					value,
-				};
-			}
-
-			for (const key of Object.keys(updates) as Array<
-				keyof WorkSessionDataTableFiltersType
-			>) {
-				applyUpdate(
-					key,
-					updates[
-						key
-					] as WorkSessionDataTableFiltersType[typeof key]['value'],
-				);
-			}
-
-			updateTableState({ filters: updatedFilters });
-		},
-		[filters, updateTableState],
-	);
+	const { setFilterValues } =
+		useSetFilterValues<WorkSessionDataTableFiltersType>(
+			dataTableStore,
+			updateTableState,
+		);
 
 	const [searchUser, setSearchUser] = useState(filters.user?.value ?? '');
 

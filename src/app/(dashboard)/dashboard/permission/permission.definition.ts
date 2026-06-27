@@ -140,6 +140,7 @@ export const dataSourceConfigPermission: DataSourceConfigType<PermissionModel> =
 				},
 				permission: ['permission', 'update'],
 				entriesSelection: 'single',
+				customEntryCheck: (entry: PermissionModel) => !entry.deleted_at, // Return true if the entry is not deleted
 				operationFunction: (
 					params: PermissionFormValuesType,
 					id: number,

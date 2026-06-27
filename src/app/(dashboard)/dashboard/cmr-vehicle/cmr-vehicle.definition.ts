@@ -137,6 +137,7 @@ export type CmrVehicleDataTableFiltersType = {
 	cmr_id: { value: string | null; matchMode: 'equals' };
 	vehicle: { value: string | null; matchMode: 'equals' };
 	vehicle_id: { value: number | null; matchMode: 'equals' };
+	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
 function displayButtonView(
@@ -162,6 +163,7 @@ export const dataSourceConfigCmrVehicle: DataSourceConfigType<CmrVehicleModel> =
 					cmr_id: { value: null, matchMode: 'equals' },
 					vehicle: { value: '', matchMode: 'equals' },
 					vehicle_id: { value: null, matchMode: 'equals' },
+					is_deleted: { value: false, matchMode: 'equals' },
 				} satisfies CmrVehicleDataTableFiltersType,
 			},
 			columns: [
@@ -182,6 +184,18 @@ export const dataSourceConfigCmrVehicle: DataSourceConfigType<CmrVehicleModel> =
 						DataTableValue(entry, column, {
 							customValue: entry.cmr.id.toString(),
 						}),
+				},
+				{
+					field: 'vehicle',
+					header: 'Vehicle',
+					body: (entry, column) =>
+						DataTableValue(entry, column, {
+							customValue: displayVehicleLabel(entry.vehicle),
+						}),
+				},
+				{
+					field: 'vin',
+					header: 'VIN',
 				},
 				{
 					field: 'license_plate',
@@ -226,6 +240,7 @@ export const dataSourceConfigCmrVehicle: DataSourceConfigType<CmrVehicleModel> =
 				windowComponent: FormManageCmrVehicle,
 				permission: ['cmr-vehicle', 'update'],
 				entriesSelection: 'single',
+				customEntryCheck: (entry: CmrVehicleModel) => !entry.deleted_at, // Return true if the entry is not deleted
 				operationFunction: (
 					params: CmrVehicleFormValuesType,
 					id: number,
@@ -248,6 +263,7 @@ export const dataSourceConfigCmrVehicle: DataSourceConfigType<CmrVehicleModel> =
 				windowTitle: translations['delete.title'],
 				permission: ['cmr-vehicle', 'delete'],
 				entriesSelection: 'single',
+				customEntryCheck: (entry: CmrVehicleModel) => !entry.deleted_at, // Return true if the entry is not deleted
 				operationFunction: (entry: CmrVehicleModel) => {
 					return deleteCmrVehicle(entry);
 				},

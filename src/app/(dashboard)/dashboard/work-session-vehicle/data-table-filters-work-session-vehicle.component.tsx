@@ -13,6 +13,7 @@ import { Icons } from '@/components/icon.component';
 import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
+import { useSetFilterValues } from '@/hooks/use-set-filter-values.hook';
 import {
 	type CompanyVehicleModel,
 	displayCompanyVehicleLabel,
@@ -47,41 +48,11 @@ export const DataTableFiltersWorkSessionVehicle = (): JSX.Element => {
 		(state) => state.updateTableState,
 	);
 
-	const setFilterValues = useCallback(
-		(
-			updates: Partial<{
-				[K in keyof WorkSessionVehicleDataTableFiltersType]: WorkSessionVehicleDataTableFiltersType[K]['value'];
-			}>,
-		) => {
-			const updatedFilters = { ...filters };
-
-			function applyUpdate<
-				K extends keyof WorkSessionVehicleDataTableFiltersType,
-			>(
-				key: K,
-				value: WorkSessionVehicleDataTableFiltersType[K]['value'],
-			): void {
-				updatedFilters[key] = {
-					...filters[key],
-					value,
-				};
-			}
-
-			for (const key of Object.keys(updates) as Array<
-				keyof WorkSessionVehicleDataTableFiltersType
-			>) {
-				applyUpdate(
-					key,
-					updates[
-						key
-					] as WorkSessionVehicleDataTableFiltersType[typeof key]['value'],
-				);
-			}
-
-			updateTableState({ filters: updatedFilters });
-		},
-		[filters, updateTableState],
-	);
+	const { setFilterValues } =
+		useSetFilterValues<WorkSessionVehicleDataTableFiltersType>(
+			dataTableStore,
+			updateTableState,
+		);
 
 	const [searchCompanyVehicle, setSearchCompanyVehicle] = useState(
 		filters.company_vehicle?.value ?? '',

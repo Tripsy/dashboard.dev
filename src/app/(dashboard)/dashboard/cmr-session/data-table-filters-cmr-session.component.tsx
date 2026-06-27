@@ -15,6 +15,7 @@ import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
+import { useSetFilterValues } from '@/hooks/use-set-filter-values.hook';
 import { type CmrStatus, CmrStatusEnum } from '@/models/cmr.model';
 import { type UserModel, UserRoleEnum } from '@/models/user.model';
 import {
@@ -47,38 +48,11 @@ export const DataTableFiltersCmrSession = (): JSX.Element => {
 		(state) => state.updateTableState,
 	);
 
-	const setFilterValues = useCallback(
-		(
-			updates: Partial<{
-				[K in keyof CmrSessionDataTableFiltersType]: CmrSessionDataTableFiltersType[K]['value'];
-			}>,
-		) => {
-			const updatedFilters = { ...filters };
-
-			function applyUpdate<
-				K extends keyof CmrSessionDataTableFiltersType,
-			>(key: K, value: CmrSessionDataTableFiltersType[K]['value']): void {
-				updatedFilters[key] = {
-					...filters[key],
-					value,
-				};
-			}
-
-			for (const key of Object.keys(updates) as Array<
-				keyof CmrSessionDataTableFiltersType
-			>) {
-				applyUpdate(
-					key,
-					updates[
-						key
-					] as CmrSessionDataTableFiltersType[typeof key]['value'],
-				);
-			}
-
-			updateTableState({ filters: updatedFilters });
-		},
-		[filters, updateTableState],
-	);
+	const { setFilterValues } =
+		useSetFilterValues<CmrSessionDataTableFiltersType>(
+			dataTableStore,
+			updateTableState,
+		);
 
 	const [searchUser, setSearchUser] = useState(filters.user?.value ?? '');
 

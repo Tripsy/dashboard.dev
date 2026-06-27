@@ -33,7 +33,10 @@ import {
 } from '@/app/(dashboard)/_providers/data-table.provider';
 import { DataTableFiltersBrandOrder } from '@/app/(dashboard)/dashboard/brand/order/data-table-filters-brand-order.component';
 import { Icons } from '@/components/icon.component';
-import { InfoComponent, LoadingComponent } from '@/components/status.component';
+import {
+	ErrorComponent,
+	LoadingComponent,
+} from '@/components/status.component';
 import { Button } from '@/components/ui/button';
 import Routes from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
@@ -261,7 +264,7 @@ const DataTableBrandOrderContent = (): JSX.Element => {
 	}
 
 	if (orderedBrands.length === 0) {
-		return <InfoComponent description="No entries found." />;
+		return <ErrorComponent title="" description="No entries found." />;
 	}
 
 	return (

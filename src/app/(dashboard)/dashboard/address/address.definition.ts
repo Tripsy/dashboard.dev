@@ -199,6 +199,7 @@ export const dataSourceConfigAddress: DataSourceConfigType<AddressModel> = {
 			windowComponent: FormManageAddress,
 			permission: ['address', 'update'],
 			entriesSelection: 'single',
+			customEntryCheck: (entry: AddressModel) => !entry.deleted_at, // Return true if the entry is not deleted
 			operationFunction: (params: AddressFormValuesType, id: number) =>
 				requestUpdate<AddressModel, AddressFormValuesType>(
 					'address',

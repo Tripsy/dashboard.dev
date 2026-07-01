@@ -21,15 +21,10 @@ import {
 import type { DataSourceConfigType } from '@/types/data-source.type';
 import type { FormStateType, ValidatorOutput } from '@/types/form.type';
 
-const translations = await translateBatch(
-	['create.title', 'close.title'] as const,
-	'driver-panel.work-session.action',
-);
-
-const validatorMessages = await BaseValidator.getValidatorMessages(
-	['invalid_start_at', 'invalid_start_at_time'] as const,
-	'driver-panel.work-session.validation',
-);
+const validatorMessages = [
+	'invalid_start_at',
+	'invalid_start_at_time',
+] as const;
 
 class WorkSessionValidator extends BaseValidator<typeof validatorMessages> {
 	create = () =>
@@ -47,8 +42,13 @@ class WorkSessionValidator extends BaseValidator<typeof validatorMessages> {
 		});
 }
 
-function validateFormCreate(values: WorkSessionFormValuesType) {
-	const validator = new WorkSessionValidator(validatorMessages);
+async function validateFormCreate(values: WorkSessionFormValuesType) {
+	const translations = await translateBatch(
+		validatorMessages,
+		'work-session.validation',
+	);
+
+	const validator = new WorkSessionValidator(translations);
 
 	return validator.create().safeParse(values);
 }
@@ -94,8 +94,15 @@ export function prepareParamsFromFormValues(
 	};
 }
 
-export const dataSourceConfigWorkSession: DataSourceConfigType<WorkSessionModel> =
-	{
+export default async function dataSourceConfig(): Promise<
+	DataSourceConfigType<WorkSessionModel>
+> {
+	const translations = await translateBatch(
+		['create.title', 'close.title'] as const,
+		'driver-panel.work-session.action',
+	);
+
+	return {
 		displayEntryLabel: (entry: WorkSessionModel) => {
 			return displayWorkSessionLabel(entry);
 		},
@@ -133,3 +140,4 @@ export const dataSourceConfigWorkSession: DataSourceConfigType<WorkSessionModel>
 			},
 		},
 	};
+}

@@ -24,7 +24,7 @@ export async function emailConfirmSendAction(
 	}
 
 	const formValues = getEmailConfirmSendFormValues(formData);
-	const validated = validateFormEmailConfirmSend(formValues);
+	const validated = await validateFormEmailConfirmSend(formValues);
 
 	if (!validated.success) {
 		const errors = accumulateZodErrors<EmailConfirmSendFormValuesType>(

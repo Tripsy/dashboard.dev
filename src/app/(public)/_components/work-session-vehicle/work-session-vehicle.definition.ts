@@ -25,22 +25,14 @@ import { deleteWorkSessionVehicle } from '@/services/work-session-vehicle.servic
 import type { DataSourceConfigType } from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
-const translations = await translateBatch(
-	['create.title', 'update.title', 'delete.title', 'return.title'] as const,
-	'work-session-vehicle.action',
-);
-
-const validatorMessages = await BaseValidator.getValidatorMessages(
-	[
-		'invalid_company_vehicle_id',
-		'invalid_company_vehicle',
-		'invalid_vehicle_km_start',
-		'invalid_vehicle_km_end',
-		'invalid_vehicle_type',
-		'invalid_notes',
-	] as const,
-	'driver-panel.work-session-vehicle.validation',
-);
+const validatorMessages = [
+	'invalid_company_vehicle_id',
+	'invalid_company_vehicle',
+	'invalid_vehicle_km_start',
+	'invalid_vehicle_km_end',
+	'invalid_vehicle_type',
+	'invalid_notes',
+] as const;
 
 class WorkSessionVehicleValidator extends BaseValidator<
 	typeof validatorMessages
@@ -141,11 +133,16 @@ class WorkSessionVehicleValidator extends BaseValidator<
 			});
 }
 
-function validateForm(
+async function validateForm(
 	values: WorkSessionVehicleFormValuesType,
 	isSubmit: boolean = true,
 ) {
-	const validator = new WorkSessionVehicleValidator(validatorMessages);
+	const translations = await translateBatch(
+		validatorMessages,
+		'work-session-vehicle.validation',
+	);
+
+	const validator = new WorkSessionVehicleValidator(translations);
 
 	return validator.manage(isSubmit).safeParse(values);
 }
@@ -185,8 +182,15 @@ function getFormState(
 	};
 }
 
-function validateReturnForm(values: WorkSessionVehicleFormReturnValuesType) {
-	const validator = new WorkSessionVehicleValidator(validatorMessages);
+async function validateReturnForm(
+	values: WorkSessionVehicleFormReturnValuesType,
+) {
+	const translations = await translateBatch(
+		validatorMessages,
+		'work-session-vehicle.validation',
+	);
+
+	const validator = new WorkSessionVehicleValidator(translations);
 
 	return validator.return().safeParse(values);
 }
@@ -219,81 +223,91 @@ function getFormReturnState(
 		},
 	};
 }
+export default async function dataSourceConfig(): Promise<
+	Omit<DataSourceConfigType<WorkSessionVehicleModel>, 'dataTable'>
+> {
+	const translations = await translateBatch(
+		[
+			'create.title',
+			'update.title',
+			'delete.title',
+			'return.title',
+		] as const,
+		'work-session-vehicle.action',
+	);
 
-export const dataSourceConfigWorkSessionVehicle: Omit<
-	DataSourceConfigType<WorkSessionVehicleModel>,
-	'dataTable'
-> = {
-	displayEntryLabel: (entry: WorkSessionVehicleModel) => {
-		return displayWorkSessionVehicleLabel(entry);
-	},
-	actions: {
-		create: {
-			windowType: 'form',
-			windowTitle: translations['create.title'],
-			windowComponent: FormManageWorkSessionVehicle,
-			permission: ['work-session-vehicle', 'create'],
-			entriesSelection: 'free',
-			operationFunction: () => {
-				// It is overridden in the component
-				throw new ExecutionError('Not defined here');
-			},
-			buttonPosition: 'hidden',
-			getFormValues: getFormValues,
-			validateForm: validateForm,
-			getFormState: getFormState,
+	return {
+		displayEntryLabel: (entry: WorkSessionVehicleModel) => {
+			return displayWorkSessionVehicleLabel(entry);
 		},
-		update: {
-			windowType: 'form',
-			windowTitle: translations['update.title'],
-			windowComponent: FormManageWorkSessionVehicle,
-			permission: ['work-session-vehicle', 'update'],
-			entriesSelection: 'single',
-			operationFunction: () => {
-				// It is overridden in the component
-				throw new ExecutionError('Not defined here');
+		actions: {
+			create: {
+				windowType: 'form',
+				windowTitle: translations['create.title'],
+				windowComponent: FormManageWorkSessionVehicle,
+				permission: ['work-session-vehicle', 'create'],
+				entriesSelection: 'free',
+				operationFunction: () => {
+					// It is overridden in the component
+					throw new ExecutionError('Not defined here');
+				},
+				buttonPosition: 'hidden',
+				getFormValues: getFormValues,
+				validateForm: validateForm,
+				getFormState: getFormState,
 			},
-			buttonPosition: 'hidden',
-			button: {
-				variant: 'outline',
-				hover: 'success',
+			update: {
+				windowType: 'form',
+				windowTitle: translations['update.title'],
+				windowComponent: FormManageWorkSessionVehicle,
+				permission: ['work-session-vehicle', 'update'],
+				entriesSelection: 'single',
+				operationFunction: () => {
+					// It is overridden in the component
+					throw new ExecutionError('Not defined here');
+				},
+				buttonPosition: 'hidden',
+				button: {
+					variant: 'outline',
+					hover: 'success',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateForm,
+				getFormState: getFormState,
 			},
-			getFormValues: getFormValues,
-			validateForm: validateForm,
-			getFormState: getFormState,
+			delete: {
+				windowType: 'action',
+				windowTitle: translations['delete.title'],
+				permission: ['work-session-vehicle', 'delete'],
+				entriesSelection: 'single',
+				operationFunction: (entry: WorkSessionVehicleModel) => {
+					return deleteWorkSessionVehicle(entry);
+				},
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'error',
+				},
+			},
+			return: {
+				windowType: 'form',
+				windowTitle: translations['return.title'],
+				windowComponent: FormReturnWorkSessionVehicle,
+				permission: ['work-session-vehicle', 'update'],
+				entriesSelection: 'single',
+				operationFunction: () => {
+					// It is overridden in the component
+					throw new ExecutionError('Not defined here');
+				},
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'success',
+				},
+				getFormValues: getFormReturnValues,
+				validateForm: validateReturnForm,
+				getFormState: getFormReturnState,
+			},
 		},
-		delete: {
-			windowType: 'action',
-			windowTitle: translations['delete.title'],
-			permission: ['work-session-vehicle', 'delete'],
-			entriesSelection: 'single',
-			operationFunction: (entry: WorkSessionVehicleModel) => {
-				return deleteWorkSessionVehicle(entry);
-			},
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'error',
-			},
-		},
-		return: {
-			windowType: 'form',
-			windowTitle: translations['return.title'],
-			windowComponent: FormReturnWorkSessionVehicle,
-			permission: ['work-session-vehicle', 'update'],
-			entriesSelection: 'single',
-			operationFunction: () => {
-				// It is overridden in the component
-				throw new ExecutionError('Not defined here');
-			},
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'success',
-			},
-			getFormValues: getFormReturnValues,
-			validateForm: validateReturnForm,
-			getFormState: getFormReturnState,
-		},
-	},
-};
+	};
+}

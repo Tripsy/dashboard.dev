@@ -97,6 +97,7 @@ export function SideMenu() {
 				'dashboard.labels.address',
 				'dashboard.labels.place',
 				'dashboard.labels.brand',
+				'dashboard.labels.image',
 				'dashboard.labels.vehicle',
 				'dashboard.labels.vendor',
 
@@ -233,6 +234,13 @@ export function SideMenu() {
 						text: translations['dashboard.labels.brand'],
 						icon: Icons.Brand,
 						permission: hasPermission(auth, 'brand'),
+					},
+					{
+						page: 'image',
+						href: Routes.get('image'),
+						text: translations['dashboard.labels.image'],
+						icon: Icons.Image,
+						permission: hasPermission(auth, 'image'),
 					},
 					{
 						page: 'vehicle',

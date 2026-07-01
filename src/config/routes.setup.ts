@@ -231,6 +231,13 @@ Routes.group('dashboard')
 	.add('cron-history', '/dashboard/cron-history', {
 		permissionEntity: 'cron-history',
 	})
+	.add('image', '/dashboard/image', {
+		permissionEntity: 'image',
+	})
+	.add('image-order', '/dashboard/image/order', {
+		permissionEntity: 'image',
+		permissionOperation: 'update',
+	})
 	.add('mail-queue', '/dashboard/mail-queue', {
 		permissionEntity: 'mail-queue',
 	})

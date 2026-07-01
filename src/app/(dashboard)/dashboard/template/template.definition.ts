@@ -35,32 +35,17 @@ import type {
 } from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
-const translations = await translateBatch(
-	[
-		'create.title',
-		'update.title',
-		'view.title',
-		'delete.title',
-		'restore.title',
-		'permission.title',
-	] as const,
-	'template.action',
-);
-
-const validatorMessages = await BaseValidator.getValidatorMessages(
-	[
-		'invalid_label',
-		'invalid_language',
-		'invalid_email_subject',
-		'invalid_email_text',
-		'invalid_email_html',
-		'invalid_email_layout',
-		'invalid_page_title',
-		'invalid_page_html',
-		'invalid_page_layout',
-	] as const,
-	'template.validation',
-);
+const validatorMessages = [
+	'invalid_label',
+	'invalid_language',
+	'invalid_email_subject',
+	'invalid_email_text',
+	'invalid_email_html',
+	'invalid_email_layout',
+	'invalid_page_title',
+	'invalid_page_html',
+	'invalid_page_layout',
+] as const;
 
 class TemplateValidator extends BaseValidator<typeof validatorMessages> {
 	baseSchema = {
@@ -115,8 +100,13 @@ class TemplateValidator extends BaseValidator<typeof validatorMessages> {
 	]);
 }
 
-function validateForm(values: TemplateFormValuesType) {
-	const validator = new TemplateValidator(validatorMessages);
+async function validateForm(values: TemplateFormValuesType) {
+	const translations = await translateBatch(
+		validatorMessages,
+		'template.validation',
+	);
+
+	const validator = new TemplateValidator(translations);
 
 	return validator.manage.safeParse(values);
 }
@@ -236,160 +226,179 @@ export type TemplateDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
-function displayButtonView(
-	auth: AuthModel | null,
-): DataTableValueOptionsType<TemplateModel>['displayButton'] {
+export default async function dataSourceConfig(): Promise<
+	DataSourceConfigType<TemplateModel>
+> {
+	const translations = await translateBatch(
+		[
+			'create.title',
+			'update.title',
+			'view.title',
+			'delete.title',
+			'restore.title',
+			'permission.title',
+		] as const,
+		'template.action',
+	);
+
+	function displayButtonView(
+		auth: AuthModel | null,
+	): DataTableValueOptionsType<TemplateModel>['displayButton'] {
+		return {
+			action: () =>
+				hasPermission(auth, 'template', 'read') ? 'view' : undefined,
+			dataSource: 'template',
+		};
+	}
+
 	return {
-		action: () =>
-			hasPermission(auth, 'template', 'read') ? 'view' : undefined,
-		dataSource: 'template',
+		dataTable: {
+			state: {
+				first: 0,
+				rows: 10,
+				sortField: 'id',
+				sortOrder: -1 as const,
+				filters: {
+					global: { value: null, matchMode: 'contains' },
+					language: { value: null, matchMode: 'equals' },
+					type: { value: null, matchMode: 'equals' },
+					is_deleted: { value: false, matchMode: 'equals' },
+				} satisfies TemplateDataTableFiltersType,
+			},
+			columns: [
+				{
+					field: 'id',
+					header: 'ID',
+					sortable: true,
+					body: (entry, column, auth) =>
+						DataTableValue(entry, column, {
+							markDeleted: true,
+							displayButton: displayButtonView(auth),
+						}),
+				},
+				{
+					field: 'label',
+					header: 'Label',
+					sortable: true,
+				},
+				{
+					field: 'language',
+					header: 'Language',
+				},
+				{
+					field: 'type',
+					header: 'Type',
+					body: (entry, column) =>
+						DataTableValue(entry, column, {
+							capitalize: true,
+						}),
+				},
+				{
+					field: 'created_at',
+					header: 'Created At',
+					sortable: true,
+					body: (entry, column) =>
+						DataTableValue(entry, column, {
+							displayDate: true,
+						}),
+				},
+			],
+			find: (params: FindFunctionParamsType) =>
+				requestFind<TemplateModel>('template', params),
+		},
+		displayEntryLabel: (entry: TemplateModel) => {
+			return `[${entry.type}] ${entry.label}`;
+		},
+		actions: {
+			create: {
+				windowType: 'form',
+				windowTitle: translations['create.title'],
+				windowComponent: FormManageTemplate,
+				windowConfigProps: {
+					size: 'x4l',
+				},
+				permission: ['template', 'create'],
+				entriesSelection: 'free',
+				operationFunction: (params: TemplateFormValuesType) =>
+					requestCreate<TemplateModel, TemplateFormValuesType>(
+						'template',
+						params,
+					),
+				buttonPosition: 'right',
+				button: {
+					variant: 'info',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateForm,
+				getFormState: getFormState,
+			},
+			update: {
+				windowType: 'form',
+				windowTitle: translations['update.title'],
+				windowComponent: FormManageTemplate,
+				windowConfigProps: {
+					size: 'x4l',
+				},
+				permission: ['template', 'update'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: TemplateModel) => !entry.deleted_at, // Return true if the entry is not deleted
+				operationFunction: (
+					params: TemplateFormValuesType,
+					id: number,
+				) =>
+					requestUpdate<TemplateModel, TemplateFormValuesType>(
+						'template',
+						params,
+						id,
+					),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'success',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateForm,
+				getFormState: getFormState,
+			},
+			delete: {
+				windowType: 'action',
+				windowTitle: translations['delete.title'],
+				permission: ['template', 'delete'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: TemplateModel) => !entry.deleted_at, // Return true if the entry is not deleted
+				operationFunction: (entry: TemplateModel) =>
+					requestDelete('template', entry),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'error',
+				},
+			},
+			restore: {
+				windowType: 'action',
+				windowTitle: translations['restore.title'],
+				permission: ['template', 'delete'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: TemplateModel) => !!entry.deleted_at, // Return true if the entry is deleted
+				operationFunction: (entry: TemplateModel) =>
+					requestRestore('template', entry),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'info',
+				},
+			},
+			view: {
+				windowType: 'view',
+				windowTitle: translations['view.title'],
+				windowComponent: ViewTemplate,
+				windowConfigProps: {
+					size: 'x4l',
+				},
+				permission: ['template', 'read'],
+				entriesSelection: 'single',
+				buttonPosition: 'hidden',
+			},
+		},
 	};
 }
-
-export const dataSourceConfigTemplate: DataSourceConfigType<TemplateModel> = {
-	dataTable: {
-		state: {
-			first: 0,
-			rows: 10,
-			sortField: 'id',
-			sortOrder: -1 as const,
-			filters: {
-				global: { value: null, matchMode: 'contains' },
-				language: { value: null, matchMode: 'equals' },
-				type: { value: null, matchMode: 'equals' },
-				is_deleted: { value: false, matchMode: 'equals' },
-			} satisfies TemplateDataTableFiltersType,
-		},
-		columns: [
-			{
-				field: 'id',
-				header: 'ID',
-				sortable: true,
-				body: (entry, column, auth) =>
-					DataTableValue(entry, column, {
-						markDeleted: true,
-						displayButton: displayButtonView(auth),
-					}),
-			},
-			{
-				field: 'label',
-				header: 'Label',
-				sortable: true,
-			},
-			{
-				field: 'language',
-				header: 'Language',
-			},
-			{
-				field: 'type',
-				header: 'Type',
-				body: (entry, column) =>
-					DataTableValue(entry, column, {
-						capitalize: true,
-					}),
-			},
-			{
-				field: 'created_at',
-				header: 'Created At',
-				sortable: true,
-				body: (entry, column) =>
-					DataTableValue(entry, column, {
-						displayDate: true,
-					}),
-			},
-		],
-		find: (params: FindFunctionParamsType) =>
-			requestFind<TemplateModel>('template', params),
-	},
-	displayEntryLabel: (entry: TemplateModel) => {
-		return `[${entry.type}] ${entry.label}`;
-	},
-	actions: {
-		create: {
-			windowType: 'form',
-			windowTitle: translations['create.title'],
-			windowComponent: FormManageTemplate,
-			windowConfigProps: {
-				size: 'x4l',
-			},
-			permission: ['template', 'create'],
-			entriesSelection: 'free',
-			operationFunction: (params: TemplateFormValuesType) =>
-				requestCreate<TemplateModel, TemplateFormValuesType>(
-					'template',
-					params,
-				),
-			buttonPosition: 'right',
-			button: {
-				variant: 'info',
-			},
-			getFormValues: getFormValues,
-			validateForm: validateForm,
-			getFormState: getFormState,
-		},
-		update: {
-			windowType: 'form',
-			windowTitle: translations['update.title'],
-			windowComponent: FormManageTemplate,
-			windowConfigProps: {
-				size: 'x4l',
-			},
-			permission: ['template', 'update'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: TemplateModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			operationFunction: (params: TemplateFormValuesType, id: number) =>
-				requestUpdate<TemplateModel, TemplateFormValuesType>(
-					'template',
-					params,
-					id,
-				),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'success',
-			},
-			getFormValues: getFormValues,
-			validateForm: validateForm,
-			getFormState: getFormState,
-		},
-		delete: {
-			windowType: 'action',
-			windowTitle: translations['delete.title'],
-			permission: ['template', 'delete'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: TemplateModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			operationFunction: (entry: TemplateModel) =>
-				requestDelete('template', entry),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'error',
-			},
-		},
-		restore: {
-			windowType: 'action',
-			windowTitle: translations['restore.title'],
-			permission: ['template', 'delete'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: TemplateModel) => !!entry.deleted_at, // Return true if the entry is deleted
-			operationFunction: (entry: TemplateModel) =>
-				requestRestore('template', entry),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'info',
-			},
-		},
-		view: {
-			windowType: 'view',
-			windowTitle: translations['view.title'],
-			windowComponent: ViewTemplate,
-			windowConfigProps: {
-				size: 'x4l',
-			},
-			permission: ['template', 'read'],
-			entriesSelection: 'single',
-			buttonPosition: 'hidden',
-		},
-	},
-};

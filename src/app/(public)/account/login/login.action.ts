@@ -26,7 +26,7 @@ export async function loginAction(
 	}
 
 	const formValues = getLoginFormValues(formData);
-	const validated = validateFormLogin(formValues);
+	const validated = await validateFormLogin(formValues);
 
 	if (!validated.success) {
 		const errors = accumulateZodErrors<LoginFormValuesType>(

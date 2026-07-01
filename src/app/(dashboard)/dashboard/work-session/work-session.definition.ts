@@ -43,30 +43,13 @@ import type {
 } from '@/types/data-source.type';
 import type { FormStateType, ValidatorOutput } from '@/types/form.type';
 
-const translations = await translateBatch(
-	[
-		'create.title',
-		'update.title',
-		'view.title',
-		'delete.title',
-		'restore.title',
-		'close.title',
-		'viewUser.title',
-		'setupVehicles.title',
-	] as const,
-	'work-session.action',
-);
-
-const validatorMessages = await BaseValidator.getValidatorMessages(
-	[
-		'invalid_user_id',
-		'invalid_user',
-		'invalid_start_at',
-		'invalid_start_at_time',
-		'invalid_end_at_time',
-	] as const,
-	'work-session.validation',
-);
+const validatorMessages = [
+	'invalid_user_id',
+	'invalid_user',
+	'invalid_start_at',
+	'invalid_start_at_time',
+	'invalid_end_at_time',
+] as const;
 
 class WorkSessionValidator extends BaseValidator<typeof validatorMessages> {
 	create = (isSubmit: boolean = true) =>
@@ -143,20 +126,30 @@ class WorkSessionValidator extends BaseValidator<typeof validatorMessages> {
 			});
 }
 
-function validateFormCreate(
+async function validateFormCreate(
 	values: WorkSessionFormValuesType,
 	isSubmit: boolean = true,
 ) {
-	const validator = new WorkSessionValidator(validatorMessages);
+	const translations = await translateBatch(
+		validatorMessages,
+		'work-session.validation',
+	);
+
+	const validator = new WorkSessionValidator(translations);
 
 	return validator.create(isSubmit).safeParse(values);
 }
 
-function validateFormUpdate(
+async function validateFormUpdate(
 	values: WorkSessionFormValuesType,
 	isSubmit: boolean = true,
 ) {
-	const validator = new WorkSessionValidator(validatorMessages);
+	const translations = await translateBatch(
+		validatorMessages,
+		'work-session.validation',
+	);
+
+	const validator = new WorkSessionValidator(translations);
 
 	return validator.update(isSubmit).safeParse(values);
 }
@@ -223,57 +216,75 @@ export type WorkSessionDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
-function displayButtonView(
-	auth: AuthModel | null,
-): DataTableValueOptionsType<WorkSessionModel>['displayButton'] {
-	return {
-		action: () =>
-			hasPermission(auth, 'work-session', 'read') ? 'view' : undefined,
-		dataSource: 'work-session',
-	};
-}
+export default async function dataSourceConfig(): Promise<
+	DataSourceConfigType<WorkSessionModel>
+> {
+	const translations = await translateBatch(
+		[
+			'create.title',
+			'update.title',
+			'view.title',
+			'delete.title',
+			'restore.title',
+			'close.title',
+			'viewUser.title',
+			'setupVehicles.title',
+		] as const,
+		'work-session.action',
+	);
 
-function displayButtonStatus(
-	auth: AuthModel | null,
-): DataTableValueOptionsType<WorkSessionModel>['displayButton'] {
-	return {
-		action: (entry: WorkSessionModel) => {
-			if (entry.deleted_at) {
-				return hasPermission(auth, 'work-session', 'delete')
-					? 'restore'
+	function displayButtonView(
+		auth: AuthModel | null,
+	): DataTableValueOptionsType<WorkSessionModel>['displayButton'] {
+		return {
+			action: () =>
+				hasPermission(auth, 'work-session', 'read')
+					? 'view'
+					: undefined,
+			dataSource: 'work-session',
+		};
+	}
+
+	function displayButtonStatus(
+		auth: AuthModel | null,
+	): DataTableValueOptionsType<WorkSessionModel>['displayButton'] {
+		return {
+			action: (entry: WorkSessionModel) => {
+				if (entry.deleted_at) {
+					return hasPermission(auth, 'work-session', 'delete')
+						? 'restore'
+						: undefined;
+				}
+
+				if (!hasPermission(auth, 'work-session', 'update')) {
+					return undefined;
+				}
+
+				return entry.status === WorkSessionStatusEnum.ACTIVE
+					? 'close'
 					: undefined;
-			}
+			},
+		};
+	}
 
-			if (!hasPermission(auth, 'work-session', 'update')) {
-				return undefined;
-			}
+	function displayButtonViewUser(
+		auth: AuthModel | null,
+		entry: WorkSessionModel,
+	): DataTableValueOptionsType<WorkSessionModel>['displayButton'] {
+		if (!entry.user) {
+			return undefined;
+		}
 
-			return entry.status === WorkSessionStatusEnum.ACTIVE
-				? 'close'
-				: undefined;
-		},
-	};
-}
-
-function displayButtonViewUser(
-	auth: AuthModel | null,
-	entry: WorkSessionModel,
-): DataTableValueOptionsType<WorkSessionModel>['displayButton'] {
-	if (!entry.user) {
-		return undefined;
+		return {
+			action: () =>
+				hasPermission(auth, 'user', 'read') ? 'view' : undefined,
+			dataSource: 'user',
+			title: translations['viewUser.title'],
+			alternateEntryId: entry.user.id,
+		};
 	}
 
 	return {
-		action: () =>
-			hasPermission(auth, 'user', 'read') ? 'view' : undefined,
-		dataSource: 'user',
-		title: translations['viewUser.title'],
-		alternateEntryId: entry.user.id,
-	};
-}
-
-export const dataSourceConfigWorkSession: DataSourceConfigType<WorkSessionModel> =
-	{
 		dataTable: {
 			state: {
 				first: 0,
@@ -485,3 +496,4 @@ export const dataSourceConfigWorkSession: DataSourceConfigType<WorkSessionModel>
 			},
 		},
 	};
+}

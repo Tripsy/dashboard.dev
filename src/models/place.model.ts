@@ -40,7 +40,7 @@ export type PlaceModel<D = Date | string> = {
 // Helpers
 export function getPlaceContentProp(
 	place: PlaceModel,
-	language: Language | string | null,
+	language: Language,
 	prop: keyof Pick<PlaceContent, 'name' | 'type_label'> = 'name',
 ): string {
 	if (!place.contents) {
@@ -82,17 +82,17 @@ export function getParentPlaceType(place_type: PlaceType) {
 
 export const displayPlaceLabel = (
 	p: PlaceModel,
-	selectedLanguage: Language | null = null,
+	language: Language,
 	withType: boolean = true,
 ) => {
-	const name = getPlaceContentProp(p, selectedLanguage, 'name');
+	const name = getPlaceContentProp(p, language, 'name');
 
 	if (!withType) {
 		return name;
 	}
 
 	const place_type =
-		getPlaceContentProp(p, selectedLanguage, 'type_label') || p.place_type;
+		getPlaceContentProp(p, language, 'type_label') || p.place_type;
 
 	return `(${capitalizeFirstLetter(place_type)} / ${name}`;
 };

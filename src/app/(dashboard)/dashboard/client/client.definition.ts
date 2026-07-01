@@ -33,36 +33,20 @@ import type {
 } from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
-const translations = await translateBatch(
-	[
-		'create.title',
-		'update.title',
-		'view.title',
-		'delete.title',
-		'restore.title',
-		'enable.title',
-		'disable.title',
-	] as const,
-	'client.action',
-);
-
-const validatorMessages = await BaseValidator.getValidatorMessages(
-	[
-		'invalid_client_type',
-		'invalid_iban',
-		'invalid_bank_name',
-		'invalid_contact_name',
-		'invalid_contact_email',
-		'invalid_contact_phone',
-		'invalid_notes',
-		'invalid_company_name',
-		'invalid_company_cui',
-		'invalid_company_reg_com',
-		'invalid_person_name',
-		'invalid_person_identification_number',
-	] as const,
-	'client.validation',
-);
+const validatorMessages = [
+	'invalid_client_type',
+	'invalid_iban',
+	'invalid_bank_name',
+	'invalid_contact_name',
+	'invalid_contact_email',
+	'invalid_contact_phone',
+	'invalid_notes',
+	'invalid_company_name',
+	'invalid_company_cui',
+	'invalid_company_reg_com',
+	'invalid_person_name',
+	'invalid_person_identification_number',
+] as const;
 
 class ClientValidator extends BaseValidator<typeof validatorMessages> {
 	baseSchema = {
@@ -139,8 +123,13 @@ class ClientValidator extends BaseValidator<typeof validatorMessages> {
 	]);
 }
 
-function validateForm(values: ClientFormValuesType) {
-	const validator = new ClientValidator(validatorMessages);
+async function validateForm(values: ClientFormValuesType) {
+	const translations = await translateBatch(
+		validatorMessages,
+		'client.validation',
+	);
+
+	const validator = new ClientValidator(translations);
 
 	return validator.manage.safeParse(values);
 }
@@ -237,237 +226,254 @@ export type ClientDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
-function displayButtonView(
-	auth: AuthModel | null,
-): DataTableValueOptionsType<ClientModel>['displayButton'] {
+export default async function dataSourceConfig(): Promise<
+	DataSourceConfigType<ClientModel>
+> {
+	const translations = await translateBatch(
+		[
+			'create.title',
+			'update.title',
+			'view.title',
+			'delete.title',
+			'restore.title',
+			'enable.title',
+			'disable.title',
+		] as const,
+		'client.action',
+	);
+
+	function displayButtonView(
+		auth: AuthModel | null,
+	): DataTableValueOptionsType<ClientModel>['displayButton'] {
+		return {
+			action: () =>
+				hasPermission(auth, 'client', 'read') ? 'view' : undefined,
+			dataSource: 'client',
+		};
+	}
+
+	function displayButtonStatus(
+		auth: AuthModel | null,
+	): DataTableValueOptionsType<ClientModel>['displayButton'] {
+		return {
+			action: (entry: ClientModel) => {
+				if (entry.deleted_at) {
+					return hasPermission(auth, 'client', 'delete')
+						? 'restore'
+						: undefined;
+				}
+
+				if (!hasPermission(auth, 'client', 'update')) {
+					return undefined;
+				}
+
+				return entry.status === ClientStatusEnum.ACTIVE
+					? 'disable'
+					: 'enable';
+			},
+		};
+	}
+
 	return {
-		action: () =>
-			hasPermission(auth, 'client', 'read') ? 'view' : undefined,
-		dataSource: 'client',
-	};
-}
-
-function displayButtonStatus(
-	auth: AuthModel | null,
-): DataTableValueOptionsType<ClientModel>['displayButton'] {
-	return {
-		action: (entry: ClientModel) => {
-			if (entry.deleted_at) {
-				return hasPermission(auth, 'client', 'delete')
-					? 'restore'
-					: undefined;
-			}
-
-			if (!hasPermission(auth, 'client', 'update')) {
-				return undefined;
-			}
-
-			return entry.status === ClientStatusEnum.ACTIVE
-				? 'disable'
-				: 'enable';
+		dataTable: {
+			state: {
+				first: 0,
+				rows: 10,
+				sortField: 'id',
+				sortOrder: -1 as const,
+				filters: {
+					global: { value: null, matchMode: 'contains' },
+					status: { value: null, matchMode: 'equals' },
+					client_type: { value: null, matchMode: 'equals' },
+					create_at_start: { value: null, matchMode: 'equals' },
+					create_at_end: { value: null, matchMode: 'equals' },
+					is_deleted: { value: false, matchMode: 'equals' },
+				} satisfies ClientDataTableFiltersType,
+			},
+			columns: [
+				{
+					field: 'id',
+					header: 'ID',
+					sortable: true,
+					body: (entry, column, auth) =>
+						DataTableValue(entry, column, {
+							markDeleted: true,
+							displayButton: displayButtonView(auth),
+						}),
+				},
+				{
+					field: 'client_type',
+					header: 'Type',
+					sortable: true,
+					body: (entry, column) =>
+						DataTableValue(entry, column, {
+							capitalize: true,
+						}),
+				},
+				{
+					field: 'name',
+					header: 'Name',
+					body: (entry, column) =>
+						DataTableValue(entry, column, {
+							customValue: displayClientLabel(entry),
+						}),
+				},
+				{
+					field: 'status',
+					header: 'Status',
+					body: (entry, column, auth) =>
+						DataTableValue(entry, column, {
+							dataSource: 'client',
+							isStatus: true,
+							markDeleted: true,
+							displayButton: displayButtonStatus(auth),
+						}),
+					style: {
+						minWidth: '8rem',
+						maxWidth: '8rem',
+					},
+				},
+				{
+					field: 'created_at',
+					header: 'Created At',
+					sortable: true,
+					body: (entry, column) =>
+						DataTableValue(entry, column, {
+							displayDate: true,
+						}),
+				},
+			],
+			find: (params: FindFunctionParamsType) =>
+				requestFind<ClientModel>('client', params),
 		},
-	};
-}
-
-export const dataSourceConfigClient: DataSourceConfigType<ClientModel> = {
-	dataTable: {
-		state: {
-			first: 0,
-			rows: 10,
-			sortField: 'id',
-			sortOrder: -1 as const,
-			filters: {
-				global: { value: null, matchMode: 'contains' },
-				status: { value: null, matchMode: 'equals' },
-				client_type: { value: null, matchMode: 'equals' },
-				create_at_start: { value: null, matchMode: 'equals' },
-				create_at_end: { value: null, matchMode: 'equals' },
-				is_deleted: { value: false, matchMode: 'equals' },
-			} satisfies ClientDataTableFiltersType,
+		displayEntryLabel: (entry: ClientModel) => {
+			return displayClientLabel(entry);
 		},
-		columns: [
-			{
-				field: 'id',
-				header: 'ID',
-				sortable: true,
-				body: (entry, column, auth) =>
-					DataTableValue(entry, column, {
-						markDeleted: true,
-						displayButton: displayButtonView(auth),
-					}),
+		actions: {
+			create: {
+				windowType: 'form',
+				windowTitle: translations['create.title'],
+				windowComponent: FormManageClient,
+				windowConfigProps: {
+					size: 'x2l',
+				},
+				permission: ['client', 'create'],
+				entriesSelection: 'free',
+				operationFunction: (params: ClientFormValuesType) =>
+					requestCreate<ClientModel, ClientFormValuesType>(
+						'client',
+						params,
+					),
+				buttonPosition: 'right',
+				button: {
+					variant: 'info',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateForm,
+				getFormState: getFormState,
 			},
-			{
-				field: 'client_type',
-				header: 'Type',
-				sortable: true,
-				body: (entry, column) =>
-					DataTableValue(entry, column, {
-						capitalize: true,
-					}),
+			update: {
+				windowType: 'form',
+				windowTitle: translations['update.title'],
+				windowComponent: FormManageClient,
+				windowConfigProps: {
+					size: 'x2l',
+				},
+				permission: ['client', 'update'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: ClientModel) => !entry.deleted_at, // Return true if the entry is not deleted
+				operationFunction: (params: ClientFormValuesType, id: number) =>
+					requestUpdate<ClientModel, ClientFormValuesType>(
+						'client',
+						params,
+						id,
+					),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'success',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateForm,
+				getFormState: getFormState,
 			},
-			{
-				field: 'name',
-				header: 'Name',
-				body: (entry, column) =>
-					DataTableValue(entry, column, {
-						customValue: displayClientLabel(entry),
-					}),
-			},
-			{
-				field: 'status',
-				header: 'Status',
-				body: (entry, column, auth) =>
-					DataTableValue(entry, column, {
-						dataSource: 'client',
-						isStatus: true,
-						markDeleted: true,
-						displayButton: displayButtonStatus(auth),
-					}),
-				style: {
-					minWidth: '8rem',
-					maxWidth: '8rem',
+			delete: {
+				windowType: 'action',
+				windowTitle: translations['delete.title'],
+				permission: ['client', 'delete'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: ClientModel) => !entry.deleted_at, // Return true if the entry is not deleted
+				operationFunction: (entry: ClientModel) =>
+					requestDelete('client', entry),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'error',
 				},
 			},
-			{
-				field: 'created_at',
-				header: 'Created At',
-				sortable: true,
-				body: (entry, column) =>
-					DataTableValue(entry, column, {
-						displayDate: true,
-					}),
+			restore: {
+				windowType: 'action',
+				windowTitle: translations['restore.title'],
+				permission: ['client', 'delete'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: ClientModel) => !!entry.deleted_at, // Return true if the entry is deleted
+				operationFunction: (entry: ClientModel) =>
+					requestRestore('client', entry),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'info',
+				},
 			},
-		],
-		find: (params: FindFunctionParamsType) =>
-			requestFind<ClientModel>('client', params),
-	},
-	displayEntryLabel: (entry: ClientModel) => {
-		return displayClientLabel(entry);
-	},
-	actions: {
-		create: {
-			windowType: 'form',
-			windowTitle: translations['create.title'],
-			windowComponent: FormManageClient,
-			windowConfigProps: {
-				size: 'x2l',
+			enable: {
+				windowType: 'action',
+				windowTitle: translations['enable.title'],
+				permission: ['client', 'update'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: ClientModel) =>
+					!entry.deleted_at &&
+					arrayHasValue(entry.status, [
+						ClientStatusEnum.PENDING,
+						ClientStatusEnum.INACTIVE,
+					]),
+				operationFunction: (entry: ClientModel) =>
+					requestUpdateStatus('client', entry, 'active'),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'info',
+				},
 			},
-			permission: ['client', 'create'],
-			entriesSelection: 'free',
-			operationFunction: (params: ClientFormValuesType) =>
-				requestCreate<ClientModel, ClientFormValuesType>(
-					'client',
-					params,
-				),
-			buttonPosition: 'right',
-			button: {
-				variant: 'info',
+			disable: {
+				windowType: 'action',
+				windowTitle: translations['disable.title'],
+				permission: ['client', 'update'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: ClientModel) =>
+					!entry.deleted_at &&
+					arrayHasValue(entry.status, [
+						ClientStatusEnum.PENDING,
+						ClientStatusEnum.ACTIVE,
+					]),
+				operationFunction: (entry: ClientModel) =>
+					requestUpdateStatus('client', entry, 'inactive'),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'error',
+				},
 			},
-			getFormValues: getFormValues,
-			validateForm: validateForm,
-			getFormState: getFormState,
-		},
-		update: {
-			windowType: 'form',
-			windowTitle: translations['update.title'],
-			windowComponent: FormManageClient,
-			windowConfigProps: {
-				size: 'x2l',
-			},
-			permission: ['client', 'update'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: ClientModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			operationFunction: (params: ClientFormValuesType, id: number) =>
-				requestUpdate<ClientModel, ClientFormValuesType>(
-					'client',
-					params,
-					id,
-				),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'success',
-			},
-			getFormValues: getFormValues,
-			validateForm: validateForm,
-			getFormState: getFormState,
-		},
-		delete: {
-			windowType: 'action',
-			windowTitle: translations['delete.title'],
-			permission: ['client', 'delete'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: ClientModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			operationFunction: (entry: ClientModel) =>
-				requestDelete('client', entry),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'error',
+			view: {
+				windowType: 'view',
+				windowTitle: translations['view.title'],
+				windowComponent: ViewClient,
+				windowConfigProps: {
+					size: 'x4l',
+				},
+				permission: ['client', 'read'],
+				entriesSelection: 'single',
+				buttonPosition: 'hidden',
 			},
 		},
-		restore: {
-			windowType: 'action',
-			windowTitle: translations['restore.title'],
-			permission: ['client', 'delete'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: ClientModel) => !!entry.deleted_at, // Return true if the entry is deleted
-			operationFunction: (entry: ClientModel) =>
-				requestRestore('client', entry),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'info',
-			},
-		},
-		enable: {
-			windowType: 'action',
-			windowTitle: translations['enable.title'],
-			permission: ['client', 'update'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: ClientModel) =>
-				!entry.deleted_at &&
-				arrayHasValue(entry.status, [
-					ClientStatusEnum.PENDING,
-					ClientStatusEnum.INACTIVE,
-				]),
-			operationFunction: (entry: ClientModel) =>
-				requestUpdateStatus('client', entry, 'active'),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'info',
-			},
-		},
-		disable: {
-			windowType: 'action',
-			windowTitle: translations['disable.title'],
-			permission: ['client', 'update'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: ClientModel) =>
-				!entry.deleted_at &&
-				arrayHasValue(entry.status, [
-					ClientStatusEnum.PENDING,
-					ClientStatusEnum.ACTIVE,
-				]),
-			operationFunction: (entry: ClientModel) =>
-				requestUpdateStatus('client', entry, 'inactive'),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'error',
-			},
-		},
-		view: {
-			windowType: 'view',
-			windowTitle: translations['view.title'],
-			windowComponent: ViewClient,
-			windowConfigProps: {
-				size: 'x4l',
-			},
-			permission: ['client', 'read'],
-			entriesSelection: 'single',
-			buttonPosition: 'hidden',
-		},
-	},
-};
+	};
+}

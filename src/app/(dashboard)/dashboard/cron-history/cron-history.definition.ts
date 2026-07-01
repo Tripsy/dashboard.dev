@@ -13,11 +13,6 @@ import type {
 	DataTableValueOptionsType,
 } from '@/types/data-source.type';
 
-const translations = await translateBatch(
-	['view.title', 'delete.title'] as const,
-	'cron-history.action',
-);
-
 export type CronHistoryDataTableFiltersType = {
 	global: { value: string | null; matchMode: 'contains' };
 	status: { value: CronHistoryStatus | null; matchMode: 'equals' };
@@ -25,18 +20,27 @@ export type CronHistoryDataTableFiltersType = {
 	start_at_end: { value: string | null; matchMode: 'equals' };
 };
 
-function displayButtonView(
-	auth: AuthModel | null,
-): DataTableValueOptionsType<CronHistoryModel>['displayButton'] {
-	return {
-		action: () =>
-			hasPermission(auth, 'cron-history', 'read') ? 'view' : undefined,
-		dataSource: 'cron-history',
-	};
-}
+export default async function dataSourceConfig(): Promise<
+	DataSourceConfigType<CronHistoryModel>
+> {
+	const translations = await translateBatch(
+		['view.title', 'delete.title'] as const,
+		'cron-history.action',
+	);
 
-export const dataSourceConfigCronHistory: DataSourceConfigType<CronHistoryModel> =
-	{
+	function displayButtonView(
+		auth: AuthModel | null,
+	): DataTableValueOptionsType<CronHistoryModel>['displayButton'] {
+		return {
+			action: () =>
+				hasPermission(auth, 'cron-history', 'read')
+					? 'view'
+					: undefined,
+			dataSource: 'cron-history',
+		};
+	}
+
+	return {
 		dataTable: {
 			state: {
 				first: 0,
@@ -125,3 +129,4 @@ export const dataSourceConfigCronHistory: DataSourceConfigType<CronHistoryModel>
 			},
 		},
 	};
+}

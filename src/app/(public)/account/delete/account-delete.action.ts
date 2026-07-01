@@ -24,7 +24,7 @@ export async function accountDeleteAction(
 	}
 
 	const formValues = getAccountDeleteFormValues(formData);
-	const validated = validateFormAccountDelete(formValues);
+	const validated = await validateFormAccountDelete(formValues);
 
 	if (!validated.success) {
 		const errors = accumulateZodErrors<AccountDeleteFormValuesType>(

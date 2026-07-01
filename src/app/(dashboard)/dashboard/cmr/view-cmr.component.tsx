@@ -1,5 +1,6 @@
 'use client';
 
+import { getLanguageClient } from '@/config/translate.setup';
 import { formatDate } from '@/helpers/date.helper';
 import { DisplayStatus } from '@/helpers/display.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
@@ -7,7 +8,9 @@ import { displayAddressLabel } from '@/models/address.model';
 import { displayClientLabel } from '@/models/client.model';
 import type { CmrModel } from '@/models/cmr.model';
 
-export function ViewCmr({ entry }: { entry: CmrModel }) {
+export async function ViewCmr({ entry }: { entry: CmrModel }) {
+	const language = getLanguageClient();
+
 	return (
 		<div className="space-y-6">
 			<div className="space-y-1">
@@ -31,11 +34,11 @@ export function ViewCmr({ entry }: { entry: CmrModel }) {
 				</div>
 				<div>
 					<span className="font-semibold">Pickup Address</span>{' '}
-					{displayAddressLabel(entry.pickup_address)}
+					{displayAddressLabel(entry.pickup_address, language)}
 				</div>
 				<div>
 					<span className="font-semibold">Delivery Address</span>{' '}
-					{displayAddressLabel(entry.delivery_address)}
+					{displayAddressLabel(entry.delivery_address, language)}
 				</div>
 			</div>
 

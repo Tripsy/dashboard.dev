@@ -8,6 +8,7 @@ export const PermissionEntitiesSuggestions = [
 	'cmr-vehicle',
 	'company-vehicle',
 	'cron-history',
+	'image',
 	'log-data',
 	'log-history',
 	'mail-queue',
@@ -27,7 +28,7 @@ export const PermissionOperationSuggestions = [
 	'read',
 	'find',
 	'delete',
-	'refund',
+	'refund', // TODO not all entities have all the operations
 ] as const;
 
 export type PermissionEntityType =

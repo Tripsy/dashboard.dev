@@ -7,7 +7,7 @@ import {
 import { SetupUserPermissions } from '@/app/(dashboard)/dashboard/user/setup-user-permissions.component';
 import { ViewUser } from '@/app/(dashboard)/dashboard/user/view-user.component';
 import { Configuration } from '@/config/settings.config';
-import { translateBatch } from '@/config/translate.setup';
+import { getLanguageClient, translateBatch } from '@/config/translate.setup';
 import { getFormDataAsEnum, getFormDataAsString } from '@/helpers/form.helper';
 import { arrayHasValue } from '@/helpers/objects.helper';
 import {
@@ -36,38 +36,21 @@ import type {
 } from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
-const translations = await translateBatch(
-	[
-		'create.title',
-		'update.title',
-		'view.title',
-		'delete.title',
-		'restore.title',
-		'enable.title',
-		'disable.title',
-		'setupPermissions.title',
-	] as const,
-	'user.action',
-);
-
-const validatorMessages = await BaseValidator.getValidatorMessages(
-	[
-		'invalid_name',
-		'name_min',
-		'invalid_email',
-		'invalid_language',
-		'invalid_role',
-		'invalid_password',
-		'password_min',
-		'password_condition_capital_letter',
-		'password_condition_number',
-		'password_condition_special_character',
-		'password_confirm_required',
-		'password_confirm_mismatch',
-		'invalid_operator_type',
-	] as const,
-	'user.validation',
-);
+const validatorMessages = [
+	'invalid_name',
+	'name_min',
+	'invalid_email',
+	'invalid_language',
+	'invalid_role',
+	'invalid_password',
+	'password_min',
+	'password_condition_capital_letter',
+	'password_condition_number',
+	'password_condition_special_character',
+	'password_confirm_required',
+	'password_confirm_mismatch',
+	'invalid_operator_type',
+] as const;
 
 class UserValidator extends BaseValidator<typeof validatorMessages> {
 	baseSchema = z.object({
@@ -201,14 +184,24 @@ class UserValidator extends BaseValidator<typeof validatorMessages> {
 		});
 }
 
-function validateFormCreate(values: UserFormValuesType) {
-	const validator = new UserValidator(validatorMessages);
+async function validateFormCreate(values: UserFormValuesType) {
+	const translations = await translateBatch(
+		validatorMessages,
+		'user.validation',
+	);
+
+	const validator = new UserValidator(translations);
 
 	return validator.create.safeParse(values);
 }
 
-function validateFormUpdate(values: UserFormValuesType) {
-	const validator = new UserValidator(validatorMessages);
+async function validateFormUpdate(values: UserFormValuesType) {
+	const translations = await translateBatch(
+		validatorMessages,
+		'user.validation',
+	);
+
+	const validator = new UserValidator(translations);
 
 	return validator.update.safeParse(values);
 }
@@ -221,7 +214,7 @@ function getFormValues(formData: FormData): UserFormValuesType {
 		password_confirm: getFormDataAsString(formData, 'password_confirm'),
 		language:
 			getFormDataAsEnum(formData, 'language', LanguageEnum) ||
-			Configuration.language(),
+			getLanguageClient(),
 		role:
 			getFormDataAsEnum(formData, 'role', UserRoleEnum) ||
 			UserRoleEnum.DRIVER,
@@ -259,270 +252,291 @@ export type UserDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
-function displayButtonView(
-	auth: AuthModel | null,
-): DataTableValueOptionsType<UserModel>['displayButton'] {
+export default async function dataSourceConfig(): Promise<
+	DataSourceConfigType<UserModel>
+> {
+	const translations = await translateBatch(
+		[
+			'create.title',
+			'update.title',
+			'view.title',
+			'delete.title',
+			'restore.title',
+			'enable.title',
+			'disable.title',
+			'setupPermissions.title',
+		] as const,
+		'user.action',
+	);
+
+	function displayButtonView(
+		auth: AuthModel | null,
+	): DataTableValueOptionsType<UserModel>['displayButton'] {
+		return {
+			action: () =>
+				hasPermission(auth, 'user', 'read') ? 'view' : undefined,
+			dataSource: 'user',
+		};
+	}
+
+	function displayButtonStatus(
+		auth: AuthModel | null,
+	): DataTableValueOptionsType<UserModel>['displayButton'] {
+		return {
+			action: (entry: UserModel) => {
+				if (entry.deleted_at) {
+					return hasPermission(auth, 'user', 'delete')
+						? 'restore'
+						: undefined;
+				}
+
+				if (!hasPermission(auth, 'user', 'update')) {
+					return undefined;
+				}
+
+				return entry.status === UserStatusEnum.ACTIVE
+					? 'disable'
+					: 'enable';
+			},
+		};
+	}
+
+	function displayButtonSetupPermissions(
+		auth: AuthModel | null,
+		entry: UserModel,
+	): DataTableValueOptionsType<UserModel>['displayButton'] {
+		return {
+			action: () =>
+				entry.role === UserRoleEnum.OPERATOR &&
+				hasPermission(auth, 'permission', 'update')
+					? 'setupPermissions'
+					: undefined,
+			dataSource: 'user',
+		};
+	}
+
 	return {
-		action: () =>
-			hasPermission(auth, 'user', 'read') ? 'view' : undefined,
-		dataSource: 'user',
-	};
-}
-
-function displayButtonStatus(
-	auth: AuthModel | null,
-): DataTableValueOptionsType<UserModel>['displayButton'] {
-	return {
-		action: (entry: UserModel) => {
-			if (entry.deleted_at) {
-				return hasPermission(auth, 'user', 'delete')
-					? 'restore'
-					: undefined;
-			}
-
-			if (!hasPermission(auth, 'user', 'update')) {
-				return undefined;
-			}
-
-			return entry.status === UserStatusEnum.ACTIVE
-				? 'disable'
-				: 'enable';
+		dataTable: {
+			state: {
+				first: 0,
+				rows: 10,
+				sortField: 'id',
+				sortOrder: -1 as const,
+				filters: {
+					global: { value: null, matchMode: 'contains' },
+					role: { value: null, matchMode: 'equals' },
+					status: { value: null, matchMode: 'equals' },
+					create_at_start: { value: null, matchMode: 'equals' },
+					create_at_end: { value: null, matchMode: 'equals' },
+					is_deleted: { value: false, matchMode: 'equals' },
+				} satisfies UserDataTableFiltersType,
+			},
+			columns: [
+				{
+					field: 'id',
+					header: 'ID',
+					sortable: true,
+					body: (entry, column, auth) =>
+						DataTableValue(entry, column, {
+							markDeleted: true,
+							displayButton: displayButtonView(auth),
+						}),
+				},
+				{
+					field: 'name',
+					header: 'Name',
+					sortable: true,
+				},
+				{
+					field: 'email',
+					header: 'Email',
+				},
+				{
+					field: 'role',
+					header: 'Role',
+					body: (entry, column, auth) =>
+						DataTableValue(entry, column, {
+							capitalize: true,
+							displayButton: displayButtonSetupPermissions(
+								auth,
+								entry,
+							),
+						}),
+				},
+				{
+					field: 'status',
+					header: 'Status',
+					body: (entry, column, auth) =>
+						DataTableValue(entry, column, {
+							dataSource: 'user',
+							isStatus: true,
+							markDeleted: true,
+							displayButton: displayButtonStatus(auth),
+						}),
+					style: {
+						minWidth: '8rem',
+						maxWidth: '8rem',
+					},
+				},
+				{
+					field: 'created_at',
+					header: 'Created At',
+					sortable: true,
+					body: (entry, column) =>
+						DataTableValue(entry, column, {
+							displayDate: true,
+						}),
+				},
+			],
+			find: (params: FindFunctionParamsType) =>
+				requestFind<UserModel>('user', params),
+			// onRowSelect: (entry: UserModel) => console.log('selected', entry),
+			// onRowUnselect: (entry: UserModel) => console.log('unselected', entry),
 		},
-	};
-}
-
-function displayButtonSetupPermissions(
-	auth: AuthModel | null,
-	entry: UserModel,
-): DataTableValueOptionsType<UserModel>['displayButton'] {
-	return {
-		action: () =>
-			entry.role === UserRoleEnum.OPERATOR &&
-			hasPermission(auth, 'permission', 'update')
-				? 'setupPermissions'
-				: undefined,
-		dataSource: 'user',
-	};
-}
-
-export const dataSourceConfigUser: DataSourceConfigType<UserModel> = {
-	dataTable: {
-		state: {
-			first: 0,
-			rows: 10,
-			sortField: 'id',
-			sortOrder: -1 as const,
-			filters: {
-				global: { value: null, matchMode: 'contains' },
-				role: { value: null, matchMode: 'equals' },
-				status: { value: null, matchMode: 'equals' },
-				create_at_start: { value: null, matchMode: 'equals' },
-				create_at_end: { value: null, matchMode: 'equals' },
-				is_deleted: { value: false, matchMode: 'equals' },
-			} satisfies UserDataTableFiltersType,
+		displayEntryLabel: (entry: UserModel) => {
+			return entry.name;
 		},
-		columns: [
-			{
-				field: 'id',
-				header: 'ID',
-				sortable: true,
-				body: (entry, column, auth) =>
-					DataTableValue(entry, column, {
-						markDeleted: true,
-						displayButton: displayButtonView(auth),
-					}),
+		actions: {
+			create: {
+				windowType: 'form',
+				windowTitle: translations['create.title'],
+				windowComponent: FormManageUser,
+				permission: ['user', 'create'],
+				entriesSelection: 'free',
+				operationFunction: (params: UserFormValuesType) =>
+					requestCreate<UserModel, UserFormValuesType>(
+						'user',
+						params,
+					),
+				buttonPosition: 'right',
+				button: {
+					variant: 'info',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateFormCreate,
+				getFormState: getFormState,
+				// events: {
+				// 	success: (resultData: UserModel) => {
+				// 		console.log('onCreateSuccess', resultData);
+				// 	},
+				// },
 			},
-			{
-				field: 'name',
-				header: 'Name',
-				sortable: true,
+			update: {
+				windowType: 'form',
+				windowTitle: translations['update.title'],
+				windowComponent: FormManageUser,
+				permission: ['user', 'update'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: UserModel) => !entry.deleted_at, // Return true if the entry is not deleted
+				operationFunction: (params: UserFormValuesType, id: number) =>
+					requestUpdate<UserModel, UserFormValuesType>(
+						'user',
+						params,
+						id,
+					),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'success',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateFormUpdate,
+				getFormState: getFormState,
 			},
-			{
-				field: 'email',
-				header: 'Email',
-			},
-			{
-				field: 'role',
-				header: 'Role',
-				body: (entry, column, auth) =>
-					DataTableValue(entry, column, {
-						capitalize: true,
-						displayButton: displayButtonSetupPermissions(
-							auth,
-							entry,
-						),
-					}),
-			},
-			{
-				field: 'status',
-				header: 'Status',
-				body: (entry, column, auth) =>
-					DataTableValue(entry, column, {
-						dataSource: 'user',
-						isStatus: true,
-						markDeleted: true,
-						displayButton: displayButtonStatus(auth),
-					}),
-				style: {
-					minWidth: '8rem',
-					maxWidth: '8rem',
+			delete: {
+				windowType: 'action',
+				windowTitle: translations['delete.title'],
+				permission: ['user', 'delete'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: UserModel) => !entry.deleted_at, // Return true if the entry is not deleted
+				operationFunction: (entry: UserModel) =>
+					requestDelete('user', entry),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'error',
 				},
 			},
-			{
-				field: 'created_at',
-				header: 'Created At',
-				sortable: true,
-				body: (entry, column) =>
-					DataTableValue(entry, column, {
-						displayDate: true,
-					}),
+			restore: {
+				windowType: 'action',
+				windowTitle: translations['restore.title'],
+				permission: ['user', 'delete'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: UserModel) => !!entry.deleted_at, // Return true if the entry is deleted
+				operationFunction: (entry: UserModel) =>
+					requestRestore('user', entry),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'info',
+				},
 			},
-		],
-		find: (params: FindFunctionParamsType) =>
-			requestFind<UserModel>('user', params),
-		// onRowSelect: (entry: UserModel) => console.log('selected', entry),
-		// onRowUnselect: (entry: UserModel) => console.log('unselected', entry),
-	},
-	displayEntryLabel: (entry: UserModel) => {
-		return entry.name;
-	},
-	actions: {
-		create: {
-			windowType: 'form',
-			windowTitle: translations['create.title'],
-			windowComponent: FormManageUser,
-			permission: ['user', 'create'],
-			entriesSelection: 'free',
-			operationFunction: (params: UserFormValuesType) =>
-				requestCreate<UserModel, UserFormValuesType>('user', params),
-			buttonPosition: 'right',
-			button: {
-				variant: 'info',
+			enable: {
+				windowType: 'action',
+				windowTitle: translations['enable.title'],
+				permission: ['user', 'update'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: UserModel) =>
+					!entry.deleted_at &&
+					arrayHasValue(entry.status, [
+						UserStatusEnum.PENDING,
+						UserStatusEnum.INACTIVE,
+					]),
+				operationFunction: (entry: UserModel) =>
+					requestUpdateStatus('user', entry, 'active'),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'info',
+				},
 			},
-			getFormValues: getFormValues,
-			validateForm: validateFormCreate,
-			getFormState: getFormState,
-			// events: {
-			// 	success: (resultData: UserModel) => {
-			// 		console.log('onCreateSuccess', resultData);
-			// 	},
-			// },
-		},
-		update: {
-			windowType: 'form',
-			windowTitle: translations['update.title'],
-			windowComponent: FormManageUser,
-			permission: ['user', 'update'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: UserModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			operationFunction: (params: UserFormValuesType, id: number) =>
-				requestUpdate<UserModel, UserFormValuesType>(
-					'user',
-					params,
-					id,
-				),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'success',
+			disable: {
+				windowType: 'action',
+				windowTitle: translations['disable.title'],
+				permission: ['user', 'update'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: UserModel) =>
+					!entry.deleted_at &&
+					arrayHasValue(entry.status, [
+						UserStatusEnum.PENDING,
+						UserStatusEnum.ACTIVE,
+					]),
+				operationFunction: (entry: UserModel) =>
+					requestUpdateStatus('user', entry, 'inactive'),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'error',
+				},
 			},
-			getFormValues: getFormValues,
-			validateForm: validateFormUpdate,
-			getFormState: getFormState,
-		},
-		delete: {
-			windowType: 'action',
-			windowTitle: translations['delete.title'],
-			permission: ['user', 'delete'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: UserModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			operationFunction: (entry: UserModel) =>
-				requestDelete('user', entry),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'error',
+			view: {
+				windowType: 'view',
+				windowTitle: translations['view.title'],
+				windowComponent: ViewUser,
+				windowConfigProps: {
+					size: 'xl',
+				},
+				permission: ['user', 'read'],
+				entriesSelection: 'single',
+				buttonPosition: 'hidden',
 			},
-		},
-		restore: {
-			windowType: 'action',
-			windowTitle: translations['restore.title'],
-			permission: ['user', 'delete'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: UserModel) => !!entry.deleted_at, // Return true if the entry is deleted
-			operationFunction: (entry: UserModel) =>
-				requestRestore('user', entry),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'info',
+			setupPermissions: {
+				windowType: 'other',
+				windowTitle: translations['setupPermissions.title'],
+				windowComponent: SetupUserPermissions,
+				windowConfigProps: {
+					size: 'lg',
+				},
+				permission: ['permission', 'update'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: UserModel) =>
+					!entry.deleted_at && entry.role === UserRoleEnum.OPERATOR,
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'success',
+				},
 			},
 		},
-		enable: {
-			windowType: 'action',
-			windowTitle: translations['enable.title'],
-			permission: ['user', 'update'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: UserModel) =>
-				!entry.deleted_at &&
-				arrayHasValue(entry.status, [
-					UserStatusEnum.PENDING,
-					UserStatusEnum.INACTIVE,
-				]),
-			operationFunction: (entry: UserModel) =>
-				requestUpdateStatus('user', entry, 'active'),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'info',
-			},
-		},
-		disable: {
-			windowType: 'action',
-			windowTitle: translations['disable.title'],
-			permission: ['user', 'update'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: UserModel) =>
-				!entry.deleted_at &&
-				arrayHasValue(entry.status, [
-					UserStatusEnum.PENDING,
-					UserStatusEnum.ACTIVE,
-				]),
-			operationFunction: (entry: UserModel) =>
-				requestUpdateStatus('user', entry, 'inactive'),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'error',
-			},
-		},
-		view: {
-			windowType: 'view',
-			windowTitle: translations['view.title'],
-			windowComponent: ViewUser,
-			windowConfigProps: {
-				size: 'xl',
-			},
-			permission: ['user', 'read'],
-			entriesSelection: 'single',
-			buttonPosition: 'hidden',
-		},
-		setupPermissions: {
-			windowType: 'other',
-			windowTitle: translations['setupPermissions.title'],
-			windowComponent: SetupUserPermissions,
-			windowConfigProps: {
-				size: 'lg',
-			},
-			permission: ['permission', 'update'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: UserModel) =>
-				!entry.deleted_at && entry.role === UserRoleEnum.OPERATOR,
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'success',
-			},
-		},
-	},
-};
+	};
+}

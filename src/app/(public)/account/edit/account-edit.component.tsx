@@ -25,7 +25,7 @@ import {
 } from '@/components/status.component';
 import { Link } from '@/components/ui/link';
 import Routes from '@/config/routes.setup';
-import { Configuration } from '@/config/settings.config';
+import { getLanguageClient } from '@/config/translate.setup';
 import { createHandleChange, toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
@@ -45,7 +45,7 @@ export default function AccountEdit() {
 		...AccountEditState,
 		values: {
 			name: auth?.name ?? '',
-			language: auth?.language ?? Configuration.language(),
+			language: auth?.language ?? getLanguageClient(),
 		},
 	});
 

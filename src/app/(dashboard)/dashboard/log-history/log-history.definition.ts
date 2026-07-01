@@ -14,11 +14,6 @@ import type {
 	DataTableValueOptionsType,
 } from '@/types/data-source.type';
 
-const translations = await translateBatch(
-	['delete.title', 'view.title', 'viewUser.title'] as const,
-	'log-history.action',
-);
-
 export type LogHistoryDataTableFiltersType = {
 	request_id: { value: string | null; matchMode: 'contains' };
 	entity: { value: string | null; matchMode: 'equals' };
@@ -29,35 +24,42 @@ export type LogHistoryDataTableFiltersType = {
 	recorded_at_end: { value: string | null; matchMode: 'equals' };
 };
 
-function displayButtonView(
-	auth: AuthModel | null,
-): DataTableValueOptionsType<LogHistoryModel>['displayButton'] {
-	return {
-		action: () =>
-			hasPermission(auth, 'log-history', 'read') ? 'view' : undefined,
-		dataSource: 'log-history',
-	};
-}
+export default async function dataSourceConfig(): Promise<
+	DataSourceConfigType<LogHistoryModel>
+> {
+	const translations = await translateBatch(
+		['delete.title', 'view.title', 'viewUser.title'] as const,
+		'log-history.action',
+	);
 
-function displayButtonViewUser(
-	auth: AuthModel | null,
-	entry: LogHistoryModel,
-): DataTableValueOptionsType<LogHistoryModel>['displayButton'] {
-	if (!entry.auth_id) {
-		return undefined;
+	function displayButtonView(
+		auth: AuthModel | null,
+	): DataTableValueOptionsType<LogHistoryModel>['displayButton'] {
+		return {
+			action: () =>
+				hasPermission(auth, 'log-history', 'read') ? 'view' : undefined,
+			dataSource: 'log-history',
+		};
+	}
+
+	function displayButtonViewUser(
+		auth: AuthModel | null,
+		entry: LogHistoryModel,
+	): DataTableValueOptionsType<LogHistoryModel>['displayButton'] {
+		if (!entry.auth_id) {
+			return undefined;
+		}
+
+		return {
+			action: () =>
+				hasPermission(auth, 'user', 'read') ? 'view' : undefined,
+			dataSource: 'user',
+			title: translations['viewUser.title'],
+			alternateEntryId: entry.auth_id,
+		};
 	}
 
 	return {
-		action: () =>
-			hasPermission(auth, 'user', 'read') ? 'view' : undefined,
-		dataSource: 'user',
-		title: translations['viewUser.title'],
-		alternateEntryId: entry.auth_id,
-	};
-}
-
-export const dataSourceConfigLogHistory: DataSourceConfigType<LogHistoryModel> =
-	{
 		dataTable: {
 			state: {
 				first: 0,
@@ -160,3 +162,4 @@ export const dataSourceConfigLogHistory: DataSourceConfigType<LogHistoryModel> =
 			},
 		},
 	};
+}

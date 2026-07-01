@@ -1,4 +1,3 @@
-import { toCamelCase } from '@/helpers/string.helper';
 import type { DataSourceKey, DatasourceModels } from '@/types/data-source.key';
 import {
 	type DataSourceConfigType,
@@ -24,12 +23,8 @@ export async function getDataSourceConfig<
 	prop: P,
 ): Promise<DataSourceConfigType<DatasourceModels[K]>[P]> {
 	if (!registry[section]?.[key]) {
-		const defKey = toCamelCase(key, {
-			capitalizeFirst: true,
-		});
-
 		// biome-ignore lint/suspicious/noExplicitAny: It's fine
-		let defModule: Record<string, DataSourceConfigType<any>>;
+		let defModule: { default: () => Promise<DataSourceConfigType<any>> };
 
 		if (section === DataSourceSectionEnum.DASHBOARD) {
 			defModule = await import(
@@ -41,7 +36,7 @@ export async function getDataSourceConfig<
 			);
 		}
 
-		registry[section][key] = defModule[`dataSourceConfig${defKey}`];
+		registry[section][key] = await defModule.default();
 	}
 
 	// biome-ignore lint/style/noNonNullAssertion: registry[section][key] is guaranteed to be set above

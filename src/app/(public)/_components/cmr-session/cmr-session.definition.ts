@@ -3,13 +3,15 @@ import type { CmrSessionModel } from '@/models/cmr-session.model';
 import { deleteCmrSession } from '@/services/cmr-session.service';
 import type { DataSourceConfigType } from '@/types/data-source.type';
 
-const translations = await translateBatch(
-	['drop.title'] as const,
-	'cmr-session.action',
-);
+export default async function dataSourceConfig(): Promise<
+	DataSourceConfigType<CmrSessionModel>
+> {
+	const translations = await translateBatch(
+		['drop.title'] as const,
+		'cmr-session.action',
+	);
 
-export const dataSourceConfigCmrSession: DataSourceConfigType<CmrSessionModel> =
-	{
+	return {
 		displayEntryLabel: (entry: CmrSessionModel) => {
 			return `CMR${entry.cmr.id}`;
 		},
@@ -29,3 +31,4 @@ export const dataSourceConfigCmrSession: DataSourceConfigType<CmrSessionModel> =
 			},
 		},
 	};
+}

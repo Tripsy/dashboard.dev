@@ -19,15 +19,7 @@ import type { FindFunctionParamsType } from '@/types/action.type';
 import type { DataSourceConfigType } from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
-const translations = await translateBatch(
-	['create.title', 'update.title', 'delete.title', 'restore.title'] as const,
-	'permission.action',
-);
-
-const validatorMessages = await BaseValidator.getValidatorMessages(
-	['invalid_entity', 'invalid_operation'] as const,
-	'permission.validation',
-);
+const validatorMessages = ['invalid_entity', 'invalid_operation'] as const;
 
 class PermissionValidator extends BaseValidator<typeof validatorMessages> {
 	manage = z.object({
@@ -36,8 +28,13 @@ class PermissionValidator extends BaseValidator<typeof validatorMessages> {
 	});
 }
 
-function validateForm(values: PermissionFormValuesType) {
-	const validator = new PermissionValidator(validatorMessages);
+async function validateForm(values: PermissionFormValuesType) {
+	const translations = await translateBatch(
+		validatorMessages,
+		'permission.validation',
+	);
+
+	const validator = new PermissionValidator(translations);
 
 	return validator.manage.safeParse(values);
 }
@@ -68,8 +65,20 @@ export type PermissionDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
-export const dataSourceConfigPermission: DataSourceConfigType<PermissionModel> =
-	{
+export default async function dataSourceConfig(): Promise<
+	DataSourceConfigType<PermissionModel>
+> {
+	const translations = await translateBatch(
+		[
+			'create.title',
+			'update.title',
+			'delete.title',
+			'restore.title',
+		] as const,
+		'permission.action',
+	);
+
+	return {
 		dataTable: {
 			state: {
 				first: 0,
@@ -190,3 +199,4 @@ export const dataSourceConfigPermission: DataSourceConfigType<PermissionModel> =
 			},
 		},
 	};
+}

@@ -1,14 +1,15 @@
 import { Configuration } from '@/config/settings.config';
 import { getObjectValue } from '@/helpers/objects.helper';
 import { replaceVars } from '@/helpers/string.helper';
+import type { Language } from '@/types/common.type';
 
 type TranslationValue = string | { [key: string]: TranslationValue };
 type TranslationResource = Record<string, TranslationValue>;
 
 const languageResources: Record<string, TranslationResource> = {};
 
-async function fetchLanguage(): Promise<string> {
-	const fallback = Configuration.get('language.default') as string;
+async function fetchLanguage(): Promise<Language> {
+	const fallback = Configuration.language();
 
 	try {
 		const { headers } = await import('next/headers');
@@ -17,7 +18,7 @@ async function fetchLanguage(): Promise<string> {
 		const fromHeader = headerStore.get('x-language')?.trim().toLowerCase();
 
 		if (fromHeader && Configuration.isSupportedLanguage(fromHeader)) {
-			return fromHeader;
+			return fromHeader as Language;
 		}
 	} catch (error) {
 		console.error('Failed to read language header:', error);
@@ -26,19 +27,22 @@ async function fetchLanguage(): Promise<string> {
 	return fallback;
 }
 
-export async function getLanguage(): Promise<string> {
-	if (typeof document !== 'undefined') {
-		// Client: read from html[lang] set by RootLayout — always fresh
-		const fromDom = document.documentElement.lang?.toLowerCase();
+export function getLanguageClient(): Language {
+	// Client: read from html[lang] set by RootLayout — always fresh
+	const fromDom = document.documentElement.lang?.toLowerCase();
 
-		if (fromDom && Configuration.isSupportedLanguage(fromDom)) {
-			return fromDom;
-		}
-
-		return Configuration.get('language.default') as string;
+	if (fromDom && Configuration.isSupportedLanguage(fromDom)) {
+		return fromDom as Language;
 	}
 
-	// Server: read cookie directly
+	return Configuration.language();
+}
+
+export async function getLanguage(): Promise<Language> {
+	if (typeof document !== 'undefined') {
+		return getLanguageClient();
+	}
+
 	return fetchLanguage();
 }
 
@@ -142,11 +146,11 @@ export const translateBatch = async <
 	return result;
 };
 
-export async function getLocaleValue<T>(key: string): Promise<T | undefined> {
-	const language = await getLanguage();
-	const resource = await loadLanguageResource(language);
-
-	const value = getObjectValue(resource, key);
-
-	return value as T | undefined;
-}
+// export async function getLocaleValue<T>(key: string): Promise<T | undefined> {
+// 	const language = await getLanguage();
+// 	const resource = await loadLanguageResource(language);
+//
+// 	const value = getObjectValue(resource, key);
+//
+// 	return value as T | undefined;
+// }

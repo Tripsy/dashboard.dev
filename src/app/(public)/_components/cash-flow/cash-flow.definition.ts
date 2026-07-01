@@ -43,29 +43,21 @@ import { CurrencyEnum } from '@/types/common.type';
 import type { DataSourceConfigType } from '@/types/data-source.type';
 import type { FormStateType, ValidatorOutput } from '@/types/form.type';
 
-const translations = await translateBatch(
-	['create.title', 'update.title', 'complete.title', 'cancel.title'] as const,
-	'cash-flow.action',
-);
-
-const validatorMessages = await BaseValidator.getValidatorMessages(
-	[
-		'invalid_category',
-		'invalid_method',
-		'invalid_amount',
-		'invalid_vat_rate',
-		'invalid_currency',
-		'invalid_external_reference',
-		'invalid_notes',
-		'invalid_client',
-		'invalid_vendor',
-		'invalid_employee',
-		'invalid_company_vehicle',
-		'invalid_cmr',
-		'required_operational_record_type',
-	] as const,
-	'cash-flow.validation',
-);
+const validatorMessages = [
+	'invalid_category',
+	'invalid_method',
+	'invalid_amount',
+	'invalid_vat_rate',
+	'invalid_currency',
+	'invalid_external_reference',
+	'invalid_notes',
+	'invalid_client',
+	'invalid_vendor',
+	'invalid_employee',
+	'invalid_company_vehicle',
+	'invalid_cmr',
+	'required_operational_record_type',
+] as const;
 
 class CashFlowValidator extends BaseValidator<typeof validatorMessages> {
 	readonly operationalRecords = z
@@ -156,8 +148,13 @@ class CashFlowValidator extends BaseValidator<typeof validatorMessages> {
 		});
 }
 
-function validateForm(values: CashFlowFormValuesType) {
-	const validator = new CashFlowValidator(validatorMessages);
+async function validateForm(values: CashFlowFormValuesType) {
+	const translations = await translateBatch(
+		validatorMessages,
+		'cash-flow.validation',
+	);
+
+	const validator = new CashFlowValidator(translations);
 
 	return validator.manage.safeParse(values);
 }
@@ -260,116 +257,133 @@ function prepareParamsFromFormValues(data: CashFlowManageOutput) {
 	};
 }
 
-export const dataSourceConfigCashFlow: DataSourceConfigType<CashFlowModel> = {
-	displayEntryLabel: (entry: CashFlowModel) => {
-		const formatted = formatAmount(entry.grossAmount, entry.currency);
+export default async function dataSourceConfig(): Promise<
+	DataSourceConfigType<CashFlowModel>
+> {
+	const translations = await translateBatch(
+		[
+			'create.title',
+			'update.title',
+			'complete.title',
+			'cancel.title',
+		] as const,
+		'cash-flow.action',
+	);
 
-		if (entry.category_type === CashFlowCategoryTypeEnum.REVENUE) {
-			if (entry.operational_records.client) {
-				return `${displayClientLabel(entry.operational_records.client)} ${formatted.value} ${formatted.currency}`;
+	return {
+		displayEntryLabel: (entry: CashFlowModel) => {
+			const formatted = formatAmount(entry.grossAmount, entry.currency);
+
+			if (entry.category_type === CashFlowCategoryTypeEnum.REVENUE) {
+				if (entry.operational_records.client) {
+					return `${displayClientLabel(entry.operational_records.client)} ${formatted.value} ${formatted.currency}`;
+				}
+
+				return `${formatted.value} ${formatted.currency}`;
 			}
 
-			return `${formatted.value} ${formatted.currency}`;
-		}
-
-		return `${formatEnumLabel(entry.category)} ${formatted.value} ${formatted.currency}`;
-	},
-	actions: {
-		create: {
-			windowType: 'form',
-			windowTitle: translations['create.title'],
-			windowComponent: FormManageCashFlow,
-			permission: ['cash-flow', 'create'],
-			entriesSelection: 'free',
-			operationFunction: (values: CashFlowManageOutput) => {
-				const params = prepareParamsFromFormValues(values);
-
-				return requestCreate<CashFlowModel, typeof params>(
-					'cash-flow',
-					params,
-				);
-			},
-			buttonPosition: 'right',
-			button: {
-				variant: 'info',
-			},
-			getFormValues: getFormValues,
-			validateForm: validateForm,
-			getFormState: getFormState,
+			return `${formatEnumLabel(entry.category)} ${formatted.value} ${formatted.currency}`;
 		},
-		update: {
-			windowType: 'form',
-			windowTitle: translations['update.title'],
-			windowComponent: FormManageCashFlow,
-			permission: ['cash-flow', 'update'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: CashFlowModel) =>
-				arrayHasValue(entry.status, MUTABLE_STATUSES),
-			operationFunction: (values: CashFlowManageOutput, id: number) => {
-				const params = prepareParamsFromFormValues(values);
+		actions: {
+			create: {
+				windowType: 'form',
+				windowTitle: translations['create.title'],
+				windowComponent: FormManageCashFlow,
+				permission: ['cash-flow', 'create'],
+				entriesSelection: 'free',
+				operationFunction: (values: CashFlowManageOutput) => {
+					const params = prepareParamsFromFormValues(values);
 
-				return requestUpdate<CashFlowModel, typeof params>(
-					'cash-flow',
-					params,
-					id,
-				);
+					return requestCreate<CashFlowModel, typeof params>(
+						'cash-flow',
+						params,
+					);
+				},
+				buttonPosition: 'right',
+				button: {
+					variant: 'info',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateForm,
+				getFormState: getFormState,
 			},
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'success',
-			},
-			getFormValues: getFormValues,
-			validateForm: validateForm,
-			getFormState: getFormState,
-		},
-		complete: {
-			windowType: 'action',
-			windowTitle: translations['complete.title'],
-			permission: ['cash-flow', 'update'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: CashFlowModel) => {
-				const statusTransitions = getStatusTransitions(
-					entry.status,
-					STATUS_TRANSITIONS,
-				);
+			update: {
+				windowType: 'form',
+				windowTitle: translations['update.title'],
+				windowComponent: FormManageCashFlow,
+				permission: ['cash-flow', 'update'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: CashFlowModel) =>
+					arrayHasValue(entry.status, MUTABLE_STATUSES),
+				operationFunction: (
+					values: CashFlowManageOutput,
+					id: number,
+				) => {
+					const params = prepareParamsFromFormValues(values);
 
-				return arrayHasValue(
-					CashFlowStatusEnum.COMPLETED,
-					statusTransitions,
-				);
+					return requestUpdate<CashFlowModel, typeof params>(
+						'cash-flow',
+						params,
+						id,
+					);
+				},
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'success',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateForm,
+				getFormState: getFormState,
 			},
-			operationFunction: (entry: CashFlowModel) =>
-				requestUpdateStatus('cash-flow', entry, 'completed'),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'info',
-			},
-		},
-		cancel: {
-			windowType: 'action',
-			windowTitle: translations['cancel.title'],
-			permission: ['cash-flow', 'update'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: CashFlowModel) => {
-				const statusTransitions = getStatusTransitions(
-					entry.status,
-					STATUS_TRANSITIONS,
-				);
+			complete: {
+				windowType: 'action',
+				windowTitle: translations['complete.title'],
+				permission: ['cash-flow', 'update'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: CashFlowModel) => {
+					const statusTransitions = getStatusTransitions(
+						entry.status,
+						STATUS_TRANSITIONS,
+					);
 
-				return arrayHasValue(
-					CashFlowStatusEnum.CANCELED,
-					statusTransitions,
-				);
+					return arrayHasValue(
+						CashFlowStatusEnum.COMPLETED,
+						statusTransitions,
+					);
+				},
+				operationFunction: (entry: CashFlowModel) =>
+					requestUpdateStatus('cash-flow', entry, 'completed'),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'info',
+				},
 			},
-			operationFunction: (entry: CashFlowModel) =>
-				requestUpdateStatus('cash-flow', entry, 'canceled'),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'error',
+			cancel: {
+				windowType: 'action',
+				windowTitle: translations['cancel.title'],
+				permission: ['cash-flow', 'update'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: CashFlowModel) => {
+					const statusTransitions = getStatusTransitions(
+						entry.status,
+						STATUS_TRANSITIONS,
+					);
+
+					return arrayHasValue(
+						CashFlowStatusEnum.CANCELED,
+						statusTransitions,
+					);
+				},
+				operationFunction: (entry: CashFlowModel) =>
+					requestUpdateStatus('cash-flow', entry, 'canceled'),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'error',
+				},
 			},
 		},
-	},
-};
+	};
+}

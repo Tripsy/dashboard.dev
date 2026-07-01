@@ -38,29 +38,14 @@ import type {
 } from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
-const translations = await translateBatch(
-	[
-		'create.title',
-		'update.title',
-		'view.title',
-		'delete.title',
-		'restore.title',
-		'statusTransition.title',
-	] as const,
-	'company-vehicle.action',
-);
-
-const validatorMessages = await BaseValidator.getValidatorMessages(
-	[
-		'invalid_vehicle_id',
-		'invalid_vehicle',
-		'invalid_scope',
-		'invalid_license_plate',
-		'invalid_vin',
-		'invalid_notes',
-	] as const,
-	'company-vehicle.validation',
-);
+const validatorMessages = [
+	'invalid_vehicle_id',
+	'invalid_vehicle',
+	'invalid_scope',
+	'invalid_license_plate',
+	'invalid_vin',
+	'invalid_notes',
+] as const;
 
 class CompanyVehicleValidator extends BaseValidator<typeof validatorMessages> {
 	manage = (isSubmit: boolean = true) =>
@@ -106,11 +91,16 @@ class CompanyVehicleValidator extends BaseValidator<typeof validatorMessages> {
 			});
 }
 
-function validateForm(
+async function validateForm(
 	values: CompanyVehicleFormValuesType,
 	isSubmit: boolean = true,
 ) {
-	const validator = new CompanyVehicleValidator(validatorMessages);
+	const translations = await translateBatch(
+		validatorMessages,
+		'company-vehicle.validation',
+	);
+
+	const validator = new CompanyVehicleValidator(translations);
 
 	return validator.manage(isSubmit).safeParse(values);
 }
@@ -153,48 +143,64 @@ export type CompanyVehicleDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
-function displayButtonView(
-	auth: AuthModel | null,
-): DataTableValueOptionsType<CompanyVehicleModel>['displayButton'] {
+export default async function dataSourceConfig(): Promise<
+	DataSourceConfigType<CompanyVehicleModel>
+> {
+	const translations = await translateBatch(
+		[
+			'create.title',
+			'update.title',
+			'view.title',
+			'delete.title',
+			'restore.title',
+			'statusTransition.title',
+		] as const,
+		'company-vehicle.action',
+	);
+
+	function displayButtonView(
+		auth: AuthModel | null,
+	): DataTableValueOptionsType<CompanyVehicleModel>['displayButton'] {
+		return {
+			action: () =>
+				hasPermission(auth, 'company-vehicle', 'read')
+					? 'view'
+					: undefined,
+			dataSource: 'company-vehicle',
+		};
+	}
+
+	function displayButtonStatus(
+		auth: AuthModel | null,
+	): DataTableValueOptionsType<CompanyVehicleModel>['displayButton'] {
+		return {
+			action: (entry: CompanyVehicleModel) => {
+				if (entry.deleted_at) {
+					return hasPermission(auth, 'company-vehicle', 'delete')
+						? 'restore'
+						: undefined;
+				}
+
+				const statusTransitions = getStatusTransitions(
+					entry.status,
+					STATUS_TRANSITIONS,
+				);
+
+				if (statusTransitions.length === 0) {
+					return undefined;
+				}
+
+				if (!hasPermission(auth, 'company-vehicle', 'update')) {
+					return undefined;
+				}
+
+				return 'statusTransition';
+			},
+			dataSource: 'company-vehicle',
+		};
+	}
+
 	return {
-		action: () =>
-			hasPermission(auth, 'company-vehicle', 'read') ? 'view' : undefined,
-		dataSource: 'company-vehicle',
-	};
-}
-
-function displayButtonStatus(
-	auth: AuthModel | null,
-): DataTableValueOptionsType<CompanyVehicleModel>['displayButton'] {
-	return {
-		action: (entry: CompanyVehicleModel) => {
-			if (entry.deleted_at) {
-				return hasPermission(auth, 'company-vehicle', 'delete')
-					? 'restore'
-					: undefined;
-			}
-
-			const statusTransitions = getStatusTransitions(
-				entry.status,
-				STATUS_TRANSITIONS,
-			);
-
-			if (statusTransitions.length === 0) {
-				return undefined;
-			}
-
-			if (!hasPermission(auth, 'company-vehicle', 'update')) {
-				return undefined;
-			}
-
-			return 'statusTransition';
-		},
-		dataSource: 'company-vehicle',
-	};
-}
-
-export const dataSourceConfigCompanyVehicle: DataSourceConfigType<CompanyVehicleModel> =
-	{
 		dataTable: {
 			state: {
 				first: 0,
@@ -386,3 +392,4 @@ export const dataSourceConfigCompanyVehicle: DataSourceConfigType<CompanyVehicle
 			},
 		},
 	};
+}

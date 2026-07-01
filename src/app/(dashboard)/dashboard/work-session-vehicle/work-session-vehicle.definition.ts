@@ -40,29 +40,15 @@ import type {
 } from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
-const translations = await translateBatch(
-	[
-		'create.title',
-		'update.title',
-		'delete.title',
-		'view.title',
-		'return.title',
-	] as const,
-	'work-session-vehicle.action',
-);
-
-const validatorMessages = await BaseValidator.getValidatorMessages(
-	[
-		'invalid_work_session_id',
-		'invalid_company_vehicle_id',
-		'invalid_company_vehicle',
-		'invalid_vehicle_type',
-		'invalid_vehicle_km_start',
-		'invalid_vehicle_km_end',
-		'invalid_notes',
-	] as const,
-	'work-session-vehicle.validation',
-);
+const validatorMessages = [
+	'invalid_work_session_id',
+	'invalid_company_vehicle_id',
+	'invalid_company_vehicle',
+	'invalid_vehicle_type',
+	'invalid_vehicle_km_start',
+	'invalid_vehicle_km_end',
+	'invalid_notes',
+] as const;
 
 class WorkSessionVehicleValidator extends BaseValidator<
 	typeof validatorMessages
@@ -132,11 +118,16 @@ class WorkSessionVehicleValidator extends BaseValidator<
 			});
 }
 
-function validateForm(
+async function validateForm(
 	values: WorkSessionVehicleFormValuesType,
 	isSubmit: boolean = true,
 ) {
-	const validator = new WorkSessionVehicleValidator(validatorMessages);
+	const translations = await translateBatch(
+		validatorMessages,
+		'work-session-vehicle.validation',
+	);
+
+	const validator = new WorkSessionVehicleValidator(translations);
 
 	return validator.manage(isSubmit).safeParse(values);
 }
@@ -188,33 +179,46 @@ export type WorkSessionVehicleDataTableFiltersType = {
 	status: { value: WorkSessionVehicleStatus | null; matchMode: 'equals' };
 };
 
-function displayButtonView(
-	auth: AuthModel | null,
-): DataTableValueOptionsType<WorkSessionVehicleModel>['displayButton'] {
-	return {
-		action: () =>
-			hasPermission(auth, 'work-session-vehicle', 'read')
-				? 'view'
-				: undefined,
-		dataSource: 'work-session-vehicle',
-	};
-}
+export default async function dataSourceConfig(): Promise<
+	DataSourceConfigType<WorkSessionVehicleModel>
+> {
+	const translations = await translateBatch(
+		[
+			'create.title',
+			'update.title',
+			'delete.title',
+			'view.title',
+			'return.title',
+		] as const,
+		'work-session-vehicle.action',
+	);
 
-function displayButtonReturn(
-	auth: AuthModel | null,
-	entry: WorkSessionVehicleModel,
-): DataTableValueOptionsType<WorkSessionVehicleModel>['displayButton'] {
-	return {
-		action: () =>
-			entry.status === WorkSessionVehicleStatusEnum.ASSIGNED &&
-			hasPermission(auth, 'work-session-vehicle', 'update')
-				? 'return'
-				: undefined,
-	};
-}
+	function displayButtonView(
+		auth: AuthModel | null,
+	): DataTableValueOptionsType<WorkSessionVehicleModel>['displayButton'] {
+		return {
+			action: () =>
+				hasPermission(auth, 'work-session-vehicle', 'read')
+					? 'view'
+					: undefined,
+			dataSource: 'work-session-vehicle',
+		};
+	}
 
-export const dataSourceConfigWorkSessionVehicle: DataSourceConfigType<WorkSessionVehicleModel> =
-	{
+	function displayButtonReturn(
+		auth: AuthModel | null,
+		entry: WorkSessionVehicleModel,
+	): DataTableValueOptionsType<WorkSessionVehicleModel>['displayButton'] {
+		return {
+			action: () =>
+				entry.status === WorkSessionVehicleStatusEnum.ASSIGNED &&
+				hasPermission(auth, 'work-session-vehicle', 'update')
+					? 'return'
+					: undefined,
+		};
+	}
+
+	return {
 		dataTable: {
 			state: {
 				first: 0,
@@ -422,3 +426,4 @@ export const dataSourceConfigWorkSessionVehicle: DataSourceConfigType<WorkSessio
 			},
 		},
 	};
+}

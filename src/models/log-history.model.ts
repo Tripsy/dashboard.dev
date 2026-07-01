@@ -15,6 +15,7 @@ export const LogHistoryEntities = [
 	'client',
 	'cmr',
 	'company-vehicle',
+	'image',
 	'permission',
 	'place',
 	'template',

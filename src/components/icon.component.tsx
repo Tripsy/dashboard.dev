@@ -11,6 +11,7 @@ import {
 	BookText,
 	Building2,
 	Calendar,
+	Camera,
 	Car,
 	CarFront,
 	Check,
@@ -159,6 +160,7 @@ export const Icons = {
 	Toll: createIcon(BanknoteArrowUp),
 	Sign: createIcon(PenTool),
 	Print: createIcon(Printer),
+	Image: createIcon(Camera),
 
 	Direction: {
 		ArrowUp: createIcon(ArrowUp),

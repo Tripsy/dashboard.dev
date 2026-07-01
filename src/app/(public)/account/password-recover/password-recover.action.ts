@@ -24,7 +24,7 @@ export async function passwordRecoverAction(
 	}
 
 	const formValues = getPasswordRecoverFormValues(formData);
-	const validated = validateFormPasswordRecover(formValues);
+	const validated = await validateFormPasswordRecover(formValues);
 
 	if (!validated.success) {
 		const errors = accumulateZodErrors<PasswordRecoverFormValuesType>(

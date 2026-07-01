@@ -5,7 +5,7 @@ import {
 } from '@/app/(public)/_components/cmr/form-manage-cmr.component';
 import { SetupCmrVehicles } from '@/app/(public)/_components/cmr/setup-cmr-vehicles.component';
 import { StatusTransitionCmr } from '@/app/(public)/_components/cmr/status-transition-cmr.component';
-import { translateBatch } from '@/config/translate.setup';
+import { getLanguageClient, translateBatch } from '@/config/translate.setup';
 import {
 	combineDateAndTime,
 	formatDate,
@@ -35,40 +35,26 @@ import {
 import type { DataSourceConfigType } from '@/types/data-source.type';
 import type { FormStateType, ValidatorOutput } from '@/types/form.type';
 
-const translations = await translateBatch(
-	[
-		'create.title',
-		'update.title',
-		'delete.title',
-		'statusTransition.title',
-		'setupVehicles.title',
-	] as const,
-	'cmr.action',
-);
-
-const validatorMessages = await BaseValidator.getValidatorMessages(
-	[
-		'invalid_transport_type',
-		'invalid_client_id',
-		'invalid_client',
-		'invalid_pickup_address_id',
-		'invalid_pickup_address',
-		'invalid_delivery_address_id',
-		'invalid_delivery_address',
-		'invalid_contact_name',
-		'invalid_contact_email',
-		'invalid_contact_phone',
-		'invalid_pick_scheduled_at',
-		'invalid_pick_scheduled_at_time',
-		'invalid_estimated_delivery_at',
-		'invalid_estimated_delivery_at_time',
-		'invalid_delivered_at',
-		'invalid_delivered_at_time',
-		'invalid_notes',
-		'delivery_same_as_pickup_address',
-	] as const,
-	'cmr.validation',
-);
+const validatorMessages = [
+	'invalid_transport_type',
+	'invalid_client_id',
+	'invalid_client',
+	'invalid_pickup_address_id',
+	'invalid_pickup_address',
+	'invalid_delivery_address_id',
+	'invalid_delivery_address',
+	'invalid_contact_name',
+	'invalid_contact_email',
+	'invalid_contact_phone',
+	'invalid_pick_scheduled_at',
+	'invalid_pick_scheduled_at_time',
+	'invalid_estimated_delivery_at',
+	'invalid_estimated_delivery_at_time',
+	'invalid_delivered_at',
+	'invalid_delivered_at_time',
+	'invalid_notes',
+	'delivery_same_as_pickup_address',
+] as const;
 
 class CmrValidator extends BaseValidator<typeof validatorMessages> {
 	manage = (isSubmit: boolean = true) =>
@@ -238,8 +224,16 @@ class CmrValidator extends BaseValidator<typeof validatorMessages> {
 			});
 }
 
-function validateForm(values: CmrFormValuesType, isSubmit: boolean = true) {
-	const validator = new CmrValidator(validatorMessages);
+async function validateForm(
+	values: CmrFormValuesType,
+	isSubmit: boolean = true,
+) {
+	const translations = await translateBatch(
+		validatorMessages,
+		'cmr.validation',
+	);
+
+	const validator = new CmrValidator(translations);
 
 	return validator.manage(isSubmit).safeParse(values);
 }
@@ -297,11 +291,14 @@ function getFormState(data?: CmrModel): FormStateType<CmrFormValuesType> {
 			client: data?.client ? displayClientLabel(data.client) : null,
 			pickup_address_id: data?.pickup_address?.id ?? null,
 			pickup_address: data?.pickup_address
-				? displayAddressLabel(data.pickup_address)
+				? displayAddressLabel(data.pickup_address, getLanguageClient())
 				: null,
 			delivery_address_id: data?.delivery_address?.id ?? null,
 			delivery_address: data?.delivery_address
-				? displayAddressLabel(data.delivery_address)
+				? displayAddressLabel(
+						data.delivery_address,
+						getLanguageClient(),
+					)
 				: null,
 			contact_name: data?.contact_name ?? null,
 			contact_email: data?.contact_email ?? null,
@@ -359,108 +356,127 @@ function prepareParamsFromFormValues(data: CmrManageOutput) {
 	};
 }
 
-export const dataSourceConfigCmr: DataSourceConfigType<CmrModel> = {
-	displayEntryLabel: (entry: CmrModel) => {
-		return displayCmrLabel(entry);
-	},
-	actions: {
-		create: {
-			windowType: 'form',
-			windowTitle: translations['create.title'],
-			windowComponent: FormManageCmr,
-			windowConfigProps: {
-				size: 'x3l',
-			},
-			permission: ['cmr', 'create'],
-			entriesSelection: 'free',
-			operationFunction: (values: CmrManageOutput) => {
-				const params = prepareParamsFromFormValues(values);
+export default async function dataSourceConfig(): Promise<
+	DataSourceConfigType<CmrModel>
+> {
+	const translations = await translateBatch(
+		[
+			'create.title',
+			'update.title',
+			'delete.title',
+			'statusTransition.title',
+			'setupVehicles.title',
+		] as const,
+		'cmr.action',
+	);
 
-				return requestCreate<CmrModel, typeof params>('cmr', params);
-			},
-			buttonPosition: 'right',
-			button: {
-				variant: 'info',
-			},
-			getFormValues: getFormValues,
-			validateForm: validateForm,
-			getFormState: getFormState,
+	return {
+		displayEntryLabel: (entry: CmrModel) => {
+			return displayCmrLabel(entry);
 		},
-		update: {
-			windowType: 'form',
-			windowTitle: translations['update.title'],
-			windowComponent: FormManageCmr,
-			windowConfigProps: {
-				size: 'x3l',
-			},
-			permission: ['cmr', 'update'],
-			entriesSelection: 'single',
-			operationFunction: (values: CmrManageOutput, id: number) => {
-				const params = prepareParamsFromFormValues(values);
+		actions: {
+			create: {
+				windowType: 'form',
+				windowTitle: translations['create.title'],
+				windowComponent: FormManageCmr,
+				windowConfigProps: {
+					size: 'x3l',
+				},
+				permission: ['cmr', 'create'],
+				entriesSelection: 'free',
+				operationFunction: (values: CmrManageOutput) => {
+					const params = prepareParamsFromFormValues(values);
 
-				return requestUpdate<CmrModel, typeof params>(
-					'cmr',
-					params,
-					id,
-				);
+					return requestCreate<CmrModel, typeof params>(
+						'cmr',
+						params,
+					);
+				},
+				buttonPosition: 'right',
+				button: {
+					variant: 'info',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateForm,
+				getFormState: getFormState,
 			},
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'success',
+			update: {
+				windowType: 'form',
+				windowTitle: translations['update.title'],
+				windowComponent: FormManageCmr,
+				windowConfigProps: {
+					size: 'x3l',
+				},
+				permission: ['cmr', 'update'],
+				entriesSelection: 'single',
+				operationFunction: (values: CmrManageOutput, id: number) => {
+					const params = prepareParamsFromFormValues(values);
+
+					return requestUpdate<CmrModel, typeof params>(
+						'cmr',
+						params,
+						id,
+					);
+				},
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'success',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateForm,
+				getFormState: getFormState,
 			},
-			getFormValues: getFormValues,
-			validateForm: validateForm,
-			getFormState: getFormState,
+			delete: {
+				windowType: 'action',
+				windowTitle: translations['delete.title'],
+				permission: ['cmr', 'delete'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: CmrModel) => !entry.deleted_at, // Return true if the entry is not deleted
+				operationFunction: (entry: CmrModel) =>
+					requestDelete('cmr', entry),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'error',
+				},
+			},
+			statusTransition: {
+				windowType: 'other',
+				windowTitle: translations['statusTransition.title'],
+				windowComponent: StatusTransitionCmr,
+				windowConfigProps: {
+					size: 'lg',
+				},
+				permission: ['cmr', 'update'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: CmrModel) =>
+					getStatusTransitions(entry.status, STATUS_TRANSITIONS)
+						.length > 0,
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'info',
+				},
+			},
+			setupVehicles: {
+				windowType: 'other',
+				windowTitle: translations['setupVehicles.title'],
+				windowComponent: SetupCmrVehicles,
+				windowConfigProps: {
+					size: 'x3l',
+				},
+				permission: ['cmr-vehicle', 'update'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: CmrModel) =>
+					entry.status === CmrStatusEnum.PREPARING,
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'info',
+					icon: 'Setup',
+				},
+			},
 		},
-		delete: {
-			windowType: 'action',
-			windowTitle: translations['delete.title'],
-			permission: ['cmr', 'delete'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: CmrModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			operationFunction: (entry: CmrModel) => requestDelete('cmr', entry),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'error',
-			},
-		},
-		statusTransition: {
-			windowType: 'other',
-			windowTitle: translations['statusTransition.title'],
-			windowComponent: StatusTransitionCmr,
-			windowConfigProps: {
-				size: 'lg',
-			},
-			permission: ['cmr', 'update'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: CmrModel) =>
-				getStatusTransitions(entry.status, STATUS_TRANSITIONS).length >
-				0,
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'info',
-			},
-		},
-		setupVehicles: {
-			windowType: 'other',
-			windowTitle: translations['setupVehicles.title'],
-			windowComponent: SetupCmrVehicles,
-			windowConfigProps: {
-				size: 'x3l',
-			},
-			permission: ['cmr-vehicle', 'update'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: CmrModel) =>
-				entry.status === CmrStatusEnum.PREPARING,
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'info',
-				icon: 'Setup',
-			},
-		},
-	},
-};
+	};
+}

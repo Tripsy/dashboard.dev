@@ -7,6 +7,7 @@ import {
 import { Icons } from '@/components/icon.component';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Configuration } from '@/config/settings.config';
+import { getLanguageClient } from '@/config/translate.setup';
 import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { requestFind } from '@/helpers/services.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
@@ -76,7 +77,7 @@ export function FormManagePlace() {
 	};
 
 	const [selectedLanguage, setSelectedLanguage] = useState<Language>(
-		Configuration.language(),
+		getLanguageClient(),
 	);
 	const [searchParentPlaces, setSearchParentPlaces] = useState('');
 
@@ -238,6 +239,7 @@ export function FormManagePlace() {
 					const findIndex = formValues.contents.findIndex(
 						(c) => c.language === language,
 					);
+
 					const contentIndex =
 						findIndex === -1 &&
 						language === Configuration.language()

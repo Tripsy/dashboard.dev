@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { Configuration } from '@/config/settings.config';
+import { getLanguage, translateBatch } from '@/config/translate.setup';
 import { getFormDataAsEnum, getFormDataAsString } from '@/helpers/form.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import { type Language, LanguageEnum } from '@/types/common.type';
@@ -29,10 +30,11 @@ export const AccountEditState: AccountEditStateType = {
 	situation: null,
 };
 
-const validatorMessages = await BaseValidator.getValidatorMessages(
-	['invalid_name', 'name_min', 'invalid_language'] as const,
-	'account-edit.validation',
-);
+const validatorMessages = [
+	'invalid_name',
+	'name_min',
+	'invalid_language',
+] as const;
 
 class AccountEditValidator extends BaseValidator<typeof validatorMessages> {
 	accountEdit = z.object({
@@ -51,19 +53,26 @@ class AccountEditValidator extends BaseValidator<typeof validatorMessages> {
 	});
 }
 
-export function validateFormAccountEdit(values: AccountEditFormValuesType) {
-	const validator = new AccountEditValidator(validatorMessages);
+export async function validateFormAccountEdit(
+	values: AccountEditFormValuesType,
+) {
+	const translations = await translateBatch(
+		validatorMessages,
+		'account-edit.validation',
+	);
+
+	const validator = new AccountEditValidator(translations);
 
 	return validator.accountEdit.safeParse(values);
 }
 
-export function getAccountEditFormValues(
+export async function getAccountEditFormValues(
 	formData: FormData,
-): AccountEditFormValuesType {
+): Promise<AccountEditFormValuesType> {
 	return {
 		name: getFormDataAsString(formData, 'name'),
 		language:
 			getFormDataAsEnum(formData, 'language', LanguageEnum) ||
-			Configuration.language(),
+			(await getLanguage()),
 	};
 }

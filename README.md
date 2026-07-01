@@ -197,22 +197,19 @@ pnpm run build    # Production build
     - page.tsx
     - car.definition.ts
     - view-car.component.ts 
-3. Update `src/config/data-source.config.ts`
-    - export type DataSourceKey
-4. Update `src/config/data-source.register.ts`
-5. Add `cars.json` to `src/locales/[language]` & update src/locales/en/index.ts
-6. Update `Routes.group('dashboard')` in `src/config/routes.setup.ts`
+3. Update `src/types/data-source.key.ts`
+4. Add `cars.json` to `src/locales/[language]` & update src/locales/en/index.ts
+5. Update `src/models/permission.model.ts`
+6. Update `src/models/log-history.model.ts`
 7. Update `src/app/(dashboard)/_components/side-menu.component.tsx`
-8. Update `src/models/log-history.model.ts`
-    - LogHistoryEntities
+8. Update `Routes.group('dashboard')` in `src/config/routes.setup.ts`
 
 # 📌 TODO
 
-1. maybe drop await BaseValidator.getValidatorMessages(
-2. order page ..glitch when moving to order without type (brand)
-3. dashboard stats
-4. monthly driver report 
-5. deploy
+1. order page ..glitch when moving to order without type (brand)
+2. dashboard stats
+3. monthly driver report 
+4. deploy
 
 ---------- 
 1. Add section "documentation"

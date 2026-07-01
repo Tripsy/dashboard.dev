@@ -5,7 +5,7 @@ import {
 	FormManageAddress,
 } from '@/app/(dashboard)/dashboard/address/form-manage-address.component';
 import { ViewAddress } from '@/app/(dashboard)/dashboard/address/view-address.component';
-import { translateBatch } from '@/config/translate.setup';
+import { getLanguageClient, translateBatch } from '@/config/translate.setup';
 import {
 	getFormDataAsNumber,
 	getFormDataAsString,
@@ -20,7 +20,7 @@ import {
 import { BaseValidator } from '@/helpers/validator.helper';
 import { type AddressModel, displayAddressLabel } from '@/models/address.model';
 import { type AuthModel, hasPermission } from '@/models/auth.model';
-import { getPlaceContentProp } from '@/models/place.model';
+import { displayPlaceLabel, getPlaceContentProp } from '@/models/place.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
 import type {
 	DataSourceConfigType,
@@ -28,27 +28,13 @@ import type {
 } from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
-const translations = await translateBatch(
-	[
-		'create.title',
-		'update.title',
-		'delete.title',
-		'restore.title',
-		'view.title',
-	] as const,
-	'address.action',
-);
-
-const validatorMessages = await BaseValidator.getValidatorMessages(
-	[
-		'invalid_city_id',
-		'invalid_city',
-		'invalid_details',
-		'invalid_postal_code',
-		'invalid_notes',
-	] as const,
-	'address.validation',
-);
+const validatorMessages = [
+	'invalid_city_id',
+	'invalid_city',
+	'invalid_details',
+	'invalid_postal_code',
+	'invalid_notes',
+] as const;
 
 class AddressValidator extends BaseValidator<typeof validatorMessages> {
 	manage = (isSubmit: boolean = true) =>
@@ -84,8 +70,16 @@ class AddressValidator extends BaseValidator<typeof validatorMessages> {
 			});
 }
 
-function validateForm(values: AddressFormValuesType, isSubmit: boolean = true) {
-	const validator = new AddressValidator(validatorMessages);
+async function validateForm(
+	values: AddressFormValuesType,
+	isSubmit: boolean = true,
+) {
+	const translations = await translateBatch(
+		validatorMessages,
+		'address.validation',
+	);
+
+	const validator = new AddressValidator(translations);
 
 	return validator.manage(isSubmit).safeParse(values);
 }
@@ -108,7 +102,9 @@ function getFormState(
 		situation: null,
 		values: {
 			city_id: data?.city?.id ?? null,
-			city: data?.city ? getPlaceContentProp(data?.city, 'name') : null,
+			city: data?.city
+				? displayPlaceLabel(data?.city, getLanguageClient())
+				: null,
 			details: data?.details ?? null,
 			postal_code: data?.postal_code ?? null,
 		},
@@ -120,136 +116,159 @@ export type AddressDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
-function displayButtonView(
-	auth: AuthModel | null,
-): DataTableValueOptionsType<AddressModel>['displayButton'] {
+export default async function dataSourceConfig(): Promise<
+	DataSourceConfigType<AddressModel>
+> {
+	const translations = await translateBatch(
+		[
+			'create.title',
+			'update.title',
+			'delete.title',
+			'restore.title',
+			'view.title',
+		] as const,
+		'address.action',
+	);
+
+	function displayButtonView(
+		auth: AuthModel | null,
+	): DataTableValueOptionsType<AddressModel>['displayButton'] {
+		return {
+			action: () =>
+				hasPermission(auth, 'address', 'read') ? 'view' : undefined,
+		};
+	}
+
 	return {
-		action: () =>
-			hasPermission(auth, 'address', 'read') ? 'view' : undefined,
+		dataTable: {
+			state: {
+				first: 0,
+				rows: 10,
+				sortField: 'id',
+				sortOrder: -1 as const,
+				filters: {
+					global: { value: null, matchMode: 'contains' },
+					is_deleted: { value: false, matchMode: 'equals' },
+				} satisfies AddressDataTableFiltersType,
+			},
+			columns: [
+				{
+					field: 'id',
+					header: 'ID',
+					sortable: true,
+					body: (entry, column, auth) =>
+						DataTableValue(entry, column, {
+							dataSource: 'address',
+							markDeleted: true,
+							displayButton: displayButtonView(auth),
+						}),
+				},
+				{
+					field: 'city',
+					header: 'City',
+					body: (entry, column) =>
+						DataTableValue(entry, column, {
+							customValue: entry.city
+								? getPlaceContentProp(
+										entry.city,
+										getLanguageClient(),
+										'name',
+									)
+								: undefined,
+						}),
+				},
+				{
+					field: 'details',
+					header: 'Address',
+					sortable: true,
+				},
+			],
+			find: (params: FindFunctionParamsType) =>
+				requestFind<AddressModel>('address', params),
+		},
+		displayEntryLabel: (entry: AddressModel) =>
+			displayAddressLabel(entry, getLanguageClient()),
+		actions: {
+			create: {
+				windowType: 'form',
+				windowTitle: translations['create.title'],
+				windowComponent: FormManageAddress,
+				permission: ['address', 'create'],
+				entriesSelection: 'free',
+				operationFunction: (params: AddressFormValuesType) =>
+					requestCreate<AddressModel, AddressFormValuesType>(
+						'address',
+						params,
+					),
+				buttonPosition: 'right',
+				button: {
+					variant: 'info',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateForm,
+				getFormState: getFormState,
+			},
+			update: {
+				windowType: 'form',
+				windowTitle: translations['update.title'],
+				windowComponent: FormManageAddress,
+				permission: ['address', 'update'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: AddressModel) => !entry.deleted_at, // Return true if the entry is not deleted
+				operationFunction: (
+					params: AddressFormValuesType,
+					id: number,
+				) =>
+					requestUpdate<AddressModel, AddressFormValuesType>(
+						'address',
+						params,
+						id,
+					),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'success',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateForm,
+				getFormState: getFormState,
+			},
+			delete: {
+				windowType: 'action',
+				windowTitle: translations['delete.title'],
+				permission: ['address', 'delete'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: AddressModel) => !entry.deleted_at, // Return true if the entry is not deleted
+				operationFunction: (entry: AddressModel) =>
+					requestDelete('address', entry),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'error',
+				},
+			},
+			restore: {
+				windowType: 'action',
+				windowTitle: translations['restore.title'],
+				permission: ['address', 'delete'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: AddressModel) => !!entry.deleted_at, // Return true if the entry is deleted
+				operationFunction: (entry: AddressModel) =>
+					requestRestore('address', entry),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'info',
+				},
+			},
+			view: {
+				windowType: 'view',
+				windowTitle: translations['view.title'],
+				windowComponent: ViewAddress,
+				permission: ['address', 'read'],
+				entriesSelection: 'single',
+				buttonPosition: 'hidden',
+			},
+		},
 	};
 }
-
-export const dataSourceConfigAddress: DataSourceConfigType<AddressModel> = {
-	dataTable: {
-		state: {
-			first: 0,
-			rows: 10,
-			sortField: 'id',
-			sortOrder: -1 as const,
-			filters: {
-				global: { value: null, matchMode: 'contains' },
-				is_deleted: { value: false, matchMode: 'equals' },
-			} satisfies AddressDataTableFiltersType,
-		},
-		columns: [
-			{
-				field: 'id',
-				header: 'ID',
-				sortable: true,
-				body: (entry, column, auth) =>
-					DataTableValue(entry, column, {
-						dataSource: 'address',
-						markDeleted: true,
-						displayButton: displayButtonView(auth),
-					}),
-			},
-			{
-				field: 'city',
-				header: 'City',
-				body: (entry, column) =>
-					DataTableValue(entry, column, {
-						customValue: entry.city
-							? getPlaceContentProp(entry.city, 'name')
-							: undefined,
-					}),
-			},
-			{
-				field: 'details',
-				header: 'Address',
-				sortable: true,
-			},
-		],
-		find: (params: FindFunctionParamsType) =>
-			requestFind<AddressModel>('address', params),
-	},
-	displayEntryLabel: (entry: AddressModel) => displayAddressLabel(entry),
-	actions: {
-		create: {
-			windowType: 'form',
-			windowTitle: translations['create.title'],
-			windowComponent: FormManageAddress,
-			permission: ['address', 'create'],
-			entriesSelection: 'free',
-			operationFunction: (params: AddressFormValuesType) =>
-				requestCreate<AddressModel, AddressFormValuesType>(
-					'address',
-					params,
-				),
-			buttonPosition: 'right',
-			button: {
-				variant: 'info',
-			},
-			getFormValues: getFormValues,
-			validateForm: validateForm,
-			getFormState: getFormState,
-		},
-		update: {
-			windowType: 'form',
-			windowTitle: translations['update.title'],
-			windowComponent: FormManageAddress,
-			permission: ['address', 'update'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: AddressModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			operationFunction: (params: AddressFormValuesType, id: number) =>
-				requestUpdate<AddressModel, AddressFormValuesType>(
-					'address',
-					params,
-					id,
-				),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'success',
-			},
-			getFormValues: getFormValues,
-			validateForm: validateForm,
-			getFormState: getFormState,
-		},
-		delete: {
-			windowType: 'action',
-			windowTitle: translations['delete.title'],
-			permission: ['address', 'delete'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: AddressModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			operationFunction: (entry: AddressModel) =>
-				requestDelete('address', entry),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'error',
-			},
-		},
-		restore: {
-			windowType: 'action',
-			windowTitle: translations['restore.title'],
-			permission: ['address', 'delete'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: AddressModel) => !!entry.deleted_at, // Return true if the entry is deleted
-			operationFunction: (entry: AddressModel) =>
-				requestRestore('address', entry),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'info',
-			},
-		},
-		view: {
-			windowType: 'view',
-			windowTitle: translations['view.title'],
-			windowComponent: ViewAddress,
-			permission: ['address', 'read'],
-			entriesSelection: 'single',
-			buttonPosition: 'hidden',
-		},
-	},
-};

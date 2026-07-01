@@ -28,7 +28,7 @@ export async function processForm<Entry, FormValues extends FormValuesType>(
 ): Promise<FormStateType<FormValues>> {
 	try {
 		const formValues = getFormValues(formData);
-		const validated = validateForm(formValues);
+		const validated = await validateForm(formValues);
 
 		if (!validated.success) {
 			const errors = accumulateZodErrors<FormValues>(validated.error);

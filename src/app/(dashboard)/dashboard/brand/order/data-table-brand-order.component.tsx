@@ -39,7 +39,7 @@ import {
 } from '@/components/status.component';
 import { Button } from '@/components/ui/button';
 import Routes from '@/config/routes.setup';
-import { Configuration } from '@/config/settings.config';
+import { getLanguageClient } from '@/config/translate.setup';
 import { requestFind } from '@/helpers/services.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import {
@@ -165,7 +165,7 @@ const DataTableBrandOrderContent = (): JSX.Element => {
 						BRAND_DEFAULT_TYPE,
 					language:
 						tableState.filters.language.value ??
-						Configuration.language(),
+						getLanguageClient(),
 				},
 			});
 

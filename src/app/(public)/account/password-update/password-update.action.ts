@@ -25,7 +25,7 @@ export async function passwordUpdateAction(
 	}
 
 	const formValues = getPasswordUpdateFormValues(formData);
-	const validated = validateFormPasswordUpdate(formValues);
+	const validated = await validateFormPasswordUpdate(formValues);
 
 	if (!validated.success) {
 		const errors = accumulateZodErrors<PasswordUpdateFormValuesType>(

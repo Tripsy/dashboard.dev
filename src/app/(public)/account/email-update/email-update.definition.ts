@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { translateBatch } from '@/config/translate.setup';
 import { getFormDataAsString } from '@/helpers/form.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import type { FormErrorsType, FormSituationType } from '@/types/form.type';
@@ -25,10 +26,7 @@ export const EmailUpdateState: EmailUpdateStateType = {
 	situation: null,
 };
 
-const validatorMessages = await BaseValidator.getValidatorMessages(
-	['invalid_email'] as const,
-	'account-email-update.validation',
-);
+const validatorMessages = ['invalid_email'] as const;
 
 class EmailUpdateValidator extends BaseValidator<typeof validatorMessages> {
 	emailUpdate = z.object({
@@ -36,8 +34,15 @@ class EmailUpdateValidator extends BaseValidator<typeof validatorMessages> {
 	});
 }
 
-export function validateFormEmailUpdate(values: EmailUpdateFormValuesType) {
-	const validator = new EmailUpdateValidator(validatorMessages);
+export async function validateFormEmailUpdate(
+	values: EmailUpdateFormValuesType,
+) {
+	const translations = await translateBatch(
+		validatorMessages,
+		'email-update.validation',
+	);
+
+	const validator = new EmailUpdateValidator(translations);
 
 	return validator.emailUpdate.safeParse(values);
 }

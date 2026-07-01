@@ -213,6 +213,7 @@ export function resolveRequestPath(key: DataSourceKey) {
 	const withSuffixList: DataSourceKey[] = [
 		'brand',
 		'client',
+		'image',
 		'permission',
 		'place',
 		'template',

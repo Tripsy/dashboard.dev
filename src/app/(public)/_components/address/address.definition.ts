@@ -3,7 +3,7 @@ import {
 	type AddressFormValuesType,
 	FormManageAddress,
 } from '@/app/(public)/_components/address/form-manage-address.component';
-import { translateBatch } from '@/config/translate.setup';
+import { getLanguageClient, translateBatch } from '@/config/translate.setup';
 import {
 	getFormDataAsNumber,
 	getFormDataAsString,
@@ -15,21 +15,13 @@ import { getPlaceContentProp } from '@/models/place.model';
 import type { DataSourceConfigType } from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
-const translations = await translateBatch(
-	['create.title'] as const,
-	'address.action',
-);
-
-const validatorMessages = await BaseValidator.getValidatorMessages(
-	[
-		'invalid_city_id',
-		'invalid_city',
-		'invalid_details',
-		'invalid_postal_code',
-		'invalid_notes',
-	] as const,
-	'address.validation',
-);
+const validatorMessages = [
+	'invalid_city_id',
+	'invalid_city',
+	'invalid_details',
+	'invalid_postal_code',
+	'invalid_notes',
+] as const;
 
 class AddressValidator extends BaseValidator<typeof validatorMessages> {
 	manage = (isSubmit: boolean = true) =>
@@ -65,8 +57,16 @@ class AddressValidator extends BaseValidator<typeof validatorMessages> {
 			});
 }
 
-function validateForm(values: AddressFormValuesType, isSubmit: boolean = true) {
-	const validator = new AddressValidator(validatorMessages);
+async function validateForm(
+	values: AddressFormValuesType,
+	isSubmit: boolean = true,
+) {
+	const translations = await translateBatch(
+		validatorMessages,
+		'address.validation',
+	);
+
+	const validator = new AddressValidator(translations);
 
 	return validator.manage(isSubmit).safeParse(values);
 }
@@ -89,33 +89,44 @@ function getFormState(
 		situation: null,
 		values: {
 			city_id: data?.city?.id ?? null,
-			city: data?.city ? getPlaceContentProp(data?.city, 'name') : null,
+			city: data?.city
+				? getPlaceContentProp(data?.city, getLanguageClient())
+				: null,
 			details: data?.details ?? null,
 			postal_code: data?.postal_code ?? null,
 		},
 	};
 }
 
-export const dataSourceConfigAddress: DataSourceConfigType<AddressModel> = {
-	actions: {
-		create: {
-			windowType: 'form',
-			windowTitle: translations['create.title'],
-			windowComponent: FormManageAddress,
-			permission: ['address', 'create'],
-			entriesSelection: 'free',
-			operationFunction: (params: AddressFormValuesType) =>
-				requestCreate<AddressModel, AddressFormValuesType>(
-					'address',
-					params,
-				),
-			buttonPosition: 'right',
-			button: {
-				variant: 'info',
+export default async function dataSourceConfig(): Promise<
+	DataSourceConfigType<AddressModel>
+> {
+	const translations = await translateBatch(
+		['create.title'] as const,
+		'address.action',
+	);
+
+	return {
+		actions: {
+			create: {
+				windowType: 'form',
+				windowTitle: translations['create.title'],
+				windowComponent: FormManageAddress,
+				permission: ['address', 'create'],
+				entriesSelection: 'free',
+				operationFunction: (params: AddressFormValuesType) =>
+					requestCreate<AddressModel, AddressFormValuesType>(
+						'address',
+						params,
+					),
+				buttonPosition: 'right',
+				button: {
+					variant: 'info',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateForm,
+				getFormState: getFormState,
 			},
-			getFormValues: getFormValues,
-			validateForm: validateForm,
-			getFormState: getFormState,
 		},
-	},
-};
+	};
+}

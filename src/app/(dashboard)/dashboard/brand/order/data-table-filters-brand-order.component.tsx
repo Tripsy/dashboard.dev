@@ -6,7 +6,7 @@ import { FormFiltersSelect } from '@/app/(dashboard)/_components/form-filters.co
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
 import type { BrandDataTableFiltersType } from '@/app/(dashboard)/dashboard/brand/brand.definition';
 import type { TemplateDataTableFiltersType } from '@/app/(dashboard)/dashboard/template/template.definition';
-import { Configuration } from '@/config/settings.config';
+import { getLanguageClient } from '@/config/translate.setup';
 import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
@@ -62,7 +62,7 @@ export const DataTableFiltersBrandOrder = (): JSX.Element => {
 			<FormFiltersSelect<TemplateDataTableFiltersType>
 				labelText="Language"
 				fieldName="language"
-				fieldValue={filters.language.value ?? Configuration.language()}
+				fieldValue={filters.language.value ?? getLanguageClient()}
 				options={languages}
 				onChange={(value) =>
 					setFilterValue('language', value as Language)

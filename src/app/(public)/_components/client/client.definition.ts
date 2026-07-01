@@ -11,26 +11,18 @@ import { type ClientModel, ClientTypeEnum } from '@/models/client.model';
 import type { DataSourceConfigType } from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
-const translations = await translateBatch(
-	['create.title'] as const,
-	'client.action',
-);
-
-const validatorMessages = await BaseValidator.getValidatorMessages(
-	[
-		'invalid_client_type',
-		'invalid_contact_name',
-		'invalid_contact_email',
-		'invalid_contact_phone',
-		'invalid_notes',
-		'invalid_company_name',
-		'invalid_company_cui',
-		'invalid_company_reg_com',
-		'invalid_person_name',
-		'invalid_person_identification_number',
-	] as const,
-	'client.validation',
-);
+const validatorMessages = [
+	'invalid_client_type',
+	'invalid_contact_name',
+	'invalid_contact_email',
+	'invalid_contact_phone',
+	'invalid_notes',
+	'invalid_company_name',
+	'invalid_company_cui',
+	'invalid_company_reg_com',
+	'invalid_person_name',
+	'invalid_person_identification_number',
+] as const;
 
 class ClientValidator extends BaseValidator<typeof validatorMessages> {
 	baseSchema = {
@@ -101,8 +93,13 @@ class ClientValidator extends BaseValidator<typeof validatorMessages> {
 	]);
 }
 
-function validateForm(values: ClientFormValuesType) {
-	const validator = new ClientValidator(validatorMessages);
+async function validateForm(values: ClientFormValuesType) {
+	const translations = await translateBatch(
+		validatorMessages,
+		'client.validation',
+	);
+
+	const validator = new ClientValidator(translations);
 
 	return validator.manage.safeParse(values);
 }
@@ -184,29 +181,38 @@ function getFormState(data?: ClientModel): FormStateType<ClientFormValuesType> {
 	};
 }
 
-export const dataSourceConfigClient: DataSourceConfigType<ClientModel> = {
-	actions: {
-		create: {
-			windowType: 'form',
-			windowTitle: translations['create.title'],
-			windowComponent: FormManageClient,
-			windowConfigProps: {
-				size: 'x2l',
+export default async function dataSourceConfig(): Promise<
+	DataSourceConfigType<ClientModel>
+> {
+	const translations = await translateBatch(
+		['create.title'] as const,
+		'client.action',
+	);
+
+	return {
+		actions: {
+			create: {
+				windowType: 'form',
+				windowTitle: translations['create.title'],
+				windowComponent: FormManageClient,
+				windowConfigProps: {
+					size: 'x2l',
+				},
+				permission: ['client', 'create'],
+				entriesSelection: 'free',
+				operationFunction: (params: ClientFormValuesType) =>
+					requestCreate<ClientModel, ClientFormValuesType>(
+						'client',
+						params,
+					),
+				buttonPosition: 'right',
+				button: {
+					variant: 'info',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateForm,
+				getFormState: getFormState,
 			},
-			permission: ['client', 'create'],
-			entriesSelection: 'free',
-			operationFunction: (params: ClientFormValuesType) =>
-				requestCreate<ClientModel, ClientFormValuesType>(
-					'client',
-					params,
-				),
-			buttonPosition: 'right',
-			button: {
-				variant: 'info',
-			},
-			getFormValues: getFormValues,
-			validateForm: validateForm,
-			getFormState: getFormState,
 		},
-	},
-};
+	};
+}

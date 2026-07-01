@@ -61,7 +61,7 @@
 		"order": {
 			"title": "Sort brands",
 			"label": "Sort",
-			"success": "Sort order updated successfully"
+			"success": "Order updated successfully"
 		}
 	}
 }

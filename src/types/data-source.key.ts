@@ -7,6 +7,7 @@ import type { CmrSessionModel } from '@/models/cmr-session.model';
 import type { CmrVehicleModel } from '@/models/cmr-vehicle.model';
 import type { CompanyVehicleModel } from '@/models/company-vehicle.model';
 import type { CronHistoryModel } from '@/models/cron-history.model';
+import type { ImageModel } from '@/models/image.model';
 import type { LogDataModel } from '@/models/log-data.model';
 import type { LogHistoryModel } from '@/models/log-history.model';
 import type { MailQueueModel } from '@/models/mail-queue.model';
@@ -29,6 +30,7 @@ export type DatasourceModels = {
 	'cmr-vehicle': CmrVehicleModel;
 	'company-vehicle': CompanyVehicleModel;
 	'cron-history': CronHistoryModel;
+	image: ImageModel;
 	'log-data': LogDataModel;
 	'log-history': LogHistoryModel;
 	'mail-queue': MailQueueModel;

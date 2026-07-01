@@ -24,7 +24,7 @@ export async function registerAction(
 	}
 
 	const formValues = getRegisterFormValues(formData);
-	const validated = validateFormRegister(formValues);
+	const validated = await validateFormRegister(formValues);
 
 	if (!validated.success) {
 		const errors = accumulateZodErrors<RegisterFormValuesType>(

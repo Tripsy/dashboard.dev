@@ -16,12 +16,12 @@ export const BrandTypeEnum = {
 	PRODUCT: 'product',
 } as const;
 
-export type BrandType = (typeof BrandTypeEnum)[keyof typeof BrandTypeEnum];
-
 export const BRAND_DEFAULT_TYPE = BrandTypeEnum.PRODUCT;
 
-export type BrandContent = {
-	language: Language | string;
+export type BrandType = (typeof BrandTypeEnum)[keyof typeof BrandTypeEnum];
+
+export type BrandContentType = {
+	language: Language;
 	description: string | null;
 	meta: PageMeta;
 };
@@ -42,13 +42,13 @@ export type BrandModel<D = Date | string> = {
 	deleted_at: D;
 
 	// Content translations
-	contents?: BrandContent[];
+	contents?: BrandContentType[];
 };
 
 // Helpers
 export function getBrandDescription(
 	brand: BrandModel,
-	language: Language | string,
+	language: Language,
 ): string {
 	if (!brand.contents) {
 		return '[empty description]';
@@ -77,6 +77,6 @@ export function getBrandDescription(
 	return '[empty description]';
 }
 
-export const displayBrandLabel = (p: BrandModel) => {
-	return `${capitalizeFirstLetter(p.brand_type)} / ${p.name}`;
+export const displayBrandLabel = (m: BrandModel) => {
+	return `${capitalizeFirstLetter(m.brand_type)} / ${m.name}`;
 };

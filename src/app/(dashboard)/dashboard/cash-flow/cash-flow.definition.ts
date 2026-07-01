@@ -55,38 +55,22 @@ import type {
 } from '@/types/data-source.type';
 import type { FormStateType, ValidatorOutput } from '@/types/form.type';
 
-const translations = await translateBatch(
-	[
-		'create.title',
-		'refund.title',
-		'update.title',
-		'view.title',
-		'delete.title',
-		'complete.title',
-		'cancel.title',
-	] as const,
-	'cash-flow.action',
-);
-
-const validatorMessages = await BaseValidator.getValidatorMessages(
-	[
-		'invalid_category',
-		'invalid_method',
-		'invalid_amount',
-		'invalid_vat_rate',
-		'invalid_currency',
-		'invalid_external_reference',
-		'invalid_parent_id',
-		'invalid_notes',
-		'invalid_client',
-		'invalid_vendor',
-		'invalid_employee',
-		'invalid_company_vehicle',
-		'invalid_cmr',
-		'required_operational_record_type',
-	] as const,
-	'cash-flow.validation',
-);
+const validatorMessages = [
+	'invalid_category',
+	'invalid_method',
+	'invalid_amount',
+	'invalid_vat_rate',
+	'invalid_currency',
+	'invalid_external_reference',
+	'invalid_parent_id',
+	'invalid_notes',
+	'invalid_client',
+	'invalid_vendor',
+	'invalid_employee',
+	'invalid_company_vehicle',
+	'invalid_cmr',
+	'required_operational_record_type',
+] as const;
 
 class CashFlowValidator extends BaseValidator<typeof validatorMessages> {
 	readonly operationalRecords = z
@@ -177,8 +161,13 @@ class CashFlowValidator extends BaseValidator<typeof validatorMessages> {
 		});
 }
 
-function validateForm(values: CashFlowFormValuesType) {
-	const validator = new CashFlowValidator(validatorMessages);
+async function validateForm(values: CashFlowFormValuesType) {
+	const translations = await translateBatch(
+		validatorMessages,
+		'cash-flow.validation',
+	);
+
+	const validator = new CashFlowValidator(translations);
 
 	return validator.manage.safeParse(values);
 }
@@ -296,325 +285,345 @@ export type CashFlowDataTableFiltersType = {
 	cmr_id: { value: number | null; matchMode: 'equals' };
 };
 
-function displayButtonView(
-	auth: AuthModel | null,
-): DataTableValueOptionsType<CashFlowModel>['displayButton'] {
+export default async function dataSourceConfig(): Promise<
+	DataSourceConfigType<CashFlowModel>
+> {
+	const translations = await translateBatch(
+		[
+			'create.title',
+			'refund.title',
+			'update.title',
+			'view.title',
+			'delete.title',
+			'complete.title',
+			'cancel.title',
+		] as const,
+		'cash-flow.action',
+	);
+
+	function displayButtonView(
+		auth: AuthModel | null,
+	): DataTableValueOptionsType<CashFlowModel>['displayButton'] {
+		return {
+			action: () =>
+				hasPermission(auth, 'cash-flow', 'read') ? 'view' : undefined,
+		};
+	}
+
+	function displayButtonStatus(
+		auth: AuthModel | null,
+	): DataTableValueOptionsType<CashFlowModel>['displayButton'] {
+		return {
+			action: (entry: CashFlowModel) => {
+				if (entry.deleted_at) {
+					return undefined;
+				}
+
+				const statusTransitions = getStatusTransitions(
+					entry.status,
+					STATUS_TRANSITIONS,
+				);
+
+				if (statusTransitions.length === 0) {
+					return undefined;
+				}
+
+				if (!hasPermission(auth, 'cash-flow', 'update')) {
+					return undefined;
+				}
+
+				if (entry.status === CashFlowStatusEnum.PENDING) {
+					return 'complete';
+				}
+
+				return 'cancel';
+			},
+		};
+	}
+
 	return {
-		action: () =>
-			hasPermission(auth, 'cash-flow', 'read') ? 'view' : undefined,
-	};
-}
-
-function displayButtonStatus(
-	auth: AuthModel | null,
-): DataTableValueOptionsType<CashFlowModel>['displayButton'] {
-	return {
-		action: (entry: CashFlowModel) => {
-			if (entry.deleted_at) {
-				return undefined;
-			}
-
-			const statusTransitions = getStatusTransitions(
-				entry.status,
-				STATUS_TRANSITIONS,
-			);
-
-			if (statusTransitions.length === 0) {
-				return undefined;
-			}
-
-			if (!hasPermission(auth, 'cash-flow', 'update')) {
-				return undefined;
-			}
-
-			if (entry.status === CashFlowStatusEnum.PENDING) {
-				return 'complete';
-			}
-
-			return 'cancel';
-		},
-	};
-}
-
-export const dataSourceConfigCashFlow: DataSourceConfigType<CashFlowModel> = {
-	dataTable: {
-		state: {
-			first: 0,
-			rows: 10,
-			sortField: 'id',
-			sortOrder: -1 as const,
-			filters: {
-				global: { value: null, matchMode: 'contains' },
-				direction: { value: null, matchMode: 'equals' },
-				category: { value: null, matchMode: 'equals' },
-				method: { value: null, matchMode: 'equals' },
-				currency: { value: null, matchMode: 'equals' },
-				status: { value: null, matchMode: 'equals' },
-				create_at_start: { value: null, matchMode: 'equals' },
-				create_at_end: { value: null, matchMode: 'equals' },
-				is_deleted: { value: false, matchMode: 'equals' },
-				client: { value: '', matchMode: 'equals' },
-				client_id: { value: null, matchMode: 'equals' },
-				employee: { value: '', matchMode: 'equals' },
-				employee_id: { value: null, matchMode: 'equals' },
-				vendor: { value: '', matchMode: 'equals' },
-				vendor_id: { value: null, matchMode: 'equals' },
-				company_vehicle: { value: '', matchMode: 'equals' },
-				company_vehicle_id: { value: null, matchMode: 'equals' },
-				cmr: { value: '', matchMode: 'equals' },
-				cmr_id: { value: null, matchMode: 'equals' },
-			} satisfies CashFlowDataTableFiltersType,
-		},
-		columns: [
-			{
-				field: 'id',
-				header: 'ID',
-				sortable: true,
-				body: (entry, column, auth) =>
-					DataTableValue(entry, column, {
-						dataSource: 'cash-flow',
-						markDeleted: true,
-						displayButton: displayButtonView(auth),
-					}),
+		dataTable: {
+			state: {
+				first: 0,
+				rows: 10,
+				sortField: 'id',
+				sortOrder: -1 as const,
+				filters: {
+					global: { value: null, matchMode: 'contains' },
+					direction: { value: null, matchMode: 'equals' },
+					category: { value: null, matchMode: 'equals' },
+					method: { value: null, matchMode: 'equals' },
+					currency: { value: null, matchMode: 'equals' },
+					status: { value: null, matchMode: 'equals' },
+					create_at_start: { value: null, matchMode: 'equals' },
+					create_at_end: { value: null, matchMode: 'equals' },
+					is_deleted: { value: false, matchMode: 'equals' },
+					client: { value: '', matchMode: 'equals' },
+					client_id: { value: null, matchMode: 'equals' },
+					employee: { value: '', matchMode: 'equals' },
+					employee_id: { value: null, matchMode: 'equals' },
+					vendor: { value: '', matchMode: 'equals' },
+					vendor_id: { value: null, matchMode: 'equals' },
+					company_vehicle: { value: '', matchMode: 'equals' },
+					company_vehicle_id: { value: null, matchMode: 'equals' },
+					cmr: { value: '', matchMode: 'equals' },
+					cmr_id: { value: null, matchMode: 'equals' },
+				} satisfies CashFlowDataTableFiltersType,
 			},
-			{
-				field: 'category_type',
-				header: 'Type',
-				body: (entry, column) =>
-					DataTableValue(entry, column, {
-						customValue: formatEnumLabel(entry.category_type),
-					}),
-			},
-			{
-				field: 'category',
-				header: 'Category',
-				sortable: true,
-				body: (entry, column) =>
-					DataTableValue(entry, column, {
-						customValue: formatEnumLabel(entry.category),
-					}),
-			},
-			{
-				field: 'amount',
-				header: 'Net Amount',
-				body: (entry, column) =>
-					DataTableValue(entry, column, {
-						customValue: DisplayAmount({
-							amount: entry.netAmount,
-							currencyCode: entry.currency,
+			columns: [
+				{
+					field: 'id',
+					header: 'ID',
+					sortable: true,
+					body: (entry, column, auth) =>
+						DataTableValue(entry, column, {
+							dataSource: 'cash-flow',
+							markDeleted: true,
+							displayButton: displayButtonView(auth),
 						}),
-					}),
+				},
+				{
+					field: 'category_type',
+					header: 'Type',
+					body: (entry, column) =>
+						DataTableValue(entry, column, {
+							customValue: formatEnumLabel(entry.category_type),
+						}),
+				},
+				{
+					field: 'category',
+					header: 'Category',
+					sortable: true,
+					body: (entry, column) =>
+						DataTableValue(entry, column, {
+							customValue: formatEnumLabel(entry.category),
+						}),
+				},
+				{
+					field: 'amount',
+					header: 'Net Amount',
+					body: (entry, column) =>
+						DataTableValue(entry, column, {
+							customValue: DisplayAmount({
+								amount: entry.netAmount,
+								currencyCode: entry.currency,
+							}),
+						}),
+				},
+				{
+					field: 'method',
+					header: 'Method',
+					body: (entry, column) =>
+						DataTableValue(entry, column, {
+							customValue: formatEnumLabel(entry.method),
+						}),
+				},
+				{
+					field: 'external_reference',
+					header: 'Reference',
+				},
+				{
+					field: 'status',
+					header: 'Status',
+					body: (entry, column, auth) =>
+						DataTableValue(entry, column, {
+							dataSource: 'cash-flow',
+							isStatus: true,
+							markDeleted: true,
+							displayButton: displayButtonStatus(auth),
+						}),
+					style: {
+						minWidth: '10rem',
+						maxWidth: '10rem',
+					},
+				},
+				{
+					field: 'created_at',
+					header: 'Created At',
+					sortable: true,
+					body: (entry, column) =>
+						DataTableValue(entry, column, {
+							displayDate: true,
+						}),
+				},
+			],
+			find: (params: FindFunctionParamsType) =>
+				requestFind<CashFlowModel>('cash-flow', params),
+		},
+		displayEntryLabel: (entry: CashFlowModel) => {
+			const formatted = formatAmount(entry.netAmount, entry.currency);
+
+			return `${formatEnumLabel(entry.category)} ${formatted.value} ${formatted.currency}`;
+		},
+		actions: {
+			create: {
+				windowType: 'form',
+				windowTitle: translations['create.title'],
+				windowComponent: FormManageCashFlow,
+				permission: ['cash-flow', 'create'],
+				entriesSelection: 'free',
+				operationFunction: (values: CashFlowManageOutput) => {
+					const params = prepareParamsFromFormValues(values);
+
+					return requestCreate<CashFlowModel, typeof params>(
+						'cash-flow',
+						params,
+					);
+				},
+				buttonPosition: 'right',
+				button: {
+					variant: 'info',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateForm,
+				getFormState: getFormState,
 			},
-			{
-				field: 'method',
-				header: 'Method',
-				body: (entry, column) =>
-					DataTableValue(entry, column, {
-						customValue: formatEnumLabel(entry.method),
-					}),
+			refund: {
+				windowType: 'form',
+				windowTitle: translations['refund.title'],
+				windowComponent: FormManageCashFlow,
+				permission: ['cash-flow', 'refund'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: CashFlowModel) =>
+					arrayHasValue(entry.status, REFUNDABLE_STATUSES),
+				operationFunction: (values: CashFlowManageOutput) => {
+					const params = prepareParamsFromFormValues(values);
+
+					return requestCreate<CashFlowModel, typeof params>(
+						'cash-flow',
+						params,
+					);
+				},
+				prepareEntry: (entry: CashFlowModel) => {
+					return {
+						category: CashFlowCategoryEnum.REFUND,
+						method: entry.method,
+						amount: -Math.abs(entry.amount),
+						vat_rate: entry.vat_rate,
+						currency: entry.currency,
+						external_reference: entry.external_reference
+							? `REFUND ${entry.external_reference}`
+							: null,
+						parent_id: entry.id,
+					};
+				},
+				buttonPosition: 'right',
+				button: {
+					variant: 'success',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateForm,
+				getFormState: getFormState,
 			},
-			{
-				field: 'external_reference',
-				header: 'Reference',
+			update: {
+				windowType: 'form',
+				windowTitle: translations['update.title'],
+				windowComponent: FormManageCashFlow,
+				permission: ['cash-flow', 'update'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: CashFlowModel) =>
+					arrayHasValue(entry.status, MUTABLE_STATUSES) &&
+					!entry.deleted_at,
+				operationFunction: (
+					values: CashFlowManageOutput,
+					id: number,
+				) => {
+					const params = prepareParamsFromFormValues(values);
+
+					return requestUpdate<CashFlowModel, typeof params>(
+						'cash-flow',
+						params,
+						id,
+					);
+				},
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'success',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateForm,
+				getFormState: getFormState,
 			},
-			{
-				field: 'status',
-				header: 'Status',
-				body: (entry, column, auth) =>
-					DataTableValue(entry, column, {
-						dataSource: 'cash-flow',
-						isStatus: true,
-						markDeleted: true,
-						displayButton: displayButtonStatus(auth),
-					}),
-				style: {
-					minWidth: '10rem',
-					maxWidth: '10rem',
+			delete: {
+				windowType: 'action',
+				windowTitle: translations['delete.title'],
+				permission: ['cash-flow', 'delete'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: CashFlowModel) => !entry.deleted_at, // Return true if the entry is not deleted
+				operationFunction: (entry: CashFlowModel) =>
+					requestDelete('cash-flow', entry),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'error',
 				},
 			},
-			{
-				field: 'created_at',
-				header: 'Created At',
-				sortable: true,
-				body: (entry, column) =>
-					DataTableValue(entry, column, {
-						displayDate: true,
-					}),
-			},
-		],
-		find: (params: FindFunctionParamsType) =>
-			requestFind<CashFlowModel>('cash-flow', params),
-	},
-	displayEntryLabel: (entry: CashFlowModel) => {
-		const formatted = formatAmount(entry.netAmount, entry.currency);
+			complete: {
+				windowType: 'action',
+				windowTitle: translations['complete.title'],
+				permission: ['cash-flow', 'update'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: CashFlowModel) => {
+					const statusTransitions = getStatusTransitions(
+						entry.status,
+						STATUS_TRANSITIONS,
+					);
 
-		return `${formatEnumLabel(entry.category)} ${formatted.value} ${formatted.currency}`;
-	},
-	actions: {
-		create: {
-			windowType: 'form',
-			windowTitle: translations['create.title'],
-			windowComponent: FormManageCashFlow,
-			permission: ['cash-flow', 'create'],
-			entriesSelection: 'free',
-			operationFunction: (values: CashFlowManageOutput) => {
-				const params = prepareParamsFromFormValues(values);
+					return (
+						!entry.deleted_at &&
+						arrayHasValue(
+							CashFlowStatusEnum.COMPLETED,
+							statusTransitions,
+						)
+					);
+				},
+				operationFunction: (entry: CashFlowModel) =>
+					requestUpdateStatus('cash-flow', entry, 'completed'),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'info',
+				},
+			},
+			cancel: {
+				windowType: 'action',
+				windowTitle: translations['cancel.title'],
+				permission: ['cash-flow', 'update'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: CashFlowModel) => {
+					const statusTransitions = getStatusTransitions(
+						entry.status,
+						STATUS_TRANSITIONS,
+					);
 
-				return requestCreate<CashFlowModel, typeof params>(
-					'cash-flow',
-					params,
-				);
+					return (
+						!entry.deleted_at &&
+						arrayHasValue(
+							CashFlowStatusEnum.CANCELED,
+							statusTransitions,
+						)
+					);
+				},
+				operationFunction: (entry: CashFlowModel) =>
+					requestUpdateStatus('cash-flow', entry, 'canceled'),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'error',
+				},
 			},
-			buttonPosition: 'right',
-			button: {
-				variant: 'info',
-			},
-			getFormValues: getFormValues,
-			validateForm: validateForm,
-			getFormState: getFormState,
-		},
-		refund: {
-			windowType: 'form',
-			windowTitle: translations['refund.title'],
-			windowComponent: FormManageCashFlow,
-			permission: ['cash-flow', 'refund'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: CashFlowModel) =>
-				arrayHasValue(entry.status, REFUNDABLE_STATUSES),
-			operationFunction: (values: CashFlowManageOutput) => {
-				const params = prepareParamsFromFormValues(values);
-
-				return requestCreate<CashFlowModel, typeof params>(
-					'cash-flow',
-					params,
-				);
-			},
-			prepareEntry: (entry: CashFlowModel) => {
-				return {
-					category: CashFlowCategoryEnum.REFUND,
-					method: entry.method,
-					amount: -Math.abs(entry.amount),
-					vat_rate: entry.vat_rate,
-					currency: entry.currency,
-					external_reference: entry.external_reference
-						? `REFUND ${entry.external_reference}`
-						: null,
-					parent_id: entry.id,
-				};
-			},
-			buttonPosition: 'right',
-			button: {
-				variant: 'success',
-			},
-			getFormValues: getFormValues,
-			validateForm: validateForm,
-			getFormState: getFormState,
-		},
-		update: {
-			windowType: 'form',
-			windowTitle: translations['update.title'],
-			windowComponent: FormManageCashFlow,
-			permission: ['cash-flow', 'update'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: CashFlowModel) =>
-				arrayHasValue(entry.status, MUTABLE_STATUSES) &&
-				!entry.deleted_at,
-			operationFunction: (values: CashFlowManageOutput, id: number) => {
-				const params = prepareParamsFromFormValues(values);
-
-				return requestUpdate<CashFlowModel, typeof params>(
-					'cash-flow',
-					params,
-					id,
-				);
-			},
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'success',
-			},
-			getFormValues: getFormValues,
-			validateForm: validateForm,
-			getFormState: getFormState,
-		},
-		delete: {
-			windowType: 'action',
-			windowTitle: translations['delete.title'],
-			permission: ['cash-flow', 'delete'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: CashFlowModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			operationFunction: (entry: CashFlowModel) =>
-				requestDelete('cash-flow', entry),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'error',
+			view: {
+				windowType: 'view',
+				windowTitle: translations['view.title'],
+				windowComponent: ViewCashFlow,
+				windowConfigProps: {
+					size: 'xl',
+				},
+				permission: ['cash-flow', 'read'],
+				entriesSelection: 'single',
+				buttonPosition: 'hidden',
 			},
 		},
-		complete: {
-			windowType: 'action',
-			windowTitle: translations['complete.title'],
-			permission: ['cash-flow', 'update'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: CashFlowModel) => {
-				const statusTransitions = getStatusTransitions(
-					entry.status,
-					STATUS_TRANSITIONS,
-				);
-
-				return (
-					!entry.deleted_at &&
-					arrayHasValue(
-						CashFlowStatusEnum.COMPLETED,
-						statusTransitions,
-					)
-				);
-			},
-			operationFunction: (entry: CashFlowModel) =>
-				requestUpdateStatus('cash-flow', entry, 'completed'),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'info',
-			},
-		},
-		cancel: {
-			windowType: 'action',
-			windowTitle: translations['cancel.title'],
-			permission: ['cash-flow', 'update'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: CashFlowModel) => {
-				const statusTransitions = getStatusTransitions(
-					entry.status,
-					STATUS_TRANSITIONS,
-				);
-
-				return (
-					!entry.deleted_at &&
-					arrayHasValue(
-						CashFlowStatusEnum.CANCELED,
-						statusTransitions,
-					)
-				);
-			},
-			operationFunction: (entry: CashFlowModel) =>
-				requestUpdateStatus('cash-flow', entry, 'canceled'),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'error',
-			},
-		},
-		view: {
-			windowType: 'view',
-			windowTitle: translations['view.title'],
-			windowComponent: ViewCashFlow,
-			windowConfigProps: {
-				size: 'xl',
-			},
-			permission: ['cash-flow', 'read'],
-			entriesSelection: 'single',
-			buttonPosition: 'hidden',
-		},
-	},
-};
+	};
+}

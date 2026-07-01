@@ -21,8 +21,8 @@ export async function accountEditAction(
 		};
 	}
 
-	const formValues = getAccountEditFormValues(formData);
-	const validated = validateFormAccountEdit(formValues);
+	const formValues = await getAccountEditFormValues(formData);
+	const validated = await validateFormAccountEdit(formValues);
 
 	if (!validated.success) {
 		const errors = accumulateZodErrors<AccountEditFormValuesType>(

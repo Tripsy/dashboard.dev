@@ -24,7 +24,7 @@ export async function emailUpdateAction(
 	}
 
 	const formValues = getEmailUpdateFormValues(formData);
-	const validated = validateFormEmailUpdate(formValues);
+	const validated = await validateFormEmailUpdate(formValues);
 
 	if (!validated.success) {
 		const errors = accumulateZodErrors<EmailUpdateFormValuesType>(

@@ -21,6 +21,7 @@ import driver_panel from '@/locales/en/driver-panel.json';
 import email_confirm from '@/locales/en/email-confirm.json';
 import email_confirm_send from '@/locales/en/email-confirm-send.json';
 import home from '@/locales/en/home.json';
+import image from '@/locales/en/image.json';
 import log_data from '@/locales/en/log-data.json';
 import log_history from '@/locales/en/log-history.json';
 import login from '@/locales/en/login.json';
@@ -59,6 +60,7 @@ const en = {
 	'email-confirm': email_confirm,
 	'email-confirm-send': email_confirm_send,
 	home,
+	image,
 	'log-data': log_data,
 	'log-history': log_history,
 	login,

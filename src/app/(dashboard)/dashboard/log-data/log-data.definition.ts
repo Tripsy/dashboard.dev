@@ -14,11 +14,6 @@ import type {
 	DataTableValueOptionsType,
 } from '@/types/data-source.type';
 
-const translations = await translateBatch(
-	['view.title', 'delete.title'] as const,
-	'log-data.action',
-);
-
 export type LogDataDataTableFiltersType = {
 	global: { value: string | null; matchMode: 'contains' };
 	level: { value: LogLevel | null; matchMode: 'equals' };
@@ -27,103 +22,112 @@ export type LogDataDataTableFiltersType = {
 	create_at_end: { value: string | null; matchMode: 'equals' };
 };
 
-function displayButtonView(
-	auth: AuthModel | null,
-): DataTableValueOptionsType<LogDataModel>['displayButton'] {
+export default async function dataSourceConfig(): Promise<
+	DataSourceConfigType<LogDataModel>
+> {
+	const translations = await translateBatch(
+		['view.title', 'delete.title'] as const,
+		'log-data.action',
+	);
+
+	function displayButtonView(
+		auth: AuthModel | null,
+	): DataTableValueOptionsType<LogDataModel>['displayButton'] {
+		return {
+			action: () =>
+				hasPermission(auth, 'log-data', 'read') ? 'view' : undefined,
+			dataSource: 'log-data',
+		};
+	}
+
 	return {
-		action: () =>
-			hasPermission(auth, 'log-data', 'read') ? 'view' : undefined,
-		dataSource: 'log-data',
+		dataTable: {
+			state: {
+				first: 0,
+				rows: 10,
+				sortField: 'id',
+				sortOrder: -1 as const,
+				filters: {
+					global: { value: null, matchMode: 'contains' },
+					level: { value: null, matchMode: 'equals' },
+					category: { value: null, matchMode: 'equals' },
+					create_at_start: { value: null, matchMode: 'equals' },
+					create_at_end: { value: null, matchMode: 'equals' },
+				} satisfies LogDataDataTableFiltersType,
+			},
+			columns: [
+				{
+					field: 'id',
+					header: 'ID',
+					sortable: true,
+					body: (entry, column, auth) =>
+						DataTableValue(entry, column, {
+							displayButton: displayButtonView(auth),
+						}),
+				},
+				{
+					field: 'category',
+					header: 'Category',
+					sortable: true,
+					body: (entry, column) =>
+						DataTableValue(entry, column, {
+							capitalize: true,
+						}),
+				},
+				{
+					field: 'level',
+					header: 'Level',
+					sortable: true,
+					body: (entry, column) =>
+						DataTableValue(entry, column, {
+							capitalize: true,
+						}),
+				},
+				{
+					field: 'message',
+					header: 'Message',
+				},
+				{
+					field: 'created_at',
+					header: 'Created At',
+					sortable: true,
+					body: (entry, column) =>
+						DataTableValue(entry, column, {
+							displayDate: true,
+						}),
+				},
+			],
+			find: (params: FindFunctionParamsType) =>
+				requestFind<LogDataModel>('log-data', params),
+		},
+		displayEntryLabel: (entry: LogDataModel) => {
+			return entry.pid;
+		},
+		actions: {
+			delete: {
+				windowType: 'action',
+				windowTitle: translations['delete.title'],
+				permission: ['log-data', 'delete'],
+				entriesSelection: 'multiple',
+				operationFunction: (ids: number[]) =>
+					requestDeleteMultiple('log-data', ids),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'error',
+				},
+			},
+			view: {
+				windowType: 'view',
+				windowTitle: translations['view.title'],
+				windowComponent: ViewLogData,
+				windowConfigProps: {
+					size: 'x3l',
+				},
+				permission: ['log-data', 'read'],
+				entriesSelection: 'single',
+				buttonPosition: 'hidden',
+			},
+		},
 	};
 }
-
-export const dataSourceConfigLogData: DataSourceConfigType<LogDataModel> = {
-	dataTable: {
-		state: {
-			first: 0,
-			rows: 10,
-			sortField: 'id',
-			sortOrder: -1 as const,
-			filters: {
-				global: { value: null, matchMode: 'contains' },
-				level: { value: null, matchMode: 'equals' },
-				category: { value: null, matchMode: 'equals' },
-				create_at_start: { value: null, matchMode: 'equals' },
-				create_at_end: { value: null, matchMode: 'equals' },
-			} satisfies LogDataDataTableFiltersType,
-		},
-		columns: [
-			{
-				field: 'id',
-				header: 'ID',
-				sortable: true,
-				body: (entry, column, auth) =>
-					DataTableValue(entry, column, {
-						displayButton: displayButtonView(auth),
-					}),
-			},
-			{
-				field: 'category',
-				header: 'Category',
-				sortable: true,
-				body: (entry, column) =>
-					DataTableValue(entry, column, {
-						capitalize: true,
-					}),
-			},
-			{
-				field: 'level',
-				header: 'Level',
-				sortable: true,
-				body: (entry, column) =>
-					DataTableValue(entry, column, {
-						capitalize: true,
-					}),
-			},
-			{
-				field: 'message',
-				header: 'Message',
-			},
-			{
-				field: 'created_at',
-				header: 'Created At',
-				sortable: true,
-				body: (entry, column) =>
-					DataTableValue(entry, column, {
-						displayDate: true,
-					}),
-			},
-		],
-		find: (params: FindFunctionParamsType) =>
-			requestFind<LogDataModel>('log-data', params),
-	},
-	displayEntryLabel: (entry: LogDataModel) => {
-		return entry.pid;
-	},
-	actions: {
-		delete: {
-			windowType: 'action',
-			windowTitle: translations['delete.title'],
-			permission: ['log-data', 'delete'],
-			entriesSelection: 'multiple',
-			operationFunction: (ids: number[]) =>
-				requestDeleteMultiple('log-data', ids),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'error',
-			},
-		},
-		view: {
-			windowType: 'view',
-			windowTitle: translations['view.title'],
-			windowComponent: ViewLogData,
-			windowConfigProps: {
-				size: 'x3l',
-			},
-			permission: ['log-data', 'read'],
-			entriesSelection: 'single',
-			buttonPosition: 'hidden',
-		},
-	},
-};

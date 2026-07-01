@@ -75,6 +75,10 @@
 		"setupSessions": {
 			"title": "Setup CMR sessions",
 			"label": "Setup sessions"
+		},
+		"manageImages": {
+			"title": "Manage CMR images",
+			"label": "Manage images"
 		}
 	}
 }

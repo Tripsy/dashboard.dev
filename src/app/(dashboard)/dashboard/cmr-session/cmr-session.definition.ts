@@ -38,26 +38,11 @@ import type {
 } from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
-const translations = await translateBatch(
-	[
-		'create.title',
-		'update.title',
-		'delete.title',
-		'view.title',
-		'viewWorkSession.title',
-		'viewCmr.title',
-	] as const,
-	'cmr-session.action',
-);
-
-const validatorMessages = await BaseValidator.getValidatorMessages(
-	[
-		'invalid_cmr_id',
-		'invalid_work_session_id',
-		'invalid_work_session',
-	] as const,
-	'cmr-session.validation',
-);
+const validatorMessages = [
+	'invalid_cmr_id',
+	'invalid_work_session_id',
+	'invalid_work_session',
+] as const;
 
 class CmrSessionValidator extends BaseValidator<typeof validatorMessages> {
 	create = (isSubmit: boolean = true) =>
@@ -85,11 +70,16 @@ class CmrSessionValidator extends BaseValidator<typeof validatorMessages> {
 			});
 }
 
-function validateForm(
+async function validateForm(
 	values: CmrSessionFormValuesType,
 	isSubmit: boolean = true,
 ) {
-	const validator = new CmrSessionValidator(validatorMessages);
+	const translations = await translateBatch(
+		validatorMessages,
+		'cmr-session.validation',
+	);
+
+	const validator = new CmrSessionValidator(translations);
 
 	return validator.create(isSubmit).safeParse(values);
 }
@@ -131,51 +121,68 @@ export type CmrSessionDataTableFiltersType = {
 	};
 };
 
-function displayButtonView(
-	auth: AuthModel | null,
-): DataTableValueOptionsType<CmrSessionModel>['displayButton'] {
-	return {
-		action: () =>
-			hasPermission(auth, 'cmr-session', 'read') ? 'view' : undefined,
-		dataSource: 'cmr-session',
-	};
-}
+export default async function dataSourceConfig(): Promise<
+	DataSourceConfigType<CmrSessionModel>
+> {
+	const translations = await translateBatch(
+		[
+			'create.title',
+			'update.title',
+			'delete.title',
+			'view.title',
+			'viewWorkSession.title',
+			'viewCmr.title',
+		] as const,
+		'cmr-session.action',
+	);
 
-function displayButtonViewWorkSession(
-	auth: AuthModel | null,
-	entry: CmrSessionModel,
-): DataTableValueOptionsType<CmrSessionModel>['displayButton'] {
-	if (!entry.work_session) {
-		return undefined;
+	function displayButtonView(
+		auth: AuthModel | null,
+	): DataTableValueOptionsType<CmrSessionModel>['displayButton'] {
+		return {
+			action: () =>
+				hasPermission(auth, 'cmr-session', 'read') ? 'view' : undefined,
+			dataSource: 'cmr-session',
+		};
+	}
+
+	function displayButtonViewWorkSession(
+		auth: AuthModel | null,
+		entry: CmrSessionModel,
+	): DataTableValueOptionsType<CmrSessionModel>['displayButton'] {
+		if (!entry.work_session) {
+			return undefined;
+		}
+
+		return {
+			action: () =>
+				hasPermission(auth, 'work-session', 'read')
+					? 'view'
+					: undefined,
+			dataSource: 'work-session',
+			title: translations['viewWorkSession.title'],
+			alternateEntryId: entry.work_session.id,
+		};
+	}
+
+	function displayButtonViewCmr(
+		auth: AuthModel | null,
+		entry: CmrSessionModel,
+	): DataTableValueOptionsType<CmrSessionModel>['displayButton'] {
+		if (!entry.cmr) {
+			return undefined;
+		}
+
+		return {
+			action: () =>
+				hasPermission(auth, 'cmr', 'read') ? 'view' : undefined,
+			dataSource: 'cmr',
+			title: translations['viewCmr.title'],
+			alternateEntryId: entry.cmr.id,
+		};
 	}
 
 	return {
-		action: () =>
-			hasPermission(auth, 'work-session', 'read') ? 'view' : undefined,
-		dataSource: 'work-session',
-		title: translations['viewWorkSession.title'],
-		alternateEntryId: entry.work_session.id,
-	};
-}
-
-function displayButtonViewCmr(
-	auth: AuthModel | null,
-	entry: CmrSessionModel,
-): DataTableValueOptionsType<CmrSessionModel>['displayButton'] {
-	if (!entry.cmr) {
-		return undefined;
-	}
-
-	return {
-		action: () => (hasPermission(auth, 'cmr', 'read') ? 'view' : undefined),
-		dataSource: 'cmr',
-		title: translations['viewCmr.title'],
-		alternateEntryId: entry.cmr.id,
-	};
-}
-
-export const dataSourceConfigCmrSession: DataSourceConfigType<CmrSessionModel> =
-	{
 		dataTable: {
 			state: {
 				first: 0,
@@ -307,3 +314,4 @@ export const dataSourceConfigCmrSession: DataSourceConfigType<CmrSessionModel> =
 			},
 		},
 	};
+}

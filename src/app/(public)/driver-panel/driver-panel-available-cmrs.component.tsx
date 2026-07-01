@@ -8,6 +8,7 @@ import {
 	LoadingComponent,
 } from '@/components/status.component';
 import { Button } from '@/components/ui/button';
+import { getLanguageClient } from '@/config/translate.setup';
 import { formatDate } from '@/helpers/date.helper';
 import { DisplayStatus } from '@/helpers/display.helper';
 import { arrayHasValue } from '@/helpers/objects.helper';
@@ -66,7 +67,7 @@ export function DriverPanelAvailableCmrs() {
 	);
 }
 
-function DriverPanelAvailableCmrEntry({ cmr }: { cmr: CmrModel }) {
+async function DriverPanelAvailableCmrEntry({ cmr }: { cmr: CmrModel }) {
 	const {
 		setActiveTab,
 		activeSession,
@@ -74,6 +75,8 @@ function DriverPanelAvailableCmrEntry({ cmr }: { cmr: CmrModel }) {
 		activeSessionVehicleAuto,
 		activeSessionVehicleTrailer,
 	} = useWorkSession();
+
+	const language = getLanguageClient();
 
 	const handleAssignCmr = useCallback(
 		async (
@@ -99,10 +102,10 @@ function DriverPanelAvailableCmrEntry({ cmr }: { cmr: CmrModel }) {
 	);
 
 	const deliveryAddress = cmr.delivery_address
-		? displayAddressLabel(cmr.delivery_address)
+		? displayAddressLabel(cmr.delivery_address, language)
 		: null;
 	const pickupAddress = cmr.pickup_address
-		? displayAddressLabel(cmr.pickup_address)
+		? displayAddressLabel(cmr.pickup_address, language)
 		: null;
 
 	return (

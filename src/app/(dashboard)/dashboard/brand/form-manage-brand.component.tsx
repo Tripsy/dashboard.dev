@@ -10,7 +10,7 @@ import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import {
-	type BrandContent,
+	type BrandContentType,
 	type BrandType,
 	BrandTypeEnum,
 } from '@/models/brand.model';
@@ -23,7 +23,7 @@ export type BrandFormValuesType = {
 	slug: string | null;
 	brand_type: BrandType;
 
-	contents: BrandContent[];
+	contents: BrandContentType[];
 };
 
 const languages = Object.values(LanguageEnum);
@@ -32,7 +32,7 @@ const brandTypes = toOptionsFromEnum(BrandTypeEnum, {
 	formatter: formatEnumLabel,
 });
 
-export function FormManageBrand() {
+export async function FormManageBrand() {
 	const { formValues, errors, handleChange, pending } =
 		useWindowForm<BrandFormValuesType>();
 
@@ -45,17 +45,17 @@ export function FormManageBrand() {
 
 	// Derive map from formValues
 	const [contentsMap, setContentsMap] = useState<
-		Partial<Record<Language, BrandContent>>
+		Partial<Record<Language, BrandContentType>>
 	>(
 		() =>
 			Object.fromEntries(
 				(formValues.contents ?? []).map((m) => [m.language, m]),
-			) as Partial<Record<Language, BrandContent>>,
+			) as Partial<Record<Language, BrandContentType>>,
 	);
 
 	const handleContentChange = (
 		language: Language,
-		field: keyof BrandContent,
+		field: keyof BrandContentType,
 		value: string,
 	) => {
 		const updated = {
@@ -72,7 +72,7 @@ export function FormManageBrand() {
 		// Sync back to formValues as array
 		handleChange(
 			'contents',
-			Object.values(updated).filter((m): m is BrandContent => !!m),
+			Object.values(updated).filter((m): m is BrandContentType => !!m),
 		);
 	};
 
@@ -97,7 +97,7 @@ export function FormManageBrand() {
 
 		handleChange(
 			'contents',
-			Object.values(updated).filter((c): c is BrandContent => !!c),
+			Object.values(updated).filter((c): c is BrandContentType => !!c),
 		);
 	};
 
@@ -138,7 +138,7 @@ export function FormManageBrand() {
 				value={JSON.stringify(
 					Object.values(formValues.contents).filter(
 						Boolean,
-					) as BrandContent[],
+					) as BrandContentType[],
 				)}
 			/>
 			<Tabs defaultValue={Configuration.language()} className="w-full">
@@ -158,6 +158,7 @@ export function FormManageBrand() {
 					const findIndex = formValues.contents.findIndex(
 						(c) => c.language === language,
 					);
+
 					const contentIndex =
 						findIndex === -1 &&
 						language === Configuration.language()
@@ -167,7 +168,7 @@ export function FormManageBrand() {
 					return (
 						<TabsContent key={`form-${language}`} value={language}>
 							<div className="form-section">
-								<FormComponentInput<BrandContent>
+								<FormComponentInput<BrandContentType>
 									id={`${elementIds.contents}-${language}-description`}
 									labelText="Description"
 									fieldName="description"

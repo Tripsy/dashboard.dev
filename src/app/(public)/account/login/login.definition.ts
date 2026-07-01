@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { translateBatch } from '@/config/translate.setup';
 import { getFormDataAsString } from '@/helpers/form.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import type { AuthTokenType } from '@/types/auth.type';
@@ -37,10 +38,7 @@ export const LoginState: LoginStateType = {
 	situation: null,
 };
 
-const validatorMessages = await BaseValidator.getValidatorMessages(
-	['invalid_email', 'invalid_password'] as const,
-	'login.validation',
-);
+const validatorMessages = ['invalid_email', 'invalid_password'] as const;
 
 class LoginValidator extends BaseValidator<typeof validatorMessages> {
 	login = z.object({
@@ -49,8 +47,13 @@ class LoginValidator extends BaseValidator<typeof validatorMessages> {
 	});
 }
 
-export function validateFormLogin(values: LoginFormValuesType) {
-	const validator = new LoginValidator(validatorMessages);
+export async function validateFormLogin(values: LoginFormValuesType) {
+	const translations = await translateBatch(
+		validatorMessages,
+		'login.validation',
+	);
+
+	const validator = new LoginValidator(translations);
 
 	return validator.login.safeParse(values);
 }

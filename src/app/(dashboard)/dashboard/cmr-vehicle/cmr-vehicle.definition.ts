@@ -30,28 +30,14 @@ import type {
 } from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
-const translations = await translateBatch(
-	[
-		'create.title',
-		'update.title',
-		'delete.title',
-		'restore.title',
-		'view.title',
-	] as const,
-	'cmr-vehicle.action',
-);
-
-const validatorMessages = await BaseValidator.getValidatorMessages(
-	[
-		'invalid_cmr_id',
-		'invalid_vehicle_id',
-		'invalid_vehicle',
-		'invalid_vin',
-		'invalid_license_plate',
-		'invalid_notes',
-	] as const,
-	'cmr-vehicle.validation',
-);
+const validatorMessages = [
+	'invalid_cmr_id',
+	'invalid_vehicle_id',
+	'invalid_vehicle',
+	'invalid_vin',
+	'invalid_license_plate',
+	'invalid_notes',
+] as const;
 
 class CmrVehicleValidator extends BaseValidator<typeof validatorMessages> {
 	manage = (isSubmit: boolean = true) =>
@@ -94,11 +80,16 @@ class CmrVehicleValidator extends BaseValidator<typeof validatorMessages> {
 			});
 }
 
-function validateForm(
+async function validateForm(
 	values: CmrVehicleFormValuesType,
 	isSubmit: boolean = true,
 ) {
-	const validator = new CmrVehicleValidator(validatorMessages);
+	const translations = await translateBatch(
+		validatorMessages,
+		'cmr-vehicle.validation',
+	);
+
+	const validator = new CmrVehicleValidator(translations);
 
 	return validator.manage(isSubmit).safeParse(values);
 }
@@ -140,18 +131,31 @@ export type CmrVehicleDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
-function displayButtonView(
-	auth: AuthModel | null,
-): DataTableValueOptionsType<CmrVehicleModel>['displayButton'] {
-	return {
-		action: () =>
-			hasPermission(auth, 'cmr-vehicle', 'read') ? 'view' : undefined,
-		dataSource: 'cmr-vehicle',
-	};
-}
+export default async function dataSourceConfig(): Promise<
+	DataSourceConfigType<CmrVehicleModel>
+> {
+	const translations = await translateBatch(
+		[
+			'create.title',
+			'update.title',
+			'delete.title',
+			'restore.title',
+			'view.title',
+		] as const,
+		'cmr-vehicle.action',
+	);
 
-export const dataSourceConfigCmrVehicle: DataSourceConfigType<CmrVehicleModel> =
-	{
+	function displayButtonView(
+		auth: AuthModel | null,
+	): DataTableValueOptionsType<CmrVehicleModel>['displayButton'] {
+		return {
+			action: () =>
+				hasPermission(auth, 'cmr-vehicle', 'read') ? 'view' : undefined,
+			dataSource: 'cmr-vehicle',
+		};
+	}
+
+	return {
 		dataTable: {
 			state: {
 				first: 0,
@@ -301,3 +305,4 @@ export const dataSourceConfigCmrVehicle: DataSourceConfigType<CmrVehicleModel> =
 			},
 		},
 	};
+}

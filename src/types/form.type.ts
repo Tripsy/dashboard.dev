@@ -1,4 +1,8 @@
 import type { ZodSafeParseError, ZodSafeParseSuccess, z } from 'zod';
+import type {
+	ImageAttributesType,
+	ImagePropertiesType,
+} from '@/types/image.type';
 import type { PageMeta } from '@/types/page-meta.type';
 
 export type FormSituationType =
@@ -13,6 +17,8 @@ type FormValueType =
 	| boolean
 	| Date
 	| PageMeta
+	| ImagePropertiesType
+	| ImageAttributesType
 	| null
 	| undefined;
 
@@ -41,7 +47,7 @@ export type ValidateFormReturnType<FormValues> =
 export type ValidateFormFnType<FormValues, ValidatedValues = FormValues> = (
 	values: FormValues,
 	isSubmit?: boolean,
-) => ValidateFormReturnType<ValidatedValues>;
+) => Promise<ValidateFormReturnType<ValidatedValues>>;
 
 export type FormErrorsType<FormValues extends FormValuesType> = {
 	[K in keyof FormValues]?: FormValues[K] extends Array<infer Item>

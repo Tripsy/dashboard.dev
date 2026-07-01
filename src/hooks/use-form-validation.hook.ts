@@ -46,7 +46,7 @@ export function useFormValidation<FormValues extends FormValuesType>({
 	}, []);
 
 	useDebouncedEffect(
-		() => {
+		async () => {
 			const shouldValidate =
 				submitted || Object.keys(touchedFields).length > 0;
 
@@ -54,7 +54,7 @@ export function useFormValidation<FormValues extends FormValuesType>({
 				return;
 			}
 
-			const result = validateForm(formValues, false);
+			const result = await validateForm(formValues, false);
 
 			if (result.success) {
 				setErrors({});

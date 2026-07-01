@@ -5,13 +5,13 @@ import {
 	FormComponentInput,
 } from '@/components/form/form-element.component';
 import { Icons } from '@/components/icon.component';
-import { getLanguage } from '@/config/translate.setup';
+import { getLanguageClient } from '@/config/translate.setup';
 import { requestCreate, requestFind } from '@/helpers/services.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useRemoteAutocomplete } from '@/hooks/use-remote-autocomplete';
 import {
 	CITY_DEFAULT,
-	getPlaceContentProp,
+	displayPlaceLabel,
 	type PlaceModel,
 	PlaceTypeEnum,
 } from '@/models/place.model';
@@ -26,8 +26,6 @@ export type AddressFormValuesType = {
 	postal_code: string | null;
 };
 
-const language = await getLanguage();
-
 export function FormManageAddress() {
 	const { formValues, errors, handleChange, pending } =
 		useWindowForm<AddressFormValuesType>();
@@ -41,6 +39,7 @@ export function FormManageAddress() {
 	] as const);
 
 	const [searchCity, setSearchCity] = useState('');
+	const language = getLanguageClient();
 
 	const { suggestions: citySuggestions, isFetching: isCityFetching } =
 		useRemoteAutocomplete<PlaceModel>({
@@ -109,10 +108,10 @@ export function FormManageAddress() {
 					suggestions: citySuggestions,
 					isLoading: isCityFetching,
 					onSelect: (c) => {
-						handleChange('city', getPlaceContentProp(c, language));
+						handleChange('city', displayPlaceLabel(c, language));
 						handleChange('city_id', c.id);
 					},
-					getOptionLabel: (c) => getPlaceContentProp(c, language),
+					getOptionLabel: (c) => displayPlaceLabel(c, language),
 					getOptionKey: (c) => c.id,
 
 					allowCreate: true,

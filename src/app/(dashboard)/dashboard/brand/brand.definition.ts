@@ -22,7 +22,7 @@ import { BaseValidator } from '@/helpers/validator.helper';
 import { type AuthModel, hasPermission } from '@/models/auth.model';
 import {
 	BRAND_DEFAULT_TYPE,
-	type BrandContent,
+	type BrandContentType,
 	type BrandModel,
 	type BrandStatus,
 	BrandStatusEnum,
@@ -38,35 +38,18 @@ import type {
 } from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
-const translations = await translateBatch(
-	[
-		'create.title',
-		'update.title',
-		'view.title',
-		'delete.title',
-		'restore.title',
-		'enable.title',
-		'disable.title',
-		'order.title',
-	] as const,
-	'brand.action',
-);
-
-const validatorMessages = await BaseValidator.getValidatorMessages(
-	[
-		'invalid_brand_type',
-		'invalid_name',
-		'invalid_slug',
-		'invalid_contents',
-		'duplicate_contents',
-		'invalid_language',
-		'invalid_description',
-		'invalid_meta_title',
-		'invalid_meta_description',
-		'invalid_meta_keywords',
-	] as const,
-	'brand.validation',
-);
+const validatorMessages = [
+	'invalid_brand_type',
+	'invalid_name',
+	'invalid_slug',
+	'invalid_contents',
+	'duplicate_contents',
+	'invalid_language',
+	'invalid_description',
+	'invalid_meta_title',
+	'invalid_meta_description',
+	'invalid_meta_keywords',
+] as const;
 
 class BrandValidator extends BaseValidator<typeof validatorMessages> {
 	contentsSchema() {
@@ -102,13 +85,18 @@ class BrandValidator extends BaseValidator<typeof validatorMessages> {
 		});
 }
 
-function validateForm(values: BrandFormValuesType) {
-	const validator = new BrandValidator(validatorMessages);
+async function validateForm(values: BrandFormValuesType) {
+	const translations = await translateBatch(
+		validatorMessages,
+		'brand.validation',
+	);
+
+	const validator = new BrandValidator(translations);
 
 	const normalizedValues = {
 		...values,
 		contents: Object.values(values.contents).filter(
-			(c): c is BrandContent => !!c,
+			(c): c is BrandContentType => !!c,
 		),
 	};
 
@@ -118,11 +106,11 @@ function validateForm(values: BrandFormValuesType) {
 function getFormValues(formData: FormData): BrandFormValuesType {
 	const contentsRaw = formData.get('contents');
 
-	let contents: BrandContent[] = [];
+	let contents: BrandContentType[] = [];
 
 	if (typeof contentsRaw === 'string' && contentsRaw.length > 0) {
 		try {
-			contents = JSON.parse(contentsRaw) as BrandContent[];
+			contents = JSON.parse(contentsRaw) as BrandContentType[];
 		} catch {
 			contents = [];
 		}
@@ -164,220 +152,245 @@ export type BrandDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
-function displayButtonView(
-	auth: AuthModel | null,
-): DataTableValueOptionsType<BrandModel>['displayButton'] {
+export default async function dataSourceConfig(): Promise<
+	DataSourceConfigType<BrandModel>
+> {
+	const translations = await translateBatch(
+		[
+			'create.title',
+			'update.title',
+			'view.title',
+			'delete.title',
+			'restore.title',
+			'enable.title',
+			'disable.title',
+			'order.title',
+		] as const,
+		'brand.action',
+	);
+
+	function displayButtonView(
+		auth: AuthModel | null,
+	): DataTableValueOptionsType<BrandModel>['displayButton'] {
+		return {
+			action: () =>
+				hasPermission(auth, 'brand', 'read') ? 'view' : undefined,
+			dataSource: 'brand',
+		};
+	}
+
+	function displayButtonStatus(
+		auth: AuthModel | null,
+	): DataTableValueOptionsType<BrandModel>['displayButton'] {
+		return {
+			action: (entry: BrandModel) => {
+				if (entry.deleted_at) {
+					return hasPermission(auth, 'brand', 'delete')
+						? 'restore'
+						: undefined;
+				}
+
+				if (!hasPermission(auth, 'brand', 'update')) {
+					return undefined;
+				}
+
+				return entry.status === BrandStatusEnum.ACTIVE
+					? 'disable'
+					: 'enable';
+			},
+			dataSource: 'brand',
+		};
+	}
+
 	return {
-		action: () =>
-			hasPermission(auth, 'brand', 'read') ? 'view' : undefined,
-		dataSource: 'brand',
-	};
-}
-
-function displayButtonStatus(
-	auth: AuthModel | null,
-): DataTableValueOptionsType<BrandModel>['displayButton'] {
-	return {
-		action: (entry: BrandModel) => {
-			if (entry.deleted_at) {
-				return hasPermission(auth, 'brand', 'delete')
-					? 'restore'
-					: undefined;
-			}
-
-			if (!hasPermission(auth, 'brand', 'update')) {
-				return undefined;
-			}
-
-			return entry.status === BrandStatusEnum.ACTIVE
-				? 'disable'
-				: 'enable';
+		dataTable: {
+			state: {
+				first: 0,
+				rows: 10,
+				sortField: 'id',
+				sortOrder: -1 as const,
+				filters: {
+					global: { value: null, matchMode: 'contains' },
+					brand_type: { value: null, matchMode: 'equals' },
+					status: { value: null, matchMode: 'equals' },
+					language: { value: null, matchMode: 'equals' },
+					is_deleted: { value: false, matchMode: 'equals' },
+				} satisfies BrandDataTableFiltersType,
+			},
+			columns: [
+				{
+					field: 'id',
+					header: 'ID',
+					sortable: true,
+					body: (entry, column, auth) =>
+						DataTableValue(entry, column, {
+							markDeleted: true,
+							displayButton: displayButtonView(auth),
+						}),
+				},
+				{
+					field: 'brand_type',
+					header: 'Type',
+					body: (entry, column) =>
+						DataTableValue(entry, column, {
+							capitalize: true,
+						}),
+				},
+				{
+					field: 'name',
+					header: 'Name',
+					sortable: true,
+				},
+				{
+					field: 'status',
+					header: 'Status',
+					body: (entry, column, auth) =>
+						DataTableValue(entry, column, {
+							dataSource: 'brand',
+							isStatus: true,
+							markDeleted: true,
+							displayButton: displayButtonStatus(auth),
+						}),
+					style: {
+						minWidth: '8rem',
+						maxWidth: '8rem',
+					},
+				},
+			],
+			find: (params: FindFunctionParamsType) =>
+				requestFind<BrandModel>('brand', params),
 		},
-		dataSource: 'brand',
-	};
-}
-
-export const dataSourceConfigBrand: DataSourceConfigType<BrandModel> = {
-	dataTable: {
-		state: {
-			first: 0,
-			rows: 10,
-			sortField: 'id',
-			sortOrder: -1 as const,
-			filters: {
-				global: { value: null, matchMode: 'contains' },
-				brand_type: { value: null, matchMode: 'equals' },
-				status: { value: null, matchMode: 'equals' },
-				language: { value: null, matchMode: 'equals' },
-				is_deleted: { value: false, matchMode: 'equals' },
-			} satisfies BrandDataTableFiltersType,
+		displayEntryLabel: (entry: BrandModel) => {
+			return displayBrandLabel(entry);
 		},
-		columns: [
-			{
-				field: 'id',
-				header: 'ID',
-				sortable: true,
-				body: (entry, column, auth) =>
-					DataTableValue(entry, column, {
-						markDeleted: true,
-						displayButton: displayButtonView(auth),
-					}),
+		actions: {
+			create: {
+				windowType: 'form',
+				windowTitle: translations['create.title'],
+				windowComponent: FormManageBrand,
+				permission: ['brand', 'create'],
+				entriesSelection: 'free',
+				operationFunction: (params: BrandFormValuesType) =>
+					requestCreate<BrandModel, BrandFormValuesType>(
+						'brand',
+						params,
+					),
+				buttonPosition: 'right',
+				button: {
+					variant: 'info',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateForm,
+				getFormState: getFormState,
 			},
-			{
-				field: 'brand_type',
-				header: 'Type',
-				body: (entry, column) =>
-					DataTableValue(entry, column, {
-						capitalize: true,
-					}),
+			update: {
+				windowType: 'form',
+				windowTitle: translations['update.title'],
+				windowComponent: FormManageBrand,
+				permission: ['brand', 'update'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: BrandModel) => !entry.deleted_at, // Return true if the entry is not deleted
+				operationFunction: (params: BrandFormValuesType, id: number) =>
+					requestUpdate<BrandModel, BrandFormValuesType>(
+						'brand',
+						params,
+						id,
+					),
+				reloadEntry: (id: number) =>
+					requestView<BrandModel>('brand', id),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'success',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateForm,
+				getFormState: getFormState,
 			},
-			{
-				field: 'name',
-				header: 'Name',
-				sortable: true,
-			},
-			{
-				field: 'status',
-				header: 'Status',
-				body: (entry, column, auth) =>
-					DataTableValue(entry, column, {
-						dataSource: 'brand',
-						isStatus: true,
-						markDeleted: true,
-						displayButton: displayButtonStatus(auth),
-					}),
-				style: {
-					minWidth: '8rem',
-					maxWidth: '8rem',
+			delete: {
+				windowType: 'action',
+				windowTitle: translations['delete.title'],
+				permission: ['brand', 'delete'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: BrandModel) => !entry.deleted_at, // Return true if the entry is not deleted
+				operationFunction: (entry: BrandModel) =>
+					requestDelete('brand', entry),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'error',
 				},
 			},
-		],
-		find: (params: FindFunctionParamsType) =>
-			requestFind<BrandModel>('brand', params),
-	},
-	displayEntryLabel: (entry: BrandModel) => {
-		return displayBrandLabel(entry);
-	},
-	actions: {
-		create: {
-			windowType: 'form',
-			windowTitle: translations['create.title'],
-			windowComponent: FormManageBrand,
-			permission: ['brand', 'create'],
-			entriesSelection: 'free',
-			operationFunction: (params: BrandFormValuesType) =>
-				requestCreate<BrandModel, BrandFormValuesType>('brand', params),
-			buttonPosition: 'right',
-			button: {
-				variant: 'info',
+			restore: {
+				windowType: 'action',
+				windowTitle: translations['restore.title'],
+				permission: ['brand', 'delete'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: BrandModel) => !!entry.deleted_at, // Return true if the entry is deleted
+				operationFunction: (entry: BrandModel) =>
+					requestRestore('brand', entry),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'info',
+				},
 			},
-			getFormValues: getFormValues,
-			validateForm: validateForm,
-			getFormState: getFormState,
-		},
-		update: {
-			windowType: 'form',
-			windowTitle: translations['update.title'],
-			windowComponent: FormManageBrand,
-			permission: ['brand', 'update'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: BrandModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			operationFunction: (params: BrandFormValuesType, id: number) =>
-				requestUpdate<BrandModel, BrandFormValuesType>(
-					'brand',
-					params,
-					id,
-				),
-			reloadEntry: (id: number) => requestView<BrandModel>('brand', id),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'success',
+			enable: {
+				windowType: 'action',
+				windowTitle: translations['enable.title'],
+				permission: ['brand', 'update'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: BrandModel) =>
+					!entry.deleted_at &&
+					entry.status === BrandStatusEnum.INACTIVE,
+				operationFunction: (entry: BrandModel) =>
+					requestUpdateStatus('brand', entry, 'active'),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'info',
+				},
 			},
-			getFormValues: getFormValues,
-			validateForm: validateForm,
-			getFormState: getFormState,
-		},
-		delete: {
-			windowType: 'action',
-			windowTitle: translations['delete.title'],
-			permission: ['brand', 'delete'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: BrandModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			operationFunction: (entry: BrandModel) =>
-				requestDelete('brand', entry),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'error',
+			disable: {
+				windowType: 'action',
+				windowTitle: translations['disable.title'],
+				permission: ['brand', 'update'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: BrandModel) =>
+					!entry.deleted_at &&
+					entry.status === BrandStatusEnum.ACTIVE,
+				operationFunction: (entry: BrandModel) =>
+					requestUpdateStatus('brand', entry, 'inactive'),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'error',
+				},
 			},
-		},
-		restore: {
-			windowType: 'action',
-			windowTitle: translations['restore.title'],
-			permission: ['brand', 'delete'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: BrandModel) => !!entry.deleted_at, // Return true if the entry is deleted
-			operationFunction: (entry: BrandModel) =>
-				requestRestore('brand', entry),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'info',
+			view: {
+				windowType: 'view',
+				windowTitle: translations['view.title'],
+				windowComponent: ViewBrand,
+				windowConfigProps: {
+					size: 'xl',
+				},
+				permission: ['brand', 'read'],
+				entriesSelection: 'single',
+				buttonPosition: 'hidden',
+				reloadEntry: (id: number) =>
+					requestView<BrandModel>('brand', id),
+			},
+			order: {
+				windowType: 'link',
+				windowTitle: translations['order.title'],
+				windowTarget: Routes.get('brand-order'),
+				permission: ['brand', 'update'],
+				entriesSelection: 'free',
+				buttonPosition: 'right',
+				button: {
+					variant: 'default',
+				},
 			},
 		},
-		enable: {
-			windowType: 'action',
-			windowTitle: translations['enable.title'],
-			permission: ['brand', 'update'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: BrandModel) =>
-				!entry.deleted_at && entry.status === BrandStatusEnum.INACTIVE,
-			operationFunction: (entry: BrandModel) =>
-				requestUpdateStatus('brand', entry, 'active'),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'info',
-			},
-		},
-		disable: {
-			windowType: 'action',
-			windowTitle: translations['disable.title'],
-			permission: ['brand', 'update'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: BrandModel) =>
-				!entry.deleted_at && entry.status === BrandStatusEnum.ACTIVE,
-			operationFunction: (entry: BrandModel) =>
-				requestUpdateStatus('brand', entry, 'inactive'),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'error',
-			},
-		},
-		view: {
-			windowType: 'view',
-			windowTitle: translations['view.title'],
-			windowComponent: ViewBrand,
-			windowConfigProps: {
-				size: 'xl',
-			},
-			permission: ['brand', 'read'],
-			entriesSelection: 'single',
-			buttonPosition: 'hidden',
-			reloadEntry: (id: number) => requestView<BrandModel>('brand', id),
-		},
-		order: {
-			windowType: 'link',
-			windowTitle: translations['order.title'],
-			windowTarget: Routes.get('brand-order'),
-			permission: ['brand', 'update'],
-			entriesSelection: 'free',
-			buttonPosition: 'right',
-			button: {
-				variant: 'default',
-			},
-		},
-	},
-};
+	};
+}

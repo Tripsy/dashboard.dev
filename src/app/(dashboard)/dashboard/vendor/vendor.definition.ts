@@ -31,23 +31,7 @@ import type {
 } from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
-const translations = await translateBatch(
-	[
-		'create.title',
-		'update.title',
-		'view.title',
-		'delete.title',
-		'restore.title',
-		'enable.title',
-		'disable.title',
-	] as const,
-	'vendor.action',
-);
-
-const validatorMessages = await BaseValidator.getValidatorMessages(
-	['invalid_name'] as const,
-	'vendor.validation',
-);
+const validatorMessages = ['invalid_name'] as const;
 
 class VendorValidator extends BaseValidator<typeof validatorMessages> {
 	manage = () =>
@@ -56,8 +40,13 @@ class VendorValidator extends BaseValidator<typeof validatorMessages> {
 		});
 }
 
-function validateForm(values: VendorFormValuesType) {
-	const validator = new VendorValidator(validatorMessages);
+async function validateForm(values: VendorFormValuesType) {
+	const translations = await translateBatch(
+		validatorMessages,
+		'vendor.validation',
+	);
+
+	const validator = new VendorValidator(translations);
 
 	return validator.manage().safeParse(values);
 }
@@ -85,214 +74,231 @@ export type VendorDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
-function displayButtonView(
-	auth: AuthModel | null,
-): DataTableValueOptionsType<VendorModel>['displayButton'] {
-	return {
-		action: () =>
-			hasPermission(auth, 'vendor', 'read') ? 'view' : undefined,
-		dataSource: 'vendor',
-	};
-}
+export default async function dataSourceConfig(): Promise<
+	DataSourceConfigType<VendorModel>
+> {
+	const translations = await translateBatch(
+		[
+			'create.title',
+			'update.title',
+			'view.title',
+			'delete.title',
+			'restore.title',
+			'enable.title',
+			'disable.title',
+		] as const,
+		'vendor.action',
+	);
 
-function displayButtonStatus(
-	auth: AuthModel | null,
-): DataTableValueOptionsType<VendorModel>['displayButton'] {
-	return {
-		action: (entry: VendorModel) => {
-			if (entry.deleted_at) {
-				return hasPermission(auth, 'vendor', 'delete')
-					? 'restore'
-					: undefined;
-			}
+	function displayButtonView(
+		auth: AuthModel | null,
+	): DataTableValueOptionsType<VendorModel>['displayButton'] {
+		return {
+			action: () =>
+				hasPermission(auth, 'vendor', 'read') ? 'view' : undefined,
+			dataSource: 'vendor',
+		};
+	}
 
-			if (!hasPermission(auth, 'vendor', 'update')) {
-				return undefined;
-			}
+	function displayButtonStatus(
+		auth: AuthModel | null,
+	): DataTableValueOptionsType<VendorModel>['displayButton'] {
+		return {
+			action: (entry: VendorModel) => {
+				if (entry.deleted_at) {
+					return hasPermission(auth, 'vendor', 'delete')
+						? 'restore'
+						: undefined;
+				}
 
-			return entry.status === VendorStatusEnum.ACTIVE
-				? 'disable'
-				: 'enable';
-		},
-	};
-}
+				if (!hasPermission(auth, 'vendor', 'update')) {
+					return undefined;
+				}
 
-export const dataSourceConfigVendor: DataSourceConfigType<VendorModel> = {
-	dataTable: {
-		state: {
-			first: 0,
-			rows: 10,
-			sortField: 'id',
-			sortOrder: -1 as const,
-			filters: {
-				global: { value: null, matchMode: 'contains' },
-				status: { value: null, matchMode: 'equals' },
-				is_deleted: { value: false, matchMode: 'equals' },
-			} satisfies VendorDataTableFiltersType,
-		},
-		columns: [
-			{
-				field: 'id',
-				header: 'ID',
-				sortable: true,
-				body: (entry, column, auth) =>
-					DataTableValue(entry, column, {
-						markDeleted: true,
-						displayButton: displayButtonView(auth),
-					}),
+				return entry.status === VendorStatusEnum.ACTIVE
+					? 'disable'
+					: 'enable';
 			},
-			{
-				field: 'name',
-				header: 'Name',
-				sortable: true,
+		};
+	}
+
+	return {
+		dataTable: {
+			state: {
+				first: 0,
+				rows: 10,
+				sortField: 'id',
+				sortOrder: -1 as const,
+				filters: {
+					global: { value: null, matchMode: 'contains' },
+					status: { value: null, matchMode: 'equals' },
+					is_deleted: { value: false, matchMode: 'equals' },
+				} satisfies VendorDataTableFiltersType,
 			},
-			{
-				field: 'status',
-				header: 'Status',
-				body: (entry, column, auth) =>
-					DataTableValue(entry, column, {
-						dataSource: 'vendor',
-						isStatus: true,
-						markDeleted: true,
-						displayButton: displayButtonStatus(auth),
-					}),
-				style: {
-					minWidth: '8rem',
-					maxWidth: '8rem',
+			columns: [
+				{
+					field: 'id',
+					header: 'ID',
+					sortable: true,
+					body: (entry, column, auth) =>
+						DataTableValue(entry, column, {
+							markDeleted: true,
+							displayButton: displayButtonView(auth),
+						}),
+				},
+				{
+					field: 'name',
+					header: 'Name',
+					sortable: true,
+				},
+				{
+					field: 'status',
+					header: 'Status',
+					body: (entry, column, auth) =>
+						DataTableValue(entry, column, {
+							dataSource: 'vendor',
+							isStatus: true,
+							markDeleted: true,
+							displayButton: displayButtonStatus(auth),
+						}),
+					style: {
+						minWidth: '8rem',
+						maxWidth: '8rem',
+					},
+				},
+				{
+					field: 'created_at',
+					header: 'Created At',
+					sortable: true,
+					body: (entry, column) =>
+						DataTableValue(entry, column, {
+							displayDate: true,
+						}),
+				},
+			],
+			find: (params: FindFunctionParamsType) =>
+				requestFind<VendorModel>('vendor', params),
+		},
+		displayEntryLabel: (entry: VendorModel) => displayVendorLabel(entry),
+		actions: {
+			create: {
+				windowType: 'form',
+				windowTitle: translations['create.title'],
+				windowComponent: FormManageVendor,
+				permission: ['vendor', 'create'],
+				entriesSelection: 'free',
+				operationFunction: (params: VendorFormValuesType) =>
+					requestCreate<VendorModel, VendorFormValuesType>(
+						'vendor',
+						params,
+					),
+				buttonPosition: 'right',
+				button: {
+					variant: 'info',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateForm,
+				getFormState: getFormState,
+			},
+			update: {
+				windowType: 'form',
+				windowTitle: translations['update.title'],
+				windowComponent: FormManageVendor,
+				permission: ['vendor', 'update'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: VendorModel) => !entry.deleted_at, // Return true if the entry is not deleted
+				operationFunction: (params: VendorFormValuesType, id: number) =>
+					requestUpdate<VendorModel, VendorFormValuesType>(
+						'vendor',
+						params,
+						id,
+					),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'success',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateForm,
+				getFormState: getFormState,
+			},
+			delete: {
+				windowType: 'action',
+				windowTitle: translations['delete.title'],
+				permission: ['vendor', 'delete'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: VendorModel) => !entry.deleted_at, // Return true if the entry is not deleted
+				operationFunction: (entry: VendorModel) =>
+					requestDelete('vendor', entry),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'error',
 				},
 			},
-			{
-				field: 'created_at',
-				header: 'Created At',
-				sortable: true,
-				body: (entry, column) =>
-					DataTableValue(entry, column, {
-						displayDate: true,
-					}),
+			restore: {
+				windowType: 'action',
+				windowTitle: translations['restore.title'],
+				permission: ['vendor', 'delete'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: VendorModel) => !!entry.deleted_at, // Return true if the entry is deleted
+				operationFunction: (entry: VendorModel) =>
+					requestRestore('vendor', entry),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'info',
+				},
 			},
-		],
-		find: (params: FindFunctionParamsType) =>
-			requestFind<VendorModel>('vendor', params),
-	},
-	displayEntryLabel: (entry: VendorModel) => displayVendorLabel(entry),
-	actions: {
-		create: {
-			windowType: 'form',
-			windowTitle: translations['create.title'],
-			windowComponent: FormManageVendor,
-			permission: ['vendor', 'create'],
-			entriesSelection: 'free',
-			operationFunction: (params: VendorFormValuesType) =>
-				requestCreate<VendorModel, VendorFormValuesType>(
-					'vendor',
-					params,
-				),
-			buttonPosition: 'right',
-			button: {
-				variant: 'info',
+			enable: {
+				windowType: 'action',
+				windowTitle: translations['enable.title'],
+				permission: ['vendor', 'update'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: VendorModel) =>
+					!entry.deleted_at &&
+					arrayHasValue(entry.status, [
+						VendorStatusEnum.PENDING,
+						VendorStatusEnum.INACTIVE,
+					]),
+				operationFunction: (entry: VendorModel) =>
+					requestUpdateStatus('vendor', entry, 'active'),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'info',
+				},
 			},
-			getFormValues: getFormValues,
-			validateForm: validateForm,
-			getFormState: getFormState,
-		},
-		update: {
-			windowType: 'form',
-			windowTitle: translations['update.title'],
-			windowComponent: FormManageVendor,
-			permission: ['vendor', 'update'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: VendorModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			operationFunction: (params: VendorFormValuesType, id: number) =>
-				requestUpdate<VendorModel, VendorFormValuesType>(
-					'vendor',
-					params,
-					id,
-				),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'success',
+			disable: {
+				windowType: 'action',
+				windowTitle: translations['disable.title'],
+				permission: ['vendor', 'update'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: VendorModel) =>
+					!entry.deleted_at &&
+					arrayHasValue(entry.status, [
+						VendorStatusEnum.PENDING,
+						VendorStatusEnum.ACTIVE,
+					]),
+				operationFunction: (entry: VendorModel) =>
+					requestUpdateStatus('vendor', entry, 'inactive'),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'error',
+				},
 			},
-			getFormValues: getFormValues,
-			validateForm: validateForm,
-			getFormState: getFormState,
-		},
-		delete: {
-			windowType: 'action',
-			windowTitle: translations['delete.title'],
-			permission: ['vendor', 'delete'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: VendorModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			operationFunction: (entry: VendorModel) =>
-				requestDelete('vendor', entry),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'error',
+			view: {
+				windowType: 'view',
+				windowTitle: translations['view.title'],
+				windowComponent: ViewVendor,
+				windowConfigProps: {
+					size: 'xl',
+				},
+				permission: ['vendor', 'read'],
+				entriesSelection: 'single',
+				buttonPosition: 'hidden',
 			},
 		},
-		restore: {
-			windowType: 'action',
-			windowTitle: translations['restore.title'],
-			permission: ['vendor', 'delete'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: VendorModel) => !!entry.deleted_at, // Return true if the entry is deleted
-			operationFunction: (entry: VendorModel) =>
-				requestRestore('vendor', entry),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'info',
-			},
-		},
-		enable: {
-			windowType: 'action',
-			windowTitle: translations['enable.title'],
-			permission: ['vendor', 'update'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: VendorModel) =>
-				!entry.deleted_at &&
-				arrayHasValue(entry.status, [
-					VendorStatusEnum.PENDING,
-					VendorStatusEnum.INACTIVE,
-				]),
-			operationFunction: (entry: VendorModel) =>
-				requestUpdateStatus('vendor', entry, 'active'),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'info',
-			},
-		},
-		disable: {
-			windowType: 'action',
-			windowTitle: translations['disable.title'],
-			permission: ['vendor', 'update'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: VendorModel) =>
-				!entry.deleted_at &&
-				arrayHasValue(entry.status, [
-					VendorStatusEnum.PENDING,
-					VendorStatusEnum.ACTIVE,
-				]),
-			operationFunction: (entry: VendorModel) =>
-				requestUpdateStatus('vendor', entry, 'inactive'),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'error',
-			},
-		},
-		view: {
-			windowType: 'view',
-			windowTitle: translations['view.title'],
-			windowComponent: ViewVendor,
-			windowConfigProps: {
-				size: 'xl',
-			},
-			permission: ['vendor', 'read'],
-			entriesSelection: 'single',
-			buttonPosition: 'hidden',
-		},
-	},
-};
+	};
+}

@@ -9,6 +9,7 @@ import {
 	FormComponentTime,
 } from '@/components/form/form-element.component';
 import { Icons } from '@/components/icon.component';
+import { getLanguageClient } from '@/config/translate.setup';
 import { createCurrentDate } from '@/helpers/date.helper';
 import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { requestFind } from '@/helpers/services.helper';
@@ -55,7 +56,7 @@ const transportTypes = toOptionsFromEnum(CmrTransportTypeEnum, {
 	formatter: formatEnumLabel,
 });
 
-export function FormManageCmr() {
+export async function FormManageCmr() {
 	const { formValues, errors, handleChange, pending } =
 		useWindowForm<CmrFormValuesType>();
 
@@ -165,6 +166,7 @@ export function FormManageCmr() {
 	);
 
 	const minDate = createCurrentDate();
+	const language = getLanguageClient();
 
 	return (
 		<>
@@ -281,10 +283,13 @@ export function FormManageCmr() {
 					suggestions: pickupAddressSuggestions,
 					isLoading: isPickupAddressFetching,
 					onSelect: (m) => {
-						handleChange('pickup_address', displayAddressLabel(m));
+						handleChange(
+							'pickup_address',
+							displayAddressLabel(m, language),
+						);
 						handleChange('pickup_address_id', m.id);
 					},
-					getOptionLabel: (m) => displayAddressLabel(m),
+					getOptionLabel: (m) => displayAddressLabel(m, language),
 					getOptionKey: (m) => m.id,
 
 					allowCreate: true,
@@ -308,7 +313,7 @@ export function FormManageCmr() {
 
 									handleChange(
 										'pickup_address',
-										displayAddressLabel(address),
+										displayAddressLabel(address, language),
 									);
 									handleChange(
 										'pickup_address_id',
@@ -361,11 +366,11 @@ export function FormManageCmr() {
 					onSelect: (m) => {
 						handleChange(
 							'delivery_address',
-							displayAddressLabel(m),
+							displayAddressLabel(m, language),
 						);
 						handleChange('delivery_address_id', m.id);
 					},
-					getOptionLabel: (m) => displayAddressLabel(m),
+					getOptionLabel: (m) => displayAddressLabel(m, language),
 					getOptionKey: (m) => m.id,
 
 					allowCreate: true,
@@ -389,7 +394,7 @@ export function FormManageCmr() {
 
 									handleChange(
 										'delivery_address',
-										displayAddressLabel(address),
+										displayAddressLabel(address, language),
 									);
 									handleChange(
 										'delivery_address_id',

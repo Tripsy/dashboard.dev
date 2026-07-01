@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { DocumentCmrPrint } from '@/app/document/cmr/[tracking_number]/document-cmr-print.component';
 import { Configuration } from '@/config/settings.config';
-import { translate } from '@/config/translate.setup';
+import { getLanguageClient, translate } from '@/config/translate.setup';
 import { ApiRequest, getResponseData } from '@/helpers/api.helper';
 import { displayAddressLabel } from '@/models/address.model';
 import { type CmrModel, displayCmrLabel } from '@/models/cmr.model';
@@ -78,9 +78,7 @@ export default async function Page(props: Props) {
 		notFound();
 	}
 
-	// console.log(data);
-	console.log(data.cmr_sessions);
-	// console.log(data.cmr_vehicles);
+	const language = getLanguageClient();
 
 	return (
 		<DocumentCmrPrint
@@ -88,8 +86,14 @@ export default async function Page(props: Props) {
 				signed: true,
 				data: {
 					id: String(data.id).padStart(6, '0'),
-					pickupAddress: displayAddressLabel(data.pickup_address),
-					deliveryAddress: displayAddressLabel(data.delivery_address),
+					pickupAddress: displayAddressLabel(
+						data.pickup_address,
+						language,
+					),
+					deliveryAddress: displayAddressLabel(
+						data.delivery_address,
+						language,
+					),
 					cmrVehicles: data.cmr_vehicles.map((cmr_vehicle) => ({
 						id: cmr_vehicle.id,
 						vehicle: displayVehicleLabel(cmr_vehicle.vehicle),

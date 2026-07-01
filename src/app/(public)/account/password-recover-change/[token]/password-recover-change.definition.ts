@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { Configuration } from '@/config/settings.config';
+import { translateBatch } from '@/config/translate.setup';
 import { getFormDataAsString } from '@/helpers/form.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import type { FormErrorsType, FormSituationType } from '@/types/form.type';
@@ -32,18 +33,15 @@ export const PasswordRecoverChangeState: PasswordRecoverChangeStateType = {
 	situation: null,
 };
 
-const validatorMessages = await BaseValidator.getValidatorMessages(
-	[
-		'invalid_password',
-		'password_min',
-		'password_condition_capital_letter',
-		'password_condition_number',
-		'password_condition_special_character',
-		'password_confirm_required',
-		'password_confirm_mismatch',
-	] as const,
-	'password-recover-change.validation',
-);
+const validatorMessages = [
+	'invalid_password',
+	'password_min',
+	'password_condition_capital_letter',
+	'password_condition_number',
+	'password_condition_special_character',
+	'password_confirm_required',
+	'password_confirm_mismatch',
+] as const;
 
 class PasswordRecoverChangeValidator extends BaseValidator<
 	typeof validatorMessages
@@ -89,10 +87,15 @@ class PasswordRecoverChangeValidator extends BaseValidator<
 		});
 }
 
-export function validateFormPasswordRecoverChange(
+export async function validateFormPasswordRecoverChange(
 	values: PasswordRecoverChangeFormValuesType,
 ) {
-	const validator = new PasswordRecoverChangeValidator(validatorMessages);
+	const translations = await translateBatch(
+		validatorMessages,
+		'password-recover-change.validation',
+	);
+
+	const validator = new PasswordRecoverChangeValidator(translations);
 
 	return validator.passwordRecoverChange.safeParse(values);
 }

@@ -8,7 +8,7 @@ import { SetupCmrSessions } from '@/app/(dashboard)/dashboard/cmr/setup-cmr-sess
 import { SetupCmrVehicles } from '@/app/(dashboard)/dashboard/cmr/setup-cmr-vehicles.component';
 import { StatusTransitionCmr } from '@/app/(dashboard)/dashboard/cmr/status-transition-cmr.component';
 import { ViewCmr } from '@/app/(dashboard)/dashboard/cmr/view-cmr.component';
-import { translateBatch } from '@/config/translate.setup';
+import { getLanguageClient, translateBatch } from '@/config/translate.setup';
 import {
 	combineDateAndTime,
 	formatDate,
@@ -51,46 +51,28 @@ import type {
 } from '@/types/data-source.type';
 import type { FormStateType, ValidatorOutput } from '@/types/form.type';
 
-const translations = await translateBatch(
-	[
-		'create.title',
-		'update.title',
-		'view.title',
-		'delete.title',
-		'restore.title',
-		'statusTransition.title',
-		'viewClient.title',
-		'setupVehicles.title',
-		'setupSessions.title',
-	] as const,
-	'cmr.action',
-);
-
-const validatorMessages = await BaseValidator.getValidatorMessages(
-	[
-		'invalid_transport_type',
-		'invalid_client_id',
-		'invalid_client',
-		'invalid_pickup_address_id',
-		'invalid_pickup_address',
-		'invalid_delivery_address_id',
-		'invalid_delivery_address',
-		'invalid_contact_name',
-		'invalid_contact_email',
-		'invalid_contact_phone',
-		'invalid_ordered_at',
-		'invalid_ordered_at_time',
-		'invalid_pick_scheduled_at',
-		'invalid_pick_scheduled_at_time',
-		'invalid_estimated_delivery_at',
-		'invalid_estimated_delivery_at_time',
-		'invalid_delivered_at',
-		'invalid_delivered_at_time',
-		'invalid_notes',
-		'delivery_same_as_pickup_address',
-	] as const,
-	'cmr.validation',
-);
+const validatorMessages = [
+	'invalid_transport_type',
+	'invalid_client_id',
+	'invalid_client',
+	'invalid_pickup_address_id',
+	'invalid_pickup_address',
+	'invalid_delivery_address_id',
+	'invalid_delivery_address',
+	'invalid_contact_name',
+	'invalid_contact_email',
+	'invalid_contact_phone',
+	'invalid_ordered_at',
+	'invalid_ordered_at_time',
+	'invalid_pick_scheduled_at',
+	'invalid_pick_scheduled_at_time',
+	'invalid_estimated_delivery_at',
+	'invalid_estimated_delivery_at_time',
+	'invalid_delivered_at',
+	'invalid_delivered_at_time',
+	'invalid_notes',
+	'delivery_same_as_pickup_address',
+] as const;
 
 class CmrValidator extends BaseValidator<typeof validatorMessages> {
 	manage = (isSubmit: boolean = true) =>
@@ -280,8 +262,16 @@ class CmrValidator extends BaseValidator<typeof validatorMessages> {
 			});
 }
 
-function validateForm(values: CmrFormValuesType, isSubmit: boolean = true) {
-	const validator = new CmrValidator(validatorMessages);
+async function validateForm(
+	values: CmrFormValuesType,
+	isSubmit: boolean = true,
+) {
+	const translations = await translateBatch(
+		validatorMessages,
+		'cmr.validation',
+	);
+
+	const validator = new CmrValidator(translations);
 
 	return validator.manage(isSubmit).safeParse(values);
 }
@@ -341,11 +331,14 @@ function getFormState(data?: CmrModel): FormStateType<CmrFormValuesType> {
 			client: data?.client ? displayClientLabel(data.client) : null,
 			pickup_address_id: data?.pickup_address?.id ?? null,
 			pickup_address: data?.pickup_address
-				? displayAddressLabel(data.pickup_address)
+				? displayAddressLabel(data.pickup_address, getLanguageClient())
 				: null,
 			delivery_address_id: data?.delivery_address?.id ?? null,
 			delivery_address: data?.delivery_address
-				? displayAddressLabel(data.delivery_address)
+				? displayAddressLabel(
+						data.delivery_address,
+						getLanguageClient(),
+					)
 				: null,
 			contact_name: data?.contact_name ?? null,
 			contact_email: data?.contact_email ?? null,
@@ -421,57 +414,76 @@ export type CmrDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
-function displayButtonView(
-	auth: AuthModel | null,
-): DataTableValueOptionsType<CmrModel>['displayButton'] {
+export default async function dataSourceConfig(): Promise<
+	DataSourceConfigType<CmrModelWithSessionModel>
+> {
+	const translations = await translateBatch(
+		[
+			'create.title',
+			'update.title',
+			'view.title',
+			'delete.title',
+			'restore.title',
+			'statusTransition.title',
+			'viewClient.title',
+			'setupVehicles.title',
+			'setupSessions.title',
+			'manageImages.title',
+		] as const,
+		'cmr.action',
+	);
+
+	function displayButtonView(
+		auth: AuthModel | null,
+	): DataTableValueOptionsType<CmrModel>['displayButton'] {
+		return {
+			action: () =>
+				hasPermission(auth, 'cmr', 'read') ? 'view' : undefined,
+			dataSource: 'cmr',
+		};
+	}
+
+	function displayButtonStatus(
+		auth: AuthModel | null,
+	): DataTableValueOptionsType<CmrModel>['displayButton'] {
+		return {
+			action: (entry: CmrModel) => {
+				if (entry.deleted_at) {
+					return undefined;
+				}
+
+				const statusTransitions = getStatusTransitions(
+					entry.status,
+					STATUS_TRANSITIONS,
+				);
+
+				if (statusTransitions.length === 0) {
+					return undefined;
+				}
+
+				if (!hasPermission(auth, 'cmr', 'update')) {
+					return undefined;
+				}
+
+				return 'statusTransition';
+			},
+		};
+	}
+
+	function displayButtonViewClient(
+		auth: AuthModel | null,
+		entry: CmrModel,
+	): DataTableValueOptionsType<CmrModel>['displayButton'] {
+		return {
+			action: () =>
+				hasPermission(auth, 'client', 'read') ? 'view' : undefined,
+			dataSource: 'client',
+			title: translations['viewClient.title'],
+			alternateEntryId: entry.client.id,
+		};
+	}
+
 	return {
-		action: () => (hasPermission(auth, 'cmr', 'read') ? 'view' : undefined),
-		dataSource: 'cmr',
-	};
-}
-
-function displayButtonStatus(
-	auth: AuthModel | null,
-): DataTableValueOptionsType<CmrModel>['displayButton'] {
-	return {
-		action: (entry: CmrModel) => {
-			if (entry.deleted_at) {
-				return undefined;
-			}
-
-			const statusTransitions = getStatusTransitions(
-				entry.status,
-				STATUS_TRANSITIONS,
-			);
-
-			if (statusTransitions.length === 0) {
-				return undefined;
-			}
-
-			if (!hasPermission(auth, 'cmr', 'update')) {
-				return undefined;
-			}
-
-			return 'statusTransition';
-		},
-	};
-}
-
-function displayButtonViewClient(
-	auth: AuthModel | null,
-	entry: CmrModel,
-): DataTableValueOptionsType<CmrModel>['displayButton'] {
-	return {
-		action: () =>
-			hasPermission(auth, 'client', 'read') ? 'view' : undefined,
-		dataSource: 'client',
-		title: translations['viewClient.title'],
-		alternateEntryId: entry.client.id,
-	};
-}
-
-export const dataSourceConfigCmr: DataSourceConfigType<CmrModelWithSessionModel> =
-	{
 		dataTable: {
 			state: {
 				first: 0,
@@ -721,5 +733,28 @@ export const dataSourceConfigCmr: DataSourceConfigType<CmrModelWithSessionModel>
 					icon: 'Setup',
 				},
 			},
+			manageImages: {
+				windowType: 'other',
+				windowTitle: translations['manageImages.title'],
+				windowComponent: SetupCmrSessions,
+				windowConfigProps: {
+					size: 'x4l',
+				},
+				permission: ['image', 'update'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: CmrModel) =>
+					arrayHasValue(entry.status, [
+						CmrStatusEnum.ORDERED,
+						CmrStatusEnum.PREPARING,
+						CmrStatusEnum.TRANSIT,
+					]),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'info',
+					icon: 'Image',
+				},
+			},
 		},
 	};
+}

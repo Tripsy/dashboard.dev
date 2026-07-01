@@ -38,32 +38,16 @@ import type {
 } from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
-const translations = await translateBatch(
-	[
-		'create.title',
-		'update.title',
-		'view.title',
-		'delete.title',
-		'restore.title',
-		'verified.title',
-		'draft.title',
-	] as const,
-	'vehicle.action',
-);
-
-const validatorMessages = await BaseValidator.getValidatorMessages(
-	[
-		'invalid_brand_id',
-		'invalid_brand',
-		'invalid_vehicle_type',
-		'invalid_model',
-		'invalid_length',
-		'invalid_width',
-		'invalid_height',
-		'invalid_weight',
-	] as const,
-	'vehicle.validation',
-);
+const validatorMessages = [
+	'invalid_brand_id',
+	'invalid_brand',
+	'invalid_vehicle_type',
+	'invalid_model',
+	'invalid_length',
+	'invalid_width',
+	'invalid_height',
+	'invalid_weight',
+] as const;
 
 class VehicleValidator extends BaseValidator<typeof validatorMessages> {
 	manage = (isSubmit: boolean = true) =>
@@ -102,8 +86,16 @@ class VehicleValidator extends BaseValidator<typeof validatorMessages> {
 			});
 }
 
-function validateForm(values: VehicleFormValuesType, isSubmit: boolean = true) {
-	const validator = new VehicleValidator(validatorMessages);
+async function validateForm(
+	values: VehicleFormValuesType,
+	isSubmit: boolean = true,
+) {
+	const translations = await translateBatch(
+		validatorMessages,
+		'vehicle.validation',
+	);
+
+	const validator = new VehicleValidator(translations);
 
 	return validator.manage(isSubmit).safeParse(values);
 }
@@ -152,227 +144,247 @@ export type VehicleDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
-function displayButtonView(
-	auth: AuthModel | null,
-): DataTableValueOptionsType<VehicleModel>['displayButton'] {
+export default async function dataSourceConfig(): Promise<
+	DataSourceConfigType<VehicleModel>
+> {
+	const translations = await translateBatch(
+		[
+			'create.title',
+			'update.title',
+			'view.title',
+			'delete.title',
+			'restore.title',
+			'verified.title',
+			'draft.title',
+		] as const,
+		'vehicle.action',
+	);
+
+	function displayButtonView(
+		auth: AuthModel | null,
+	): DataTableValueOptionsType<VehicleModel>['displayButton'] {
+		return {
+			action: () =>
+				hasPermission(auth, 'vehicle', 'read') ? 'view' : undefined,
+			dataSource: 'vehicle',
+		};
+	}
+
+	function displayButtonStatus(
+		auth: AuthModel | null,
+	): DataTableValueOptionsType<VehicleModel>['displayButton'] {
+		return {
+			action: (entry: VehicleModel) => {
+				if (entry.deleted_at) {
+					return hasPermission(auth, 'vehicle', 'delete')
+						? 'restore'
+						: undefined;
+				}
+
+				if (!hasPermission(auth, 'vehicle', 'update')) {
+					return undefined;
+				}
+
+				return entry.status === VehicleStatusEnum.DRAFT
+					? 'verified'
+					: 'draft';
+			},
+		};
+	}
+
 	return {
-		action: () =>
-			hasPermission(auth, 'vehicle', 'read') ? 'view' : undefined,
-		dataSource: 'vehicle',
-	};
-}
-
-function displayButtonStatus(
-	auth: AuthModel | null,
-): DataTableValueOptionsType<VehicleModel>['displayButton'] {
-	return {
-		action: (entry: VehicleModel) => {
-			if (entry.deleted_at) {
-				return hasPermission(auth, 'vehicle', 'delete')
-					? 'restore'
-					: undefined;
-			}
-
-			if (!hasPermission(auth, 'vehicle', 'update')) {
-				return undefined;
-			}
-
-			return entry.status === VehicleStatusEnum.DRAFT
-				? 'verified'
-				: 'draft';
+		dataTable: {
+			state: {
+				first: 0,
+				rows: 10,
+				sortField: 'id',
+				sortOrder: -1 as const,
+				filters: {
+					global: { value: null, matchMode: 'contains' },
+					brand: { value: '', matchMode: 'equals' },
+					brand_id: { value: null, matchMode: 'equals' },
+					vehicle_type: { value: null, matchMode: 'equals' },
+					status: { value: null, matchMode: 'equals' },
+					is_deleted: { value: false, matchMode: 'equals' },
+				} satisfies VehicleDataTableFiltersType,
+			},
+			columns: [
+				{
+					field: 'id',
+					header: 'ID',
+					sortable: true,
+					body: (entry, column, auth) =>
+						DataTableValue(entry, column, {
+							markDeleted: true,
+							displayButton: displayButtonView(auth),
+						}),
+				},
+				{
+					field: 'brand',
+					header: 'Brand',
+					body: (entry, column) =>
+						DataTableValue(entry, column, {
+							customValue: entry.brand?.name ?? 'n/a',
+						}),
+				},
+				{
+					field: 'model',
+					header: 'Model',
+					sortable: true,
+				},
+				{
+					field: 'vehicle_type',
+					header: 'Type',
+					body: (entry, column) =>
+						DataTableValue(entry, column, {
+							customValue: formatEnumLabel(entry.vehicle_type),
+						}),
+				},
+				{
+					field: 'status',
+					header: 'Status',
+					body: (entry, column, auth) =>
+						DataTableValue(entry, column, {
+							dataSource: 'vehicle',
+							isStatus: true,
+							markDeleted: true,
+							displayButton: displayButtonStatus(auth),
+						}),
+					style: {
+						minWidth: '8rem',
+						maxWidth: '8rem',
+					},
+				},
+				{
+					field: 'created_at',
+					header: 'Created At',
+					sortable: true,
+					body: (entry, column) =>
+						DataTableValue(entry, column, {
+							displayDate: true,
+						}),
+				},
+			],
+			find: (params: FindFunctionParamsType) =>
+				requestFind<VehicleModel>('vehicle', params),
 		},
-	};
-}
-
-export const dataSourceConfigVehicle: DataSourceConfigType<VehicleModel> = {
-	dataTable: {
-		state: {
-			first: 0,
-			rows: 10,
-			sortField: 'id',
-			sortOrder: -1 as const,
-			filters: {
-				global: { value: null, matchMode: 'contains' },
-				brand: { value: '', matchMode: 'equals' },
-				brand_id: { value: null, matchMode: 'equals' },
-				vehicle_type: { value: null, matchMode: 'equals' },
-				status: { value: null, matchMode: 'equals' },
-				is_deleted: { value: false, matchMode: 'equals' },
-			} satisfies VehicleDataTableFiltersType,
-		},
-		columns: [
-			{
-				field: 'id',
-				header: 'ID',
-				sortable: true,
-				body: (entry, column, auth) =>
-					DataTableValue(entry, column, {
-						markDeleted: true,
-						displayButton: displayButtonView(auth),
-					}),
+		displayEntryLabel: (entry: VehicleModel) => displayVehicleLabel(entry),
+		actions: {
+			create: {
+				windowType: 'form',
+				windowTitle: translations['create.title'],
+				windowComponent: FormManageVehicle,
+				permission: ['vehicle', 'create'],
+				entriesSelection: 'free',
+				operationFunction: (params: VehicleFormValuesType) =>
+					requestCreate<VehicleModel, VehicleFormValuesType>(
+						'vehicle',
+						params,
+					),
+				buttonPosition: 'right',
+				button: {
+					variant: 'info',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateForm,
+				getFormState: getFormState,
 			},
-			{
-				field: 'brand',
-				header: 'Brand',
-				body: (entry, column) =>
-					DataTableValue(entry, column, {
-						customValue: entry.brand?.name ?? 'n/a',
-					}),
+			update: {
+				windowType: 'form',
+				windowTitle: translations['update.title'],
+				windowComponent: FormManageVehicle,
+				permission: ['vehicle', 'update'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: VehicleModel) => !entry.deleted_at, // Return true if the entry is not deleted
+				operationFunction: (
+					params: VehicleFormValuesType,
+					id: number,
+				) =>
+					requestUpdate<VehicleModel, VehicleFormValuesType>(
+						'vehicle',
+						params,
+						id,
+					),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'success',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateForm,
+				getFormState: getFormState,
 			},
-			{
-				field: 'model',
-				header: 'Model',
-				sortable: true,
-			},
-			{
-				field: 'vehicle_type',
-				header: 'Type',
-				body: (entry, column) =>
-					DataTableValue(entry, column, {
-						customValue: formatEnumLabel(entry.vehicle_type),
-					}),
-			},
-			{
-				field: 'status',
-				header: 'Status',
-				body: (entry, column, auth) =>
-					DataTableValue(entry, column, {
-						dataSource: 'vehicle',
-						isStatus: true,
-						markDeleted: true,
-						displayButton: displayButtonStatus(auth),
-					}),
-				style: {
-					minWidth: '8rem',
-					maxWidth: '8rem',
+			delete: {
+				windowType: 'action',
+				windowTitle: translations['delete.title'],
+				permission: ['vehicle', 'delete'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: VehicleModel) => !entry.deleted_at, // Return true if the entry is not deleted
+				operationFunction: (entry: VehicleModel) =>
+					requestDelete('vehicle', entry),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'error',
 				},
 			},
-			{
-				field: 'created_at',
-				header: 'Created At',
-				sortable: true,
-				body: (entry, column) =>
-					DataTableValue(entry, column, {
-						displayDate: true,
-					}),
+			restore: {
+				windowType: 'action',
+				windowTitle: translations['restore.title'],
+				permission: ['vehicle', 'delete'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: VehicleModel) => !!entry.deleted_at, // Return true if the entry is deleted
+				operationFunction: (entry: VehicleModel) =>
+					requestRestore('vehicle', entry),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'info',
+				},
 			},
-		],
-		find: (params: FindFunctionParamsType) =>
-			requestFind<VehicleModel>('vehicle', params),
-	},
-	displayEntryLabel: (entry: VehicleModel) => displayVehicleLabel(entry),
-	actions: {
-		create: {
-			windowType: 'form',
-			windowTitle: translations['create.title'],
-			windowComponent: FormManageVehicle,
-			permission: ['vehicle', 'create'],
-			entriesSelection: 'free',
-			operationFunction: (params: VehicleFormValuesType) =>
-				requestCreate<VehicleModel, VehicleFormValuesType>(
-					'vehicle',
-					params,
-				),
-			buttonPosition: 'right',
-			button: {
-				variant: 'info',
+			verified: {
+				windowType: 'action',
+				windowTitle: translations['verified.title'],
+				permission: ['vehicle', 'update'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: VehicleModel) =>
+					!entry.deleted_at &&
+					arrayHasValue(entry.status, [VehicleStatusEnum.DRAFT]),
+				operationFunction: (entry: VehicleModel) =>
+					requestUpdateStatus('vehicle', entry, 'verified'),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'info',
+				},
 			},
-			getFormValues: getFormValues,
-			validateForm: validateForm,
-			getFormState: getFormState,
-		},
-		update: {
-			windowType: 'form',
-			windowTitle: translations['update.title'],
-			windowComponent: FormManageVehicle,
-			permission: ['vehicle', 'update'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: VehicleModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			operationFunction: (params: VehicleFormValuesType, id: number) =>
-				requestUpdate<VehicleModel, VehicleFormValuesType>(
-					'vehicle',
-					params,
-					id,
-				),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'success',
+			draft: {
+				windowType: 'action',
+				windowTitle: translations['draft.title'],
+				permission: ['vehicle', 'update'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: VehicleModel) =>
+					!entry.deleted_at &&
+					arrayHasValue(entry.status, [VehicleStatusEnum.VERIFIED]),
+				operationFunction: (entry: VehicleModel) =>
+					requestUpdateStatus('vehicle', entry, 'draft'),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'error',
+				},
 			},
-			getFormValues: getFormValues,
-			validateForm: validateForm,
-			getFormState: getFormState,
-		},
-		delete: {
-			windowType: 'action',
-			windowTitle: translations['delete.title'],
-			permission: ['vehicle', 'delete'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: VehicleModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			operationFunction: (entry: VehicleModel) =>
-				requestDelete('vehicle', entry),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'error',
+			view: {
+				windowType: 'view',
+				windowTitle: translations['view.title'],
+				windowComponent: ViewVehicle,
+				windowConfigProps: {
+					size: 'xl',
+				},
+				permission: ['vehicle', 'read'],
+				entriesSelection: 'single',
+				buttonPosition: 'hidden',
 			},
 		},
-		restore: {
-			windowType: 'action',
-			windowTitle: translations['restore.title'],
-			permission: ['vehicle', 'delete'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: VehicleModel) => !!entry.deleted_at, // Return true if the entry is deleted
-			operationFunction: (entry: VehicleModel) =>
-				requestRestore('vehicle', entry),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'info',
-			},
-		},
-		verified: {
-			windowType: 'action',
-			windowTitle: translations['verified.title'],
-			permission: ['vehicle', 'update'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: VehicleModel) =>
-				!entry.deleted_at &&
-				arrayHasValue(entry.status, [VehicleStatusEnum.DRAFT]),
-			operationFunction: (entry: VehicleModel) =>
-				requestUpdateStatus('vehicle', entry, 'verified'),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'info',
-			},
-		},
-		draft: {
-			windowType: 'action',
-			windowTitle: translations['draft.title'],
-			permission: ['vehicle', 'update'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: VehicleModel) =>
-				!entry.deleted_at &&
-				arrayHasValue(entry.status, [VehicleStatusEnum.VERIFIED]),
-			operationFunction: (entry: VehicleModel) =>
-				requestUpdateStatus('vehicle', entry, 'draft'),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'error',
-			},
-		},
-		view: {
-			windowType: 'view',
-			windowTitle: translations['view.title'],
-			windowComponent: ViewVehicle,
-			windowConfigProps: {
-				size: 'xl',
-			},
-			permission: ['vehicle', 'read'],
-			entriesSelection: 'single',
-			buttonPosition: 'hidden',
-		},
-	},
-};
+	};
+}

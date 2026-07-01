@@ -5,8 +5,7 @@ import {
 	type PlaceFormValuesType,
 } from '@/app/(dashboard)/dashboard/place/form-manage-place.component';
 import { ViewPlace } from '@/app/(dashboard)/dashboard/place/view-place.component';
-import { Configuration } from '@/config/settings.config';
-import { translateBatch } from '@/config/translate.setup';
+import { getLanguageClient, translateBatch } from '@/config/translate.setup';
 import {
 	getFormDataAsEnum,
 	getFormDataAsNumber,
@@ -38,31 +37,17 @@ import type {
 } from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
-const translations = await translateBatch(
-	[
-		'create.title',
-		'update.title',
-		'view.title',
-		'delete.title',
-		'restore.title',
-	] as const,
-	'place.action',
-);
-
-const validatorMessages = await BaseValidator.getValidatorMessages(
-	[
-		'invalid_place_type',
-		'invalid_code',
-		'invalid_parent',
-		'invalid_parent_id',
-		'invalid_contents',
-		'duplicate_contents',
-		'invalid_language',
-		'invalid_name',
-		'invalid_type_label',
-	] as const,
-	'place.validation',
-);
+const validatorMessages = [
+	'invalid_place_type',
+	'invalid_code',
+	'invalid_parent',
+	'invalid_parent_id',
+	'invalid_contents',
+	'duplicate_contents',
+	'invalid_language',
+	'invalid_name',
+	'invalid_type_label',
+] as const;
 
 class PlaceValidator extends BaseValidator<typeof validatorMessages> {
 	contentsSchema() {
@@ -118,8 +103,16 @@ class PlaceValidator extends BaseValidator<typeof validatorMessages> {
 			});
 }
 
-function validateForm(values: PlaceFormValuesType, isSubmit: boolean = true) {
-	const validator = new PlaceValidator(validatorMessages);
+async function validateForm(
+	values: PlaceFormValuesType,
+	isSubmit: boolean = true,
+) {
+	const translations = await translateBatch(
+		validatorMessages,
+		'place.validation',
+	);
+
+	const validator = new PlaceValidator(translations);
 
 	const normalizedValues = {
 		...values,
@@ -165,7 +158,7 @@ function getFormState(data?: PlaceModel): FormStateType<PlaceFormValuesType> {
 			code: data?.code ?? null,
 			parent_id: data?.parent?.id ?? null,
 			parent: data?.parent
-				? getPlaceContentProp(data?.parent, 'name')
+				? getPlaceContentProp(data?.parent, getLanguageClient(), 'name')
 				: null,
 			contents: data?.contents ?? [],
 		},
@@ -179,158 +172,182 @@ export type PlaceDataTableFiltersType = {
 	is_deleted: { value: boolean; matchMode: 'equals' };
 };
 
-function displayButtonView(
-	auth: AuthModel | null,
-): DataTableValueOptionsType<PlaceModel>['displayButton'] {
+export default async function dataSourceConfig(): Promise<
+	DataSourceConfigType<PlaceModel>
+> {
+	const translations = await translateBatch(
+		[
+			'create.title',
+			'update.title',
+			'view.title',
+			'delete.title',
+			'restore.title',
+		] as const,
+		'place.action',
+	);
+
+	function displayButtonView(
+		auth: AuthModel | null,
+	): DataTableValueOptionsType<PlaceModel>['displayButton'] {
+		return {
+			action: () =>
+				hasPermission(auth, 'place', 'read') ? 'view' : undefined,
+			dataSource: 'place',
+		};
+	}
+
 	return {
-		action: () =>
-			hasPermission(auth, 'place', 'read') ? 'view' : undefined,
-		dataSource: 'place',
+		dataTable: {
+			state: {
+				first: 0,
+				rows: 10,
+				sortField: 'id',
+				sortOrder: -1 as const,
+				filters: {
+					global: { value: null, matchMode: 'contains' },
+					place_type: { value: null, matchMode: 'equals' },
+					language: { value: null, matchMode: 'equals' },
+					is_deleted: { value: false, matchMode: 'equals' },
+				} satisfies PlaceDataTableFiltersType,
+			},
+			columns: [
+				{
+					field: 'id',
+					header: 'ID',
+					sortable: true,
+					body: (entry, column, auth) =>
+						DataTableValue(entry, column, {
+							markDeleted: true,
+							displayButton: displayButtonView(auth),
+						}),
+				},
+				{
+					field: 'place_type',
+					header: 'Type',
+					sortable: true,
+					body: (entry, column) =>
+						DataTableValue(entry, column, {
+							capitalize: true,
+						}),
+				},
+				{
+					field: 'code',
+					header: 'Code',
+					sortable: true,
+				},
+				{
+					field: 'name',
+					header: 'Name',
+					body: (entry, column) =>
+						DataTableValue(entry, column, {
+							customValue: getPlaceContentProp(
+								entry,
+								getLanguageClient(),
+								'name',
+							),
+						}),
+				},
+				{
+					field: 'created_at',
+					header: 'Created At',
+					sortable: true,
+					body: (entry, column) =>
+						DataTableValue(entry, column, {
+							displayDate: true,
+						}),
+				},
+			],
+			find: (params: FindFunctionParamsType) =>
+				requestFind<PlaceModel>('place', params),
+		},
+		displayEntryLabel: (entry: PlaceModel) => {
+			return displayPlaceLabel(entry, getLanguageClient());
+		},
+		actions: {
+			create: {
+				windowType: 'form',
+				windowTitle: translations['create.title'],
+				windowComponent: FormManagePlace,
+				permission: ['place', 'create'],
+				entriesSelection: 'free',
+				operationFunction: (params: PlaceFormValuesType) =>
+					requestCreate<PlaceModel, PlaceFormValuesType>(
+						'place',
+						params,
+					),
+				buttonPosition: 'right',
+				button: {
+					variant: 'info',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateForm,
+				getFormState: getFormState,
+			},
+			update: {
+				windowType: 'form',
+				windowTitle: translations['update.title'],
+				windowComponent: FormManagePlace,
+				permission: ['place', 'update'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: PlaceModel) => !entry.deleted_at, // Return true if the entry is not deleted
+				operationFunction: (params: PlaceFormValuesType, id: number) =>
+					requestUpdate<PlaceModel, PlaceFormValuesType>(
+						'place',
+						params,
+						id,
+					),
+				reloadEntry: (id: number) =>
+					requestView<PlaceModel>('place', id),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'success',
+				},
+				getFormValues: getFormValues,
+				validateForm: validateForm,
+				getFormState: getFormState,
+			},
+			delete: {
+				windowType: 'action',
+				windowTitle: translations['delete.title'],
+				permission: ['place', 'delete'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: PlaceModel) => !entry.deleted_at, // Return true if the entry is not deleted
+				operationFunction: (entry: PlaceModel) =>
+					requestDelete('place', entry),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'error',
+				},
+			},
+			restore: {
+				windowType: 'action',
+				windowTitle: translations['restore.title'],
+				permission: ['place', 'delete'],
+				entriesSelection: 'single',
+				customEntryCheck: (entry: PlaceModel) => !!entry.deleted_at, // Return true if the entry is deleted
+				operationFunction: (entry: PlaceModel) =>
+					requestRestore('place', entry),
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'info',
+				},
+			},
+			view: {
+				windowType: 'view',
+				windowTitle: translations['view.title'],
+				windowComponent: ViewPlace,
+				windowConfigProps: {
+					size: 'xl',
+				},
+				permission: ['place', 'read'],
+				entriesSelection: 'single',
+				buttonPosition: 'hidden',
+				reloadEntry: (id: number) =>
+					requestView<PlaceModel>('place', id),
+			},
+		},
 	};
 }
-
-export const dataSourceConfigPlace: DataSourceConfigType<PlaceModel> = {
-	dataTable: {
-		state: {
-			first: 0,
-			rows: 10,
-			sortField: 'id',
-			sortOrder: -1 as const,
-			filters: {
-				global: { value: null, matchMode: 'contains' },
-				place_type: { value: null, matchMode: 'equals' },
-				language: { value: null, matchMode: 'equals' },
-				is_deleted: { value: false, matchMode: 'equals' },
-			} satisfies PlaceDataTableFiltersType,
-		},
-		columns: [
-			{
-				field: 'id',
-				header: 'ID',
-				sortable: true,
-				body: (entry, column, auth) =>
-					DataTableValue(entry, column, {
-						markDeleted: true,
-						displayButton: displayButtonView(auth),
-					}),
-			},
-			{
-				field: 'place_type',
-				header: 'Type',
-				sortable: true,
-				body: (entry, column) =>
-					DataTableValue(entry, column, {
-						capitalize: true,
-					}),
-			},
-			{
-				field: 'code',
-				header: 'Code',
-				sortable: true,
-			},
-			{
-				field: 'name',
-				header: 'Name',
-				body: (entry, column) =>
-					DataTableValue(entry, column, {
-						customValue: getPlaceContentProp(entry, 'name'),
-					}),
-			},
-			{
-				field: 'created_at',
-				header: 'Created At',
-				sortable: true,
-				body: (entry, column) =>
-					DataTableValue(entry, column, {
-						displayDate: true,
-					}),
-			},
-		],
-		find: (params: FindFunctionParamsType) =>
-			requestFind<PlaceModel>('place', params),
-	},
-	displayEntryLabel: (entry: PlaceModel) => {
-		return displayPlaceLabel(entry, Configuration.language());
-	},
-	actions: {
-		create: {
-			windowType: 'form',
-			windowTitle: translations['create.title'],
-			windowComponent: FormManagePlace,
-			permission: ['place', 'create'],
-			entriesSelection: 'free',
-			operationFunction: (params: PlaceFormValuesType) =>
-				requestCreate<PlaceModel, PlaceFormValuesType>('place', params),
-			buttonPosition: 'right',
-			button: {
-				variant: 'info',
-			},
-			getFormValues: getFormValues,
-			validateForm: validateForm,
-			getFormState: getFormState,
-		},
-		update: {
-			windowType: 'form',
-			windowTitle: translations['update.title'],
-			windowComponent: FormManagePlace,
-			permission: ['place', 'update'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: PlaceModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			operationFunction: (params: PlaceFormValuesType, id: number) =>
-				requestUpdate<PlaceModel, PlaceFormValuesType>(
-					'place',
-					params,
-					id,
-				),
-			reloadEntry: (id: number) => requestView<PlaceModel>('place', id),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'success',
-			},
-			getFormValues: getFormValues,
-			validateForm: validateForm,
-			getFormState: getFormState,
-		},
-		delete: {
-			windowType: 'action',
-			windowTitle: translations['delete.title'],
-			permission: ['place', 'delete'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: PlaceModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			operationFunction: (entry: PlaceModel) =>
-				requestDelete('place', entry),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'error',
-			},
-		},
-		restore: {
-			windowType: 'action',
-			windowTitle: translations['restore.title'],
-			permission: ['place', 'delete'],
-			entriesSelection: 'single',
-			customEntryCheck: (entry: PlaceModel) => !!entry.deleted_at, // Return true if the entry is deleted
-			operationFunction: (entry: PlaceModel) =>
-				requestRestore('place', entry),
-			buttonPosition: 'left',
-			button: {
-				variant: 'outline',
-				hover: 'info',
-			},
-		},
-		view: {
-			windowType: 'view',
-			windowTitle: translations['view.title'],
-			windowComponent: ViewPlace,
-			windowConfigProps: {
-				size: 'xl',
-			},
-			permission: ['place', 'read'],
-			entriesSelection: 'single',
-			buttonPosition: 'hidden',
-			reloadEntry: (id: number) => requestView<PlaceModel>('place', id),
-		},
-	},
-};

@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { type TranslateKey, translateBatch } from '@/config/translate.setup';
 import {
 	createCurrentDate,
 	dateDiff,
@@ -73,38 +72,28 @@ export abstract class IsValidator {
 type EmptyValue = null | undefined;
 
 export abstract class BaseValidator<
-	TMessage extends Record<string, string>,
-	TEmpty extends EmptyValue = null, // null - for FE; undefined - for BE
+	TMessage extends ReadonlyArray<string>,
+	TEmpty extends EmptyValue = null,
 > extends IsValidator {
 	private readonly emptyValue: TEmpty;
+	private readonly message: Record<TMessage[number], string>;
 
 	constructor(
-		private readonly message: TMessage,
+		message: Record<TMessage[number], string>,
 		options?: { emptyValue?: TEmpty },
 	) {
 		super();
 
+		this.message = message;
 		this.emptyValue = options?.emptyValue ?? (undefined as TEmpty);
 	}
 
-	static async getValidatorMessages<const T extends readonly string[]>(
-		keys: T,
-		prefix: string,
-	): Promise<Record<TranslateKey<T[number]>, string>> {
-		return translateBatch(keys, prefix);
-	}
-
-	protected getMessage<K extends keyof TMessage>(
+	protected getMessage<K extends TMessage[number]>(
 		key: K,
 		vars?: Record<string, string>,
 	): string {
 		const message = this.message[key];
-
-		if (!vars) {
-			return message;
-		}
-
-		return replaceVars(message, vars);
+		return vars ? replaceVars(message, vars) : message;
 	}
 
 	/**

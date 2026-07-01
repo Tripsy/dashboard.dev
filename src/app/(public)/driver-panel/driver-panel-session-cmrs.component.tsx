@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Link } from '@/components/ui/link';
 import { WhatsAppContact } from '@/components/whatsapp-contact';
 import Routes from '@/config/routes.setup';
+import { getLanguageClient } from '@/config/translate.setup';
 import { formatDate } from '@/helpers/date.helper';
 import { DisplayStatus } from '@/helpers/display.helper';
 import { arrayHasValue } from '@/helpers/objects.helper';
@@ -55,7 +56,7 @@ export function DriverPanelSessionCmrs({
 	);
 }
 
-function DriverPanelSessionCmrEntry({
+async function DriverPanelSessionCmrEntry({
 	cmr,
 	cmrSession,
 }: {
@@ -71,6 +72,7 @@ function DriverPanelSessionCmrEntry({
 	} = useWorkSession();
 
 	const [withDetails, setWithDetails] = useState(false);
+	const language = getLanguageClient();
 
 	const handleStatusTransition = useCallback(
 		(entry: CmrModel) => {
@@ -198,10 +200,10 @@ function DriverPanelSessionCmrEntry({
 	);
 
 	const deliveryAddress = cmr.delivery_address
-		? displayAddressLabel(cmr.delivery_address)
+		? displayAddressLabel(cmr.delivery_address, language)
 		: null;
 	const pickupAddress = cmr.pickup_address
-		? displayAddressLabel(cmr.pickup_address)
+		? displayAddressLabel(cmr.pickup_address, language)
 		: null;
 	const contactPhone = cmr.contact_phone;
 

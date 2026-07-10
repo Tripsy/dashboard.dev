@@ -64,7 +64,8 @@ export default function ProtectedRoute({
 	const translationsKeys = useMemo(
 		() =>
 			[
-				'app.text.loading',
+				'app.action.loading.title',
+				'app.action.loading.label',
 				'auth.message.already_logged_in',
 				'auth.message.unauthorized',
 			] as const,
@@ -121,7 +122,10 @@ export default function ProtectedRoute({
 	// Loading
 	if (authStatus === 'loading') {
 		return (
-			<LoadingComponent description={translations['app.text.loading']} />
+			<LoadingComponent
+				title={translations['app.action.loading.title']}
+				description={translations['app.action.loading.label']}
+			/>
 		);
 	}
 

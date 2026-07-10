@@ -1,10 +1,11 @@
 import type { LucideProps } from 'lucide-react';
 import Link from 'next/link';
-import React, { type JSX, useMemo } from 'react';
+import type { JSX } from 'react';
+import React from 'react';
 import { getActionIcon } from '@/components/icon.component';
 import { LoadingIcon } from '@/components/status.component';
 import { Button } from '@/components/ui/button';
-import { useTranslation } from '@/hooks/use-translation.hook';
+import { capitalizeFirstLetter } from '@/helpers/string.helper';
 import type { ButtonAppearanceType } from '@/types/html.type';
 
 type ActionCommand = {
@@ -20,75 +21,64 @@ type LinkCommand = {
 
 export type ButtonCommand = ActionCommand | LinkCommand;
 
-function ActionButtonContent({
+export function ActionButtonContent({
 	icon,
+	action,
 	label,
 }: {
-	icon: React.ReactElement | React.ComponentType<LucideProps> | null;
+	icon?: React.ReactElement | React.ComponentType<LucideProps> | string;
+	action: string;
 	label: string | JSX.Element;
 }) {
+	const iconSource = icon || action;
+
+	let iconElement: React.ReactElement | null = null;
+
+	if (React.isValidElement(iconSource)) {
+		// Already a JSX element
+		iconElement = iconSource;
+	} else if (typeof iconSource === 'string') {
+		const IconComponent = getActionIcon(iconSource);
+
+		if (IconComponent) {
+			iconElement = <IconComponent className="h-4 w-4" />;
+		}
+	} else if (iconSource) {
+		// A component type was passed directly — covers plain function
+		// components, class components, and forwardRef/memo wrapper objects
+		const IconComponent = iconSource as React.ComponentType<LucideProps>;
+
+		iconElement = <IconComponent className="h-4 w-4" />;
+	}
+
 	return (
 		<>
-			{icon && React.isValidElement(icon)
-				? icon
-				: icon &&
-					React.createElement(
-						icon as React.ComponentType<LucideProps>,
-					)}
+			{iconElement}
 			{label}
 		</>
 	);
 }
 
 export function ActionButton({
-	dataSource,
 	action,
 	buttonAppearance,
 	disabled = false,
 	command,
 }: {
-	dataSource: string;
 	action: string;
 	buttonAppearance?: ButtonAppearanceType;
 	disabled?: boolean;
 	command: ButtonCommand;
 }) {
-	const actionTitleKey = `${dataSource}.action.${action}.title`;
-	const actionLabelKey = `${dataSource}.action.${action}.label`;
-
-	const translationsKeys = useMemo(
-		() => [actionTitleKey, actionLabelKey, 'app.text.please_wait'] as const,
-		[actionLabelKey, actionTitleKey],
-	);
-
-	const { translations, isTranslationLoading } =
-		useTranslation(translationsKeys);
-
-	let ActionIcon:
-		| React.ReactElement
-		| React.ComponentType<LucideProps>
-		| null;
-
-	if (buttonAppearance?.icon) {
-		if (React.isValidElement(buttonAppearance.icon)) {
-			ActionIcon = buttonAppearance.icon;
-		} else {
-			ActionIcon = getActionIcon(buttonAppearance.icon);
-		}
-	} else {
-		ActionIcon = getActionIcon(action);
-	}
-
-	if (isTranslationLoading) {
-		return null;
-	}
-
-	const label = buttonAppearance?.label || translations[actionLabelKey];
-	const title = translations[actionTitleKey].replace(' - {{entry}}', '');
+	const label = buttonAppearance?.label ?? capitalizeFirstLetter(action);
+	const title = buttonAppearance?.title
+		? buttonAppearance.title.replace(' - {{entry}}', '')
+		: buttonAppearance?.label && typeof buttonAppearance?.label === 'string'
+			? buttonAppearance.label
+			: capitalizeFirstLetter(action);
 
 	return (
 		<Button
-			type="button"
 			variant={buttonAppearance?.variant}
 			hover={buttonAppearance?.hover}
 			size={buttonAppearance?.size}
@@ -101,14 +91,22 @@ export function ActionButton({
 			{disabled ? (
 				<>
 					<LoadingIcon />
-					{translations['app.text.please_wait']}
+					{buttonAppearance?.loadingLabel ?? 'Please wait...'}
 				</>
 			) : command.type === 'link' ? (
 				<Link href={command.href} target={command.target ?? '_self'}>
-					<ActionButtonContent icon={ActionIcon} label={label} />
+					<ActionButtonContent
+						icon={buttonAppearance?.icon}
+						action={action}
+						label={label}
+					/>
 				</Link>
 			) : (
-				<ActionButtonContent icon={ActionIcon} label={label} />
+				<ActionButtonContent
+					icon={buttonAppearance?.icon}
+					action={action}
+					label={label}
+				/>
 			)}
 		</Button>
 	);

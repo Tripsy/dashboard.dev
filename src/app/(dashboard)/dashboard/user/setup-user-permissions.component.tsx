@@ -25,8 +25,8 @@ export function SetupUserPermissions({ entries }: { entries: UserModel[] }) {
 	const translationsKeys = useMemo(
 		() =>
 			[
-				'app.text.error_title',
-				'app.text.success_title',
+				'app.error.title',
+				'app.success.title',
 				'user.error.no_permissions_defined',
 			] as const,
 		[],
@@ -94,7 +94,7 @@ export function SetupUserPermissions({ entries }: { entries: UserModel[] }) {
 		if (error) {
 			showToast({
 				severity: 'error',
-				summary: translations['app.text.error_title'],
+				summary: translations['app.error.title'],
 				detail: (error as Error).message,
 			});
 		}
@@ -139,7 +139,7 @@ export function SetupUserPermissions({ entries }: { entries: UserModel[] }) {
 
 					showToast({
 						severity: 'success',
-						summary: translations['app.text.success_title'],
+						summary: translations['app.success.title'],
 						detail: `All '${entity}' permissions granted`,
 					});
 				} else {
@@ -150,7 +150,7 @@ export function SetupUserPermissions({ entries }: { entries: UserModel[] }) {
 					);
 					showToast({
 						severity: 'info',
-						summary: translations['app.text.success_title'],
+						summary: translations['app.success.title'],
 						detail: `All '${entity}' permissions revoked`,
 					});
 				}
@@ -162,7 +162,7 @@ export function SetupUserPermissions({ entries }: { entries: UserModel[] }) {
 				);
 				showToast({
 					severity: 'error',
-					summary: translations['app.text.error_title'],
+					summary: translations['app.error.title'],
 					detail: (err as Error).message,
 				});
 			}
@@ -190,7 +190,7 @@ export function SetupUserPermissions({ entries }: { entries: UserModel[] }) {
 
 					showToast({
 						severity: 'success',
-						summary: translations['app.text.success_title'],
+						summary: translations['app.success.title'],
 						detail: `'${label}' granted`,
 					});
 				} else {
@@ -198,7 +198,7 @@ export function SetupUserPermissions({ entries }: { entries: UserModel[] }) {
 
 					showToast({
 						severity: 'info',
-						summary: translations['app.text.success_title'],
+						summary: translations['app.success.title'],
 						detail: `'${label}' revoked`,
 					});
 				}
@@ -210,7 +210,7 @@ export function SetupUserPermissions({ entries }: { entries: UserModel[] }) {
 				);
 				showToast({
 					severity: 'error',
-					summary: translations['app.text.error_title'],
+					summary: translations['app.error.title'],
 					detail: (err as Error).message,
 				});
 			}

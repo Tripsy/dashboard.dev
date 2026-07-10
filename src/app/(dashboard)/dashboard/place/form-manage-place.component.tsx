@@ -217,7 +217,7 @@ export function FormManagePlace() {
 				)}
 			/>
 			<Tabs
-				defaultValue={Configuration.language()}
+				defaultValue={Configuration.defaultLanguage()}
 				onValueChange={(value) =>
 					setSelectedLanguage(value as Language)
 				}
@@ -242,7 +242,7 @@ export function FormManagePlace() {
 
 					const contentIndex =
 						findIndex === -1 &&
-						language === Configuration.language()
+						language === Configuration.defaultLanguage()
 							? 0
 							: findIndex;
 

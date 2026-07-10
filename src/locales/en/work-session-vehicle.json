@@ -34,13 +34,13 @@
 			"title": "Delete vehicle - {{entry}}",
 			"label": "Delete",
 			"success": "Vehicle deleted successfully",
-			"confirmText": "Are you sure you want to delete this vehicle?"
+			"confirm": "Are you sure you want to delete this vehicle?"
 		},
 		"return": {
 			"title": "Mark vehicle as returned - {{entry}}",
 			"label": "Return",
 			"success": "Vehicle status marked as returned",
-			"confirmText": "Are you sure you want to mark this vehicle as returned?"
+			"confirm": "Are you sure you want to mark this vehicle as returned?"
 		},
 		"view": {
 			"title": "Work session vehicle details - {{entry}}",

@@ -4,7 +4,7 @@ import type { ApiResponseFetch } from '@/types/api.type';
 
 export async function createCmrSession<P>(
 	params: Partial<P>,
-	cmr_id: number | null,
+	cmr_id: number,
 ): Promise<ApiResponseFetch<CmrSessionModel>> {
 	return await new ApiRequest().doFetch(
 		`/${resolveRequestPath('cmr-session')}/${cmr_id}`,

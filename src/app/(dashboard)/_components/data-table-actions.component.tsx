@@ -23,6 +23,7 @@ import {
 	type ActionConfigType,
 	DataSourceSectionEnum,
 } from '@/types/data-source.type';
+import type { ButtonAppearanceType } from '@/types/html.type';
 
 type HandleActionType<K extends DataSourceKey> = (
 	action: string,
@@ -37,6 +38,57 @@ type AllowActionType<K extends DataSourceKey> = (
 	entriesSelection: EntriesSelectionType,
 	customEntryCheck?: (entry: DatasourceModels[K]) => boolean,
 ) => boolean;
+
+function DataTableActionButton({
+	dataSource,
+	action,
+	disabled = false,
+	buttonAppearance,
+	command,
+}: {
+	dataSource: string;
+	action: string;
+
+	disabled?: boolean;
+	buttonAppearance?: ButtonAppearanceType;
+	command: ButtonCommand;
+}) {
+	const actionTitleKey = `${dataSource}.action.${action}.title`;
+	const actionLabelKey = `${dataSource}.action.${action}.label`;
+
+	const translationsKeys = useMemo(
+		() =>
+			[
+				actionTitleKey,
+				actionLabelKey,
+				'app.action.loading.label',
+			] as const,
+		[actionTitleKey, actionLabelKey],
+	);
+
+	const { translations, isTranslationLoading } =
+		useTranslation(translationsKeys);
+
+	if (isTranslationLoading) {
+		return null;
+	}
+
+	return (
+		<ActionButton
+			action={action}
+			buttonAppearance={{
+				...buttonAppearance,
+				title: buttonAppearance?.title ?? translations[actionTitleKey],
+				label: buttonAppearance?.label ?? translations[actionLabelKey],
+				loadingLabel:
+					buttonAppearance?.loadingLabel ??
+					translations['app.action.loading.label'],
+			}}
+			disabled={disabled}
+			command={command}
+		/>
+	);
+}
 
 function buildActionButtons<K extends DataSourceKey>(
 	position: 'left' | 'right',
@@ -81,7 +133,7 @@ function buildActionButtons<K extends DataSourceKey>(
 			}
 
 			return (
-				<ActionButton
+				<DataTableActionButton
 					key={`button-${dataSource}-${action}`}
 					dataSource={dataSource}
 					action={action}
@@ -133,11 +185,7 @@ export function DataTableActions<K extends DataSourceKey>() {
 	}, [dataSource]);
 
 	const translationsKeys = useMemo(
-		() =>
-			[
-				'app.error.operation_not_allowed',
-				'app.text.error_title',
-			] as const,
+		() => ['app.error.operation_not_allowed', 'app.error.title'] as const,
 		[],
 	);
 
@@ -182,7 +230,7 @@ export function DataTableActions<K extends DataSourceKey>() {
 		(error: unknown) => {
 			showToast({
 				severity: 'error',
-				summary: translations['app.text.error_title'],
+				summary: translations['app.error.title'],
 				detail: getErrorMessage(error),
 			});
 		},

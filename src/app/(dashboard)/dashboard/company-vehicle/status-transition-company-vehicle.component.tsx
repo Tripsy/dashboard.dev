@@ -30,8 +30,8 @@ export function StatusTransitionCompanyVehicle({
 	const translationsKeys = useMemo(
 		() =>
 			[
-				'app.text.error_title',
-				'app.text.success_title',
+				'app.error.title',
+				'app.success.title',
 				'company-vehicle.error.cannot_update_status',
 				'company-vehicle.action.statusTransition.success',
 			] as const,
@@ -56,7 +56,7 @@ export function StatusTransitionCompanyVehicle({
 
 				showToast({
 					severity: 'success',
-					summary: translations['app.text.success_title'],
+					summary: translations['app.success.title'],
 					detail: translations[
 						'company-vehicle.action.statusTransition.success'
 					],
@@ -66,7 +66,7 @@ export function StatusTransitionCompanyVehicle({
 			} catch (error) {
 				showToast({
 					severity: 'error',
-					summary: translations['app.text.error_title'],
+					summary: translations['app.error.title'],
 					detail: (error as Error).message,
 				});
 			} finally {

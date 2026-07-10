@@ -32,7 +32,7 @@ const brandTypes = toOptionsFromEnum(BrandTypeEnum, {
 	formatter: formatEnumLabel,
 });
 
-export async function FormManageBrand() {
+export function FormManageBrand() {
 	const { formValues, errors, handleChange, pending } =
 		useWindowForm<BrandFormValuesType>();
 
@@ -141,7 +141,10 @@ export async function FormManageBrand() {
 					) as BrandContentType[],
 				)}
 			/>
-			<Tabs defaultValue={Configuration.language()} className="w-full">
+			<Tabs
+				defaultValue={Configuration.defaultLanguage()}
+				className="w-full"
+			>
 				<div className="flex items-center justify-center border-b border-line pb-2 mb-4">
 					<h3 className="font-bold whitespace-nowrap">
 						Language specific
@@ -161,7 +164,7 @@ export async function FormManageBrand() {
 
 					const contentIndex =
 						findIndex === -1 &&
-						language === Configuration.language()
+						language === Configuration.defaultLanguage()
 							? 0
 							: findIndex;
 

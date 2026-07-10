@@ -3,9 +3,7 @@
 import { useMemo, useState } from 'react';
 import { dispatchFilterReset } from '@/app/(dashboard)/_events/data-table-filter-reset.event';
 import { ActionButton } from '@/components/action-button.component';
-import { Icons } from '@/components/icon.component';
 import { LoadingComponent } from '@/components/status.component';
-import { Button } from '@/components/ui/button';
 import { ApiError } from '@/exceptions/api.error';
 import ValueError from '@/exceptions/value.error';
 import { replaceVars } from '@/helpers/string.helper';
@@ -18,6 +16,7 @@ import type {
 } from '@/types/action.type';
 import type { DataSourceKey } from '@/types/data-source.key';
 import { DataSourceSectionEnum } from '@/types/data-source.type';
+import type { ButtonAppearanceType } from '@/types/html.type';
 import type { WindowEntryType } from '@/types/window.type';
 
 export function WindowAction<WindowEntry extends WindowEntryType>({
@@ -68,19 +67,26 @@ export function WindowAction<WindowEntry extends WindowEntryType>({
 
 	const windowEvents = windowConfig.events;
 
-	const confirmTextKey = `${windowConfig.dataSource}.action.${windowConfig.action}.confirmText`;
+	const actionTitleKey = `${windowConfig.dataSource}.action.${windowConfig.action}.title`;
+	const actionLabelKey = `${windowConfig.dataSource}.action.${windowConfig.action}.label`;
+	const actionConfirmKey = `${windowConfig.dataSource}.action.${windowConfig.action}.confirm`;
 
 	const translationsKeys = useMemo(
 		() =>
 			[
-				confirmTextKey,
-				'app.error.generic',
-				'app.text.success_title',
-				'app.text.error_title',
+				actionTitleKey,
+				actionLabelKey,
+				actionConfirmKey,
+				'app.error.description',
+				'app.success.title',
+				'app.error.title',
+				'app.action.loading.label',
+				'app.action.abort.title',
+				'app.action.abort.label',
 				'dashboard.text.selected_entries_one',
 				'dashboard.text.selected_entries_many',
 			] as const,
-		[confirmTextKey],
+		[actionTitleKey, actionLabelKey, actionConfirmKey],
 	);
 
 	const { translations, isTranslationLoading } =
@@ -107,7 +113,7 @@ export function WindowAction<WindowEntry extends WindowEntryType>({
 			if (fetchResponse?.success) {
 				showToast({
 					severity: 'success',
-					summary: translations['app.text.success_title'],
+					summary: translations['app.success.title'],
 					detail: fetchResponse?.message,
 				});
 
@@ -123,7 +129,7 @@ export function WindowAction<WindowEntry extends WindowEntryType>({
 			} else {
 				showToast({
 					severity: 'error',
-					summary: translations['app.text.error_title'],
+					summary: translations['app.error.title'],
 					detail: fetchResponse?.message,
 				});
 
@@ -136,11 +142,20 @@ export function WindowAction<WindowEntry extends WindowEntryType>({
 				detail:
 					error instanceof ValueError || error instanceof ApiError
 						? error.message
-						: translations['app.error.generic'],
+						: translations['app.error.description'],
 			});
 		} finally {
 			setLoading(false);
 		}
+	};
+
+	const buttonAppearance: ButtonAppearanceType = {
+		...windowDefinition.button,
+		title: windowDefinition.button?.title ?? translations[actionTitleKey],
+		label: windowDefinition.button?.label ?? translations[actionLabelKey],
+		loadingLabel:
+			windowDefinition.button?.loadingLabel ??
+			translations['app.action.loading.label'],
 	};
 
 	if (isTranslationLoading) {
@@ -167,23 +182,29 @@ export function WindowAction<WindowEntry extends WindowEntryType>({
 					</li>
 				))}
 			</ul>
-			<p className="pb-4 font-semibold">{translations[confirmTextKey]}</p>
+			<p className="pb-4 font-semibold">
+				{translations[actionConfirmKey]}
+			</p>
 
 			<div className="flex justify-end gap-3">
-				<Button
-					variant="outline"
-					hover="warning"
-					onClick={handleClose}
-					title="Abort"
-					disabled={loading}
-				>
-					<Icons.Action.Abort />
-					Abort
-				</Button>
 				<ActionButton
-					dataSource={windowConfig.dataSource}
+					action="abort"
+					buttonAppearance={{
+						variant: 'outline',
+						hover: 'warning',
+						title: translations['app.action.abort.title'],
+						icon: 'abort',
+						label: translations['app.action.abort.label'],
+					}}
+					disabled={loading}
+					command={{
+						type: 'action',
+						onClick: handleClose,
+					}}
+				/>
+				<ActionButton
 					action={windowConfig.action}
-					buttonAppearance={windowDefinition.button}
+					buttonAppearance={buttonAppearance}
 					disabled={loading}
 					command={{
 						type: 'action',

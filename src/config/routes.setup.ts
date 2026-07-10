@@ -8,7 +8,7 @@ export const RouteAuthEnum = {
 	PUBLIC: 'public',
 	UNAUTHENTICATED: 'unauthenticated',
 	AUTHENTICATED: 'authenticated',
-	PROTECTED: 'protected', // Admin OR Operator
+	PROTECTED: 'protected', // `admin` OR `operator` OR `driver`
 } as const;
 
 export type RouteAuth = (typeof RouteAuthEnum)[keyof typeof RouteAuthEnum];
@@ -168,7 +168,10 @@ Routes.add('document-cmr', '/document/cmr/:tracking_number');
 Routes.group('api')
 	.add('proxy', '/api/proxy/:path*')
 	.add('csrf', '/api/csrf')
-	.add('language', '/api/language');
+	.add('language', '/api/language')
+	.add('api-image', '/api/image', {
+		auth: RouteAuthEnum.PUBLIC,
+	});
 
 // Account
 Routes.group('account')

@@ -110,7 +110,6 @@ export default function EmailConfirmSend() {
 					error={formSituation === 'failedValidation'}
 					button={{
 						label: 'Get confirmation',
-						iconLabel: 'submit',
 					}}
 				/>
 

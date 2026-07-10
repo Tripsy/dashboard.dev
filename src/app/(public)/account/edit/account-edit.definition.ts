@@ -23,7 +23,7 @@ export type AccountEditStateType = {
 export const AccountEditState: AccountEditStateType = {
 	values: {
 		name: '',
-		language: Configuration.language(),
+		language: Configuration.defaultLanguage(),
 	},
 	errors: {},
 	message: null,

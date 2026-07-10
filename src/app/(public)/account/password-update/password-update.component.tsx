@@ -161,8 +161,8 @@ export default function PasswordUpdate() {
 						submitted={submitted}
 						error={formSituation === 'failedValidation'}
 						button={{
+							icon: 'save',
 							label: 'Update password',
-							iconLabel: 'save',
 						}}
 					/>
 				</div>

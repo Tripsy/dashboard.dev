@@ -61,6 +61,7 @@ import {
 	MapPin,
 	MapPinHouse,
 	Minus,
+	Move,
 	PenTool,
 	PiggyBank,
 	Play,
@@ -89,6 +90,7 @@ import {
 	TrendingUp,
 	TriangleAlert,
 	Undo2,
+	Upload,
 	UserRound,
 	Users,
 	Wrench,
@@ -234,6 +236,9 @@ export const Icons = {
 		Setup: createIcon(FileCog),
 		Return: createIcon(Undo2),
 		Order: createIcon(ListOrdered),
+		Image: createIcon(Camera),
+		Upload: createIcon(Upload),
+		Move: createIcon(Move),
 	},
 };
 

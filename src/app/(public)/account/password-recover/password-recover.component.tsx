@@ -110,7 +110,6 @@ export default function PasswordRecover() {
 					error={formSituation === 'failedValidation'}
 					button={{
 						label: 'Recover password',
-						iconLabel: 'submit',
 					}}
 				/>
 

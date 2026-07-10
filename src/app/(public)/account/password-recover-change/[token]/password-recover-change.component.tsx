@@ -136,7 +136,6 @@ export default function PasswordRecoverChange() {
 					error={formSituation === 'failedValidation'}
 					button={{
 						label: 'Set password',
-						iconLabel: 'submit',
 					}}
 				/>
 

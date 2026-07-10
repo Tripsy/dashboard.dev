@@ -28,8 +28,8 @@ export function StatusTransitionCmr({ entries }: { entries: CmrModel[] }) {
 	const translationsKeys = useMemo(
 		() =>
 			[
-				'app.text.error_title',
-				'app.text.success_title',
+				'app.error.title',
+				'app.success.title',
 				'cmr.error.cannot_update_status',
 				'cmr.action.statusTransition.success',
 			] as const,
@@ -54,7 +54,7 @@ export function StatusTransitionCmr({ entries }: { entries: CmrModel[] }) {
 
 				showToast({
 					severity: 'success',
-					summary: translations['app.text.success_title'],
+					summary: translations['app.success.title'],
 					detail: translations['cmr.action.statusTransition.success'],
 				});
 
@@ -62,7 +62,7 @@ export function StatusTransitionCmr({ entries }: { entries: CmrModel[] }) {
 			} catch (error) {
 				showToast({
 					severity: 'error',
-					summary: translations['app.text.error_title'],
+					summary: translations['app.error.title'],
 					detail: (error as Error).message,
 				});
 			} finally {

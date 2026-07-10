@@ -1,36 +1,20 @@
-import { z } from 'zod';
 import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
-import {
-	FormManageImage,
-	type ImageFormValuesType,
-} from '@/app/(dashboard)/dashboard/image/form-manage-image.component';
 import { ViewImage } from '@/app/(dashboard)/dashboard/image/view-image.component';
-import Routes from '@/config/routes.setup';
 import { translateBatch } from '@/config/translate.setup';
-import { getFormDataAsEnum, getFormDataAsNumber } from '@/helpers/form.helper';
 import {
 	requestDelete,
 	requestFind,
-	requestRestore,
-	requestUpdate,
 	requestUpdateStatus,
 	requestView,
 } from '@/helpers/services.helper';
-import { BaseValidator } from '@/helpers/validator.helper';
 import { type AuthModel, hasPermission } from '@/models/auth.model';
 import {
 	displayImageLabel,
-	IMAGE_DEFAULT_SECTION,
-	IMAGE_DEFAULT_TYPE,
-	type ImageContentType,
 	type ImageModel,
 	type ImageSection,
-	ImageSectionEnum,
 	type ImageStatus,
 	ImageStatusEnum,
-	ImageStorageEnum,
 	type ImageType,
-	ImageTypeEnum,
 } from '@/models/image.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
 import type { Language } from '@/types/common.type';
@@ -38,112 +22,112 @@ import type {
 	DataSourceConfigType,
 	DataTableValueOptionsType,
 } from '@/types/data-source.type';
-import type { FormStateType } from '@/types/form.type';
-import { ImageMimeEnum } from '@/types/image.type';
 
-const validatorMessages = [
-	'invalid_section',
-	'invalid_entity_id',
-	'invalid_image_type',
-	'invalid_contents',
-	'duplicate_contents',
-	'invalid_language',
-	'invalid_storage',
-	'invalid_path',
-	'invalid_width',
-	'invalid_height',
-	'invalid_size',
-	'invalid_mime',
-	'invalid_alt',
-	'invalid_title',
-	'invalid_description',
-] as const;
+// TODO clean up
 
-class ImageValidator extends BaseValidator<typeof validatorMessages> {
-	protected validateProperties(
-		message = {
-			invalid_width: 'Invalid width',
-			invalid_height: 'Invalid height',
-			invalid_size: 'Invalid file size',
-			invalid_mime: 'Invalid mime type',
-		},
-	) {
-		return z.preprocess(
-			(val) => val ?? {},
-			z.object({
-				width: this.validateNumber(message.invalid_width, {
-					required: false,
-				}),
-				height: this.validateNumber(message.invalid_width, {
-					required: false,
-				}),
-				size: this.validateNumber(message.invalid_width),
-				mime: this.validateEnum(ImageMimeEnum, message.invalid_mime),
-			}),
-		);
-	}
+// const validatorMessages = [
+// 	'invalid_section',
+// 	'invalid_entity_id',
+// 	'invalid_image_type',
+// 	'invalid_contents',
+// 	'duplicate_contents',
+// 	'invalid_language',
+// 	'invalid_storage',
+// 	'invalid_path',
+// 	'invalid_width',
+// 	'invalid_height',
+// 	'invalid_size',
+// 	'invalid_mime',
+// 	'invalid_alt',
+// 	'invalid_title',
+// 	'invalid_description',
+// ] as const;
 
-	protected validateAttributes(
-		message = {
-			invalid_alt: 'Invalid alt',
-			invalid_title: 'Invalid title',
-			invalid_description: 'Invalid description',
-		},
-	) {
-		return z.preprocess(
-			(val) => val ?? {},
-			z.object({
-				alt: this.validateString(message.invalid_alt, {
-					required: false,
-				}),
-				title: this.validateString(message.invalid_title, {
-					required: false,
-				}),
-				description: this.validateString(message.invalid_description, {
-					required: false,
-				}),
-			}),
-		);
-	}
-
-	protected contentsSchema() {
-		return z.object({
-			language: this.validateLanguage(
-				this.getMessage('invalid_language'),
-			),
-			storage: this.validateEnum(
-				ImageStorageEnum,
-				this.getMessage('invalid_storage'),
-			),
-			path: this.validateString(this.getMessage('invalid_path')),
-			properties: this.validateProperties({
-				invalid_width: this.getMessage('invalid_width'),
-				invalid_height: this.getMessage('invalid_height'),
-				invalid_size: this.getMessage('invalid_size'),
-				invalid_mime: this.getMessage('invalid_mime'),
-			}),
-			attributes: this.validateAttributes({
-				invalid_alt: this.getMessage('invalid_alt'),
-				invalid_title: this.getMessage('invalid_title'),
-				invalid_description: this.getMessage('invalid_description'),
-			}),
-		});
-	}
-
-	update = () =>
-		z.object({
-			section: this.validateEnum(
-				ImageSectionEnum,
-				this.getMessage('invalid_section'),
-			),
-			entity_id: this.validateId(this.getMessage('invalid_entity_id')),
-			image_type: this.validateEnum(
-				ImageTypeEnum,
-				this.getMessage('invalid_image_type'),
-			),
-			contents: this.contentsSchema().array(),
-		});
-}
+// class ImageValidator extends BaseValidator<typeof validatorMessages> {
+// 	protected validateProperties(
+// 		message = {
+// 			invalid_width: 'Invalid width',
+// 			invalid_height: 'Invalid height',
+// 			invalid_size: 'Invalid file size',
+// 			invalid_mime: 'Invalid mime type',
+// 		},
+// 	) {
+// 		return z.preprocess(
+// 			(val) => val ?? {},
+// 			z.object({
+// 				width: this.validateNumber(message.invalid_width, {
+// 					required: false,
+// 				}),
+// 				height: this.validateNumber(message.invalid_width, {
+// 					required: false,
+// 				}),
+// 				size: this.validateNumber(message.invalid_width),
+// 				mime: this.validateEnum(ImageMimeEnum, message.invalid_mime),
+// 			}),
+// 		);
+// 	}
+//
+// 	protected validateAttributes(
+// 		message = {
+// 			invalid_alt: 'Invalid alt',
+// 			invalid_title: 'Invalid title',
+// 			invalid_description: 'Invalid description',
+// 		},
+// 	) {
+// 		return z.preprocess(
+// 			(val) => val ?? {},
+// 			z.object({
+// 				alt: this.validateString(message.invalid_alt, {
+// 					required: false,
+// 				}),
+// 				title: this.validateString(message.invalid_title, {
+// 					required: false,
+// 				}),
+// 				description: this.validateString(message.invalid_description, {
+// 					required: false,
+// 				}),
+// 			}),
+// 		);
+// 	}
+//
+// 	protected contentsSchema() {
+// 		return z.object({
+// 			language: this.validateLanguage(
+// 				this.getMessage('invalid_language'),
+// 			),
+// 			storage: this.validateEnum(
+// 				ImageStorageEnum,
+// 				this.getMessage('invalid_storage'),
+// 			),
+// 			path: this.validateString(this.getMessage('invalid_path')),
+// 			properties: this.validateProperties({
+// 				invalid_width: this.getMessage('invalid_width'),
+// 				invalid_height: this.getMessage('invalid_height'),
+// 				invalid_size: this.getMessage('invalid_size'),
+// 				invalid_mime: this.getMessage('invalid_mime'),
+// 			}),
+// 			attributes: this.validateAttributes({
+// 				invalid_alt: this.getMessage('invalid_alt'),
+// 				invalid_title: this.getMessage('invalid_title'),
+// 				invalid_description: this.getMessage('invalid_description'),
+// 			}),
+// 		});
+// 	}
+//
+// 	update = () =>
+// 		z.object({
+// 			section: this.validateEnum(
+// 				ImageSectionEnum,
+// 				this.getMessage('invalid_section'),
+// 			),
+// 			entity_id: this.validateId(this.getMessage('invalid_entity_id')),
+// 			image_type: this.validateEnum(
+// 				ImageTypeEnum,
+// 				this.getMessage('invalid_image_type'),
+// 			),
+// 			contents: this.contentsSchema().array(),
+// 		});
+// }
 
 // async function validateFormUpdate(values: ImageFormValuesType) {
 // 	const translations = await translateBatch(
@@ -217,14 +201,14 @@ export default async function dataSourceConfig(): Promise<
 > {
 	const translations = await translateBatch(
 		[
+			// TODO drop
 			// 'create.title',
 			// 'update.title',
 			'view.title',
 			'delete.title',
-			'restore.title',
 			'enable.title',
 			'disable.title',
-			'order.title',
+			// 'order.title',
 		] as const,
 		'image.action',
 	);
@@ -244,12 +228,6 @@ export default async function dataSourceConfig(): Promise<
 	): DataTableValueOptionsType<ImageModel>['displayButton'] {
 		return {
 			action: (entry: ImageModel) => {
-				if (entry.deleted_at) {
-					return hasPermission(auth, 'image', 'delete')
-						? 'restore'
-						: undefined;
-				}
-
 				if (!hasPermission(auth, 'image', 'update')) {
 					return undefined;
 				}
@@ -341,51 +319,11 @@ export default async function dataSourceConfig(): Promise<
 			return displayImageLabel(entry);
 		},
 		actions: {
-			// create: {
-			// 	windowType: 'form',
-			// 	windowTitle: translations['create.title'],
-			// 	windowComponent: FormManageImage,
-			// 	permission: ['image', 'create'],
-			// 	entriesSelection: 'free',
-			// 	operationFunction: (params: ImageFormValuesType) =>
-			// 		requestCreate<ImageModel, ImageFormValuesType>('image', params),
-			// 	buttonPosition: 'right',
-			// 	button: {
-			// 		variant: 'info',
-			// 	},
-			// 	getFormValues: getFormValues,
-			// 	validateForm: validateForm,
-			// 	getFormState: getFormState,
-			// },
-			// update: {
-			// 	windowType: 'form',
-			// 	windowTitle: translations['update.title'],
-			// 	windowComponent: FormManageImage,
-			// 	permission: ['image', 'update'],
-			// 	entriesSelection: 'single',
-			// 	customEntryCheck: (entry: ImageModel) => !entry.deleted_at, // Return true if the entry is not deleted
-			// 	operationFunction: (params: ImageFormValuesType, id: number) =>
-			// 		requestUpdate<ImageModel, ImageFormValuesType>(
-			// 			'image',
-			// 			params,
-			// 			id,
-			// 		),
-			// 	reloadEntry: (id: number) => requestView<ImageModel>('image', id),
-			// 	buttonPosition: 'left',
-			// 	button: {
-			// 		variant: 'outline',
-			// 		hover: 'success',
-			// 	},
-			// 	getFormValues: getFormValues,
-			// 	validateForm: validateFormUpdate,
-			// 	getFormState: getFormState,
-			// },
 			delete: {
 				windowType: 'action',
 				windowTitle: translations['delete.title'],
 				permission: ['image', 'delete'],
 				entriesSelection: 'single',
-				customEntryCheck: (entry: ImageModel) => !entry.deleted_at, // Return true if the entry is not deleted
 				operationFunction: (entry: ImageModel) =>
 					requestDelete('image', entry),
 				buttonPosition: 'left',
@@ -394,27 +332,12 @@ export default async function dataSourceConfig(): Promise<
 					hover: 'error',
 				},
 			},
-			restore: {
-				windowType: 'action',
-				windowTitle: translations['restore.title'],
-				permission: ['image', 'delete'],
-				entriesSelection: 'single',
-				customEntryCheck: (entry: ImageModel) => !!entry.deleted_at, // Return true if the entry is deleted
-				operationFunction: (entry: ImageModel) =>
-					requestRestore('image', entry),
-				buttonPosition: 'left',
-				button: {
-					variant: 'outline',
-					hover: 'info',
-				},
-			},
 			enable: {
 				windowType: 'action',
 				windowTitle: translations['enable.title'],
 				permission: ['image', 'update'],
 				entriesSelection: 'single',
 				customEntryCheck: (entry: ImageModel) =>
-					!entry.deleted_at &&
 					entry.status === ImageStatusEnum.INACTIVE,
 				operationFunction: (entry: ImageModel) =>
 					requestUpdateStatus('image', entry, 'active'),
@@ -430,7 +353,6 @@ export default async function dataSourceConfig(): Promise<
 				permission: ['image', 'update'],
 				entriesSelection: 'single',
 				customEntryCheck: (entry: ImageModel) =>
-					!entry.deleted_at &&
 					entry.status === ImageStatusEnum.ACTIVE,
 				operationFunction: (entry: ImageModel) =>
 					requestUpdateStatus('image', entry, 'inactive'),
@@ -452,17 +374,6 @@ export default async function dataSourceConfig(): Promise<
 				buttonPosition: 'hidden',
 				reloadEntry: (id: number) =>
 					requestView<ImageModel>('image', id),
-			},
-			order: {
-				windowType: 'link',
-				windowTitle: translations['order.title'],
-				windowTarget: Routes.get('image-order'),
-				permission: ['image', 'update'],
-				entriesSelection: 'free',
-				buttonPosition: 'right',
-				button: {
-					variant: 'default',
-				},
 			},
 		},
 	};

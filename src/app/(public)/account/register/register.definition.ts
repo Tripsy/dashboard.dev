@@ -37,7 +37,7 @@ export const RegisterState: RegisterStateType = {
 		email: '',
 		password: '',
 		password_confirm: '',
-		language: Configuration.language(),
+		language: Configuration.defaultLanguage(),
 		terms: false,
 	},
 	errors: {},

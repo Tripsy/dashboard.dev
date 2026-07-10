@@ -4,6 +4,7 @@ import {
 	type CmrFormValuesType,
 	FormManageCmr,
 } from '@/app/(dashboard)/dashboard/cmr/form-manage-cmr.component';
+import { ManagerCmrImages } from '@/app/(dashboard)/dashboard/cmr/manager-cmr-images.component';
 import { SetupCmrSessions } from '@/app/(dashboard)/dashboard/cmr/setup-cmr-sessions.component';
 import { SetupCmrVehicles } from '@/app/(dashboard)/dashboard/cmr/setup-cmr-vehicles.component';
 import { StatusTransitionCmr } from '@/app/(dashboard)/dashboard/cmr/status-transition-cmr.component';
@@ -428,7 +429,7 @@ export default async function dataSourceConfig(): Promise<
 			'viewClient.title',
 			'setupVehicles.title',
 			'setupSessions.title',
-			'manageImages.title',
+			'managerImages.title',
 		] as const,
 		'cmr.action',
 	);
@@ -733,14 +734,14 @@ export default async function dataSourceConfig(): Promise<
 					icon: 'Setup',
 				},
 			},
-			manageImages: {
+			managerImages: {
 				windowType: 'other',
-				windowTitle: translations['manageImages.title'],
-				windowComponent: SetupCmrSessions,
+				windowTitle: translations['managerImages.title'],
+				windowComponent: ManagerCmrImages,
 				windowConfigProps: {
 					size: 'x4l',
 				},
-				permission: ['image', 'update'],
+				permission: ['cmr', 'read'],
 				entriesSelection: 'single',
 				customEntryCheck: (entry: CmrModel) =>
 					arrayHasValue(entry.status, [

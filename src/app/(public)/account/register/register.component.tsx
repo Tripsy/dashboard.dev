@@ -254,7 +254,6 @@ export default function Register() {
 					error={formSituation === 'failedValidation'}
 					button={{
 						label: 'Create account',
-						iconLabel: 'submit',
 					}}
 				/>
 

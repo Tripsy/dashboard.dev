@@ -1,3 +1,5 @@
+import type { ImageMime } from '@/types/image.type';
+
 export function capitalizeFirstLetter(str: string): string {
 	return str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
 }
@@ -256,4 +258,38 @@ export function normalizePhoneNumber(
 	}
 
 	return defaultCountryCode + digits;
+}
+
+/**
+ * Formats bytes
+ *
+ * @param bytes
+ */
+export function formatBytes(bytes?: number): string {
+	if (bytes == null) {
+		return '—';
+	}
+
+	if (bytes < 1024) {
+		return `${bytes} B`;
+	}
+
+	if (bytes < 1024 * 1024) {
+		return `${(bytes / 1024).toFixed(1)} KB`;
+	}
+
+	return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+}
+
+/**
+ * Formats MIME type (eg: 'image/jpeg' → 'JPEG')
+ *
+ * @param mime
+ */
+export function formatMime(mime?: ImageMime): string {
+	if (!mime) {
+		return '—';
+	}
+
+	return mime.replace('image/', '').toUpperCase();
 }

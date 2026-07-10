@@ -82,6 +82,21 @@ function loadSettings(): Settings {
 			username: process.env.MAIL_USERNAME || '',
 			password: process.env.MAIL_PASSWORD || '',
 		},
+		images: {
+			storage: process.env.IMAGE_STORAGE || 'local',
+			local: {
+				save: process.env.IMAGE_SAVE_PATH ?? 'public/uploads',
+				view: process.env.IMAGE_VIEW_PATH ?? '/uploads',
+			},
+			s3: {
+				bucket: process.env.AWS_S3_BUCKET ?? '',
+				region: process.env.AWS_REGION ?? 'eu-central-1',
+				accessKeyId: process.env.AWS_ACCESS_KEY_ID ?? '',
+				secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? '',
+				baseUrl: process.env.AWS_S3_BASE_URL ?? '',
+			},
+			maxSizeBytes: 10 * 1024 * 1024,
+		},
 	};
 }
 
@@ -118,7 +133,7 @@ export const Configuration = {
 		return Configuration.environment() === value;
 	},
 
-	language: () => {
+	defaultLanguage: () => {
 		return Configuration.get('language.default') as Language;
 	},
 

@@ -56,7 +56,7 @@ const transportTypes = toOptionsFromEnum(CmrTransportTypeEnum, {
 	formatter: formatEnumLabel,
 });
 
-export async function FormManageCmr() {
+export function FormManageCmr() {
 	const { formValues, errors, handleChange, pending } =
 		useWindowForm<CmrFormValuesType>();
 

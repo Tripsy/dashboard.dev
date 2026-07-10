@@ -170,8 +170,8 @@ export default function Login() {
 					submitted={submitted}
 					error={formSituation === 'failedValidation'}
 					button={{
+						icon: 'login',
 						label: 'Login',
-						iconLabel: 'login',
 					}}
 				/>
 

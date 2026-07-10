@@ -206,10 +206,12 @@ pnpm run build    # Production build
 
 # 📌 TODO
 
-1. order page ..glitch when moving to order without type (brand)
-2. dashboard stats
-3. monthly driver report 
-4. deploy
+1. adjust image list on BE
+2. add images for CMR in driver panel
+3. order page ..glitch when moving to order without type (brand)
+4. dashboard stats
+5. monthly driver report 
+6. deploy
 
 ---------- 
 1. Add section "documentation"

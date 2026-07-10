@@ -26,25 +26,25 @@
 			"title": "Delete vendor - {{entry}}",
 			"label": "Delete",
 			"success": "Vendor deleted successfully",
-			"confirmText": "Are you sure you want to delete this vendor?"
+			"confirm": "Are you sure you want to delete this vendor?"
 		},
 		"restore": {
 			"title": "Restore vendor - {{entry}}",
 			"label": "Restore",
 			"success": "Vendor restored successfully",
-			"confirmText": "Are you sure you want to restore this vendor?"
+			"confirm": "Are you sure you want to restore this vendor?"
 		},
 		"enable": {
 			"title": "Enable vendor - {{entry}}",
 			"label": "Enable",
 			"success": "Vendor status marked as active",
-			"confirmText": "Are you sure you want to activate this vendor?"
+			"confirm": "Are you sure you want to activate this vendor?"
 		},
 		"disable": {
 			"title": "Disable vendor - {{entry}}",
 			"label": "Disable",
 			"success": "Vendor status marked as inactive",
-			"confirmText": "Are you sure you want to mark this vendor as inactive?"
+			"confirm": "Are you sure you want to mark this vendor as inactive?"
 		},
 		"view": {
 			"title": "Vendor details - {{entry}}",

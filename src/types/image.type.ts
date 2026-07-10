@@ -14,9 +14,3 @@ export type ImagePropertiesType = {
 	size?: number; // in bytes
 	mime?: ImageMime;
 };
-
-export type ImageAttributesType = {
-	alt?: string;
-	title?: string;
-	description?: string;
-};

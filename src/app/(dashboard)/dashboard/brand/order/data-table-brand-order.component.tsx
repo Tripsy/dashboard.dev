@@ -1,21 +1,6 @@
 'use client';
 
-import {
-	closestCenter,
-	DndContext,
-	type DragEndEvent,
-	KeyboardSensor,
-	PointerSensor,
-	useSensor,
-	useSensors,
-} from '@dnd-kit/core';
-import {
-	arrayMove,
-	SortableContext,
-	sortableKeyboardCoordinates,
-	useSortable,
-	verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
+import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import {
 	keepPreviousData,
@@ -33,6 +18,7 @@ import {
 } from '@/app/(dashboard)/_providers/data-table.provider';
 import { DataTableFiltersBrandOrder } from '@/app/(dashboard)/dashboard/brand/order/data-table-filters-brand-order.component';
 import { Icons } from '@/components/icon.component';
+import { SortableList } from '@/components/sortable-list.component';
 import {
 	ErrorComponent,
 	LoadingComponent,
@@ -48,24 +34,19 @@ import {
 	BrandStatusEnum,
 	type BrandType,
 } from '@/models/brand.model';
+import { useSortablePosition } from '@/providers/sortable-position.provider';
 import { useToast } from '@/providers/toast.provider';
 import { orderUpdate } from '@/services/brand.service';
 
 type SortableBrandItemProps = {
 	brand: BrandModel;
-	isFirst: boolean;
-	isLast: boolean;
-	onMoveUp: (id: number) => void;
-	onMoveDown: (id: number) => void;
 };
 
-const SortableBrandItem = ({
-	brand,
-	isFirst,
-	isLast,
-	onMoveUp,
-	onMoveDown,
-}: SortableBrandItemProps): JSX.Element => {
+const SortableBrandItem = ({ brand }: SortableBrandItemProps): JSX.Element => {
+	const { isFirst, isLast, onMoveUp, onMoveDown } = useSortablePosition(
+		brand.id,
+	);
+
 	const {
 		attributes,
 		listeners,
@@ -94,7 +75,7 @@ const SortableBrandItem = ({
 				<div className="flex gap-2">
 					<button
 						type="button"
-						onClick={() => onMoveUp(brand.id)}
+						onClick={onMoveUp}
 						disabled={isFirst}
 						className="cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
 						aria-label={`Move ${brand.name} up`}
@@ -103,7 +84,7 @@ const SortableBrandItem = ({
 					</button>
 					<button
 						type="button"
-						onClick={() => onMoveDown(brand.id)}
+						onClick={onMoveDown}
 						disabled={isLast}
 						className="cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
 						aria-label={`Move ${brand.name} down`}
@@ -120,8 +101,8 @@ const DataTableBrandOrderContent = (): JSX.Element => {
 	const translationsKeys = useMemo(
 		() =>
 			[
-				'app.text.error_title',
-				'app.text.success_title',
+				'app.error.title',
+				'app.success.title',
 				'brand-order.success.order_updated',
 				'brand-order.error.order_updated',
 			] as const,
@@ -193,7 +174,7 @@ const DataTableBrandOrderContent = (): JSX.Element => {
 		onSuccess: async () => {
 			showToast({
 				severity: 'success',
-				summary: translations['app.text.success_title'],
+				summary: translations['app.success.title'],
 				detail: translations['brand-order.success.order_updated'],
 			});
 
@@ -202,56 +183,11 @@ const DataTableBrandOrderContent = (): JSX.Element => {
 		onError: () => {
 			showToast({
 				severity: 'error',
-				summary: translations['app.text.error_title'],
+				summary: translations['app.error.title'],
 				detail: translations['brand-order.error.order_updated'],
 			});
 		},
 	});
-
-	const sensors = useSensors(
-		useSensor(PointerSensor, {
-			activationConstraint: { distance: 5 },
-		}),
-		useSensor(KeyboardSensor, {
-			coordinateGetter: sortableKeyboardCoordinates,
-		}),
-	);
-
-	const handleDragEnd = (event: DragEndEvent): void => {
-		const { active, over } = event;
-
-		if (!over || active.id === over.id) {
-			return;
-		}
-
-		setOrderedBrands((items) => {
-			const oldIndex = items.findIndex((item) => item.id === active.id);
-			const newIndex = items.findIndex((item) => item.id === over.id);
-
-			return arrayMove(items, oldIndex, newIndex);
-		});
-	};
-
-	const moveBrand = (id: number, direction: 'up' | 'down'): void => {
-		setOrderedBrands((items) => {
-			const index = items.findIndex((item) => item.id === id);
-
-			if (index === -1) {
-				return items;
-			}
-
-			const targetIndex = direction === 'up' ? index - 1 : index + 1;
-
-			if (targetIndex < 0 || targetIndex >= items.length) {
-				return items;
-			}
-
-			return arrayMove(items, index, targetIndex);
-		});
-	};
-
-	const handleMoveUp = (id: number): void => moveBrand(id, 'up');
-	const handleMoveDown = (id: number): void => moveBrand(id, 'down');
 
 	const handleUpdateOrder = (): void => {
 		const positions = orderedBrands.map((brand) => brand.id);
@@ -269,29 +205,14 @@ const DataTableBrandOrderContent = (): JSX.Element => {
 
 	return (
 		<>
-			<DndContext
-				sensors={sensors}
-				collisionDetection={closestCenter}
-				onDragEnd={handleDragEnd}
-			>
-				<SortableContext
-					items={orderedBrands.map((brand) => brand.id)}
-					strategy={verticalListSortingStrategy}
-				>
-					<ol className="list-decimal space-y-2 ml-8 mt-4">
-						{orderedBrands.map((brand, index) => (
-							<SortableBrandItem
-								key={brand.id}
-								brand={brand}
-								isFirst={index === 0}
-								isLast={index === orderedBrands.length - 1}
-								onMoveUp={handleMoveUp}
-								onMoveDown={handleMoveDown}
-							/>
-						))}
-					</ol>
-				</SortableContext>
-			</DndContext>
+			<SortableList
+				items={orderedBrands}
+				onReorder={setOrderedBrands}
+				className="list-decimal space-y-2 ml-8 mt-4"
+				renderItem={(brand) => (
+					<SortableBrandItem key={brand.id} brand={brand} />
+				)}
+			/>
 
 			<div className="flex gap-3 mt-4">
 				<Button variant="outline" title="Back to list" asChild={true}>

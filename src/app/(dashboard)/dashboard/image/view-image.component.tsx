@@ -44,14 +44,6 @@ export function ViewImage({ entry }: { entry: ImageModel }) {
 						<span className="font-semibold">Updated At</span>{' '}
 						{formatDate(entry.updated_at, 'date-time') || '-'}
 					</div>
-					{entry.deleted_at && (
-						<div>
-							<span className="font-semibold">Deleted At</span>{' '}
-							<span className="text-error">
-								{formatDate(entry.deleted_at, 'date-time')}
-							</span>
-						</div>
-					)}
 				</div>
 			</div>
 

@@ -28,13 +28,13 @@
 			"title": "Delete place - {{entry}}",
 			"label": "Delete",
 			"success": "Place deleted successfully",
-			"confirmText": "Are you sure you want to delete this place?"
+			"confirm": "Are you sure you want to delete this place?"
 		},
 		"restore": {
 			"title": "Restore place - {{entry}}",
 			"label": "Restore",
 			"success": "Place restored successfully",
-			"confirmText": "Are you sure you want to restore this place?"
+			"confirm": "Are you sure you want to restore this place?"
 		},
 		"view": {
 			"title": "Place details - {{entry}}",

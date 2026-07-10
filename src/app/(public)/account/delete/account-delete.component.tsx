@@ -133,8 +133,8 @@ export default function AccountDelete() {
 						error={formSituation === 'failedValidation'}
 						button={{
 							variant: 'error',
+							icon: 'destroy',
 							label: 'Delete account',
-							iconLabel: 'destroy',
 						}}
 					/>
 				</div>

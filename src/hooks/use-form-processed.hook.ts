@@ -35,12 +35,7 @@ export function useWindowFormProcessed<
 	const successMessageKey = `${windowConfig.dataSource}.action.${windowConfig.action}.success`;
 
 	const translationsKeys = useMemo(
-		() =>
-			[
-				successMessageKey,
-				actionLabelKey,
-				'app.text.success_title',
-			] as const,
+		() => [successMessageKey, actionLabelKey, 'app.success.title'] as const,
 		[actionLabelKey, successMessageKey],
 	);
 
@@ -51,7 +46,7 @@ export function useWindowFormProcessed<
 			if (situation === 'success') {
 				showToast({
 					severity: 'success',
-					summary: translations['app.text.success_title'],
+					summary: translations['app.success.title'],
 					detail: translations[successMessageKey],
 				});
 

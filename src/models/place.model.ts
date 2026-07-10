@@ -54,7 +54,7 @@ export function getPlaceContentProp(
 	}
 
 	const contentDefault = place.contents.find(
-		(c) => c.language === Configuration.language(),
+		(c) => c.language === Configuration.defaultLanguage(),
 	);
 
 	if (contentDefault) {
@@ -103,7 +103,7 @@ export const CITY_DEFAULT = {
 	place_type: PlaceTypeEnum.CITY,
 	contents: [
 		{
-			language: Configuration.language(),
+			language: Configuration.defaultLanguage(),
 			type_label: PlaceTypeEnum.CITY.toLowerCase(),
 		},
 	],

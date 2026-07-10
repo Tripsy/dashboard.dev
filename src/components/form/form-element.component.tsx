@@ -1,8 +1,9 @@
 import React, { type JSX, useEffect, useMemo, useRef, useState } from 'react';
+import { ActionButtonContent } from '@/components/action-button.component';
 import { FormElementError } from '@/components/form/form-element-error.component';
-import { getActionIcon, Icons } from '@/components/icon.component';
+import { Icons } from '@/components/icon.component';
 import { LoadingIcon } from '@/components/status.component';
-import { Button, type ButtonVariant } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -26,6 +27,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/helpers/css.helper';
 import { formatDate, stringToDate } from '@/helpers/date.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
+import type { ButtonAppearanceType } from '@/types/html.type';
 
 export type InputValueType = string | null | undefined;
 export type OptionValueType = string | null | undefined;
@@ -1028,14 +1030,6 @@ export const FormComponentAutoComplete = <Fields, T>({
 
 /** Common form elements **/
 
-type FormComponentSubmitButtonType = {
-	label: string;
-	variant?: ButtonVariant;
-	iconLabel: string;
-	iconSize?: number;
-	className?: string;
-};
-
 export const FormComponentSubmit = ({
 	pending,
 	submitted,
@@ -1045,37 +1039,43 @@ export const FormComponentSubmit = ({
 	pending: boolean;
 	submitted: boolean;
 	error: boolean;
-	button: FormComponentSubmitButtonType;
+	button?: ButtonAppearanceType;
 }) => {
 	const translationsKeys = useMemo(
-		() => ['app.text.please_wait'] as const,
+		() => ['app.action.loading.label', 'app.action.submit.label'] as const,
 		[],
 	);
 
 	const { translations } = useTranslation(translationsKeys);
-	const IconButton = getActionIcon(button.iconLabel);
+
+	const buttonLabel =
+		button?.label || translations['app.action.submit.label'];
 
 	return (
 		<Button
 			type="submit"
-			variant={button.variant}
-			className={button.className}
+			variant={button?.variant || 'info'}
+			className={button?.className}
 			disabled={pending || (submitted && error)}
 			aria-busy={pending}
 		>
 			{pending ? (
 				<span className="flex items-center gap-1.5">
 					<LoadingIcon />
-					{translations['app.text.please_wait']}
+					{translations['app.action.loading.label']}
 				</span>
 			) : submitted && error ? (
 				<span className="flex items-center gap-1.5">
 					<Icons.Status.Error className="animate-pulse" />
-					{button.label}
+					{buttonLabel}
 				</span>
 			) : (
 				<span className="flex items-center gap-1.5">
-					<IconButton size={button.iconSize || 16} /> {button.label}
+					<ActionButtonContent
+						icon={button?.icon}
+						action="submit"
+						label={buttonLabel}
+					/>
 				</span>
 			)}
 		</Button>

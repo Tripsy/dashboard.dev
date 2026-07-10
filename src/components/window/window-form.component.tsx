@@ -2,15 +2,15 @@
 
 import type React from 'react';
 import { useActionState, useMemo } from 'react';
+import { ActionButton } from '@/components/action-button.component';
 import { FormComponentSubmit } from '@/components/form/form-element.component';
 import { FormError } from '@/components/form/form-error.component';
-import { Icons } from '@/components/icon.component';
-import { Button } from '@/components/ui/button';
 import { createHandleChange, processForm } from '@/helpers/form.helper';
 import { useWindowFormProcessed } from '@/hooks/use-form-processed.hook';
 import { useFormSituation } from '@/hooks/use-form-situation.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
+import { useTranslation } from '@/hooks/use-translation.hook';
 import { WindowFormProvider } from '@/providers/window-form.provider';
 import { useModalStore } from '@/stores/window.store';
 import type { FormOperationFunctionType } from '@/types/action.type';
@@ -114,6 +114,13 @@ export function WindowForm<
 		entryId,
 	});
 
+	const translationsKeys = useMemo(
+		() => ['app.action.cancel.title', 'app.action.cancel.label'] as const,
+		[],
+	);
+
+	const { translations } = useTranslation(translationsKeys);
+
 	const handleChange = useMemo(
 		() => createHandleChange<FormValues>(setFormValues, markFieldAsTouched),
 		[setFormValues, markFieldAsTouched],
@@ -142,28 +149,28 @@ export function WindowForm<
 				{children}
 
 				<div className="flex justify-end gap-3">
-					<Button
-						variant="outline"
-						hover="warning"
-						onClick={handleClose}
-						title="Cancel"
+					<ActionButton
+						action="abort"
+						buttonAppearance={{
+							variant: 'outline',
+							hover: 'warning',
+							title: translations['app.action.cancel.title'],
+							icon: 'cancel',
+							label: translations['app.action.cancel.label'],
+						}}
 						disabled={pending}
-					>
-						<Icons.Action.Cancel />
-						Cancel
-					</Button>
+						command={{
+							type: 'action',
+							onClick: handleClose,
+						}}
+					/>
 					<FormComponentSubmit
 						pending={pending}
 						submitted={submitted}
 						error={formSituation === 'failedValidation'}
-						button={{
-							variant: buttonSubmit?.variant || 'info',
-							label: (buttonSubmit?.label as string) || 'Submit',
-							iconLabel: buttonSubmit?.icon || 'submit',
-						}}
+						button={buttonSubmit}
 					/>
 				</div>
-
 				<FormError
 					formSituation={formSituation}
 					formMessage={formMessage}

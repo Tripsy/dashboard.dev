@@ -41,25 +41,25 @@
 			"title": "Delete user - {{entry}}",
 			"label": "Delete",
 			"success": "User deleted successfully",
-			"confirmText": "Are you sure you want to delete this user?"
+			"confirm": "Are you sure you want to delete this user?"
 		},
 		"restore": {
 			"title": "Restore user - {{entry}}",
 			"label": "Restore",
 			"success": "User restored successfully",
-			"confirmText": "Are you sure you want to restore this user?"
+			"confirm": "Are you sure you want to restore this user?"
 		},
 		"enable": {
 			"title": "Enable user - {{entry}}",
 			"label": "Enable",
 			"success": "User status marked as active",
-			"confirmText": "Are you sure you want to activate this user?"
+			"confirm": "Are you sure you want to activate this user?"
 		},
 		"disable": {
 			"title": "Disable user - {{entry}}",
 			"label": "Disable",
 			"success": "User status marked as inactive",
-			"confirmText": "Are you sure you want to mark this user as inactive?"
+			"confirm": "Are you sure you want to mark this user as inactive?"
 		},
 		"view": {
 			"title": "User details - {{entry}}",

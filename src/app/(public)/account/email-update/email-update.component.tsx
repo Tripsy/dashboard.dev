@@ -122,8 +122,8 @@ export default function EmailUpdate() {
 						submitted={submitted}
 						error={formSituation === 'failedValidation'}
 						button={{
+							icon: 'save',
 							label: 'Update',
-							iconLabel: 'save',
 						}}
 					/>
 				</div>

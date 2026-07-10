@@ -1,8 +1,5 @@
 import type { ZodSafeParseError, ZodSafeParseSuccess, z } from 'zod';
-import type {
-	ImageAttributesType,
-	ImagePropertiesType,
-} from '@/types/image.type';
+import type { ImagePropertiesType } from '@/types/image.type';
 import type { PageMeta } from '@/types/page-meta.type';
 
 export type FormSituationType =
@@ -18,7 +15,6 @@ type FormValueType =
 	| Date
 	| PageMeta
 	| ImagePropertiesType
-	| ImageAttributesType
 	| null
 	| undefined;
 

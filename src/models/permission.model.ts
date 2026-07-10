@@ -1,4 +1,5 @@
 export const PermissionEntitiesSuggestions = [
+	'dashboard', // NOT an entity
 	'address',
 	'brand',
 	'cash-flow',
@@ -32,8 +33,7 @@ export const PermissionOperationSuggestions = [
 ] as const;
 
 export type PermissionEntityType =
-	| (typeof PermissionEntitiesSuggestions)[number]
-	| 'dashboard';
+	(typeof PermissionEntitiesSuggestions)[number];
 export type PermissionOperationType =
 	(typeof PermissionOperationSuggestions)[number];
 

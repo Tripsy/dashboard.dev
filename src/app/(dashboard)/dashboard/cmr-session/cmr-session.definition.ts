@@ -278,7 +278,7 @@ export default async function dataSourceConfig(): Promise<
 				operationFunction: (params: CmrSessionFormValuesType) => {
 					const { cmr_id, work_session, ...prepareParams } = params;
 
-					return createCmrSession(prepareParams, cmr_id);
+					return createCmrSession(prepareParams, cmr_id as number);
 				},
 				buttonPosition: 'hidden',
 				button: {

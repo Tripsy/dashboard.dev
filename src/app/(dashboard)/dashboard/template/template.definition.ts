@@ -122,7 +122,7 @@ export function getFormValues(formData: FormData): TemplateFormValuesType {
 		label: label ? toKebabCase(label) : null,
 		language:
 			getFormDataAsEnum(formData, 'language', LanguageEnum) ||
-			Configuration.language(),
+			Configuration.defaultLanguage(),
 	};
 
 	if (type === TemplateTypeEnum.EMAIL) {

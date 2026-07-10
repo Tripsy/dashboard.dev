@@ -28,13 +28,13 @@
 			"title": "Delete template - {{entry}}",
 			"label": "Delete",
 			"success": "Template deleted successfully",
-			"confirmText": "Are you sure you want to delete this template?"
+			"confirm": "Are you sure you want to delete this template?"
 		},
 		"restore": {
 			"title": "Restore template - {{entry}}",
 			"label": "Restore",
 			"success": "Template restored successfully",
-			"confirmText": "Are you sure you want to restore this template?"
+			"confirm": "Are you sure you want to restore this template?"
 		},
 		"view": {
 			"title": "Template - {{entry}}",

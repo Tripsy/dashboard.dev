@@ -61,7 +61,7 @@ export function getBrandDescription(
 	}
 
 	const contentDefault = brand.contents.find(
-		(c) => c.language === Configuration.language(),
+		(c) => c.language === Configuration.defaultLanguage(),
 	);
 
 	if (contentDefault?.description) {

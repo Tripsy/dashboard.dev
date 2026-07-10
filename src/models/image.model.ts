@@ -1,10 +1,7 @@
 import { Configuration } from '@/config/settings.config';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
 import type { Language } from '@/types/common.type';
-import type {
-	ImageAttributesType,
-	ImagePropertiesType,
-} from '@/types/image.type';
+import type { ImagePropertiesType } from '@/types/image.type';
 
 export const ImageSectionEnum = {
 	CMR: 'cmr',
@@ -44,10 +41,8 @@ export type ImageStorage =
 
 export type ImageContentType = {
 	language: string;
-	storage: ImageStorage;
-	path: string;
-	properties?: ImagePropertiesType;
-	attributes?: ImageAttributesType;
+	title: string;
+	description?: string;
 };
 
 // Full image model with relations
@@ -56,89 +51,59 @@ export type ImageModel<D = Date | string> = {
 	section: ImageSection;
 	entity_id: number;
 	image_type: ImageType;
+	storage: ImageStorage;
+	path: string;
+	properties: ImagePropertiesType;
 	status: ImageStatus;
 	sort_order: number;
 
 	// Timestamps
 	created_at: D;
 	updated_at: D;
-	deleted_at: D;
 
 	// Content translations
-	contents?: ImageContentType[];
+	contents: ImageContentType[];
 };
 
 // Helpers
-export function getImageProperties(
-	image: ImageModel,
-	language: Language,
-): ImagePropertiesType | undefined {
-	if (!image.contents) {
-		return;
-	}
-
-	const contentSelected = image.contents.find((c) => c.language === language);
-
-	if (contentSelected?.properties) {
-		return contentSelected.properties;
-	}
-
-	const contentDefault = image.contents.find(
-		(c) => c.language === Configuration.language(),
-	);
-
-	if (contentDefault?.properties) {
-		return contentDefault.properties;
-	}
-
-	const contentFirst = image.contents[0];
-
-	if (contentFirst?.properties) {
-		return contentFirst.properties;
-	}
-}
-
 export function getImageProperty(
 	image: ImageModel,
-	language: Language,
 	key: keyof ImagePropertiesType,
 ) {
-	const properties = getImageProperties(image, language);
-
-	if (properties?.[key]) {
-		return properties?.[key];
+	if (image.properties?.[key]) {
+		return image.properties?.[key];
 	}
 }
 
-export function getImageAttributes(
+export function getImageContent(
 	image: ImageModel,
 	language: Language,
-): ImageAttributesType | undefined {
+): ImageContentType | undefined {
 	if (!image.contents) {
 		return;
 	}
 
 	const contentSelected = image.contents.find((c) => c.language === language);
 
-	if (contentSelected?.attributes) {
-		return contentSelected.attributes;
+	if (contentSelected) {
+		return contentSelected;
 	}
 
 	const contentDefault = image.contents.find(
-		(c) => c.language === Configuration.language(),
+		(c) => c.language === Configuration.defaultLanguage(),
 	);
 
-	if (contentDefault?.attributes) {
-		return contentDefault.attributes;
+	if (contentDefault) {
+		return contentDefault;
 	}
 
 	const contentFirst = image.contents[0];
 
-	if (contentFirst?.attributes) {
-		return contentFirst.attributes;
+	if (contentFirst) {
+		return contentFirst;
 	}
 }
 
 export const displayImageLabel = (m: ImageModel) => {
-	return `${capitalizeFirstLetter(m.section)} / ${m.contents?.[0]?.path}`;
+	return `${capitalizeFirstLetter(m.section)} / ${m.path}`;
 };

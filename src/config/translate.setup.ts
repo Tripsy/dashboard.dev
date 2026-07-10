@@ -9,7 +9,7 @@ type TranslationResource = Record<string, TranslationValue>;
 const languageResources: Record<string, TranslationResource> = {};
 
 async function fetchLanguage(): Promise<Language> {
-	const fallback = Configuration.language();
+	const fallback = Configuration.defaultLanguage();
 
 	try {
 		const { headers } = await import('next/headers');
@@ -35,7 +35,7 @@ export function getLanguageClient(): Language {
 		return fromDom as Language;
 	}
 
-	return Configuration.language();
+	return Configuration.defaultLanguage();
 }
 
 export async function getLanguage(): Promise<Language> {

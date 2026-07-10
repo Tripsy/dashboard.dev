@@ -148,8 +148,8 @@ export default function AccountEdit() {
 						submitted={submitted}
 						error={formSituation === 'failedValidation'}
 						button={{
+							icon: 'save',
 							label: 'Save',
-							iconLabel: 'save',
 						}}
 					/>
 				</div>

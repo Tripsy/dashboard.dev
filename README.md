@@ -206,8 +206,7 @@ pnpm run build    # Production build
 
 # 📌 TODO
 
-1. adjust image list on BE
-2. add images for CMR in driver panel
+2. For window-component form / action it should allow close only from button, clicking outside should trigger a confirmation
 3. order page ..glitch when moving to order without type (brand)
 4. dashboard stats
 5. monthly driver report 

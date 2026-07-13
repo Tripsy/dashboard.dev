@@ -2,9 +2,9 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatDate } from '@/helpers/date.helper';
-import { DisplayStatus } from '@/helpers/display.helper';
+import { DisplayStatus, displayImage } from '@/helpers/display.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
-import type { ImageModel } from '@/models/image.model';
+import { type ImageModel, showImage } from '@/models/image.model';
 
 export function ViewImage({ entry }: { entry: ImageModel }) {
 	const languageContents = Object.values(entry.contents ?? []);
@@ -15,6 +15,10 @@ export function ViewImage({ entry }: { entry: ImageModel }) {
 			<div className="space-y-1">
 				<div>
 					<span className="font-semibold">ID</span> {entry.id}
+				</div>
+				<div>
+					<span className="font-semibold">Section</span>{' '}
+					{formatEnumLabel(entry.section)}
 				</div>
 				<div>
 					<span className="font-semibold">Type</span>{' '}
@@ -28,6 +32,15 @@ export function ViewImage({ entry }: { entry: ImageModel }) {
 							dataSource="image"
 						/>
 					</div>
+				</div>
+				<div>
+					<div className="font-semibold">Image</div>{' '}
+					{displayImage({
+						src: showImage(entry.path, entry.storage),
+						alt: entry.path,
+						width: 100,
+						height: 100,
+					})}
 				</div>
 			</div>
 
@@ -73,27 +86,15 @@ export function ViewImage({ entry }: { entry: ImageModel }) {
 								<div className="ml-4 space-y-1 text-sm">
 									<div>
 										<span className="font-semibold">
+											Title
+										</span>{' '}
+										{value.title || 'n/a'}
+									</div>
+									<div>
+										<span className="font-semibold">
 											Description
 										</span>{' '}
 										{value.description}
-									</div>
-									<div>
-										<span className="font-semibold">
-											Meta - Title
-										</span>{' '}
-										{value.meta?.title || 'N/A'}
-									</div>
-									<div>
-										<span className="font-semibold">
-											Meta - Description
-										</span>{' '}
-										{value.meta?.description || 'N/A'}
-									</div>
-									<div>
-										<span className="font-semibold">
-											Meta - Keywords
-										</span>{' '}
-										{value.meta?.keywords || 'N/A'}
 									</div>
 								</div>
 							</TabsContent>

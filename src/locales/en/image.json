@@ -16,7 +16,7 @@
 		"invalid_size": "Invalid size",
 		"invalid_mime": "Invalid mime type",
 		"invalid_alt": "Invalid alt text",
-		"invalid_title": "Invalid title",
+		"invalid_attribute": "Invalid attribute: {{attribute}}",
 		"invalid_description": "Invalid description"
 	},
 	"error": {

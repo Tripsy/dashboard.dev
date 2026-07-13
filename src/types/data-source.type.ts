@@ -78,6 +78,7 @@ export type DataTableColumnType<Entry> = {
 export type DataTableValueOptionsType<Entry> = {
 	customValue?: string | JSX.Element;
 	capitalize?: boolean;
+	uppercase?: boolean;
 	markDeleted?: boolean;
 	isStatus?: boolean;
 	dataSource?: DataSourceKey;

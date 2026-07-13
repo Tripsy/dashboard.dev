@@ -240,7 +240,17 @@ export function DataTableActions<K extends DataSourceKey>() {
 	const handleAction: HandleActionType<K> = useCallback(
 		(action, targetDataSource, entries, actionConfig) => {
 			const execute = async () => {
-				const resolvedActionConfig = actionConfig ?? actions?.[action];
+				const resolvedActionConfig =
+					actionConfig ??
+					(targetDataSource === dataSource
+						? actions?.[action]
+						: (
+								await getDataSourceConfig(
+									DataSourceSectionEnum.DASHBOARD,
+									targetDataSource,
+									'actions',
+								)
+							)?.[action]);
 
 				if (!resolvedActionConfig) {
 					throw new Error(`Action "${action}" is not defined`);
@@ -254,6 +264,7 @@ export function DataTableActions<K extends DataSourceKey>() {
 						resolvedActionConfig.customEntryCheck,
 					)
 				) {
+					console.log(resolvedActionConfig);
 					throw new Error(
 						translations['app.error.operation_not_allowed'],
 					);
@@ -275,7 +286,14 @@ export function DataTableActions<K extends DataSourceKey>() {
 
 			execute().catch(handleActionError);
 		},
-		[actions, allowAction, open, translations, handleActionError],
+		[
+			actions,
+			allowAction,
+			open,
+			translations,
+			handleActionError,
+			dataSource,
+		],
 	);
 
 	useEffect(() => {

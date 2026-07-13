@@ -1,11 +1,19 @@
 import clsx from 'clsx';
-import { type ComponentType, type JSX, useMemo } from 'react';
+import Image from 'next/image';
+import { type ComponentType, type JSX, useMemo, useState } from 'react';
 import { Icons } from '@/components/icon.component';
 import {
 	Badge,
 	type BadgeSize,
 	type BadgeVariant,
 } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from '@/components/ui/popover';
+import { cn } from '@/helpers/css.helper';
 import { formatAmount } from '@/helpers/string.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import type { CmrSessionModel } from '@/models/cmr-session.model';
@@ -232,5 +240,103 @@ export function displayColumnSession(cmr_sessions: CmrSessionModel[]) {
 			/>
 			{displayWorkSessionLabel(lastSession.work_session)}
 		</div>
+	);
+}
+
+export function displayImage({
+	src,
+	alt,
+	className,
+	width = 64,
+	height = 64,
+}: {
+	src: string;
+	alt: string;
+	className?: string;
+	width?: number;
+	height?: number;
+}) {
+	const [isOpen, setIsOpen] = useState(false);
+
+	return (
+		<Popover
+			open={isOpen}
+			onOpenChange={(open) => {
+				// Only allow closing via our close button
+				// Keep it open if trying to close by clicking outside
+				if (!open) {
+					// Don't close - only close via button
+					return;
+				}
+				setIsOpen(open);
+			}}
+		>
+			<PopoverTrigger asChild>
+				<button
+					type="button"
+					className="cursor-pointer relative group"
+					tabIndex={0}
+					aria-label={`View larger version of ${alt}`}
+				>
+					<Image
+						src={src}
+						alt={alt}
+						className={cn(
+							'h-full w-full object-contain',
+							className,
+						)}
+						width={width}
+						height={height}
+					/>
+				</button>
+			</PopoverTrigger>
+			<PopoverContent
+				className="shadow-xl overflow-hidden"
+				align="center"
+				side="right"
+				style={{
+					width: 'auto',
+					height: 'auto',
+					maxWidth: '80vw',
+					maxHeight: '80vh',
+				}}
+				// Prevent closing by clicking outside
+				onInteractOutside={(e) => {
+					e.preventDefault();
+				}}
+				// Prevent closing by pressing Escape
+				onEscapeKeyDown={(e) => {
+					e.preventDefault();
+				}}
+			>
+				<div className="relative w-auto h-auto max-w-[80vw] max-h-[80vh]">
+					<Image
+						src={src}
+						alt={alt}
+						className="object-contain"
+						width={800}
+						height={800}
+						sizes="80vw"
+						priority
+						style={{
+							maxWidth: '80vw',
+							maxHeight: '80vh',
+							width: 'auto',
+							height: 'auto',
+						}}
+					/>
+
+					<Button
+						variant="ghost"
+						onClick={() => setIsOpen(false)}
+						className="absolute top-2 right-2 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors z-10 cursor-pointer"
+						aria-label="Close"
+						title="Close"
+					>
+						<Icons.Close className="h-5 w-5" />
+					</Button>
+				</div>
+			</PopoverContent>
+		</Popover>
 	);
 }

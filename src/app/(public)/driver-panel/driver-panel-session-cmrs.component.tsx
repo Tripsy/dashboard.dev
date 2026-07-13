@@ -56,7 +56,7 @@ export function DriverPanelSessionCmrs({
 	);
 }
 
-async function DriverPanelSessionCmrEntry({
+function DriverPanelSessionCmrEntry({
 	cmr,
 	cmrSession,
 }: {
@@ -101,6 +101,21 @@ async function DriverPanelSessionCmrEntry({
 				section: DataSourceSectionEnum.PUBLIC,
 				dataSource: 'cmr',
 				action: 'setupVehicles',
+				data: {
+					entries: [entry],
+				},
+			});
+		},
+		[open],
+	);
+
+	const handleViewCmrImages = useCallback(
+		(entry: CmrModel) => {
+			open({
+				minimized: false,
+				section: DataSourceSectionEnum.PUBLIC,
+				dataSource: 'cmr',
+				action: 'managerImages',
 				data: {
 					entries: [entry],
 				},
@@ -408,6 +423,15 @@ async function DriverPanelSessionCmrEntry({
 						<Icons.Vehicle className="h-4 w-4" />
 					</Button>
 				)}
+				<Button
+					variant="secondary"
+					hover="info"
+					onClick={() => handleViewCmrImages(cmr)}
+					className="cursor-pointer"
+					title="View CMR images"
+				>
+					<Icons.Image className="h-4 w-4" />
+				</Button>
 				<Button
 					variant="secondary"
 					hover="info"

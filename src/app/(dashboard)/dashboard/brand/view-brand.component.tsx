@@ -89,19 +89,19 @@ export function ViewBrand({ entry }: { entry: BrandModel }) {
 										<span className="font-semibold">
 											Meta - Title
 										</span>{' '}
-										{value.meta?.title || 'N/A'}
+										{value.meta?.title || 'n/a'}
 									</div>
 									<div>
 										<span className="font-semibold">
 											Meta - Description
 										</span>{' '}
-										{value.meta?.description || 'N/A'}
+										{value.meta?.description || 'n/a'}
 									</div>
 									<div>
 										<span className="font-semibold">
 											Meta - Keywords
 										</span>{' '}
-										{value.meta?.keywords || 'N/A'}
+										{value.meta?.keywords || 'n/a'}
 									</div>
 								</div>
 							</TabsContent>

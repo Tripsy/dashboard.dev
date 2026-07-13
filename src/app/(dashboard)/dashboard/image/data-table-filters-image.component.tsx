@@ -6,25 +6,27 @@ import {
 	FormFiltersReset,
 	FormFiltersSearch,
 	FormFiltersSelect,
-	FormFiltersShowDeleted,
 } from '@/app/(dashboard)/_components/form-filters.component';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
 import type { ImageDataTableFiltersType } from '@/app/(dashboard)/dashboard/image/image.definition';
-import type { TemplateDataTableFiltersType } from '@/app/(dashboard)/dashboard/template/template.definition';
-import { getLanguageClient } from '@/config/translate.setup';
+import type { LogHistoryDataTableFiltersType } from '@/app/(dashboard)/dashboard/log-history/log-history.definition';
 import { toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useDataTableFilterReset } from '@/hooks/use-data-table-filter-reset.hook';
 import { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import { useSetFilterValues } from '@/hooks/use-set-filter-values.hook';
-import { type ImageType, ImageTypeEnum } from '@/models/image.model';
-import { type Language, LanguageEnum } from '@/types/common.type';
+import {
+	type ImageSection,
+	ImageSectionEnum,
+	type ImageType,
+	ImageTypeEnum,
+} from '@/models/image.model';
 
-const imageTypes = toOptionsFromEnum(ImageTypeEnum, {
+const sections = toOptionsFromEnum(ImageSectionEnum, {
 	formatter: formatEnumLabel,
 });
 
-const languages = toOptionsFromEnum(LanguageEnum, {
+const imageTypes = toOptionsFromEnum(ImageTypeEnum, {
 	formatter: formatEnumLabel,
 });
 
@@ -47,16 +49,16 @@ export const DataTableFiltersImage = (): JSX.Element => {
 		updateTableState,
 	);
 
-	const searchGlobal = useSearchFilter({
-		initialValue: filters.global.value ?? '',
+	const searchEntityId = useSearchFilter({
+		initialValue: filters.entity_id.value ?? '',
 		debounceDelay: 1000,
-		minLength: 3,
-		onSearch: (value) => setFilterValue('global', value),
+		minLength: 1,
+		onSearch: (value) => setFilterValue('entity_id', value),
 	});
 
 	const resetCallbacks = useMemo(
-		() => [searchGlobal.onReset],
-		[searchGlobal.onReset],
+		() => [searchEntityId.onReset],
+		[searchEntityId.onReset],
 	);
 
 	useDataTableFilterReset({
@@ -68,9 +70,20 @@ export const DataTableFiltersImage = (): JSX.Element => {
 
 	return (
 		<div className="form-section flex-row flex-wrap gap-4 border-b border-line pb-4">
-			<FormFiltersSearch<ImageDataTableFiltersType>
-				labelText="ID / Name"
-				search={searchGlobal}
+			<FormFiltersSelect<ImageDataTableFiltersType>
+				labelText="Section"
+				fieldName="section"
+				fieldValue={filters.section.value}
+				options={sections}
+				onChange={(value) =>
+					setFilterValue('section', value as ImageSection)
+				}
+			/>
+
+			<FormFiltersSearch<LogHistoryDataTableFiltersType>
+				labelText="Entity ID"
+				fieldName="entity_id"
+				search={searchEntityId}
 			/>
 
 			<FormFiltersSelect<ImageDataTableFiltersType>
@@ -81,22 +94,6 @@ export const DataTableFiltersImage = (): JSX.Element => {
 				onChange={(value) =>
 					setFilterValue('image_type', value as ImageType)
 				}
-			/>
-
-			<FormFiltersSelect<TemplateDataTableFiltersType>
-				labelText="Language"
-				fieldName="language"
-				fieldValue={filters.language.value ?? getLanguageClient()}
-				options={languages}
-				onChange={(value) =>
-					setFilterValue('language', value as Language)
-				}
-			/>
-
-			<FormFiltersShowDeleted
-				dataSource="image"
-				checked={filters.is_deleted.value ?? false}
-				onCheckedChange={(value) => setFilterValue('is_deleted', value)}
 			/>
 
 			<FormFiltersReset dataSource="image" />

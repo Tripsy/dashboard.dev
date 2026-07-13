@@ -67,7 +67,7 @@ export function DriverPanelAvailableCmrs() {
 	);
 }
 
-async function DriverPanelAvailableCmrEntry({ cmr }: { cmr: CmrModel }) {
+function DriverPanelAvailableCmrEntry({ cmr }: { cmr: CmrModel }) {
 	const {
 		setActiveTab,
 		activeSession,

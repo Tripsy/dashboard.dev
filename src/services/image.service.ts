@@ -1,20 +1,11 @@
-import { Configuration } from '@/config/settings.config';
+import Routes from '@/config/routes.setup';
 import { ApiRequest, resolveRequestPath } from '@/helpers/api.helper';
-import {
-	type ImageModel,
-	type ImageSection,
-	type ImageStorage,
-	ImageStorageEnum,
+import type {
+	ImageModel,
+	ImageSection,
+	ImageStorage,
 } from '@/models/image.model';
 import type { ApiResponseFetch } from '@/types/api.type';
-
-export function showImage(path: string, storage?: ImageStorage) {
-	if (storage === ImageStorageEnum.LOCAL) {
-		return `${Configuration.get('images.local.view')}/${path}`;
-	}
-
-	return path;
-}
 
 export async function createImage<P>(
 	params: Partial<P>,
@@ -44,4 +35,29 @@ export async function orderUpdate(
 			}),
 		},
 	);
+}
+
+/**
+ * Remove image file from storage
+ *
+ * @param path
+ * @param storage
+ * @param section
+ */
+export async function removeImageFile(
+	path: string,
+	storage: ImageStorage,
+	section: ImageSection,
+) {
+	await fetch(Routes.get('api-image'), {
+		method: 'DELETE',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({
+			path,
+			storage,
+			section,
+		}),
+	});
 }

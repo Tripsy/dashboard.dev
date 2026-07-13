@@ -3,7 +3,6 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import Image from 'next/image';
 import type React from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Icons } from '@/components/icon.component';
@@ -20,6 +19,7 @@ import { getLanguageClient } from '@/config/translate.setup';
 import { ApiError } from '@/exceptions/api.error';
 import ValueError from '@/exceptions/value.error';
 import { cn } from '@/helpers/css.helper';
+import { displayImage } from '@/helpers/display.helper';
 import { getErrorMessage } from '@/helpers/objects.helper';
 import {
 	requestDelete,
@@ -30,7 +30,6 @@ import {
 import { formatBytes, formatMime, replaceVars } from '@/helpers/string.helper';
 import { useConfirmationDialog } from '@/hooks/use-confirmation-dialog';
 import { useTranslation } from '@/hooks/use-translation.hook';
-import { hasPermission } from '@/models/auth.model';
 import {
 	type ImageContentType,
 	type ImageModel,
@@ -40,27 +39,20 @@ import {
 	type ImageStorage,
 	type ImageType,
 	ImageTypeEnum,
+	showImage,
 } from '@/models/image.model';
-import type { PermissionEntityType } from '@/models/permission.model';
-import { useAuth } from '@/providers/auth.provider';
 import { useToast } from '@/providers/toast.provider';
-import { createImage, orderUpdate, showImage } from '@/services/image.service';
-import { type Language, LanguageEnum } from '@/types/common.type';
+import {
+	createImage,
+	orderUpdate,
+	removeImageFile,
+} from '@/services/image.service';
+import type { Language } from '@/types/common.type';
 import {
 	type ImageMime,
 	ImageMimeEnum,
 	type ImagePropertiesType,
 } from '@/types/image.type';
-
-// Constants
-
-const GALLERY_MAX = 5;
-const ACCEPTED_MIME_TYPES = Object.values(ImageMimeEnum);
-const ACCEPTED_EXTENSIONS = ACCEPTED_MIME_TYPES.join(',');
-const ACCEPTED_EXTENSIONS_DESC = 'JPEG, PNG, WebP, SVG, GIF';
-
-const languages = Object.values(LanguageEnum);
-const defaultLanguage = Configuration.get('language.default') as Language;
 
 // Types
 
@@ -92,6 +84,26 @@ export type ImageEntry = {
 	// Only for staged images
 	file?: File;
 };
+
+type AttributeFieldName = keyof Omit<ImageContentType, 'language'>;
+type AttributeFieldRequirement = 'required' | 'optional';
+
+export type AttributeFieldsConfig = Partial<
+	Record<AttributeFieldName, AttributeFieldRequirement>
+>;
+
+type ValidationErrors = Record<string, string[]>;
+
+// Constants
+
+const GALLERY_MAX = 5;
+const ACCEPTED_MIME_TYPES = Object.values(ImageMimeEnum);
+const ACCEPTED_EXTENSIONS = ACCEPTED_MIME_TYPES.join(',');
+const ACCEPTED_EXTENSIONS_DESC = 'JPEG, PNG, WebP, SVG, GIF';
+const DEFAULT_LANGUAGE = Configuration.get('language.default') as Language;
+
+// Fixed display order — independent of key order in whatever config object gets passed in
+const ATTRIBUTE_FIELD_ORDER: AttributeFieldName[] = ['title', 'description'];
 
 // Helpers
 
@@ -148,6 +160,7 @@ async function buildImageEntry(
 		contents: {
 			[getLanguageClient()]: {
 				title: '',
+				description: '',
 			},
 		},
 		sort_order: 0,
@@ -170,12 +183,44 @@ function normalizeExistingImage(model: ImageModel): ImageEntry {
 			model.contents.map((c) => [
 				c.language,
 				{
-					title: c.title,
+					title: c.title ?? '',
 					description: c.description ?? '',
 				},
 			]),
 		) as Partial<Record<Language, ImageContentType>>,
 	};
+}
+
+function getConfiguredFields(
+	attributeFields: AttributeFieldsConfig,
+): AttributeFieldName[] {
+	return ATTRIBUTE_FIELD_ORDER.filter((field) => attributeFields[field]);
+}
+
+function isFieldRequired(
+	attributeFields: AttributeFieldsConfig,
+	field: AttributeFieldName,
+): boolean {
+	return attributeFields[field] === 'required';
+}
+
+function buildContentsPayload(
+	entry: ImageEntry,
+	attributeFields: AttributeFieldsConfig,
+) {
+	const configuredFields = getConfiguredFields(attributeFields);
+
+	return Object.entries(entry.contents)
+		.filter(([, c]) => configuredFields.some((field) => c?.[field]?.trim()))
+		.map(([language, c]) => {
+			const payload: Record<string, string | null> = { language };
+
+			for (const field of configuredFields) {
+				payload[field] = c?.[field]?.trim() || null;
+			}
+
+			return payload;
+		});
 }
 
 function withUpdatedOrder(entries: ImageEntry[]): ImageEntry[] {
@@ -234,7 +279,8 @@ function AttributeField({
 type ImageCardBaseProps = {
 	entry: ImageEntry;
 	language: Language;
-	error: string;
+	attributeFields: AttributeFieldsConfig;
+	errors: string[];
 };
 
 type ImageCardViewProps = ImageCardBaseProps & {
@@ -265,10 +311,11 @@ function ImageCard({
 	mode,
 	entry,
 	language,
+	attributeFields,
 	onRemove,
 	onContentChange,
 	onStatusChange,
-	error,
+	errors,
 	dragButton,
 }: ImageCardProps & {
 	dragButton?: React.ReactNode;
@@ -278,18 +325,17 @@ function ImageCard({
 
 	const fileName = determineImageName(entry);
 
+	const configuredFields = getConfiguredFields(attributeFields);
+
 	return (
 		<div className="group rounded-lg border border-border bg-card overflow-hidden shadow-sm">
 			{/* Preview row */}
 			<div className="flex items-start gap-3 p-3">
 				<div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md border border-border bg-muted/30">
-					<Image
-						src={showImage(entry.path, entry.storage)}
-						alt={fileName}
-						className="h-full w-full object-contain"
-						width={64}
-						height={64}
-					/>
+					{displayImage({
+						src: showImage(entry.path, entry.storage),
+						alt: fileName,
+					})}
 				</div>
 
 				<div className="min-w-0 flex-1">
@@ -376,34 +422,34 @@ function ImageCard({
 				)}
 			</div>
 
-			{/* Attributes */}
-			<div className="border-t border-border bg-muted/30 px-3 pb-3 pt-2.5">
-				<div className="flex flex-col gap-1.5">
-					<AttributeField
-						mode={mode}
-						label="Title"
-						value={attributes?.title ?? ''}
-						onChange={(v) =>
-							mode === 'edit' &&
-							onContentChange(language, 'title', v)
-						}
-					/>
-					<AttributeField
-						mode={mode}
-						label="Description"
-						value={attributes?.description ?? ''}
-						onChange={(v) =>
-							mode === 'edit' &&
-							onContentChange(language, 'description', v)
-						}
-					/>
+			{/* Attributes — only render if at least one field is configured */}
+			{configuredFields.length > 0 && (
+				<div className="border-t border-border bg-muted/30 px-3 pb-3 pt-2.5">
+					<div className="flex flex-col gap-1.5">
+						{configuredFields.map((field) => (
+							<AttributeField
+								key={field}
+								mode={mode}
+								label={
+									field === 'title' ? 'Title' : 'Description'
+								}
+								value={attributes?.[field] ?? ''}
+								onChange={(v) =>
+									mode === 'edit' &&
+									onContentChange(language, field, v)
+								}
+							/>
+						))}
+					</div>
 				</div>
-			</div>
+			)}
 
-			{error && (
-				<p className="text-sm dark:bg-error-foreground text-error p-2 inline-block">
-					{error}
-				</p>
+			{errors && errors.length > 0 && (
+				<div className="text-sm dark:bg-error-foreground text-error p-2 inline-block">
+					{errors.map((error) => (
+						<div key={error}>{error}</div>
+					))}
+				</div>
 			)}
 		</div>
 	);
@@ -568,14 +614,24 @@ export function ManagerImages({
 	section,
 	entity_id,
 	types,
+	permissions,
+	attributeFields = {},
+	attributeLanguages,
 }: {
 	section: ImageSection;
 	entity_id: number;
 	types: ImageType[];
+	permissions: {
+		edit: boolean;
+	};
+	attributeFields?: AttributeFieldsConfig;
+	attributeLanguages?: Language[];
 }) {
 	const [mode, setMode] = useState<ManagerMode>('view');
-	const { auth } = useAuth();
 	const { showToast } = useToast();
+	const languages = attributeLanguages ?? [DEFAULT_LANGUAGE];
+
+	console.log(attributeFields);
 
 	const translationsKeys = useMemo(
 		() =>
@@ -584,7 +640,7 @@ export function ManagerImages({
 				'app.error.description',
 				'app.success.title',
 				'image.action.add.success',
-				'image.validation.invalid_title',
+				'image.validation.invalid_attribute',
 				'image.error.save_failed',
 				'image.success.save',
 				'image.action.delete.title',
@@ -638,7 +694,7 @@ export function ManagerImages({
 		getLanguageClient(),
 	);
 	const [saving, setSaving] = useState(false);
-	const [errors, setErrors] = useState<Record<string, string>>({});
+	const [errors, setErrors] = useState<ValidationErrors>({});
 
 	const [logo, setLogo] = useState<ImageEntry | null>(null);
 	const [gallery, setGallery] = useState<ImageEntry[]>([]);
@@ -707,7 +763,7 @@ export function ManagerImages({
 	}, [images, types]);
 
 	/**
-	 * Triggers save for `staged` (eg: createEntry) and `existing_dirty` (eg: updateEntry) via button click
+	 * Triggers save for `staged` (eg: createEntry) and `existing_dirty` (eg: updateEntry) via button click && save image sort_order
 	 */
 	async function handleSave() {
 		setSaving(true);
@@ -717,20 +773,34 @@ export function ManagerImages({
 			['staged', 'existing_dirty'].includes(e.situation),
 		);
 
-		const validationErrors: Record<string, string> = {};
+		const requiredFields = getConfiguredFields(attributeFields).filter(
+			(field) => isFieldRequired(attributeFields, field),
+		);
+
+		const validationErrors: ValidationErrors = {};
 
 		for (const entry of toSave) {
-			const title = entry.contents[defaultLanguage]?.title;
+			const content = entry.contents[DEFAULT_LANGUAGE];
 
-			if (!title?.trim()) {
-				validationErrors[entry.key] =
-					translations['image.validation.invalid_title'];
+			for (const field of requiredFields) {
+				if (!content?.[field]?.trim()) {
+					if (!validationErrors[entry.key]) {
+						validationErrors[entry.key] = [];
+					}
+
+					validationErrors[entry.key].push(
+						replaceVars(
+							translations['image.validation.invalid_attribute'],
+							{ attribute: field },
+						),
+					);
+				}
 			}
 		}
 
 		if (Object.keys(validationErrors).length > 0) {
 			setErrors(validationErrors);
-			setActiveLanguage(defaultLanguage);
+			setActiveLanguage(DEFAULT_LANGUAGE);
 			setSaving(false);
 
 			return;
@@ -748,7 +818,7 @@ export function ManagerImages({
 			),
 		];
 
-		if (existingOrder.length > 0) {
+		if (orderChanged && existingOrder.length >= 2) {
 			savePromises.push(orderUpdate(section, entity_id, existingOrder));
 		}
 
@@ -759,15 +829,14 @@ export function ManagerImages({
 		);
 
 		if (failedEntries.length > 0) {
-			// Mark failed entries so the UI can reflect the error state
 			const entryErrors = Object.fromEntries(
 				failedEntries.map((e) => [
 					e.key,
-					translations['image.error.save_failed'],
+					[translations['image.error.save_failed']],
 				]),
 			);
 
-			setErrors(entryErrors);
+			setErrors(entryErrors); // This will replace all existing errors
 		}
 
 		const anySucceeded = results.some((r) => r.status === 'fulfilled');
@@ -1031,31 +1100,6 @@ export function ManagerImages({
 	);
 
 	/**
-	 * Remove image file from storage
-	 *
-	 * @param path
-	 * @param storage
-	 * @param section
-	 */
-	async function removeImageFile(
-		path: string,
-		storage: ImageStorage,
-		section: ImageSection,
-	) {
-		await fetch(Routes.get('api-image'), {
-			method: 'DELETE',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				path,
-				storage,
-				section,
-			}),
-		});
-	}
-
-	/**
 	 * Remove image
 	 *
 	 * @param entry
@@ -1073,13 +1117,13 @@ export function ManagerImages({
 					return;
 				}
 
-				await removeImageFile(entry.path, entry.storage, section);
-
 				if (entry.id) {
 					await requestDelete('image', {
 						id: entry.id,
 					});
 				}
+
+				await removeImageFile(entry.path, entry.storage, section);
 			} catch {
 				throw new Error('Image removal failed');
 			}
@@ -1124,13 +1168,7 @@ export function ManagerImages({
 					path,
 					properties: entry.properties,
 					sort_order: entry.sort_order,
-					contents: Object.entries(entry.contents)
-						.filter(([, c]) => c?.title?.trim())
-						.map(([language, c]) => ({
-							language,
-							title: c.title,
-							description: c.description || null,
-						})),
+					contents: buildContentsPayload(entry, attributeFields),
 				},
 				section,
 				entity_id,
@@ -1156,13 +1194,7 @@ export function ManagerImages({
 		await requestUpdate(
 			'image',
 			{
-				contents: Object.entries(entry.contents)
-					.filter(([, c]) => c?.title?.trim())
-					.map(([language, c]) => ({
-						language,
-						title: c.title,
-						description: c.description || null,
-					})),
+				contents: buildContentsPayload(entry, attributeFields),
 			},
 			entry.id,
 		);
@@ -1181,40 +1213,40 @@ export function ManagerImages({
 		return <LoadingComponent />;
 	}
 
-	const canUpdate = hasPermission(
-		auth,
-		section as PermissionEntityType,
-		'update',
-	);
-
 	const galleryFull = gallery.length >= GALLERY_MAX;
 
 	return (
 		<div className="flex flex-col gap-8">
 			<div className="flex justify-between items-center">
 				{/* Language section */}
-				<section aria-labelledby="language-zone" className="flex gap-2">
-					{languages.map((lang) => (
-						<Button
-							key={lang}
-							variant="outline"
-							size="xs"
-							disabled={saving}
-							onClick={() => setActiveLanguage(lang)}
-							className={cn(
-								'relative font-semibold uppercase transition-all duration-200 rounded-md',
-								activeLanguage === lang
-									? 'bg-warning/80 text-warning-foreground hover:text-warning-foreground hover:bg-warning/70'
-									: 'hover:text-warning-foreground hover:bg-warning/50 hover:shadow-sm',
-							)}
-							aria-label={lang.toUpperCase()}
-						>
-							{lang}
-						</Button>
-					))}
-				</section>
+				{Object.keys(attributeFields).length > 0 && (
+					<section
+						aria-labelledby="language-zone"
+						className="flex gap-2"
+					>
+						{languages.map((lang) => (
+							<Button
+								key={lang}
+								variant="outline"
+								size="xs"
+								disabled={saving}
+								onClick={() => setActiveLanguage(lang)}
+								className={cn(
+									'relative font-semibold uppercase transition-all duration-200 rounded-md',
+									activeLanguage === lang
+										? 'bg-warning/80 text-warning-foreground hover:text-warning-foreground hover:bg-warning/70'
+										: 'hover:text-warning-foreground hover:bg-warning/50 hover:shadow-sm',
+								)}
+								aria-label={lang.toUpperCase()}
+							>
+								{lang}
+							</Button>
+						))}
+					</section>
+				)}
+
 				{/* Save button */}
-				{mode === 'view' && canUpdate && (
+				{mode === 'view' && permissions.edit && (
 					<section aria-labelledby="update-button-zone">
 						<Button
 							variant="outline"
@@ -1273,6 +1305,7 @@ export function ManagerImages({
 							mode={mode}
 							entry={logo}
 							language={activeLanguage}
+							attributeFields={attributeFields}
 							onRemove={() => triggerRemove(logo)}
 							onContentChange={(language, field, value) =>
 								handleContentChange(
@@ -1283,7 +1316,7 @@ export function ManagerImages({
 								)
 							}
 							onStatusChange={() => triggerStatusChange(logo)}
-							error={errors[logo.key]}
+							errors={errors[logo.key]}
 						/>
 					)}
 				</section>
@@ -1334,6 +1367,7 @@ export function ManagerImages({
 									mode={mode}
 									entry={entry}
 									language={activeLanguage}
+									attributeFields={attributeFields}
 									onRemove={() => triggerRemove(entry)}
 									onContentChange={(language, field, value) =>
 										handleContentChange(
@@ -1346,7 +1380,7 @@ export function ManagerImages({
 									onStatusChange={() =>
 										triggerStatusChange(entry)
 									}
-									error={errors[entry.key]}
+									errors={errors[entry.key]}
 									disabled={saving}
 									isSortable={gallery.length > 1}
 								/>
@@ -1360,7 +1394,8 @@ export function ManagerImages({
 									mode={mode}
 									entry={entry}
 									language={activeLanguage}
-									error={errors[entry.key]}
+									attributeFields={attributeFields}
+									errors={errors[entry.key]}
 								/>
 							))}
 						</div>

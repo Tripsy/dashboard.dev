@@ -3,6 +3,7 @@ import {
 	type CmrFormValuesType,
 	FormManageCmr,
 } from '@/app/(public)/_components/cmr/form-manage-cmr.component';
+import { ManagerCmrImages } from '@/app/(public)/_components/cmr/manager-cmr-images.component';
 import { SetupCmrVehicles } from '@/app/(public)/_components/cmr/setup-cmr-vehicles.component';
 import { StatusTransitionCmr } from '@/app/(public)/_components/cmr/status-transition-cmr.component';
 import { getLanguageClient, translateBatch } from '@/config/translate.setup';
@@ -366,6 +367,7 @@ export default async function dataSourceConfig(): Promise<
 			'delete.title',
 			'statusTransition.title',
 			'setupVehicles.title',
+			'managerImages.title',
 		] as const,
 		'cmr.action',
 	);
@@ -475,6 +477,22 @@ export default async function dataSourceConfig(): Promise<
 					variant: 'outline',
 					hover: 'info',
 					icon: 'Setup',
+				},
+			},
+			managerImages: {
+				windowType: 'other',
+				windowTitle: translations['managerImages.title'],
+				windowComponent: ManagerCmrImages,
+				windowConfigProps: {
+					size: 'x4l',
+				},
+				permission: ['cmr', 'read'],
+				entriesSelection: 'single',
+				buttonPosition: 'left',
+				button: {
+					variant: 'outline',
+					hover: 'info',
+					icon: 'Image',
 				},
 			},
 		},

@@ -21,5 +21,5 @@ export function displayAddressLabel(
 		return entry.details;
 	}
 
-	return `${displayPlaceLabel(entry.city, language)}, ${entry.details}`;
+	return `${displayPlaceLabel(entry.city, language, false)}, ${entry.details}`;
 }

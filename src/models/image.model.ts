@@ -1,5 +1,4 @@
 import { Configuration } from '@/config/settings.config';
-import { capitalizeFirstLetter } from '@/helpers/string.helper';
 import type { Language } from '@/types/common.type';
 import type { ImagePropertiesType } from '@/types/image.type';
 
@@ -9,8 +8,6 @@ export const ImageSectionEnum = {
 	BRAND: 'brand',
 } as const;
 
-export const IMAGE_DEFAULT_SECTION = ImageSectionEnum.CMR;
-
 export type ImageSection =
 	(typeof ImageSectionEnum)[keyof typeof ImageSectionEnum];
 
@@ -18,8 +15,6 @@ export const ImageTypeEnum = {
 	LOGO: 'logo',
 	GALLERY: 'gallery',
 } as const;
-
-export const IMAGE_DEFAULT_TYPE = ImageTypeEnum.GALLERY;
 
 export type ImageType = (typeof ImageTypeEnum)[keyof typeof ImageTypeEnum];
 
@@ -41,7 +36,7 @@ export type ImageStorage =
 
 export type ImageContentType = {
 	language: string;
-	title: string;
+	title?: string;
 	description?: string;
 };
 
@@ -105,5 +100,13 @@ export function getImageContent(
 }
 
 export const displayImageLabel = (m: ImageModel) => {
-	return `${capitalizeFirstLetter(m.section)} / ${m.path}`;
+	return `${m.path}`;
 };
+
+export function showImage(path: string, storage?: ImageStorage) {
+	if (storage === ImageStorageEnum.LOCAL) {
+		return `${Configuration.get('images.local.view')}/${path}`;
+	}
+
+	return path;
+}

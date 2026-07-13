@@ -743,12 +743,6 @@ export default async function dataSourceConfig(): Promise<
 				},
 				permission: ['cmr', 'read'],
 				entriesSelection: 'single',
-				customEntryCheck: (entry: CmrModel) =>
-					arrayHasValue(entry.status, [
-						CmrStatusEnum.ORDERED,
-						CmrStatusEnum.PREPARING,
-						CmrStatusEnum.TRANSIT,
-					]),
 				buttonPosition: 'left',
 				button: {
 					variant: 'outline',

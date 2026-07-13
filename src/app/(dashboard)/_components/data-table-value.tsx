@@ -92,6 +92,10 @@ export const DataTableValue = <Entry extends Record<string, unknown>>(
 		outputValue = capitalizeFirstLetter(outputValue);
 	}
 
+	if (options.uppercase && typeof outputValue === 'string') {
+		outputValue = outputValue.toUpperCase();
+	}
+
 	if (options.displayDate && typeof outputValue === 'string') {
 		outputValue = formatDate(outputValue, 'date-time') || '-';
 	}

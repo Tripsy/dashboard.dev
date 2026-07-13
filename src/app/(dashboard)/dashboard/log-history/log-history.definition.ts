@@ -155,6 +155,8 @@ export default async function dataSourceConfig(): Promise<
 				windowComponent: ViewLogHistory,
 				windowConfigProps: {
 					size: 'x2l',
+					closeOnBackdrop: true,
+					closeOnEscape: true,
 				},
 				permission: ['log-history', 'read'],
 				entriesSelection: 'single',

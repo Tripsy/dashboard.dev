@@ -631,8 +631,6 @@ export function ManagerImages({
 	const { showToast } = useToast();
 	const languages = attributeLanguages ?? [DEFAULT_LANGUAGE];
 
-	console.log(attributeFields);
-
 	const translationsKeys = useMemo(
 		() =>
 			[

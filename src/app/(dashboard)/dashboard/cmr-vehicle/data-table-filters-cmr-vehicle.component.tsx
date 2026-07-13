@@ -106,7 +106,6 @@ export const DataTableFiltersCmrVehicle = (): JSX.Element => {
 				dataSource="vehicle"
 				checked={filters.is_deleted.value ?? false}
 				onCheckedChange={(value) => {
-					console.log('is_deleted', value);
 					setFilterValues({ is_deleted: value });
 				}}
 			/>

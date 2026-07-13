@@ -373,6 +373,8 @@ export default async function dataSourceConfig(): Promise<
 				windowComponent: ViewBrand,
 				windowConfigProps: {
 					size: 'xl',
+					closeOnBackdrop: true,
+					closeOnEscape: true,
 				},
 				permission: ['brand', 'read'],
 				entriesSelection: 'single',

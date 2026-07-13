@@ -264,7 +264,6 @@ export function DataTableActions<K extends DataSourceKey>() {
 						resolvedActionConfig.customEntryCheck,
 					)
 				) {
-					console.log(resolvedActionConfig);
 					throw new Error(
 						translations['app.error.operation_not_allowed'],
 					);

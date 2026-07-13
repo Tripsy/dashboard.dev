@@ -298,6 +298,8 @@ export default async function dataSourceConfig(): Promise<
 				windowComponent: ViewCmrVehicle,
 				windowConfigProps: {
 					size: 'xl',
+					closeOnBackdrop: true,
+					closeOnEscape: true,
 				},
 				permission: ['cmr-vehicle', 'read'],
 				entriesSelection: 'single',

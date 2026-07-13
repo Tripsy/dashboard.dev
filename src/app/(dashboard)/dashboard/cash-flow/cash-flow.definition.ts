@@ -619,6 +619,8 @@ export default async function dataSourceConfig(): Promise<
 				windowComponent: ViewCashFlow,
 				windowConfigProps: {
 					size: 'xl',
+					closeOnBackdrop: true,
+					closeOnEscape: true,
 				},
 				permission: ['cash-flow', 'read'],
 				entriesSelection: 'single',

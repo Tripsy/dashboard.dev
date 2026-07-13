@@ -206,13 +206,13 @@ pnpm run build    # Production build
 
 # 📌 TODO
 
-2. For window-component form / action it should allow close only from button, clicking outside should trigger a confirmation
-3. order page ..glitch when moving to order without type (brand)
-4. dashboard stats
-5. monthly driver report 
-6. deploy
+1. order page ..glitch when moving to order without type (brand)
+2. dashboard stats
+3. monthly driver report 
+4. deploy
 
 ---------- 
+
 1. Add section "documentation"
 2. login with google / facebook
 3. Replace all console.error with logging

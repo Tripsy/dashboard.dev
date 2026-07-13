@@ -366,6 +366,8 @@ export default async function dataSourceConfig(): Promise<
 				windowComponent: ViewCompanyVehicle,
 				windowConfigProps: {
 					size: 'xl',
+					closeOnBackdrop: true,
+					closeOnEscape: true,
 				},
 				permission: ['company-vehicle', 'read'],
 				entriesSelection: 'single',

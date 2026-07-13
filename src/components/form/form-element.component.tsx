@@ -1,8 +1,9 @@
 import React, { type JSX, useEffect, useMemo, useRef, useState } from 'react';
+import { ActionButtonContent } from '@/components/action-button.component';
 import { FormElementError } from '@/components/form/form-element-error.component';
-import { getActionIcon, Icons } from '@/components/icon.component';
+import { Icons } from '@/components/icon.component';
 import { LoadingIcon } from '@/components/status.component';
-import { Button, type ButtonVariant } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -24,8 +25,9 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/helpers/css.helper';
-import { formatDate, toDateInstance } from '@/helpers/date.helper';
+import { formatDate, stringToDate } from '@/helpers/date.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
+import type { ButtonAppearanceType } from '@/types/html.type';
 
 export type InputValueType = string | null | undefined;
 export type OptionValueType = string | null | undefined;
@@ -125,7 +127,7 @@ const useFieldState = ({
 	value,
 	error,
 }: {
-	value?: string | number | boolean | Date | null;
+	value?: string | number | boolean | null;
 	error?: string[];
 }) => {
 	if (error?.length) {
@@ -142,7 +144,7 @@ const useFieldState = ({
 export type FormComponentProps<Fields, Value> = {
 	id: string;
 	labelText?: string;
-	fieldType?: 'text' | 'password' | 'email' | 'number';
+	fieldType?: 'text' | 'password' | 'email' | 'number' | 'time';
 	fieldName: keyof Fields & string;
 	fieldValue: Value;
 	isRequired?: boolean;
@@ -176,9 +178,7 @@ export const FormComponentInput = <Fields,>({
 	onChange,
 	error,
 	icons,
-}: FormComponentProps<Fields, InputValueType | number> & {
-	step?: number;
-}) => {
+}: FormComponentProps<Fields, InputValueType | number>) => {
 	const { borderClass } = useFieldState({ value: fieldValue, error });
 
 	return (
@@ -214,6 +214,189 @@ export const FormComponentInput = <Fields,>({
 					)}
 				</div>
 			</FormElementWrapper>
+		</FormElement>
+	);
+};
+
+type FormComponentTimeProps<Fields> = Omit<
+	FormComponentProps<Fields, InputValueType>,
+	'fieldType' | 'autoComplete' | 'icons'
+> & {
+	minTime?: string;
+	maxTime?: string;
+	minuteInterval?: number;
+};
+
+export const FormComponentTime = <Fields,>({
+	labelText,
+	id,
+	fieldName,
+	fieldValue,
+	isRequired = false,
+	className = 'min-w-36',
+	placeholderText = '--:--',
+	disabled,
+	onChange,
+	error,
+	minTime,
+	maxTime,
+	minuteInterval = 1,
+}: FormComponentTimeProps<Fields>) => {
+	const [open, setOpen] = useState(false);
+	const { borderClass } = useFieldState({ value: fieldValue, error });
+
+	const hours = Array.from({ length: 24 }, (_, i) =>
+		String(i).padStart(2, '0'),
+	).filter((h) => {
+		if (minTime && `${h}:59` < minTime) {
+			return false;
+		}
+
+		if (maxTime && `${h}:00` > maxTime) {
+			return false;
+		}
+
+		return true;
+	});
+
+	const getMinutes = (selectedHour: string) => {
+		const interval = minuteInterval > 1 ? minuteInterval : 1;
+		return Array.from({ length: Math.floor(60 / interval) }, (_, i) =>
+			String(i * interval).padStart(2, '0'),
+		).filter((m) => {
+			const time = `${selectedHour}:${m}`;
+
+			if (minTime && time < minTime) {
+				return false;
+			}
+
+			if (maxTime && time > maxTime) {
+				return false;
+			}
+
+			return true;
+		});
+	};
+
+	const [selectedHour, selectedMinute] = fieldValue
+		? fieldValue.split(':')
+		: [null, null];
+
+	const handleHourSelect = (hour: string) => {
+		const minutes = getMinutes(hour);
+		const minute =
+			selectedMinute && minutes.includes(selectedMinute)
+				? selectedMinute
+				: minutes[0];
+
+		const syntheticEvent = {
+			target: { value: `${hour}:${minute ?? '00'}`, name: fieldName },
+		} as React.ChangeEvent<HTMLInputElement>;
+
+		onChange(syntheticEvent);
+	};
+
+	const handleMinuteSelect = (minute: string) => {
+		const hour = selectedHour ?? '00';
+
+		const syntheticEvent = {
+			target: { value: `${hour}:${minute}`, name: fieldName },
+		} as React.ChangeEvent<HTMLInputElement>;
+
+		onChange(syntheticEvent);
+
+		setOpen(false);
+	};
+
+	const minutes = selectedHour ? getMinutes(selectedHour) : [];
+
+	return (
+		<FormElement
+			label={{ for: id, text: labelText, required: isRequired }}
+			error={error}
+		>
+			<div>
+				<input
+					type="hidden"
+					name={fieldName}
+					value={fieldValue ?? ''}
+				/>
+				<Popover open={open} onOpenChange={setOpen}>
+					<PopoverTrigger asChild>
+						<Button
+							id={id}
+							variant="outline"
+							className={cn(
+								'justify-start text-left text-sm',
+								!fieldValue && 'text-muted-foreground',
+								borderClass,
+								className,
+							)}
+							disabled={disabled}
+						>
+							<Icons.Clock className="mr-2 h-4 w-4" />
+							{fieldValue ?? <span>{placeholderText}</span>}
+						</Button>
+					</PopoverTrigger>
+					<PopoverContent className="w-auto p-2" align="start">
+						<div className="flex gap-2">
+							{/* Hours */}
+							<div className="flex flex-col gap-1">
+								<p className="text-xs text-muted-foreground text-center pb-1">
+									HH
+								</p>
+								<ul className="h-48 overflow-y-auto flex flex-col gap-0.5">
+									{hours.map((hour) => (
+										<li key={hour}>
+											<button
+												type="button"
+												onClick={() =>
+													handleHourSelect(hour)
+												}
+												className={cn(
+													'w-full px-3 py-1 text-sm rounded hover:bg-accent',
+													selectedHour === hour &&
+														'bg-accent font-semibold',
+												)}
+											>
+												{hour}
+											</button>
+										</li>
+									))}
+								</ul>
+							</div>
+
+							<div className="w-px bg-border" />
+
+							{/* Minutes */}
+							<div className="flex flex-col gap-1">
+								<p className="text-xs text-muted-foreground text-center pb-1">
+									MM
+								</p>
+								<ul className="h-48 overflow-y-auto flex flex-col gap-0.5">
+									{minutes.map((minute) => (
+										<li key={minute}>
+											<button
+												type="button"
+												onClick={() =>
+													handleMinuteSelect(minute)
+												}
+												className={cn(
+													'w-full px-3 py-1 text-sm rounded hover:bg-accent',
+													selectedMinute === minute &&
+														'bg-accent font-semibold',
+												)}
+											>
+												{minute}
+											</button>
+										</li>
+									))}
+								</ul>
+							</div>
+						</div>
+					</PopoverContent>
+				</Popover>
+			</div>
 		</FormElement>
 	);
 };
@@ -472,25 +655,18 @@ export const FormComponentCalendarWithoutFormElement = <Fields,>({
 	| 'onChange'
 > & {
 	onSelect: (value: string) => void;
-	minDate?: Date | string;
-	maxDate?: Date | string;
+	minDate?: Date;
+	maxDate?: Date;
 }) => {
-	const fieldValueAsDate = fieldValue
-		? toDateInstance(fieldValue)
-		: undefined;
-	const minDateAsDate = minDate ? toDateInstance(minDate) : undefined;
-	const maxDateAsDate = maxDate ? toDateInstance(maxDate) : undefined;
+	const [open, setOpen] = useState(false);
+
+	const selected = fieldValue ? stringToDate(fieldValue) : undefined;
 
 	return (
 		<>
-			<input
-				type="hidden"
-				name={fieldName}
-				value={fieldValue ?? ''}
-				disabled={disabled}
-			/>
+			<input type="hidden" name={fieldName} value={fieldValue ?? ''} />
 
-			<Popover>
+			<Popover open={open} onOpenChange={setOpen}>
 				<PopoverTrigger asChild>
 					<Button
 						id={id}
@@ -504,7 +680,7 @@ export const FormComponentCalendarWithoutFormElement = <Fields,>({
 					>
 						<Icons.Calendar className="mr-2 h-4 w-4" />
 						{fieldValue ? (
-							formatDate(fieldValue, 'default')
+							fieldValue
 						) : (
 							<span>{placeholderText}</span>
 						)}
@@ -514,22 +690,19 @@ export const FormComponentCalendarWithoutFormElement = <Fields,>({
 					<Calendar
 						mode="single"
 						required={false}
-						selected={fieldValueAsDate || undefined}
+						selected={selected}
 						onSelect={(date: Date | undefined) => {
 							const value = date
 								? (formatDate(date, 'default') as string)
 								: '';
 
 							onSelect(value);
+							setOpen(false);
 						}}
 						aria-placeholder={placeholderText}
 						disabled={[
-							...(minDateAsDate
-								? [{ before: minDateAsDate }]
-								: []),
-							...(maxDateAsDate
-								? [{ after: maxDateAsDate }]
-								: []),
+							...(minDate ? [{ before: minDate }] : []),
+							...(maxDate ? [{ after: maxDate }] : []),
 						]}
 					/>
 				</PopoverContent>
@@ -549,11 +722,15 @@ export const FormComponentCalendar = <Fields,>({
 	disabled,
 	error,
 	onSelect,
+	minDate,
+	maxDate,
 }: Omit<
 	FormComponentProps<Fields, InputValueType>,
 	'fieldType' | 'autoComplete' | 'icons' | 'onChange'
 > & {
 	onSelect: (value: string) => void;
+	minDate?: Date;
+	maxDate?: Date;
 }) => {
 	return (
 		<FormElement
@@ -568,6 +745,8 @@ export const FormComponentCalendar = <Fields,>({
 				placeholderText={placeholderText}
 				disabled={disabled}
 				onSelect={onSelect}
+				minDate={minDate}
+				maxDate={maxDate}
 			/>
 		</FormElement>
 	);
@@ -593,7 +772,7 @@ export const FormComponentAutoComplete = <Fields, T>({
 	icons?: { left?: JSX.Element };
 	onInputChange?: (value: string) => void;
 	autoCompleteProps: {
-		suggestions: T[];
+		suggestions: readonly T[];
 		onSelect?: (item: T) => void;
 
 		getOptionLabel: (item: T) => string;
@@ -851,54 +1030,52 @@ export const FormComponentAutoComplete = <Fields, T>({
 
 /** Common form elements **/
 
-type FormComponentSubmitButtonType = {
-	label: string;
-	variant?: ButtonVariant;
-	iconLabel: string;
-	iconSize?: number;
-	className?: string;
-};
-
 export const FormComponentSubmit = ({
 	pending,
 	submitted,
-	errors,
+	error,
 	button,
 }: {
 	pending: boolean;
 	submitted: boolean;
-	errors: Record<string, string[]>;
-	button: FormComponentSubmitButtonType;
+	error: boolean;
+	button?: ButtonAppearanceType;
 }) => {
 	const translationsKeys = useMemo(
-		() => ['app.text.please_wait'] as const,
+		() => ['app.action.loading.label', 'app.action.submit.label'] as const,
 		[],
 	);
 
 	const { translations } = useTranslation(translationsKeys);
-	const IconButton = getActionIcon(button.iconLabel);
+
+	const buttonLabel =
+		button?.label || translations['app.action.submit.label'];
 
 	return (
 		<Button
 			type="submit"
-			variant={button.variant}
-			className={button.className}
-			disabled={pending || (submitted && Object.keys(errors).length > 0)}
+			variant={button?.variant || 'info'}
+			className={button?.className}
+			disabled={pending || (submitted && error)}
 			aria-busy={pending}
 		>
 			{pending ? (
 				<span className="flex items-center gap-1.5">
 					<LoadingIcon />
-					{translations['app.text.please_wait']}
+					{translations['app.action.loading.label']}
 				</span>
-			) : submitted && Object.keys(errors).length > 0 ? (
+			) : submitted && error ? (
 				<span className="flex items-center gap-1.5">
 					<Icons.Status.Error className="animate-pulse" />
-					{button.label}
+					{buttonLabel}
 				</span>
 			) : (
 				<span className="flex items-center gap-1.5">
-					<IconButton size={button.iconSize || 16} /> {button.label}
+					<ActionButtonContent
+						icon={button?.icon}
+						action="submit"
+						label={buttonLabel}
+					/>
 				</span>
 			)}
 		</Button>

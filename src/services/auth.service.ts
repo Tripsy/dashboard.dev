@@ -41,7 +41,7 @@ export async function createAuth(
 	};
 }
 
-export async function getAuth(): Promise<ApiResponseFetch<AuthModel>> {
+export async function getAuth(): Promise<ApiResponseFetch<AuthModel | null>> {
 	try {
 		const sessionToken = await getTrackedCookie(
 			Configuration.get('user.sessionToken') as string,

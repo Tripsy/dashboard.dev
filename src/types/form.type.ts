@@ -1,15 +1,23 @@
-import type { ZodSafeParseError, ZodSafeParseSuccess } from 'zod';
+import type { ZodSafeParseError, ZodSafeParseSuccess, z } from 'zod';
+import type { ImagePropertiesType } from '@/types/image.type';
 import type { PageMeta } from '@/types/page-meta.type';
 
-export type FormSituationType = 'success' | 'error' | null;
+export type FormSituationType =
+	| 'success'
+	| 'failedValidation'
+	| 'serverError'
+	| null;
+
 type FormValueType =
 	| string
 	| number
 	| boolean
 	| Date
 	| PageMeta
+	| ImagePropertiesType
 	| null
 	| undefined;
+
 export type FormValuesType = {
 	[key: string]:
 		| FormValueType
@@ -21,14 +29,21 @@ export type GetFormValuesFnType<FormValues> = (
 	formData: FormData,
 ) => FormValues;
 
+export type ValidatorOutput<V, K extends keyof V> = V[K] extends z.ZodTypeAny
+	? z.output<V[K]>
+	: // biome-ignore lint/suspicious/noExplicitAny: It's fine
+		V[K] extends (...args: any[]) => z.ZodTypeAny
+		? z.output<ReturnType<V[K]>>
+		: never;
+
 export type ValidateFormReturnType<FormValues> =
 	| ZodSafeParseSuccess<FormValues>
 	| ZodSafeParseError<FormValues>;
 
-export type ValidateFormFnType<FormValues> = (
+export type ValidateFormFnType<FormValues, ValidatedValues = FormValues> = (
 	values: FormValues,
 	isSubmit?: boolean,
-) => ValidateFormReturnType<FormValues>;
+) => Promise<ValidateFormReturnType<ValidatedValues>>;
 
 export type FormErrorsType<FormValues extends FormValuesType> = {
 	[K in keyof FormValues]?: FormValues[K] extends Array<infer Item>

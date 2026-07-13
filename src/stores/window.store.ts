@@ -1,24 +1,22 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import {
-	type DataSourceKey,
-	getDataSourceConfig,
-} from '@/config/data-source.config';
+import { getDataSourceConfig } from '@/config/data-source.config';
 import ValueError from '@/exceptions/value.error';
 import { generateWindowUid } from '@/helpers/window.helper';
+import type { DataSourceKey } from '@/types/data-source.key';
+import { DataSourceSectionEnum } from '@/types/data-source.type';
 import type {
 	WindowConfig,
 	WindowCreateConfig,
 	WindowDefinition,
-	WindowEntryType,
 } from '@/types/window.type';
 
 type WindowStore = {
 	stack: WindowConfig[];
-	open: <Entry extends WindowEntryType>(
-		config: WindowCreateConfig<Entry>,
-		replacedUid?: string,
-	) => string; // If argument `replacedUid` is provided and a window exists it will be closed
+	open: (
+		config: WindowCreateConfig,
+		replacedUid?: string, // If argument `replacedUid` is provided and a window exists it will be closed
+	) => void;
 	close: (uid?: string) => void; // Removes from stack
 	closeAll: () => void; // Clear stack
 	minimize: (uid: string) => void; // Still in stack, hidden
@@ -28,14 +26,16 @@ type WindowStore = {
 };
 
 // Helper to prepare config on create
-const prepareConfigOnCreate = <Entry extends WindowEntryType>(
-	config: WindowCreateConfig<Entry>,
-): WindowConfig => {
+const prepareConfigOnCreate = async (
+	config: WindowCreateConfig,
+): Promise<WindowConfig> => {
 	const enrichedConfig = { ...config };
 
 	switch (enrichedConfig.section) {
-		case 'dashboard': {
-			const actions = getDataSourceConfig(
+		case DataSourceSectionEnum.DASHBOARD:
+		case DataSourceSectionEnum.PUBLIC: {
+			const actions = await getDataSourceConfig(
+				enrichedConfig.section,
 				enrichedConfig.dataSource as DataSourceKey,
 				'actions',
 			);
@@ -54,26 +54,28 @@ const prepareConfigOnCreate = <Entry extends WindowEntryType>(
 				);
 			}
 
-			// Create definition object
+			const displayEntryLabel = await getDataSourceConfig(
+				enrichedConfig.section,
+				enrichedConfig.dataSource as DataSourceKey,
+				'displayEntryLabel',
+			);
+
 			const definition: WindowDefinition = {
 				windowType: actionConfig.windowType,
 				windowTitle: actionConfig.windowTitle,
 				windowComponent: actionConfig.windowComponent,
 				entriesSelection: actionConfig.entriesSelection,
-				operationFunction: actionConfig.operationFunction,
+				operationFunction:
+					actionConfig.operationFunction as WindowDefinition['operationFunction'],
 				button: actionConfig.button,
 				validateForm: actionConfig.validateForm,
 				getFormValues: actionConfig.getFormValues,
 				getFormState: actionConfig.getFormState,
 				reloadEntry: actionConfig.reloadEntry,
 				prepareEntry: actionConfig.prepareEntry,
-				displayEntryLabel: getDataSourceConfig(
-					enrichedConfig.dataSource as DataSourceKey,
-					'displayEntryLabel',
-				),
-			};
+				displayEntryLabel,
+			} as WindowDefinition;
 
-			// Return complete WindowConfig
 			return {
 				...enrichedConfig,
 				uid:
@@ -84,7 +86,10 @@ const prepareConfigOnCreate = <Entry extends WindowEntryType>(
 						entriesSelection: actionConfig.entriesSelection,
 						entries: enrichedConfig.data?.entries,
 					}),
-				definition,
+				definition: {
+					...definition,
+					...enrichedConfig.definition,
+				},
 				props: {
 					...actionConfig.windowConfigProps,
 					...enrichedConfig.props,
@@ -110,11 +115,6 @@ export const useModalStore = create<WindowStore>()(
 					return get().stack.some((window) => window.uid === uid);
 				};
 
-				// // Private helper to get focused (top) window
-				// const getFocusedWindow = (): WindowConfig | undefined => {
-				// 	return get().stack.find((m) => !m.minimized);
-				// };
-
 				const minimizeAll = (stack: WindowConfig[]): WindowConfig[] =>
 					stack.map((m) =>
 						m.minimized ? m : { ...m, minimized: true },
@@ -124,38 +124,39 @@ export const useModalStore = create<WindowStore>()(
 					stack: [],
 
 					open: (config, replacedUid) => {
-						// Close a different window if explicitly requested (e.g. replacing a stale entry)
 						if (replacedUid) {
 							get().close(replacedUid);
 						}
 
-						const preparedConfig = prepareConfigOnCreate(config);
-						const alreadyExists = windowExists(preparedConfig.uid);
+						prepareConfigOnCreate(config).then((preparedConfig) => {
+							const alreadyExists = windowExists(
+								preparedConfig.uid,
+							);
 
-						set((state) => {
-							const minimizedStack = minimizeAll(state.stack);
+							set((state) => {
+								const minimizedStack = minimizeAll(state.stack);
 
-							if (!alreadyExists) {
-								// New window — push to top of stack
+								if (!alreadyExists) {
+									return {
+										stack: [
+											...minimizedStack,
+											preparedConfig,
+										],
+									};
+								}
+
 								return {
-									stack: [...minimizedStack, preparedConfig],
+									stack: minimizedStack.map((w) =>
+										w.uid === preparedConfig.uid
+											? {
+													...preparedConfig,
+													minimized: false,
+												}
+											: w,
+									),
 								};
-							}
-
-							// Existing window — update in-place and bring to front (un-minimize)
-							return {
-								stack: minimizedStack.map((w) =>
-									w.uid === preparedConfig.uid
-										? {
-												...preparedConfig,
-												minimized: false,
-											}
-										: w,
-								),
-							};
+							});
 						});
-
-						return preparedConfig.uid;
 					},
 
 					close: (uid) =>
@@ -213,25 +214,28 @@ export const useModalStore = create<WindowStore>()(
 				}),
 
 				// Re-derive complete WindowConfig after rehydration
-				onRehydrateStorage: () => (state) => {
+				onRehydrateStorage: () => async (state) => {
 					if (!state) {
 						return;
 					}
 
-					const serializedStack =
-						state.stack as unknown as WindowCreateConfig[];
+					const serializedStack = state.stack;
 
-					state.stack = serializedStack
-						.map((window) => {
-							try {
-								return prepareConfigOnCreate(window);
-							} catch (error) {
-								console.warn(
-									`[window-store] Failed to rehydrate window "${window.uid}":`,
-									error,
-								);
-								return null;
-							}
+					const results = await Promise.allSettled(
+						serializedStack.map((window) =>
+							prepareConfigOnCreate(window),
+						),
+					);
+
+					state.stack = results
+						.map((result, i) => {
+							if (result.status === 'fulfilled')
+								return result.value;
+							console.warn(
+								`[window-store] Failed to rehydrate window "${serializedStack[i].uid}":`,
+								result.reason,
+							);
+							return null;
 						})
 						.filter((w): w is WindowConfig => w !== null);
 				},

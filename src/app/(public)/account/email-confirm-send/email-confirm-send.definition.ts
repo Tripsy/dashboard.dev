@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { translateBatch } from '@/config/translate.setup';
 import { getFormDataAsString } from '@/helpers/form.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import type { FormErrorsType, FormSituationType } from '@/types/form.type';
@@ -7,7 +8,7 @@ export type EmailConfirmSendFormValuesType = {
 	email: string | null;
 };
 
-export type EmailConfirmSendSituationType = FormSituationType | 'csrf_error';
+export type EmailConfirmSendSituationType = FormSituationType | 'csrfError';
 
 export type EmailConfirmSendStateType = {
 	values: EmailConfirmSendFormValuesType;
@@ -25,10 +26,7 @@ export const EmailConfirmSendState: EmailConfirmSendStateType = {
 	situation: null,
 };
 
-const validatorMessages = await BaseValidator.getValidatorMessages(
-	['invalid_email'] as const,
-	'email-confirm-send.validation',
-);
+const validatorMessages = ['invalid_email'] as const;
 
 class EmailConfirmSendValidator extends BaseValidator<
 	typeof validatorMessages
@@ -38,10 +36,15 @@ class EmailConfirmSendValidator extends BaseValidator<
 	});
 }
 
-export function validateFormEmailConfirmSend(
+export async function validateFormEmailConfirmSend(
 	values: EmailConfirmSendFormValuesType,
 ) {
-	const validator = new EmailConfirmSendValidator(validatorMessages);
+	const translations = await translateBatch(
+		validatorMessages,
+		'email-confirm-send.validation',
+	);
+
+	const validator = new EmailConfirmSendValidator(translations);
 
 	return validator.emailConfirmSend.safeParse(values);
 }

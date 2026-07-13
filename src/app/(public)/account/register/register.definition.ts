@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { Configuration } from '@/config/settings.config';
+import { getLanguageClient, translateBatch } from '@/config/translate.setup';
 import {
 	getFormDataAsBoolean,
 	getFormDataAsEnum,
@@ -20,8 +21,8 @@ export type RegisterFormValuesType = {
 
 export type RegisterSituationType =
 	| FormSituationType
-	| 'csrf_error'
-	| 'pending_account';
+	| 'csrfError'
+	| 'pendingAccount';
 
 export type RegisterStateType = {
 	values: RegisterFormValuesType;
@@ -36,7 +37,7 @@ export const RegisterState: RegisterStateType = {
 		email: '',
 		password: '',
 		password_confirm: '',
-		language: Configuration.language(),
+		language: Configuration.defaultLanguage(),
 		terms: false,
 	},
 	errors: {},
@@ -44,23 +45,20 @@ export const RegisterState: RegisterStateType = {
 	situation: null,
 };
 
-const validatorMessages = await BaseValidator.getValidatorMessages(
-	[
-		'invalid_name',
-		'name_min',
-		'invalid_email',
-		'invalid_password',
-		'password_min',
-		'password_condition_capital_letter',
-		'password_condition_number',
-		'password_condition_special_character',
-		'password_confirm_required',
-		'password_confirm_mismatch',
-		'invalid_language',
-		'terms_required',
-	] as const,
-	'register.validation',
-);
+const validatorMessages = [
+	'invalid_name',
+	'name_min',
+	'invalid_email',
+	'invalid_password',
+	'password_min',
+	'password_condition_capital_letter',
+	'password_condition_number',
+	'password_condition_special_character',
+	'password_confirm_required',
+	'password_confirm_mismatch',
+	'invalid_language',
+	'terms_required',
+] as const;
 
 class RegisterValidator extends BaseValidator<typeof validatorMessages> {
 	register = z
@@ -120,8 +118,13 @@ class RegisterValidator extends BaseValidator<typeof validatorMessages> {
 		});
 }
 
-export function validateFormRegister(values: RegisterFormValuesType) {
-	const validator = new RegisterValidator(validatorMessages);
+export async function validateFormRegister(values: RegisterFormValuesType) {
+	const translations = await translateBatch(
+		validatorMessages,
+		'register.validation',
+	);
+
+	const validator = new RegisterValidator(translations);
 
 	return validator.register.safeParse(values);
 }
@@ -136,7 +139,7 @@ export function getRegisterFormValues(
 		password_confirm: getFormDataAsString(formData, 'password_confirm'),
 		language:
 			getFormDataAsEnum(formData, 'language', LanguageEnum) ||
-			Configuration.language(),
+			getLanguageClient(),
 		terms: getFormDataAsBoolean(formData, 'terms') || false,
 	};
 }

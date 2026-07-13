@@ -1,4 +1,4 @@
-import type { DataSourceKey } from '@/config/data-source.config';
+import type { DataSourceKey } from '@/types/data-source.key';
 
 const FILTER_RESET_EVENT = 'filterReset' as const;
 

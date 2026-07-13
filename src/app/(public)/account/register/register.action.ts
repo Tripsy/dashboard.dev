@@ -19,12 +19,12 @@ export async function registerAction(
 		return {
 			...formState,
 			message: await translate('app.error.csrf'),
-			situation: 'csrf_error',
+			situation: 'csrfError',
 		};
 	}
 
 	const formValues = getRegisterFormValues(formData);
-	const validated = validateFormRegister(formValues);
+	const validated = await validateFormRegister(formValues);
 
 	if (!validated.success) {
 		const errors = accumulateZodErrors<RegisterFormValuesType>(
@@ -34,7 +34,7 @@ export async function registerAction(
 		return {
 			...formState,
 			values: formValues,
-			situation: 'error',
+			situation: 'failedValidation',
 			message: await translate('app.error.validation'),
 			errors,
 		};
@@ -47,16 +47,16 @@ export async function registerAction(
 			...formState,
 			values: validated.data,
 			message: requestResponse?.message || null,
-			situation: requestResponse?.success ? 'success' : 'error',
+			situation: requestResponse?.success ? 'success' : 'serverError',
 		};
 	} catch (error: unknown) {
 		let message: string = '';
-		let situation: RegisterSituationType = 'error';
+		let situation: RegisterSituationType = 'serverError';
 
 		if (error instanceof ApiError) {
 			switch (error.status) {
 				case 409:
-					situation = 'pending_account';
+					situation = 'pendingAccount';
 					message = await translate(
 						'register.message.pending_account',
 					);

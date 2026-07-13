@@ -37,18 +37,10 @@ export type PlaceModel<D = Date | string> = {
 	deleted_at: D;
 };
 
-export type PlaceFormValuesType = {
-	place_type: PlaceType;
-	code: string | null;
-	parent_id: number | null;
-	parent: string | null;
-	contents: PlaceContent[];
-};
-
 // Helpers
 export function getPlaceContentProp(
 	place: PlaceModel,
-	language: Language | string,
+	language: Language,
 	prop: keyof Pick<PlaceContent, 'name' | 'type_label'> = 'name',
 ): string {
 	if (!place.contents) {
@@ -62,7 +54,7 @@ export function getPlaceContentProp(
 	}
 
 	const contentDefault = place.contents.find(
-		(c) => c.language === Configuration.language(),
+		(c) => c.language === Configuration.defaultLanguage(),
 	);
 
 	if (contentDefault) {
@@ -90,13 +82,19 @@ export function getParentPlaceType(place_type: PlaceType) {
 
 export const displayPlaceLabel = (
 	p: PlaceModel,
-	selectedLanguage: Language,
+	language: Language,
+	withType: boolean = true,
 ) => {
-	const name = getPlaceContentProp(p, selectedLanguage, 'name');
-	const place_type =
-		getPlaceContentProp(p, selectedLanguage, 'type_label') || p.place_type;
+	const name = getPlaceContentProp(p, language, 'name');
 
-	return `${capitalizeFirstLetter(place_type)} / ${name}`;
+	if (!withType) {
+		return name;
+	}
+
+	const place_type =
+		getPlaceContentProp(p, language, 'type_label') || p.place_type;
+
+	return `(${capitalizeFirstLetter(place_type)} / ${name}`;
 };
 
 export const CITY_DEFAULT = {
@@ -105,7 +103,7 @@ export const CITY_DEFAULT = {
 	place_type: PlaceTypeEnum.CITY,
 	contents: [
 		{
-			language: Configuration.language(),
+			language: Configuration.defaultLanguage(),
 			type_label: PlaceTypeEnum.CITY.toLowerCase(),
 		},
 	],

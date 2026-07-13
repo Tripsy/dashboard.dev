@@ -17,8 +17,8 @@ import { getAuth } from '@/services/auth.service';
 type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated' | 'error';
 
 type AuthContextType = {
-	auth: AuthModel;
-	setAuth: (model: AuthModel) => void;
+	auth: AuthModel | null;
+	setAuth: (model: AuthModel | null) => void;
 	authStatus: AuthStatus;
 	setAuthStatus: (status: AuthStatus) => void;
 	refreshAuth: () => Promise<void>;
@@ -30,12 +30,12 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const AuthProvider = ({
 	children,
-	initAuth = null,
+	initAuth,
 }: {
 	children: ReactNode;
-	initAuth?: AuthModel;
+	initAuth: AuthModel | null;
 }) => {
-	const [auth, setAuth] = useState<AuthModel>(initAuth);
+	const [auth, setAuth] = useState<AuthModel | null>(initAuth);
 	const [authStatus, setAuthStatus] = useState<AuthStatus>(
 		initAuth ? 'authenticated' : 'loading',
 	);

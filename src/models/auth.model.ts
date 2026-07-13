@@ -1,25 +1,40 @@
 import { normalizeDates } from '@/helpers/model.helper';
+import type {
+	PermissionEntityType,
+	PermissionOperationType,
+} from '@/models/permission.model';
 import { type UserModel, UserRoleEnum } from '@/models/user.model';
 
-export type AuthModel =
-	| (UserModel<Date> & {
-			permissions: string[];
-	  })
-	| null;
+export type AuthModelPermissions = Record<
+	PermissionEntityType,
+	PermissionOperationType[]
+>;
 
-export function isAdmin(data: AuthModel): boolean {
+export type AuthModel = UserModel<Date> & {
+	permissions: AuthModelPermissions;
+};
+
+export function isAdmin(data: AuthModel | null): boolean {
 	return data?.role === UserRoleEnum.ADMIN;
 }
 
-export function isOperator(data: AuthModel): boolean {
+export function isOperator(data: AuthModel | null): boolean {
 	return data?.role === UserRoleEnum.OPERATOR;
 }
 
-export function isAuthenticated(auth: AuthModel): boolean {
+export function isDriver(data: AuthModel | null): boolean {
+	return data?.role === UserRoleEnum.DRIVER;
+}
+
+export function isAuthenticated(auth: AuthModel | null): boolean {
 	return auth !== null;
 }
 
-export function hasPermission(auth: AuthModel, permission?: string): boolean {
+export function hasPermission(
+	auth: AuthModel | null,
+	entity: PermissionEntityType,
+	operation?: PermissionOperationType,
+): boolean {
 	if (!isAuthenticated(auth)) {
 		return false;
 	}
@@ -28,17 +43,19 @@ export function hasPermission(auth: AuthModel, permission?: string): boolean {
 		return true;
 	}
 
-	if (isOperator(auth)) {
-		if (permission) {
-			return auth?.permissions.includes(permission) || false;
-		} else {
-			return true;
-		}
+	if (!isDriver(auth) && !isOperator(auth)) {
+		return false;
 	}
 
-	return false;
+	if (!operation) {
+		const permissions = auth?.permissions?.[entity];
+
+		return Array.isArray(permissions) && permissions.length > 0;
+	}
+
+	return auth?.permissions?.[entity]?.includes(operation) || false;
 }
 
 export function prepareAuthModel(data: AuthModel): AuthModel {
-	return normalizeDates(data) as AuthModel;
+	return normalizeDates(data) as unknown as AuthModel;
 }

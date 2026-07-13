@@ -2,12 +2,12 @@ import type { Draft } from 'immer';
 import { create, type StateCreator } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import {
-	type DataSourceKey,
-	type DataTableFiltersType,
-	type DataTableStateType,
-	getDataSourceConfig,
-} from '@/config/data-source.config';
+import type { DataSourceKey } from '@/types/data-source.key';
+import type {
+	DataSourceSection,
+	DataTableFiltersType,
+	DataTableStateType,
+} from '@/types/data-source.type';
 
 // ============================================================================
 // TABLE SLICE
@@ -19,8 +19,8 @@ export interface DataTableSlice {
 }
 
 export const createDataTableSlice =
-	<K extends DataSourceKey>(
-		dataSource: K,
+	(
+		initialState: DataTableStateType,
 	): StateCreator<
 		DataTableStore,
 		[['zustand/immer', never]],
@@ -28,9 +28,7 @@ export const createDataTableSlice =
 		DataTableSlice
 	> =>
 	(set) => ({
-		tableState: structuredClone(
-			getDataSourceConfig(dataSource, 'dataTable').state,
-		),
+		tableState: structuredClone(initialState),
 
 		updateTableState: (newState) =>
 			set((state: Draft<DataTableSlice>) => {
@@ -87,13 +85,15 @@ export type DataTableStore<Model = any> = DataTableSlice &
 	};
 
 export const createDataTableStore = <K extends DataSourceKey, Model>(
+	section: DataSourceSection,
 	dataSource: K,
+	initialState: DataTableStateType,
 ) =>
 	create<DataTableStore<Model>>()(
 		devtools(
 			persist(
 				immer((set, get, store) => ({
-					...createDataTableSlice<K>(dataSource)(set, get, store),
+					...createDataTableSlice(initialState)(set, get, store),
 					...createDataTableSelectionSlice<Model>()(set, get, store),
 
 					isLoading: false,
@@ -104,7 +104,7 @@ export const createDataTableStore = <K extends DataSourceKey, Model>(
 					},
 				})),
 				{
-					name: `datatable-store-${String(dataSource)}`,
+					name: `datatable-store-${String(section)}-${String(dataSource)}`,
 					partialize: (state) => ({
 						tableState: state.tableState,
 						selectedEntries: state.selectedEntries,

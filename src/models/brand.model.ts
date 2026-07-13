@@ -12,21 +12,22 @@ export type BrandStatus =
 	(typeof BrandStatusEnum)[keyof typeof BrandStatusEnum];
 
 export const BrandTypeEnum = {
+	VEHICLE: 'vehicle',
 	PRODUCT: 'product',
 } as const;
 
-export type BrandType = (typeof BrandTypeEnum)[keyof typeof BrandTypeEnum];
-
 export const BRAND_DEFAULT_TYPE = BrandTypeEnum.PRODUCT;
 
-export type BrandContent = {
-	language: Language | string;
+export type BrandType = (typeof BrandTypeEnum)[keyof typeof BrandTypeEnum];
+
+export type BrandContentType = {
+	language: Language;
 	description: string | null;
 	meta: PageMeta;
 };
 
-// Brand base type without relations
-type BrandBase<D = Date | string> = {
+// Full brand model with relations
+export type BrandModel<D = Date | string> = {
 	id: number;
 	name: string;
 	slug: string;
@@ -39,27 +40,15 @@ type BrandBase<D = Date | string> = {
 	created_at: D;
 	updated_at: D;
 	deleted_at: D;
-};
 
-// Full brand model with relations
-export type BrandModel<D = Date | string> = BrandBase<D> & {
 	// Content translations
-	contents?: BrandContent[];
-};
-
-// Form values type for creating/editing a brand
-export type BrandFormValuesType = {
-	name: string | null;
-	slug: string | null;
-	brand_type: BrandType;
-
-	contents: BrandContent[];
+	contents?: BrandContentType[];
 };
 
 // Helpers
 export function getBrandDescription(
 	brand: BrandModel,
-	language: Language | string,
+	language: Language,
 ): string {
 	if (!brand.contents) {
 		return '[empty description]';
@@ -72,7 +61,7 @@ export function getBrandDescription(
 	}
 
 	const contentDefault = brand.contents.find(
-		(c) => c.language === Configuration.language(),
+		(c) => c.language === Configuration.defaultLanguage(),
 	);
 
 	if (contentDefault?.description) {
@@ -88,6 +77,6 @@ export function getBrandDescription(
 	return '[empty description]';
 }
 
-export const displayBrandLabel = (p: BrandModel) => {
-	return `${capitalizeFirstLetter(p.brand_type)} / ${p.name}`;
+export const displayBrandLabel = (m: BrandModel) => {
+	return `${capitalizeFirstLetter(m.brand_type)} / ${m.name}`;
 };

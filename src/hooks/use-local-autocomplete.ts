@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 
 export type UseLocalAutocompleteOptions<T> = {
-	source: T[];
+	source: readonly T[]; // ← accept readonly arrays
 	filter?: (item: T, query: string) => boolean;
 	minLength?: number;
 };
@@ -24,13 +24,7 @@ export function useLocalAutocomplete<T>({
 	const activeFilter = filter ?? defaultFilter;
 
 	const suggestions = useMemo(() => {
-		if (!query) {
-			return source;
-		}
-
-		if (query.length < minLength) {
-			return [];
-		}
+		if (!query || query.length < minLength) return source;
 
 		return source.filter((item) => activeFilter(item, query));
 	}, [source, query, minLength, activeFilter]);

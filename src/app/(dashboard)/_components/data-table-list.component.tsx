@@ -6,22 +6,25 @@ import {
 	DataTable,
 	type DataTablePageEvent,
 	type DataTableSortEvent,
-	type DataTableValue,
 } from 'primereact/datatable';
 import type { PaginatorCurrentPageReportOptions } from 'primereact/paginator';
 import type React from 'react';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useStore } from 'zustand/react';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
 import { LoadingComponent } from '@/components/status.component';
-import {
-	type DataTableFiltersType,
-	getDataSourceConfig,
-} from '@/config/data-source.config';
-import { toDateInstanceCustom } from '@/helpers/date.helper';
+import { getDataSourceConfig } from '@/config/data-source.config';
+import { toUTCISOString } from '@/helpers/date.helper';
 import { replaceVars } from '@/helpers/string.helper';
+import { assertDefined } from '@/helpers/types.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
+import { useAuth } from '@/providers/auth.provider';
 import type { QueryFiltersType } from '@/types/api.type';
+import {
+	type DataSourceConfigType,
+	DataSourceSectionEnum,
+	type DataTableFiltersType,
+} from '@/types/data-source.type';
 
 function findFunctionFilter(filters: DataTableFiltersType): QueryFiltersType {
 	return Object.entries(filters).reduce((acc, [key, filter]) => {
@@ -33,22 +36,10 @@ function findFunctionFilter(filters: DataTableFiltersType): QueryFiltersType {
 		}
 
 		// Handle date filters
-		if (/_date_start$/.test(key)) {
-			const date = toDateInstanceCustom(value as string);
-
-			if (!date) {
-				throw new Error(`Invalid start date: ${value}`);
-			}
-
-			acc[key] = date.startOf('day').toISOString();
-		} else if (/_date_end$/.test(key)) {
-			const date = toDateInstanceCustom(value as string);
-
-			if (!date) {
-				throw new Error(`Invalid end date: ${value}`);
-			}
-
-			acc[key] = date.endOf('day').toISOString();
+		if (/_at_start$/.test(key)) {
+			acc[key] = toUTCISOString(value as string);
+		} else if (/_at_end$/.test(key)) {
+			acc[key] = toUTCISOString(value as string, true);
 		} else {
 			// Convert key 'global' to 'term' for search
 			const newKey = key === 'global' ? 'term' : key;
@@ -64,11 +55,12 @@ type SelectionChangeEvent<T> = {
 	value: T[];
 };
 
-export default function DataTableList<Model extends DataTableValue>(props: {
+export default function DataTableList(props: {
 	dataKey: string;
 	scrollHeight?: string;
 }) {
 	const { dataSource, selectionMode, dataTableStore } = useDataTable();
+	const { auth } = useAuth();
 
 	const tableState = useStore(dataTableStore, (s) => s.tableState);
 	const selectedEntries = useStore(dataTableStore, (s) => s.selectedEntries);
@@ -97,10 +89,25 @@ export default function DataTableList<Model extends DataTableValue>(props: {
 	const { isTranslationLoading, translations } =
 		useTranslation(translationsKeys);
 
-	const dataTable = useMemo(
-		() => getDataSourceConfig(dataSource, 'dataTable'),
-		[dataSource],
-	);
+	const [dataTable, setDataTable] = useState<
+		// biome-ignore lint/suspicious/noExplicitAny: It's fine
+		DataSourceConfigType<any>['dataTable'] | null
+	>(null);
+
+	useEffect(() => {
+		getDataSourceConfig(
+			DataSourceSectionEnum.DASHBOARD,
+			dataSource,
+			'dataTable',
+		).then((config) =>
+			setDataTable(
+				assertDefined(
+					config,
+					`dataTable config not defined for ${dataSource}`,
+				),
+			),
+		);
+	}, [dataSource]);
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: Reset to first page when filters change
 	useEffect(() => {
@@ -134,7 +141,7 @@ export default function DataTableList<Model extends DataTableValue>(props: {
 	const { data, isLoading } = useQuery({
 		queryKey,
 		queryFn: async () => {
-			const response = await dataTable.find({
+			const response = await dataTable?.find({
 				order_by: tableState.sortField,
 				direction: tableState.sortOrder === 1 ? 'ASC' : 'DESC',
 				limit: tableState.rows,
@@ -155,7 +162,7 @@ export default function DataTableList<Model extends DataTableValue>(props: {
 	});
 
 	const entries = data?.entries ?? [];
-	const totalRecords = data?.pagination.total ?? 0;
+	const totalRecords = data?.pagination?.total ?? 0;
 
 	const onPage = useCallback(
 		(event: DataTablePageEvent) => {
@@ -183,7 +190,8 @@ export default function DataTableList<Model extends DataTableValue>(props: {
 	);
 
 	const onSelectionChange = useCallback(
-		(event: SelectionChangeEvent<Model>) => {
+		// biome-ignore lint/suspicious/noExplicitAny: It's fine
+		(event: SelectionChangeEvent<any>) => {
 			setSelectedEntries(event.value);
 		},
 		[setSelectedEntries],
@@ -191,7 +199,7 @@ export default function DataTableList<Model extends DataTableValue>(props: {
 
 	const tableColumns = useMemo(
 		() =>
-			dataTable.columns.map((column) => (
+			dataTable?.columns.map((column) => (
 				<Column
 					key={column.field}
 					field={column.field}
@@ -200,12 +208,12 @@ export default function DataTableList<Model extends DataTableValue>(props: {
 					sortable={column.sortable ?? false}
 					body={(rowData) =>
 						column.body
-							? column.body(rowData, column)
+							? column.body(rowData, column, auth)
 							: rowData[column.field]
 					}
 				/>
 			)),
-		[dataTable.columns],
+		[dataTable?.columns, auth],
 	);
 
 	const paginatorTemplate = useMemo(
@@ -228,6 +236,10 @@ export default function DataTableList<Model extends DataTableValue>(props: {
 	);
 
 	if (isTranslationLoading) {
+		return <LoadingComponent />;
+	}
+
+	if (!dataTable) {
 		return <LoadingComponent />;
 	}
 

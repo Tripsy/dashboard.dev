@@ -1,6 +1,12 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { ApiRequest, getResponseData } from '@/helpers/api.helper';
+import { Configuration } from '@/config/settings.config';
+import { translate } from '@/config/translate.setup';
+import {
+	ApiRequest,
+	getResponseData,
+	resolveRequestPath,
+} from '@/helpers/api.helper';
 import { formatDate } from '@/helpers/date.helper';
 import type {
 	TemplateContentPageType,
@@ -25,7 +31,7 @@ async function getPageData(label: string): Promise<{
 		const fetchResponse: ApiResponseFetch<TemplateModel> | undefined =
 			await new ApiRequest()
 				.setRequestMode('remote-api')
-				.doFetch(`/templates/${label}/page`, {
+				.doFetch(`/${resolveRequestPath('template')}/${label}/page`, {
 					method: 'GET',
 					next: { revalidate: 3600 },
 				});
@@ -62,7 +68,9 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
 	if (!pageData) {
 		return {
-			title: 'Page Not Found',
+			title: await translate('app.page.not_found', {
+				app_name: Configuration.get('app.name') as string,
+			}),
 		};
 	}
 

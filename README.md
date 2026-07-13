@@ -11,8 +11,8 @@
 (Dashboard) is a demo frontend implementation using [NReady](https://github.com/Tripsy/nready) as a backend API.
 
 This boilerplate provides an authentication system (login, register, recover password, account pages, etc.)
-and includes an administration dashboard (users, cron-history, log-history, log-data, mail-queue, permissions, 
-templates, clients, client-address, places, brands, cash-flow, etc.)
+and includes an administration dashboard (user, cron-history, log-history, log-data, mail-queue, permission, 
+template, client, address, place, brand, cash-flow, etc.)
 
 This project is still a work in progress, and the next goals are:
 - Include additional [NReady](https://github.com/Tripsy/nready) features in the administration dashboard
@@ -38,7 +38,7 @@ Meanwhile, we're open to suggestions / feedback, and if you find this project us
 
 # ⚙️ Characteristics
 
-- [x] Dashboard: Administration panel with CRUD operations for users, permissions, templates, logs, etc.
+- [x] Dashboard: Administration panel with CRUD operations for user, permission, template, logs, etc.
 - [x] Auth system: Login, register, logout, forgot password, reset password, email confirmation, etc.
 - [x] Best Practices: Clean architecture, TypeScript, error handling, async patterns, DRY, SOLID, KISS
 - [x] Security: rate limiting, input validation
@@ -55,8 +55,8 @@ Meanwhile, we're open to suggestions / feedback, and if you find this project us
 - [x] (Public) 
     - Auth system: login, register, logout, forgot password, reset password, email confirmation, etc.
 - [x] (Dashboard) 
-    - cron-history, log-data, log-history, mail-queue, permissions, templates, users
-    - brands, cash-flow, client-address, clients, places
+    - cron-history, log-data, log-history, mail-queue, permission, template, user
+    - brand, cash-flow, address, client, place
     - // TODO 
 
 # 🛠 Setup
@@ -189,46 +189,43 @@ pnpm run build    # Production build
 
 ## Adding new model for `dashboard` (ex: `cars`)
 
-1. Create `models/cars.model.ts` from `models/users.model.ts`
-2. Duplicate `src/(dashboard)/dashboard/users` > `src/(dashboard)/dashboard/cars` & rename files
-    - data-table-cars.component.tsx    
-    - data-table-cars-filters.component.tsx
-    - form-manage-cars.component.tsx
+1. Create `models/car.model.ts` from `models/user.model.ts`
+2. Duplicate `src/(dashboard)/dashboard/user` > `src/(dashboard)/dashboard/car` & rename files
+    - data-table-filters-car.component.tsx
+    - data-table-car.component.tsx    
+    - form-manage-car.component.tsx
     - page.tsx
-    - cars.definition.ts
+    - car.definition.ts
     - view-car.component.ts 
-3. Update `src/config/data-source.config.ts`
-    - export type DataSourceKey
-4. Update `src/config/data-source.register.ts`
-5. Add `cars.json` to `src/locales/[language]` & update src/locales/en/index.ts
-6. Update `Routes.group('dashboard')` in `src/config/routes.setup.ts`
+3. Update `src/types/data-source.key.ts`
+4. Add `cars.json` to `src/locales/[language]` & update src/locales/en/index.ts
+5. Update `src/models/permission.model.ts`
+6. Update `src/models/log-history.model.ts`
 7. Update `src/app/(dashboard)/_components/side-menu.component.tsx`
-8. Update `src/models/permission.model.ts`
-    - PermissionEntitiesSuggestions
-9. Update `src/models/log-history.model.ts`
-    - LogHistoryEntities
+8. Update `Routes.group('dashboard')` in `src/config/routes.setup.ts`
 
 # 📌 TODO
 
-1. Cash Flow
-    - cash flow status update 
-    - cash flow manage
-    - cash flow details
-    - add places  icons region > area, city > building, country → map
-2. Review security
-3. Add section "documentation"
-4. login with google / facebook
-5. Replace all console.error with logging
-6. Implement kill all sessions except current
+2. For window-component form / action it should allow close only from button, clicking outside should trigger a confirmation
+3. order page ..glitch when moving to order without type (brand)
+4. dashboard stats
+5. monthly driver report 
+6. deploy
+
+---------- 
+1. Add section "documentation"
+2. login with google / facebook
+3. Replace all console.error with logging
+4. Implement kill all sessions except current
       // // This will actually remove all sessions - keep it for further implementation
       // await AccountTokenRepository.createQuery()
       //     .filterBy('user_id', policy.getUserId())
       //     .delete(false, true);
-7. For template section
+5. For template section
     - would be a nice idea to keep track of the last changes (maybe add a new column - prev version id and a button to restore to that version)
     - view presentation could be enhanced
-8. https://nextjs.org/docs/app/getting-started/partial-prerendering
-9. https://react.dev/learn/react-compiler/introduction
+6. https://nextjs.org/docs/app/getting-started/partial-prerendering
+7. https://react.dev/learn/react-compiler/introduction
 
 # 🔗 Dependencies
 

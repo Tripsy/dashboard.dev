@@ -1,61 +1,67 @@
 import { DataTableValue } from '@/app/(dashboard)/_components/data-table-value';
 import { ViewCronHistory } from '@/app/(dashboard)/dashboard/cron-history/view-cron-history.component';
-import type {
-	DataSourceConfigType,
-	DataTableColumnType,
-} from '@/config/data-source.config';
 import { translateBatch } from '@/config/translate.setup';
 import { requestDeleteMultiple, requestFind } from '@/helpers/services.helper';
+import { type AuthModel, hasPermission } from '@/models/auth.model';
 import type {
 	CronHistoryModel,
 	CronHistoryStatus,
 } from '@/models/cron-history.model';
 import type { FindFunctionParamsType } from '@/types/action.type';
-
-const translations = await translateBatch(
-	['view.title', 'delete.title'] as const,
-	'cron-history.action',
-);
+import type {
+	DataSourceConfigType,
+	DataTableValueOptionsType,
+} from '@/types/data-source.type';
 
 export type CronHistoryDataTableFiltersType = {
 	global: { value: string | null; matchMode: 'contains' };
 	status: { value: CronHistoryStatus | null; matchMode: 'equals' };
-	start_date_start: { value: string | null; matchMode: 'equals' };
-	start_date_end: { value: string | null; matchMode: 'equals' };
+	start_at_start: { value: string | null; matchMode: 'equals' };
+	start_at_end: { value: string | null; matchMode: 'equals' };
 };
 
-export const cronHistoryDataTableFilters: CronHistoryDataTableFiltersType = {
-	global: { value: null, matchMode: 'contains' },
-	status: { value: null, matchMode: 'equals' },
-	start_date_start: { value: null, matchMode: 'equals' },
-	start_date_end: { value: null, matchMode: 'equals' },
-};
+export default async function dataSourceConfig(): Promise<
+	DataSourceConfigType<CronHistoryModel>
+> {
+	const translations = await translateBatch(
+		['view.title', 'delete.title'] as const,
+		'cron-history.action',
+	);
 
-export const dataSourceConfigCronHistory: DataSourceConfigType<CronHistoryModel> =
-	{
+	function displayButtonView(
+		auth: AuthModel | null,
+	): DataTableValueOptionsType<CronHistoryModel>['displayButton'] {
+		return {
+			action: () =>
+				hasPermission(auth, 'cron-history', 'read')
+					? 'view'
+					: undefined,
+			dataSource: 'cron-history',
+		};
+	}
+
+	return {
 		dataTable: {
 			state: {
 				first: 0,
 				rows: 10,
 				sortField: 'id',
 				sortOrder: -1 as const,
-				filters: cronHistoryDataTableFilters,
+				filters: {
+					global: { value: null, matchMode: 'contains' },
+					status: { value: null, matchMode: 'equals' },
+					start_at_start: { value: null, matchMode: 'equals' },
+					start_at_end: { value: null, matchMode: 'equals' },
+				} satisfies CronHistoryDataTableFiltersType,
 			},
 			columns: [
 				{
 					field: 'id',
 					header: 'ID',
 					sortable: true,
-					body: (
-						entry: CronHistoryModel,
-						column: DataTableColumnType<CronHistoryModel>,
-					) =>
+					body: (entry, column, auth) =>
 						DataTableValue(entry, column, {
-							markDeleted: true,
-							displayButton: {
-								action: 'view',
-								dataSource: 'cron-history',
-							},
+							displayButton: displayButtonView(auth),
 						}),
 				},
 				{
@@ -67,10 +73,7 @@ export const dataSourceConfigCronHistory: DataSourceConfigType<CronHistoryModel>
 					field: 'start_at',
 					header: 'Start At',
 					sortable: true,
-					body: (
-						entry: CronHistoryModel,
-						column: DataTableColumnType<CronHistoryModel>,
-					) =>
+					body: (entry, column) =>
 						DataTableValue(entry, column, {
 							displayDate: true,
 						}),
@@ -78,12 +81,10 @@ export const dataSourceConfigCronHistory: DataSourceConfigType<CronHistoryModel>
 				{
 					field: 'status',
 					header: 'Status',
-					body: (
-						entry: CronHistoryModel,
-						column: DataTableColumnType<CronHistoryModel>,
-					) =>
+					body: (entry, column) =>
 						DataTableValue(entry, column, {
 							isStatus: true,
+							dataSource: 'cron-history',
 						}),
 					style: {
 						minWidth: '6rem',
@@ -105,7 +106,7 @@ export const dataSourceConfigCronHistory: DataSourceConfigType<CronHistoryModel>
 			delete: {
 				windowType: 'action',
 				windowTitle: translations['delete.title'],
-				permission: 'cron-history.delete',
+				permission: ['cron-history', 'delete'],
 				entriesSelection: 'multiple',
 				operationFunction: (ids: number[]) =>
 					requestDeleteMultiple('cron-history', ids),
@@ -122,9 +123,10 @@ export const dataSourceConfigCronHistory: DataSourceConfigType<CronHistoryModel>
 				windowConfigProps: {
 					size: 'x2l',
 				},
-				permission: 'cron-history.read',
+				permission: ['cron-history', 'read'],
 				entriesSelection: 'single',
 				buttonPosition: 'hidden',
 			},
 		},
 	};
+}

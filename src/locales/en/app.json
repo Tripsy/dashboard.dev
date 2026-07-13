@@ -1,40 +1,60 @@
 {
 	"name": "{{app_name}}",
 	"description": "{{app_name}}",
+	"page": {
+		"not_found": "{{app_name}} - Page not found"
+	},
 	"error": {
-		"generic": "Something went wrong",
+		"title": "Error",
+		"description": "Something went wrong",
 		"csrf": "Error occurred while processing your request. Please reload page and try again.",
 		"form": "Something went wrong while processing your request.",
 		"validation": "Form validation failed.",
 		"undefined_route": "The page you are looking for doesn't exist or has been moved.",
 		"unauthorized": "Access denied. Please check your permissions",
 		"already_logged_in": "You're already signed in",
-		"operation_not_allowed": "Operation not allowed"
+		"operation_not_allowed": "Operation not allowed",
+		"entry_required": "Entry is required",
+		"service_unavailable": "Service unavailable"
+	},
+	"success": {
+		"title": "Success",
+		"description": "Operation completed successfully"
 	},
 	"info": {
 		"account_delete": "Hey ..I don't know your name anymore! Thank you for being with us for a while. Your account has been marked for deletion. All data associated with your account will be removed from our database within 5–30 days. You’re always welcome to create a new account anytime."
-	},
-	"text": {
-		"error_title": "Error",
-		"success_title": "Success",
-		"loading": "Loading...",
-		"please_wait": "Please wait...",
-		"saving": "Saving..."
 	},
 	"status": {
 		"active": "Active",
 		"pending": "Pending",
 		"inactive": "Inactive",
 		"deleted": "Deleted",
-		"ok": "Ok",
-		"error": "Error",
-		"warning": "Warning",
-		"sent": "Sent",
-		"authorized": "Authorized",
-		"completed": "Completed",
-		"failed": "Failed",
-		"canceled": "Canceled",
-		"expired": "Expired",
-		"requires_action": "Requires action"
+		"closed": "Closed"
+	},
+	"action": {
+		"abort": {
+			"title": "Abort",
+			"label": "Abort"
+		},
+		"cancel": {
+			"title": "Cancel",
+			"label": "Cancel"
+		},
+		"loading": {
+			"title": "Loading",
+			"label": "Please wait..."
+		},
+		"saving": {
+			"title": "Saving",
+			"label": "Saving..."
+		},
+		"confirm": {
+			"title": "Confirm",
+			"label": "Confirm"
+		},
+		"submit": {
+			"title": "Submit",
+			"label": "Submit"
+		}
 	}
 }

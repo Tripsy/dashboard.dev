@@ -4,7 +4,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { AuthTokenList } from '@/app/(public)/_components/auth-token-list.component';
 import { Icons } from '@/components/icon.component';
-import { LogoComponent } from '@/components/layout/logo.default';
 import { LoadingComponent } from '@/components/status.component';
 import { Badge } from '@/components/ui/badge';
 import { Link } from '@/components/ui/link';
@@ -96,9 +95,6 @@ export default function AccountMe() {
 	return (
 		<div className="min-h-[calc(80vh-4rem)] px-4 py-12">
 			<div className="text-center mb-8">
-				<div className="flex justify-center mb-4">
-					<LogoComponent />
-				</div>
 				<h1 className="text-2xl font-bold mb-2">My Account</h1>
 			</div>
 
@@ -178,7 +174,11 @@ export default function AccountMe() {
 						<div className="text-sm text-muted-foreground font-semibold">
 							Member Since
 						</div>
-						<p>{formatDate(auth.created_at, 'MMMM D, YYYY')}</p>
+						<p>
+							{formatDate(auth.created_at, undefined, {
+								customFormat: 'MMMM D, YYYY',
+							})}
+						</p>
 					</div>
 				</div>
 
@@ -199,7 +199,10 @@ export default function AccountMe() {
 									Last updated:{' '}
 									{formatDate(
 										auth.password_updated_at,
-										'D MMMM YYYY, h:mm A',
+										undefined,
+										{
+											customFormat: 'D MMMM YYYY, h:mm A',
+										},
 									)}
 								</p>
 							</div>
@@ -231,7 +234,7 @@ export default function AccountMe() {
 				{/* Sessions Management */}
 				<div className="bg-card border border-border rounded-xl p-6 shadow-xl space-y-4 w-full max-w-md">
 					<h2 className="text-lg font-bold flex items-center gap-2">
-						<Icons.Session />
+						<Icons.Sessions />
 						Sessions
 					</h2>
 

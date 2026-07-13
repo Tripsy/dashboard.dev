@@ -19,12 +19,12 @@ export async function emailConfirmSendAction(
 		return {
 			...formState,
 			message: await translate('app.error.csrf'),
-			situation: 'csrf_error',
+			situation: 'csrfError',
 		};
 	}
 
 	const formValues = getEmailConfirmSendFormValues(formData);
-	const validated = validateFormEmailConfirmSend(formValues);
+	const validated = await validateFormEmailConfirmSend(formValues);
 
 	if (!validated.success) {
 		const errors = accumulateZodErrors<EmailConfirmSendFormValuesType>(
@@ -34,7 +34,7 @@ export async function emailConfirmSendAction(
 		return {
 			...formState,
 			values: formValues,
-			situation: 'error',
+			situation: 'failedValidation',
 			message: await translate('app.error.validation'),
 			errors,
 		};
@@ -47,11 +47,11 @@ export async function emailConfirmSendAction(
 			...formState,
 			values: validated.data,
 			message: requestResponse?.message || null,
-			situation: requestResponse?.success ? 'success' : 'error',
+			situation: requestResponse?.success ? 'success' : 'serverError',
 		};
 	} catch (error: unknown) {
 		let message: string = '';
-		const situation: EmailConfirmSendSituationType = 'error';
+		const situation: EmailConfirmSendSituationType = 'serverError';
 
 		if (error instanceof ApiError) {
 			switch (error.status) {

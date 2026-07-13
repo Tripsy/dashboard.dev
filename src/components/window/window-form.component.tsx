@@ -1,35 +1,34 @@
 'use client';
 
-import React, { useActionState } from 'react';
+import type React from 'react';
+import { useActionState, useMemo } from 'react';
+import { ActionButton } from '@/components/action-button.component';
 import { FormComponentSubmit } from '@/components/form/form-element.component';
 import { FormError } from '@/components/form/form-error.component';
-import { Icons } from '@/components/icon.component';
-import { Button } from '@/components/ui/button';
 import { createHandleChange, processForm } from '@/helpers/form.helper';
 import { useWindowFormProcessed } from '@/hooks/use-form-processed.hook';
+import { useFormSituation } from '@/hooks/use-form-situation.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
+import { useTranslation } from '@/hooks/use-translation.hook';
 import { WindowFormProvider } from '@/providers/window-form.provider';
 import { useModalStore } from '@/stores/window.store';
 import type { FormOperationFunctionType } from '@/types/action.type';
 import type { FormStateType, FormValuesType } from '@/types/form.type';
-import type { WindowConfig, WindowEntryType } from '@/types/window.type';
 
-type WindowFormType<WindowEntry> = {
+type WindowFormType<Entry> = {
 	uid: string;
-	entry?: WindowEntry;
+	entry?: Entry;
 	children: React.ReactElement<unknown>;
 };
 
 export function WindowForm<
 	FormValues extends FormValuesType,
-	WindowEntry extends WindowEntryType,
->({ uid, entry, children }: WindowFormType<WindowEntry>) {
+	Entry extends Record<string, unknown>,
+>({ uid, entry, children }: WindowFormType<Entry>) {
 	const { getWindow, close } = useModalStore();
 
-	const windowConfig = getWindow(uid) as
-		| WindowConfig<FormValues, WindowEntry>
-		| undefined;
+	const windowConfig = getWindow(uid);
 	const windowDefinition = windowConfig?.definition;
 
 	// Guards
@@ -70,13 +69,10 @@ export function WindowForm<
 
 	// WindowForm only handles form operations.
 	const operationFunction =
-		formOperationFunction as FormOperationFunctionType<
-			WindowEntry,
-			FormValues
-		>;
+		formOperationFunction as FormOperationFunctionType<Entry, FormValues>;
 
 	const initState = getFormState(entry);
-	const entryId = entry && 'id' in entry ? (entry.id as number) : undefined; // Present for update, undefined for create
+	const entryId = entry && 'id' in entry ? (entry.id as number) : undefined; // Undefined for create
 
 	const [state, action, pending] = useActionState<
 		FormStateType<FormValues>,
@@ -96,8 +92,20 @@ export function WindowForm<
 
 	const [formValues, setFormValues] = useFormValues<FormValues>(state.values);
 
-	const { errors, submitted, markSubmit, markFieldAsTouched } =
-		useFormValidation({ formValues, validateForm, debounceDelay: 800 });
+	const { formSituation, formMessage, handleValidation } =
+		useFormSituation<FormValues>(state);
+
+	const {
+		errors: formErrors,
+		submitted,
+		markSubmit,
+		markFieldAsTouched,
+	} = useFormValidation({
+		formValues,
+		validateForm,
+		debounceDelay: 800,
+		onValidation: handleValidation,
+	});
 
 	useWindowFormProcessed({
 		state,
@@ -106,13 +114,21 @@ export function WindowForm<
 		entryId,
 	});
 
-	const handleChange = createHandleChange<FormValues>(
-		setFormValues,
-		markFieldAsTouched,
+	const translationsKeys = useMemo(
+		() => ['app.action.cancel.title', 'app.action.cancel.label'] as const,
+		[],
+	);
+
+	const { translations } = useTranslation(translationsKeys);
+
+	const handleChange = useMemo(
+		() => createHandleChange<FormValues>(setFormValues, markFieldAsTouched),
+		[setFormValues, markFieldAsTouched],
 	);
 
 	const handleClose = () => {
 		close(uid);
+		windowEvents?.close?.();
 	};
 
 	return (
@@ -120,7 +136,7 @@ export function WindowForm<
 			value={{
 				formOperation: windowConfig.action,
 				formValues,
-				errors,
+				errors: formErrors,
 				handleChange,
 				pending,
 			}}
@@ -133,52 +149,32 @@ export function WindowForm<
 				{children}
 
 				<div className="flex justify-end gap-3">
-					<Button
-						variant="outline"
-						hover="warning"
-						onClick={handleClose}
-						title="Cancel"
+					<ActionButton
+						action="abort"
+						buttonAppearance={{
+							variant: 'outline',
+							hover: 'warning',
+							title: translations['app.action.cancel.title'],
+							icon: 'cancel',
+							label: translations['app.action.cancel.label'],
+						}}
 						disabled={pending}
-					>
-						<Icons.Action.Cancel />
-						Cancel
-					</Button>
+						command={{
+							type: 'action',
+							onClick: handleClose,
+						}}
+					/>
 					<FormComponentSubmit
 						pending={pending}
 						submitted={submitted}
-						errors={errors as Record<string, string[]>} // remove `as`
-						button={{
-							variant: buttonSubmit?.variant || 'info',
-							label: (buttonSubmit?.label as string) || 'Submit',
-							iconLabel: buttonSubmit?.icon || 'submit',
-						}}
+						error={formSituation === 'failedValidation'}
+						button={buttonSubmit}
 					/>
 				</div>
-
-				{state.situation === 'error' && state.message && (
-					<FormError>
-						<React.Fragment key="form-error-content">
-							<div className="flex items-center gap-1.5 mb-2">
-								<Icons.Status.Error />
-								<div>{state.message}</div>
-							</div>
-							{Object.entries(state.errors ?? {}).length > 0 && (
-								<ul className="list-disc ml-8 text-sm">
-									{Object.entries(state.errors ?? {}).flatMap(
-										([_field, messages]) =>
-											Array.isArray(messages)
-												? messages.map((message) => (
-														<li key={`${message}`}>
-															{message}
-														</li>
-													))
-												: [],
-									)}
-								</ul>
-							)}
-						</React.Fragment>
-					</FormError>
-				)}
+				<FormError
+					formSituation={formSituation}
+					formMessage={formMessage}
+				/>
 			</form>
 		</WindowFormProvider>
 	);

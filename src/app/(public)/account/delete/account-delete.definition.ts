@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { translateBatch } from '@/config/translate.setup';
 import { getFormDataAsString } from '@/helpers/form.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import type { FormErrorsType, FormSituationType } from '@/types/form.type';
@@ -7,7 +8,7 @@ export type AccountDeleteFormValuesType = {
 	password_current: string | null;
 };
 
-export type AccountDeleteSituationType = FormSituationType | 'csrf_error';
+export type AccountDeleteSituationType = FormSituationType | 'csrfError';
 
 export type AccountDeleteStateType = {
 	values: AccountDeleteFormValuesType;
@@ -25,10 +26,7 @@ export const AccountDeleteState: AccountDeleteStateType = {
 	situation: null,
 };
 
-const validatorMessages = await BaseValidator.getValidatorMessages(
-	['invalid_password_current'] as const,
-	'account-delete.validation',
-);
+const validatorMessages = ['invalid_password_current'] as const;
 
 class AccountDeleteValidator extends BaseValidator<typeof validatorMessages> {
 	accountDelete = z.object({
@@ -38,8 +36,15 @@ class AccountDeleteValidator extends BaseValidator<typeof validatorMessages> {
 	});
 }
 
-export function validateFormAccountDelete(values: AccountDeleteFormValuesType) {
-	const validator = new AccountDeleteValidator(validatorMessages);
+export async function validateFormAccountDelete(
+	values: AccountDeleteFormValuesType,
+) {
+	const translations = await translateBatch(
+		validatorMessages,
+		'account-delete.validation',
+	);
+
+	const validator = new AccountDeleteValidator(translations);
 
 	return validator.accountDelete.safeParse(values);
 }

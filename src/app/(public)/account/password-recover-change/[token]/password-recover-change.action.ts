@@ -19,12 +19,12 @@ export async function passwordRecoverChangeAction(
 		return {
 			...formState,
 			message: await translate('app.error.csrf'),
-			situation: 'csrf_error',
+			situation: 'csrfError',
 		};
 	}
 
 	const formValues = getPasswordRecoverChangeFormValues(formData);
-	const validated = validateFormPasswordRecoverChange(formValues);
+	const validated = await validateFormPasswordRecoverChange(formValues);
 
 	if (!validated.success) {
 		const errors = accumulateZodErrors<PasswordRecoverChangeFormValuesType>(
@@ -34,7 +34,7 @@ export async function passwordRecoverChangeAction(
 		return {
 			...formState,
 			values: formValues,
-			situation: 'error',
+			situation: 'failedValidation',
 			message: await translate('app.error.validation'),
 			errors,
 		};
@@ -50,11 +50,11 @@ export async function passwordRecoverChangeAction(
 			...formState,
 			values: validated.data,
 			message: requestResponse?.message || null,
-			situation: requestResponse?.success ? 'success' : 'error',
+			situation: requestResponse?.success ? 'success' : 'serverError',
 		};
 	} catch (error: unknown) {
 		let message: string = '';
-		const situation: PasswordRecoverChangeSituationType = 'error';
+		const situation: PasswordRecoverChangeSituationType = 'serverError';
 
 		if (error instanceof ApiError) {
 			message = error.message;

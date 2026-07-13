@@ -21,13 +21,13 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from '@/components/ui/tooltip';
-import type { DataSourceKey } from '@/config/data-source.config';
 import Routes from '@/config/routes.setup';
 import { cn } from '@/helpers/css.helper';
 import { useDebouncedEffect } from '@/hooks/use-debounced-effect.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { hasPermission } from '@/models/auth.model';
 import { useAuth } from '@/providers/auth.provider';
+import type { DataSourceKey } from '@/types/data-source.key';
 
 type SideMenuSectionProps = {
 	isExpanded?: boolean;
@@ -43,7 +43,10 @@ type SideMenuSectionProps = {
 	}[];
 };
 
-type SideMenuOpenSectionProps = Omit<SideMenuSectionProps, 'items' | 'icon'> & {
+type SideMenuOpenSectionProps = Omit<
+	SideMenuSectionProps,
+	'items' | 'icon' | 'permission'
+> & {
 	selectedPage: SelectedPageType;
 	items: {
 		page: DataSourceKey;
@@ -53,7 +56,10 @@ type SideMenuOpenSectionProps = Omit<SideMenuSectionProps, 'items' | 'icon'> & {
 	}[];
 };
 
-type SideMenuClosedSectionProps = Omit<SideMenuSectionProps, 'items'> & {
+type SideMenuClosedSectionProps = Omit<
+	SideMenuSectionProps,
+	'items' | 'permission'
+> & {
 	selectedPage: SelectedPageType;
 	items: {
 		page: DataSourceKey;
@@ -74,21 +80,38 @@ export function SideMenu() {
 		() =>
 			[
 				'dashboard.labels.financial',
-				'dashboard.labels.content',
-				'dashboard.labels.settings',
-				'dashboard.labels.logs',
-				'dashboard.labels.templates',
-				'dashboard.labels.clients',
-				'dashboard.labels.client-address',
-				'dashboard.labels.places',
-				'dashboard.labels.brands',
+				'dashboard.labels.client',
 				'dashboard.labels.cash-flow',
+
+				'dashboard.labels.activity',
+				'dashboard.labels.cmr',
+				'dashboard.labels.cmr-session',
+				'dashboard.labels.cmr-vehicle',
+				'dashboard.labels.work-session',
+				'dashboard.labels.work-session-vehicle',
+
+				'dashboard.labels.assets',
+				'dashboard.labels.company-vehicle',
+
+				'dashboard.labels.content',
+				'dashboard.labels.address',
+				'dashboard.labels.place',
+				'dashboard.labels.brand',
+				'dashboard.labels.image',
+				'dashboard.labels.vehicle',
+				'dashboard.labels.vendor',
+
+				'dashboard.labels.settings',
+				'dashboard.labels.template',
+
+				'dashboard.labels.logs',
 				'dashboard.labels.log-data',
 				'dashboard.labels.log-history',
 				'dashboard.labels.cron-history',
 				'dashboard.labels.mail-queue',
-				'dashboard.labels.permissions',
-				'dashboard.labels.users',
+
+				'dashboard.labels.user',
+				'dashboard.labels.permission',
 			] as const,
 		[],
 	);
@@ -110,18 +133,78 @@ export function SideMenu() {
 				isExpanded: false,
 				items: [
 					{
-						page: 'clients',
+						page: 'client',
 						href: Routes.get('client'),
-						text: translations['dashboard.labels.clients'],
+						text: translations['dashboard.labels.client'],
 						icon: Icons.Client,
-						permission: hasPermission(auth, 'client.find'),
+						permission: hasPermission(auth, 'client'),
 					},
 					{
 						page: 'cash-flow',
 						href: Routes.get('cash-flow'),
 						text: translations['dashboard.labels.cash-flow'],
 						icon: Icons.CashFlow,
-						permission: hasPermission(auth, 'cash_flow.find'),
+						permission: hasPermission(auth, 'cash-flow'),
+					},
+				],
+			},
+			{
+				label: 'activity',
+				text: translations['dashboard.labels.activity'],
+				icon: Icons.Activity,
+				isExpanded: false,
+				items: [
+					{
+						page: 'cmr',
+						href: Routes.get('cmr'),
+						text: translations['dashboard.labels.cmr'],
+						icon: Icons.Cmr,
+						permission: hasPermission(auth, 'cmr'),
+					},
+					{
+						page: 'cmr-session',
+						href: Routes.get('cmr-session'),
+						text: translations['dashboard.labels.cmr-session'],
+						icon: Icons.CmrSession,
+						permission: hasPermission(auth, 'cmr-session'),
+					},
+					{
+						page: 'cmr-vehicle',
+						href: Routes.get('cmr-vehicle'),
+						text: translations['dashboard.labels.cmr-vehicle'],
+						icon: Icons.Vehicle,
+						permission: hasPermission(auth, 'cmr-vehicle'),
+					},
+					{
+						page: 'work-session',
+						href: Routes.get('work-session'),
+						text: translations['dashboard.labels.work-session'],
+						icon: Icons.WorkSession,
+						permission: hasPermission(auth, 'work-session'),
+					},
+					{
+						page: 'work-session-vehicle',
+						href: Routes.get('work-session-vehicle'),
+						text: translations[
+							'dashboard.labels.work-session-vehicle'
+						],
+						icon: Icons.Vehicle,
+						permission: hasPermission(auth, 'work-session-vehicle'),
+					},
+				],
+			},
+			{
+				label: 'assets',
+				text: translations['dashboard.labels.assets'],
+				icon: Icons.Asset,
+				isExpanded: false,
+				items: [
+					{
+						page: 'company-vehicle',
+						href: Routes.get('company-vehicle'),
+						text: translations['dashboard.labels.company-vehicle'],
+						icon: Icons.CompanyVehicle,
+						permission: hasPermission(auth, 'company-vehicle'),
 					},
 				],
 			},
@@ -132,25 +215,46 @@ export function SideMenu() {
 				isExpanded: false,
 				items: [
 					{
-						page: 'places',
+						page: 'place',
 						href: Routes.get('place'),
-						text: translations['dashboard.labels.places'],
+						text: translations['dashboard.labels.place'],
 						icon: Icons.Location,
-						permission: hasPermission(auth, 'place.find'),
+						permission: hasPermission(auth, 'place'),
 					},
 					{
-						page: 'client-address',
-						href: Routes.get('client-address'),
-						text: translations['dashboard.labels.client-address'],
+						page: 'address',
+						href: Routes.get('address'),
+						text: translations['dashboard.labels.address'],
 						icon: Icons.Address,
-						permission: hasPermission(auth, 'client_address.find'),
+						permission: hasPermission(auth, 'address'),
 					},
 					{
-						page: 'brands',
+						page: 'brand',
 						href: Routes.get('brand'),
-						text: translations['dashboard.labels.brands'],
+						text: translations['dashboard.labels.brand'],
 						icon: Icons.Brand,
-						permission: hasPermission(auth, 'brand.find'),
+						permission: hasPermission(auth, 'brand'),
+					},
+					{
+						page: 'image',
+						href: Routes.get('image'),
+						text: translations['dashboard.labels.image'],
+						icon: Icons.Image,
+						permission: hasPermission(auth, 'image'),
+					},
+					{
+						page: 'vehicle',
+						href: Routes.get('vehicle'),
+						text: translations['dashboard.labels.vehicle'],
+						icon: Icons.Vehicle,
+						permission: hasPermission(auth, 'vehicle'),
+					},
+					{
+						page: 'vendor',
+						href: Routes.get('vendor'),
+						text: translations['dashboard.labels.vendor'],
+						icon: Icons.Vendor,
+						permission: hasPermission(auth, 'vendor'),
 					},
 				],
 			},
@@ -160,11 +264,11 @@ export function SideMenu() {
 				icon: Icons.Settings,
 				items: [
 					{
-						page: 'templates',
+						page: 'template',
 						href: Routes.get('template'),
-						text: translations['dashboard.labels.templates'],
+						text: translations['dashboard.labels.template'],
 						icon: Icons.Template,
-						permission: hasPermission(auth, 'template.find'),
+						permission: hasPermission(auth, 'template'),
 					},
 				],
 			},
@@ -179,58 +283,61 @@ export function SideMenu() {
 						href: Routes.get('log-data'),
 						text: translations['dashboard.labels.log-data'],
 						icon: Icons.HardDrive,
-						permission: hasPermission(auth, 'log_data.find'),
+						permission: hasPermission(auth, 'log-data'),
 					},
 					{
 						page: 'log-history',
 						href: Routes.get('log-history'),
 						text: translations['dashboard.labels.log-history'],
 						icon: Icons.History,
-						permission: hasPermission(auth, 'log_history.find'),
+						permission: hasPermission(auth, 'log-history'),
 					},
 					{
 						page: 'cron-history',
 						href: Routes.get('cron-history'),
 						text: translations['dashboard.labels.cron-history'],
 						icon: Icons.Cron,
-						permission: hasPermission(auth, 'cron_history.find'),
+						permission: hasPermission(auth, 'cron-history'),
 					},
 					{
 						page: 'mail-queue',
 						href: Routes.get('mail-queue'),
 						text: translations['dashboard.labels.mail-queue'],
 						icon: Icons.Mails,
-						permission: hasPermission(auth, 'mail_queue.find'),
+						permission: hasPermission(auth, 'mail-queue'),
 					},
 				],
 			},
 			{
 				label: 'user-management',
-				text: translations['dashboard.labels.users'],
+				text: translations['dashboard.labels.user'],
 				icon: Icons.Account,
 				isExpanded: true,
 				items: [
 					{
-						page: 'users',
+						page: 'user',
 						href: Routes.get('user'),
-						text: translations['dashboard.labels.users'],
-						icon: Icons.Users,
-						permission: hasPermission(auth, 'user.find'),
+						text: translations['dashboard.labels.user'],
+						icon: Icons.User,
+						permission: hasPermission(auth, 'user'),
 					},
 					{
-						page: 'permissions',
+						page: 'permission',
 						href: Routes.get('permission'),
-						text: translations['dashboard.labels.permissions'],
+						text: translations['dashboard.labels.permission'],
 						icon: Icons.Permission,
-						permission: hasPermission(auth, 'permission.find'),
+						permission: hasPermission(auth, 'permission'),
 					},
 				],
 			},
 		];
 
-		const displaySections = sections.filter((section) =>
-			section.items.some((item) => item.permission),
-		);
+		const displaySections = sections
+			.map((section) => ({
+				...section,
+				items: section.items.filter((item) => item.permission),
+			}))
+			.filter((section) => section.items.length > 0);
 
 		if (menuState === 'open') {
 			return displaySections.map((section) => (

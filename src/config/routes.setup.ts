@@ -1,10 +1,14 @@
 import ValueError from '@/exceptions/value.error';
+import type {
+	PermissionEntityType,
+	PermissionOperationType,
+} from '@/models/permission.model';
 
 export const RouteAuthEnum = {
 	PUBLIC: 'public',
 	UNAUTHENTICATED: 'unauthenticated',
 	AUTHENTICATED: 'authenticated',
-	PROTECTED: 'protected', // Admin OR Operator
+	PROTECTED: 'protected', // `admin` OR `operator` OR `driver`
 } as const;
 
 export type RouteAuth = (typeof RouteAuthEnum)[keyof typeof RouteAuthEnum];
@@ -12,7 +16,8 @@ export type RouteAuth = (typeof RouteAuthEnum)[keyof typeof RouteAuthEnum];
 type RouteProps = {
 	type?: string;
 	auth?: RouteAuth;
-	permission?: string;
+	permissionEntity?: PermissionEntityType;
+	permissionOperation?: PermissionOperationType;
 };
 
 type RoutesData = {
@@ -153,15 +158,20 @@ class RoutesCollection {
 const Routes = new RoutesCollection();
 
 Routes.add('home', '/');
-Routes.add('status', '/status/:type');
-Routes.add('page', '/page/:label');
 Routes.add('docs', '/docs');
+Routes.add('driver-panel', '/driver-panel');
+Routes.add('page', '/page/:label');
+Routes.add('status', '/status/:type');
+Routes.add('document-cmr', '/document/cmr/:tracking_number');
 
 // API
 Routes.group('api')
 	.add('proxy', '/api/proxy/:path*')
 	.add('csrf', '/api/csrf')
-	.add('language', '/api/language');
+	.add('language', '/api/language')
+	.add('api-image', '/api/image', {
+		auth: RouteAuthEnum.PUBLIC,
+	});
 
 // Account
 Routes.group('account')
@@ -190,42 +200,81 @@ Routes.group('account')
 // Dashboard
 Routes.group('dashboard')
 	.auth(RouteAuthEnum.PROTECTED)
-	.add('dashboard', '/dashboard')
-	.add('template', '/dashboard/templates', {
-		permission: 'template.find',
+	.add('dashboard', '/dashboard', {
+		permissionEntity: 'dashboard',
 	})
-	.add('client', '/dashboard/clients', {
-		permission: 'client.find',
+	.add('template', '/dashboard/template', {
+		permissionEntity: 'template',
 	})
-	.add('client-address', '/dashboard/client-address', {
-		permission: 'client_address.find',
+	.add('client', '/dashboard/client', {
+		permissionEntity: 'client',
 	})
-	.add('place', '/dashboard/places', {
-		permission: 'place.find',
+	.add('address', '/dashboard/address', {
+		permissionEntity: 'address',
 	})
-	.add('brand', '/dashboard/brands', {
-		permission: 'brand.find',
+	.add('place', '/dashboard/place', {
+		permissionEntity: 'place',
+	})
+	.add('brand', '/dashboard/brand', {
+		permissionEntity: 'brand',
+	})
+	.add('brand-order', '/dashboard/brand/order', {
+		permissionEntity: 'brand',
+		permissionOperation: 'update',
 	})
 	.add('cash-flow', '/dashboard/cash-flow', {
-		permission: 'cash_flow.find',
+		permissionEntity: 'cash-flow',
 	})
 	.add('log-data', '/dashboard/log-data', {
-		permission: 'log_data.find',
+		permissionEntity: 'log-data',
 	})
 	.add('log-history', '/dashboard/log-history', {
-		permission: 'log_history.find',
+		permissionEntity: 'log-history',
 	})
 	.add('cron-history', '/dashboard/cron-history', {
-		permission: 'cron_history.find',
+		permissionEntity: 'cron-history',
+	})
+	.add('image', '/dashboard/image', {
+		permissionEntity: 'image',
+	})
+	.add('image-order', '/dashboard/image/order', {
+		permissionEntity: 'image',
+		permissionOperation: 'update',
 	})
 	.add('mail-queue', '/dashboard/mail-queue', {
-		permission: 'mail_queue.find',
+		permissionEntity: 'mail-queue',
 	})
-	.add('user', '/dashboard/users', {
-		permission: 'user.find',
+	.add('user', '/dashboard/user', {
+		permissionEntity: 'user',
 	})
-	.add('permission', '/dashboard/permissions', {
-		permission: 'permission.find',
+	.add('permission', '/dashboard/permission', {
+		permissionEntity: 'permission',
+	})
+
+	.add('vehicle', '/dashboard/vehicle', {
+		permissionEntity: 'vehicle',
+	})
+	.add('vendor', '/dashboard/vendor', {
+		permissionEntity: 'vendor',
+	})
+	.add('company-vehicle', '/dashboard/company-vehicle', {
+		permissionEntity: 'company-vehicle',
+	})
+
+	.add('cmr', '/dashboard/cmr', {
+		permissionEntity: 'cmr',
+	})
+	.add('cmr-session', '/dashboard/cmr-session', {
+		permissionEntity: 'cmr-session',
+	})
+	.add('cmr-vehicle', '/dashboard/cmr-vehicle', {
+		permissionEntity: 'cmr-vehicle',
+	})
+	.add('work-session', '/dashboard/work-session', {
+		permissionEntity: 'work-session',
+	})
+	.add('work-session-vehicle', '/dashboard/work-session-vehicle', {
+		permissionEntity: 'work-session-vehicle',
 	});
 
 /**

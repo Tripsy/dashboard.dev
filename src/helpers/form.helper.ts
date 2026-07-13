@@ -3,6 +3,7 @@ import sanitizeHtml from 'sanitize-html';
 import type { z } from 'zod';
 import { translate } from '@/config/translate.setup';
 import { ApiError } from '@/exceptions/api.error';
+import { ExecutionError } from '@/exceptions/execution.error';
 import type {
 	CreateFunctionType,
 	FormOperationFunctionType,
@@ -27,7 +28,7 @@ export async function processForm<Entry, FormValues extends FormValuesType>(
 ): Promise<FormStateType<FormValues>> {
 	try {
 		const formValues = getFormValues(formData);
-		const validated = validateForm(formValues);
+		const validated = await validateForm(formValues);
 
 		if (!validated.success) {
 			const errors = accumulateZodErrors<FormValues>(validated.error);
@@ -35,7 +36,7 @@ export async function processForm<Entry, FormValues extends FormValuesType>(
 			return {
 				...formState,
 				values: formValues,
-				situation: 'error',
+				situation: 'failedValidation',
 				message: await translate('app.error.validation'),
 				errors,
 			};
@@ -61,19 +62,23 @@ export async function processForm<Entry, FormValues extends FormValuesType>(
 			...formState,
 			values: validated.data,
 			message: fetchResponse?.message || null,
-			situation: fetchResponse?.success ? 'success' : 'error',
+			situation: fetchResponse?.success ? 'success' : 'serverError',
 			resultData: fetchResponse?.data,
 		};
 	} catch (error) {
-		const message =
-			error instanceof ApiError
-				? error.message
-				: await translate('app.error.form');
+		let message: string = await translate('app.error.form');
+
+		if (error instanceof ApiError && error.status === 409) {
+			message = error.message;
+		} else if (error instanceof ExecutionError) {
+			message = error.message;
+		}
 
 		return {
 			...formState,
-			message: message,
-			situation: 'error',
+			message,
+			situation: 'serverError',
+			errors: {},
 		};
 	}
 }

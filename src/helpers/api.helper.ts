@@ -6,6 +6,7 @@ import type {
 	ApiResponseFetch,
 	QueryFiltersType,
 } from '@/types/api.type';
+import type { DataSourceKey } from '@/types/data-source.key';
 
 /**
  * Build a query string from an object
@@ -97,8 +98,14 @@ export class ApiRequest {
 	}
 
 	private async handleJsonResponse(res: Response) {
+		const text = await res.text();
+
+		if (!text) {
+			return null;
+		}
+
 		try {
-			return await res.json();
+			return JSON.parse(text);
 		} catch {
 			if (res.ok) {
 				throw new Error('Invalid JSON response');
@@ -189,9 +196,8 @@ export class ApiRequest {
 					res.status,
 					jsonResponse,
 				);
-				this.handleError(error);
 
-				return undefined;
+				this.handleError(error);
 			}
 
 			return jsonResponse;
@@ -199,8 +205,31 @@ export class ApiRequest {
 			clearTimeout(timeout);
 
 			this.handleError(error);
-
-			return undefined;
 		}
 	}
+}
+
+export function resolveRequestPath(key: DataSourceKey) {
+	const withSuffixList: DataSourceKey[] = [
+		'brand',
+		'client',
+		'image',
+		'permission',
+		'place',
+		'template',
+		'user',
+		'vehicle',
+		'vendor',
+		'company-vehicle',
+		'cmr-session',
+		'cmr-vehicle',
+		'work-session',
+		'work-session-vehicle',
+	];
+
+	if (withSuffixList.includes(key)) {
+		return `${key}s`;
+	}
+
+	return key;
 }

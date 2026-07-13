@@ -5,6 +5,7 @@ import { useActionState, useEffect, useState } from 'react';
 import { accountDeleteAction } from '@/app/(public)/account/delete/account-delete.action';
 import {
 	type AccountDeleteFormValuesType,
+	type AccountDeleteSituationType,
 	AccountDeleteState,
 	validateFormAccountDelete,
 } from '@/app/(public)/account/delete/account-delete.definition';
@@ -16,11 +17,15 @@ import {
 import { FormError } from '@/components/form/form-error.component';
 import { FormWrapperComponent } from '@/components/form/form-wrapper';
 import { Icons } from '@/components/icon.component';
-import { LoadingComponent } from '@/components/status.component';
+import {
+	ErrorComponent,
+	LoadingComponent,
+} from '@/components/status.component';
 import { Link } from '@/components/ui/link';
 import Routes from '@/config/routes.setup';
 import { createHandleChange } from '@/helpers/form.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
+import { useFormSituation } from '@/hooks/use-form-situation.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
 import { useAuth } from '@/providers/auth.provider';
@@ -37,11 +42,17 @@ export default function AccountDelete() {
 	const [formValues, setFormValues] =
 		useFormValues<AccountDeleteFormValuesType>(state.values);
 
+	const { formSituation, formMessage, handleValidation } = useFormSituation<
+		AccountDeleteFormValuesType,
+		AccountDeleteSituationType
+	>(state);
+
 	const { errors, submitted, markSubmit, markFieldAsTouched } =
 		useFormValidation({
 			formValues: formValues,
 			validateForm: validateFormAccountDelete,
 			debounceDelay: 800,
+			onValidation: handleValidation,
 		});
 
 	const handleChange = createHandleChange(setFormValues, markFieldAsTouched);
@@ -50,14 +61,14 @@ export default function AccountDelete() {
 
 	// Refresh auth and redirect to `/status/error`
 	useEffect(() => {
-		if (state.situation === 'success') {
+		if (formSituation === 'success') {
 			router.replace(
 				`${Routes.get('status', { type: 'error' })}?r=account-delete`,
 			);
 		}
-	}, [state.situation, router]);
+	}, [formSituation, router]);
 
-	const elementIds = useElementIds(['passwordCurrent']);
+	const elementIds = useElementIds(['passwordCurrent'] as const);
 
 	if (authStatus === 'loading') {
 		return <LoadingComponent />;
@@ -68,8 +79,13 @@ export default function AccountDelete() {
 		return null;
 	}
 
-	if (state.situation === 'csrf_error') {
-		throw new Error(state.message as string);
+	if (formSituation === 'csrfError') {
+		return (
+			<ErrorComponent
+				title="My Account - Delete request"
+				description={formMessage as string}
+			/>
+		);
 	}
 
 	return (
@@ -114,23 +130,19 @@ export default function AccountDelete() {
 					<FormComponentSubmit
 						pending={pending}
 						submitted={submitted}
-						errors={errors}
+						error={formSituation === 'failedValidation'}
 						button={{
 							variant: 'error',
+							icon: 'destroy',
 							label: 'Delete account',
-							iconLabel: 'destroy',
 						}}
 					/>
 				</div>
 
-				{state.situation === 'error' && state.message && (
-					<FormError>
-						<div className="flex items-center gap-1.5">
-							<Icons.Status.Error />
-							<div>{state.message}</div>
-						</div>
-					</FormError>
-				)}
+				<FormError
+					formSituation={formSituation}
+					formMessage={formMessage}
+				/>
 			</form>
 		</FormWrapperComponent>
 	);

@@ -8,11 +8,11 @@ export default async function RootLayout({
 }: Readonly<{
 	children: ReactNode;
 }>) {
-	const language = await getLanguage();
+	const currentLanguage = await getLanguage();
 
 	return (
 		<Providers>
-			<html lang={language}>
+			<html lang={currentLanguage} data-scroll-behavior="smooth">
 				<body>{children}</body>
 			</html>
 		</Providers>

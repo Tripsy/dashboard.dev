@@ -1,6 +1,7 @@
-import { useMemo } from 'react';
+import { type JSX, useMemo } from 'react';
 import { dispatchFilterReset } from '@/app/(dashboard)/_events/data-table-filter-reset.event';
 import {
+	FormComponentAutoComplete,
 	FormComponentCalendarWithoutFormElement,
 	FormComponentCheckbox,
 	FormComponentInput,
@@ -13,11 +14,102 @@ import {
 import { Icons } from '@/components/icon.component';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import type { DataSourceKey } from '@/config/data-source.config';
 import { cn } from '@/helpers/css.helper';
+import { stringToDate } from '@/helpers/date.helper';
+import { requestFind } from '@/helpers/services.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
+import { useRemoteAutocomplete } from '@/hooks/use-remote-autocomplete';
 import type { useSearchFilter } from '@/hooks/use-search-filter.hook';
 import { useTranslation } from '@/hooks/use-translation.hook';
+import { hasPermission } from '@/models/auth.model';
+import { useAuth } from '@/providers/auth.provider';
+import type { FindFunctionResponseType } from '@/types/action.type';
+import type { DataSourceKey } from '@/types/data-source.key';
+import type { DataTableFiltersType } from '@/types/data-source.type';
+
+export function FormFiltersAutoComplete<
+	Fields extends DataTableFiltersType,
+	Model,
+>({
+	labelText,
+	fieldName,
+	fieldNameId,
+	fieldValue,
+	className,
+	icons,
+	setFilterValues,
+	setSearch,
+	dataSourceKey,
+	getOptionLabel,
+	getOptionKey,
+}: {
+	labelText: string;
+	fieldName: keyof Fields & string;
+	fieldNameId: keyof Fields & string;
+	fieldValue: string;
+	className?: string;
+	icons?: { left?: JSX.Element; right?: JSX.Element };
+	setFilterValues: (
+		updates: Partial<{ [K in keyof Fields]: Fields[K]['value'] }>,
+	) => void;
+	setSearch: (value: string) => void;
+	dataSourceKey: DataSourceKey;
+	getOptionLabel: (m: Model) => string;
+	getOptionKey: (m: Model) => number;
+}) {
+	const elementKey = `search-${String(fieldName)}`;
+	const elementIds = useElementIds([elementKey]);
+
+	const { suggestions, isFetching } = useRemoteAutocomplete<Model>({
+		query: fieldValue,
+		queryKey: [`s-${fieldName}`],
+		queryFn: async (q) => {
+			const res: FindFunctionResponseType<Model> | undefined =
+				await requestFind(dataSourceKey, {
+					filter: { term: q },
+					limit: 10,
+				});
+
+			return res?.entries ?? [];
+		},
+		minLength: 3,
+	});
+
+	return (
+		<FormComponentAutoComplete<Fields, Model>
+			labelText={labelText}
+			id={elementIds[elementKey]}
+			fieldName={fieldName}
+			fieldValue={fieldValue}
+			className={className}
+			disabled={false}
+			onInputChange={(value) => {
+				setSearch(value);
+				setFilterValues({
+					[fieldName]: null,
+					[fieldNameId]: null,
+				} as Partial<{ [K in keyof Fields]: Fields[K]['value'] }>);
+			}}
+			autoCompleteProps={{
+				suggestions: suggestions,
+				isLoading: isFetching,
+				onSelect: (m) => {
+					const label = getOptionLabel(m);
+					const key = getOptionKey(m);
+
+					setSearch(label);
+					setFilterValues({
+						[fieldName]: label,
+						[fieldNameId]: key,
+					} as Partial<{ [K in keyof Fields]: Fields[K]['value'] }>);
+				},
+				getOptionLabel,
+				getOptionKey,
+			}}
+			icons={icons}
+		/>
+	);
+}
 
 export function FormFiltersSearch<Fields>({
 	labelText,
@@ -118,6 +210,11 @@ export function FormFiltersDateRange<Fields>({
 
 	const { translations } = useTranslation(translationsKeys);
 
+	const maxDate = end.fieldValue ? stringToDate(end.fieldValue) : undefined;
+	const minDate = start.fieldValue
+		? stringToDate(start.fieldValue)
+		: undefined;
+
 	return (
 		<div className="flex flex-col gap-3 h-full">
 			<Label htmlFor={elementIds[elementKeyStart]}>{labelText}</Label>
@@ -131,7 +228,7 @@ export function FormFiltersDateRange<Fields>({
 					}
 					disabled={false}
 					onSelect={start.onSelect}
-					maxDate={end.fieldValue || undefined}
+					maxDate={maxDate}
 				/>
 				<FormComponentCalendarWithoutFormElement
 					id={elementIds[elementKeyEnd]}
@@ -142,7 +239,7 @@ export function FormFiltersDateRange<Fields>({
 					}
 					disabled={false}
 					onSelect={end.onSelect}
-					minDate={start.fieldValue || undefined}
+					minDate={minDate}
 				/>
 			</div>
 		</div>
@@ -150,13 +247,17 @@ export function FormFiltersDateRange<Fields>({
 }
 
 export function FormFiltersShowDeleted({
+	dataSource,
 	checked = false,
 	onCheckedChange,
 }: {
+	dataSource: DataSourceKey;
 	checked: boolean;
 	onCheckedChange: (checked: boolean) => void;
 }) {
-	const elementIds = useElementIds(['search-is-deleted']);
+	const { auth } = useAuth();
+
+	const elementIds = useElementIds(['search-is-deleted'] as const);
 
 	const translationsKeys = useMemo(
 		() => ['dashboard.text.label_checkbox_show_deleted'] as const,
@@ -164,6 +265,10 @@ export function FormFiltersShowDeleted({
 	);
 
 	const { translations } = useTranslation(translationsKeys);
+
+	if (!auth || !hasPermission(auth, dataSource, 'delete')) {
+		return null;
+	}
 
 	return (
 		<div className="flex self-end pb-3">

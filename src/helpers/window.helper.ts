@@ -12,7 +12,7 @@ export function displayWindowTitle({
 	entriesSelection,
 	entriesCount,
 	entryLabel,
-	windowTitle = 'N/A',
+	windowTitle = 'n/a',
 }: {
 	entriesSelection: EntriesSelectionType;
 	entriesCount: number;

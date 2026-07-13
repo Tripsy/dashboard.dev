@@ -1,5 +1,10 @@
 import { arrayHasValue } from '@/helpers/objects.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
+import type { ClientModel } from '@/models/client.model';
+import type { CmrModel } from '@/models/cmr.model';
+import type { CompanyVehicleModel } from '@/models/company-vehicle.model';
+import type { UserModel } from '@/models/user.model';
+import type { VendorModel } from '@/models/vendor.model';
 import type { Currency, StatusTransitions } from '@/types/common.type';
 
 export const CashFlowDirectionEnum = {
@@ -28,8 +33,10 @@ export const CashFlowCategoryEnum = {
 	MAINTENANCE: 'maintenance', // Vehicle repairs
 	TOLLS: 'tolls', // Road tolls
 
-	// Personnel
+	// Employee
 	EMPLOYEE_SALARY: 'employee_salary',
+	EMPLOYEE_EXPENSE_ADVANCE: 'employee_advance',
+	EMPLOYEE_TRAVEL_ALLOWANCE: 'employee_allowance',
 
 	// Business Expenses
 	VENDOR: 'vendor', // Third-party services
@@ -37,7 +44,6 @@ export const CashFlowCategoryEnum = {
 	TAXES: 'taxes',
 
 	// Correction
-	CORRECTION: 'correction',
 	REFUND: 'refund',
 	EMPLOYEE_REIMBURSEMENT: 'employee_reimbursement',
 } as const;
@@ -88,13 +94,10 @@ export const STATUS_TRANSITIONS: StatusTransitions<CashFlowStatus> = {
 	[CashFlowStatusEnum.EXPIRED]: [],
 };
 
-export function getStatusTransitions(status: CashFlowStatus): CashFlowStatus[] {
-	return STATUS_TRANSITIONS[status] ?? [];
-}
-
 export const CashFlowMethodEnum = {
 	CASH: 'cash',
 	BANK_TRANSFER: 'bank_transfer',
+	CREDIT_CARD: 'credit_card',
 } as const;
 
 export type CashFlowMethod =
@@ -109,12 +112,13 @@ export const getExpectedCategoryType = (
 		CashFlowCategoryEnum.MAINTENANCE,
 		CashFlowCategoryEnum.TOLLS,
 		CashFlowCategoryEnum.EMPLOYEE_SALARY,
+		CashFlowCategoryEnum.EMPLOYEE_EXPENSE_ADVANCE,
+		CashFlowCategoryEnum.EMPLOYEE_TRAVEL_ALLOWANCE,
 		CashFlowCategoryEnum.VENDOR,
 		CashFlowCategoryEnum.INSURANCE,
 		CashFlowCategoryEnum.TAXES,
 	];
 	const correctionCategories = [
-		CashFlowCategoryEnum.CORRECTION,
 		CashFlowCategoryEnum.REFUND,
 		CashFlowCategoryEnum.EMPLOYEE_REIMBURSEMENT,
 	];
@@ -149,6 +153,14 @@ export const GroupedCategories = [
 				label: 'Employee Salary',
 				value: CashFlowCategoryEnum.EMPLOYEE_SALARY,
 			},
+			{
+				label: 'Employee Advance',
+				value: CashFlowCategoryEnum.EMPLOYEE_EXPENSE_ADVANCE,
+			},
+			{
+				label: 'Employee Allowance',
+				value: CashFlowCategoryEnum.EMPLOYEE_TRAVEL_ALLOWANCE,
+			},
 			{ label: 'Vendor', value: CashFlowCategoryEnum.VENDOR },
 			{ label: 'Insurance', value: CashFlowCategoryEnum.INSURANCE },
 			{ label: 'Taxes', value: CashFlowCategoryEnum.TAXES },
@@ -157,7 +169,6 @@ export const GroupedCategories = [
 	{
 		label: formatEnumLabel(CashFlowCategoryTypeEnum.CORRECTION),
 		options: [
-			{ label: 'Correction', value: CashFlowCategoryEnum.CORRECTION },
 			{ label: 'Refund', value: CashFlowCategoryEnum.REFUND },
 			{
 				label: 'Employee Reimbursement',
@@ -196,6 +207,133 @@ export const getExpectedDirection = (
 	}
 };
 
+export const OperationalRecordTypeEnum = {
+	CLIENT: 'client',
+	VENDOR: 'vendor',
+	EMPLOYEE: 'employee',
+	COMPANY_VEHICLE: 'company_vehicle',
+	CMR: 'cmr',
+} as const;
+
+export type OperationalRecordType =
+	(typeof OperationalRecordTypeEnum)[keyof typeof OperationalRecordTypeEnum];
+
+export type CashFlowCategoryOperationalRecordOptionsType = {
+	required?: OperationalRecordType[];
+	optional?: OperationalRecordType[];
+};
+
+type CashFlowCategoryOperationalRecordType = Partial<
+	Record<CashFlowCategory, CashFlowCategoryOperationalRecordOptionsType>
+>;
+
+const CashFlowCategoryOperationalRecord: CashFlowCategoryOperationalRecordType =
+	{
+		[CashFlowCategoryEnum.CUSTOMER]: {
+			required: [OperationalRecordTypeEnum.CLIENT],
+			optional: [
+				OperationalRecordTypeEnum.EMPLOYEE,
+				OperationalRecordTypeEnum.CMR,
+			],
+		},
+		[CashFlowCategoryEnum.FUEL]: {
+			required: [OperationalRecordTypeEnum.COMPANY_VEHICLE],
+			optional: [
+				OperationalRecordTypeEnum.VENDOR,
+				OperationalRecordTypeEnum.EMPLOYEE,
+			],
+		},
+		[CashFlowCategoryEnum.MAINTENANCE]: {
+			required: [OperationalRecordTypeEnum.COMPANY_VEHICLE],
+			optional: [
+				OperationalRecordTypeEnum.VENDOR,
+				OperationalRecordTypeEnum.EMPLOYEE,
+			],
+		},
+		[CashFlowCategoryEnum.TOLLS]: {
+			required: [OperationalRecordTypeEnum.COMPANY_VEHICLE],
+			optional: [
+				OperationalRecordTypeEnum.VENDOR,
+				OperationalRecordTypeEnum.EMPLOYEE,
+				OperationalRecordTypeEnum.CMR,
+			],
+		},
+		[CashFlowCategoryEnum.EMPLOYEE_SALARY]: {
+			required: [OperationalRecordTypeEnum.EMPLOYEE],
+		},
+		[CashFlowCategoryEnum.EMPLOYEE_EXPENSE_ADVANCE]: {
+			required: [OperationalRecordTypeEnum.EMPLOYEE],
+		},
+		[CashFlowCategoryEnum.EMPLOYEE_TRAVEL_ALLOWANCE]: {
+			required: [OperationalRecordTypeEnum.EMPLOYEE],
+		},
+		[CashFlowCategoryEnum.EMPLOYEE_REIMBURSEMENT]: {
+			required: [OperationalRecordTypeEnum.EMPLOYEE],
+		},
+		[CashFlowCategoryEnum.VENDOR]: {
+			required: [OperationalRecordTypeEnum.VENDOR],
+			optional: [
+				OperationalRecordTypeEnum.EMPLOYEE,
+				OperationalRecordTypeEnum.COMPANY_VEHICLE,
+			],
+		},
+		[CashFlowCategoryEnum.INSURANCE]: {
+			required: [OperationalRecordTypeEnum.VENDOR],
+			optional: [
+				OperationalRecordTypeEnum.EMPLOYEE,
+				OperationalRecordTypeEnum.COMPANY_VEHICLE,
+			],
+		},
+		[CashFlowCategoryEnum.TAXES]: {
+			required: [OperationalRecordTypeEnum.VENDOR],
+			optional: [
+				OperationalRecordTypeEnum.EMPLOYEE,
+				OperationalRecordTypeEnum.COMPANY_VEHICLE,
+			],
+		},
+	};
+
+export const getOperationalRecordOptions = (
+	category: CashFlowCategory,
+	type?: keyof CashFlowCategoryOperationalRecordOptionsType,
+): Record<
+	OperationalRecordType,
+	keyof CashFlowCategoryOperationalRecordOptionsType
+> => {
+	const options = CashFlowCategoryOperationalRecord[category];
+
+	const result = {} as Record<
+		OperationalRecordType,
+		keyof CashFlowCategoryOperationalRecordOptionsType
+	>;
+
+	if (!options) {
+		return result;
+	}
+
+	if (!type || type === 'required') {
+		for (const requiredType of options.required ?? []) {
+			result[requiredType] = 'required';
+		}
+	}
+
+	if (!type || type === 'optional') {
+		for (const requiredType of options.optional ?? []) {
+			result[requiredType] = 'optional';
+		}
+	}
+
+	return result;
+};
+
+export type CashFlowOperationalRecordsType = Partial<{
+	[OperationalRecordTypeEnum.CLIENT]: ClientModel | null;
+	[OperationalRecordTypeEnum.EMPLOYEE]: UserModel | null;
+	[OperationalRecordTypeEnum.COMPANY_VEHICLE]: CompanyVehicleModel | null;
+	[OperationalRecordTypeEnum.VENDOR]: VendorModel | null;
+	[OperationalRecordTypeEnum.CMR]: CmrModel | null;
+}>;
+
 export type CashFlowModel<D = Date | string> = {
 	id: number;
 
@@ -210,6 +348,8 @@ export type CashFlowModel<D = Date | string> = {
 
 	// Amount data
 	amount: number; // stored in cents
+	netAmount: number; // decimal value (does not include VAT)
+	grossAmount: number; // decimal value (includes VAT)
 	vat_rate: number;
 	currency: Currency;
 	exchange_rate: number;
@@ -224,24 +364,6 @@ export type CashFlowModel<D = Date | string> = {
 	created_at: D;
 	updated_at: D;
 	deleted_at: D;
-};
 
-export type CashFlowFormValuesType = {
-	category: CashFlowCategory;
-	method: CashFlowMethod;
-
-	amount: number | null;
-	vat_rate: number | null;
-	currency: Currency;
-
-	external_reference: string | null;
-
-	parent_id: number | null;
-
-	notes: string | null;
-};
-
-export type CashFlowParamsType = CashFlowFormValuesType & {
-	direction: CashFlowDirection;
-	category_type: CashFlowCategoryType;
+	operational_records: CashFlowOperationalRecordsType;
 };

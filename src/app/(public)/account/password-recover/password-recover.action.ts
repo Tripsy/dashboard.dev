@@ -19,12 +19,12 @@ export async function passwordRecoverAction(
 		return {
 			...formState,
 			message: await translate('app.error.csrf'),
-			situation: 'csrf_error',
+			situation: 'csrfError',
 		};
 	}
 
 	const formValues = getPasswordRecoverFormValues(formData);
-	const validated = validateFormPasswordRecover(formValues);
+	const validated = await validateFormPasswordRecover(formValues);
 
 	if (!validated.success) {
 		const errors = accumulateZodErrors<PasswordRecoverFormValuesType>(
@@ -34,7 +34,7 @@ export async function passwordRecoverAction(
 		return {
 			...formState,
 			values: formValues,
-			situation: 'error',
+			situation: 'failedValidation',
 			message: await translate('app.error.validation'),
 			errors,
 		};
@@ -47,11 +47,11 @@ export async function passwordRecoverAction(
 			...formState,
 			values: validated.data,
 			message: requestResponse?.message || null,
-			situation: requestResponse?.success ? 'success' : 'error',
+			situation: requestResponse?.success ? 'success' : 'serverError',
 		};
 	} catch (error: unknown) {
 		let message: string = '';
-		const situation: PasswordRecoverSituationType = 'error';
+		const situation: PasswordRecoverSituationType = 'serverError';
 
 		if (error instanceof ApiError) {
 			switch (error.status) {

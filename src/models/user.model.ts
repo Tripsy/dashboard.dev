@@ -2,7 +2,7 @@ import type { Language } from '@/types/common.type';
 
 export const UserRoleEnum = {
 	ADMIN: 'admin',
-	MEMBER: 'member',
+	DRIVER: 'driver',
 	OPERATOR: 'operator',
 } as const;
 
@@ -36,16 +36,10 @@ export type UserModel<D = Date | string> = {
 	role: UserRole;
 	operator_type: UserOperatorType | null;
 	created_at: D;
-	updated_at: D;
-	deleted_at: D;
+	updated_at: D | null;
+	deleted_at: D | null;
 };
 
-export type UserFormValuesType = Pick<
-	UserModel,
-	'language' | 'role' | 'operator_type'
-> & {
-	name: string | null;
-	email: string | null;
-	password: string | null;
-	password_confirm: string | null;
+export const displayUserLabel = (entry: UserModel) => {
+	return entry.name;
 };

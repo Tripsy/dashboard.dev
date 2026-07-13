@@ -31,7 +31,7 @@ const badgeVariants = cva(
 );
 
 export type BadgeVariant = VariantProps<typeof badgeVariants>['variant'];
-// export type BadgeSize = VariantProps<typeof badgeVariants>['size'];
+export type BadgeSize = VariantProps<typeof badgeVariants>['size'];
 
 export interface BadgeProps
 	extends React.HTMLAttributes<HTMLDivElement>,

@@ -1,3 +1,5 @@
+import type { ImageMime } from '@/types/image.type';
+
 export function capitalizeFirstLetter(str: string): string {
 	return str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
 }
@@ -9,6 +11,27 @@ export function formatEnumLabel(value: string): string {
 		.join(' ');
 }
 
+/**
+ * Convert a string to kebab-case
+ *
+ * toKebabCase("hello world")           // "hello-world"
+ * toKebabCase("HelloWorld")             // "hello-world"
+ * toKebabCase("helloWorld")             // "hello-world"
+ * toKebabCase("hello_world")            // "hello_world"
+ * toKebabCase("hello__world")           // "hello__world"
+ * toKebabCase("Hello World!")           // "hello-world"
+ * toKebabCase("myVariableName")         // "my-variable-name"
+ * toKebabCase("This is a test")         // "this-is-a-test"
+ * toKebabCase("  leading trailing  ")   // "leading-trailing"
+ *
+ * toKebabCase("hello_world", { preserveUnderscores: false })   // "hello-world"
+ * toKebabCase("hello__world", { preserveUnderscores: false })  // "hello-world"
+ * toKebabCase("hello_world test", { preserveUnderscores: false }) // "hello-world-test"
+ *
+ * toKebabCase("HelloWorld", { preserveCase: true })     // "Hello-World" (keeps case)
+ * toKebabCase("myXMLParser", { preserveCase: true })    // "my-XML-Parser"
+ * toKebabCase("HelloWorld", { preserveCase: true, preserveUnderscores: false }) // "Hello-World"
+ */
 export function toKebabCase(
 	str: string,
 	options: {
@@ -47,6 +70,10 @@ export function toKebabCase(
 	return result;
 }
 
+/**
+ * Convert a string to title case
+ * Ex: 'cash-flow' → 'Cash Flow'
+ */
 export function toTitleCase(str: string): string {
 	return str
 		.replace(/[_-]/g, ' ')
@@ -62,6 +89,38 @@ export function toTitleCase(str: string): string {
 		.join(' ')
 		.replace(/\s+/g, ' ')
 		.trim();
+}
+
+/**
+ * Convert a string to camelCase (or PascalCase if capitalizeFirst is true)
+ * Ex: 'cash-flow' → 'cashFlow'
+ * Ex: 'cash-flow' with capitalizeFirst: true → 'CashFlow'
+ */
+export function toCamelCase(
+	str: string,
+	options: { capitalizeFirst?: boolean } = {},
+): string {
+	const { capitalizeFirst = false } = options;
+
+	return str
+		.replace(/[_-]/g, ' ')
+		.split(' ')
+		.map((word, index) => {
+			if (!word) return '';
+
+			// If capitalizeFirst is true, capitalize even the first word
+			if (capitalizeFirst) {
+				return (
+					word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+				);
+			}
+
+			// Default behavior: first word lowercase, rest capitalized
+			return index === 0
+				? word.toLowerCase()
+				: word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+		})
+		.join('');
 }
 
 /**
@@ -98,6 +157,53 @@ export function parseJson(val: unknown) {
 }
 
 /**
+ * Add VAT to a net amount
+ *
+ * @param {number} netAmount - Amount excluding VAT
+ * @param {number} vatRate - VAT rate in percentage (e.g., 20 for 20%)
+ * @returns {number} Total amount including VAT
+ */
+export function calcGrossAmount(netAmount: number, vatRate: number): number {
+	if (vatRate < 0) {
+		throw new Error('VAT rate must be greater or equal to 0');
+	}
+
+	return netAmount * (1 + vatRate / 100);
+}
+
+/**
+ * Remove VAT from a gross amount to get net amount (excl. tax)
+ *
+ * @param {number} grossAmount - Amount including VAT
+ * @param {number} vatRate - VAT rate in percentage (e.g., 20 for 20%)
+ * @returns {number} Net amount excluding VAT
+ */
+export function calcNetAmount(grossAmount: number, vatRate: number): number {
+	if (vatRate < 0) {
+		throw new Error('VAT rate must be greater or equal to 0');
+	}
+
+	const netAmount = grossAmount / (1 + vatRate / 100);
+
+	return parseFloat(netAmount.toFixed(4));
+}
+
+/**
+ * Extract VAT amount from a gross amount
+ *
+ * @param {number} grossAmount - Amount including VAT
+ * @param {number} vatRate - VAT rate in percentage (e.g., 20 for 20%)
+ * @returns {number} VAT amount only
+ */
+export function extractVAT(grossAmount: number, vatRate: number): number {
+	if (vatRate < 0) {
+		throw new Error('VAT rate must be greater or equal to 0');
+	}
+
+	return grossAmount - grossAmount / (1 + vatRate / 100);
+}
+
+/**
  * Formats an amount
  *
  * @param amount
@@ -112,7 +218,7 @@ export function formatAmount(amount: number, currencyCode: string) {
 	const symbolFormatter = new Intl.NumberFormat(undefined, {
 		style: 'currency',
 		currency: currencyCode,
-		currencyDisplay: 'symbol',
+		currencyDisplay: 'narrowSymbol',
 	});
 
 	const parts = symbolFormatter.formatToParts(0);
@@ -123,4 +229,67 @@ export function formatAmount(amount: number, currencyCode: string) {
 		value: numberFormatter.format(amount),
 		currency,
 	};
+}
+
+export function normalizePhoneNumber(
+	number: string,
+	defaultCountryCode: string = '40',
+): string {
+	let digits = number.replace(/\D/g, '');
+
+	// Already in international format
+	if (number.trimStart().startsWith('+')) {
+		return digits;
+	}
+
+	// International prefix (00...)
+	if (digits.startsWith('00')) {
+		return digits.substring(2);
+	}
+
+	// Has enough digits to already include a country code
+	if (digits.length > 10) {
+		return digits;
+	}
+
+	// Local number — strip trunk prefix (leading 0) and add country code
+	if (digits.startsWith('0')) {
+		digits = digits.substring(1);
+	}
+
+	return defaultCountryCode + digits;
+}
+
+/**
+ * Formats bytes
+ *
+ * @param bytes
+ */
+export function formatBytes(bytes?: number): string {
+	if (bytes == null) {
+		return '—';
+	}
+
+	if (bytes < 1024) {
+		return `${bytes} B`;
+	}
+
+	if (bytes < 1024 * 1024) {
+		return `${(bytes / 1024).toFixed(1)} KB`;
+	}
+
+	return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+}
+
+/**
+ * Formats MIME type (eg: 'image/jpeg' → 'JPEG')
+ *
+ * @param mime
+ */
+export function formatMime(mime?: ImageMime): string {
+	if (!mime) {
+		return '—';
+	}
+
+	return mime.replace('image/', '').toUpperCase();
 }

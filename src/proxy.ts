@@ -2,6 +2,7 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import Routes, { RouteAuthEnum, type RouteMatch } from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
+import { ApiError } from '@/exceptions/api.error';
 import { ApiRequest, getResponseData } from '@/helpers/api.helper';
 import { getTrackedCookie } from '@/helpers/session.helper';
 import { apiHeaders } from '@/helpers/system.helper';
@@ -27,9 +28,6 @@ class MiddlewareContext {
 
 		// Clickjacking protection
 		this.res.headers.set('X-Frame-Options', 'DENY');
-
-		// Determine language; add it to headers; create the cookie
-		this.setupLanguage();
 
 		return this.res;
 	}
@@ -69,7 +67,9 @@ class MiddlewareContext {
 		const queryLang = url.searchParams.get('lang');
 
 		// 2. Check existing cookie
-		const cookieLang = this.req.cookies.get('preferred-language')?.value;
+		const cookieLang = this.req.cookies.get(
+			Configuration.get('language.cookie_name') as string,
+		)?.value;
 
 		// 3. Check Accept-Language header
 		const acceptLanguage = this.req.headers.get('accept-language');
@@ -79,13 +79,20 @@ class MiddlewareContext {
 		const language = queryLang || cookieLang || headerLang;
 
 		if (language && Configuration.isSupportedLanguage(language)) {
+			const languageCookie = Configuration.get(
+				'language.cookie_name',
+			) as string;
+			const languageCookieMaxAge = Configuration.get(
+				'language.cookie_max_age',
+			) as number;
+
 			if (language !== cookieLang) {
-				this.res.cookies.set('preferred-language', language, {
-					httpOnly: true,
-					secure: Configuration.isEnvironment('production'),
+				this.res.cookies.set(languageCookie, language, {
+					maxAge: languageCookieMaxAge,
 					path: '/',
 					sameSite: 'lax',
-					maxAge: 60 * 60 * 24 * 365,
+					secure: Configuration.isEnvironment('production'),
+					httpOnly: true,
 				});
 			}
 
@@ -127,9 +134,11 @@ class MiddlewareContext {
 	}
 
 	destroySession() {
-		this.res.cookies.delete(
-			Configuration.get('user.sessionToken') as string,
-		);
+		if (Configuration.isEnvironment('production')) {
+			this.res.cookies.delete(
+				Configuration.get('user.sessionToken') as string,
+			);
+		}
 	}
 
 	async handleAuth(
@@ -139,11 +148,15 @@ class MiddlewareContext {
 			Configuration.get('user.sessionToken') as string,
 		);
 
-		const { auth: routeAuth, permission: routePermission } =
-			routeMatch?.props || {
-				auth: RouteAuthEnum.PUBLIC,
-				permission: undefined,
-			};
+		const {
+			auth: routeAuth,
+			permissionEntity,
+			permissionOperation,
+		} = routeMatch?.props || {
+			auth: RouteAuthEnum.PUBLIC,
+			permissionEntity: undefined,
+			permissionOperation: undefined,
+		};
 
 		if (!sessionToken.value) {
 			switch (routeAuth) {
@@ -158,9 +171,9 @@ class MiddlewareContext {
 			}
 		}
 
-		const authModel = await fetchAuthModel(sessionToken.value);
+		const authResult = await fetchAuthModel(sessionToken.value); // null = invalid token, false = server error
 
-		if (!authModel) {
+		if (authResult === null) {
 			switch (routeAuth) {
 				case RouteAuthEnum.UNAUTHENTICATED:
 				case RouteAuthEnum.PUBLIC: {
@@ -182,6 +195,9 @@ class MiddlewareContext {
 					return this.redirectToError('undefined_route');
 				}
 			}
+		} else if (authResult === false) {
+			// server is down, don't punish the user's session
+			return this.redirectToError('service_unavailable');
 		}
 
 		if (routeAuth === RouteAuthEnum.UNAUTHENTICATED) {
@@ -189,12 +205,19 @@ class MiddlewareContext {
 		}
 
 		if (routeAuth === RouteAuthEnum.PROTECTED) {
-			if (!hasPermission(authModel, routePermission)) {
+			if (
+				!permissionEntity ||
+				!hasPermission(
+					authResult,
+					permissionEntity,
+					permissionOperation,
+				)
+			) {
 				return this.redirectToError('unauthorized');
 			}
 		}
 
-		this.res.headers.set('x-auth-data', JSON.stringify(authModel));
+		this.res.headers.set('x-auth-data', JSON.stringify(authResult));
 
 		if (sessionToken.action === 'set' && sessionToken.value) {
 			const cookieName = Configuration.get('user.sessionToken') as string;
@@ -237,7 +260,9 @@ class MiddlewareContext {
  *
  * @param token
  */
-async function fetchAuthModel(token: string): Promise<AuthModel> {
+async function fetchAuthModel(
+	token: string,
+): Promise<AuthModel | null | false> {
 	try {
 		const fetchResponse: ApiResponseFetch<AuthModel> =
 			await new ApiRequest()
@@ -259,8 +284,12 @@ async function fetchAuthModel(token: string): Promise<AuthModel> {
 		}
 
 		return null;
-	} catch {
-		return null;
+	} catch (error) {
+		if (error instanceof ApiError && error.status >= 500) {
+			return false; // Server error, token may still be valid
+		}
+
+		return null; // 401/403/invalid token or anything else
 	}
 }
 
@@ -277,12 +306,14 @@ export async function proxy(req: NextRequest) {
 		return ctx.success();
 	}
 
-	// Block suspicious origins
-	if (!ctx.isValidOrigin()) {
-		return new NextResponse('Forbidden', {
-			status: 403,
-		});
+	// Only enforce origin checks on state-changing requests
+	const isMutating = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method);
+
+	if (isMutating && !ctx.isValidOrigin()) {
+		return new NextResponse('Forbidden', { status: 403 });
 	}
+
+	ctx.setupLanguage();
 
 	const pathname = req.nextUrl.pathname;
 	const routeMatch = Routes.match(pathname);

@@ -46,17 +46,3 @@ export type TemplateModel<D = Date | string> = {
 	updated_at: D;
 	deleted_at: D;
 };
-
-export type TemplateFormValuesType = Pick<
-	TemplateModel,
-	'language' | 'type'
-> & {
-	label: string | null;
-	content: {
-		subject?: string | null; // Email specific
-		title?: string | null; // Page specific
-		layout: TemplateLayoutEmail | TemplateLayoutPage;
-		html: string | null;
-		text?: string | null;
-	};
-};

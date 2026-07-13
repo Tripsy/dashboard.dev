@@ -2,7 +2,6 @@ import Link from 'next/link';
 import type { JSX } from 'react';
 import { Breadcrumb } from '@/app/(dashboard)/_components/breadcrumb.component';
 import DashboardMain from '@/app/(dashboard)/_components/dashboard-main.component';
-import { DataSourceRegistrar } from '@/app/(dashboard)/_components/data-source-registrar.component';
 import { SideMenu } from '@/app/(dashboard)/_components/side-menu.component';
 import { SideMenuToggle } from '@/app/(dashboard)/_components/side-menu-toggle.component';
 import { DashboardProvider } from '@/app/(dashboard)/_providers/dashboard.provider';
@@ -12,7 +11,6 @@ import { UserMenu } from '@/components/layout/user-menu.component';
 import ProtectedRoute from '@/components/protected-route.component';
 import { WindowContainer } from '@/components/window/window-container.component';
 import Routes, { RouteAuthEnum } from '@/config/routes.setup';
-import { Configuration } from '@/config/settings.config';
 
 function Header() {
 	return (
@@ -24,17 +22,14 @@ function Header() {
 						href={Routes.get('home')}
 						className="flex items-center gap-2"
 					>
-						<LogoComponent divClass="h-9 w-9" spanClass="text-lg" />
-						<span className="text-xl font-semibold text-foreground">
-							{Configuration.get('app.name')}
-						</span>
+						<LogoComponent />
 					</Link>
 
-					<div className="w-full pl-26">
+					<div className="md:pl-12">
 						<Breadcrumb />
 					</div>
 
-					<div className="flex items-center gap-2">
+					<div className="flex items-center gap-2 ml-auto">
 						<ToggleTheme />
 						<UserMenu />
 					</div>
@@ -47,7 +42,6 @@ function Header() {
 export default async function Layout({ children }: { children: JSX.Element }) {
 	return (
 		<DashboardProvider>
-			<DataSourceRegistrar />
 			<div className="dashboard-layout min-h-screen bg-background">
 				<Header />
 				<ProtectedRoute routeAuth={RouteAuthEnum.PROTECTED}>

@@ -1,46 +1,102 @@
 'use client';
 
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useStore } from 'zustand/react';
 import { addDataTableActionListener } from '@/app/(dashboard)/_events/data-table-action.event';
 import { useDataTable } from '@/app/(dashboard)/_providers/data-table.provider';
-import { ActionButton } from '@/components/action-button.component';
 import {
-	type ActionConfigType,
-	type DataSourceKey,
-	getDataSourceConfig,
-} from '@/config/data-source.config';
+	ActionButton,
+	type ButtonCommand,
+} from '@/components/action-button.component';
+import { getDataSourceConfig } from '@/config/data-source.config';
 import { getErrorMessage } from '@/helpers/objects.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { hasPermission } from '@/models/auth.model';
+import { UserRoleEnum } from '@/models/user.model';
 import { useAuth } from '@/providers/auth.provider';
 import { useToast } from '@/providers/toast.provider';
 import { useModalStore } from '@/stores/window.store';
 import type { EntriesSelectionType } from '@/types/action.type';
-import type { WindowEntryType } from '@/types/window.type';
+import type { DataSourceKey, DatasourceModels } from '@/types/data-source.key';
+import {
+	type ActionConfigPermission,
+	type ActionConfigType,
+	DataSourceSectionEnum,
+} from '@/types/data-source.type';
+import type { ButtonAppearanceType } from '@/types/html.type';
 
-type HandleActionType = (
+type HandleActionType<K extends DataSourceKey> = (
 	action: string,
 	dataSource: DataSourceKey,
-	entries: WindowEntryType[],
-	actionConfig?: ActionConfigType,
-) => Promise<void>;
+	entries: DatasourceModels[K][],
+	actionConfig?: ActionConfigType<DatasourceModels[K]>,
+) => void;
 
-type AllowActionType = (
-	entries: WindowEntryType[],
-	permission: string,
+type AllowActionType<K extends DataSourceKey> = (
+	entries: DatasourceModels[K][],
+	permission: ActionConfigPermission,
 	entriesSelection: EntriesSelectionType,
-	customEntryCheck?: (entry: WindowEntryType) => boolean,
+	customEntryCheck?: (entry: DatasourceModels[K]) => boolean,
 ) => boolean;
 
-function buildActionButtons(
+function DataTableActionButton({
+	dataSource,
+	action,
+	disabled = false,
+	buttonAppearance,
+	command,
+}: {
+	dataSource: string;
+	action: string;
+
+	disabled?: boolean;
+	buttonAppearance?: ButtonAppearanceType;
+	command: ButtonCommand;
+}) {
+	const actionTitleKey = `${dataSource}.action.${action}.title`;
+	const actionLabelKey = `${dataSource}.action.${action}.label`;
+
+	const translationsKeys = useMemo(
+		() =>
+			[
+				actionTitleKey,
+				actionLabelKey,
+				'app.action.loading.label',
+			] as const,
+		[actionTitleKey, actionLabelKey],
+	);
+
+	const { translations, isTranslationLoading } =
+		useTranslation(translationsKeys);
+
+	if (isTranslationLoading) {
+		return null;
+	}
+
+	return (
+		<ActionButton
+			action={action}
+			buttonAppearance={{
+				...buttonAppearance,
+				title: buttonAppearance?.title ?? translations[actionTitleKey],
+				label: buttonAppearance?.label ?? translations[actionLabelKey],
+				loadingLabel:
+					buttonAppearance?.loadingLabel ??
+					translations['app.action.loading.label'],
+			}}
+			disabled={disabled}
+			command={command}
+		/>
+	);
+}
+
+function buildActionButtons<K extends DataSourceKey>(
 	position: 'left' | 'right',
-	actions: Record<string, ActionConfigType>,
+	actions: Record<string, ActionConfigType<DatasourceModels[K]>>,
 	dataSource: DataSourceKey,
-	selectedEntries: WindowEntryType[],
-	allowAction: AllowActionType,
-	handleAction: HandleActionType,
-	handleActionError: (error: unknown) => void,
+	selectedEntries: DatasourceModels[K][],
+	allowAction: AllowActionType<K>,
+	handleAction: HandleActionType<K>,
 ) {
 	return Object.entries(actions)
 		.filter(
@@ -55,28 +111,43 @@ function buildActionButtons(
 					actionConfig.customEntryCheck,
 				),
 		)
-		.map(([action, actionConfig]) => (
-			<ActionButton
-				key={`button-${dataSource}-${action}`}
-				dataSource={dataSource}
-				action={action}
-				buttonProps={actionConfig.button}
-				handleClick={() =>
-					handleAction(
-						action,
-						dataSource,
-						selectedEntries,
-						actionConfig,
-					).catch(handleActionError)
-				}
-			/>
-		));
+		.map(([action, actionConfig]) => {
+			let command: ButtonCommand;
+
+			if (actionConfig.windowType === 'link') {
+				command = {
+					type: 'link',
+					href: actionConfig.windowTarget ?? '/',
+				};
+			} else {
+				command = {
+					type: 'action',
+					onClick: () =>
+						handleAction(
+							action,
+							dataSource,
+							selectedEntries,
+							actionConfig,
+						),
+				};
+			}
+
+			return (
+				<DataTableActionButton
+					key={`button-${dataSource}-${action}`}
+					dataSource={dataSource}
+					action={action}
+					buttonAppearance={actionConfig.button}
+					command={command}
+				/>
+			);
+		});
 }
 
-function resolveActionEntries(
-	entries: WindowEntryType[],
+function resolveActionEntries<K extends DataSourceKey>(
+	entries: DatasourceModels[K][],
 	entriesSelection: EntriesSelectionType,
-): WindowEntryType[] {
+): DatasourceModels[K][] {
 	if (entriesSelection === 'free') {
 		return [];
 	}
@@ -88,14 +159,10 @@ function resolveActionEntries(
 	return entries;
 }
 
-export function DataTableActions<
-	K extends DataSourceKey,
-	Entry extends WindowEntryType,
->() {
-	const { dataSource, selectionMode, dataTableStore } = useDataTable<
-		K,
-		Entry
-	>();
+export function DataTableActions<K extends DataSourceKey>() {
+	type Entry = DatasourceModels[K];
+
+	const { dataSource, selectionMode, dataTableStore } = useDataTable<K>();
 	const { auth } = useAuth();
 	const { showToast } = useToast();
 	const { open } = useModalStore();
@@ -105,28 +172,31 @@ export function DataTableActions<
 		(state) => state.selectedEntries,
 	);
 
-	const actions = useMemo(
-		() => getDataSourceConfig(dataSource, 'actions'),
-		[dataSource],
-	);
+	const [actions, setActions] = useState<
+		Record<string, ActionConfigType<Entry>> | undefined
+	>(undefined);
+
+	useEffect(() => {
+		getDataSourceConfig(
+			DataSourceSectionEnum.DASHBOARD,
+			dataSource,
+			'actions',
+		).then(setActions);
+	}, [dataSource]);
 
 	const translationsKeys = useMemo(
-		() =>
-			[
-				'app.error.operation_not_allowed',
-				'app.text.error_title',
-			] as const,
+		() => ['app.error.operation_not_allowed', 'app.error.title'] as const,
 		[],
 	);
 
 	const { translations } = useTranslation(translationsKeys);
 
-	const allowAction: AllowActionType = useCallback(
+	const allowAction: AllowActionType<K> = useCallback(
 		(
-			entries: WindowEntryType[],
-			permission: string,
+			entries: Entry[],
+			permission: ActionConfigPermission,
 			entriesSelection: EntriesSelectionType,
-			customEntryCheck?: (entry: WindowEntryType) => boolean,
+			customEntryCheck?: (entry: Entry) => boolean,
 		) => {
 			if (entriesSelection === 'single') {
 				if (entries.length !== 1) {
@@ -142,117 +212,121 @@ export function DataTableActions<
 				return false;
 			}
 
-			return hasPermission(auth, permission);
-		},
-		[auth],
-	);
-
-	const handleAction: HandleActionType = useCallback(
-		async (action, targetDataSource, entries, actionConfig) => {
-			const resolvedActionConfig: ActionConfigType | undefined =
-				actionConfig ??
-				getDataSourceConfig(targetDataSource, 'actions')?.[action];
-
-			if (!resolvedActionConfig) {
-				throw new Error(`Action "${action}" is not defined`);
-			}
+			const [permissionEntity, permissionOperation] = permission;
 
 			if (
-				!allowAction(
-					entries,
-					resolvedActionConfig.permission,
-					resolvedActionConfig.entriesSelection,
-					resolvedActionConfig.customEntryCheck,
-				)
+				auth?.role === UserRoleEnum.DRIVER &&
+				!['find', 'read'].includes(permissionOperation)
 			) {
-				throw new Error(
-					translations['app.error.operation_not_allowed'],
-				);
+				return false;
 			}
 
-			const actionEntries = resolveActionEntries(
-				entries,
-				resolvedActionConfig.entriesSelection,
-			);
-
-			open({
-				minimized: false,
-				section: 'dashboard',
-				dataSource: targetDataSource,
-				action: action,
-				data: {
-					entries: actionEntries,
-				},
-			});
+			return hasPermission(auth, permissionEntity, permissionOperation);
 		},
-		[allowAction, open, translations],
+		[auth],
 	);
 
 	const handleActionError = useCallback(
 		(error: unknown) => {
 			showToast({
 				severity: 'error',
-				summary: translations['app.text.error_title'],
+				summary: translations['app.error.title'],
 				detail: getErrorMessage(error),
 			});
 		},
 		[showToast, translations],
 	);
 
-	useEffect(() => {
-		return addDataTableActionListener<Entry>(
-			({ action, dataSource, entries }) => {
-				handleAction(action, dataSource, entries).catch(
-					handleActionError,
-				);
-			},
-		);
-	}, [handleAction, handleActionError]);
+	const handleAction: HandleActionType<K> = useCallback(
+		(action, targetDataSource, entries, actionConfig) => {
+			const execute = async () => {
+				const resolvedActionConfig =
+					actionConfig ??
+					(targetDataSource === dataSource
+						? actions?.[action]
+						: (
+								await getDataSourceConfig(
+									DataSourceSectionEnum.DASHBOARD,
+									targetDataSource,
+									'actions',
+								)
+							)?.[action]);
 
-	const leftActions = useMemo(
-		() =>
-			actions
-				? buildActionButtons(
-						'left',
-						actions,
-						dataSource,
-						selectedEntries,
-						allowAction,
-						handleAction,
-						handleActionError,
+				if (!resolvedActionConfig) {
+					throw new Error(`Action "${action}" is not defined`);
+				}
+
+				if (
+					!allowAction(
+						entries,
+						resolvedActionConfig.permission,
+						resolvedActionConfig.entriesSelection,
+						resolvedActionConfig.customEntryCheck,
 					)
-				: null,
+				) {
+					console.log(resolvedActionConfig);
+					throw new Error(
+						translations['app.error.operation_not_allowed'],
+					);
+				}
+
+				const actionEntries = resolveActionEntries(
+					entries,
+					resolvedActionConfig.entriesSelection,
+				);
+
+				open({
+					minimized: false,
+					section: DataSourceSectionEnum.DASHBOARD,
+					dataSource: targetDataSource,
+					action,
+					data: { entries: actionEntries },
+				});
+			};
+
+			execute().catch(handleActionError);
+		},
 		[
 			actions,
-			dataSource,
-			selectedEntries,
 			allowAction,
-			handleAction,
+			open,
+			translations,
 			handleActionError,
+			dataSource,
 		],
 	);
 
-	const rightActions = useMemo(
+	useEffect(() => {
+		return addDataTableActionListener<Entry>(
+			({ action, dataSource, entries }) => {
+				handleAction(action, dataSource, entries);
+			},
+		);
+	}, [handleAction]);
+
+	const [leftActions, rightActions] = useMemo(
 		() =>
 			actions
-				? buildActionButtons(
-						'right',
-						actions,
-						dataSource,
-						selectedEntries,
-						allowAction,
-						handleAction,
-						handleActionError,
-					)
-				: null,
-		[
-			actions,
-			dataSource,
-			selectedEntries,
-			allowAction,
-			handleAction,
-			handleActionError,
-		],
+				? [
+						buildActionButtons(
+							'left',
+							actions,
+							dataSource,
+							selectedEntries,
+							allowAction,
+							handleAction,
+						),
+						buildActionButtons(
+							'right',
+							actions,
+							dataSource,
+							selectedEntries,
+							allowAction,
+							handleAction,
+						),
+					]
+				: [null, null],
+		[actions, dataSource, selectedEntries, allowAction, handleAction],
 	);
 
 	return (

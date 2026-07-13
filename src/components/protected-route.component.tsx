@@ -14,12 +14,17 @@ import Routes, {
 } from '@/config/routes.setup';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { hasPermission } from '@/models/auth.model';
+import type {
+	PermissionEntityType,
+	PermissionOperationType,
+} from '@/models/permission.model';
 import { useAuth } from '@/providers/auth.provider';
 
 type ProtectedRouteProps = {
 	children: React.ReactNode;
 	routeAuth: RouteAuth;
-	routePermission?: string;
+	routePermissionEntity?: PermissionEntityType;
+	routePermissionOperation?: PermissionOperationType;
 	className?: string;
 	fallback?: React.ReactNode;
 };
@@ -37,7 +42,8 @@ const ProtectedRouteWrapper = ({
 export default function ProtectedRoute({
 	children,
 	routeAuth,
-	routePermission,
+	routePermissionEntity,
+	routePermissionOperation,
 	className,
 	fallback,
 }: ProtectedRouteProps) {
@@ -58,7 +64,8 @@ export default function ProtectedRoute({
 	const translationsKeys = useMemo(
 		() =>
 			[
-				'app.text.loading',
+				'app.action.loading.title',
+				'app.action.loading.label',
 				'auth.message.already_logged_in',
 				'auth.message.unauthorized',
 			] as const,
@@ -68,20 +75,39 @@ export default function ProtectedRoute({
 	const { translations, isTranslationLoading } =
 		useTranslation(translationsKeys);
 
-	const permission = useMemo(() => {
-		if (routePermission) {
-			return routePermission;
+	const { permissionEntity, permissionOperation } = useMemo(() => {
+		// Explicit props always take priority
+		if (routePermissionEntity) {
+			return {
+				permissionEntity: routePermissionEntity,
+				permissionOperation: routePermissionOperation,
+			};
 		}
 
+		// Only derive from route when authenticated and protected
 		if (
-			routeAuth === RouteAuthEnum.PROTECTED &&
-			authStatus === 'authenticated'
+			routeAuth !== RouteAuthEnum.PROTECTED ||
+			authStatus !== 'authenticated'
 		) {
-			return Routes.match(pathname)?.props?.permission;
+			return {
+				permissionEntity: undefined,
+				permissionOperation: undefined,
+			};
 		}
 
-		return undefined;
-	}, [routePermission, routeAuth, authStatus, pathname]);
+		const routeProps = Routes.match(pathname)?.props;
+
+		return {
+			permissionEntity: routeProps?.permissionEntity,
+			permissionOperation: routeProps?.permissionOperation,
+		};
+	}, [
+		routePermissionEntity,
+		routePermissionOperation,
+		routeAuth,
+		authStatus,
+		pathname,
+	]);
 
 	// Loading
 	if (isTranslationLoading) {
@@ -96,39 +122,50 @@ export default function ProtectedRoute({
 	// Loading
 	if (authStatus === 'loading') {
 		return (
-			<LoadingComponent description={translations['app.text.loading']} />
+			<LoadingComponent
+				title={translations['app.action.loading.title']}
+				description={translations['app.action.loading.label']}
+			/>
 		);
 	}
 
-	if (
-		routeAuth === RouteAuthEnum.UNAUTHENTICATED &&
-		authStatus === 'authenticated'
-	) {
-		return (
-			<ProtectedRouteWrapper className={className}>
-				<ErrorComponent
-					description={translations['auth.message.already_logged_in']}
-				>
-					{fallback}
-				</ErrorComponent>
-			</ProtectedRouteWrapper>
-		);
+	if (authStatus === 'authenticated') {
+		if (routeAuth === RouteAuthEnum.UNAUTHENTICATED) {
+			return (
+				<ProtectedRouteWrapper className={className}>
+					<ErrorComponent
+						description={
+							translations['auth.message.already_logged_in']
+						}
+					>
+						{fallback}
+					</ErrorComponent>
+				</ProtectedRouteWrapper>
+			);
+		}
+
+		if (
+			routeAuth === RouteAuthEnum.PROTECTED &&
+			(!permissionEntity ||
+				!hasPermission(auth, permissionEntity, permissionOperation))
+		) {
+			return (
+				<ProtectedRouteWrapper className={className}>
+					<ErrorComponent
+						description={translations['auth.message.unauthorized']}
+					>
+						{fallback}
+					</ErrorComponent>
+				</ProtectedRouteWrapper>
+			);
+		}
 	}
 
-	// If this is a protected route and the user doesn't have the required permission
 	if (
-		routeAuth === RouteAuthEnum.PROTECTED &&
-		!hasPermission(auth, permission)
+		authStatus === 'unauthenticated' &&
+		routeAuth === RouteAuthEnum.PROTECTED
 	) {
-		return (
-			<ProtectedRouteWrapper className={className}>
-				<ErrorComponent
-					description={translations['auth.message.unauthorized']}
-				>
-					{fallback}
-				</ErrorComponent>
-			</ProtectedRouteWrapper>
-		);
+		return null; // useEffect handles the redirect
 	}
 
 	return <>{children}</>;

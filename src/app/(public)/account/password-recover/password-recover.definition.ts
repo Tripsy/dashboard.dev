@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { translateBatch } from '@/config/translate.setup';
 import { getFormDataAsString } from '@/helpers/form.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import type { FormErrorsType, FormSituationType } from '@/types/form.type';
@@ -7,7 +8,7 @@ export type PasswordRecoverFormValuesType = {
 	email: string | null;
 };
 
-export type PasswordRecoverSituationType = FormSituationType | 'csrf_error';
+export type PasswordRecoverSituationType = FormSituationType | 'csrfError';
 
 export type PasswordRecoverStateType = {
 	values: PasswordRecoverFormValuesType;
@@ -25,10 +26,7 @@ export const PasswordRecoverState: PasswordRecoverStateType = {
 	situation: null,
 };
 
-const validatorMessages = await BaseValidator.getValidatorMessages(
-	['invalid_email'] as const,
-	'password-recover.validation',
-);
+const validatorMessages = ['invalid_email'] as const;
 
 class PasswordRecoverValidator extends BaseValidator<typeof validatorMessages> {
 	passwordRecover = z.object({
@@ -36,10 +34,15 @@ class PasswordRecoverValidator extends BaseValidator<typeof validatorMessages> {
 	});
 }
 
-export function validateFormPasswordRecover(
+export async function validateFormPasswordRecover(
 	values: PasswordRecoverFormValuesType,
 ) {
-	const validator = new PasswordRecoverValidator(validatorMessages);
+	const translations = await translateBatch(
+		validatorMessages,
+		'password-recover.validation',
+	);
+
+	const validator = new PasswordRecoverValidator(translations);
 
 	return validator.passwordRecover.safeParse(values);
 }

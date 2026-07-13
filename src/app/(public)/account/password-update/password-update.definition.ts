@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { Configuration } from '@/config/settings.config';
+import { translateBatch } from '@/config/translate.setup';
 import { getFormDataAsString } from '@/helpers/form.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import type { FormErrorsType, FormSituationType } from '@/types/form.type';
@@ -10,7 +11,7 @@ export type PasswordUpdateFormValuesType = {
 	password_confirm: string | null;
 };
 
-export type PasswordUpdateSituationType = FormSituationType | 'csrf_error';
+export type PasswordUpdateSituationType = FormSituationType | 'csrfError';
 
 export type PasswordUpdateStateType = {
 	values: PasswordUpdateFormValuesType;
@@ -30,19 +31,16 @@ export const PasswordUpdateState: PasswordUpdateStateType = {
 	situation: null,
 };
 
-const validatorMessages = await BaseValidator.getValidatorMessages(
-	[
-		'invalid_password_current',
-		'invalid_password_new',
-		'password_min',
-		'password_condition_capital_letter',
-		'password_condition_number',
-		'password_condition_special_character',
-		'password_confirm_required',
-		'password_confirm_mismatch',
-	] as const,
-	'account-password-update.validation',
-);
+const validatorMessages = [
+	'invalid_password_current',
+	'invalid_password_new',
+	'password_min',
+	'password_condition_capital_letter',
+	'password_condition_number',
+	'password_condition_special_character',
+	'password_confirm_required',
+	'password_confirm_mismatch',
+] as const;
 
 class PasswordUpdateValidator extends BaseValidator<typeof validatorMessages> {
 	passwordUpdate = z
@@ -89,10 +87,15 @@ class PasswordUpdateValidator extends BaseValidator<typeof validatorMessages> {
 		});
 }
 
-export function validateFormPasswordUpdate(
+export async function validateFormPasswordUpdate(
 	values: PasswordUpdateFormValuesType,
 ) {
-	const validator = new PasswordUpdateValidator(validatorMessages);
+	const translations = await translateBatch(
+		validatorMessages,
+		'password-update.validation',
+	);
+
+	const validator = new PasswordUpdateValidator(translations);
 
 	return validator.passwordUpdate.safeParse(values);
 }

@@ -2,11 +2,6 @@
 
 import type { JSX } from 'react';
 import { dispatchDataTableAction } from '@/app/(dashboard)/_events/data-table-action.event';
-import type {
-	DataSourceKey,
-	DataTableColumnType,
-	DataTableValueOptionsType,
-} from '@/config/data-source.config';
 import { formatDate } from '@/helpers/date.helper';
 import {
 	DisplayDeleted,
@@ -17,15 +12,20 @@ import { getErrorMessage } from '@/helpers/objects.helper';
 import { requestView } from '@/helpers/services.helper';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
 import { useToast } from '@/providers/toast.provider';
-import type { ActionButtonPropsType } from '@/types/html.type';
+import type { DataSourceKey } from '@/types/data-source.key';
+import type {
+	DataTableColumnType,
+	DataTableValueOptionsType,
+} from '@/types/data-source.type';
+import type { ButtonAppearanceType } from '@/types/html.type';
 
 export const DisplayButton = <Entry,>({
-	buttonProps,
+	buttonAppearance,
 	action,
 	dataSource,
 	entryOrId,
 }: {
-	buttonProps: ActionButtonPropsType;
+	buttonAppearance: ButtonAppearanceType;
 	action: string;
 	dataSource: DataSourceKey;
 	entryOrId: Entry | number;
@@ -56,26 +56,26 @@ export const DisplayButton = <Entry,>({
 					});
 				}
 			}}
-			title={buttonProps.title}
+			title={buttonAppearance.title}
 		>
-			{buttonProps.label}
+			{buttonAppearance.label}
 		</button>
 	);
 };
 
 export const DataTableValue = <Entry extends Record<string, unknown>>(
 	entry: Entry,
-	column: DataTableColumnType<Entry>,
+	column: DataTableColumnType<Entry> | keyof Entry,
 	options: DataTableValueOptionsType<Entry>,
 ) => {
 	let outputValue: string | JSX.Element;
 
+	const field = typeof column === 'object' ? column.field : column;
+
 	if (options.customValue) {
 		outputValue = options.customValue;
 	} else {
-		const entryValue: string | object = entry[column.field] as
-			| string
-			| object;
+		const entryValue = entry[field] as string | object;
 
 		if (entryValue == null) {
 			return '-';
@@ -92,17 +92,27 @@ export const DataTableValue = <Entry extends Record<string, unknown>>(
 		outputValue = capitalizeFirstLetter(outputValue);
 	}
 
+	if (options.uppercase && typeof outputValue === 'string') {
+		outputValue = outputValue.toUpperCase();
+	}
+
 	if (options.displayDate && typeof outputValue === 'string') {
 		outputValue = formatDate(outputValue, 'date-time') || '-';
 	}
 
-	if (options.isStatus && column.field === 'status' && 'status' in entry) {
+	if (options.isStatus && field === 'status' && 'status' in entry) {
 		const status =
 			options.markDeleted && 'deleted_at' in entry && entry?.deleted_at
 				? 'deleted'
 				: (entry.status as keyof typeof statusList);
 
-		outputValue = <DisplayStatus status={status} />;
+		if (!options.dataSource) {
+			throw new Error('dataSource is required for `DisplayStatus`');
+		}
+
+		outputValue = (
+			<DisplayStatus status={status} dataSource={options.dataSource} />
+		);
 	} else if (options.markDeleted && 'deleted_at' in entry) {
 		outputValue = (
 			<DisplayDeleted
@@ -113,21 +123,34 @@ export const DataTableValue = <Entry extends Record<string, unknown>>(
 	}
 
 	if (options.displayButton) {
-		const { action, dataSource } = options.displayButton;
+		const {
+			action,
+			title,
+			alternateEntryId,
+			dataSource: displayButtonDataSource,
+		} = options.displayButton;
 
 		const resolvedAction =
 			typeof action === 'function' ? action(entry) : action;
 
 		if (resolvedAction) {
+			// If displayButtonDataSource is provided, use it, otherwise use options.dataSource
+			const displayButtonDataSourceValue =
+				displayButtonDataSource || options.dataSource;
+
+			if (!displayButtonDataSourceValue) {
+				throw new Error('dataSource is required for `DisplayButton`');
+			}
+
 			outputValue = (
 				<DisplayButton
-					buttonProps={{
+					buttonAppearance={{
 						label: outputValue,
-						title: options.displayButton.altTitle,
+						title: title,
 					}}
 					action={resolvedAction}
-					dataSource={dataSource}
-					entryOrId={options.displayButton.alternateEntryId ?? entry}
+					dataSource={displayButtonDataSourceValue}
+					entryOrId={alternateEntryId ?? entry}
 				/>
 			);
 		}

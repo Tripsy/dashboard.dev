@@ -9,12 +9,11 @@ import type {
 	ReloadEntryFnType,
 } from '@/types/action.type';
 import type {
-	FormValuesType,
 	GetFormStateFnType,
 	GetFormValuesFnType,
 	ValidateFormFnType,
 } from '@/types/form.type';
-import type { ActionButtonPropsType } from '@/types/html.type';
+import type { ButtonAppearanceType } from '@/types/html.type';
 
 export type WindowEntryType = Record<string, unknown>;
 export type WindowConfigPropsType = {
@@ -24,60 +23,55 @@ export type WindowConfigPropsType = {
 };
 export type WindowSectionType = 'dashboard' | 'public';
 export type WindowType<T extends EntriesSelectionType> = T extends 'free'
-	? 'form' | 'other'
+	? 'form' | 'other' | 'link'
 	: T extends 'single'
 		? 'view' | 'action' | 'other'
 		: T extends 'multiple'
 			? 'view' | 'action' | 'other'
 			: never;
 
-type AllowedDisplayEntryLabel<
-	T extends EntriesSelectionType,
-	Entry,
-> = T extends 'single' ? DisplayEntryLabelFnType<Entry> : never;
-
-export type WindowDefinition<
-	FormValues extends FormValuesType = FormValuesType,
-	Entry extends WindowEntryType = WindowEntryType,
-	T extends EntriesSelectionType = EntriesSelectionType,
-> = {
-	entriesSelection: T;
-	windowType?: WindowType<T>;
+export type WindowDefinition = {
+	entriesSelection: EntriesSelectionType;
+	windowType?: string;
 	windowTitle?: string;
 	windowComponent?: WindowComponent;
-	operationFunction?: OperationFunctionType<Entry, FormValues>;
-	button?: ActionButtonPropsType;
-	validateForm?: ValidateFormFnType<FormValues>;
-	getFormValues?: GetFormValuesFnType<FormValues>;
-	getFormState?: GetFormStateFnType<FormValues, Entry>;
-	displayEntryLabel?: AllowedDisplayEntryLabel<T, Entry>;
-	reloadEntry?: ReloadEntryFnType<Entry>;
-	prepareEntry?: PrepareEntryFnType<Entry>;
+	// biome-ignore lint/suspicious/noExplicitAny: It's fine
+	operationFunction?: OperationFunctionType<any, any>;
+	button?: ButtonAppearanceType;
+	// biome-ignore lint/suspicious/noExplicitAny: It's fine
+	validateForm?: ValidateFormFnType<any>;
+	// biome-ignore lint/suspicious/noExplicitAny: It's fine
+	getFormValues?: GetFormValuesFnType<any>;
+	// biome-ignore lint/suspicious/noExplicitAny: It's fine
+	getFormState?: GetFormStateFnType<any, any>;
+	// biome-ignore lint/suspicious/noExplicitAny: It's fine
+	displayEntryLabel?: DisplayEntryLabelFnType<any>;
+	// biome-ignore lint/suspicious/noExplicitAny: It's fine
+	reloadEntry?: ReloadEntryFnType<any>;
+	// biome-ignore lint/suspicious/noExplicitAny: It's fine
+	prepareEntry?: PrepareEntryFnType<any>;
 };
 
 // biome-ignore lint/suspicious/noExplicitAny: It's fine
 export type WindowComponent = React.ComponentType<any>;
 
-export type WindowConfig<
-	FormValues extends FormValuesType = FormValuesType,
-	Entry extends WindowEntryType = WindowEntryType,
-> = {
+export type WindowConfig = {
 	uid: string;
 	section: WindowSectionType;
 	dataSource: string;
 	action: string;
 	minimized: boolean;
-	definition: WindowDefinition<FormValues, Entry>;
+	definition: WindowDefinition;
 	data?: {
-		entries?: Entry[];
-		prefillEntry?: Partial<Entry>;
+		entries?: WindowEntryType[];
+		prefillEntry?: Partial<WindowEntryType>;
 	};
-	events?: Record<string, ActionEventType<Entry>>;
+	// biome-ignore lint/suspicious/noExplicitAny: It's fine
+	events?: Record<string, ActionEventType<any>>;
 	props?: WindowConfigPropsType;
 };
 
-export type WindowCreateConfig<
-	Entry extends WindowEntryType = WindowEntryType,
-> = Omit<WindowConfig<FormValuesType, Entry>, 'uid' | 'definition'> & {
+export type WindowCreateConfig = Omit<WindowConfig, 'uid' | 'definition'> & {
 	uid?: string;
+	definition?: Partial<WindowDefinition>;
 };

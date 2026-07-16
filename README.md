@@ -206,13 +206,14 @@ pnpm run build    # Production build
 
 # 📌 TODO
 
-1. order page ..glitch when moving to order without type (brand)
-2. dashboard stats
-3. monthly driver report 
+1. dashboard stats - drivers stats to do
+2. monthly driver report
+3. order page ..glitch when moving to order without type (brand)
 4. deploy
 
 ---------- 
 
+1. Hero UI -> components & CSS redo 
 1. Add section "documentation"
 2. login with google / facebook
 3. Replace all console.error with logging

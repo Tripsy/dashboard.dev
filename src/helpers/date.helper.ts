@@ -213,6 +213,100 @@ export function dateDiff(
 	}
 }
 
+interface TimeAgoOptions {
+	/**
+	 * Use "just now" for very recent times
+	 * @default true
+	 */
+	useJustNow?: boolean;
+
+	/**
+	 * Maximum precision level (e.g., 'minute' will show "2 minutes ago" but not "2 hours ago")
+	 */
+	maxPrecision?:
+		| 'second'
+		| 'minute'
+		| 'hour'
+		| 'day'
+		| 'week'
+		| 'month'
+		| 'year';
+
+	/**
+	 * Add suffix like "ago" or "from now"
+	 * @default 'ago'
+	 */
+	suffix?: string;
+
+	/**
+	 * Use "yesterday" for 1 day ago
+	 * @default false
+	 */
+	useYesterday?: boolean;
+}
+
+export function timeAgo(
+	date: string | Date,
+	options: TimeAgoOptions = {},
+): string {
+	const {
+		useJustNow = true,
+		maxPrecision = 'year',
+		suffix = 'ago',
+		useYesterday = false,
+	} = options;
+
+	const target = dayjs(date);
+
+	if (!target.isValid()) {
+		throw new Error('Invalid date argument provided for timeAgo');
+	}
+
+	const now = dayjs();
+	const diffInSeconds = now.diff(target, 'second');
+	const diffInMinutes = now.diff(target, 'minute');
+	const diffInHours = now.diff(target, 'hour');
+	const diffInDays = now.diff(target, 'day');
+
+	// Check for yesterday
+	if (useYesterday && diffInDays === 1) {
+		return 'yesterday';
+	}
+
+	// Check max precision
+	if (maxPrecision === 'second') {
+		if (diffInSeconds < 60) {
+			return useJustNow
+				? 'just now'
+				: `${diffInSeconds} second${diffInSeconds !== 1 ? 's' : ''} ${suffix}`;
+		}
+	}
+
+	if (maxPrecision === 'minute' || maxPrecision === 'second') {
+		if (diffInMinutes < 60) {
+			const value = Math.max(1, diffInMinutes);
+			return `${value} minute${value > 1 ? 's' : ''} ${suffix}`;
+		}
+	}
+
+	if (maxPrecision === 'hour' || maxPrecision === 'minute') {
+		if (diffInHours < 24) {
+			const value = Math.max(1, diffInHours);
+			return `${value} hour${value > 1 ? 's' : ''} ${suffix}`;
+		}
+	}
+
+	if (maxPrecision === 'day' || maxPrecision === 'hour') {
+		if (diffInDays < 7) {
+			const value = Math.max(1, diffInDays);
+			return `${value} day${value > 1 ? 's' : ''} ${suffix}`;
+		}
+	}
+
+	// For all other cases, use the simple version
+	return target.fromNow();
+}
+
 /**
  * Convert a local datetime string to UTC ISO string for sending to BE
  *

@@ -2,27 +2,30 @@ import {
 	ArrowUpRight,
 	BanknoteArrowDown,
 	DollarSign,
+	FileText,
 	Hourglass,
-	MoreHorizontal,
-	TrendingDown,
-	TrendingUp,
-	Truck,
 } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Card } from 'primereact/card';
+import { ActiveWorkSessions } from '@/app/(dashboard)/_components/stats/active-work-sessions';
+import { CountCMRs } from '@/app/(dashboard)/_components/stats/count-cmrs';
+import { CountWorkingHours } from '@/app/(dashboard)/_components/stats/count-working-hours';
+import { LatestCMRs } from '@/app/(dashboard)/_components/stats/latest-cmrs';
+import { RecentActivity } from '@/app/(dashboard)/_components/stats/recent-activity';
+import { SumExpenses } from '@/app/(dashboard)/_components/stats/sum-expenses';
+import { SumRevenues } from '@/app/(dashboard)/_components/stats/sum-revenues';
 import { Button } from '@/components/ui/button';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+// import {
+// 	DropdownMenu,
+// 	DropdownMenuContent,
+// 	DropdownMenuItem,
+// 	DropdownMenuTrigger,
+// } from '@/components/ui/dropdown-menu';
 import Routes from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
 import { translate } from '@/config/translate.setup';
-import { cn } from '@/helpers/css.helper';
 
 export async function generateMetadata(): Promise<Metadata> {
 	return {
@@ -32,194 +35,141 @@ export async function generateMetadata(): Promise<Metadata> {
 	};
 }
 
-const stats = [
-	{
-		id: 1,
-		title: 'CMRs',
-		value: '1,284',
-		change: '+12%',
-		trend: 'up',
-		icon: Truck,
-	},
-	{
-		id: 2,
-		title: 'Working Hours',
-		value: '892',
-		change: '+8%',
-		trend: 'up',
-		icon: Hourglass,
-	},
-	{
-		id: 3,
-		title: 'Expenses',
-		value: '24.5K',
-		change: '-3%',
-		trend: 'down',
-		icon: BanknoteArrowDown,
-	},
-	{
-		id: 4,
-		title: 'Revenues',
-		value: '$12,840',
-		change: '+18%',
-		trend: 'up',
-		icon: DollarSign,
-	},
-];
+function Stats({
+	box,
+}: {
+	box: 'cmr' | 'working-hours' | 'expenses' | 'revenues';
+}) {
+	const config = {
+		cmr: {
+			title: 'CMRs',
+			icon: FileText,
+			component: CountCMRs,
+		},
+		'working-hours': {
+			title: 'Working Hours',
+			icon: Hourglass,
+			component: CountWorkingHours,
+		},
+		expenses: {
+			title: 'Expenses',
+			icon: BanknoteArrowDown,
+			component: SumExpenses,
+		},
+		revenues: {
+			title: 'Revenues',
+			icon: DollarSign,
+			component: SumRevenues,
+		},
+	};
 
-const recentActivity = [
-	{
-		id: 1,
-		action: 'New entry created',
-		user: 'John Doe',
-		time: '2 minutes ago',
-	},
-	{
-		id: 2,
-		action: 'Entry updated',
-		user: 'Jane Smith',
-		time: '15 minutes ago',
-	},
-	{ id: 3, action: 'Comment added', user: 'Bob Johnson', time: '1 hour ago' },
-	{
-		id: 4,
-		action: 'Entry deleted',
-		user: 'Alice Williams',
-		time: '2 hours ago',
-	},
-	{
-		id: 5,
-		action: 'New user signup',
-		user: 'Charlie Brown',
-		time: '3 hours ago',
-	},
-];
+	const Icon = config[box].icon;
+	const StatsComponent = config[box].component;
 
-const topEntries = [
-	{ id: 1, title: 'Getting Started Guide', views: 1234, trend: 'up' },
-	{ id: 2, title: 'API Reference', views: 987, trend: 'up' },
-	{ id: 3, title: 'Best Practices', views: 756, trend: 'down' },
-	{ id: 4, title: 'Troubleshooting', views: 654, trend: 'up' },
-	{ id: 5, title: 'FAQ', views: 543, trend: 'down' },
-];
+	return (
+		<Card className="card-hover">
+			<CardHeader className="flex flex-row items-center justify-between pb-2">
+				<CardTitle className="text-sm font-medium text-muted-foreground">
+					{config[box].title}
+				</CardTitle>
+				<Icon className="h-4 w-4 text-muted-foreground" />
+			</CardHeader>
+			<CardContent>
+				<StatsComponent />
+			</CardContent>
+		</Card>
+	);
+}
+
+// function ChartSkeleton() {
+// 	const items = Array.from({ length: 12 }, (_, i) => ({
+// 		id: `chart-bar-${i}`,
+// 		height: Math.random() * 80 + 20,
+// 	}));
+//
+// 	return (
+// 		<>
+// 			<div className="h-64 flex items-end gap-2">
+// 				{items.map((v) => (
+// 					<Skeleton
+// 						key={v.id}
+// 						className="flex-1 rounded-t-md"
+// 						style={{ height: `${v.height}%` }}
+// 					/>
+// 				))}
+// 			</div>
+// 			<div className="flex justify-between mt-2">
+// 				{items.map((v) => (
+// 					<Skeleton key={v.id} className="h-3 w-8" />
+// 				))}
+// 			</div>
+// 		</>
+// 	);
+// }
+//
+// async function Chart() {
+// 	return (
+// 		<>
+// 			<div className="h-64 flex items-end gap-2">
+// 				{[40, 65, 45, 80, 55, 70, 90, 60, 75, 85, 50, 95].map(
+// 					(height) => (
+// 						<div
+// 							key={height}
+// 							className="flex-1 bg-primary/20 rounded-t-md transition-all hover:bg-primary/40"
+// 							style={{ height: `${height}%` }}
+// 						/>
+// 					),
+// 				)}
+// 			</div>
+// 			<div className="flex justify-between mt-2 text-xs text-muted-foreground">
+// 				<span>Jan</span>
+// 				<span>Feb</span>
+// 				<span>Mar</span>
+// 				<span>Apr</span>
+// 				<span>May</span>
+// 				<span>Jun</span>
+// 				<span>Jul</span>
+// 				<span>Aug</span>
+// 				<span>Sep</span>
+// 				<span>Oct</span>
+// 				<span>Nov</span>
+// 				<span>Dec</span>
+// 			</div>
+// 		</>
+// 	);
+// }
 
 export default async function Page() {
 	return (
 		<>
-			{/* Stats grid */}
+			{/* Stats with skeleton */}
 			<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-6">
-				{stats.map((stat) => (
-					<Card key={stat.id} className="card-hover">
-						<CardHeader className="flex flex-row items-center justify-between pb-2">
-							<CardTitle className="text-sm font-medium text-muted-foreground">
-								{stat.title}
-							</CardTitle>
-							<stat.icon className="h-4 w-4 text-muted-foreground" />
-						</CardHeader>
-						<CardContent>
-							<div className="text-2xl font-bold">
-								{stat.value}
-							</div>
-							<div
-								className={cn(
-									'flex items-center text-xs mt-1',
-									stat.trend === 'up'
-										? 'text-success'
-										: 'text-error',
-								)}
-							>
-								{stat.trend === 'up' ? (
-									<TrendingUp className="h-3 w-3 mr-1" />
-								) : (
-									<TrendingDown className="h-3 w-3 mr-1" />
-								)}
-								{stat.change} from last month
-							</div>
-						</CardContent>
-					</Card>
-				))}
+				<Stats box="cmr" />
+				<Stats box="working-hours" />
+				<Stats box="expenses" />
+				<Stats box="revenues" />
 			</div>
 
 			<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-				{/* Recent activity */}
-				<Card>
-					<CardHeader className="flex flex-row items-center justify-between">
-						<CardTitle>Recent Activity</CardTitle>
-						<Link href={Routes.get('log-history')}>
-							<Button variant="ghost" size="sm" className="gap-1">
-								View more <ArrowUpRight className="h-4 w-4" />
-							</Button>
-						</Link>
-					</CardHeader>
-					<CardContent>
-						<div className="space-y-4">
-							{recentActivity.map((activity) => (
-								<div
-									key={activity.id}
-									className="flex items-center justify-between py-2 border-b border-border last:border-0"
-								>
-									<div>
-										<p className="font-medium">
-											{activity.action}
-										</p>
-										<p className="text-sm text-muted-foreground">
-											by {activity.user}
-										</p>
-									</div>
-									<span className="text-sm text-muted-foreground">
-										{activity.time}
-									</span>
-								</div>
-							))}
-						</div>
-					</CardContent>
-				</Card>
-
 				<div className="space-y-6">
 					{/* Work Sessions */}
 					<Card>
 						<CardHeader className="flex flex-row items-center justify-between">
 							<CardTitle>Work Sessions</CardTitle>
-							<Link href="#">
-								<Button
-									variant="ghost"
-									size="sm"
-									className="gap-1"
-								>
-									View all{' '}
+							<Button
+								variant="ghost"
+								size="sm"
+								className="gap-1"
+								asChild
+							>
+								<Link href={Routes.get('work-session')}>
+									View more{' '}
 									<ArrowUpRight className="h-4 w-4" />
-								</Button>
-							</Link>
+								</Link>
+							</Button>
 						</CardHeader>
 						<CardContent>
-							<div className="space-y-4">
-								{topEntries.map((entry, i) => (
-									<div
-										key={entry.id}
-										className="flex items-center justify-between"
-									>
-										<div className="flex items-center gap-3">
-											<span className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-sm font-medium">
-												{i + 1}
-											</span>
-											<span className="font-medium">
-												{entry.title}
-											</span>
-										</div>
-										<div className="flex items-center gap-2">
-											<span className="text-sm text-muted-foreground">
-												{entry.views.toLocaleString()}{' '}
-												views
-											</span>
-											{entry.trend === 'up' ? (
-												<TrendingUp className="h-4 w-4 text-success" />
-											) : (
-												<TrendingDown className="h-4 w-4 text-error" />
-											)}
-										</div>
-									</div>
-								))}
-							</div>
+							<ActiveWorkSessions />
 						</CardContent>
 					</Card>
 
@@ -227,103 +177,73 @@ export default async function Page() {
 					<Card>
 						<CardHeader className="flex flex-row items-center justify-between">
 							<CardTitle>Latest CMRs</CardTitle>
-							<Link href="#">
-								<Button
-									variant="ghost"
-									size="sm"
-									className="gap-1"
-								>
-									View all{' '}
+							<Button
+								variant="ghost"
+								size="sm"
+								className="gap-1"
+								asChild
+							>
+								<Link href={Routes.get('cmr')}>
+									View more{' '}
 									<ArrowUpRight className="h-4 w-4" />
-								</Button>
-							</Link>
+								</Link>
+							</Button>
 						</CardHeader>
 						<CardContent>
-							<div className="space-y-4">
-								{topEntries.map((entry, i) => (
-									<div
-										key={entry.id}
-										className="flex items-center justify-between"
-									>
-										<div className="flex items-center gap-3">
-											<span className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-sm font-medium">
-												{i + 1}
-											</span>
-											<span className="font-medium">
-												{entry.title}
-											</span>
-										</div>
-										<div className="flex items-center gap-2">
-											<span className="text-sm text-muted-foreground">
-												{entry.views.toLocaleString()}{' '}
-												views
-											</span>
-											{entry.trend === 'up' ? (
-												<TrendingUp className="h-4 w-4 text-success" />
-											) : (
-												<TrendingDown className="h-4 w-4 text-error" />
-											)}
-										</div>
-									</div>
-								))}
-							</div>
+							<LatestCMRs />
 						</CardContent>
 					</Card>
 
-					{/* Chart placeholder */}
-					<Card>
-						<CardHeader className="flex flex-row items-center justify-between">
-							<CardTitle>Analytics Overview</CardTitle>
-							<DropdownMenu>
-								<DropdownMenuTrigger asChild>
-									<Button variant="ghost" className="h-8 w-8">
-										<MoreHorizontal className="h-4 w-4" />
-									</Button>
-								</DropdownMenuTrigger>
-								<DropdownMenuContent align="end">
-									<DropdownMenuItem>
-										Last 7 days
-									</DropdownMenuItem>
-									<DropdownMenuItem>
-										Last 30 days
-									</DropdownMenuItem>
-									<DropdownMenuItem>
-										Last 90 days
-									</DropdownMenuItem>
-								</DropdownMenuContent>
-							</DropdownMenu>
-						</CardHeader>
-						<CardContent>
-							{/* Placeholder chart visualization */}
-							<div className="h-64 flex items-end gap-2">
-								{[
-									40, 65, 45, 80, 55, 70, 90, 60, 75, 85, 50,
-									95,
-								].map((height) => (
-									<div
-										key={height}
-										className="flex-1 bg-primary/20 rounded-t-md transition-all hover:bg-primary/40"
-										style={{ height: `${height}%` }}
-									/>
-								))}
-							</div>
-							<div className="flex justify-between mt-2 text-xs text-muted-foreground">
-								<span>Jan</span>
-								<span>Feb</span>
-								<span>Mar</span>
-								<span>Apr</span>
-								<span>May</span>
-								<span>Jun</span>
-								<span>Jul</span>
-								<span>Aug</span>
-								<span>Sep</span>
-								<span>Oct</span>
-								<span>Nov</span>
-								<span>Dec</span>
-							</div>
-						</CardContent>
-					</Card>
+					{/* Chart */}
+					{/*<Card>*/}
+					{/*	<CardHeader className="flex flex-row items-center justify-between">*/}
+					{/*		<CardTitle>Analytics Overview</CardTitle>*/}
+					{/*		<DropdownMenu>*/}
+					{/*			<DropdownMenuTrigger asChild>*/}
+					{/*				<Button variant="ghost" className="h-8 w-8">*/}
+					{/*					<MoreHorizontal className="h-4 w-4" />*/}
+					{/*				</Button>*/}
+					{/*			</DropdownMenuTrigger>*/}
+					{/*			<DropdownMenuContent align="end">*/}
+					{/*				<DropdownMenuItem>*/}
+					{/*					Last 7 days*/}
+					{/*				</DropdownMenuItem>*/}
+					{/*				<DropdownMenuItem>*/}
+					{/*					Last 30 days*/}
+					{/*				</DropdownMenuItem>*/}
+					{/*				<DropdownMenuItem>*/}
+					{/*					Last 90 days*/}
+					{/*				</DropdownMenuItem>*/}
+					{/*			</DropdownMenuContent>*/}
+					{/*		</DropdownMenu>*/}
+					{/*	</CardHeader>*/}
+					{/*	<CardContent>*/}
+					{/*		<Suspense fallback={<ChartSkeleton />}>*/}
+					{/*			<Chart />*/}
+					{/*		</Suspense>*/}
+					{/*	</CardContent>*/}
+					{/*</Card>*/}
 				</div>
+
+				{/* Recent activity */}
+				<Card>
+					<CardHeader className="flex flex-row items-center justify-between">
+						<CardTitle>Recent Activity</CardTitle>
+						<Button
+							variant="ghost"
+							size="sm"
+							className="gap-1"
+							asChild
+						>
+							<Link href={Routes.get('log-history')}>
+								View more <ArrowUpRight className="h-4 w-4" />
+							</Link>
+						</Button>
+					</CardHeader>
+					<CardContent>
+						<RecentActivity />
+					</CardContent>
+				</Card>
 			</div>
 		</>
 	);

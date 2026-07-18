@@ -1,6 +1,5 @@
 import type React from 'react';
 import type { JSX } from 'react';
-import type { ModalSizeType } from '@/components/ui/modal';
 import type { AuthModel } from '@/models/auth.model';
 import type {
 	PermissionEntityType,
@@ -27,6 +26,7 @@ import type {
 	ValidateFormFnType,
 } from '@/types/form.type';
 import type { ButtonAppearanceType } from '@/types/html.type';
+import type { WindowConfigPropsType } from '@/types/window.type';
 
 export const DataSourceSectionEnum = {
 	DASHBOARD: 'dashboard',
@@ -105,11 +105,7 @@ type ActionConfigBase<Entry, FormValues extends FormValuesType> = {
 	// biome-ignore lint/suspicious/noExplicitAny: It's fine
 	windowComponent?: React.ComponentType<any>; // e.g: ViewUser, FormManageUser, SetupUserPermissions, etc.
 	windowTarget?: string; // Used for `link` windowType
-	windowConfigProps?: {
-		title?: string;
-		size?: ModalSizeType;
-		className?: string;
-	};
+	windowConfigProps?: WindowConfigPropsType;
 
 	permission: ActionConfigPermission;
 	customEntryCheck?: (entry: Entry) => boolean; // Additional function to check if the action is available (hint: active user cannot have `active` action)

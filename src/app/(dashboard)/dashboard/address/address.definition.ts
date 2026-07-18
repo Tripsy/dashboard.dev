@@ -265,6 +265,10 @@ export default async function dataSourceConfig(): Promise<
 				windowType: 'view',
 				windowTitle: translations['view.title'],
 				windowComponent: ViewAddress,
+				windowConfigProps: {
+					closeOnBackdrop: true,
+					closeOnEscape: true,
+				},
 				permission: ['address', 'read'],
 				entriesSelection: 'single',
 				buttonPosition: 'hidden',

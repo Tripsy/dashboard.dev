@@ -689,6 +689,8 @@ export default async function dataSourceConfig(): Promise<
 				windowComponent: ViewCmr,
 				windowConfigProps: {
 					size: 'xl',
+					closeOnBackdrop: true,
+					closeOnEscape: true,
 				},
 				permission: ['cmr', 'read'],
 				entriesSelection: 'single',

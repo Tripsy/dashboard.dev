@@ -469,6 +469,8 @@ export default async function dataSourceConfig(): Promise<
 				windowComponent: ViewClient,
 				windowConfigProps: {
 					size: 'x4l',
+					closeOnBackdrop: true,
+					closeOnEscape: true,
 				},
 				permission: ['client', 'read'],
 				entriesSelection: 'single',

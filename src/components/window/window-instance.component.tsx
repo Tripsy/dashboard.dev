@@ -169,6 +169,8 @@ export function WindowInstance({
 			title={modalTitle}
 			onClose={handleClose}
 			onMinimize={handleMinimize}
+			closeOnBackdrop={windowProps?.closeOnBackdrop ?? false}
+			closeOnEscape={windowProps?.closeOnEscape ?? false}
 		>
 			{isEntryLoading && definition.reloadEntry ? (
 				<LoadingComponent />

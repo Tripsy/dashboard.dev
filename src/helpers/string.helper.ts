@@ -293,3 +293,12 @@ export function formatMime(mime?: ImageMime): string {
 
 	return mime.replace('image/', '').toUpperCase();
 }
+
+/**
+ * Formats a number with a sign
+ *
+ * @param num
+ */
+export function numberWithSign(num: number) {
+	return num > 0 ? `+${num}` : `${num}`;
+}

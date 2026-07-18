@@ -206,13 +206,14 @@ pnpm run build    # Production build
 
 # 📌 TODO
 
-2. For window-component form / action it should allow close only from button, clicking outside should trigger a confirmation
+1. dashboard stats - drivers stats to do
+2. monthly driver report
 3. order page ..glitch when moving to order without type (brand)
-4. dashboard stats
-5. monthly driver report 
-6. deploy
+4. deploy
 
 ---------- 
+
+1. Hero UI -> components & CSS redo 
 1. Add section "documentation"
 2. login with google / facebook
 3. Replace all console.error with logging

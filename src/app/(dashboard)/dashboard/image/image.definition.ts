@@ -254,6 +254,8 @@ export default async function dataSourceConfig(): Promise<
 				windowComponent: ViewImage,
 				windowConfigProps: {
 					size: 'xl',
+					closeOnBackdrop: true,
+					closeOnEscape: true,
 				},
 				permission: ['image', 'read'],
 				entriesSelection: 'single',

@@ -20,6 +20,8 @@ export type WindowConfigPropsType = {
 	title?: string;
 	size?: ModalSizeType;
 	className?: string;
+	closeOnBackdrop?: boolean;
+	closeOnEscape?: boolean;
 };
 export type WindowSectionType = 'dashboard' | 'public';
 export type WindowType<T extends EntriesSelectionType> = T extends 'free'

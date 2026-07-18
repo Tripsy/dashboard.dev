@@ -154,6 +154,8 @@ export default async function dataSourceConfig(): Promise<
 				windowComponent: ViewMailQueue,
 				windowConfigProps: {
 					size: 'x4l',
+					closeOnBackdrop: true,
+					closeOnEscape: true,
 				},
 				permission: ['mail-queue', 'read'],
 				entriesSelection: 'single',

@@ -123,6 +123,8 @@ export default async function dataSourceConfig(): Promise<
 				windowComponent: ViewLogData,
 				windowConfigProps: {
 					size: 'x3l',
+					closeOnBackdrop: true,
+					closeOnEscape: true,
 				},
 				permission: ['log-data', 'read'],
 				entriesSelection: 'single',

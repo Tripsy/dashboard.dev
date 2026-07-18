@@ -122,6 +122,8 @@ export default async function dataSourceConfig(): Promise<
 				windowComponent: ViewCronHistory,
 				windowConfigProps: {
 					size: 'x2l',
+					closeOnBackdrop: true,
+					closeOnEscape: true,
 				},
 				permission: ['cron-history', 'read'],
 				entriesSelection: 'single',

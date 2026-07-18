@@ -24,7 +24,15 @@ export const LogHistoryEntities = [
 	'work-session',
 	'work-session-vehicle',
 ];
-export const LogHistoryActions = ['created', 'updated', 'deleted'];
+export const LogHistoryActions = [
+	'created',
+	'updated',
+	'deleted',
+	'removed',
+	'restored',
+	'status',
+	'password_change',
+];
 
 export type LogHistoryModel<D = Date | string> = {
 	id: number;
@@ -43,3 +51,14 @@ export type LogHistoryModel<D = Date | string> = {
 
 	details?: Record<string, unknown>;
 };
+
+export function logHistoryActionMeaning(action: string) {
+	switch (action) {
+		case 'status':
+			return 'status updated';
+		case 'password_change':
+			return 'password changed';
+		default:
+			return action;
+	}
+}

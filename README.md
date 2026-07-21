@@ -227,6 +227,7 @@ pnpm run build    # Production build
     - view presentation could be enhanced
 6. https://nextjs.org/docs/app/getting-started/partial-prerendering
 7. https://react.dev/learn/react-compiler/introduction
+8. Consider unifying the two form-submission patterns (dashboard `WindowForm`/`<entity>.definition.ts` vs public account `<flow>.action.ts` + `FormCsrf`) — currently split because they grew out of separate sections (dashboard CRUD vs public auth), not by design
 
 # 🔗 Dependencies
 

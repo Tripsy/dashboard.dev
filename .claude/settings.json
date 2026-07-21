@@ -1,0 +1,22 @@
+{
+  "env": {
+    "DOCKER_CONTAINER": "dashboard.test",
+    "USER_NAME": "David Gabriel"
+  },
+  "permissions": {
+    "additionalDirectories": [
+      "../star-backend",
+      "../shared",
+      "../nready.dev"
+    ],
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git commit:*)",
+      "Bash(docker exec $DOCKER_CONTAINER pnpm run biome)",
+      "Bash(docker exec $DOCKER_CONTAINER pnpm run madge)",
+      "WebSearch"
+    ]
+  }
+}

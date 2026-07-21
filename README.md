@@ -25,7 +25,7 @@ Meanwhile, we're open to suggestions / feedback, and if you find this project us
 - Language: TypeScript 5.9
 - Runtime Environment: Node.js 22
 - Runtime: React 19.2
-- Framework: Next.js 16.1
+- Framework: Next.js 16.2
 
 ## Code Quality
 - Linting & Formatting: Biome

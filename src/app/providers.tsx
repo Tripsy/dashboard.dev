@@ -1,6 +1,7 @@
 import { headers } from 'next/headers';
 import type React from 'react';
 import type { AuthModel } from '@/models/auth.model';
+import { AriaRouterProvider } from '@/providers/aria-router.provider';
 import { AuthProvider } from '@/providers/auth.provider';
 import { PrimeProvider } from '@/providers/prime.provider';
 import { QueryProvider } from '@/providers/query-client.provider';
@@ -25,7 +26,7 @@ export async function Providers({ children }: { children: React.ReactNode }) {
 				<ToastProvider>
 					<QueryProvider>
 						<AuthProvider initAuth={initAuth}>
-							{children}
+							<AriaRouterProvider>{children}</AriaRouterProvider>
 						</AuthProvider>
 					</QueryProvider>
 				</ToastProvider>

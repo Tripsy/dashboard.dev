@@ -1,5 +1,6 @@
 'use client';
 
+import { Dropdown } from '@heroui/react';
 import {
 	ChevronDown,
 	KeyRound,
@@ -12,15 +13,12 @@ import {
 import Link from 'next/link';
 import { LoadingIcon } from '@/components/status.component';
 import { Button } from '@/components/ui/button';
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import Routes from '@/config/routes.setup';
 import { useAuth } from '@/providers/auth.provider';
+
+const triggerClass =
+	'flex items-center gap-2 h-10 px-2 rounded-md hover:bg-surface-secondary';
+const itemClass = 'flex items-center gap-2';
 
 export function UserMenu() {
 	const { auth, authStatus } = useAuth();
@@ -59,96 +57,76 @@ export function UserMenu() {
 				</div>
 
 				{/* Mobile version */}
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild className="sm:hidden">
-						<Button
-							variant="ghost"
-							className="flex items-center gap-2 h-10 px-2"
-						>
-							<User className="h-4 w-4" />
-						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end" className="w-48">
-						<DropdownMenuItem>
-							<Link
+				<Dropdown>
+					<Dropdown.Trigger className={`sm:hidden ${triggerClass}`}>
+						<User className="h-4 w-4" />
+					</Dropdown.Trigger>
+					<Dropdown.Popover placement="bottom end" className="w-48">
+						<Dropdown.Menu>
+							<Dropdown.Item
+								id={Routes.get('login')}
 								href={Routes.get('login')}
-								className="flex items-center gap-2"
-								title="Sign in"
+								textValue="Login"
+								className={itemClass}
 							>
-								<KeyRound className="h-4 w-4" />
-								Login
-							</Link>
-						</DropdownMenuItem>
-						<DropdownMenuSeparator />
-						<DropdownMenuItem>
-							<Link
+								<KeyRound className="h-4 w-4" /> Login
+							</Dropdown.Item>
+							<Dropdown.Item
+								id={Routes.get('register')}
 								href={Routes.get('register')}
-								className="flex items-center gap-2"
-								title="Create an account"
+								textValue="Sign Up"
+								className={itemClass}
 							>
-								<UserPlus className="h-4 w-4" />
-								Sign Up
-							</Link>
-						</DropdownMenuItem>
-					</DropdownMenuContent>
-				</DropdownMenu>
+								<UserPlus className="h-4 w-4" /> Sign Up
+							</Dropdown.Item>
+						</Dropdown.Menu>
+					</Dropdown.Popover>
+				</Dropdown>
 			</>
 		);
 	}
 
 	if (authStatus === 'authenticated' && auth) {
 		return (
-			<DropdownMenu>
-				<DropdownMenuTrigger asChild>
-					<Button
-						variant="ghost"
-						className="flex items-center gap-2 h-10 px-2"
-					>
-						<div className="h-8 w-8 bg-accent text-accent-foreground text-sm shrink-0 overflow-hidden flex items-center justify-center rounded-full">
-							{auth.name.charAt(0).toUpperCase()}
-						</div>
-						<span className="text-sm font-medium hidden sm:inline-block">
-							{auth.name}
-						</span>
-						<ChevronDown className="h-4 w-4 text-muted" />
-					</Button>
-				</DropdownMenuTrigger>
-				<DropdownMenuContent align="end" className="w-48">
-					<DropdownMenuItem asChild>
-						<Link
+			<Dropdown>
+				<Dropdown.Trigger className={triggerClass}>
+					<div className="h-8 w-8 bg-accent text-accent-foreground text-sm shrink-0 overflow-hidden flex items-center justify-center rounded-full">
+						{auth.name.charAt(0).toUpperCase()}
+					</div>
+					<span className="text-sm font-medium hidden sm:inline-block">
+						{auth.name}
+					</span>
+					<ChevronDown className="h-4 w-4 text-muted" />
+				</Dropdown.Trigger>
+				<Dropdown.Popover placement="bottom end" className="w-48">
+					<Dropdown.Menu>
+						<Dropdown.Item
+							id={Routes.get('account-me')}
 							href={Routes.get('account-me')}
-							className="flex items-center gap-2"
-							title="My account"
+							textValue="My account"
+							className={itemClass}
 						>
-							<User className="h-4 w-4" />
-							My account
-						</Link>
-					</DropdownMenuItem>
-					<DropdownMenuSeparator />
-					<DropdownMenuItem asChild>
-						<Link
+							<User className="h-4 w-4" /> My account
+						</Dropdown.Item>
+						<Dropdown.Item
+							id={Routes.get('dashboard')}
 							href={Routes.get('dashboard')}
-							className="flex items-center gap-2"
-							title="Go to administration"
+							textValue="Dashboard"
+							className={itemClass}
 						>
-							<LayoutDashboard className="h-4 w-4" />
-							Dashboard
-						</Link>
-					</DropdownMenuItem>
-					<DropdownMenuSeparator />
-					<DropdownMenuItem asChild className="text-danger">
-						<Link
+							<LayoutDashboard className="h-4 w-4" /> Dashboard
+						</Dropdown.Item>
+						<Dropdown.Item
+							id={Routes.get('logout')}
 							href={Routes.get('logout')}
-							className="flex items-center gap-2"
-							prefetch={false}
-							title="Sign out"
+							textValue="Logout"
+							className={`${itemClass} text-danger`}
 						>
-							<LogOut className="h-4 w-4" />
-							Logout
-						</Link>
-					</DropdownMenuItem>
-				</DropdownMenuContent>
-			</DropdownMenu>
+							<LogOut className="h-4 w-4" /> Logout
+						</Dropdown.Item>
+					</Dropdown.Menu>
+				</Dropdown.Popover>
+			</Dropdown>
 		);
 	}
 }

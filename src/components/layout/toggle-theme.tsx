@@ -1,21 +1,26 @@
 'use client';
 
 import { Moon, Sun } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { useTheme } from '@/providers/theme.provider';
 
 export function ToggleTheme() {
-	const { toggleTheme } = useTheme();
+	const { theme, toggleTheme } = useTheme();
+	const isDark = theme === 'dark';
 
 	return (
-		<Button
-			variant="ghost"
-			onClick={toggleTheme}
-			className="relative h-10 w-10 rounded-full"
+		<Switch
+			size="lg"
+			isSelected={isDark}
+			onChange={toggleTheme}
 			aria-label="Toggle theme"
-		>
-			<Sun className="absolute h-5 w-5 rotate-0 scale-100 origin-center transition-all duration-300 ease-in-out dark:-rotate-90 dark:scale-0" />
-			<Moon className="absolute h-5 w-5 rotate-90 scale-0 origin-center transition-all duration-300 ease-in-out dark:rotate-0 dark:scale-100" />
-		</Button>
+			thumbIcon={
+				isDark ? (
+					<Moon className="h-3.5 w-3.5" />
+				) : (
+					<Sun className="h-3.5 w-3.5" />
+				)
+			}
+		/>
 	);
 }

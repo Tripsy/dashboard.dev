@@ -77,7 +77,7 @@ export const statusList: Record<
 		icon: Icons.Status.Expired,
 	},
 	requires_action: {
-		variant: 'info',
+		variant: 'default',
 		icon: Icons.Status.RequiresAction,
 	},
 	verified: {
@@ -97,7 +97,7 @@ export const statusList: Record<
 		icon: Icons.Status.Damaged,
 	},
 	sold: {
-		variant: 'info',
+		variant: 'default',
 		icon: Icons.Status.Sold,
 	},
 	scrapped: {
@@ -109,7 +109,7 @@ export const statusList: Record<
 		icon: Icons.Status.Closed,
 	},
 	assigned: {
-		variant: 'info',
+		variant: 'default',
 		icon: Icons.Status.Assigned,
 	},
 	returned: {
@@ -121,11 +121,11 @@ export const statusList: Record<
 		icon: Icons.Status.Ordered,
 	},
 	preparing: {
-		variant: 'info',
+		variant: 'default',
 		icon: Icons.Status.Preparing,
 	},
 	transit: {
-		variant: 'info',
+		variant: 'default',
 		icon: Icons.Status.Transit,
 	},
 	delivered: {
@@ -205,7 +205,7 @@ export const DisplayDeleted = ({
 export function DisplayAmount({
 	amount,
 	currencyCode,
-	classNameNegative = 'text-error dark:text-warning',
+	classNameNegative = 'text-danger dark:text-warning',
 	classNamePositive,
 }: {
 	amount: number;

@@ -230,7 +230,7 @@ export default async function dataSourceConfig(): Promise<
 				buttonPosition: 'left',
 				button: {
 					variant: 'outline',
-					hover: 'info',
+					hover: 'default',
 				},
 			},
 			disable: {

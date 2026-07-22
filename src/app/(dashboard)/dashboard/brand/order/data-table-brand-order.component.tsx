@@ -64,7 +64,7 @@ const SortableBrandItem = ({ brand }: SortableBrandItemProps): JSX.Element => {
 
 	return (
 		<li ref={setNodeRef} style={style} {...attributes}>
-			<div className="flex items-center gap-2 bg-secondary p-2">
+			<div className="flex items-center gap-2 bg-default p-2">
 				<span
 					{...listeners}
 					className="cursor-row-resize flex-1 select-none touch-none"
@@ -223,7 +223,7 @@ const DataTableBrandOrderContent = (): JSX.Element => {
 				</Button>
 				<Button
 					variant="outline"
-					hover="info"
+					hover="default"
 					onClick={handleUpdateOrder}
 					title="Update"
 					disabled={loading}

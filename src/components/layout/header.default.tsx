@@ -146,8 +146,8 @@ export function Header({
 								className={cn(
 									'px-4 py-2 text-sm font-medium rounded-md transition-colors',
 									isActive(link.href)
-										? 'bg-accent text-accent-foreground'
-										: 'text-muted-foreground hover:text-foreground hover:bg-muted',
+										? 'bg-accent-soft text-accent-soft-foreground'
+										: 'text-muted hover:text-foreground hover:bg-surface-secondary',
 								)}
 							>
 								{link.label}
@@ -191,8 +191,8 @@ export function Header({
 									className={cn(
 										'px-4 py-3 text-sm font-medium rounded-md transition-colors',
 										isActive(link.href)
-											? 'bg-accent text-accent-foreground'
-											: 'text-muted-foreground hover:text-foreground hover:bg-muted',
+											? 'bg-accent-soft text-accent-soft-foreground'
+											: 'text-muted hover:text-foreground hover:bg-surface-secondary',
 									)}
 								>
 									{link.label}

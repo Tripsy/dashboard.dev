@@ -43,7 +43,7 @@ function ViewCashFlowRefunds({ refunds }: { refunds: CashFlowModel[] }) {
 					{refunds.map((r) => (
 						<tr
 							key={`refund-${r.id}`}
-							className="border-t border-line hover:bg-muted/30"
+							className="border-t border-line hover:bg-surface-secondary/30"
 						>
 							<td className="py-2 px-3">#{r.id}</td>
 							<td className="py-2 px-3">
@@ -92,7 +92,7 @@ function ViewCashFlowOperationalRecords({
 					{operationalRecords.map((m) => (
 						<tr
 							key={`operational-record-${m.id}`}
-							className="border-t border-line hover:bg-muted/30"
+							className="border-t border-line hover:bg-surface-secondary/30"
 						>
 							<td className="py-2 px-3">#{m.id}</td>
 							<td className="py-2 px-3">
@@ -200,7 +200,7 @@ export function ViewCashFlow({ entry }: { entry: CashFlowModel }) {
 					{entry.deleted_at && (
 						<div>
 							<span className="font-semibold">Deleted At</span>{' '}
-							<span className="text-error">
+							<span className="text-danger">
 								{formatDate(entry.deleted_at, 'date-time')}
 							</span>
 						</div>

@@ -16,10 +16,10 @@ export function FormWrapperComponent({
 			<div className="w-full max-w-md">
 				<div className="text-center mb-8">
 					<h1 className="text-2xl font-bold mb-2">{title}</h1>
-					<p className="text-muted-foreground">{description}</p>
+					<p className="text-muted">{description}</p>
 				</div>
 
-				<div className="bg-card border border-border rounded-xl p-6 shadow-xl">
+				<div className="bg-surface border border-border rounded-xl p-6 shadow-xl">
 					{children}
 				</div>
 			</div>

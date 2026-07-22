@@ -58,8 +58,8 @@ export function DriverPanelSessionCashFlow({
 	return (
 		<>
 			<div className="mb-4">
-				<div className="flex items-center gap-4 bg-card border border-border rounded-lg p-4">
-					<div className="font-semibold py-2 px-4 bg-muted-foreground/20 rounded-lg">
+				<div className="flex items-center gap-4 bg-surface border border-border rounded-lg p-4">
+					<div className="font-semibold py-2 px-4 bg-surface-secondary/20 rounded-lg">
 						Balance
 					</div>
 					<div className="flex gap-6 font-semibold">
@@ -81,7 +81,7 @@ export function DriverPanelSessionCashFlow({
 				{entries.map((m) => (
 					<div
 						key={m.id}
-						className="bg-card border border-border rounded-lg p-4"
+						className="bg-surface border border-border rounded-lg p-4"
 					>
 						<DriverPanelSessionCashFlowEntry
 							entry={m}
@@ -171,12 +171,12 @@ function DriverPanelSessionCashFlowEntry({
 	return (
 		<div className="flex justify-between">
 			<div className="flex flex-col justify-between items-start self-stretch gap-2">
-				<h3 className="font-semibold text-card-foreground flex items-center gap-4">
+				<h3 className="font-semibold text-surface-foreground flex items-center gap-4">
 					<div className="flex items-center gap-1">
 						{entry.direction === CashFlowDirectionEnum.IN ? (
 							<Icons.Direction.ArrowRight className="h-4 w-4 text-success" />
 						) : (
-							<Icons.Direction.ArrowLeft className="h-4 w-4 text-error dark:text-warning" />
+							<Icons.Direction.ArrowLeft className="h-4 w-4 text-danger dark:text-warning" />
 						)}
 						{formatEnumLabel(entry.method)} #{entry.id}
 					</div>
@@ -189,7 +189,7 @@ function DriverPanelSessionCashFlowEntry({
 				</h3>
 				{entry.operational_records?.client && (
 					<div>
-						<span className="text-muted-foreground">Client:</span>
+						<span className="text-muted">Client:</span>
 						<span className="ml-2 font-mono">
 							{displayClientLabel(
 								entry.operational_records.client,
@@ -198,7 +198,7 @@ function DriverPanelSessionCashFlowEntry({
 					</div>
 				)}
 				<div>
-					<span className="text-muted-foreground">Amount:</span>
+					<span className="text-muted">Amount:</span>
 					<span className="ml-2 font-mono">
 						<DisplayAmount
 							amount={entry.grossAmount}
@@ -209,9 +209,7 @@ function DriverPanelSessionCashFlowEntry({
 				</div>
 				{entry.external_reference && (
 					<div>
-						<span className="text-muted-foreground">
-							Reference:
-						</span>
+						<span className="text-muted">Reference:</span>
 						<span className="ml-2 font-mono">
 							{entry.external_reference}
 						</span>
@@ -219,7 +217,7 @@ function DriverPanelSessionCashFlowEntry({
 				)}
 				{entry.operational_records?.vendor && (
 					<div>
-						<span className="text-muted-foreground">Vendor:</span>
+						<span className="text-muted">Vendor:</span>
 						<span className="ml-2 font-mono">
 							{displayVendorLabel(
 								entry.operational_records.vendor,
@@ -229,7 +227,7 @@ function DriverPanelSessionCashFlowEntry({
 				)}
 				{entry.notes && (
 					<div>
-						<span className="text-muted-foreground">Notes:</span>
+						<span className="text-muted">Notes:</span>
 						<span className="ml-2 font-mono">{entry.notes}</span>
 					</div>
 				)}
@@ -239,7 +237,7 @@ function DriverPanelSessionCashFlowEntry({
 				{entry.status === CashFlowStatusEnum.PENDING && (
 					<Button
 						variant="secondary"
-						hover="info"
+						hover="default"
 						onClick={() => handleUpdateCashFlow(entry)}
 						className="cursor-pointer"
 						title="Update payment"
@@ -252,7 +250,7 @@ function DriverPanelSessionCashFlowEntry({
 						<>
 							<Button
 								variant="secondary"
-								hover="info"
+								hover="default"
 								onClick={() => handleCompleteCashFlow(entry)}
 								className="cursor-pointer"
 								title="Mark as complete"

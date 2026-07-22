@@ -202,7 +202,7 @@ export function DriverPanel() {
 							</div>
 
 							{!hasAssignedAuto && (
-								<div className="text-destructive py-2">
+								<div className="text-danger py-2">
 									<Icons.Status.Warning className="inline-block" />{' '}
 									No assigned auto vehicles found
 								</div>
@@ -236,9 +236,9 @@ export function DriverPanel() {
 											}
 										/>
 									) : (
-										<div className="text-center py-8 px-4 bg-muted rounded-lg border border-border">
-											<Icons.Vehicle className="mx-auto h-12 w-12 text-muted-foreground" />
-											<p className="mt-2 text-sm text-muted-foreground">
+										<div className="text-center py-8 px-4 bg-surface-secondary rounded-lg border border-border">
+											<Icons.Vehicle className="mx-auto h-12 w-12 text-muted" />
+											<p className="mt-2 text-sm text-muted">
 												There are no vehicles assigned
 												to current session
 											</p>
@@ -265,9 +265,9 @@ export function DriverPanel() {
 											sessionCmrs={workSessionCmrs}
 										/>
 									) : (
-										<div className="text-center py-8 px-4 bg-muted rounded-lg border border-border">
-											<Icons.Cmr className="mx-auto h-12 w-12 text-muted-foreground" />
-											<p className="mt-2 text-sm text-muted-foreground">
+										<div className="text-center py-8 px-4 bg-surface-secondary rounded-lg border border-border">
+											<Icons.Cmr className="mx-auto h-12 w-12 text-muted" />
+											<p className="mt-2 text-sm text-muted">
 												There are no CMRs assigned to
 												current session
 											</p>
@@ -288,9 +288,9 @@ export function DriverPanel() {
 						</div>
 					) : (
 						<div>
-							<div className="text-center py-8 px-4 bg-muted rounded-lg border border-border">
-								<Icons.WorkSession className="mx-auto h-12 w-12 text-muted-foreground" />
-								<p className="mt-2 text-sm text-muted-foreground">
+							<div className="text-center py-8 px-4 bg-surface-secondary rounded-lg border border-border">
+								<Icons.WorkSession className="mx-auto h-12 w-12 text-muted" />
+								<p className="mt-2 text-sm text-muted">
 									There is no work session active at the
 									moment!
 								</p>

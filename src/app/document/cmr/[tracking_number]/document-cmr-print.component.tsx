@@ -85,7 +85,7 @@ export function DocumentCmrPrint({
 				// Sign trigger — lives outside the printable area
 				<div className="no-print fixed top-2 left-2 z-20">
 					<Button
-						variant="info"
+						variant="default"
 						onClick={() => handleInitSignature()}
 					>
 						<Icons.Sign />

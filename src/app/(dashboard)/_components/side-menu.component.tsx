@@ -377,7 +377,7 @@ export function SideMenu() {
 							<p className="text-sm font-medium text-sidebar-accent-foreground mb-1">
 								Need help?
 							</p>
-							<p className="text-xs text-muted-foreground mb-3">
+							<p className="text-xs text-muted mb-3">
 								Check our documentation for guidance.
 							</p>
 							<Button

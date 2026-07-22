@@ -48,8 +48,8 @@ export function DriverPanelAvailableCmrs() {
 	return (
 		<div className="space-y-4">
 			{cmrs.length === 0 ? (
-				<div className="text-center py-8 px-4 bg-muted rounded-lg border border-border">
-					<p className="text-sm text-muted-foreground">
+				<div className="text-center py-8 px-4 bg-surface-secondary rounded-lg border border-border">
+					<p className="text-sm text-muted">
 						No CMRs for this session yet
 					</p>
 				</div>
@@ -57,7 +57,7 @@ export function DriverPanelAvailableCmrs() {
 				cmrs.map((cmr) => (
 					<div
 						key={cmr.id}
-						className="bg-card border border-border rounded-lg p-4"
+						className="bg-surface border border-border rounded-lg p-4"
 					>
 						<DriverPanelAvailableCmrEntry cmr={cmr} />
 					</div>
@@ -112,14 +112,14 @@ function DriverPanelAvailableCmrEntry({ cmr }: { cmr: CmrModel }) {
 		<div className="flex justify-between">
 			<div className="flex flex-col justify-between items-start self-stretch gap-2">
 				<h3 className="flex items-center gap-4">
-					<div className="font-semibold text-card-foreground ">
+					<div className="font-semibold text-surface-foreground ">
 						CMR#{cmr.id}
 					</div>
 					<DisplayStatus status={cmr.status} dataSource="cmr" />
 
 					{activeSession && activeSessionVehicleAuto && (
 						<Button
-							variant="info"
+							variant="default"
 							onClick={() =>
 								handleAssignCmr(
 									cmr,
@@ -136,23 +136,23 @@ function DriverPanelAvailableCmrEntry({ cmr }: { cmr: CmrModel }) {
 					)}
 				</h3>
 				<div className="flex items-center">
-					<span className="text-muted-foreground">Notes:</span>
+					<span className="text-muted">Notes:</span>
 					<span className="ml-2 font-mono">{cmr.notes}</span>
 				</div>
 				<div className="flex">
-					<div className="text-muted-foreground">Transport:</div>
+					<div className="text-muted">Transport:</div>
 					<div className="ml-4 font-mono">
 						{formatEnumLabel(cmr.transport_type)}
 					</div>
 				</div>
 				<div>
-					<span className="text-muted-foreground">Client:</span>
+					<span className="text-muted">Client:</span>
 					<span className="ml-2 font-mono">
 						{displayClientLabel(cmr.client)}
 					</span>
 				</div>
 				<div>
-					<span className="text-muted-foreground">Contact:</span>
+					<span className="text-muted">Contact:</span>
 					<span className="ml-2 font-mono flex gap-2">
 						{cmr.contact_name}
 						<a href={`tel:${cmr.contact_phone}`}>
@@ -161,7 +161,7 @@ function DriverPanelAvailableCmrEntry({ cmr }: { cmr: CmrModel }) {
 					</span>
 				</div>
 				<div className="flex items-center">
-					<span className="text-muted-foreground">Ordered at:</span>
+					<span className="text-muted">Ordered at:</span>
 					<span className="ml-2 font-mono">
 						{formatDate(cmr.ordered_at, undefined, {
 							customFormat: 'D MMMM, HH:mm',
@@ -170,9 +170,7 @@ function DriverPanelAvailableCmrEntry({ cmr }: { cmr: CmrModel }) {
 				</div>
 				{cmr.status === CmrStatusEnum.ORDERED && (
 					<div className="flex items-center">
-						<span className="text-muted-foreground">
-							Pick scheduled at:
-						</span>
+						<span className="text-muted">Pick scheduled at:</span>
 						<span className="ml-2 font-mono">
 							{formatDate(cmr.pick_scheduled_at, undefined, {
 								customFormat: 'D MMMM, HH:mm',
@@ -182,7 +180,7 @@ function DriverPanelAvailableCmrEntry({ cmr }: { cmr: CmrModel }) {
 				)}
 				{cmr.status === CmrStatusEnum.ORDERED && (
 					<div className="flex flex-col">
-						<div className="text-muted-foreground flex items-center gap-2">
+						<div className="text-muted flex items-center gap-2">
 							Pickup address:
 							<LocationNavigator address={pickupAddress} />
 						</div>
@@ -196,7 +194,7 @@ function DriverPanelAvailableCmrEntry({ cmr }: { cmr: CmrModel }) {
 					CmrStatusEnum.DELAYED,
 				]) && (
 					<div className="flex items-center">
-						<span className="text-muted-foreground">
+						<span className="text-muted">
 							Estimated delivery at:
 						</span>
 						<span className="ml-2 font-mono">
@@ -207,7 +205,7 @@ function DriverPanelAvailableCmrEntry({ cmr }: { cmr: CmrModel }) {
 					</div>
 				)}
 				<div className="flex flex-col">
-					<div className="text-muted-foreground flex items-center gap-2">
+					<div className="text-muted flex items-center gap-2">
 						Delivery address:
 						<LocationNavigator address={deliveryAddress} />
 					</div>

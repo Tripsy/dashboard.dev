@@ -47,7 +47,7 @@ export function DriverPanelSessionCmrs({
 			{sessionCmrsSorted.map((m) => (
 				<div
 					key={m.id}
-					className="bg-card border border-border rounded-lg p-4"
+					className="bg-surface border border-border rounded-lg p-4"
 				>
 					<DriverPanelSessionCmrEntry cmr={m.cmr} cmrSession={m} />
 				</div>
@@ -231,7 +231,7 @@ function DriverPanelSessionCmrEntry({
 							variant="outline"
 							onClick={() => setWithDetails(false)}
 							title="Show less details"
-							className="text-muted-foreground"
+							className="text-muted"
 						>
 							<Icons.Direction.ArrowCurvedBottom className="h-4 w-4" />
 						</Button>
@@ -240,12 +240,12 @@ function DriverPanelSessionCmrEntry({
 							variant="outline"
 							onClick={() => setWithDetails(true)}
 							title="Show more details"
-							className="text-muted-foreground"
+							className="text-muted"
 						>
 							<Icons.Direction.ArrowRight className="h-4 w-4" />
 						</Button>
 					)}
-					<div className="font-semibold text-card-foreground ">
+					<div className="font-semibold text-surface-foreground ">
 						CMR#{cmr.id}
 					</div>
 					{arrayHasValue(cmr.status, [
@@ -269,9 +269,7 @@ function DriverPanelSessionCmrEntry({
 				</h3>
 				{withDetails && (
 					<div className="flex items-center">
-						<span className="text-muted-foreground">
-							Last update at:
-						</span>
+						<span className="text-muted">Last update at:</span>
 						<span className="ml-2 font-mono">
 							{formatDate(cmr.updated_at, undefined, {
 								customFormat: 'D MMMM, HH:mm',
@@ -281,13 +279,13 @@ function DriverPanelSessionCmrEntry({
 				)}
 				{withDetails && cmr.notes && (
 					<div className="flex items-center">
-						<span className="text-muted-foreground">Notes:</span>
+						<span className="text-muted">Notes:</span>
 						<span className="ml-2 font-mono">{cmr.notes}</span>
 					</div>
 				)}
 				{withDetails && (
 					<div>
-						<span className="text-muted-foreground">Tracking:</span>
+						<span className="text-muted">Tracking:</span>
 						<span className="ml-2 font-mono">
 							{cmr.tracking_number}
 						</span>
@@ -295,20 +293,20 @@ function DriverPanelSessionCmrEntry({
 				)}
 				{withDetails && (
 					<div className="flex">
-						<div className="text-muted-foreground">Transport:</div>
+						<div className="text-muted">Transport:</div>
 						<div className="ml-4 font-mono">
 							{formatEnumLabel(cmr.transport_type)}
 						</div>
 					</div>
 				)}
 				<div>
-					<span className="text-muted-foreground">Client:</span>
+					<span className="text-muted">Client:</span>
 					<span className="ml-2 font-mono">
 						{displayClientLabel(cmr.client)}
 					</span>
 				</div>
 				<div className="flex items-center gap-2">
-					<div className="text-muted-foreground">Contact:</div>
+					<div className="text-muted">Contact:</div>
 					<div className="font-mono">{cmr.contact_name}</div>
 					{cmr.contact_phone && (
 						<div>
@@ -328,9 +326,7 @@ function DriverPanelSessionCmrEntry({
 				</div>
 				{withDetails && (
 					<div className="flex items-center">
-						<span className="text-muted-foreground">
-							Ordered at:
-						</span>
+						<span className="text-muted">Ordered at:</span>
 						<span className="ml-2 font-mono">
 							{formatDate(cmr.ordered_at, undefined, {
 								customFormat: 'D MMMM, HH:mm',
@@ -340,9 +336,7 @@ function DriverPanelSessionCmrEntry({
 				)}
 				{withDetails && (
 					<div className="flex items-center">
-						<span className="text-muted-foreground">
-							Pick scheduled at:
-						</span>
+						<span className="text-muted">Pick scheduled at:</span>
 						<span className="ml-2 font-mono">
 							{formatDate(cmr.pick_scheduled_at, undefined, {
 								customFormat: 'D MMMM, HH:mm',
@@ -352,7 +346,7 @@ function DriverPanelSessionCmrEntry({
 				)}
 				{(withDetails || cmr.status === CmrStatusEnum.ORDERED) && (
 					<div className="flex flex-col">
-						<div className="text-muted-foreground flex items-center gap-2">
+						<div className="text-muted flex items-center gap-2">
 							Pickup address:
 							<LocationNavigator address={pickupAddress} />
 						</div>
@@ -366,7 +360,7 @@ function DriverPanelSessionCmrEntry({
 					CmrStatusEnum.DELAYED,
 				]) && (
 					<div className="flex items-center">
-						<span className="text-muted-foreground">
+						<span className="text-muted">
 							Estimated delivery at:
 						</span>
 						<span className="ml-2 font-mono">
@@ -377,7 +371,7 @@ function DriverPanelSessionCmrEntry({
 					</div>
 				)}
 				<div className="flex flex-col">
-					<div className="text-muted-foreground flex items-center gap-2">
+					<div className="text-muted flex items-center gap-2">
 						Delivery address:
 						<LocationNavigator address={deliveryAddress} />
 					</div>
@@ -385,9 +379,7 @@ function DriverPanelSessionCmrEntry({
 				</div>
 				{cmr.status === CmrStatusEnum.DELIVERED && (
 					<div className="flex items-center">
-						<span className="text-muted-foreground">
-							Delivered at:
-						</span>
+						<span className="text-muted">Delivered at:</span>
 						<span className="ml-2 font-mono">
 							{formatDate(cmr.delivered_at, undefined, {
 								customFormat: 'D MMMM, HH:mm',
@@ -397,7 +389,7 @@ function DriverPanelSessionCmrEntry({
 				)}
 				{cmr.status === CmrStatusEnum.DELIVERED && (
 					<div className="flex items-center">
-						<span className="text-muted-foreground">Signed:</span>
+						<span className="text-muted">Signed:</span>
 						<span className="ml-2 font-mono">
 							{cmr.signed_by ?? 'n/a'}
 							{formatDate(cmr.signed_at, undefined, {
@@ -415,7 +407,7 @@ function DriverPanelSessionCmrEntry({
 				]) && (
 					<Button
 						variant="secondary"
-						hover="info"
+						hover="default"
 						onClick={() => handleSetupCmrVehicles(cmr)}
 						className="cursor-pointer"
 						title="Setup CMR vehicles"
@@ -425,7 +417,7 @@ function DriverPanelSessionCmrEntry({
 				)}
 				<Button
 					variant="secondary"
-					hover="info"
+					hover="default"
 					onClick={() => handleViewCmrImages(cmr)}
 					className="cursor-pointer"
 					title="View CMR images"
@@ -434,7 +426,7 @@ function DriverPanelSessionCmrEntry({
 				</Button>
 				<Button
 					variant="secondary"
-					hover="info"
+					hover="default"
 					onClick={() => handleCreatePaymentCustomer(cmr)}
 					className="cursor-pointer"
 					title="Create payment"
@@ -447,7 +439,7 @@ function DriverPanelSessionCmrEntry({
 				]) && (
 					<Button
 						variant="secondary"
-						hover="info"
+						hover="default"
 						onClick={() => handleUpdateCmr(cmr)}
 						className="cursor-pointer"
 						title="Update CMR"

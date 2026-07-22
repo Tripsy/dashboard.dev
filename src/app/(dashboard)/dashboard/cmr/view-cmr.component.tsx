@@ -116,7 +116,7 @@ export async function ViewCmr({ entry }: { entry: CmrModel }) {
 					{entry.deleted_at && (
 						<div>
 							<span className="font-semibold">Deleted At</span>{' '}
-							<span className="text-error">
+							<span className="text-danger">
 								{formatDate(entry.deleted_at, 'date-time')}
 							</span>
 						</div>

@@ -79,7 +79,7 @@ export function ConfirmationDialog({
 						action="confirm"
 						buttonAppearance={{
 							...buttonConfirm,
-							variant: buttonConfirm?.variant ?? 'info',
+							variant: buttonConfirm?.variant ?? 'default',
 							title:
 								buttonCancel?.title ??
 								translations['app.action.confirm.title'],

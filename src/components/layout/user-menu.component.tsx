@@ -32,7 +32,7 @@ export function UserMenu() {
 	if (authStatus === 'error') {
 		return (
 			<UserX
-				className="h-5 w-5 text-error"
+				className="h-5 w-5 text-danger"
 				aria-label="An error occurred while loading your account"
 			/>
 		);
@@ -104,13 +104,13 @@ export function UserMenu() {
 						variant="ghost"
 						className="flex items-center gap-2 h-10 px-2"
 					>
-						<div className="h-8 w-8 bg-primary text-primary-foreground text-sm shrink-0 overflow-hidden flex items-center justify-center rounded-full">
+						<div className="h-8 w-8 bg-accent text-accent-foreground text-sm shrink-0 overflow-hidden flex items-center justify-center rounded-full">
 							{auth.name.charAt(0).toUpperCase()}
 						</div>
 						<span className="text-sm font-medium hidden sm:inline-block">
 							{auth.name}
 						</span>
-						<ChevronDown className="h-4 w-4 text-muted-foreground" />
+						<ChevronDown className="h-4 w-4 text-muted" />
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent align="end" className="w-48">
@@ -136,7 +136,7 @@ export function UserMenu() {
 						</Link>
 					</DropdownMenuItem>
 					<DropdownMenuSeparator />
-					<DropdownMenuItem asChild className="text-error">
+					<DropdownMenuItem asChild className="text-danger">
 						<Link
 							href={Routes.get('logout')}
 							className="flex items-center gap-2"

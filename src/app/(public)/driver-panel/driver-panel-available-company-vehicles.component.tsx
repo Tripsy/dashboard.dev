@@ -53,15 +53,15 @@ export function DriverPanelAvailableCompanyVehicles({
 			{availableCompanyVehicles.map((m) => (
 				<div
 					key={m.id}
-					className="bg-card border border-border rounded-lg p-4 mb-4"
+					className="bg-surface border border-border rounded-lg p-4 mb-4"
 				>
 					<div className="flex justify-between">
 						<div className="flex flex-col justify-between items-start self-stretch">
-							<h3 className="font-semibold text-card-foreground">
+							<h3 className="font-semibold text-surface-foreground">
 								{m.vehicle?.brand?.name} {m.vehicle.model}
 							</h3>
 							<div>
-								<span className="text-muted-foreground">
+								<span className="text-muted">
 									{m.license_plate}
 								</span>
 							</div>

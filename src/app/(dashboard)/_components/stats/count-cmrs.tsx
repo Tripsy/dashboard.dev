@@ -25,15 +25,13 @@ export function CountCMRs() {
 
 	if (isError) {
 		return (
-			<div className="text-error">Failed to retrieve count of CMRs</div>
+			<div className="text-danger">Failed to retrieve count of CMRs</div>
 		);
 	}
 
 	if (!data) {
 		return (
-			<div className="text-muted-foreground">
-				Could not retrieve count of CMRs
-			</div>
+			<div className="text-muted">Could not retrieve count of CMRs</div>
 		);
 	}
 
@@ -43,7 +41,7 @@ export function CountCMRs() {
 			<div
 				className={cn(
 					'flex items-center text-xs mt-1',
-					data.trend === 'up' ? 'text-success' : 'text-error',
+					data.trend === 'up' ? 'text-success' : 'text-danger',
 				)}
 			>
 				{data.trend === 'up' ? (

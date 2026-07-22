@@ -22,13 +22,13 @@ export default function HomeContent() {
 	}, [authStatus, auth, router]);
 
 	return (
-		<section className="py-20 md:py-28 bg-muted/30">
+		<section className="py-20 md:py-28 bg-surface-secondary/30">
 			<div className="container-default">
 				<div className="max-w-3xl mx-auto text-center">
 					<h2 className="text-3xl md:text-4xl font-bold mb-4">
 						Ready to Get Started?
 					</h2>
-					<p className="text-lg text-muted-foreground mb-8">
+					<p className="text-lg text-muted mb-8">
 						Join our team as a driver.
 					</p>
 					<div className="flex flex-col sm:flex-row gap-4 justify-center">

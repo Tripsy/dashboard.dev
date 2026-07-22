@@ -194,23 +194,23 @@ export function SetupWorkSessionVehicles({
 			{(workSessionVehicle?.entries?.length ?? 0) > 0 ? (
 				<div className="overflow-x-auto rounded-lg border border-border shadow-sm">
 					<table className="min-w-full divide-y divide-border">
-						<thead className="bg-muted">
+						<thead className="bg-surface-secondary">
 							<tr>
-								<th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+								<th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
 									Vehicle
 								</th>
-								<th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+								<th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
 									Status
 								</th>
-								<th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+								<th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
 									Range (Km)
 								</th>
-								<th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
+								<th className="px-4 py-3 text-right text-xs font-medium text-muted uppercase tracking-wider">
 									Actions
 								</th>
 							</tr>
 						</thead>
-						<tbody className="divide-y divide-border bg-card">
+						<tbody className="divide-y divide-border bg-surface">
 							{workSessionVehicle?.entries.map((v) => (
 								<WorkSessionVehicleEntry
 									key={v.id}
@@ -224,11 +224,9 @@ export function SetupWorkSessionVehicles({
 					</table>
 				</div>
 			) : (
-				<div className="text-center py-8 px-4 bg-muted rounded-lg border border-border">
-					<Icons.Vehicle className="mx-auto h-12 w-12 text-muted-foreground" />
-					<p className="mt-2 text-sm text-muted-foreground">
-						No vehicles set
-					</p>
+				<div className="text-center py-8 px-4 bg-surface-secondary rounded-lg border border-border">
+					<Icons.Vehicle className="mx-auto h-12 w-12 text-muted" />
+					<p className="mt-2 text-sm text-muted">No vehicles set</p>
 				</div>
 			)}
 
@@ -261,8 +259,8 @@ function WorkSessionVehicleEntry({
 	onStatusReturn,
 }: WorkSessionVehicleEntryProps) {
 	return (
-		<tr className="hover:bg-muted/50 transition-colors duration-150">
-			<td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-card-foreground">
+		<tr className="hover:bg-surface-secondary/50 transition-colors duration-150">
+			<td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-surface-foreground">
 				{displayCompanyVehicleLabel(m.company_vehicle)}
 			</td>
 			<td className="px-4 py-4 whitespace-nowrap">
@@ -285,18 +283,16 @@ function WorkSessionVehicleEntry({
 					/>
 				)}
 			</td>
-			<td className="px-4 py-4 whitespace-nowrap text-sm text-card-foreground">
+			<td className="px-4 py-4 whitespace-nowrap text-sm text-surface-foreground">
 				{m.company_vehicle.vehicle.vehicle_type ===
 				VehicleTypeEnum.TRAILER ? (
-					<span className="mx-1 text-muted-foreground italic">
-						n/a
-					</span>
+					<span className="mx-1 text-muted italic">n/a</span>
 				) : (
 					<div>
 						<span className="font-mono">
 							{m.vehicle_km_start || '-'}
 						</span>
-						<span className="mx-1 text-muted-foreground">→</span>
+						<span className="mx-1 text-muted">→</span>
 						<span className="font-mono">
 							{m.vehicle_km_end || '-'}
 						</span>
@@ -308,7 +304,7 @@ function WorkSessionVehicleEntry({
 					<button
 						type="button"
 						onClick={() => onUpdate(m)}
-						className="cursor-pointer text-primary hover:text-primary-hover transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded focus:ring-offset-background"
+						className="cursor-pointer text-accent hover:text-accent-hover transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-focus focus:ring-offset-2 rounded focus:ring-offset-background"
 						title="Update vehicle"
 					>
 						<Icons.Action.Update className="h-4 w-4" />
@@ -317,7 +313,7 @@ function WorkSessionVehicleEntry({
 					<button
 						type="button"
 						onClick={() => onDelete(m)}
-						className="cursor-pointer text-destructive hover:text-destructive/80 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-destructive focus:ring-offset-2 rounded focus:ring-offset-background"
+						className="cursor-pointer text-danger hover:text-danger/80 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-danger focus:ring-offset-2 rounded focus:ring-offset-background"
 						title="Delete vehicle"
 					>
 						<Icons.Action.Delete className="h-4 w-4" />

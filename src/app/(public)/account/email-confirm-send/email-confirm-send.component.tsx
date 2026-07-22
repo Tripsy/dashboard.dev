@@ -74,7 +74,7 @@ export default function EmailConfirmSend() {
 					Meanwhile you can go back to{' '}
 					<Link
 						href={Routes.get('home')}
-						className="text-primary font-medium hover:underline"
+						className="text-accent font-medium hover:underline"
 					>
 						home page
 					</Link>
@@ -119,11 +119,11 @@ export default function EmailConfirmSend() {
 				/>
 
 				<div className="text-center space-y-2">
-					<p className="text-sm text-muted-foreground">
+					<p className="text-sm text-muted">
 						Not registered yet?{' '}
 						<Link
 							href={Routes.get('register')}
-							className="text-primary font-medium hover:underline"
+							className="text-accent font-medium hover:underline"
 						>
 							Create an account
 						</Link>

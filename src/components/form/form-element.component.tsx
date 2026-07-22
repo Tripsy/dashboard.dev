@@ -58,14 +58,14 @@ export const FormElement = ({
 				<Label htmlFor={label.for}>
 					{label.text}
 					{label.required && (
-						<span className="text-error ml-1">*</span>
+						<span className="text-danger ml-1">*</span>
 					)}
 				</Label>
 			) : (
 				<div className="label-placeholder">
 					{label.text}
 					{label.required && (
-						<span className="text-error ml-1">*</span>
+						<span className="text-danger ml-1">*</span>
 					)}
 				</div>
 			))}
@@ -116,7 +116,7 @@ const stateConfig = {
 		borderClass: 'border border-success focus-visible:ring-success',
 	},
 	error: {
-		borderClass: 'border border-error focus-visible:ring-error',
+		borderClass: 'border border-danger focus-visible:ring-danger',
 	},
 	warning: {
 		borderClass: 'border border-warning focus-visible:ring-warning',
@@ -328,7 +328,7 @@ export const FormComponentTime = <Fields,>({
 							variant="outline"
 							className={cn(
 								'justify-start text-left text-sm',
-								!fieldValue && 'text-muted-foreground',
+								!fieldValue && 'text-muted',
 								borderClass,
 								className,
 							)}
@@ -342,7 +342,7 @@ export const FormComponentTime = <Fields,>({
 						<div className="flex gap-2">
 							{/* Hours */}
 							<div className="flex flex-col gap-1">
-								<p className="text-xs text-muted-foreground text-center pb-1">
+								<p className="text-xs text-muted text-center pb-1">
 									HH
 								</p>
 								<ul className="h-48 overflow-y-auto flex flex-col gap-0.5">
@@ -354,9 +354,9 @@ export const FormComponentTime = <Fields,>({
 													handleHourSelect(hour)
 												}
 												className={cn(
-													'w-full px-3 py-1 text-sm rounded hover:bg-accent',
+													'w-full px-3 py-1 text-sm rounded hover:bg-accent-soft',
 													selectedHour === hour &&
-														'bg-accent font-semibold',
+														'bg-accent-soft font-semibold',
 												)}
 											>
 												{hour}
@@ -370,7 +370,7 @@ export const FormComponentTime = <Fields,>({
 
 							{/* Minutes */}
 							<div className="flex flex-col gap-1">
-								<p className="text-xs text-muted-foreground text-center pb-1">
+								<p className="text-xs text-muted text-center pb-1">
 									MM
 								</p>
 								<ul className="h-48 overflow-y-auto flex flex-col gap-0.5">
@@ -382,9 +382,9 @@ export const FormComponentTime = <Fields,>({
 													handleMinuteSelect(minute)
 												}
 												className={cn(
-													'w-full px-3 py-1 text-sm rounded hover:bg-accent',
+													'w-full px-3 py-1 text-sm rounded hover:bg-accent-soft',
 													selectedMinute === minute &&
-														'bg-accent font-semibold',
+														'bg-accent-soft font-semibold',
 												)}
 											>
 												{minute}
@@ -673,7 +673,7 @@ export const FormComponentCalendarWithoutFormElement = <Fields,>({
 						variant="outline"
 						className={cn(
 							'justify-start text-left text-sm',
-							!fieldValue && 'text-muted-foreground',
+							!fieldValue && 'text-muted',
 							className,
 						)}
 						disabled={disabled}
@@ -943,7 +943,7 @@ export const FormComponentAutoComplete = <Fields, T>({
 									onClick={handleClear}
 									className="cursor-pointer"
 								>
-									<Icons.Clear className="h-4.5 w-4.5 text-muted-foreground hover:text-foreground" />
+									<Icons.Clear className="h-4.5 w-4.5 text-muted hover:text-foreground" />
 								</button>
 							</FormElementIcon>
 						)}
@@ -951,10 +951,10 @@ export const FormComponentAutoComplete = <Fields, T>({
 				</FormElementWrapper>
 
 				{shouldShowDropdown && (
-					<ul className="absolute z-50 w-full mt-1 max-h-60 overflow-auto bg-popover border border-border rounded-md shadow-lg">
+					<ul className="absolute z-50 w-full mt-1 max-h-60 overflow-auto bg-overlay border border-border rounded-md shadow-lg">
 						{/* Loading */}
 						{isLoading && (
-							<li className="px-3 py-2 text-sm text-muted-foreground">
+							<li className="px-3 py-2 text-sm text-muted">
 								{autoCompleteProps.loadingMessage ??
 									'Searching...'}
 							</li>
@@ -962,7 +962,7 @@ export const FormComponentAutoComplete = <Fields, T>({
 
 						{/* Empty */}
 						{isEmpty && (
-							<li className="px-3 py-2 text-sm text-muted-foreground">
+							<li className="px-3 py-2 text-sm text-muted">
 								{autoCompleteProps.emptyMessage ?? 'No results'}
 							</li>
 						)}
@@ -977,7 +977,7 @@ export const FormComponentAutoComplete = <Fields, T>({
 										);
 										setIsOpen(false);
 									}}
-									className="w-full px-3 py-2 text-sm text-left text-primary hover:bg-accent"
+									className="w-full px-3 py-2 text-sm text-left text-accent hover:bg-accent-soft"
 								>
 									{autoCompleteProps.createLabel?.(
 										inputValue,
@@ -1010,10 +1010,10 @@ export const FormComponentAutoComplete = <Fields, T>({
 											}
 											className={cn(
 												'w-full px-3 py-2 text-sm text-left',
-												'hover:bg-accent hover:text-accent-foreground',
-												'focus:bg-accent focus:text-accent-foreground',
+												'hover:bg-accent-soft hover:text-accent-soft-foreground',
+												'focus:bg-accent-soft focus:text-accent-soft-foreground',
 												isHighlighted &&
-													'bg-accent text-accent-foreground',
+													'bg-accent-soft text-accent-soft-foreground',
 											)}
 										>
 											{label}
@@ -1054,7 +1054,7 @@ export const FormComponentSubmit = ({
 	return (
 		<Button
 			type="submit"
-			variant={button?.variant || 'info'}
+			variant={button?.variant || 'default'}
 			className={button?.className}
 			disabled={pending || (submitted && error)}
 			aria-busy={pending}

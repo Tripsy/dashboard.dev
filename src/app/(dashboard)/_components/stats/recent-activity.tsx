@@ -42,15 +42,13 @@ export function RecentActivity() {
 	}
 
 	if (isError) {
-		return <div className="text-error">Failed to load recent activity</div>;
+		return (
+			<div className="text-danger">Failed to load recent activity</div>
+		);
 	}
 
 	if (!data || data.length === 0) {
-		return (
-			<div className="text-muted-foreground">
-				No recent activity found
-			</div>
-		);
+		return <div className="text-muted">No recent activity found</div>;
 	}
 
 	return (
@@ -65,11 +63,11 @@ export function RecentActivity() {
 							{toTitleCase(entry.entity)} #{entry.entity_id}{' '}
 							{logHistoryActionMeaning(entry.action)}
 						</p>
-						<p className="text-sm text-muted-foreground">
+						<p className="text-sm text-muted">
 							by {entry.performed_by}
 						</p>
 					</div>
-					<span className="text-sm text-muted-foreground">
+					<span className="text-sm text-muted">
 						{timeAgo(entry.recorded_at)}
 					</span>
 				</div>

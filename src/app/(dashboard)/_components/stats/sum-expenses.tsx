@@ -25,15 +25,11 @@ export function SumExpenses() {
 	}
 
 	if (isError) {
-		return <div className="text-error">Failed to retrieve expenses</div>;
+		return <div className="text-danger">Failed to retrieve expenses</div>;
 	}
 
 	if (!data) {
-		return (
-			<div className="text-muted-foreground">
-				Could not retrieve expenses
-			</div>
-		);
+		return <div className="text-muted">Could not retrieve expenses</div>;
 	}
 
 	return (
@@ -45,7 +41,7 @@ export function SumExpenses() {
 			<div
 				className={cn(
 					'flex items-center text-xs mt-1',
-					data.trend === 'up' ? 'text-success' : 'text-error',
+					data.trend === 'up' ? 'text-success' : 'text-danger',
 				)}
 			>
 				{data.trend === 'up' ? (

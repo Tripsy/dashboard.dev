@@ -4,16 +4,15 @@ import { cn } from '@/helpers/css.helper';
 
 const badgeVariants = cva(
 	'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md h-fit font-semibold' +
-		'transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+		'transition-colors focus:outline-none focus:ring-2 focus:ring-focus focus:ring-offset-2',
 	{
 		variants: {
 			variant: {
-				default: 'bg-primary text-primary-foreground',
-				secondary: 'bg-secondary text-secondary-foreground',
-				success: 'bg-success text-success-foreground',
-				warning: 'bg-warning text-primary-foreground',
-				info: 'bg-info text-info-foreground',
-				error: 'bg-error text-error-foreground',
+				default: 'bg-accent text-accent-foreground',
+				secondary: 'bg-default text-default-foreground',
+				success: 'bg-success text-accent-foreground',
+				error: 'bg-danger text-danger-foreground',
+				warning: 'bg-warning text-warning-foreground',
 			},
 			size: {
 				md: 'px-4 py-2',

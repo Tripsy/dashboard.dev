@@ -32,9 +32,9 @@ export function DriverPanelSession({ session }: { session: WorkSessionModel }) {
 	}, [open, session, refreshSession]);
 
 	return (
-		<div className="flex flex-col md:flex-row gap-y-1 font-medium text-muted-foreground bg-card md:border border-r-0 border-border shadow-lg">
+		<div className="flex flex-col md:flex-row gap-y-1 font-medium text-muted bg-surface md:border border-r-0 border-border shadow-lg">
 			<div className="flex flex-1">
-				<div className="bg-muted px-4 py-3 text-xs uppercase tracking-wider w-32 whitespace-nowrap">
+				<div className="bg-surface-secondary px-4 py-3 text-xs uppercase tracking-wider w-32 whitespace-nowrap">
 					Started at:
 				</div>
 				<div className="px-4 py-3 text-sm whitespace-nowrap flex items-center">
@@ -46,7 +46,7 @@ export function DriverPanelSession({ session }: { session: WorkSessionModel }) {
 			</div>
 
 			<div className="flex flex-1">
-				<div className="bg-muted px-4 py-3 text-xs uppercase tracking-wider w-32 whitespace-nowrap">
+				<div className="bg-surface-secondary px-4 py-3 text-xs uppercase tracking-wider w-32 whitespace-nowrap">
 					Duration:
 				</div>
 				<div className="px-4 py-3 text-sm whitespace-nowrap flex items-center">

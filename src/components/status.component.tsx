@@ -31,7 +31,7 @@ export function LoadingContent({
 					<LoadingIcon className="w-12 h-12 text-warning bg-warning/10 rounded-full p-3" />
 				</div>
 				<h1 className="text-2xl font-bold mb-8">{title}</h1>
-				<p className="text-muted-foreground">{description}</p>
+				<p className="text-muted">{description}</p>
 			</div>
 			{children}
 		</div>
@@ -57,7 +57,7 @@ export function LoadingComponent({
 						<LoadingIcon className="w-12 h-12 text-warning bg-warning/10 rounded-full p-3" />
 					</div>
 					<h1 className="text-2xl font-bold mb-8">{title}</h1>
-					<p className="text-muted-foreground">{description}</p>
+					<p className="text-muted">{description}</p>
 				</div>
 				{children}
 			</div>
@@ -86,10 +86,10 @@ export function ErrorComponent({
 			<div className="w-full max-w-md">
 				<div className="text-center">
 					<div className="flex justify-center mb-4">
-						<ErrorIcon className="w-12 h-12 text-error bg-error/10 rounded-full p-3" />
+						<ErrorIcon className="w-12 h-12 text-danger bg-danger/10 rounded-full p-3" />
 					</div>
 					<h1 className="text-2xl font-bold mb-8">{title}</h1>
-					<p className="text-muted-foreground">{description}</p>
+					<p className="text-muted">{description}</p>
 				</div>
 				{children}
 			</div>
@@ -117,7 +117,7 @@ export function SuccessComponent({
 						<Icons.Status.Success className="w-12 h-12 text-success bg-success/30 rounded-full p-3" />
 					</div>
 					<h1 className="text-2xl font-bold mb-8">{title}</h1>
-					<p className="text-muted-foreground">{description}</p>
+					<p className="text-muted">{description}</p>
 				</div>
 				{children}
 			</div>
@@ -145,7 +145,7 @@ export function InfoComponent({
 						<Icons.Info className="w-12 h-12 text-info bg-info/30 rounded-full p-3" />
 					</div>
 					<h1 className="text-2xl font-bold mb-8">{title}</h1>
-					<p className="text-muted-foreground">{description}</p>
+					<p className="text-muted">{description}</p>
 				</div>
 				{children}
 			</div>

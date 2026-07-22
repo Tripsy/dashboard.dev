@@ -1,8 +1,8 @@
 'use client';
 
-import { Toast } from 'primereact/toast';
+import { ToastProvider as HeroToastProvider, toast } from '@heroui/react';
 import type React from 'react';
-import { createContext, useContext, useRef } from 'react';
+import { createContext, useContext } from 'react';
 
 type ToastOptions = {
 	severity: 'success' | 'info' | 'warn' | 'error';
@@ -17,19 +17,32 @@ type ToastContextType = {
 
 const ToastContext = createContext<ToastContextType | null>(null);
 
-function ToastProvider({ children }: { children: React.ReactNode }) {
-	const toastRef = useRef<Toast>(null);
+// Map the legacy (PrimeReact) severities onto HeroUI's imperative toast variants.
+const TOAST_METHOD = {
+	success: 'success',
+	info: 'info',
+	warn: 'warning',
+	error: 'danger',
+} as const;
 
-	const showToast = (options: ToastOptions) => {
-		toastRef.current?.show({
-			...options,
-			life: options.life ?? 7000, // default to 7 seconds
+function ToastProvider({ children }: { children: React.ReactNode }) {
+	// Kept identical to the previous PrimeReact-backed API so all callers stay unchanged:
+	// summary -> toast title (first arg), detail -> description, life -> timeout (ms).
+	const showToast = ({
+		severity,
+		summary,
+		detail,
+		life,
+	}: ToastOptions): void => {
+		toast[TOAST_METHOD[severity]](summary, {
+			description: detail,
+			timeout: life ?? 7000, // default to 7 seconds
 		});
 	};
 
 	return (
 		<ToastContext.Provider value={{ showToast }}>
-			<Toast ref={toastRef} position="top-right" />
+			<HeroToastProvider placement="top end" />
 			{children}
 		</ToastContext.Provider>
 	);

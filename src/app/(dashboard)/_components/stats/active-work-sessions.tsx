@@ -42,18 +42,14 @@ export function ActiveWorkSessions() {
 
 	if (isError) {
 		return (
-			<div className="text-error">
+			<div className="text-danger">
 				Failed to load active work sessions
 			</div>
 		);
 	}
 
 	if (!data || data.length === 0) {
-		return (
-			<div className="text-muted-foreground">
-				No active work sessions found
-			</div>
-		);
+		return <div className="text-muted">No active work sessions found</div>;
 	}
 
 	return (
@@ -64,12 +60,12 @@ export function ActiveWorkSessions() {
 					className="flex items-center justify-between"
 				>
 					<div className="flex items-center gap-3">
-						<span className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-sm font-medium">
+						<span className="flex h-12 w-12 items-center justify-center rounded-full bg-surface-secondary text-sm font-medium">
 							#{entry.id}
 						</span>
 						<span className="font-medium">{entry.user.name}</span>
 					</div>
-					<div className="flex items-center gap-2 text-sm text-muted-foreground">
+					<div className="flex items-center gap-2 text-sm text-muted">
 						<Icons.Clock className="h-4 w-4" />{' '}
 						{dateDiff(
 							entry.start_at,

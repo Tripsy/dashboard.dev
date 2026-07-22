@@ -55,8 +55,8 @@ export function WindowMinimizedInstance({
 			className={cn(
 				'flex items-center gap-x-2 border  shadow-xl px-2 py-1 rounded',
 				isActive
-					? 'bg-accent text-accent-foreground'
-					: 'bg-background/95 hover:bg-accent hover:text-accent-foreground',
+					? 'bg-accent-soft text-accent-soft-foreground'
+					: 'bg-background/95 hover:bg-accent-soft hover:text-accent-soft-foreground',
 			)}
 		>
 			<button

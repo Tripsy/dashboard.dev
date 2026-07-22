@@ -202,17 +202,17 @@ export function DriverPanelSessionVehicles({
 					.map((m) => (
 						<div
 							key={m.id}
-							className="bg-card border border-border rounded-lg p-4"
+							className="bg-surface border border-border rounded-lg p-4"
 						>
 							<div className="flex justify-between items-center">
 								<div className="flex flex-col justify-between items-start self-stretch gap-2">
-									<h3 className="font-semibold text-card-foreground">
+									<h3 className="font-semibold text-surface-foreground">
 										{displayCompanyVehicleLabel(
 											m.company_vehicle,
 										)}
 									</h3>
 									<div>
-										<span className="text-muted-foreground">
+										<span className="text-muted">
 											Range Km:
 										</span>
 										<span className="ml-2 font-mono">
@@ -285,7 +285,7 @@ export function DriverPanelSessionVehicles({
 										)}
 										<Button
 											variant="secondary"
-											hover="info"
+											hover="default"
 											onClick={() =>
 												handleUpdateSessionVehicle(m)
 											}

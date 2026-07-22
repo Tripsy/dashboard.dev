@@ -114,10 +114,10 @@ export function DocumentCmr({ signed, data }: DocumentCmrProps) {
 							}}
 						>
 							<div className="flex flex-nowrap items-center">
-								<div className="text-xs text-muted-foreground">
+								<div className="text-xs text-muted">
 									1-15, 19, 21, 22
 								</div>
-								<ul className="list-disc mt-6 leading-3 text-xs text-muted-foreground">
+								<ul className="list-disc mt-6 leading-3 text-xs text-muted">
 									<li className="mb-1">
 										De completat sub responsabilitatea
 										expeditorului
@@ -979,7 +979,7 @@ export function DocumentCmr({ signed, data }: DocumentCmrProps) {
 						style={{ width: '12mm' }}
 					>
 						<div className="[writing-mode:vertical-lr]">
-							<ul className="list-disc leading-3 text-xs text-muted-foreground flex flex-col-reverse">
+							<ul className="list-disc leading-3 text-xs text-muted flex flex-col-reverse">
 								<li className="mb-1">
 									In cazul menționării unor mărfuri
 									periculoase pe lângă un eventual certificat,

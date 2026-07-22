@@ -1,3 +1,4 @@
+import { Header, ListBox, Select } from '@heroui/react';
 import React, { type JSX, useEffect, useMemo, useRef, useState } from 'react';
 import { ActionButtonContent } from '@/components/action-button.component';
 import { FormElementError } from '@/components/form/form-element-error.component';
@@ -14,15 +15,6 @@ import {
 	PopoverTrigger,
 } from '@/components/ui/popover';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import {
-	Select,
-	SelectContent,
-	SelectGroup,
-	SelectItem,
-	SelectLabel,
-	SelectTrigger,
-	SelectValue,
-} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/helpers/css.helper';
 import { formatDate, stringToDate } from '@/helpers/date.helper';
@@ -481,54 +473,67 @@ export const FormComponentSelect = <Fields,>({
 				/>
 
 				<Select
-					value={fieldValue ?? ''}
-					onValueChange={onChange}
-					disabled={disabled}
+					fullWidth
+					selectedKey={fieldValue ?? null}
+					onSelectionChange={(key) =>
+						onChange(key == null ? '' : String(key))
+					}
+					isDisabled={disabled}
+					placeholder={placeholderText}
 				>
-					<SelectTrigger
+					<Select.Trigger
 						id={id}
-						className={cn(borderClass, className)}
+						className={cn(
+							'h-10 items-center border-border',
+							borderClass,
+							className,
+						)}
 					>
-						<SelectValue placeholder={placeholderText} />
-					</SelectTrigger>
-					<SelectContent>
-						{isGrouped
-							? (options as GroupedOptionsType).map((group) => (
-									<SelectGroup key={group.label}>
-										<SelectLabel>{group.label}</SelectLabel>
+						<Select.Value />
+						<Select.Indicator />
+					</Select.Trigger>
+					<Select.Popover>
+						<ListBox>
+							{isGrouped
+								? (options as GroupedOptionsType).map(
+										(group) => (
+											<ListBox.Section
+												key={group.label}
+												className="[&:not(:first-child)]:mt-1 [&:not(:first-child)]:border-t [&:not(:first-child)]:border-border [&:not(:first-child)]:pt-1"
+											>
+												<Header className="px-2 pt-1.5 pb-1 text-[11px] font-semibold uppercase tracking-wider text-muted">
+													{group.label}
+												</Header>
 
-										{group.options.map(
-											({ label, value }) => (
-												<SelectItem
-													key={value}
-													value={value}
-													className="pl-12"
-												>
-													{label}
-												</SelectItem>
-											),
-										)}
-									</SelectGroup>
-								))
-							: (options as OptionsType).map(
-									({ label, value }) => (
-										<SelectItem key={value} value={value}>
-											{label}
-										</SelectItem>
-									),
-								)}
-					</SelectContent>
-					{/*<SelectContent>*/}
-					{/*	{options.map(({ label, value }) => {*/}
-					{/*		const key = `${id}-${value}`;*/}
-
-					{/*		return (*/}
-					{/*			<SelectItem key={key} value={value}>*/}
-					{/*				{label}*/}
-					{/*			</SelectItem>*/}
-					{/*		);*/}
-					{/*	})}*/}
-					{/*</SelectContent>*/}
+												{group.options.map(
+													({ label, value }) => (
+														<ListBox.Item
+															key={value}
+															id={value}
+															textValue={label}
+														>
+															{label}
+															<ListBox.Item.Indicator />
+														</ListBox.Item>
+													),
+												)}
+											</ListBox.Section>
+										),
+									)
+								: (options as OptionsType).map(
+										({ label, value }) => (
+											<ListBox.Item
+												key={value}
+												id={value}
+												textValue={label}
+											>
+												{label}
+												<ListBox.Item.Indicator />
+											</ListBox.Item>
+										),
+									)}
+						</ListBox>
+					</Select.Popover>
 				</Select>
 			</div>
 		</FormElement>

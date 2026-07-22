@@ -480,7 +480,12 @@ export const FormComponentSelect = <Fields,>({
 					</Header>
 
 					{group.options.map(({ label, value }) => (
-						<ListBox.Item key={value} id={value} textValue={label}>
+						<ListBox.Item
+							key={value}
+							id={value}
+							textValue={label}
+							className="rounded-md"
+						>
 							{label}
 							<ListBox.Item.Indicator />
 						</ListBox.Item>
@@ -488,7 +493,12 @@ export const FormComponentSelect = <Fields,>({
 				</ListBox.Section>
 			))
 		: (options as OptionsType).map(({ label, value }) => (
-				<ListBox.Item key={value} id={value} textValue={label}>
+				<ListBox.Item
+					key={value}
+					id={value}
+					textValue={label}
+					className="rounded-md"
+				>
 					{label}
 					<ListBox.Item.Indicator />
 				</ListBox.Item>
@@ -528,7 +538,7 @@ export const FormComponentSelect = <Fields,>({
 							/>
 							<ComboBox.Trigger />
 						</ComboBox.InputGroup>
-						<ComboBox.Popover>
+						<ComboBox.Popover className="rounded-md">
 							<ListBox>{listBoxItems}</ListBox>
 						</ComboBox.Popover>
 					</ComboBox>
@@ -553,7 +563,7 @@ export const FormComponentSelect = <Fields,>({
 							<Select.Value />
 							<Select.Indicator />
 						</Select.Trigger>
-						<Select.Popover>
+						<Select.Popover className="rounded-md">
 							<ListBox>{listBoxItems}</ListBox>
 						</Select.Popover>
 					</Select>

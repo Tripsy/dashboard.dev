@@ -1,14 +1,16 @@
 'use client';
 
-import { Tooltip } from '@radix-ui/react-tooltip';
 import { ArrowDown, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import React, {
 	type ComponentType,
+	useEffect,
 	useLayoutEffect,
 	useMemo,
+	useRef,
 	useState,
 } from 'react';
+import { createPortal } from 'react-dom';
 import {
 	type SelectedPageType,
 	useBreadcrumb,
@@ -16,11 +18,6 @@ import {
 import { useSideMenu } from '@/app/(dashboard)/_providers/side-menu.provider';
 import { Icons } from '@/components/icon.component';
 import { Button } from '@/components/ui/button';
-import {
-	TooltipContent,
-	TooltipProvider,
-	TooltipTrigger,
-} from '@/components/ui/tooltip';
 import Routes from '@/config/routes.setup';
 import { cn } from '@/helpers/css.helper';
 import { useDebouncedEffect } from '@/hooks/use-debounced-effect.hook';
@@ -362,13 +359,7 @@ export function SideMenu() {
 		<div className="side-menu-container">
 			<div className="flex flex-col h-full">
 				<nav aria-description="Side menu" className="side-menu-content">
-					{menuState === 'open' ? (
-						menuContent
-					) : (
-						<TooltipProvider delayDuration={0}>
-							{menuContent}
-						</TooltipProvider>
-					)}
+					{menuContent}
 				</nav>
 
 				{menuState === 'open' && (
@@ -493,12 +484,44 @@ function SideMenuOpenSection({
 }
 
 function SideMenuClosedSection({
-	label,
 	text,
 	icon: SectionIcon,
 	items,
 	selectedPage,
 }: SideMenuClosedSectionProps) {
+	const [isOpen, setIsOpen] = useState(false);
+	const [position, setPosition] = useState<{ top: number; left: number }>({
+		top: 0,
+		left: 0,
+	});
+	const triggerRef = useRef<HTMLDivElement>(null);
+	const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+	const openFlyout = () => {
+		if (closeTimer.current) {
+			clearTimeout(closeTimer.current);
+		}
+		const rect = triggerRef.current?.getBoundingClientRect();
+		if (rect) {
+			setPosition({ top: rect.top, left: rect.right });
+		}
+		setIsOpen(true);
+	};
+
+	// Small delay so the pointer can travel across the gap into the flyout.
+	const closeFlyout = () => {
+		closeTimer.current = setTimeout(() => setIsOpen(false), 120);
+	};
+
+	useEffect(
+		() => () => {
+			if (closeTimer.current) {
+				clearTimeout(closeTimer.current);
+			}
+		},
+		[],
+	);
+
 	if (items.length === 0) {
 		return null;
 	}
@@ -507,50 +530,69 @@ function SideMenuClosedSection({
 		(item) => item.page === selectedPage,
 	);
 
-	return (
-		<Tooltip key={`tooltip-${label}`} delayDuration={0}>
-			<TooltipTrigger asChild>
-				<div
-					className={cn(
-						'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group',
-						isSelected
-							? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
-							: 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground',
-					)}
-					aria-description={text}
-				>
-					<SectionIcon
-						className={cn(
-							'h-5 w-5 shrink-0',
-							isSelected && 'text-sidebar-primary',
-						)}
-					/>
-				</div>
-			</TooltipTrigger>
-			<TooltipContent
-				side="right"
-				align="start"
-				className="flex items-center gap-2"
+	const flyout = items.map((item) => (
+		<li key={`side-menu-item-${item.page}`}>
+			<Link
+				href={item.href}
+				className={cn(
+					'flex items-center text-left gap-2 px-3 py-2 rounded-md transition-all duration-200 group',
+					selectedPage === item.page
+						? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
+						: 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground',
+				)}
 			>
-				<ul className="py-1">
-					{items.map((item) => (
-						<li key={`side-menu-item-${item.page}`}>
-							<Link
-								href={item.href}
-								className={cn(
-									'flex items-center text-left gap-2 px-3 py-2 transition-all duration-200 group',
-									selectedPage === item.page
-										? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
-										: 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground',
-								)}
-							>
-								<item.icon className="h-4 w-4 shrink-0" />{' '}
-								{item.text}
-							</Link>
-						</li>
-					))}
-				</ul>
-			</TooltipContent>
-		</Tooltip>
+				<item.icon className="h-4 w-4 shrink-0" /> {item.text}
+			</Link>
+		</li>
+	));
+
+	return (
+		// biome-ignore lint/a11y/noStaticElementInteractions: hover-reveal flyout container (mouse-only, mirrors prior collapsed-sidebar behaviour)
+		<div
+			ref={triggerRef}
+			onMouseEnter={openFlyout}
+			onMouseLeave={closeFlyout}
+		>
+			<div
+				className={cn(
+					'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group cursor-default',
+					isSelected
+						? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
+						: 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground',
+				)}
+				aria-description={text}
+			>
+				<SectionIcon
+					className={cn(
+						'h-5 w-5 shrink-0',
+						isSelected && 'text-sidebar-primary',
+					)}
+				/>
+			</div>
+
+			{/*
+			 * Interactive hover flyout for the collapsed sidebar. Rendered in a portal so it
+			 * escapes the sidebar's overflow-clipping; positioned to the right of the icon.
+			 * (A tooltip role can't hold links, and HeroUI has no hover-card.)
+			 */}
+			{isOpen &&
+				createPortal(
+					// biome-ignore lint/a11y/noStaticElementInteractions: hover-bridge wrapper that keeps the flyout open while the pointer is over it
+					<div
+						className="fixed z-50 pl-2"
+						style={{ top: position.top, left: position.left }}
+						onMouseEnter={openFlyout}
+						onMouseLeave={closeFlyout}
+					>
+						<nav
+							aria-label={text}
+							className="min-w-48 rounded-lg border border-border bg-overlay text-overlay-foreground shadow-md p-1 animate-fade-in"
+						>
+							<ul className="py-1">{flyout}</ul>
+						</nav>
+					</div>,
+					document.body,
+				)}
+		</div>
 	);
 }

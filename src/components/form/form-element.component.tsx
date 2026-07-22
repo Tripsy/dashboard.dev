@@ -521,7 +521,7 @@ export const FormComponentSelect = <Fields,>({
 								id={id}
 								placeholder={placeholderText}
 								className={cn(
-									'h-10 w-full border-border',
+									'h-10 w-full rounded-md border border-border shadow-none',
 									borderClass,
 									className,
 								)}
@@ -545,7 +545,7 @@ export const FormComponentSelect = <Fields,>({
 						<Select.Trigger
 							id={id}
 							className={cn(
-								'h-10 items-center border-border',
+								'h-10 items-center rounded-md border border-border shadow-none',
 								borderClass,
 								className,
 							)}

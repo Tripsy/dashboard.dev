@@ -1,8 +1,11 @@
-import { useCallback } from 'react';
-import { useAvailableCmrWebSocket } from '@/app/(public)/_hooks/use-available-cmr-websocket.hook';
+import { useAttachCmrToSession } from '@/app/(public)/_hooks/use-attach-cmr-to-session.hook';
+import { useAvailableCmr } from '@/app/(public)/_providers/available-cmr.provider';
 import { useWorkSession } from '@/app/(public)/_providers/work-session.provider';
+import {
+	CmrAddressRow,
+	CmrContactRow,
+} from '@/app/(public)/driver-panel/driver-panel-cmr-fields.component';
 import { Icons } from '@/components/icon.component';
-import { LocationNavigator } from '@/components/location-navigator.component';
 import {
 	ErrorComponent,
 	LoadingComponent,
@@ -16,12 +19,14 @@ import { formatEnumLabel } from '@/helpers/string.helper';
 import { displayAddressLabel } from '@/models/address.model';
 import { displayClientLabel } from '@/models/client.model';
 import { type CmrModel, CmrStatusEnum } from '@/models/cmr.model';
-import type { CompanyVehicleModel } from '@/models/company-vehicle.model';
-import type { WorkSessionModel } from '@/models/work-session.model';
-import { createCmrSession } from '@/services/cmr-session.service';
 
 export function DriverPanelAvailableCmrs() {
-	const { entries: cmrs, wsStatus } = useAvailableCmrWebSocket();
+	const {
+		entries: cmrs,
+		wsStatus,
+		errorMessage,
+		reconnect,
+	} = useAvailableCmr();
 
 	if (wsStatus === 'connecting') {
 		return <LoadingComponent className="min-h-[calc(40vh-4rem)]" />;
@@ -29,10 +34,14 @@ export function DriverPanelAvailableCmrs() {
 
 	if (wsStatus === 'terminated') {
 		return (
-			<ErrorComponent
-				description="Connection aborted"
-				className="min-h-[calc(40vh-4rem)]"
-			/>
+			<div className="min-h-[calc(40vh-4rem)] flex flex-col items-center justify-center gap-4">
+				<ErrorComponent
+					description={errorMessage ?? 'Connection aborted'}
+				/>
+				<Button onClick={reconnect} title="Reconnect">
+					<Icons.Action.Return className="h-4 w-4" /> Reconnect
+				</Button>
+			</div>
 		);
 	}
 
@@ -48,8 +57,8 @@ export function DriverPanelAvailableCmrs() {
 	return (
 		<div className="space-y-4">
 			{cmrs.length === 0 ? (
-				<div className="text-center py-8 px-4 bg-muted rounded-lg border border-border">
-					<p className="text-sm text-muted-foreground">
+				<div className="text-center py-8 px-4 bg-surface-secondary rounded-lg border border-border">
+					<p className="text-sm text-muted">
 						No CMRs for this session yet
 					</p>
 				</div>
@@ -57,7 +66,7 @@ export function DriverPanelAvailableCmrs() {
 				cmrs.map((cmr) => (
 					<div
 						key={cmr.id}
-						className="bg-card border border-border rounded-lg p-4"
+						className="bg-surface border border-border rounded-lg p-4"
 					>
 						<DriverPanelAvailableCmrEntry cmr={cmr} />
 					</div>
@@ -68,38 +77,10 @@ export function DriverPanelAvailableCmrs() {
 }
 
 function DriverPanelAvailableCmrEntry({ cmr }: { cmr: CmrModel }) {
-	const {
-		setActiveTab,
-		activeSession,
-		refreshSession,
-		activeSessionVehicleAuto,
-		activeSessionVehicleTrailer,
-	} = useWorkSession();
+	const { activeSession, activeSessionVehicleAuto } = useWorkSession();
+	const attachCmrToSession = useAttachCmrToSession();
 
 	const language = getLanguageClient();
-
-	const handleAssignCmr = useCallback(
-		async (
-			cmr: CmrModel,
-			activeSession: WorkSessionModel,
-			activeSessionVehicleAuto: CompanyVehicleModel,
-			activeSessionVehicleTrailer: CompanyVehicleModel | null,
-		) => {
-			await createCmrSession(
-				{
-					work_session_id: activeSession.id,
-					company_vehicle_id_auto: activeSessionVehicleAuto?.id,
-					company_vehicle_id_trailer: activeSessionVehicleTrailer?.id,
-				},
-				cmr.id,
-			);
-
-			await refreshSession();
-
-			setActiveTab('sessionCmrs');
-		},
-		[refreshSession, setActiveTab],
-	);
 
 	const deliveryAddress = cmr.delivery_address
 		? displayAddressLabel(cmr.delivery_address, language)
@@ -112,22 +93,15 @@ function DriverPanelAvailableCmrEntry({ cmr }: { cmr: CmrModel }) {
 		<div className="flex justify-between">
 			<div className="flex flex-col justify-between items-start self-stretch gap-2">
 				<h3 className="flex items-center gap-4">
-					<div className="font-semibold text-card-foreground ">
+					<div className="font-semibold text-surface-foreground ">
 						CMR#{cmr.id}
 					</div>
 					<DisplayStatus status={cmr.status} dataSource="cmr" />
 
 					{activeSession && activeSessionVehicleAuto && (
 						<Button
-							variant="info"
-							onClick={() =>
-								handleAssignCmr(
-									cmr,
-									activeSession,
-									activeSessionVehicleAuto,
-									activeSessionVehicleTrailer,
-								)
-							}
+							variant="default"
+							onClick={() => attachCmrToSession(cmr.id)}
 							title="Assign CMR to my work session"
 							className="text-sm px-2 py-1.5"
 						>
@@ -136,32 +110,27 @@ function DriverPanelAvailableCmrEntry({ cmr }: { cmr: CmrModel }) {
 					)}
 				</h3>
 				<div className="flex items-center">
-					<span className="text-muted-foreground">Notes:</span>
+					<span className="text-muted">Notes:</span>
 					<span className="ml-2 font-mono">{cmr.notes}</span>
 				</div>
 				<div className="flex">
-					<div className="text-muted-foreground">Transport:</div>
+					<div className="text-muted">Transport:</div>
 					<div className="ml-4 font-mono">
 						{formatEnumLabel(cmr.transport_type)}
 					</div>
 				</div>
 				<div>
-					<span className="text-muted-foreground">Client:</span>
+					<span className="text-muted">Client:</span>
 					<span className="ml-2 font-mono">
 						{displayClientLabel(cmr.client)}
 					</span>
 				</div>
-				<div>
-					<span className="text-muted-foreground">Contact:</span>
-					<span className="ml-2 font-mono flex gap-2">
-						{cmr.contact_name}
-						<a href={`tel:${cmr.contact_phone}`}>
-							{cmr.contact_phone}
-						</a>
-					</span>
-				</div>
+				<CmrContactRow
+					name={cmr.contact_name}
+					phone={cmr.contact_phone}
+				/>
 				<div className="flex items-center">
-					<span className="text-muted-foreground">Ordered at:</span>
+					<span className="text-muted">Ordered at:</span>
 					<span className="ml-2 font-mono">
 						{formatDate(cmr.ordered_at, undefined, {
 							customFormat: 'D MMMM, HH:mm',
@@ -170,9 +139,7 @@ function DriverPanelAvailableCmrEntry({ cmr }: { cmr: CmrModel }) {
 				</div>
 				{cmr.status === CmrStatusEnum.ORDERED && (
 					<div className="flex items-center">
-						<span className="text-muted-foreground">
-							Pick scheduled at:
-						</span>
+						<span className="text-muted">Pick scheduled at:</span>
 						<span className="ml-2 font-mono">
 							{formatDate(cmr.pick_scheduled_at, undefined, {
 								customFormat: 'D MMMM, HH:mm',
@@ -181,13 +148,10 @@ function DriverPanelAvailableCmrEntry({ cmr }: { cmr: CmrModel }) {
 					</div>
 				)}
 				{cmr.status === CmrStatusEnum.ORDERED && (
-					<div className="flex flex-col">
-						<div className="text-muted-foreground flex items-center gap-2">
-							Pickup address:
-							<LocationNavigator address={pickupAddress} />
-						</div>
-						<div className="ml-4 font-mono">{pickupAddress}</div>
-					</div>
+					<CmrAddressRow
+						label="Pickup address"
+						address={pickupAddress}
+					/>
 				)}
 				{arrayHasValue(cmr.status, [
 					CmrStatusEnum.ORDERED,
@@ -196,7 +160,7 @@ function DriverPanelAvailableCmrEntry({ cmr }: { cmr: CmrModel }) {
 					CmrStatusEnum.DELAYED,
 				]) && (
 					<div className="flex items-center">
-						<span className="text-muted-foreground">
+						<span className="text-muted">
 							Estimated delivery at:
 						</span>
 						<span className="ml-2 font-mono">
@@ -206,13 +170,10 @@ function DriverPanelAvailableCmrEntry({ cmr }: { cmr: CmrModel }) {
 						</span>
 					</div>
 				)}
-				<div className="flex flex-col">
-					<div className="text-muted-foreground flex items-center gap-2">
-						Delivery address:
-						<LocationNavigator address={deliveryAddress} />
-					</div>
-					<div className="ml-4 font-mono">{deliveryAddress}</div>
-				</div>
+				<CmrAddressRow
+					label="Delivery address"
+					address={deliveryAddress}
+				/>
 			</div>
 		</div>
 	);

@@ -24,7 +24,6 @@ import {
 	ErrorComponent,
 	SuccessComponent,
 } from '@/components/status.component';
-import { Label } from '@/components/ui/label';
 import Routes from '@/config/routes.setup';
 import { createHandleChange, toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
@@ -90,13 +89,13 @@ export default function Register() {
 				description={formMessage as string}
 			>
 				<div className="text-center mt-6">
-					<span className="text-muted-foreground">
+					<span className="text-muted">
 						Have you confirmed your email? If you’ve lost the
 						instructions, you can resend the{' '}
 					</span>
 					<Link
 						href={Routes.get('email-confirm-send')}
-						className="text-primary font-medium hover:underline"
+						className="text-accent font-medium hover:underline"
 					>
 						confirmation email
 					</Link>
@@ -128,7 +127,7 @@ export default function Register() {
 					Meanwhile you can go back to{' '}
 					<Link
 						href={Routes.get('home')}
-						className="text-primary font-medium hover:underline"
+						className="text-accent font-medium hover:underline"
 					>
 						home page
 					</Link>
@@ -217,16 +216,13 @@ export default function Register() {
 					error={errors.terms}
 				>
 					<div>
-						<Label
-							htmlFor={elementIds.terms}
-							className="cursor-pointer text-sm text-muted-foreground"
-						>
+						<span className="cursor-pointer text-sm text-muted">
 							I agree to the{' '}
 							<Link
 								href={Routes.get('page', {
 									label: 'terms-and-conditions',
 								})}
-								className="text-primary font-medium hover:underline"
+								className="text-accent font-medium hover:underline"
 								target="_blank"
 								title="Terms & Conditions"
 							>
@@ -237,14 +233,14 @@ export default function Register() {
 								href={Routes.get('page', {
 									label: 'privacy-policy',
 								})}
-								className="text-primary font-medium hover:underline"
+								className="text-accent font-medium hover:underline"
 								target="_blank"
 								title="Privacy Policy"
 							>
 								Privacy Policy
 							</Link>
 							.
-						</Label>
+						</span>
 					</div>
 				</FormComponentCheckbox>
 
@@ -263,11 +259,11 @@ export default function Register() {
 				/>
 
 				<div className="text-center space-y-2">
-					<p className="text-sm text-muted-foreground">
+					<p className="text-sm text-muted">
 						Already registered?{' '}
 						<Link
 							href={Routes.get('login')}
-							className="text-primary font-medium hover:underline"
+							className="text-accent font-medium hover:underline"
 						>
 							Sign in here
 						</Link>

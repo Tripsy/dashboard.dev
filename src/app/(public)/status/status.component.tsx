@@ -30,7 +30,7 @@ const HomeLink = () => (
 		Go back to{' '}
 		<Link
 			href={Routes.get('home')}
-			className="text-primary font-medium hover:underline"
+			className="text-accent font-medium hover:underline"
 		>
 			home page
 		</Link>

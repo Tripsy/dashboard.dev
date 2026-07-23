@@ -82,7 +82,7 @@ export default function PasswordRecoverChange() {
 					You can now go to the{' '}
 					<Link
 						href={Routes.get('login')}
-						className="text-primary font-medium hover:underline"
+						className="text-accent font-medium hover:underline"
 					>
 						login page
 					</Link>{' '}

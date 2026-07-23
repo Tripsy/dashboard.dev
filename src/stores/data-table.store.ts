@@ -105,6 +105,7 @@ export const createDataTableStore = <K extends DataSourceKey, Model>(
 				})),
 				{
 					name: `datatable-store-${String(section)}-${String(dataSource)}`,
+					version: 1, // Bump on breaking changes to `DataTableStateType`/filters shape to drop stale persisted state
 					partialize: (state) => ({
 						tableState: state.tableState,
 						selectedEntries: state.selectedEntries,

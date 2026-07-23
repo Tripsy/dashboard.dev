@@ -61,16 +61,16 @@ export function ViewImage({ entry }: { entry: ImageModel }) {
 			</div>
 
 			<div className="mb-4">
-				<Tabs defaultValue={contentTabDefault} className="w-full">
-					<div className="flex items-center justify-center border-b border-line pb-2 mb-4">
+				<Tabs defaultSelectedKey={contentTabDefault} className="w-full">
+					<div className="flex items-center border-b border-line pb-2 gap-2">
 						<h3 className="font-bold whitespace-nowrap">
 							Language specific
 						</h3>
-						<TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
+						<TabsList>
 							{languageContents.map((value) => (
 								<TabsTrigger
 									key={value.language}
-									value={value.language}
+									id={value.language}
 								>
 									{value.language.toUpperCase()}
 								</TabsTrigger>
@@ -81,9 +81,9 @@ export function ViewImage({ entry }: { entry: ImageModel }) {
 						return (
 							<TabsContent
 								key={`content-${value.language}`}
-								value={value.language}
+								id={value.language}
 							>
-								<div className="ml-4 space-y-1 text-sm">
+								<div className="space-y-1 text-sm">
 									<div>
 										<span className="font-semibold">
 											Title

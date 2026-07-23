@@ -22,75 +22,24 @@ export function DriverPanelSessionCashFlow({
 }: {
 	entries: CashFlowModel[];
 }) {
-	const { data: ronData, invalidate: ronInvalidate } = useDriverCashBalance(
-		CurrencyEnum.RON,
-	);
-	const { data: eurData, invalidate: eurInvalidate } = useDriverCashBalance(
-		CurrencyEnum.EUR,
-	);
-	const { data: usdData, invalidate: usdInvalidate } = useDriverCashBalance(
-		CurrencyEnum.USD,
-	);
-
-	const balances = [
-		{ currency: CurrencyEnum.RON, balance: ronData?.balance ?? 0 },
-		{ currency: CurrencyEnum.EUR, balance: eurData?.balance ?? 0 },
-		{ currency: CurrencyEnum.USD, balance: usdData?.balance ?? 0 },
-	];
-
-	const invalidateBalance = useCallback(
-		async (currency: string) => {
-			switch (currency) {
-				case CurrencyEnum.RON:
-					await ronInvalidate();
-					break;
-				case CurrencyEnum.EUR:
-					await eurInvalidate();
-					break;
-				case CurrencyEnum.USD:
-					await usdInvalidate();
-					break;
-			}
-		},
-		[ronInvalidate, eurInvalidate, usdInvalidate],
-	);
+	// One call refreshes every currency balance (the cash-flow list can move any
+	// of them); the currency arg only satisfies the hook signature.
+	const { invalidateAll } = useDriverCashBalance(CurrencyEnum.RON);
 
 	return (
-		<>
-			<div className="mb-4">
-				<div className="flex items-center gap-4 bg-card border border-border rounded-lg p-4">
-					<div className="font-semibold py-2 px-4 bg-muted-foreground/20 rounded-lg">
-						Balance
-					</div>
-					<div className="flex gap-6 font-semibold">
-						{balances
-							.filter(({ balance }) => balance && balance !== 0)
-							.map(({ currency, balance }) => (
-								<div key={currency}>
-									<DisplayAmount
-										amount={balance}
-										currencyCode={currency}
-										classNamePositive="text-success dark:text-success"
-									/>
-								</div>
-							))}
-					</div>
+		<div className="space-y-4">
+			{entries.map((m) => (
+				<div
+					key={m.id}
+					className="bg-surface border border-border rounded-lg p-4"
+				>
+					<DriverPanelSessionCashFlowEntry
+						entry={m}
+						onBalanceInvalidate={invalidateAll}
+					/>
 				</div>
-			</div>
-			<div className="space-y-4">
-				{entries.map((m) => (
-					<div
-						key={m.id}
-						className="bg-card border border-border rounded-lg p-4"
-					>
-						<DriverPanelSessionCashFlowEntry
-							entry={m}
-							onBalanceInvalidate={invalidateBalance}
-						/>
-					</div>
-				))}
-			</div>
-		</>
+			))}
+		</div>
 	);
 }
 
@@ -99,9 +48,9 @@ function DriverPanelSessionCashFlowEntry({
 	onBalanceInvalidate,
 }: {
 	entry: CashFlowModel;
-	onBalanceInvalidate: (currency: string) => Promise<void>;
+	onBalanceInvalidate: () => Promise<void>;
 }) {
-	const { open } = useModalStore();
+	const open = useModalStore((s) => s.open);
 	const { refetchSessionCashFlowEntries } = useWorkSession();
 
 	const handleUpdateCashFlow = useCallback(
@@ -139,7 +88,7 @@ function DriverPanelSessionCashFlowEntry({
 						await refetchSessionCashFlowEntries();
 
 						if (entry.method === CashFlowMethodEnum.CASH) {
-							await onBalanceInvalidate(entry.currency);
+							await onBalanceInvalidate();
 						}
 					},
 				},
@@ -171,12 +120,12 @@ function DriverPanelSessionCashFlowEntry({
 	return (
 		<div className="flex justify-between">
 			<div className="flex flex-col justify-between items-start self-stretch gap-2">
-				<h3 className="font-semibold text-card-foreground flex items-center gap-4">
+				<h3 className="font-semibold text-surface-foreground flex items-center gap-4">
 					<div className="flex items-center gap-1">
 						{entry.direction === CashFlowDirectionEnum.IN ? (
 							<Icons.Direction.ArrowRight className="h-4 w-4 text-success" />
 						) : (
-							<Icons.Direction.ArrowLeft className="h-4 w-4 text-error dark:text-warning" />
+							<Icons.Direction.ArrowLeft className="h-4 w-4 text-danger dark:text-warning" />
 						)}
 						{formatEnumLabel(entry.method)} #{entry.id}
 					</div>
@@ -189,7 +138,7 @@ function DriverPanelSessionCashFlowEntry({
 				</h3>
 				{entry.operational_records?.client && (
 					<div>
-						<span className="text-muted-foreground">Client:</span>
+						<span className="text-muted">Client:</span>
 						<span className="ml-2 font-mono">
 							{displayClientLabel(
 								entry.operational_records.client,
@@ -198,7 +147,7 @@ function DriverPanelSessionCashFlowEntry({
 					</div>
 				)}
 				<div>
-					<span className="text-muted-foreground">Amount:</span>
+					<span className="text-muted">Amount:</span>
 					<span className="ml-2 font-mono">
 						<DisplayAmount
 							amount={entry.grossAmount}
@@ -209,9 +158,7 @@ function DriverPanelSessionCashFlowEntry({
 				</div>
 				{entry.external_reference && (
 					<div>
-						<span className="text-muted-foreground">
-							Reference:
-						</span>
+						<span className="text-muted">Reference:</span>
 						<span className="ml-2 font-mono">
 							{entry.external_reference}
 						</span>
@@ -219,7 +166,7 @@ function DriverPanelSessionCashFlowEntry({
 				)}
 				{entry.operational_records?.vendor && (
 					<div>
-						<span className="text-muted-foreground">Vendor:</span>
+						<span className="text-muted">Vendor:</span>
 						<span className="ml-2 font-mono">
 							{displayVendorLabel(
 								entry.operational_records.vendor,
@@ -229,7 +176,7 @@ function DriverPanelSessionCashFlowEntry({
 				)}
 				{entry.notes && (
 					<div>
-						<span className="text-muted-foreground">Notes:</span>
+						<span className="text-muted">Notes:</span>
 						<span className="ml-2 font-mono">{entry.notes}</span>
 					</div>
 				)}
@@ -239,7 +186,7 @@ function DriverPanelSessionCashFlowEntry({
 				{entry.status === CashFlowStatusEnum.PENDING && (
 					<Button
 						variant="secondary"
-						hover="info"
+						hover="default"
 						onClick={() => handleUpdateCashFlow(entry)}
 						className="cursor-pointer"
 						title="Update payment"
@@ -252,7 +199,7 @@ function DriverPanelSessionCashFlowEntry({
 						<>
 							<Button
 								variant="secondary"
-								hover="info"
+								hover="default"
 								onClick={() => handleCompleteCashFlow(entry)}
 								className="cursor-pointer"
 								title="Mark as complete"

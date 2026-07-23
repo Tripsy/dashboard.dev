@@ -8,8 +8,7 @@ import {
 	Zap,
 } from 'lucide-react';
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { Link } from '@/components/ui/link';
 import Routes from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
 import { translate } from '@/config/translate.setup';
@@ -68,7 +67,7 @@ export default function Page() {
 			<section className="relative overflow-hidden bg-gradient-hero">
 				<div className="container-default py-20 md:py-32">
 					<div className="max-w-3xl mx-auto text-center">
-						<div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary text-secondary-foreground text-sm font-medium mb-6">
+						<div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-default text-default-foreground text-sm font-medium mb-6">
 							<Sparkles className="h-4 w-4" />
 							<span>Introducing NReady v1.0</span>
 						</div>
@@ -78,39 +77,35 @@ export default function Page() {
 							React Apps
 							<br className="hidden sm:block" /> with Confidence
 						</h1>
-						<p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+						<p className="text-lg md:text-xl text-muted mb-8 max-w-2xl mx-auto">
 							A comprehensive design system with accessible
 							components, responsive layouts, and a stunning color
 							palette that makes your applications shine.
 						</p>
 						<div className="flex flex-col sm:flex-row gap-4 justify-center">
-							<Button
+							<Link
 								size="lg"
 								className="h-12 px-8 text-base"
-								asChild
+								href={Routes.get('register')}
 							>
-								<Link href={Routes.get('register')}>
-									Get Started
-									<ArrowRight className="ml-2 h-5 w-5" />
-								</Link>
-							</Button>
-							<Button
+								Get Started
+								<ArrowRight className="ml-2 h-5 w-5" />
+							</Link>
+							<Link
 								size="lg"
 								variant="outline"
 								className="h-12 px-8 text-base"
-								asChild
+								href={Routes.get('docs')}
 							>
-								<Link href={Routes.get('docs')}>
-									View Documentation
-								</Link>
-							</Button>
+								View Documentation
+							</Link>
 						</div>
 					</div>
 				</div>
 
 				{/* Decorative elements */}
-				<div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
-				<div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary/50 rounded-full blur-3xl" />
+				<div className="absolute top-20 left-10 w-72 h-72 bg-accent/10 rounded-full blur-3xl" />
+				<div className="absolute bottom-20 right-10 w-96 h-96 bg-default/50 rounded-full blur-3xl" />
 			</section>
 
 			{/* Features Section */}
@@ -120,7 +115,7 @@ export default function Page() {
 						<h2 className="text-3xl md:text-4xl font-bold mb-4">
 							Everything You Need
 						</h2>
-						<p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+						<p className="text-lg text-muted max-w-2xl mx-auto">
 							A complete toolkit for building modern React
 							applications with beautiful, accessible, and
 							performant components.
@@ -131,15 +126,15 @@ export default function Page() {
 						{features.map((feature) => (
 							<div
 								key={feature.title}
-								className="group p-6 rounded-xl border border-border bg-card card-hover"
+								className="group p-6 rounded-xl border border-border bg-surface card-hover"
 							>
-								<div className="flex h-12 w-12 items-center justify-center rounded-lg bg-accent mb-4">
-									<feature.icon className="h-6 w-6 text-accent-foreground" />
+								<div className="flex h-12 w-12 items-center justify-center rounded-lg bg-accent-soft mb-4">
+									<feature.icon className="h-6 w-6 text-accent-soft-foreground" />
 								</div>
 								<h3 className="text-lg font-semibold mb-2">
 									{feature.title}
 								</h3>
-								<p className="text-sm text-muted-foreground">
+								<p className="text-sm text-muted">
 									{feature.description}
 								</p>
 							</div>
@@ -149,32 +144,32 @@ export default function Page() {
 			</section>
 
 			{/* CTA Section */}
-			<section className="py-20 md:py-28 bg-muted/30">
+			<section className="py-20 md:py-28 bg-surface-secondary/30">
 				<div className="container-default">
 					<div className="max-w-3xl mx-auto text-center">
 						<h2 className="text-3xl md:text-4xl font-bold mb-4">
 							Ready to Get Started?
 						</h2>
-						<p className="text-lg text-muted-foreground mb-8">
+						<p className="text-lg text-muted mb-8">
 							Join thousands of developers building beautiful
 							applications with NReady.
 						</p>
 						<div className="flex flex-col sm:flex-row gap-4 justify-center">
-							<Button size="lg" className="h-12 px-8" asChild>
-								<Link href={Routes.get('register')}>
-									Create Free Account
-								</Link>
-							</Button>
-							<Button
+							<Link
+								size="lg"
+								className="h-12 px-8"
+								href={Routes.get('register')}
+							>
+								Create Free Account
+							</Link>
+							<Link
 								size="lg"
 								variant="secondary"
 								className="h-12 px-8"
-								asChild
+								href={Routes.get('docs')}
 							>
-								<Link href={Routes.get('docs')}>
-									Explore Components
-								</Link>
-							</Button>
+								Explore Components
+							</Link>
 						</div>
 					</div>
 				</div>

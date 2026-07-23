@@ -47,7 +47,7 @@ export function ViewBrand({ entry }: { entry: BrandModel }) {
 					{entry.deleted_at && (
 						<div>
 							<span className="font-semibold">Deleted At</span>{' '}
-							<span className="text-error">
+							<span className="text-danger">
 								{formatDate(entry.deleted_at, 'date-time')}
 							</span>
 						</div>
@@ -55,60 +55,65 @@ export function ViewBrand({ entry }: { entry: BrandModel }) {
 				</div>
 			</div>
 
-			<div className="mb-4">
-				<Tabs defaultValue={contentTabDefault} className="w-full">
-					<div className="flex items-center justify-center border-b border-line pb-2 mb-4">
-						<h3 className="font-bold whitespace-nowrap">
-							Language specific
-						</h3>
-						<TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
-							{languageContents.map((value) => (
-								<TabsTrigger
-									key={value.language}
-									value={value.language}
+			{languageContents.length > 0 && (
+				<div className="mb-4">
+					<Tabs
+						defaultSelectedKey={contentTabDefault}
+						className="w-full"
+					>
+						<div className="flex items-center justify-center border-b border-line pb-2 mb-4">
+							<h3 className="font-bold whitespace-nowrap">
+								Language specific
+							</h3>
+							<TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
+								{languageContents.map((value) => (
+									<TabsTrigger
+										key={value.language}
+										id={value.language}
+									>
+										{value.language.toUpperCase()}
+									</TabsTrigger>
+								))}
+							</TabsList>
+						</div>
+						{languageContents.map((value) => {
+							return (
+								<TabsContent
+									key={`content-${value.language}`}
+									id={value.language}
 								>
-									{value.language.toUpperCase()}
-								</TabsTrigger>
-							))}
-						</TabsList>
-					</div>
-					{languageContents.map((value) => {
-						return (
-							<TabsContent
-								key={`content-${value.language}`}
-								value={value.language}
-							>
-								<div className="ml-4 space-y-1 text-sm">
-									<div>
-										<span className="font-semibold">
-											Description
-										</span>{' '}
-										{value.description}
+									<div className="space-y-1 text-sm">
+										<div>
+											<span className="font-semibold">
+												Description
+											</span>{' '}
+											{value.description}
+										</div>
+										<div>
+											<span className="font-semibold">
+												Meta - Title
+											</span>{' '}
+											{value.meta?.title || 'n/a'}
+										</div>
+										<div>
+											<span className="font-semibold">
+												Meta - Description
+											</span>{' '}
+											{value.meta?.description || 'n/a'}
+										</div>
+										<div>
+											<span className="font-semibold">
+												Meta - Keywords
+											</span>{' '}
+											{value.meta?.keywords || 'n/a'}
+										</div>
 									</div>
-									<div>
-										<span className="font-semibold">
-											Meta - Title
-										</span>{' '}
-										{value.meta?.title || 'n/a'}
-									</div>
-									<div>
-										<span className="font-semibold">
-											Meta - Description
-										</span>{' '}
-										{value.meta?.description || 'n/a'}
-									</div>
-									<div>
-										<span className="font-semibold">
-											Meta - Keywords
-										</span>{' '}
-										{value.meta?.keywords || 'n/a'}
-									</div>
-								</div>
-							</TabsContent>
-						);
-					})}
-				</Tabs>
-			</div>
+								</TabsContent>
+							);
+						})}
+					</Tabs>
+				</div>
+			)}
 		</div>
 	);
 }

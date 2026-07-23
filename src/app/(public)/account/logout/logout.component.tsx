@@ -74,14 +74,14 @@ export default function Logout() {
 					You can go back to{' '}
 					<Link
 						href={Routes.get('login')}
-						className="text-primary font-medium hover:underline"
+						className="text-accent font-medium hover:underline"
 					>
 						login
 					</Link>{' '}
 					or navigate to{' '}
 					<Link
 						href={Routes.get('home')}
-						className="text-primary font-medium hover:underline"
+						className="text-accent font-medium hover:underline"
 					>
 						home page
 					</Link>

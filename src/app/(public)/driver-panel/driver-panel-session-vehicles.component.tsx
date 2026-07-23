@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import type { WorkSessionVehicleFormValuesType } from '@/app/(public)/_components/work-session-vehicle/form-manage-work-session-vehicle.component';
 import { useWorkSession } from '@/app/(public)/_providers/work-session.provider';
 import { Icons } from '@/components/icon.component';
@@ -13,15 +13,17 @@ import { displayCompanyVehicleLabel } from '@/models/company-vehicle.model';
 import { VehicleTypeEnum } from '@/models/vehicle.model';
 import {
 	type WorkSessionVehicleModel,
+	type WorkSessionVehicleStatus,
 	WorkSessionVehicleStatusEnum,
 } from '@/models/work-session-vehicle.model';
 import { updateWorkSessionVehicle } from '@/services/work-session-vehicle.service';
 import { useModalStore } from '@/stores/window.store';
 import { DataSourceSectionEnum } from '@/types/data-source.type';
 
-const STATUS_ORDER: Record<string, number> = {
-	assigned: 0,
-	returned: 1,
+// Full map over WorkSessionVehicleStatus so a new status must be ranked here.
+const STATUS_ORDER: Record<WorkSessionVehicleStatus, number> = {
+	[WorkSessionVehicleStatusEnum.ASSIGNED]: 0,
+	[WorkSessionVehicleStatusEnum.RETURNED]: 1,
 };
 
 export function DriverPanelSessionVehicles({
@@ -29,11 +31,23 @@ export function DriverPanelSessionVehicles({
 }: {
 	sessionVehicles: WorkSessionVehicleModel[];
 }) {
-	const { open } = useModalStore();
+	const open = useModalStore((s) => s.open);
 	const { setActiveTab, refreshSession, refetchSessionCashFlowEntries } =
 		useWorkSession();
 
 	const [withReturned, setWithReturned] = useState(false);
+
+	// update and return submit the same backend call; share one operation builder.
+	const buildUpdateOperation = useCallback(
+		(entry: WorkSessionVehicleModel) =>
+			(values: WorkSessionVehicleFormValuesType) =>
+				updateWorkSessionVehicle(
+					values,
+					entry.id,
+					entry.work_session.id,
+				),
+		[],
+	);
 
 	const handleUpdateSessionVehicle = useCallback(
 		(entry: WorkSessionVehicleModel) => {
@@ -46,15 +60,7 @@ export function DriverPanelSessionVehicles({
 					entries: [entry],
 				},
 				definition: {
-					operationFunction: (
-						values: WorkSessionVehicleFormValuesType,
-					) => {
-						return updateWorkSessionVehicle(
-							values,
-							entry.id,
-							entry.work_session.id,
-						);
-					},
+					operationFunction: buildUpdateOperation(entry),
 				},
 				events: {
 					success: async () => {
@@ -63,7 +69,7 @@ export function DriverPanelSessionVehicles({
 				},
 			});
 		},
-		[open, refreshSession],
+		[open, refreshSession, buildUpdateOperation],
 	);
 
 	const handleDeleteSessionVehicle = useCallback(
@@ -97,15 +103,7 @@ export function DriverPanelSessionVehicles({
 					entries: [entry],
 				},
 				definition: {
-					operationFunction: (
-						values: WorkSessionVehicleFormValuesType,
-					) => {
-						return updateWorkSessionVehicle(
-							values,
-							entry.id,
-							entry.work_session.id,
-						);
-					},
+					operationFunction: buildUpdateOperation(entry),
 				},
 				events: {
 					success: async () => {
@@ -114,7 +112,7 @@ export function DriverPanelSessionVehicles({
 				},
 			});
 		},
-		[open, refreshSession],
+		[open, refreshSession, buildUpdateOperation],
 	);
 
 	const handleCreatePaymentFuel = useCallback(
@@ -182,13 +180,16 @@ export function DriverPanelSessionVehicles({
 		(m) => m.status === WorkSessionVehicleStatusEnum.RETURNED,
 	);
 
-	const sessionVehiclesSorted = withReturned
-		? [...sessionVehicles].sort(
-				(a, b) =>
-					(STATUS_ORDER[a.status] ?? 99) -
-					(STATUS_ORDER[b.status] ?? 99),
-			)
-		: sessionVehicles;
+	const sessionVehiclesSorted = useMemo(
+		() =>
+			withReturned
+				? [...sessionVehicles].sort(
+						(a, b) =>
+							STATUS_ORDER[a.status] - STATUS_ORDER[b.status],
+					)
+				: sessionVehicles,
+		[withReturned, sessionVehicles],
+	);
 
 	return (
 		<>
@@ -202,17 +203,17 @@ export function DriverPanelSessionVehicles({
 					.map((m) => (
 						<div
 							key={m.id}
-							className="bg-card border border-border rounded-lg p-4"
+							className="bg-surface border border-border rounded-lg p-4"
 						>
 							<div className="flex justify-between items-center">
 								<div className="flex flex-col justify-between items-start self-stretch gap-2">
-									<h3 className="font-semibold text-card-foreground">
+									<h3 className="font-semibold text-surface-foreground">
 										{displayCompanyVehicleLabel(
 											m.company_vehicle,
 										)}
 									</h3>
 									<div>
-										<span className="text-muted-foreground">
+										<span className="text-muted">
 											Range Km:
 										</span>
 										<span className="ml-2 font-mono">
@@ -285,7 +286,7 @@ export function DriverPanelSessionVehicles({
 										)}
 										<Button
 											variant="secondary"
-											hover="info"
+											hover="default"
 											onClick={() =>
 												handleUpdateSessionVehicle(m)
 											}
@@ -315,7 +316,7 @@ export function DriverPanelSessionVehicles({
 				{hasReturnedVehicles &&
 					(withReturned ? (
 						<Button
-							variant="ghost"
+							variant="outline"
 							onClick={() => setWithReturned(false)}
 							title="Hide returned vehicles"
 						>
@@ -323,7 +324,7 @@ export function DriverPanelSessionVehicles({
 						</Button>
 					) : (
 						<Button
-							variant="ghost"
+							variant="outline"
 							onClick={() => setWithReturned(true)}
 							title="Show returned vehicles"
 						>

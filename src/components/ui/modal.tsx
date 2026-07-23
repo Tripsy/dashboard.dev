@@ -92,7 +92,7 @@ export function Modal({
 				aria-labelledby={title ? 'modal-title' : undefined}
 				aria-describedby={description ? 'modal-description' : undefined}
 				className={cn(
-					'relative w-full bg-card rounded-xl shadow-xl border border-border animate-scale-in flex flex-col',
+					'relative w-full bg-surface rounded-xl shadow-xl border border-border animate-scale-in flex flex-col',
 					'max-h-[90vh]', // Limit height to 90% of viewport
 					className,
 					SizeClasses[size],
@@ -104,7 +104,7 @@ export function Modal({
 						{title && (
 							<h2
 								id="modal-title"
-								className="text-lg font-semibold text-card-foreground pr-8" // Add padding for close button
+								className="text-lg font-semibold text-surface-foreground pr-8" // Add padding for close button
 							>
 								{title}
 							</h2>
@@ -112,7 +112,7 @@ export function Modal({
 						{description && (
 							<p
 								id="modal-description"
-								className="text-sm text-muted-foreground mt-1"
+								className="text-sm text-muted mt-1"
 							>
 								{description}
 							</p>
@@ -121,26 +121,26 @@ export function Modal({
 				)}
 
 				{/* Control buttons - Fixed */}
-				<div className="absolute right-4 top-4 z-10">
+				<div className="absolute right-4 top-4 z-10 flex gap-2">
 					<Button
 						variant="ghost"
 						size="xs"
-						className="rounded-full"
+						className="rounded-full p-1"
 						hover="warning"
 						onClick={onMinimize}
 						aria-label="Minimize modal"
 					>
-						<Icons.Minimize size={12} />
+						<Icons.Minimize />
 					</Button>
 					<Button
 						variant="ghost"
 						size="xs"
-						className="rounded-full"
+						className="rounded-full p-1"
 						hover="error"
 						onClick={onClose}
 						aria-label="Close modal"
 					>
-						<Icons.Close size={12} />
+						<Icons.Close />
 					</Button>
 				</div>
 

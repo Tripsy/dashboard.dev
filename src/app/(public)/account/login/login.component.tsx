@@ -111,13 +111,13 @@ export default function Login() {
 		return (
 			<ErrorComponent title="Login" description={formMessage as string}>
 				<div className="text-center mt-6">
-					<span className="text-muted-foreground">
+					<span className="text-muted">
 						Have you confirmed your email? If you’ve lost the
 						instructions, you can resend the{' '}
 					</span>
 					<Link
 						href={Routes.get('email-confirm-send')}
-						className="text-primary font-medium hover:underline"
+						className="text-accent font-medium hover:underline"
 					>
 						confirmation email
 					</Link>
@@ -208,20 +208,20 @@ export default function Login() {
 				)}
 
 				<div className="text-center space-y-2">
-					<p className="text-sm text-muted-foreground">
+					<p className="text-sm text-muted">
 						Don't have an account?{' '}
 						<Link
 							href={Routes.get('register')}
-							className="text-primary font-medium hover:underline"
+							className="text-accent font-medium hover:underline"
 						>
 							Create an account
 						</Link>
 					</p>
-					<p className="text-sm text-muted-foreground">
+					<p className="text-sm text-muted">
 						Forgot your password?{' '}
 						<Link
 							href={Routes.get('password-recover')}
-							className="text-primary font-medium hover:underline"
+							className="text-accent font-medium hover:underline"
 						>
 							Reset it here
 						</Link>

@@ -1,206 +1,91 @@
-@import "tailwindcss";
+/*
+ * HeroUI v3 provides Tailwind CSS v4, the full color-token system (light + dark),
+ * and tw-animate-css via this single import. Do NOT also `@import "tailwindcss"`
+ * here — it is pulled in transitively and importing it twice breaks the cascade.
+ */
+@import "@heroui/react/styles";
 
+/*
+ * Class-based dark mode for `dark:` utility variants (used in a few components).
+ * HeroUI switches its own color tokens via the `.dark` selector automatically;
+ * this only rewires the Tailwind `dark:` variant from media-query to `.dark` class,
+ * matching what `theme.provider.tsx` toggles on <html>.
+ */
+@custom-variant dark (:where(.dark, .dark *) &);
+
+/*
+ * App-specific tokens that HeroUI v3 does not ship. Values are expressed in terms
+ * of HeroUI tokens so they track the palette in both themes.
+ *   - sidebar-*      : dashboard sidebar surface (kept as-is; not part of the HeroUI rename).
+ *   - glass/gradient : decorative surfaces used by the public site.
+ */
 :root {
-	/* Gradients */
-	--gradient-lavender: linear-gradient(
-		135deg,
-		hsl(260 60% 65%) 0%,
-		hsl(280 60% 70%) 100%
-	);
+	--success-light: color-mix(in oklab, var(--success) 15%, transparent);
+	--warning-light: color-mix(in oklab, var(--warning) 15%, transparent);
+	--danger-light: color-mix(in oklab, var(--danger) 15%, transparent);
 
-	--gradient-cream: linear-gradient(
-		135deg,
-		hsl(45 60% 94%) 0%,
-		hsl(40 50% 90%) 100%
-	);
+	--sidebar-background: var(--surface);
+	--sidebar-foreground: var(--surface-foreground);
+	--sidebar-primary: var(--accent);
+	--sidebar-primary-foreground: var(--accent-foreground);
+	--sidebar-accent: var(--accent-soft);
+	--sidebar-accent-foreground: var(--accent-soft-foreground);
+	--sidebar-border: var(--border);
+	--sidebar-ring: var(--focus);
+
+	--glass-background: color-mix(in oklab, var(--surface) 80%, transparent);
+	--glass-border: color-mix(in oklab, var(--border) 60%, transparent);
 
 	--gradient-hero: linear-gradient(
 		180deg,
-		hsl(40 20% 98%) 0%,
-		hsl(260 45% 96%) 100%
+		var(--background) 0%,
+		color-mix(in oklab, var(--accent) 6%, var(--background)) 100%
 	);
-
-	/* Glass */
-	--glass-background: 0 0% 100% / 0.8;
-	--glass-border: 0 0% 100% / 0.2;
-
-	/* Shadows */
-	--shadow-sm: 0 1px 2px hsl(240 10% 15% / 0.05);
-	--shadow-md:
-		0 4px 6px -1px hsl(240 10% 15% / 0.08),
-		0 2px 4px -2px hsl(240 10% 15% / 0.05);
-	--shadow-lg:
-		0 10px 15px -3px hsl(240 10% 15% / 0.1),
-		0 4px 6px -4px hsl(240 10% 15% / 0.05);
-	--shadow-xl:
-		0 20px 25px -5px hsl(240 10% 15% / 0.1),
-		0 8px 10px -6px hsl(240 10% 15% / 0.05);
+	--gradient-accent: linear-gradient(
+		135deg,
+		var(--accent) 0%,
+		color-mix(in oklab, var(--accent) 65%, white) 100%
+	);
 }
 
-@custom-variant dark (:where(.dark, .dark *) &);
+.dark {
+	--sidebar-background: var(--surface);
+	--sidebar-foreground: var(--surface-foreground);
 
-@theme {
-	/* Core */
-	--color-background: hsl(40 20% 98%);
-	--color-foreground: hsl(240 10% 15%);
+	--glass-background: color-mix(in oklab, var(--surface) 80%, transparent);
+	--glass-border: color-mix(in oklab, var(--border) 50%, transparent);
 
-	/* Cards & elevated surfaces */
-	--color-card: hsl(0 0% 100%);
-	--color-card-foreground: hsl(240 10% 15%);
+	--gradient-hero: linear-gradient(
+		180deg,
+		var(--background) 0%,
+		color-mix(in oklab, var(--accent) 16%, var(--background)) 100%
+	);
+}
 
-	/* Popovers & dropdowns */
-	--color-popover: hsl(0 0% 100%);
-	--color-popover-foreground: hsl(240 10% 15%);
+/* Expose the custom tokens as Tailwind utilities (bg-sidebar-background, …).
+   `inline` keeps them as late-bound var() refs so `.dark` overrides above take effect. */
+@theme inline {
+	--color-success-light: var(--success-light);
+	--color-warning-light: var(--warning-light);
+	--color-danger-light: var(--danger-light);
 
-	/* Primary - Soft Lavender */
-	--color-primary: hsl(260 60% 65%);
-	--color-primary-hover: hsl(260 60% 58%);
-	--color-primary-foreground: hsl(0 0% 100%);
+	--color-sidebar-background: var(--sidebar-background);
+	--color-sidebar-foreground: var(--sidebar-foreground);
+	--color-sidebar-primary: var(--sidebar-primary);
+	--color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+	--color-sidebar-accent: var(--sidebar-accent);
+	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+	--color-sidebar-border: var(--sidebar-border);
+	--color-sidebar-ring: var(--sidebar-ring);
 
-	/* Secondary - Warm Cream */
-	--color-secondary: hsl(45 60% 94%);
-	--color-secondary-hover: hsl(45 60% 88%);
-	--color-secondary-foreground: hsl(45 40% 25%);
-
-	/* Muted surfaces */
-	--color-muted: hsl(240 10% 96%);
-	--color-muted-foreground: hsl(240 5% 46%);
-
-	/* Accent - Deep Lavender */
-	--color-accent: hsl(260 50% 92%);
-	--color-accent-foreground: hsl(260 60% 35%);
-
-	/* Semantic colors */
-	--color-success: hsl(152 60% 45%);
-	--color-success-foreground: hsl(0 0% 100%);
-	--color-success-light: hsl(152 60% 95%);
-
-	--color-warning: hsl(38 92% 50%);
-	--color-warning-foreground: hsl(38 92% 15%);
-	--color-warning-light: hsl(45 100% 94%);
-
-	--color-error: hsl(0 72% 55%);
-	--color-error-foreground: hsl(0 0% 100%);
-	--color-error-light: hsl(0 72% 96%);
-
-	--color-info: hsl(210 80% 55%);
-	--color-info-foreground: hsl(0 0% 100%);
-	--color-info-light: hsl(210 80% 96%);
-
-	/* Destructive alias */
-	--color-destructive: hsl(0 72% 55%);
-	--color-destructive-foreground: hsl(0 0% 100%);
-
-	/* Borders & inputs */
-	--color-border: hsl(240 10% 90%);
-	--color-input: hsl(240 10% 90%);
-	--color-ring: hsl(260 60% 65%);
-
-	/* Sidebar */
-	--color-sidebar-background: hsl(0 0% 100%);
-	--color-sidebar-foreground: hsl(240 10% 30%);
-	--color-sidebar-primary: hsl(260 60% 65%);
-	--color-sidebar-primary-foreground: hsl(0 0% 100%);
-	--color-sidebar-accent: hsl(260 50% 96%);
-	--color-sidebar-accent-foreground: hsl(260 60% 35%);
-	--color-sidebar-border: hsl(240 10% 92%);
-	--color-sidebar-ring: hsl(260 60% 65%);
-
-	/* Radius */
-	--radius-sm: 0.375rem;
-	--radius-md: 0.5rem;
-	--radius-lg: 0.625rem;
-	--radius-xl: 0.75rem;
-
-	/* Font */
 	--font-sans: "Inter", system-ui, sans-serif;
 
-	/* Animation */
 	--animate-gradient-shift: gradient-shift 3s ease-in-out infinite;
 	--animate-fade-in: fade-in 0.3s ease-out;
 	--animate-slide-in-right: slide-in-right 0.3s ease-out;
 	--animate-slide-in-left: slide-in-left 0.3s ease-out;
 	--animate-scale-in: scale-in 0.2s ease-out;
 	--animate-spin-slow: spin 2s linear infinite;
-}
-
-.dark {
-	--color-background: hsl(240 10% 8%);
-	--color-foreground: hsl(40 20% 98%);
-
-	--color-card: hsl(240 10% 12%);
-	--color-card-foreground: hsl(40 20% 98%);
-
-	--color-popover: hsl(240 10% 12%);
-	--color-popover-foreground: hsl(40 20% 98%);
-
-	--color-primary: hsl(260 60% 70%);
-	--color-primary-hover: hsl(260 60% 75%);
-	--color-primary-foreground: hsl(240 10% 10%);
-
-	--color-secondary: hsl(45 30% 18%);
-	--color-secondary-hover: hsl(45 30% 22%);
-	--color-secondary-foreground: hsl(45 60% 90%);
-
-	--color-muted: hsl(240 10% 18%);
-	--color-muted-foreground: hsl(240 5% 65%);
-
-	--color-accent: hsl(260 40% 20%);
-	--color-accent-foreground: hsl(260 60% 85%);
-
-	--color-success: hsl(152 60% 50%);
-	--color-success-foreground: hsl(152 60% 10%);
-	--color-success-light: hsl(152 40% 15%);
-
-	--color-warning: hsl(38 92% 55%);
-	--color-warning-foreground: hsl(38 92% 10%);
-	--color-warning-light: hsl(38 40% 15%);
-
-	--color-error: hsl(0 72% 30%);
-	--color-error-foreground: hsl(0 72% 85%);
-	--color-error-light: hsl(0 40% 15%);
-
-	--color-info: hsl(210 80% 60%);
-	--color-info-foreground: hsl(210 80% 10%);
-	--color-info-light: hsl(210 40% 15%);
-
-	--color-destructive: hsl(0 62% 45%);
-	--color-destructive-foreground: hsl(0 0% 100%);
-
-	--color-border: hsl(240 10% 20%);
-	--color-input: hsl(240 10% 20%);
-	--color-ring: hsl(260 60% 70%);
-
-	--color-sidebar-background: hsl(240 10% 10%);
-	--color-sidebar-foreground: hsl(40 20% 90%);
-	--color-sidebar-primary: hsl(260 60% 70%);
-	--color-sidebar-primary-foreground: hsl(240 10% 10%);
-	--color-sidebar-accent: hsl(260 40% 18%);
-	--color-sidebar-accent-foreground: hsl(260 60% 85%);
-	--color-sidebar-border: hsl(240 10% 18%);
-	--color-sidebar-ring: hsl(260 60% 70%);
-
-	--glass-background: hsl(240 10% 12% / 0.8);
-	--glass-border: hsl(240 10% 30% / 0.3);
-
-	--gradient-hero: linear-gradient(
-		180deg,
-		hsl(240 10% 6%) 0%,
-		hsl(250 25% 14%) 55%,
-		hsl(260 30% 11%) 100%
-	);
-
-	--gradient-lavender: linear-gradient(
-		135deg,
-		hsl(260 45% 32%) 0%,
-		hsl(280 45% 36%) 100%
-	);
-
-	--gradient-cream: linear-gradient(
-		135deg,
-		hsl(45 20% 18%) 0%,
-		hsl(40 25% 22%) 100%
-	);
 }
 
 @layer base {
@@ -223,8 +108,8 @@
 @layer components {
 	.glass {
 		@apply backdrop-blur-xl;
-		background: hsl(var(--glass-background));
-		border: 1px solid hsl(var(--glass-border));
+		background: var(--glass-background);
+		border: 1px solid var(--glass-border);
 	}
 
 	.card-hover {
@@ -270,10 +155,10 @@
 	}
 
 	.form-section .form-element .form-element-error {
-		@apply w-full text-error-foreground text-xs md:text-sm absolute left-0 top-full mt-2 z-50 px-4 py-2 bg-error rounded shadow-md transition-opacity duration-150 opacity-100 pointer-events-auto md:opacity-0 md:pointer-events-none;
+		@apply w-full text-danger-foreground text-xs md:text-sm absolute left-0 top-full mt-2 z-50 px-4 py-2 bg-danger rounded shadow-md transition-opacity duration-150 opacity-100 pointer-events-auto md:opacity-0 md:pointer-events-none;
 
 		&::before {
-			@apply absolute -top-1.5 left-4 w-3 h-3 bg-error rotate-45;
+			@apply absolute -top-1.5 left-4 w-3 h-3 bg-danger rotate-45;
 			content: "";
 		}
 	}
@@ -283,7 +168,7 @@
 	}
 
 	.form-section .form-error {
-		@apply flex items-center gap-2 mb-2 text-destructive;
+		@apply flex items-center gap-2 mb-2 text-danger;
 	}
 
 	/* Dashboard related */
@@ -327,17 +212,20 @@
 	}
 
 	.dashboard-layout .table-container {
-		@apply bg-primary-foreground rounded-2xl p-4 shadow-lg;
+		@apply bg-surface rounded-2xl p-4 shadow-lg;
 	}
 
-	.dashboard-layout .p-paginator.data-table-paginator {
-		@apply relative border-b-0!;
+	.dashboard-layout .data-table-paginator {
+		@apply relative;
 	}
 
-	.dashboard-layout
-		.p-paginator.data-table-paginator
-		.data-table-paginator-showing {
+	.dashboard-layout .data-table-paginator .data-table-paginator-showing {
 		@apply absolute left-0 hidden md:block text-sm px-4;
+	}
+
+	/* Keep page navigation centered: pull the rows-per-page dropdown out to the right. */
+	.dashboard-layout .data-table-paginator > :last-child {
+		@apply md:absolute md:right-0;
 	}
 }
 
@@ -350,9 +238,9 @@
 		@apply bg-clip-text text-transparent;
 		background-image: linear-gradient(
 			135deg,
-			hsl(260 60% 55%) 0%,
-			hsl(280 60% 60%) 50%,
-			hsl(260 60% 55%) 100%
+			var(--accent) 0%,
+			color-mix(in oklab, var(--accent) 60%, var(--foreground)) 50%,
+			var(--accent) 100%
 		);
 		background-size: 200% auto;
 		animation: var(--animate-gradient-shift);
@@ -363,7 +251,7 @@
 	}
 
 	.skeleton {
-		@apply animate-pulse rounded-lg bg-muted;
+		@apply animate-pulse rounded-lg bg-surface-secondary;
 	}
 
 	/* Custom animations */
@@ -447,19 +335,19 @@
 	}
 
 	.bg-glass {
-		background: hsl(var(--glass-background));
+		background: var(--glass-background);
 	}
 
 	.border-glass {
-		border-color: hsl(var(--glass-border));
+		border-color: var(--glass-border);
 	}
 
 	.bg-gradient-hero {
 		background-image: var(--gradient-hero);
 	}
 
-	.bg-gradient-cream {
-		background-image: var(--gradient-cream);
+	.bg-gradient-accent {
+		background-image: var(--gradient-accent);
 	}
 }
 

@@ -1,3 +1,13 @@
+import {
+	Input as AriaInput,
+	ComboBox,
+	DatePicker,
+	Header,
+	Label,
+	ListBox,
+	Select,
+} from '@heroui/react';
+import { CalendarDate, parseDate } from '@internationalized/date';
 import React, { type JSX, useEffect, useMemo, useRef, useState } from 'react';
 import { ActionButtonContent } from '@/components/action-button.component';
 import { FormElementError } from '@/components/form/form-element-error.component';
@@ -7,25 +17,14 @@ import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
 	Popover,
 	PopoverContent,
-	PopoverTrigger,
+	PopoverTriggerButton,
 } from '@/components/ui/popover';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import {
-	Select,
-	SelectContent,
-	SelectGroup,
-	SelectItem,
-	SelectLabel,
-	SelectTrigger,
-	SelectValue,
-} from '@/components/ui/select';
+import { Radio, RadioGroup } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/helpers/css.helper';
-import { formatDate, stringToDate } from '@/helpers/date.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import type { ButtonAppearanceType } from '@/types/html.type';
 
@@ -41,6 +40,19 @@ export type GroupedOptionsType = {
 	options: OptionsType;
 }[];
 
+/**
+ * Id of the `<Label>` that `FormElement` renders for a field.
+ *
+ * react-aria fields (Select, ComboBox, …) derive their accessible name from a
+ * `<Label>` rendered *inside* their own context, or from `aria-label` /
+ * `aria-labelledby`. This project's labels live one level up in `FormElement`, so
+ * those fields must point back at the label with `aria-labelledby` — otherwise
+ * react-aria logs "If you do not provide a visible label, you must specify an
+ * aria-label or aria-labelledby attribute for accessibility" and the control ends
+ * up with no accessible name.
+ */
+export const getFieldLabelId = (id: string): string => `${id}-label`;
+
 export const FormElement = ({
 	children,
 	className,
@@ -49,23 +61,28 @@ export const FormElement = ({
 }: {
 	children: JSX.Element;
 	className?: string;
-	label?: { text?: string; for?: string; required?: boolean };
+	label?: { text?: string; for?: string; id?: string; required?: boolean };
 	error?: string[];
 }): JSX.Element | null => (
 	<div className={cn('form-element', className)}>
 		{label &&
 			(label.for ? (
-				<Label htmlFor={label.for}>
+				// HeroUI's `isRequired` renders the asterisk via `.label--required`,
+				// so the marker is not duplicated in markup here.
+				<Label
+					id={getFieldLabelId(label.for)}
+					htmlFor={label.for}
+					isRequired={label.required}
+				>
 					{label.text}
-					{label.required && (
-						<span className="text-error ml-1">*</span>
-					)}
 				</Label>
 			) : (
-				<div className="label-placeholder">
+				// Group labels (radio) have no single control for `htmlFor` to point
+				// at, so the group references this element via `aria-labelledby`.
+				<div id={label.id} className="label-placeholder">
 					{label.text}
 					{label.required && (
-						<span className="text-error ml-1">*</span>
+						<span className="text-danger ml-1">*</span>
 					)}
 				</div>
 			))}
@@ -116,7 +133,7 @@ const stateConfig = {
 		borderClass: 'border border-success focus-visible:ring-success',
 	},
 	error: {
-		borderClass: 'border border-error focus-visible:ring-error',
+		borderClass: 'border border-danger focus-visible:ring-danger',
 	},
 	warning: {
 		borderClass: 'border border-warning focus-visible:ring-warning',
@@ -321,28 +338,29 @@ export const FormComponentTime = <Fields,>({
 					name={fieldName}
 					value={fieldValue ?? ''}
 				/>
-				<Popover open={open} onOpenChange={setOpen}>
-					<PopoverTrigger asChild>
-						<Button
-							id={id}
-							variant="outline"
-							className={cn(
-								'justify-start text-left text-sm',
-								!fieldValue && 'text-muted-foreground',
-								borderClass,
-								className,
-							)}
-							disabled={disabled}
-						>
-							<Icons.Clock className="mr-2 h-4 w-4" />
-							{fieldValue ?? <span>{placeholderText}</span>}
-						</Button>
-					</PopoverTrigger>
-					<PopoverContent className="w-auto p-2" align="start">
+				<Popover isOpen={open} onOpenChange={setOpen}>
+					<PopoverTriggerButton
+						id={id}
+						variant="outline"
+						className={cn(
+							'justify-start text-left text-sm',
+							!fieldValue && 'text-muted',
+							borderClass,
+							className,
+						)}
+						disabled={disabled}
+					>
+						<Icons.Clock className="mr-2 h-4 w-4" />
+						{fieldValue ?? <span>{placeholderText}</span>}
+					</PopoverTriggerButton>
+					<PopoverContent
+						className="w-auto p-2"
+						placement="bottom start"
+					>
 						<div className="flex gap-2">
 							{/* Hours */}
 							<div className="flex flex-col gap-1">
-								<p className="text-xs text-muted-foreground text-center pb-1">
+								<p className="text-xs text-muted text-center pb-1">
 									HH
 								</p>
 								<ul className="h-48 overflow-y-auto flex flex-col gap-0.5">
@@ -354,9 +372,9 @@ export const FormComponentTime = <Fields,>({
 													handleHourSelect(hour)
 												}
 												className={cn(
-													'w-full px-3 py-1 text-sm rounded hover:bg-accent',
+													'w-full px-3 py-1 text-sm rounded hover:bg-accent-soft',
 													selectedHour === hour &&
-														'bg-accent font-semibold',
+														'bg-accent-soft font-semibold',
 												)}
 											>
 												{hour}
@@ -370,7 +388,7 @@ export const FormComponentTime = <Fields,>({
 
 							{/* Minutes */}
 							<div className="flex flex-col gap-1">
-								<p className="text-xs text-muted-foreground text-center pb-1">
+								<p className="text-xs text-muted text-center pb-1">
 									MM
 								</p>
 								<ul className="h-48 overflow-y-auto flex flex-col gap-0.5">
@@ -382,9 +400,9 @@ export const FormComponentTime = <Fields,>({
 													handleMinuteSelect(minute)
 												}
 												className={cn(
-													'w-full px-3 py-1 text-sm rounded hover:bg-accent',
+													'w-full px-3 py-1 text-sm rounded hover:bg-accent-soft',
 													selectedMinute === minute &&
-														'bg-accent font-semibold',
+														'bg-accent-soft font-semibold',
 												)}
 											>
 												{minute}
@@ -456,16 +474,55 @@ export const FormComponentSelect = <Fields,>({
 	error,
 	options,
 	onChange,
+	searchable = false,
 }: Omit<
 	FormComponentProps<Fields, OptionValueType>,
 	'autoComplete' | 'icons' | 'onChange'
 > & {
 	options: OptionsType | GroupedOptionsType;
 	onChange: (value: string) => void;
+	/** Render a searchable combobox (type-to-filter) instead of a plain select. */
+	searchable?: boolean;
 }) => {
 	const { borderClass } = useFieldState({ value: fieldValue, error });
 
 	const isGrouped = 'options' in options[0];
+
+	// Shared option collection — identical for the Select and ComboBox variants.
+	const listBoxItems = isGrouped
+		? (options as GroupedOptionsType).map((group) => (
+				<ListBox.Section
+					key={group.label}
+					className="[&:not(:first-child)]:mt-1 [&:not(:first-child)]:border-t [&:not(:first-child)]:border-border [&:not(:first-child)]:pt-1"
+				>
+					<Header className="px-2 pt-1.5 pb-1 text-[11px] font-semibold uppercase tracking-wider text-muted">
+						{group.label}
+					</Header>
+
+					{group.options.map(({ label, value }) => (
+						<ListBox.Item
+							key={value}
+							id={value}
+							textValue={label}
+							className="rounded-md"
+						>
+							{label}
+							<ListBox.Item.Indicator />
+						</ListBox.Item>
+					))}
+				</ListBox.Section>
+			))
+		: (options as OptionsType).map(({ label, value }) => (
+				<ListBox.Item
+					key={value}
+					id={value}
+					textValue={label}
+					className="rounded-md"
+				>
+					{label}
+					<ListBox.Item.Indicator />
+				</ListBox.Item>
+			));
 
 	return (
 		<FormElement
@@ -480,56 +537,59 @@ export const FormComponentSelect = <Fields,>({
 					disabled={disabled}
 				/>
 
-				<Select
-					value={fieldValue ?? ''}
-					onValueChange={onChange}
-					disabled={disabled}
-				>
-					<SelectTrigger
-						id={id}
-						className={cn(borderClass, className)}
+				{searchable ? (
+					<ComboBox
+						fullWidth
+						aria-labelledby={getFieldLabelId(id)}
+						selectedKey={fieldValue ?? null}
+						onSelectionChange={(key) =>
+							onChange(key == null ? '' : String(key))
+						}
+						isDisabled={disabled}
 					>
-						<SelectValue placeholder={placeholderText} />
-					</SelectTrigger>
-					<SelectContent>
-						{isGrouped
-							? (options as GroupedOptionsType).map((group) => (
-									<SelectGroup key={group.label}>
-										<SelectLabel>{group.label}</SelectLabel>
-
-										{group.options.map(
-											({ label, value }) => (
-												<SelectItem
-													key={value}
-													value={value}
-													className="pl-12"
-												>
-													{label}
-												</SelectItem>
-											),
-										)}
-									</SelectGroup>
-								))
-							: (options as OptionsType).map(
-									({ label, value }) => (
-										<SelectItem key={value} value={value}>
-											{label}
-										</SelectItem>
-									),
+						<ComboBox.InputGroup>
+							<AriaInput
+								id={id}
+								placeholder={placeholderText}
+								className={cn(
+									'h-10 w-full rounded-md border border-border shadow-none',
+									borderClass,
+									className,
 								)}
-					</SelectContent>
-					{/*<SelectContent>*/}
-					{/*	{options.map(({ label, value }) => {*/}
-					{/*		const key = `${id}-${value}`;*/}
-
-					{/*		return (*/}
-					{/*			<SelectItem key={key} value={value}>*/}
-					{/*				{label}*/}
-					{/*			</SelectItem>*/}
-					{/*		);*/}
-					{/*	})}*/}
-					{/*</SelectContent>*/}
-				</Select>
+							/>
+							<ComboBox.Trigger />
+						</ComboBox.InputGroup>
+						<ComboBox.Popover className="rounded-md">
+							<ListBox>{listBoxItems}</ListBox>
+						</ComboBox.Popover>
+					</ComboBox>
+				) : (
+					<Select
+						fullWidth
+						aria-labelledby={getFieldLabelId(id)}
+						selectedKey={fieldValue ?? null}
+						onSelectionChange={(key) =>
+							onChange(key == null ? '' : String(key))
+						}
+						isDisabled={disabled}
+						placeholder={placeholderText}
+					>
+						<Select.Trigger
+							id={id}
+							className={cn(
+								'items-center rounded-md border border-border shadow-none',
+								borderClass,
+								className,
+							)}
+						>
+							<Select.Value />
+							<Select.Indicator />
+						</Select.Trigger>
+						<Select.Popover className="rounded-md">
+							<ListBox>{listBoxItems}</ListBox>
+						</Select.Popover>
+					</Select>
+				)}
 			</div>
 		</FormElement>
 	);
@@ -563,18 +623,19 @@ export const FormComponentCheckbox = <Fields,>({
 
 	return (
 		<FormElement error={error}>
-			<Label htmlFor={id} className="flex items-center gap-2">
-				<Checkbox
-					id={id}
-					name={fieldName}
-					disabled={disabled}
-					aria-invalid={!!error}
-					checked={checked}
-					onCheckedChange={onCheckedChange}
-					className={cn(borderClass, className)}
-				/>
+			<Checkbox
+				id={id}
+				name={fieldName}
+				isDisabled={disabled}
+				isInvalid={!!error}
+				isSelected={checked}
+				onChange={onCheckedChange}
+				className={className}
+				contentClassName="gap-2"
+				controlClassName={borderClass}
+			>
 				{children}
-			</Label>
+			</Checkbox>
 		</FormElement>
 	);
 };
@@ -585,7 +646,7 @@ export const FormComponentRadio = <Fields,>({
 	fieldName,
 	fieldValue,
 	isRequired,
-	className = 'flex flex-wrap gap-4',
+	className,
 	disabled,
 	error,
 	options,
@@ -598,7 +659,11 @@ export const FormComponentRadio = <Fields,>({
 	onChange: (value: string) => void;
 }) => (
 	<FormElement
-		label={{ text: labelText, required: isRequired }}
+		label={{
+			id: getFieldLabelId(id),
+			text: labelText,
+			required: isRequired,
+		}}
 		error={error}
 	>
 		<div>
@@ -609,27 +674,26 @@ export const FormComponentRadio = <Fields,>({
 				disabled={disabled}
 			/>
 
+			{/* `orientation` supplies the horizontal wrapping row (HeroUI's
+			    `.radio-group` is `flex flex-col` otherwise), replacing the
+			    `flex flex-wrap gap-4` this used to hardcode as a className. */}
 			<RadioGroup
-				value={fieldValue}
-				onValueChange={onChange}
+				aria-labelledby={getFieldLabelId(id)}
+				orientation="horizontal"
+				value={fieldValue ?? null}
+				onChange={onChange}
 				className={className}
-				disabled={disabled}
+				isDisabled={disabled}
 			>
-				{options.map(({ label, value }) => {
-					const key = `${id}-${value}`;
-
-					return (
-						<div key={key} className="flex items-center space-x-2">
-							<RadioGroupItem value={value} id={key} />
-							<Label
-								htmlFor={key}
-								className="font-normal cursor-pointer"
-							>
-								{label}
-							</Label>
-						</div>
-					);
-				})}
+				{options.map(({ label, value }) => (
+					<Radio
+						key={`${id}-${value}`}
+						value={value}
+						contentClassName="font-normal"
+					>
+						{label}
+					</Radio>
+				))}
 			</RadioGroup>
 		</div>
 	</FormElement>
@@ -658,55 +722,48 @@ export const FormComponentCalendarWithoutFormElement = <Fields,>({
 	minDate?: Date;
 	maxDate?: Date;
 }) => {
-	const [open, setOpen] = useState(false);
+	// The project stores dates as `YYYY-MM-DD`, which is exactly what `parseDate`
+	// reads and `CalendarDate.toString()` emits — no timezone conversion is involved
+	// in either direction. `minDate`/`maxDate` arrive as JS `Date`s and are read as
+	// local calendar parts, matching what the calendar displays.
+	const value = fieldValue ? parseDate(fieldValue) : null;
 
-	const selected = fieldValue ? stringToDate(fieldValue) : undefined;
+	const toCalendarDate = (date: Date) =>
+		new CalendarDate(
+			date.getFullYear(),
+			date.getMonth() + 1,
+			date.getDate(),
+		);
 
 	return (
 		<>
 			<input type="hidden" name={fieldName} value={fieldValue ?? ''} />
 
-			<Popover open={open} onOpenChange={setOpen}>
-				<PopoverTrigger asChild>
-					<Button
-						id={id}
-						variant="outline"
-						className={cn(
-							'justify-start text-left text-sm',
-							!fieldValue && 'text-muted-foreground',
-							className,
-						)}
-						disabled={disabled}
-					>
-						<Icons.Calendar className="mr-2 h-4 w-4" />
-						{fieldValue ? (
-							fieldValue
-						) : (
-							<span>{placeholderText}</span>
-						)}
-					</Button>
-				</PopoverTrigger>
-				<PopoverContent className="w-auto p-0" align="start">
-					<Calendar
-						mode="single"
-						required={false}
-						selected={selected}
-						onSelect={(date: Date | undefined) => {
-							const value = date
-								? (formatDate(date, 'default') as string)
-								: '';
-
-							onSelect(value);
-							setOpen(false);
-						}}
-						aria-placeholder={placeholderText}
-						disabled={[
-							...(minDate ? [{ before: minDate }] : []),
-							...(maxDate ? [{ after: maxDate }] : []),
-						]}
-					/>
-				</PopoverContent>
-			</Popover>
+			<DatePicker
+				value={value}
+				onChange={(date) => onSelect(date ? date.toString() : '')}
+				minValue={minDate ? toCalendarDate(minDate) : undefined}
+				maxValue={maxDate ? toCalendarDate(maxDate) : undefined}
+				isDisabled={disabled}
+				aria-label={placeholderText}
+			>
+				<DatePicker.Trigger
+					id={id}
+					className={cn(
+						'justify-start gap-2 rounded-md border border-border px-3 text-left text-sm',
+						!fieldValue && 'text-muted',
+						className,
+					)}
+				>
+					<DatePicker.TriggerIndicator>
+						<Icons.Calendar className="h-4 w-4" />
+					</DatePicker.TriggerIndicator>
+					{fieldValue || placeholderText}
+				</DatePicker.Trigger>
+				<DatePicker.Popover className="rounded-md">
+					<Calendar />
+				</DatePicker.Popover>
+			</DatePicker>
 		</>
 	);
 };
@@ -943,7 +1000,7 @@ export const FormComponentAutoComplete = <Fields, T>({
 									onClick={handleClear}
 									className="cursor-pointer"
 								>
-									<Icons.Clear className="h-4.5 w-4.5 text-muted-foreground hover:text-foreground" />
+									<Icons.Clear className="h-4.5 w-4.5 text-muted hover:text-foreground" />
 								</button>
 							</FormElementIcon>
 						)}
@@ -951,10 +1008,10 @@ export const FormComponentAutoComplete = <Fields, T>({
 				</FormElementWrapper>
 
 				{shouldShowDropdown && (
-					<ul className="absolute z-50 w-full mt-1 max-h-60 overflow-auto bg-popover border border-border rounded-md shadow-lg">
+					<ul className="absolute z-50 w-full mt-1 max-h-60 overflow-auto bg-overlay border border-border rounded-md shadow-lg">
 						{/* Loading */}
 						{isLoading && (
-							<li className="px-3 py-2 text-sm text-muted-foreground">
+							<li className="px-3 py-2 text-sm text-muted">
 								{autoCompleteProps.loadingMessage ??
 									'Searching...'}
 							</li>
@@ -962,7 +1019,7 @@ export const FormComponentAutoComplete = <Fields, T>({
 
 						{/* Empty */}
 						{isEmpty && (
-							<li className="px-3 py-2 text-sm text-muted-foreground">
+							<li className="px-3 py-2 text-sm text-muted">
 								{autoCompleteProps.emptyMessage ?? 'No results'}
 							</li>
 						)}
@@ -977,7 +1034,7 @@ export const FormComponentAutoComplete = <Fields, T>({
 										);
 										setIsOpen(false);
 									}}
-									className="w-full px-3 py-2 text-sm text-left text-primary hover:bg-accent"
+									className="w-full px-3 py-2 text-sm text-left text-accent hover:bg-accent-soft"
 								>
 									{autoCompleteProps.createLabel?.(
 										inputValue,
@@ -1010,10 +1067,10 @@ export const FormComponentAutoComplete = <Fields, T>({
 											}
 											className={cn(
 												'w-full px-3 py-2 text-sm text-left',
-												'hover:bg-accent hover:text-accent-foreground',
-												'focus:bg-accent focus:text-accent-foreground',
+												'hover:bg-accent-soft hover:text-accent-soft-foreground',
+												'focus:bg-accent-soft focus:text-accent-soft-foreground',
 												isHighlighted &&
-													'bg-accent text-accent-foreground',
+													'bg-accent-soft text-accent-soft-foreground',
 											)}
 										>
 											{label}
@@ -1054,7 +1111,7 @@ export const FormComponentSubmit = ({
 	return (
 		<Button
 			type="submit"
-			variant={button?.variant || 'info'}
+			variant={button?.variant || 'default'}
 			className={button?.className}
 			disabled={pending || (submitted && error)}
 			aria-busy={pending}

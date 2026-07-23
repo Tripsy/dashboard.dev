@@ -100,7 +100,7 @@ export default function AccountMe() {
 
 			<div className="flex flex-wrap justify-center gap-8">
 				{/* Personal Information */}
-				<div className="bg-card border border-border rounded-xl p-6 shadow-xl space-y-4 w-full max-w-md">
+				<div className="bg-surface border border-border rounded-xl p-6 shadow-xl space-y-4 w-full max-w-md">
 					<div className="flex justify-between items-center">
 						<h2 className="text-lg font-bold flex items-center gap-2">
 							<Icons.User />
@@ -118,7 +118,7 @@ export default function AccountMe() {
 					</div>
 
 					<div className="border-b pb-4">
-						<div className="text-sm text-muted-foreground font-semibold">
+						<div className="text-sm text-muted font-semibold">
 							Full Name
 						</div>
 						<p>{auth.name}</p>
@@ -127,7 +127,7 @@ export default function AccountMe() {
 					<div className="border-b pb-4">
 						<div className="flex justify-between">
 							<div>
-								<div className="text-sm text-muted-foreground font-semibold">
+								<div className="text-sm text-muted font-semibold">
 									Email Address
 								</div>
 								<p>{auth.email}</p>
@@ -164,14 +164,14 @@ export default function AccountMe() {
 					</div>
 
 					<div className="border-b pb-4">
-						<div className="text-sm text-muted-foreground font-semibold">
+						<div className="text-sm text-muted font-semibold">
 							Language
 						</div>
 						<p>{auth.language}</p>
 					</div>
 
 					<div>
-						<div className="text-sm text-muted-foreground font-semibold">
+						<div className="text-sm text-muted font-semibold">
 							Member Since
 						</div>
 						<p>
@@ -183,7 +183,7 @@ export default function AccountMe() {
 				</div>
 
 				{/* Security & Account */}
-				<div className="bg-card border border-border rounded-xl p-6 shadow-xl space-y-4 w-full max-w-md">
+				<div className="bg-surface border border-border rounded-xl p-6 shadow-xl space-y-4 w-full max-w-md">
 					<h2 className="text-lg font-bold flex items-center gap-2">
 						<Icons.Security />
 						Security & Account
@@ -192,7 +192,7 @@ export default function AccountMe() {
 					<div className="border-b pb-4">
 						<div className="flex justify-between">
 							<div>
-								<div className="text-sm text-muted-foreground font-semibold">
+								<div className="text-sm text-muted font-semibold">
 									Password
 								</div>
 								<p className="text-xs italic">
@@ -232,7 +232,7 @@ export default function AccountMe() {
 				</div>
 
 				{/* Sessions Management */}
-				<div className="bg-card border border-border rounded-xl p-6 shadow-xl space-y-4 w-full max-w-md">
+				<div className="bg-surface border border-border rounded-xl p-6 shadow-xl space-y-4 w-full max-w-md">
 					<h2 className="text-lg font-bold flex items-center gap-2">
 						<Icons.Sessions />
 						Sessions

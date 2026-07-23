@@ -94,7 +94,7 @@ export const displayPlaceLabel = (
 	const place_type =
 		getPlaceContentProp(p, language, 'type_label') || p.place_type;
 
-	return `(${capitalizeFirstLetter(place_type)} / ${name}`;
+	return `${capitalizeFirstLetter(place_type)} / ${name}`;
 };
 
 export const CITY_DEFAULT = {

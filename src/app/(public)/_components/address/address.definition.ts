@@ -121,7 +121,7 @@ export default async function dataSourceConfig(): Promise<
 					),
 				buttonPosition: 'right',
 				button: {
-					variant: 'info',
+					variant: 'default',
 				},
 				getFormValues: getFormValues,
 				validateForm: validateForm,

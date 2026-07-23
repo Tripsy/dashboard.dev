@@ -60,7 +60,7 @@ export default async function Page(props: Props) {
 					What's next? Check{' '}
 					<Link
 						href={Routes.get('account-me')}
-						className="text-primary font-medium hover:underline"
+						className="text-accent font-medium hover:underline"
 						title="Go to your account"
 					>
 						your account
@@ -68,7 +68,7 @@ export default async function Page(props: Props) {
 					or navigate to{' '}
 					<Link
 						href={Routes.get('home')}
-						className="text-primary font-medium hover:underline"
+						className="text-accent font-medium hover:underline"
 					>
 						home page
 					</Link>
@@ -83,7 +83,7 @@ export default async function Page(props: Props) {
 				What now? You can register for a{' '}
 				<Link
 					href={Routes.get('register')}
-					className="text-primary font-medium hover:underline"
+					className="text-accent font-medium hover:underline"
 					title="Create account"
 				>
 					new account
@@ -91,7 +91,7 @@ export default async function Page(props: Props) {
 				or request{' '}
 				<Link
 					href={Routes.get('email-confirm-send')}
-					className="text-primary font-medium hover:underline"
+					className="text-accent font-medium hover:underline"
 					title="Send confirmation link again"
 				>
 					another confirmation link

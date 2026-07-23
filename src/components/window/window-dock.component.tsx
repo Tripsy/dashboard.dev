@@ -36,7 +36,7 @@ export function WindowDock({
 				/>
 			))}
 			{hasMore && (
-				<div className="flex items-center gap-x-2 border bg-background/95 hover:bg-accent hover:text-accent-foreground shadow-xl px-2 py-1 rounded">
+				<div className="flex items-center gap-x-2 border bg-background/95 hover:bg-accent-soft hover:text-accent-soft-foreground shadow-xl px-2 py-1 rounded">
 					{!showAll && (
 						<Button
 							variant="ghost"
@@ -63,12 +63,12 @@ export function WindowDock({
 			)}
 
 			{hasWindows && (
-				<div className="flex items-center gap-x-2 border bg-background/95 hover:bg-error/80 hover:text-error-foreground px-2 py-1 rounded-full transition-colors">
+				<div className="flex items-center gap-x-2 border bg-background/95 hover:bg-danger/80 hover:text-danger-foreground px-2 py-1 rounded-full transition-colors">
 					<Button
 						variant="ghost"
 						size="xs"
 						onClick={handleCloseAll}
-						className="hover:bg-transparent hover:text-error-foreground "
+						className="hover:bg-transparent hover:text-danger-foreground "
 						aria-label="Close all windows"
 					>
 						<Icons.Close size={12} />

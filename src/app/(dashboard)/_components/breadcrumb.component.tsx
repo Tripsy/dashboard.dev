@@ -18,7 +18,7 @@ export const Breadcrumb = () => {
 				<li>
 					<Link
 						href={Routes.get('dashboard')}
-						className="flex items-center text-muted-foreground hover:text-foreground transition-colors"
+						className="flex items-center text-muted hover:text-foreground transition-colors"
 					>
 						<Home className="h-4 w-4" />
 					</Link>
@@ -28,11 +28,11 @@ export const Breadcrumb = () => {
 						key={`nav-breadcrumb-${item.label}`}
 						className="flex items-center gap-1.5"
 					>
-						<ChevronRight className="h-4 w-4 text-muted-foreground" />
+						<ChevronRight className="h-4 w-4 text-muted" />
 						{item.href && index < items.length - 1 ? (
 							<Link
 								href={item.href}
-								className="text-muted-foreground hover:text-foreground transition-colors"
+								className="text-muted hover:text-foreground transition-colors"
 							>
 								{item.label}
 							</Link>

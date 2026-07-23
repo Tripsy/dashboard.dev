@@ -1,27 +1,50 @@
-import * as PopoverPrimitive from '@radix-ui/react-popover';
-import * as React from 'react';
+import { Popover as HeroPopover } from '@heroui/react';
+import type * as React from 'react';
+import { Button, type ButtonProps } from '@/components/ui/button';
 import { cn } from '@/helpers/css.helper';
 
-const Popover = PopoverPrimitive.Root;
-const PopoverTrigger = PopoverPrimitive.Trigger;
+// Root is react-aria's DialogTrigger: controlled via `isOpen` / `onOpenChange`.
+const Popover = HeroPopover;
 
-const PopoverContent = React.forwardRef<
-	React.ComponentRef<typeof PopoverPrimitive.Content>,
-	React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>
->(({ className, align = 'center', sideOffset = 4, ...props }, ref) => (
-	<PopoverPrimitive.Portal>
-		<PopoverPrimitive.Content
-			ref={ref}
-			align={align}
-			sideOffset={sideOffset}
-			className={cn(
-				'z-50 w-72 rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
-				className,
-			)}
-			{...props}
-		/>
-	</PopoverPrimitive.Portal>
-));
-PopoverContent.displayName = PopoverPrimitive.Content.displayName;
+/**
+ * Renders the popover trigger as the project `Button`.
+ *
+ * HeroUI's own `Popover.Trigger` is a `role="button"` div wrapped in react-aria's
+ * `Pressable` — it neither carries the project button styling nor supports
+ * `disabled` (it forwards nothing to `Pressable`). Its `render` escape hatch lets
+ * us substitute a real `<button>`; the DOM props handed back are typed for the
+ * default `div`, so the cast is contained here rather than at every call site.
+ */
+const PopoverTriggerButton = ({ className, ...buttonProps }: ButtonProps) => (
+	<HeroPopover.Trigger
+		render={(domProps) => (
+			<Button
+				{...(domProps as ButtonProps)}
+				{...buttonProps}
+				className={cn(domProps.className, className)}
+			/>
+		)}
+	/>
+);
 
-export { Popover, PopoverTrigger, PopoverContent };
+type PopoverContentProps = React.ComponentProps<typeof HeroPopover.Content>;
+
+/**
+ * The positioned surface. HeroUI's `.popover` uses `min(32px, --radius-3xl)`, the
+ * same oversized radius that had to be overridden on the Select/ComboBox popovers —
+ * pinned to `rounded-md` here so every overlay matches the form fields.
+ *
+ * Padding stays on the surface rather than the inner dialog (`p-0`), so callers keep
+ * controlling it through `className` exactly as they did with the Radix wrapper.
+ */
+const PopoverContent = ({
+	className,
+	children,
+	...props
+}: PopoverContentProps) => (
+	<HeroPopover.Content className={cn('rounded-md', className)} {...props}>
+		<HeroPopover.Dialog className="p-0">{children}</HeroPopover.Dialog>
+	</HeroPopover.Content>
+);
+
+export { Popover, PopoverTriggerButton, PopoverContent };

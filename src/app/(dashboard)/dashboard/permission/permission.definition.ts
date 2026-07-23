@@ -134,7 +134,7 @@ export default async function dataSourceConfig(): Promise<
 					),
 				buttonPosition: 'right',
 				button: {
-					variant: 'info',
+					variant: 'default',
 				},
 				getFormValues: getFormValues,
 				validateForm: validateForm,
@@ -194,7 +194,7 @@ export default async function dataSourceConfig(): Promise<
 				buttonPosition: 'left',
 				button: {
 					variant: 'outline',
-					hover: 'info',
+					hover: 'default',
 				},
 			},
 		},

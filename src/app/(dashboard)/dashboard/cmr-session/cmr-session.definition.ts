@@ -282,7 +282,7 @@ export default async function dataSourceConfig(): Promise<
 				},
 				buttonPosition: 'hidden',
 				button: {
-					variant: 'info',
+					variant: 'default',
 				},
 				getFormValues: getFormValues,
 				validateForm: validateForm,

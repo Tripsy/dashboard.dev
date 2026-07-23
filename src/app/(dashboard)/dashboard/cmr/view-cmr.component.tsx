@@ -8,7 +8,7 @@ import { displayAddressLabel } from '@/models/address.model';
 import { displayClientLabel } from '@/models/client.model';
 import type { CmrModel } from '@/models/cmr.model';
 
-export async function ViewCmr({ entry }: { entry: CmrModel }) {
+export function ViewCmr({ entry }: { entry: CmrModel }) {
 	const language = getLanguageClient();
 
 	return (
@@ -116,7 +116,7 @@ export async function ViewCmr({ entry }: { entry: CmrModel }) {
 					{entry.deleted_at && (
 						<div>
 							<span className="font-semibold">Deleted At</span>{' '}
-							<span className="text-error">
+							<span className="text-danger">
 								{formatDate(entry.deleted_at, 'date-time')}
 							</span>
 						</div>

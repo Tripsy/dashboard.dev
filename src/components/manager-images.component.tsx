@@ -229,7 +229,7 @@ function withUpdatedOrder(entries: ImageEntry[]): ImageEntry[] {
 
 function PropertyBadge({ label, value }: { label: string; value: string }) {
 	return (
-		<span className="text-xs text-muted-foreground">
+		<span className="text-xs text-muted">
 			<span className="font-medium text-foreground/60">{label}:</span>{' '}
 			{value}
 		</span>
@@ -253,7 +253,7 @@ function AttributeField({
 		<div className="flex items-center gap-2">
 			<label
 				htmlFor={`attribute-${label}`}
-				className="text-xs font-medium text-muted-foreground w-20 shrink-0"
+				className="text-xs font-medium text-muted w-20 shrink-0"
 			>
 				{label}
 			</label>
@@ -265,9 +265,9 @@ function AttributeField({
 				onChange={(e) => onChange(e.target.value)}
 				className={cn(
 					'w-64 shrink-0',
-					'rounded-md border border-input bg-background px-3 py-1.5',
+					'rounded-md border border-border bg-background px-3 py-1.5',
 					'text-sm text-foreground',
-					'focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20',
+					'focus:border-focus focus:outline-none focus:ring-2 focus:ring-focus/20',
 					'transition-colors',
 					mode === 'view' && 'w-full border-none px-0 bg-transparent',
 				)}
@@ -328,10 +328,10 @@ function ImageCard({
 	const configuredFields = getConfiguredFields(attributeFields);
 
 	return (
-		<div className="group rounded-lg border border-border bg-card overflow-hidden shadow-sm">
+		<div className="group rounded-lg border border-border bg-surface overflow-hidden shadow-sm">
 			{/* Preview row */}
 			<div className="flex items-start gap-3 p-3">
-				<div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md border border-border bg-muted/30">
+				<div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md border border-border bg-surface-secondary/30">
 					{displayImage({
 						src: showImage(entry.path, entry.storage),
 						alt: fileName,
@@ -339,7 +339,7 @@ function ImageCard({
 				</div>
 
 				<div className="min-w-0 flex-1">
-					<p className="truncate text-sm font-medium text-card-foreground">
+					<p className="truncate text-sm font-medium text-surface-foreground">
 						{fileName}
 					</p>
 
@@ -371,7 +371,7 @@ function ImageCard({
 				</div>
 
 				{mode === 'edit' && (
-					<div className="flex">
+					<div className="flex gap-4">
 						{entry.status !== undefined && (
 							<Button
 								variant="ghost"
@@ -379,9 +379,9 @@ function ImageCard({
 								className={cn(
 									'hover:scale-125',
 									entry.status === ImageStatusEnum.ACTIVE &&
-										'text-success hover:text-error',
+										'text-success hover:text-danger',
 									entry.status === ImageStatusEnum.INACTIVE &&
-										'text-error hover:text-success',
+										'text-danger hover:text-success',
 								)}
 								title={
 									entry.status === ImageStatusEnum.ACTIVE
@@ -398,7 +398,7 @@ function ImageCard({
 						<Button
 							variant="ghost"
 							onClick={onRemove}
-							className="text-muted-foreground/50 hover:scale-125 hover:text-error"
+							className="text-muted/50 hover:scale-125 hover:text-danger"
 							title="Remove image"
 						>
 							<Icons.Action.Delete />
@@ -415,7 +415,7 @@ function ImageCard({
 						)}
 						{entry.status === ImageStatusEnum.INACTIVE && (
 							<div title="Inactive image">
-								<Icons.Status.Inactive className="text-error" />
+								<Icons.Status.Inactive className="text-danger" />
 							</div>
 						)}
 					</>
@@ -424,7 +424,7 @@ function ImageCard({
 
 			{/* Attributes — only render if at least one field is configured */}
 			{configuredFields.length > 0 && (
-				<div className="border-t border-border bg-muted/30 px-3 pb-3 pt-2.5">
+				<div className="border-t border-border bg-surface-secondary/30 px-3 pb-3 pt-2.5">
 					<div className="flex flex-col gap-1.5">
 						{configuredFields.map((field) => (
 							<AttributeField
@@ -445,7 +445,7 @@ function ImageCard({
 			)}
 
 			{errors && errors.length > 0 && (
-				<div className="text-sm dark:bg-error-foreground text-error p-2 inline-block">
+				<div className="text-sm dark:bg-danger-foreground text-danger p-2 inline-block">
 					{errors.map((error) => (
 						<div key={error}>{error}</div>
 					))}
@@ -490,7 +490,7 @@ function SortableImageCard(
 							title="Change order"
 							{...attributes}
 							{...listeners}
-							className="cursor-grab text-muted-foreground/40 active:cursor-grabbing hover:scale-125 hover:text-warning"
+							className="cursor-grab text-muted/40 active:cursor-grabbing hover:scale-125 hover:text-warning"
 							aria-label="Drag to reorder"
 						>
 							<Icons.Action.Move />
@@ -563,10 +563,10 @@ function DropZone({
 				'rounded-lg border-2 border-dashed p-8 transition-colors cursor-pointer',
 				'select-none',
 				isDragOver && !disabled
-					? 'border-ring bg-primary/5'
+					? 'border-focus bg-accent/5'
 					: disabled
-						? 'border-border bg-muted/30 cursor-not-allowed'
-						: 'border-border hover:border-ring hover:bg-muted/20',
+						? 'border-border bg-surface-secondary/30 cursor-not-allowed'
+						: 'border-border hover:border-focus hover:bg-surface-secondary/20',
 			]
 				.filter(Boolean)
 				.join(' ')}
@@ -594,17 +594,15 @@ function DropZone({
 				onChange={handleInputChange}
 			/>
 
-			<div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-muted-foreground">
+			<div className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-secondary text-muted">
 				<Icons.Action.Upload />
 			</div>
 
 			<div className="text-center">
-				<p className="text-sm font-medium text-card-foreground">
+				<p className="text-sm font-medium text-surface-foreground">
 					{label}
 				</p>
-				<p className="mt-0.5 text-xs text-muted-foreground">
-					{subLabel}
-				</p>
+				<p className="mt-0.5 text-xs text-muted">{subLabel}</p>
 			</div>
 		</button>
 	);
@@ -1267,12 +1265,12 @@ export function ManagerImages({
 						<div>
 							<h3
 								id="logo-heading"
-								className="text-sm font-medium text-card-foreground"
+								className="text-sm font-medium text-surface-foreground"
 							>
 								Logo
 							</h3>
 							{mode === 'edit' && (
-								<p className="text-xs text-muted-foreground">
+								<p className="text-xs text-muted">
 									Single image · {ACCEPTED_EXTENSIONS_DESC}
 								</p>
 							)}
@@ -1293,7 +1291,7 @@ export function ManagerImages({
 								onFiles={handleLogoFiles}
 							/>
 						) : (
-							<span className="text-xs font-medium text-muted-foreground">
+							<span className="text-xs font-medium text-muted">
 								Logo not uploaded
 							</span>
 						)
@@ -1327,12 +1325,12 @@ export function ManagerImages({
 						<div>
 							<h3
 								id="gallery-heading"
-								className="text-sm font-medium text-card-foreground"
+								className="text-sm font-medium text-surface-foreground"
 							>
 								Gallery
 							</h3>
 							{mode === 'edit' && (
-								<p className="text-xs text-muted-foreground">
+								<p className="text-xs text-muted">
 									Up to {GALLERY_MAX} images ·{' '}
 									{ACCEPTED_EXTENSIONS_DESC}
 								</p>
@@ -1344,7 +1342,7 @@ export function ManagerImages({
 									'rounded-full px-2 py-0.5 text-xs font-medium',
 									galleryFull
 										? 'bg-warning-light text-warning'
-										: 'bg-muted text-muted-foreground',
+										: 'bg-surface-secondary text-muted',
 								].join(' ')}
 							>
 								{gallery.length} / {GALLERY_MAX}
@@ -1418,7 +1416,7 @@ export function ManagerImages({
 					)}
 
 					{gallery.length === 0 && mode === 'view' && (
-						<span className="text-xs font-medium text-muted-foreground">
+						<span className="text-xs font-medium text-muted">
 							No images uploaded
 						</span>
 					)}
@@ -1435,7 +1433,7 @@ export function ManagerImages({
 			{mode === 'edit' && (
 				<section aria-labelledby="save-button-zone">
 					<Button
-						variant="info"
+						variant="default"
 						disabled={saving || !hasPendingChanges}
 						onClick={handleSave}
 						title="Save changes"

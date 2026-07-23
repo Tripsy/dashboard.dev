@@ -25,28 +25,17 @@ export function useDriverCashBalance(currency: Currency) {
 		staleTime: REFRESH_INTERVAL_CASH_BALANCE,
 	});
 
-	const invalidate = useCallback(() => {
-		return queryClient.invalidateQueries({
-			queryKey: ['driver-cash-balance', userId, currency],
-		});
-	}, [queryClient, userId, currency]);
-
+	// Invalidates every currency balance for the user in one call — a cash-flow
+	// change can affect any currency, so all are refreshed rather than tracking
+	// which one moved. Prefix match covers the per-currency `[..., currency]` keys.
 	const invalidateAll = useCallback(() => {
 		return queryClient.invalidateQueries({
 			queryKey: ['driver-cash-balance', userId],
 		});
 	}, [queryClient, userId]);
 
-	const refetch = useCallback(async () => {
-		await queryClient.refetchQueries({
-			queryKey: ['driver-cash-balance', userId, currency],
-		});
-	}, [queryClient, userId, currency]);
-
 	return {
 		...query,
-		invalidate,
 		invalidateAll,
-		refetch,
 	};
 }

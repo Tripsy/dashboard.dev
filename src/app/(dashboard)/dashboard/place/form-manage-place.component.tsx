@@ -217,19 +217,19 @@ export function FormManagePlace() {
 				)}
 			/>
 			<Tabs
-				defaultValue={Configuration.defaultLanguage()}
-				onValueChange={(value) =>
-					setSelectedLanguage(value as Language)
+				defaultSelectedKey={Configuration.defaultLanguage()}
+				onSelectionChange={(key) =>
+					setSelectedLanguage(String(key) as Language)
 				}
 				className="w-full"
 			>
-				<div className="flex items-center justify-center border-b border-line pb-2 mb-4">
+				<div className="flex items-center border-b border-line pb-2 gap-2">
 					<h3 className="font-bold whitespace-nowrap">
 						Language specific
 					</h3>
-					<TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
+					<TabsList>
 						{languages.map((language) => (
-							<TabsTrigger key={language} value={language}>
+							<TabsTrigger key={language} id={language}>
 								{language.toUpperCase()}
 							</TabsTrigger>
 						))}
@@ -247,7 +247,7 @@ export function FormManagePlace() {
 							: findIndex;
 
 					return (
-						<TabsContent key={`form-${language}`} value={language}>
+						<TabsContent key={`form-${language}`} id={language}>
 							<div className="form-section">
 								<FormComponentInput<PlaceContent>
 									id={`${elementIds.contents}-${language}-name`}

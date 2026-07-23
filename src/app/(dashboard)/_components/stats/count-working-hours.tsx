@@ -25,7 +25,7 @@ export function CountWorkingHours() {
 
 	if (isError) {
 		return (
-			<div className="text-error">
+			<div className="text-danger">
 				Failed to retrieve count of working hours
 			</div>
 		);
@@ -33,7 +33,7 @@ export function CountWorkingHours() {
 
 	if (!data) {
 		return (
-			<div className="text-muted-foreground">
+			<div className="text-muted">
 				Could not retrieve count of working hours
 			</div>
 		);
@@ -45,7 +45,7 @@ export function CountWorkingHours() {
 			<div
 				className={cn(
 					'flex items-center text-xs mt-1',
-					data.trend === 'up' ? 'text-success' : 'text-error',
+					data.trend === 'up' ? 'text-success' : 'text-danger',
 				)}
 			>
 				{data.trend === 'up' ? (

@@ -2,9 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
-import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import Routes from '@/config/routes.setup';
-import { cn } from '@/helpers/css.helper';
 
 type LanguageSwitcherProps = {
 	currentLanguage: string;
@@ -37,34 +36,26 @@ export function LanguageSwitcher({
 		});
 	};
 
-	if (supportedLanguages.length === 1) {
+	// The switch toggles between the first two supported languages (e.g. en / ro).
+	if (supportedLanguages.length < 2) {
 		return null;
 	}
 
+	const [langOff, langOn] = supportedLanguages;
+	const isOn = currentLanguage === langOn;
+
 	return (
-		<div className="flex items-center gap-2 rounded-lg glass p-1">
-			{supportedLanguages.map((language) => (
-				<Button
-					key={language}
-					type="button"
-					variant="ghost"
-					size="sm"
-					disabled={isPending}
-					onClick={() => switchLanguage(language)}
-					className={cn(
-						'relative min-w-10 px-2.5 text-xs font-semibold uppercase transition-all duration-200 rounded-md hover:scale-105',
-						currentLanguage === language
-							? 'bg-warning text-warning-foreground shadow-md hover:bg-warning/90 hover:text-warning-foreground'
-							: 'text-muted-foreground hover:bg-secondary hover:text-secondary-foreground hover:shadow-sm',
-					)}
-					aria-label={language.toUpperCase()}
-					aria-current={
-						currentLanguage === language ? 'true' : undefined
-					}
-				>
-					{language.toUpperCase()}
-				</Button>
-			))}
-		</div>
+		<Switch
+			size="lg"
+			isSelected={isOn}
+			isDisabled={isPending}
+			onChange={(selected) => switchLanguage(selected ? langOn : langOff)}
+			aria-label="Switch language"
+			thumbIcon={
+				<span className="text-xs font-bold uppercase">
+					{isOn ? langOn : langOff}
+				</span>
+			}
+		/>
 	);
 }

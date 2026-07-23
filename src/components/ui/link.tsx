@@ -1,4 +1,3 @@
-import { Slot } from '@radix-ui/react-slot';
 import type { VariantProps } from 'class-variance-authority';
 import NextLink from 'next/link';
 import * as React from 'react';
@@ -14,7 +13,6 @@ const linkVariants = buttonVariants;
 export interface LinkProps
 	extends Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>,
 		VariantProps<typeof linkVariants> {
-	asChild?: boolean;
 	href: string;
 	external?: boolean;
 	prefetch?: boolean;
@@ -27,7 +25,6 @@ const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
 			variant,
 			size,
 			hover,
-			asChild = false,
 			href,
 			external = false,
 			prefetch = true,
@@ -36,30 +33,22 @@ const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
 		},
 		ref,
 	) => {
-		const Comp = asChild ? Slot : 'a';
-
-		// External link props
-		const externalProps = external
-			? {
-					target: '_blank',
-					rel: 'noopener noreferrer',
-				}
-			: {};
-
-		// If external or asChild, use regular anchor
-		if (external || asChild) {
+		// External links skip NextLink entirely — there is nothing to prefetch
+		// or soft-navigate to — and get the usual noopener/noreferrer hardening.
+		if (external) {
 			return (
-				<Comp
+				<a
 					className={cn(
 						linkVariants({ variant, size, hover, className }),
 					)}
 					href={href}
 					ref={ref}
-					{...externalProps}
+					target="_blank"
+					rel="noopener noreferrer"
 					{...props}
 				>
 					{children}
-				</Comp>
+				</a>
 			);
 		}
 

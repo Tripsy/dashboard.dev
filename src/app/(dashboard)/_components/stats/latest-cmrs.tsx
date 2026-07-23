@@ -46,11 +46,11 @@ export function LatestCMRs() {
 	}
 
 	if (isError) {
-		return <div className="text-error">Failed to load latest CMRs</div>;
+		return <div className="text-danger">Failed to load latest CMRs</div>;
 	}
 
 	if (!data || data.length === 0) {
-		return <div className="text-muted-foreground">No CMRs found</div>;
+		return <div className="text-muted">No CMRs found</div>;
 	}
 
 	const language = getLanguageClient();
@@ -76,7 +76,7 @@ export function LatestCMRs() {
 						className="flex items-center justify-between"
 					>
 						<div className="flex items-center gap-3">
-							<span className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-sm font-medium">
+							<span className="flex h-12 w-12 items-center justify-center rounded-full bg-surface-secondary text-sm font-medium">
 								#{entry.id}
 							</span>
 							<div className="flex flex-col gap-2">
@@ -97,7 +97,7 @@ export function LatestCMRs() {
 							</div>
 						</div>
 						<div className="flex items-center gap-2">
-							<span className="text-sm text-muted-foreground">
+							<span className="text-sm text-muted">
 								<DisplayStatus
 									status={entry.status}
 									dataSource="cmr"

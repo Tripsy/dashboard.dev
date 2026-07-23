@@ -213,20 +213,23 @@ pnpm run build    # Production build
 
 ---------- 
 
-1. Hero UI -> components & CSS redo 
-1. Add section "documentation"
-2. login with google / facebook
-3. Replace all console.error with logging
-4. Implement kill all sessions except current
+1. Hero UI -> theme
+2. Review src/app/(public)/driver-panel
+3. “Show deleted” shouldn’t exist for Driver in dashboard
+4. Add section "documentation"
+5. login with google / facebook
+6. Replace all console.error with logging
+7. Implement kill all sessions except current
       // // This will actually remove all sessions - keep it for further implementation
       // await AccountTokenRepository.createQuery()
       //     .filterBy('user_id', policy.getUserId())
       //     .delete(false, true);
-5. For template section
+8. For template section
     - would be a nice idea to keep track of the last changes (maybe add a new column - prev version id and a button to restore to that version)
     - view presentation could be enhanced
-6. https://nextjs.org/docs/app/getting-started/partial-prerendering
-7. https://react.dev/learn/react-compiler/introduction
+9. https://nextjs.org/docs/app/getting-started/partial-prerendering
+10. https://react.dev/learn/react-compiler/introduction
+11. Consider unifying the two form-submission patterns (dashboard `WindowForm`/`<entity>.definition.ts` vs public account `<flow>.action.ts` + `FormCsrf`) — currently split because they grew out of separate sections (dashboard CRUD vs public auth), not by design
 
 # 🔗 Dependencies
 

@@ -7,7 +7,6 @@ import {
 	LoadingComponent,
 } from '@/components/status.component';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
 import { requestFind } from '@/helpers/services.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import type { PermissionModel } from '@/models/permission.model';
@@ -272,26 +271,23 @@ export function SetupUserPermissions({ entries }: { entries: UserModel[] }) {
 								);
 
 								return (
-									<Label
+									<Checkbox
 										key={perm.id}
-										htmlFor={`permission-${perm.id}`}
-										className="flex items-center gap-2 cursor-pointer p-2 hover:rounded-md hover:bg-base-300"
+										id={`permission-${perm.id}`}
+										isSelected={checked}
+										onChange={(checked) =>
+											handleTogglePermission(
+												Number(perm.id),
+												checked,
+												`${entity}.${perm.operation}`,
+											)
+										}
+										contentClassName="gap-2 p-2 hover:rounded-md hover:bg-base-300"
 									>
-										<Checkbox
-											id={`permission-${perm.id}`}
-											checked={checked}
-											onCheckedChange={(checked) =>
-												handleTogglePermission(
-													Number(perm.id),
-													checked === true,
-													`${entity}.${perm.operation}`,
-												)
-											}
-										/>
 										<span className="capitalize">
 											{perm.operation}
 										</span>
-									</Label>
+									</Checkbox>
 								);
 							})}
 						</div>

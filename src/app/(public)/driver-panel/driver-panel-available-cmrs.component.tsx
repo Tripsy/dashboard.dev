@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useAttachCmrToSession } from '@/app/(public)/_hooks/use-attach-cmr-to-session.hook';
 import { useAvailableCmrWebSocket } from '@/app/(public)/_hooks/use-available-cmr-websocket.hook';
 import { useWorkSession } from '@/app/(public)/_providers/work-session.provider';
 import { Icons } from '@/components/icon.component';
@@ -16,9 +16,6 @@ import { formatEnumLabel } from '@/helpers/string.helper';
 import { displayAddressLabel } from '@/models/address.model';
 import { displayClientLabel } from '@/models/client.model';
 import { type CmrModel, CmrStatusEnum } from '@/models/cmr.model';
-import type { CompanyVehicleModel } from '@/models/company-vehicle.model';
-import type { WorkSessionModel } from '@/models/work-session.model';
-import { createCmrSession } from '@/services/cmr-session.service';
 
 export function DriverPanelAvailableCmrs() {
 	const { entries: cmrs, wsStatus } = useAvailableCmrWebSocket();
@@ -68,38 +65,10 @@ export function DriverPanelAvailableCmrs() {
 }
 
 function DriverPanelAvailableCmrEntry({ cmr }: { cmr: CmrModel }) {
-	const {
-		setActiveTab,
-		activeSession,
-		refreshSession,
-		activeSessionVehicleAuto,
-		activeSessionVehicleTrailer,
-	} = useWorkSession();
+	const { activeSession, activeSessionVehicleAuto } = useWorkSession();
+	const attachCmrToSession = useAttachCmrToSession();
 
 	const language = getLanguageClient();
-
-	const handleAssignCmr = useCallback(
-		async (
-			cmr: CmrModel,
-			activeSession: WorkSessionModel,
-			activeSessionVehicleAuto: CompanyVehicleModel,
-			activeSessionVehicleTrailer: CompanyVehicleModel | null,
-		) => {
-			await createCmrSession(
-				{
-					work_session_id: activeSession.id,
-					company_vehicle_id_auto: activeSessionVehicleAuto?.id,
-					company_vehicle_id_trailer: activeSessionVehicleTrailer?.id,
-				},
-				cmr.id,
-			);
-
-			await refreshSession();
-
-			setActiveTab('sessionCmrs');
-		},
-		[refreshSession, setActiveTab],
-	);
 
 	const deliveryAddress = cmr.delivery_address
 		? displayAddressLabel(cmr.delivery_address, language)
@@ -120,14 +89,7 @@ function DriverPanelAvailableCmrEntry({ cmr }: { cmr: CmrModel }) {
 					{activeSession && activeSessionVehicleAuto && (
 						<Button
 							variant="default"
-							onClick={() =>
-								handleAssignCmr(
-									cmr,
-									activeSession,
-									activeSessionVehicleAuto,
-									activeSessionVehicleTrailer,
-								)
-							}
+							onClick={() => attachCmrToSession(cmr.id)}
 							title="Assign CMR to my work session"
 							className="text-sm px-2 py-1.5"
 						>

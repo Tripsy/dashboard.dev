@@ -18,7 +18,7 @@ import { CurrencyEnum } from '@/types/common.type';
 import { DataSourceSectionEnum } from '@/types/data-source.type';
 
 export function DriverPanelSession() {
-	const { open } = useModalStore();
+	const open = useModalStore((s) => s.open);
 	const { showToast } = useToast();
 	const attachCmrToSession = useAttachCmrToSession();
 	const {
@@ -35,11 +35,14 @@ export function DriverPanelSession() {
 	const { data: eurData } = useDriverCashBalance(CurrencyEnum.EUR);
 	const { data: usdData } = useDriverCashBalance(CurrencyEnum.USD);
 
-	const balances = [
-		{ currency: CurrencyEnum.RON, balance: ronData?.balance ?? 0 },
-		{ currency: CurrencyEnum.EUR, balance: eurData?.balance ?? 0 },
-		{ currency: CurrencyEnum.USD, balance: usdData?.balance ?? 0 },
-	];
+	const balances = useMemo(
+		() => [
+			{ currency: CurrencyEnum.RON, balance: ronData?.balance ?? 0 },
+			{ currency: CurrencyEnum.EUR, balance: eurData?.balance ?? 0 },
+			{ currency: CurrencyEnum.USD, balance: usdData?.balance ?? 0 },
+		],
+		[ronData?.balance, eurData?.balance, usdData?.balance],
+	);
 
 	// `window-action.component.tsx` invokes `windowEvents?.success?.()` without
 	// awaiting it, so a rejection inside these handlers escapes its try/catch — by

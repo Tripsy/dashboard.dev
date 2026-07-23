@@ -63,6 +63,7 @@ const WorkSessionContext = createContext<WorkSessionContextType | undefined>(
 function getSessionSituation(
 	auth: ReturnType<typeof useAuth>['auth'],
 	isLoading: boolean,
+	isError: boolean,
 	workSession: WorkSessionModel | null,
 ): SessionSituation {
 	if (!isDriver(auth)) {
@@ -71,6 +72,12 @@ function getSessionSituation(
 
 	if (isLoading) {
 		return 'loading';
+	}
+
+	// Only surface an error when there's no cached session to fall back on;
+	// otherwise keep showing the last-known session rather than an error screen.
+	if (isError && !workSession) {
+		return 'error';
 	}
 
 	return workSession ? 'active' : 'missing';
@@ -90,6 +97,7 @@ const WorkSessionProvider = ({
 	const {
 		data: sessionData,
 		isLoading: isSessionDataLoading,
+		isError: isSessionDataError,
 		refetch: refetchSession,
 	} = useQuery({
 		queryKey: ['work-session', auth?.id],
@@ -103,7 +111,7 @@ const WorkSessionProvider = ({
 		data: availableCompanyVehicles,
 		refetch: refetchAvailableCompanyVehicles,
 	} = useQuery({
-		queryKey: ['company-vehicle', 'available'],
+		queryKey: ['company-vehicle', 'available', auth?.id],
 		queryFn: () => requestAvailableCompanyVehicles(),
 		enabled: isDriver(auth),
 		staleTime: REFRESH_INTERVAL_AVAILABLE_COMPANY_VEHICLES,
@@ -138,7 +146,8 @@ const WorkSessionProvider = ({
 	const sessionSituation = getSessionSituation(
 		auth,
 		isSessionDataLoading,
-		sessionData?.workSession || null,
+		isSessionDataError,
+		sessionData?.workSession ?? null,
 	);
 
 	const sessionRefreshingRef = useRef(false);
@@ -198,7 +207,7 @@ const WorkSessionProvider = ({
 					s.company_vehicle.vehicle.vehicle_type ===
 						VehicleTypeEnum.AUTO &&
 					s.status === WorkSessionVehicleStatusEnum.ASSIGNED,
-			)?.company_vehicle || null;
+			)?.company_vehicle ?? null;
 
 		const activeSessionVehicleTrailer =
 			sessionData?.workSessionVehicles.find(
@@ -206,18 +215,18 @@ const WorkSessionProvider = ({
 					s.company_vehicle.vehicle.vehicle_type ===
 						VehicleTypeEnum.TRAILER &&
 					s.status === WorkSessionVehicleStatusEnum.ASSIGNED,
-			)?.company_vehicle || null;
+			)?.company_vehicle ?? null;
 
 		return {
 			activeTab,
 			setActiveTab,
 			sessionSituation,
-			activeSession: sessionData?.workSession || null,
-			activeSessionVehicles: sessionData?.workSessionVehicles || [],
+			activeSession: sessionData?.workSession ?? null,
+			activeSessionVehicles: sessionData?.workSessionVehicles ?? [],
 			activeSessionVehicleAuto,
 			activeSessionVehicleTrailer,
-			availableCompanyVehicles: availableCompanyVehicles || [],
-			workSessionCmrs: sessionData?.workSessionCmrs || [],
+			availableCompanyVehicles: availableCompanyVehicles ?? [],
+			workSessionCmrs: sessionData?.workSessionCmrs ?? [],
 			refreshSession,
 			sessionCashFlowEntries: sessionCashFlowEntries ?? [],
 			refetchSessionCashFlowEntries: async () => {

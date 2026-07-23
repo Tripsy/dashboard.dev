@@ -16,7 +16,7 @@ export function DriverPanelAvailableCompanyVehicles({
 	activeSession: WorkSessionModel;
 	availableCompanyVehicles: CompanyVehicleModel[];
 }) {
-	const { open } = useModalStore();
+	const open = useModalStore((s) => s.open);
 	const { refreshSession } = useWorkSession();
 
 	const handlePickSessionVehicle = useCallback(

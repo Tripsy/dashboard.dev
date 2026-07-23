@@ -15,7 +15,7 @@ function getWebSocketUrl(): string {
 
 function getReconnectDelay(retry: number): number {
 	const baseDelay =
-		(Configuration.get('remoteApi.wsReconnectDelay') as number) || 1000;
+		(Configuration.get('remoteApi.wsReconnectDelay') as number) ?? 1000;
 
 	return Math.min(baseDelay * 2 ** (retry - 1), 30000);
 }

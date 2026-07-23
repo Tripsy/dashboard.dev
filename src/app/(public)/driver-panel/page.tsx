@@ -8,7 +8,7 @@ import { translate } from '@/config/translate.setup';
 
 export async function generateMetadata(): Promise<Metadata> {
 	return {
-		title: await translate('home.meta.title', {
+		title: await translate('driver-panel.meta.title', {
 			app_name: Configuration.get('app.name') as string,
 		}),
 	};

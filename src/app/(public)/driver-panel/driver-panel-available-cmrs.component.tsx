@@ -1,8 +1,11 @@
 import { useAttachCmrToSession } from '@/app/(public)/_hooks/use-attach-cmr-to-session.hook';
-import { useAvailableCmrWebSocket } from '@/app/(public)/_hooks/use-available-cmr-websocket.hook';
+import { useAvailableCmr } from '@/app/(public)/_providers/available-cmr.provider';
 import { useWorkSession } from '@/app/(public)/_providers/work-session.provider';
+import {
+	CmrAddressRow,
+	CmrContactRow,
+} from '@/app/(public)/driver-panel/driver-panel-cmr-fields.component';
 import { Icons } from '@/components/icon.component';
-import { LocationNavigator } from '@/components/location-navigator.component';
 import {
 	ErrorComponent,
 	LoadingComponent,
@@ -18,7 +21,12 @@ import { displayClientLabel } from '@/models/client.model';
 import { type CmrModel, CmrStatusEnum } from '@/models/cmr.model';
 
 export function DriverPanelAvailableCmrs() {
-	const { entries: cmrs, wsStatus } = useAvailableCmrWebSocket();
+	const {
+		entries: cmrs,
+		wsStatus,
+		errorMessage,
+		reconnect,
+	} = useAvailableCmr();
 
 	if (wsStatus === 'connecting') {
 		return <LoadingComponent className="min-h-[calc(40vh-4rem)]" />;
@@ -26,10 +34,14 @@ export function DriverPanelAvailableCmrs() {
 
 	if (wsStatus === 'terminated') {
 		return (
-			<ErrorComponent
-				description="Connection aborted"
-				className="min-h-[calc(40vh-4rem)]"
-			/>
+			<div className="min-h-[calc(40vh-4rem)] flex flex-col items-center justify-center gap-4">
+				<ErrorComponent
+					description={errorMessage ?? 'Connection aborted'}
+				/>
+				<Button onClick={reconnect} title="Reconnect">
+					<Icons.Action.Return className="h-4 w-4" /> Reconnect
+				</Button>
+			</div>
 		);
 	}
 
@@ -113,15 +125,10 @@ function DriverPanelAvailableCmrEntry({ cmr }: { cmr: CmrModel }) {
 						{displayClientLabel(cmr.client)}
 					</span>
 				</div>
-				<div>
-					<span className="text-muted">Contact:</span>
-					<span className="ml-2 font-mono flex gap-2">
-						{cmr.contact_name}
-						<a href={`tel:${cmr.contact_phone}`}>
-							{cmr.contact_phone}
-						</a>
-					</span>
-				</div>
+				<CmrContactRow
+					name={cmr.contact_name}
+					phone={cmr.contact_phone}
+				/>
 				<div className="flex items-center">
 					<span className="text-muted">Ordered at:</span>
 					<span className="ml-2 font-mono">
@@ -141,13 +148,10 @@ function DriverPanelAvailableCmrEntry({ cmr }: { cmr: CmrModel }) {
 					</div>
 				)}
 				{cmr.status === CmrStatusEnum.ORDERED && (
-					<div className="flex flex-col">
-						<div className="text-muted flex items-center gap-2">
-							Pickup address:
-							<LocationNavigator address={pickupAddress} />
-						</div>
-						<div className="ml-4 font-mono">{pickupAddress}</div>
-					</div>
+					<CmrAddressRow
+						label="Pickup address"
+						address={pickupAddress}
+					/>
 				)}
 				{arrayHasValue(cmr.status, [
 					CmrStatusEnum.ORDERED,
@@ -166,13 +170,10 @@ function DriverPanelAvailableCmrEntry({ cmr }: { cmr: CmrModel }) {
 						</span>
 					</div>
 				)}
-				<div className="flex flex-col">
-					<div className="text-muted flex items-center gap-2">
-						Delivery address:
-						<LocationNavigator address={deliveryAddress} />
-					</div>
-					<div className="ml-4 font-mono">{deliveryAddress}</div>
-				</div>
+				<CmrAddressRow
+					label="Delivery address"
+					address={deliveryAddress}
+				/>
 			</div>
 		</div>
 	);

@@ -1,10 +1,12 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useWorkSession } from '@/app/(public)/_providers/work-session.provider';
+import {
+	CmrAddressRow,
+	CmrContactRow,
+} from '@/app/(public)/driver-panel/driver-panel-cmr-fields.component';
 import { Icons } from '@/components/icon.component';
-import { LocationNavigator } from '@/components/location-navigator.component';
 import { Button } from '@/components/ui/button';
 import { Link } from '@/components/ui/link';
-import { WhatsAppContact } from '@/components/whatsapp-contact';
 import Routes from '@/config/routes.setup';
 import { getLanguageClient } from '@/config/translate.setup';
 import { formatDate } from '@/helpers/date.helper';
@@ -17,18 +19,24 @@ import {
 	OperationalRecordTypeEnum,
 } from '@/models/cash-flow.model';
 import { displayClientLabel } from '@/models/client.model';
-import { type CmrModel, CmrStatusEnum } from '@/models/cmr.model';
+import {
+	type CmrModel,
+	type CmrStatus,
+	CmrStatusEnum,
+} from '@/models/cmr.model';
 import type { CmrSessionModel } from '@/models/cmr-session.model';
 import { useModalStore } from '@/stores/window.store';
 import { DataSourceSectionEnum } from '@/types/data-source.type';
 
-const STATUS_ORDER: Record<string, number> = {
-	preparing: 0,
-	transit: 1,
-	ordered: 2,
-	delayed: 3,
-	delivered: 4,
-	canceled: 5,
+// Full map over CmrStatus: adding a status to the enum breaks this until it's
+// ranked here, rather than silently sorting it last.
+const STATUS_ORDER: Record<CmrStatus, number> = {
+	[CmrStatusEnum.PREPARING]: 0,
+	[CmrStatusEnum.TRANSIT]: 1,
+	[CmrStatusEnum.ORDERED]: 2,
+	[CmrStatusEnum.DELAYED]: 3,
+	[CmrStatusEnum.DELIVERED]: 4,
+	[CmrStatusEnum.CANCELLED]: 5,
 };
 
 export function DriverPanelSessionCmrs({
@@ -36,10 +44,13 @@ export function DriverPanelSessionCmrs({
 }: {
 	sessionCmrs: CmrSessionModel[];
 }) {
-	const sessionCmrsSorted = [...sessionCmrs].sort(
-		(a, b) =>
-			(STATUS_ORDER[a.cmr.status] ?? 99) -
-			(STATUS_ORDER[b.cmr.status] ?? 99),
+	const sessionCmrsSorted = useMemo(
+		() =>
+			[...sessionCmrs].sort(
+				(a, b) =>
+					STATUS_ORDER[a.cmr.status] - STATUS_ORDER[b.cmr.status],
+			),
+		[sessionCmrs],
 	);
 
 	return (
@@ -63,7 +74,7 @@ function DriverPanelSessionCmrEntry({
 	cmr: CmrModel;
 	cmrSession: CmrSessionModel;
 }) {
-	const { open } = useModalStore();
+	const open = useModalStore((s) => s.open);
 	const {
 		setActiveTab,
 		activeSession,
@@ -220,7 +231,6 @@ function DriverPanelSessionCmrEntry({
 	const pickupAddress = cmr.pickup_address
 		? displayAddressLabel(cmr.pickup_address, language)
 		: null;
-	const contactPhone = cmr.contact_phone;
 
 	return (
 		<div className="flex justify-between">
@@ -304,25 +314,11 @@ function DriverPanelSessionCmrEntry({
 						{displayClientLabel(cmr.client)}
 					</span>
 				</div>
-				<div className="flex items-center gap-2">
-					<div className="text-muted">Contact:</div>
-					<div className="font-mono">{cmr.contact_name}</div>
-					{cmr.contact_phone && (
-						<div>
-							<a href={`tel:${cmr.contact_phone}`}>
-								{cmr.contact_phone}
-							</a>
-						</div>
-					)}
-					{cmr.contact_phone && (
-						<div>
-							<WhatsAppContact
-								phone={cmr.contact_phone}
-								message="Here is the CMR"
-							/>
-						</div>
-					)}
-				</div>
+				<CmrContactRow
+					name={cmr.contact_name}
+					phone={cmr.contact_phone}
+					whatsAppMessage="Here is the CMR"
+				/>
 				{withDetails && (
 					<div className="flex items-center">
 						<span className="text-muted">Ordered at:</span>
@@ -344,13 +340,10 @@ function DriverPanelSessionCmrEntry({
 					</div>
 				)}
 				{(withDetails || cmr.status === CmrStatusEnum.ORDERED) && (
-					<div className="flex flex-col">
-						<div className="text-muted flex items-center gap-2">
-							Pickup address:
-							<LocationNavigator address={pickupAddress} />
-						</div>
-						<div className="ml-4 font-mono">{pickupAddress}</div>
-					</div>
+					<CmrAddressRow
+						label="Pickup address"
+						address={pickupAddress}
+					/>
 				)}
 				{arrayHasValue(cmr.status, [
 					CmrStatusEnum.ORDERED,
@@ -369,13 +362,10 @@ function DriverPanelSessionCmrEntry({
 						</span>
 					</div>
 				)}
-				<div className="flex flex-col">
-					<div className="text-muted flex items-center gap-2">
-						Delivery address:
-						<LocationNavigator address={deliveryAddress} />
-					</div>
-					<div className="ml-4 font-mono">{deliveryAddress}</div>
-				</div>
+				<CmrAddressRow
+					label="Delivery address"
+					address={deliveryAddress}
+				/>
 				{cmr.status === CmrStatusEnum.DELIVERED && (
 					<div className="flex items-center">
 						<span className="text-muted">Delivered at:</span>
@@ -468,21 +458,20 @@ function DriverPanelSessionCmrEntry({
 						<Icons.Action.Drop className="h-4 w-4" />
 					</Button>
 				)}
-				{!arrayHasValue(cmr.status, [CmrStatusEnum.CANCELLED]) &&
-					contactPhone && (
-						<Link
-							href={Routes.get('document-cmr', {
-								tracking_number: cmr.tracking_number,
-							})}
-							variant="secondary"
-							hover="success"
-							title="View CMR"
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							<Icons.Share className="h-4 w-4" />
-						</Link>
-					)}
+				{!arrayHasValue(cmr.status, [CmrStatusEnum.CANCELLED]) && (
+					<Link
+						href={Routes.get('document-cmr', {
+							tracking_number: cmr.tracking_number,
+						})}
+						variant="secondary"
+						hover="success"
+						title="View CMR"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						<Icons.Share className="h-4 w-4" />
+					</Link>
+				)}
 			</div>
 		</div>
 	);

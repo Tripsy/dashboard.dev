@@ -5,6 +5,7 @@ import {
 	prepareParamsFromFormValues,
 	type WorkSessionCreateOutput,
 } from '@/app/(public)/_components/work-session/work-session.definition';
+import { AvailableCmrProvider } from '@/app/(public)/_providers/available-cmr.provider';
 import { useWorkSession } from '@/app/(public)/_providers/work-session.provider';
 import { DriverPanelAvailableCmrs } from '@/app/(public)/driver-panel/driver-panel-available-cmrs.component';
 import { DriverPanelAvailableCompanyVehicles } from '@/app/(public)/driver-panel/driver-panel-available-company-vehicles.component';
@@ -39,11 +40,13 @@ export function DriverPanel() {
 		sessionCashFlowEntries,
 	} = useWorkSession();
 	const { auth } = useAuth();
-	const { open } = useModalStore();
+	const open = useModalStore((s) => s.open);
 
 	const handleStartSession = useCallback(() => {
+		// The panel only renders behind an authenticated route, so `auth` is
+		// present here; guard defensively without throwing from a click handler.
 		if (!auth) {
-			throw new Error('Not authenticated');
+			return;
 		}
 
 		open({
@@ -79,6 +82,10 @@ export function DriverPanel() {
 			return <LoadingComponent />;
 		case 'error':
 			return <ErrorComponent />;
+		case 'not-applicable':
+			// Non-driver reached the panel (route is only AUTHENTICATED, not
+			// driver-scoped) — the work-session UI doesn't apply to them.
+			return null;
 	}
 
 	return (
@@ -86,116 +93,121 @@ export function DriverPanel() {
 			<div className="container-default">
 				<div className="max-w-3xl mx-auto">
 					{sessionSituation === 'active' && activeSession ? (
-						<div className="space-y-4">
-							<DriverPanelSession />
+						<AvailableCmrProvider>
+							<div className="space-y-4">
+								<DriverPanelSession />
 
-							<Tabs
-								selectedKey={activeTab}
-								onSelectionChange={(key) =>
-									setActiveTab(String(key))
-								}
-								className="w-full"
-							>
-								<TabsList
-									className="grid w-full grid-cols-2 sm:grid-cols-4 p-2 "
-									containerClassName="bg-transparent rounded-none"
+								<Tabs
+									selectedKey={activeTab}
+									onSelectionChange={(key) =>
+										setActiveTab(String(key))
+									}
+									className="w-full"
 								>
-									<TabsTrigger
+									<TabsList
+										className="grid w-full grid-cols-2 sm:grid-cols-4 p-2 "
+										containerClassName="bg-transparent rounded-none"
+									>
+										<TabsTrigger
+											id="sessionVehicles"
+											className="font-semibold"
+										>
+											Session Vehicles
+										</TabsTrigger>
+										<TabsTrigger
+											id="sessionCmrs"
+											className="font-semibold"
+										>
+											Session CMRs
+										</TabsTrigger>
+										<TabsTrigger
+											id="sessionCashFlowEntries"
+											className="font-semibold"
+										>
+											Cash Flow
+										</TabsTrigger>
+										<TabsTrigger
+											id="availableCmrs"
+											className="font-semibold"
+										>
+											Available CMRs
+										</TabsTrigger>
+									</TabsList>
+
+									<TabsContent
 										id="sessionVehicles"
-										className="font-semibold"
+										className="p-0 mt-2"
 									>
-										Session Vehicles
-									</TabsTrigger>
-									<TabsTrigger
-										id="sessionCmrs"
-										className="font-semibold"
-									>
-										Session CMRs
-									</TabsTrigger>
-									<TabsTrigger
-										id="sessionCashFlowEntries"
-										className="font-semibold"
-									>
-										Cash Flow
-									</TabsTrigger>
-									<TabsTrigger
-										id="availableCmrs"
-										className="font-semibold"
-									>
-										Available CMRs
-									</TabsTrigger>
-								</TabsList>
-
-								<TabsContent
-									id="sessionVehicles"
-									className="p-0 mt-2"
-								>
-									{activeSessionVehicles.length > 0 ? (
-										<DriverPanelSessionVehicles
-											sessionVehicles={
-												activeSessionVehicles
-											}
-										/>
-									) : (
-										<div className="text-center py-8 px-4 bg-surface-secondary rounded-lg border border-border">
-											<Icons.Vehicle className="mx-auto h-12 w-12 text-muted" />
-											<p className="mt-2 text-sm text-muted">
-												There are no vehicles assigned
-												to current session
-											</p>
-										</div>
-									)}
-									{availableCompanyVehicles.length > 0 && (
-										<div>
-											<div className="mb-4 inline-flex whitespace-nowrap rounded-sm p-2 transition-all shadow-sm">
-												Available Vehicles
-											</div>
-											<DriverPanelAvailableCompanyVehicles
-												activeSession={activeSession}
-												availableCompanyVehicles={
-													availableCompanyVehicles
+										{activeSessionVehicles.length > 0 ? (
+											<DriverPanelSessionVehicles
+												sessionVehicles={
+													activeSessionVehicles
 												}
 											/>
-										</div>
-									)}
-								</TabsContent>
+										) : (
+											<div className="text-center py-8 px-4 bg-surface-secondary rounded-lg border border-border">
+												<Icons.Vehicle className="mx-auto h-12 w-12 text-muted" />
+												<p className="mt-2 text-sm text-muted">
+													There are no vehicles
+													assigned to current session
+												</p>
+											</div>
+										)}
+										{availableCompanyVehicles.length >
+											0 && (
+											<div>
+												<div className="mb-4 inline-flex whitespace-nowrap rounded-sm p-2 transition-all shadow-sm">
+													Available Vehicles
+												</div>
+												<DriverPanelAvailableCompanyVehicles
+													activeSession={
+														activeSession
+													}
+													availableCompanyVehicles={
+														availableCompanyVehicles
+													}
+												/>
+											</div>
+										)}
+									</TabsContent>
 
-								<TabsContent
-									id="sessionCmrs"
-									className="p-0 mt-2"
-								>
-									{workSessionCmrs.length > 0 ? (
-										<DriverPanelSessionCmrs
-											sessionCmrs={workSessionCmrs}
+									<TabsContent
+										id="sessionCmrs"
+										className="p-0 mt-2"
+									>
+										{workSessionCmrs.length > 0 ? (
+											<DriverPanelSessionCmrs
+												sessionCmrs={workSessionCmrs}
+											/>
+										) : (
+											<div className="text-center py-8 px-4 bg-surface-secondary rounded-lg border border-border">
+												<Icons.Cmr className="mx-auto h-12 w-12 text-muted" />
+												<p className="mt-2 text-sm text-muted">
+													There are no CMRs assigned
+													to current session
+												</p>
+											</div>
+										)}
+									</TabsContent>
+
+									<TabsContent
+										id="sessionCashFlowEntries"
+										className="p-0 mt-2"
+									>
+										<DriverPanelSessionCashFlow
+											entries={sessionCashFlowEntries}
 										/>
-									) : (
-										<div className="text-center py-8 px-4 bg-surface-secondary rounded-lg border border-border">
-											<Icons.Cmr className="mx-auto h-12 w-12 text-muted" />
-											<p className="mt-2 text-sm text-muted">
-												There are no CMRs assigned to
-												current session
-											</p>
-										</div>
-									)}
-								</TabsContent>
+									</TabsContent>
 
-								<TabsContent
-									id="sessionCashFlowEntries"
-									className="p-0 mt-2"
-								>
-									<DriverPanelSessionCashFlow
-										entries={sessionCashFlowEntries}
-									/>
-								</TabsContent>
-
-								<TabsContent
-									id="availableCmrs"
-									className="p-0 mt-2"
-								>
-									<DriverPanelAvailableCmrs />
-								</TabsContent>
-							</Tabs>
-						</div>
+									<TabsContent
+										id="availableCmrs"
+										className="p-0 mt-2"
+									>
+										<DriverPanelAvailableCmrs />
+									</TabsContent>
+								</Tabs>
+							</div>
+						</AvailableCmrProvider>
 					) : (
 						<div>
 							<div className="text-center py-8 px-4 bg-surface-secondary rounded-lg border border-border">

@@ -22,67 +22,24 @@ export function DriverPanelSessionCashFlow({
 }: {
 	entries: CashFlowModel[];
 }) {
-	const { invalidate: ronInvalidate } = useDriverCashBalance(
-		CurrencyEnum.RON,
-	);
-	const { invalidate: eurInvalidate } = useDriverCashBalance(
-		CurrencyEnum.EUR,
-	);
-	const { invalidate: usdInvalidate } = useDriverCashBalance(
-		CurrencyEnum.USD,
-	);
-
-	const invalidateBalance = useCallback(
-		async (currency: string) => {
-			switch (currency) {
-				case CurrencyEnum.RON:
-					await ronInvalidate();
-					break;
-				case CurrencyEnum.EUR:
-					await eurInvalidate();
-					break;
-				case CurrencyEnum.USD:
-					await usdInvalidate();
-					break;
-			}
-		},
-		[ronInvalidate, eurInvalidate, usdInvalidate],
-	);
+	// One call refreshes every currency balance (the cash-flow list can move any
+	// of them); the currency arg only satisfies the hook signature.
+	const { invalidateAll } = useDriverCashBalance(CurrencyEnum.RON);
 
 	return (
-		<>
-			{/*<div className="mb-4">*/}
-			{/*	<div className="flex items-center gap-4 bg-lime-100/40 shadow-lg rounded-lg p-4">*/}
-			{/*		<div className="font-semibold">Balance:</div>*/}
-			{/*		<div className="flex gap-6 font-semibold">*/}
-			{/*			{balances*/}
-			{/*				.filter(({ balance }) => balance && balance !== 0)*/}
-			{/*				.map(({ currency, balance }) => (*/}
-			{/*					<div key={currency}>*/}
-			{/*						<DisplayAmount*/}
-			{/*							amount={balance}*/}
-			{/*							currencyCode={currency}*/}
-			{/*							classNamePositive="text-success dark:text-success"*/}
-			{/*						/>*/}
-			{/*					</div>*/}
-			{/*				))}*/}
-			{/*		</div>*/}
-			{/*	</div>*/}
-			{/*</div>*/}
-			<div className="space-y-4">
-				{entries.map((m) => (
-					<div
-						key={m.id}
-						className="bg-surface border border-border rounded-lg p-4"
-					>
-						<DriverPanelSessionCashFlowEntry
-							entry={m}
-							onBalanceInvalidate={invalidateBalance}
-						/>
-					</div>
-				))}
-			</div>
-		</>
+		<div className="space-y-4">
+			{entries.map((m) => (
+				<div
+					key={m.id}
+					className="bg-surface border border-border rounded-lg p-4"
+				>
+					<DriverPanelSessionCashFlowEntry
+						entry={m}
+						onBalanceInvalidate={invalidateAll}
+					/>
+				</div>
+			))}
+		</div>
 	);
 }
 
@@ -91,9 +48,9 @@ function DriverPanelSessionCashFlowEntry({
 	onBalanceInvalidate,
 }: {
 	entry: CashFlowModel;
-	onBalanceInvalidate: (currency: string) => Promise<void>;
+	onBalanceInvalidate: () => Promise<void>;
 }) {
-	const { open } = useModalStore();
+	const open = useModalStore((s) => s.open);
 	const { refetchSessionCashFlowEntries } = useWorkSession();
 
 	const handleUpdateCashFlow = useCallback(
@@ -131,7 +88,7 @@ function DriverPanelSessionCashFlowEntry({
 						await refetchSessionCashFlowEntries();
 
 						if (entry.method === CashFlowMethodEnum.CASH) {
-							await onBalanceInvalidate(entry.currency);
+							await onBalanceInvalidate();
 						}
 					},
 				},

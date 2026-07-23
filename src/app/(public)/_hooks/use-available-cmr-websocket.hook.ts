@@ -1,16 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Configuration } from '@/config/settings.config';
 import type { CmrModel } from '@/models/cmr.model';
+import { requestWsTicket } from '@/services/driver-session.service';
 import type { WsStatus } from '@/types/web-socket.type';
 
 const MAX_RETRIES = 5;
 
 const WS_PATH = '/cmr-available';
 
-function getWebSocketUrl(): string {
+function getWebSocketUrl(ticket: string): string {
 	const base = Configuration.get('remoteApi.wsUrl') as string;
 
-	return `${base}${WS_PATH}`;
+	// The browser can't send an Authorization header on a WebSocket, so the
+	// single-use ticket (obtained server-side via the proxy) rides on the URL.
+	return `${base}${WS_PATH}?ticket=${encodeURIComponent(ticket)}`;
 }
 
 function getReconnectDelay(retry: number): number {
@@ -29,7 +32,21 @@ export function useAvailableCmrWebSocket() {
 	const retryCount = useRef(0);
 	const isMounted = useRef(true);
 
-	const connect = useCallback(() => {
+	// Schedules the next reconnect attempt (a fresh ticket is fetched on each one).
+	const scheduleReconnect = useCallback(() => {
+		retryCount.current += 1;
+		const delay = getReconnectDelay(retryCount.current);
+
+		console.debug(
+			`Reconnecting in ${delay}ms (attempt ${retryCount.current}/${MAX_RETRIES})`,
+		);
+
+		reconnectTimer.current = setTimeout(() => {
+			void connectRef.current();
+		}, delay);
+	}, []);
+
+	const connect = useCallback(async () => {
 		if (!isMounted.current) {
 			return;
 		}
@@ -47,8 +64,31 @@ export function useAvailableCmrWebSocket() {
 		setWsStatus('connecting');
 		setErrorMessage(null);
 
+		// A ticket is single-use, so one is fetched before every (re)connect. A
+		// failure here is treated like a connection error: back off and retry.
+		let ticket: string;
+
 		try {
-			const ws = new WebSocket(getWebSocketUrl());
+			ticket = await requestWsTicket();
+		} catch (err) {
+			if (!isMounted.current) {
+				return;
+			}
+
+			console.error('Failed to obtain WebSocket ticket:', err);
+
+			setWsStatus('error');
+			setErrorMessage('Connection error. Retrying...');
+			scheduleReconnect();
+			return;
+		}
+
+		if (!isMounted.current) {
+			return;
+		}
+
+		try {
+			const ws = new WebSocket(getWebSocketUrl(ticket));
 			wsRef.current = ws;
 
 			ws.onopen = () => {
@@ -89,17 +129,7 @@ export function useAvailableCmrWebSocket() {
 				setWsStatus('disconnected');
 
 				if (event.code !== 1000) {
-					retryCount.current += 1;
-					const delay = getReconnectDelay(retryCount.current);
-
-					console.debug(
-						`Reconnecting in ${delay}ms (attempt ${retryCount.current}/${MAX_RETRIES})`,
-					);
-
-					reconnectTimer.current = setTimeout(
-						() => connectRef.current(),
-						delay,
-					);
+					scheduleReconnect();
 				}
 			};
 
@@ -126,7 +156,7 @@ export function useAvailableCmrWebSocket() {
 			setWsStatus('error');
 			setErrorMessage('Failed to establish connection');
 		}
-	}, [wsStatus]);
+	}, [wsStatus, scheduleReconnect]);
 
 	const connectRef = useRef(connect);
 
@@ -137,7 +167,7 @@ export function useAvailableCmrWebSocket() {
 	// biome-ignore lint/correctness/useExhaustiveDependencies: empty deps, connect is stable and captured via ref below
 	useEffect(() => {
 		isMounted.current = true;
-		connect();
+		void connect();
 
 		return () => {
 			isMounted.current = false;
@@ -165,7 +195,7 @@ export function useAvailableCmrWebSocket() {
 		}
 
 		retryCount.current = 0;
-		connect();
+		void connect();
 	}, [connect]);
 
 	return { entries, wsStatus, errorMessage, manualReconnect };

@@ -28,7 +28,16 @@ export function DriverPanelSession() {
 		refreshSession,
 	} = useWorkSession();
 
-	const translationsKeys = useMemo(() => ['app.error.title'] as const, []);
+	const translationsKeys = useMemo(
+		() =>
+			[
+				'app.error.title',
+				'driver-panel.tooltip.add_session_vehicle',
+				'driver-panel.tooltip.create_cmr',
+				'driver-panel.tooltip.close_session',
+			] as const,
+		[],
+	);
 	const { translations } = useTranslation(translationsKeys);
 
 	const { data: ronData } = useDriverCashBalance(CurrencyEnum.RON);
@@ -183,7 +192,9 @@ export function DriverPanelSession() {
 					variant={activeSessionVehicleAuto ? 'secondary' : 'warning'}
 					hover="success"
 					onClick={handleCreateSessionVehicle}
-					title="Add session vehicle"
+					title={
+						translations['driver-panel.tooltip.add_session_vehicle']
+					}
 				>
 					<Icons.Vehicle />
 				</Button>
@@ -192,7 +203,7 @@ export function DriverPanelSession() {
 						variant="secondary"
 						hover="success"
 						onClick={handleCreateCmr}
-						title="Create CMR"
+						title={translations['driver-panel.tooltip.create_cmr']}
 					>
 						<Icons.Cmr />
 					</Button>
@@ -201,7 +212,7 @@ export function DriverPanelSession() {
 					variant="secondary"
 					hover="error"
 					onClick={handleCloseSession}
-					title="Close session"
+					title={translations['driver-panel.tooltip.close_session']}
 				>
 					<Icons.Action.Close />
 				</Button>

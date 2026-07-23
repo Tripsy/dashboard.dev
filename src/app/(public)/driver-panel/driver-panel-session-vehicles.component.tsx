@@ -4,6 +4,7 @@ import { useWorkSession } from '@/app/(public)/_providers/work-session.provider'
 import { Icons } from '@/components/icon.component';
 import { Button } from '@/components/ui/button';
 import { DisplayStatus } from '@/helpers/display.helper';
+import { useTranslation } from '@/hooks/use-translation.hook';
 import {
 	CashFlowCategoryEnum,
 	CashFlowMethodEnum,
@@ -26,6 +27,21 @@ const STATUS_ORDER: Record<WorkSessionVehicleStatus, number> = {
 	[WorkSessionVehicleStatusEnum.RETURNED]: 1,
 };
 
+const TRANSLATION_KEYS = [
+	'driver-panel.field.range_km',
+	'driver-panel.button.fuel',
+	'driver-panel.button.toll',
+	'driver-panel.button.show_returned',
+	'driver-panel.button.hide_returned',
+	'driver-panel.tooltip.add_fuel_payment',
+	'driver-panel.tooltip.add_toll_payment',
+	'driver-panel.tooltip.return_vehicle',
+	'driver-panel.tooltip.update_vehicle',
+	'driver-panel.tooltip.delete_vehicle',
+	'driver-panel.tooltip.show_returned_vehicles',
+	'driver-panel.tooltip.hide_returned_vehicles',
+] as const;
+
 export function DriverPanelSessionVehicles({
 	sessionVehicles,
 }: {
@@ -34,6 +50,7 @@ export function DriverPanelSessionVehicles({
 	const open = useModalStore((s) => s.open);
 	const { setActiveTab, refreshSession, refetchSessionCashFlowEntries } =
 		useWorkSession();
+	const { translations } = useTranslation(TRANSLATION_KEYS);
 
 	const [withReturned, setWithReturned] = useState(false);
 
@@ -214,7 +231,12 @@ export function DriverPanelSessionVehicles({
 									</h3>
 									<div>
 										<span className="text-muted">
-											Range Km:
+											{
+												translations[
+													'driver-panel.field.range_km'
+												]
+											}
+											:
 										</span>
 										<span className="ml-2 font-mono">
 											{m.vehicle_km_start} -{' '}
@@ -244,10 +266,18 @@ export function DriverPanelSessionVehicles({
 														)
 													}
 													className="cursor-pointer"
-													title="Add fuel payment"
+													title={
+														translations[
+															'driver-panel.tooltip.add_fuel_payment'
+														]
+													}
 												>
 													<Icons.Fuel className="h-4 w-4" />{' '}
-													Fuel
+													{
+														translations[
+															'driver-panel.button.fuel'
+														]
+													}
 												</Button>
 
 												<Button
@@ -259,10 +289,18 @@ export function DriverPanelSessionVehicles({
 														)
 													}
 													className="cursor-pointer"
-													title="Add toll payment"
+													title={
+														translations[
+															'driver-panel.tooltip.add_toll_payment'
+														]
+													}
 												>
 													<Icons.Toll className="h-4 w-4" />{' '}
-													Toll
+													{
+														translations[
+															'driver-panel.button.toll'
+														]
+													}
 												</Button>
 											</div>
 										)}
@@ -279,7 +317,11 @@ export function DriverPanelSessionVehicles({
 													)
 												}
 												className="cursor-pointer"
-												title="Return vehicle"
+												title={
+													translations[
+														'driver-panel.tooltip.return_vehicle'
+													]
+												}
 											>
 												<Icons.Action.Return className="h-4 w-4" />
 											</Button>
@@ -291,7 +333,11 @@ export function DriverPanelSessionVehicles({
 												handleUpdateSessionVehicle(m)
 											}
 											className="cursor-pointer"
-											title="Update vehicle"
+											title={
+												translations[
+													'driver-panel.tooltip.update_vehicle'
+												]
+											}
 										>
 											<Icons.Action.Update className="h-4 w-4" />
 										</Button>
@@ -302,7 +348,11 @@ export function DriverPanelSessionVehicles({
 												handleDeleteSessionVehicle(m)
 											}
 											className="cursor-pointer"
-											title="Delete vehicle"
+											title={
+												translations[
+													'driver-panel.tooltip.delete_vehicle'
+												]
+											}
 										>
 											<Icons.Action.Delete className="h-4 w-4" />
 										</Button>
@@ -318,17 +368,27 @@ export function DriverPanelSessionVehicles({
 						<Button
 							variant="outline"
 							onClick={() => setWithReturned(false)}
-							title="Hide returned vehicles"
+							title={
+								translations[
+									'driver-panel.tooltip.hide_returned_vehicles'
+								]
+							}
 						>
-							<Icons.Obscured className="h-4 w-4" /> Hide returned
+							<Icons.Obscured className="h-4 w-4" />{' '}
+							{translations['driver-panel.button.hide_returned']}
 						</Button>
 					) : (
 						<Button
 							variant="outline"
 							onClick={() => setWithReturned(true)}
-							title="Show returned vehicles"
+							title={
+								translations[
+									'driver-panel.tooltip.show_returned_vehicles'
+								]
+							}
 						>
-							<Icons.Visible className="h-4 w-4" /> Show returned
+							<Icons.Visible className="h-4 w-4" />{' '}
+							{translations['driver-panel.button.show_returned']}
 						</Button>
 					))}
 			</div>

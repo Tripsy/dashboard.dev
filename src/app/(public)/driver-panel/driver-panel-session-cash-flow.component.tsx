@@ -5,6 +5,7 @@ import { Icons } from '@/components/icon.component';
 import { Button } from '@/components/ui/button';
 import { DisplayAmount, DisplayStatus } from '@/helpers/display.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
+import { useTranslation } from '@/hooks/use-translation.hook';
 import {
 	CashFlowDirectionEnum,
 	CashFlowMethodEnum,
@@ -16,6 +17,17 @@ import { displayVendorLabel } from '@/models/vendor.model';
 import { useModalStore } from '@/stores/window.store';
 import { CurrencyEnum } from '@/types/common.type';
 import { DataSourceSectionEnum } from '@/types/data-source.type';
+
+const TRANSLATION_KEYS = [
+	'driver-panel.field.client',
+	'driver-panel.field.amount',
+	'driver-panel.field.reference',
+	'driver-panel.field.vendor',
+	'driver-panel.field.notes',
+	'driver-panel.tooltip.update_payment',
+	'driver-panel.tooltip.mark_complete',
+	'driver-panel.tooltip.mark_canceled',
+] as const;
 
 export function DriverPanelSessionCashFlow({
 	entries,
@@ -52,6 +64,7 @@ function DriverPanelSessionCashFlowEntry({
 }) {
 	const open = useModalStore((s) => s.open);
 	const { refetchSessionCashFlowEntries } = useWorkSession();
+	const { translations } = useTranslation(TRANSLATION_KEYS);
 
 	const handleUpdateCashFlow = useCallback(
 		(entry: CashFlowModel) => {
@@ -138,7 +151,9 @@ function DriverPanelSessionCashFlowEntry({
 				</h3>
 				{entry.operational_records?.client && (
 					<div>
-						<span className="text-muted">Client:</span>
+						<span className="text-muted">
+							{translations['driver-panel.field.client']}:
+						</span>
 						<span className="ml-2 font-mono">
 							{displayClientLabel(
 								entry.operational_records.client,
@@ -147,7 +162,9 @@ function DriverPanelSessionCashFlowEntry({
 					</div>
 				)}
 				<div>
-					<span className="text-muted">Amount:</span>
+					<span className="text-muted">
+						{translations['driver-panel.field.amount']}:
+					</span>
 					<span className="ml-2 font-mono">
 						<DisplayAmount
 							amount={entry.grossAmount}
@@ -158,7 +175,9 @@ function DriverPanelSessionCashFlowEntry({
 				</div>
 				{entry.external_reference && (
 					<div>
-						<span className="text-muted">Reference:</span>
+						<span className="text-muted">
+							{translations['driver-panel.field.reference']}:
+						</span>
 						<span className="ml-2 font-mono">
 							{entry.external_reference}
 						</span>
@@ -166,7 +185,9 @@ function DriverPanelSessionCashFlowEntry({
 				)}
 				{entry.operational_records?.vendor && (
 					<div>
-						<span className="text-muted">Vendor:</span>
+						<span className="text-muted">
+							{translations['driver-panel.field.vendor']}:
+						</span>
 						<span className="ml-2 font-mono">
 							{displayVendorLabel(
 								entry.operational_records.vendor,
@@ -176,7 +197,9 @@ function DriverPanelSessionCashFlowEntry({
 				)}
 				{entry.notes && (
 					<div>
-						<span className="text-muted">Notes:</span>
+						<span className="text-muted">
+							{translations['driver-panel.field.notes']}:
+						</span>
 						<span className="ml-2 font-mono">{entry.notes}</span>
 					</div>
 				)}
@@ -189,7 +212,9 @@ function DriverPanelSessionCashFlowEntry({
 						hover="default"
 						onClick={() => handleUpdateCashFlow(entry)}
 						className="cursor-pointer"
-						title="Update payment"
+						title={
+							translations['driver-panel.tooltip.update_payment']
+						}
 					>
 						<Icons.Action.Update className="h-4 w-4" />
 					</Button>
@@ -202,7 +227,11 @@ function DriverPanelSessionCashFlowEntry({
 								hover="default"
 								onClick={() => handleCompleteCashFlow(entry)}
 								className="cursor-pointer"
-								title="Mark as complete"
+								title={
+									translations[
+										'driver-panel.tooltip.mark_complete'
+									]
+								}
 							>
 								<Icons.Action.Complete className="h-4 w-4" />
 							</Button>
@@ -211,7 +240,11 @@ function DriverPanelSessionCashFlowEntry({
 								hover="error"
 								onClick={() => handleCancelCashFlow(entry)}
 								className="cursor-pointer"
-								title="Mark as canceled"
+								title={
+									translations[
+										'driver-panel.tooltip.mark_canceled'
+									]
+								}
 							>
 								<Icons.Action.Cancel className="h-4 w-4" />
 							</Button>

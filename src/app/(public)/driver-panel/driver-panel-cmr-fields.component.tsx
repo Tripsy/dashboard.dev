@@ -44,10 +44,12 @@ export function CmrAddressRow({
 }
 
 export function CmrContactRow({
+	label,
 	name,
 	phone,
 	whatsAppMessage,
 }: {
+	label: string;
 	name: string | null;
 	phone: string | null;
 	// When set, a WhatsApp shortcut is rendered next to the phone number.
@@ -55,7 +57,7 @@ export function CmrContactRow({
 }) {
 	return (
 		<div className="flex items-center gap-2">
-			<div className="text-muted">Contact:</div>
+			<div className="text-muted">{label}:</div>
 			<div className="font-mono">{name}</div>
 			{phone && <a href={`tel:${phone}`}>{phone}</a>}
 			{phone && whatsAppMessage && (

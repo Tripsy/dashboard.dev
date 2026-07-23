@@ -3,11 +3,17 @@ import type { WorkSessionVehicleFormValuesType } from '@/app/(public)/_component
 import { useWorkSession } from '@/app/(public)/_providers/work-session.provider';
 import { Icons } from '@/components/icon.component';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/hooks/use-translation.hook';
 import type { CompanyVehicleModel } from '@/models/company-vehicle.model';
 import type { WorkSessionModel } from '@/models/work-session.model';
 import { createWorkSessionVehicle } from '@/services/work-session-vehicle.service';
 import { useModalStore } from '@/stores/window.store';
 import { DataSourceSectionEnum } from '@/types/data-source.type';
+
+const TRANSLATION_KEYS = [
+	'driver-panel.button.pick',
+	'driver-panel.tooltip.pick_vehicle',
+] as const;
 
 export function DriverPanelAvailableCompanyVehicles({
 	activeSession,
@@ -18,6 +24,7 @@ export function DriverPanelAvailableCompanyVehicles({
 }) {
 	const open = useModalStore((s) => s.open);
 	const { refreshSession } = useWorkSession();
+	const { translations } = useTranslation(TRANSLATION_KEYS);
 
 	const handlePickSessionVehicle = useCallback(
 		(entry: CompanyVehicleModel, workSession: WorkSessionModel) => {
@@ -74,9 +81,14 @@ export function DriverPanelAvailableCompanyVehicles({
 									handlePickSessionVehicle(m, activeSession)
 								}
 								className="cursor-pointer"
-								title="Pick vehicle"
+								title={
+									translations[
+										'driver-panel.tooltip.pick_vehicle'
+									]
+								}
 							>
-								<Icons.Action.Add className="h-4 w-4" /> Pick
+								<Icons.Action.Add className="h-4 w-4" />{' '}
+								{translations['driver-panel.button.pick']}
 							</Button>
 						</div>
 					</div>

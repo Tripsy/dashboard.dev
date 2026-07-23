@@ -231,7 +231,7 @@ function DriverPanelSessionCmrEntry({
 							variant="outline"
 							onClick={() => setWithDetails(false)}
 							title="Show less details"
-							className="text-muted"
+							className="py-1.5 px-2"
 						>
 							<Icons.Direction.ArrowCurvedBottom className="h-4 w-4" />
 						</Button>
@@ -240,7 +240,7 @@ function DriverPanelSessionCmrEntry({
 							variant="outline"
 							onClick={() => setWithDetails(true)}
 							title="Show more details"
-							className="text-muted"
+							className="py-1.5 px-2"
 						>
 							<Icons.Direction.ArrowRight className="h-4 w-4" />
 						</Button>
@@ -254,17 +254,16 @@ function DriverPanelSessionCmrEntry({
 					]) ? (
 						<DisplayStatus status={cmr.status} dataSource="cmr" />
 					) : (
-						<button
-							type="button"
+						<Button
+							variant="ghost"
 							onClick={() => handleStatusTransition(cmr)}
 							title="Update CMR status"
-							className="cursor-pointer "
 						>
 							<DisplayStatus
 								status={cmr.status}
 								dataSource="cmr"
 							/>
-						</button>
+						</Button>
 					)}
 				</h3>
 				{withDetails && (
@@ -409,7 +408,6 @@ function DriverPanelSessionCmrEntry({
 						variant="secondary"
 						hover="default"
 						onClick={() => handleSetupCmrVehicles(cmr)}
-						className="cursor-pointer"
 						title="Setup CMR vehicles"
 					>
 						<Icons.Vehicle className="h-4 w-4" />
@@ -419,7 +417,6 @@ function DriverPanelSessionCmrEntry({
 					variant="secondary"
 					hover="default"
 					onClick={() => handleViewCmrImages(cmr)}
-					className="cursor-pointer"
 					title="View CMR images"
 				>
 					<Icons.Image className="h-4 w-4" />
@@ -428,7 +425,6 @@ function DriverPanelSessionCmrEntry({
 					variant="secondary"
 					hover="default"
 					onClick={() => handleCreatePaymentCustomer(cmr)}
-					className="cursor-pointer"
 					title="Create payment"
 				>
 					<Icons.Payment className="h-4 w-4" />
@@ -441,7 +437,6 @@ function DriverPanelSessionCmrEntry({
 						variant="secondary"
 						hover="default"
 						onClick={() => handleUpdateCmr(cmr)}
-						className="cursor-pointer"
 						title="Update CMR"
 					>
 						<Icons.Action.Update className="h-4 w-4" />
@@ -455,7 +450,6 @@ function DriverPanelSessionCmrEntry({
 						variant="secondary"
 						hover="error"
 						onClick={() => handleDeleteCmr(cmr)}
-						className="cursor-pointer"
 						title="Delete CMR"
 					>
 						<Icons.Action.Delete className="h-4 w-4" />
@@ -469,7 +463,6 @@ function DriverPanelSessionCmrEntry({
 						variant="secondary"
 						hover="error"
 						onClick={() => handleDropCmr(cmrSession)}
-						className="cursor-pointer"
 						title="Drop CMR"
 					>
 						<Icons.Action.Drop className="h-4 w-4" />
@@ -483,7 +476,6 @@ function DriverPanelSessionCmrEntry({
 							})}
 							variant="secondary"
 							hover="success"
-							className="cursor-pointer"
 							title="View CMR"
 							target="_blank"
 							rel="noopener noreferrer"

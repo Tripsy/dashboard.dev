@@ -22,21 +22,15 @@ export function DriverPanelSessionCashFlow({
 }: {
 	entries: CashFlowModel[];
 }) {
-	const { data: ronData, invalidate: ronInvalidate } = useDriverCashBalance(
+	const { invalidate: ronInvalidate } = useDriverCashBalance(
 		CurrencyEnum.RON,
 	);
-	const { data: eurData, invalidate: eurInvalidate } = useDriverCashBalance(
+	const { invalidate: eurInvalidate } = useDriverCashBalance(
 		CurrencyEnum.EUR,
 	);
-	const { data: usdData, invalidate: usdInvalidate } = useDriverCashBalance(
+	const { invalidate: usdInvalidate } = useDriverCashBalance(
 		CurrencyEnum.USD,
 	);
-
-	const balances = [
-		{ currency: CurrencyEnum.RON, balance: ronData?.balance ?? 0 },
-		{ currency: CurrencyEnum.EUR, balance: eurData?.balance ?? 0 },
-		{ currency: CurrencyEnum.USD, balance: usdData?.balance ?? 0 },
-	];
 
 	const invalidateBalance = useCallback(
 		async (currency: string) => {
@@ -57,26 +51,24 @@ export function DriverPanelSessionCashFlow({
 
 	return (
 		<>
-			<div className="mb-4">
-				<div className="flex items-center gap-4 bg-surface border border-border rounded-lg p-4">
-					<div className="font-semibold py-2 px-4 bg-surface-secondary/20 rounded-lg">
-						Balance
-					</div>
-					<div className="flex gap-6 font-semibold">
-						{balances
-							.filter(({ balance }) => balance && balance !== 0)
-							.map(({ currency, balance }) => (
-								<div key={currency}>
-									<DisplayAmount
-										amount={balance}
-										currencyCode={currency}
-										classNamePositive="text-success dark:text-success"
-									/>
-								</div>
-							))}
-					</div>
-				</div>
-			</div>
+			{/*<div className="mb-4">*/}
+			{/*	<div className="flex items-center gap-4 bg-lime-100/40 shadow-lg rounded-lg p-4">*/}
+			{/*		<div className="font-semibold">Balance:</div>*/}
+			{/*		<div className="flex gap-6 font-semibold">*/}
+			{/*			{balances*/}
+			{/*				.filter(({ balance }) => balance && balance !== 0)*/}
+			{/*				.map(({ currency, balance }) => (*/}
+			{/*					<div key={currency}>*/}
+			{/*						<DisplayAmount*/}
+			{/*							amount={balance}*/}
+			{/*							currencyCode={currency}*/}
+			{/*							classNamePositive="text-success dark:text-success"*/}
+			{/*						/>*/}
+			{/*					</div>*/}
+			{/*				))}*/}
+			{/*		</div>*/}
+			{/*	</div>*/}
+			{/*</div>*/}
 			<div className="space-y-4">
 				{entries.map((m) => (
 					<div

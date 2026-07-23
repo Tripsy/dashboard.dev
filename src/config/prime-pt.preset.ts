@@ -33,7 +33,7 @@ export const primePtPreset: PrimeReactPTOptions = {
 	datatable: {
 		root: { className: 'w-full text-sm text-foreground' },
 		table: { className: 'w-full border-collapse' },
-		thead: { className: 'bg-surface-secondary text-foreground' },
+		thead: { className: 'bg-surface-secondary/70 text-foreground' },
 		wrapper: { className: 'overflow-auto rounded-lg' },
 		bodyRow: {
 			className: cx(
@@ -52,12 +52,12 @@ export const primePtPreset: PrimeReactPTOptions = {
 	column: {
 		headerCell: (o: ColumnPassThroughMethodOptions) => ({
 			className: cx(
-				'relative px-3 py-2 text-left font-semibold border-b border-r border-border last:border-r-0 whitespace-nowrap',
+				'relative px-3 py-3 text-left text-md border-b border-r border-border last:border-r-0 whitespace-nowrap',
 				o.props?.sortable &&
 					'cursor-pointer select-none hover:bg-surface-secondary/60',
 			),
 		}),
-		headerContent: { className: 'flex items-center' },
+		headerContent: { className: 'flex items-center gap-2' },
 		bodyCell: { className: 'px-3 py-2 align-middle' },
 		sortIcon: (o: ColumnPassThroughMethodOptions) => ({
 			className: cx(
@@ -68,7 +68,7 @@ export const primePtPreset: PrimeReactPTOptions = {
 		// Drag handle for `resizableColumns`; unstyled mode renders it with no size/cursor.
 		columnResizer: {
 			className:
-				'absolute top-0 right-0 h-full w-1.5 cursor-col-resize touch-none select-none hover:bg-accent/50',
+				'absolute top-0 right-0 h-full w-1.5 cursor-col-resize touch-none select-none',
 		},
 		// Selection checkboxes are styled by the top-level `checkbox` PT below.
 	},

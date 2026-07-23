@@ -1,3 +1,4 @@
+import { Label } from '@heroui/react';
 import { type JSX, useMemo } from 'react';
 import { dispatchFilterReset } from '@/app/(dashboard)/_events/data-table-filter-reset.event';
 import {
@@ -13,7 +14,6 @@ import {
 } from '@/components/form/form-element.component';
 import { Icons } from '@/components/icon.component';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import { cn } from '@/helpers/css.helper';
 import { stringToDate } from '@/helpers/date.helper';
 import { requestFind } from '@/helpers/services.helper';

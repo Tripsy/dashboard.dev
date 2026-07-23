@@ -8,8 +8,7 @@ import {
 	Zap,
 } from 'lucide-react';
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { Link } from '@/components/ui/link';
 import Routes from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
 import { translate } from '@/config/translate.setup';
@@ -84,26 +83,22 @@ export default function Page() {
 							palette that makes your applications shine.
 						</p>
 						<div className="flex flex-col sm:flex-row gap-4 justify-center">
-							<Button
+							<Link
 								size="lg"
 								className="h-12 px-8 text-base"
-								asChild
+								href={Routes.get('register')}
 							>
-								<Link href={Routes.get('register')}>
-									Get Started
-									<ArrowRight className="ml-2 h-5 w-5" />
-								</Link>
-							</Button>
-							<Button
+								Get Started
+								<ArrowRight className="ml-2 h-5 w-5" />
+							</Link>
+							<Link
 								size="lg"
 								variant="outline"
 								className="h-12 px-8 text-base"
-								asChild
+								href={Routes.get('docs')}
 							>
-								<Link href={Routes.get('docs')}>
-									View Documentation
-								</Link>
-							</Button>
+								View Documentation
+							</Link>
 						</div>
 					</div>
 				</div>
@@ -160,21 +155,21 @@ export default function Page() {
 							applications with NReady.
 						</p>
 						<div className="flex flex-col sm:flex-row gap-4 justify-center">
-							<Button size="lg" className="h-12 px-8" asChild>
-								<Link href={Routes.get('register')}>
-									Create Free Account
-								</Link>
-							</Button>
-							<Button
+							<Link
+								size="lg"
+								className="h-12 px-8"
+								href={Routes.get('register')}
+							>
+								Create Free Account
+							</Link>
+							<Link
 								size="lg"
 								variant="secondary"
 								className="h-12 px-8"
-								asChild
+								href={Routes.get('docs')}
 							>
-								<Link href={Routes.get('docs')}>
-									Explore Components
-								</Link>
-							</Button>
+								Explore Components
+							</Link>
 						</div>
 					</div>
 				</div>

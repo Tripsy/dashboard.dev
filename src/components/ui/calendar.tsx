@@ -1,71 +1,36 @@
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar as HeroCalendar } from '@heroui/react';
 import type * as React from 'react';
-import { DayPicker } from 'react-day-picker';
 
-import { buttonVariants } from '@/components/ui/button';
-import { cn } from '@/helpers/css.helper';
+export type CalendarProps = React.ComponentProps<typeof HeroCalendar>;
 
-export type CalendarProps = React.ComponentProps<typeof DayPicker>;
-
-function Calendar({
-	className,
-	classNames,
-	showOutsideDays = true,
-	...props
-}: CalendarProps) {
-	return (
-		<DayPicker
-			showOutsideDays={showOutsideDays}
-			className={cn('p-3', className)}
-			classNames={{
-				root: 'rdp-root',
-				months: 'flex flex-col sm:flex-row',
-				month: 'space-y-4',
-				month_caption:
-					'flex justify-center pt-1 relative items-center pointer-events-none',
-				caption_label: 'text-sm font-medium',
-				nav: 'space-x-1 flex items-center',
-				button_previous: cn(
-					buttonVariants({ variant: 'outline' }),
-					'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 absolute top-4 left-4',
-				),
-				button_next: cn(
-					buttonVariants({ variant: 'outline' }),
-					'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 absolute top-4 right-4',
-				),
-				month_grid: 'w-full border-collapse space-y-1 mt-4',
-				weekdays: 'flex',
-				weekday: 'text-muted rounded-md w-9 font-normal text-[0.8rem]',
-				week: 'flex w-full mt-2',
-				day: 'h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent-soft [&:has([aria-selected])]:bg-accent-soft first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20',
-				day_button: cn(
-					buttonVariants({ variant: 'ghost' }),
-					'h-9 w-9 p-0 font-normal aria-selected:opacity-100',
-				),
-				range_end: 'day-range-end',
-				selected:
-					'bg-accent text-accent-foreground hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
-				today: 'bg-accent-soft text-accent-soft-foreground',
-				outside:
-					'day-outside text-muted opacity-50 aria-selected:bg-accent-soft aria-selected:text-muted aria-selected:opacity-30',
-				disabled: 'text-muted opacity-50',
-				range_middle:
-					'aria-selected:bg-accent-soft aria-selected:text-accent-soft-foreground',
-				hidden: 'invisible',
-				...classNames,
-			}}
-			components={{
-				Chevron: ({ orientation, ...props }) => {
-					if (orientation === 'left') {
-						return <ChevronLeft className="h-4 w-4" {...props} />;
-					}
-					return <ChevronRight className="h-4 w-4" {...props} />;
-				},
-			}}
-			{...props}
-		/>
-	);
-}
-Calendar.displayName = 'Calendar';
+/**
+ * HeroUI's Calendar is fully compound and ships no default children, so the standard
+ * month view has to be assembled: header (prev / heading / next) plus a grid whose
+ * header and body take render functions. `NavButton`, `Heading` and `Cell` supply
+ * their own contents — chevrons, the month label and the day number respectively.
+ *
+ * Values are `@internationalized/date` `DateValue`s, not JS `Date`s; see
+ * `FormComponentCalendarWithoutFormElement` for the conversion to the project's
+ * `YYYY-MM-DD` strings.
+ */
+const Calendar = (props: CalendarProps) => (
+	<HeroCalendar {...props}>
+		<HeroCalendar.Header>
+			<HeroCalendar.NavButton slot="previous" />
+			<HeroCalendar.Heading />
+			<HeroCalendar.NavButton slot="next" />
+		</HeroCalendar.Header>
+		<HeroCalendar.Grid>
+			<HeroCalendar.GridHeader>
+				{(day) => (
+					<HeroCalendar.HeaderCell>{day}</HeroCalendar.HeaderCell>
+				)}
+			</HeroCalendar.GridHeader>
+			<HeroCalendar.GridBody>
+				{(date) => <HeroCalendar.Cell date={date} />}
+			</HeroCalendar.GridBody>
+		</HeroCalendar.Grid>
+	</HeroCalendar>
+);
 
 export { Calendar };

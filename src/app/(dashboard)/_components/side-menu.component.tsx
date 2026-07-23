@@ -1,7 +1,7 @@
 'use client';
 
 import { ArrowDown, ArrowRight } from 'lucide-react';
-import Link from 'next/link';
+import NextLink from 'next/link';
 import React, {
 	type ComponentType,
 	useEffect,
@@ -17,7 +17,7 @@ import {
 } from '@/app/(dashboard)/_providers/breadcrumb.provider';
 import { useSideMenu } from '@/app/(dashboard)/_providers/side-menu.provider';
 import { Icons } from '@/components/icon.component';
-import { Button } from '@/components/ui/button';
+import { Link } from '@/components/ui/link';
 import Routes from '@/config/routes.setup';
 import { cn } from '@/helpers/css.helper';
 import { useDebouncedEffect } from '@/hooks/use-debounced-effect.hook';
@@ -371,19 +371,15 @@ export function SideMenu() {
 							<p className="text-xs text-muted mb-3">
 								Check our documentation for guidance.
 							</p>
-							<Button
+							<Link
 								size="sm"
 								variant="secondary"
 								className="w-full"
-								asChild
+								href={Routes.get('docs')}
+								title="Check out the documentation"
 							>
-								<Link
-									href={Routes.get('docs')}
-									title="Check out the documentation"
-								>
-									View Docs
-								</Link>
-							</Button>
+								View Docs
+							</Link>
 						</div>
 					</div>
 				)}
@@ -463,7 +459,7 @@ function SideMenuOpenSection({
 				<ul className="ml-6 py-1">
 					{items.map((item) => (
 						<li key={`side-menu-item-${item.page}`}>
-							<Link
+							<NextLink
 								href={item.href}
 								className={cn(
 									'flex items-center text-left gap-2 px-3 py-2 transition-all duration-200 group',
@@ -474,7 +470,7 @@ function SideMenuOpenSection({
 							>
 								<item.icon className="h-4 w-4 shrink-0" />{' '}
 								{item.text}
-							</Link>
+							</NextLink>
 						</li>
 					))}
 				</ul>
@@ -532,7 +528,7 @@ function SideMenuClosedSection({
 
 	const flyout = items.map((item) => (
 		<li key={`side-menu-item-${item.page}`}>
-			<Link
+			<NextLink
 				href={item.href}
 				className={cn(
 					'flex items-center text-left gap-2 px-3 py-2 rounded-md transition-all duration-200 group',
@@ -542,7 +538,7 @@ function SideMenuClosedSection({
 				)}
 			>
 				<item.icon className="h-4 w-4 shrink-0" /> {item.text}
-			</Link>
+			</NextLink>
 		</li>
 	));
 

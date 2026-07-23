@@ -8,7 +8,7 @@ import { displayAddressLabel } from '@/models/address.model';
 import { displayClientLabel } from '@/models/client.model';
 import type { CmrModel } from '@/models/cmr.model';
 
-export async function ViewCmr({ entry }: { entry: CmrModel }) {
+export function ViewCmr({ entry }: { entry: CmrModel }) {
 	const language = getLanguageClient();
 
 	return (

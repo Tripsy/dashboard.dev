@@ -5,7 +5,6 @@ import {
 	prepareParamsFromFormValues,
 	type WorkSessionCreateOutput,
 } from '@/app/(public)/_components/work-session/work-session.definition';
-import type { WorkSessionVehicleFormValuesType } from '@/app/(public)/_components/work-session-vehicle/form-manage-work-session-vehicle.component';
 import { useWorkSession } from '@/app/(public)/_providers/work-session.provider';
 import { DriverPanelAvailableCmrs } from '@/app/(public)/driver-panel/driver-panel-available-cmrs.component';
 import { DriverPanelAvailableCompanyVehicles } from '@/app/(public)/driver-panel/driver-panel-available-company-vehicles.component';
@@ -22,13 +21,8 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { createCurrentDate } from '@/helpers/date.helper';
 import { requestCreate } from '@/helpers/services.helper';
-import type { CmrModel } from '@/models/cmr.model';
-import type { CompanyVehicleModel } from '@/models/company-vehicle.model';
-import { VehicleTypeEnum } from '@/models/vehicle.model';
 import type { WorkSessionModel } from '@/models/work-session.model';
 import { useAuth } from '@/providers/auth.provider';
-import { createCmrSession } from '@/services/cmr-session.service';
-import { createWorkSessionVehicle } from '@/services/work-session-vehicle.service';
 import { useModalStore } from '@/stores/window.store';
 import { DataSourceSectionEnum } from '@/types/data-source.type';
 
@@ -39,8 +33,6 @@ export function DriverPanel() {
 		sessionSituation,
 		activeSession,
 		activeSessionVehicles,
-		activeSessionVehicleAuto,
-		activeSessionVehicleTrailer,
 		availableCompanyVehicles,
 		workSessionCmrs,
 		refreshSession,
@@ -82,76 +74,6 @@ export function DriverPanel() {
 		});
 	}, [open, refreshSession, auth]);
 
-	const handleCreateSessionVehicle = useCallback(
-		(session: WorkSessionModel) => {
-			open({
-				minimized: false,
-				section: DataSourceSectionEnum.PUBLIC,
-				dataSource: 'work-session-vehicle',
-				action: 'create',
-				definition: {
-					operationFunction: (
-						params: WorkSessionVehicleFormValuesType,
-					) => {
-						return createWorkSessionVehicle(params, session.id);
-					},
-				},
-				events: {
-					success: async () => {
-						await refreshSession();
-
-						setActiveTab('sessionVehicles');
-					},
-				},
-			});
-		},
-		[open, refreshSession, setActiveTab],
-	);
-
-	const handleCreateCmr = useCallback(
-		(
-			session: WorkSessionModel,
-			activeSessionVehicleAuto: CompanyVehicleModel,
-			activeSessionVehicleTrailer: CompanyVehicleModel | null,
-		) => {
-			open({
-				minimized: false,
-				section: DataSourceSectionEnum.PUBLIC,
-				dataSource: 'cmr',
-				action: 'create',
-				events: {
-					success: async (cmr?: CmrModel) => {
-						if (!cmr) {
-							return;
-						}
-
-						await createCmrSession(
-							{
-								work_session_id: session.id,
-								company_vehicle_id_auto:
-									activeSessionVehicleAuto.id,
-								company_vehicle_id_trailer:
-									activeSessionVehicleTrailer?.id,
-							},
-							cmr.id,
-						);
-
-						await refreshSession();
-
-						setActiveTab('sessionCmrs');
-					},
-				},
-			});
-		},
-		[open, refreshSession, setActiveTab],
-	);
-
-	const hasAssignedAuto = activeSessionVehicles.some(
-		(item) =>
-			item.status === 'assigned' &&
-			item.company_vehicle.vehicle.vehicle_type === VehicleTypeEnum.AUTO,
-	);
-
 	switch (sessionSituation) {
 		case 'loading':
 			return <LoadingComponent />;
@@ -165,70 +87,49 @@ export function DriverPanel() {
 				<div className="max-w-3xl mx-auto">
 					{sessionSituation === 'active' && activeSession ? (
 						<div className="space-y-4">
-							<DriverPanelSession session={activeSession} />
-
-							<div className="grid grid-cols-2 gap-4">
-								<Button
-									variant="outline"
-									hover="success"
-									onClick={() =>
-										handleCreateSessionVehicle(
-											activeSession,
-										)
-									}
-									title="Add session vehicle"
-								>
-									<Icons.Action.Create className="h-4 w-4" />{' '}
-									Add session vehicle
-								</Button>
-
-								{activeSessionVehicleAuto && (
-									<Button
-										variant="outline"
-										hover="success"
-										onClick={() =>
-											handleCreateCmr(
-												activeSession,
-												activeSessionVehicleAuto,
-												activeSessionVehicleTrailer,
-											)
-										}
-										title="Add CMR"
-									>
-										<Icons.Action.Create className="h-4 w-4" />{' '}
-										Create CMR
-									</Button>
-								)}
-							</div>
-
-							{!hasAssignedAuto && (
-								<div className="text-danger py-2">
-									<Icons.Status.Warning className="inline-block" />{' '}
-									No assigned auto vehicles found
-								</div>
-							)}
+							<DriverPanelSession />
 
 							<Tabs
-								value={activeTab}
-								onValueChange={setActiveTab}
+								selectedKey={activeTab}
+								onSelectionChange={(key) =>
+									setActiveTab(String(key))
+								}
 								className="w-full"
 							>
-								<TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 p-0 mb-4">
-									<TabsTrigger value="sessionVehicles">
+								<TabsList
+									className="grid w-full grid-cols-2 sm:grid-cols-4 p-2 "
+									containerClassName="bg-transparent rounded-none"
+								>
+									<TabsTrigger
+										id="sessionVehicles"
+										className="font-semibold"
+									>
 										Session Vehicles
 									</TabsTrigger>
-									<TabsTrigger value="sessionCmrs">
+									<TabsTrigger
+										id="sessionCmrs"
+										className="font-semibold"
+									>
 										Session CMRs
 									</TabsTrigger>
-									<TabsTrigger value="sessionCashFlowEntries">
+									<TabsTrigger
+										id="sessionCashFlowEntries"
+										className="font-semibold"
+									>
 										Cash Flow
 									</TabsTrigger>
-									<TabsTrigger value="availableCmrs">
+									<TabsTrigger
+										id="availableCmrs"
+										className="font-semibold"
+									>
 										Available CMRs
 									</TabsTrigger>
 								</TabsList>
 
-								<TabsContent value="sessionVehicles">
+								<TabsContent
+									id="sessionVehicles"
+									className="p-0 mt-2"
+								>
 									{activeSessionVehicles.length > 0 ? (
 										<DriverPanelSessionVehicles
 											sessionVehicles={
@@ -259,7 +160,10 @@ export function DriverPanel() {
 									)}
 								</TabsContent>
 
-								<TabsContent value="sessionCmrs">
+								<TabsContent
+									id="sessionCmrs"
+									className="p-0 mt-2"
+								>
 									{workSessionCmrs.length > 0 ? (
 										<DriverPanelSessionCmrs
 											sessionCmrs={workSessionCmrs}
@@ -275,13 +179,19 @@ export function DriverPanel() {
 									)}
 								</TabsContent>
 
-								<TabsContent value="sessionCashFlowEntries">
+								<TabsContent
+									id="sessionCashFlowEntries"
+									className="p-0 mt-2"
+								>
 									<DriverPanelSessionCashFlow
 										entries={sessionCashFlowEntries}
 									/>
 								</TabsContent>
 
-								<TabsContent value="availableCmrs">
+								<TabsContent
+									id="availableCmrs"
+									className="p-0 mt-2"
+								>
 									<DriverPanelAvailableCmrs />
 								</TabsContent>
 							</Tabs>

@@ -315,7 +315,7 @@ export function DriverPanelSessionVehicles({
 				{hasReturnedVehicles &&
 					(withReturned ? (
 						<Button
-							variant="ghost"
+							variant="outline"
 							onClick={() => setWithReturned(false)}
 							title="Hide returned vehicles"
 						>
@@ -323,7 +323,7 @@ export function DriverPanelSessionVehicles({
 						</Button>
 					) : (
 						<Button
-							variant="ghost"
+							variant="outline"
 							onClick={() => setWithReturned(true)}
 							title="Show returned vehicles"
 						>

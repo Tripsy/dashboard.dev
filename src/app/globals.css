@@ -16,15 +16,10 @@
 /*
  * App-specific tokens that HeroUI v3 does not ship. Values are expressed in terms
  * of HeroUI tokens so they track the palette in both themes.
- *   - info / *-light : HeroUI has no `info`; `*-soft` replaces the old opaque `-light` tints.
  *   - sidebar-*      : dashboard sidebar surface (kept as-is; not part of the HeroUI rename).
  *   - glass/gradient : decorative surfaces used by the public site.
  */
 :root {
-	--info: oklch(0.62 0.14 233);
-	--info-foreground: var(--snow, oklch(0.99 0 0));
-	--info-light: color-mix(in oklab, var(--info) 15%, transparent);
-
 	--success-light: color-mix(in oklab, var(--success) 15%, transparent);
 	--warning-light: color-mix(in oklab, var(--warning) 15%, transparent);
 	--danger-light: color-mix(in oklab, var(--danger) 15%, transparent);
@@ -54,9 +49,6 @@
 }
 
 .dark {
-	--info: oklch(0.66 0.14 233);
-	--info-foreground: var(--eclipse, oklch(0.14 0 0));
-
 	--sidebar-background: var(--surface);
 	--sidebar-foreground: var(--surface-foreground);
 
@@ -70,13 +62,9 @@
 	);
 }
 
-/* Expose the custom tokens as Tailwind utilities (bg-info, bg-sidebar-background, …).
+/* Expose the custom tokens as Tailwind utilities (bg-sidebar-background, …).
    `inline` keeps them as late-bound var() refs so `.dark` overrides above take effect. */
 @theme inline {
-	--color-info: var(--info);
-	--color-info-foreground: var(--info-foreground);
-	--color-info-light: var(--info-light);
-
 	--color-success-light: var(--success-light);
 	--color-warning-light: var(--warning-light);
 	--color-danger-light: var(--danger-light);

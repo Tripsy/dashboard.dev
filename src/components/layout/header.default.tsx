@@ -1,7 +1,7 @@
 'use client';
 
 import { Menu, X } from 'lucide-react';
-import Link from 'next/link';
+import NextLink from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { LanguageSwitcher } from '@/components/layout/language-switcher.component';
@@ -9,6 +9,7 @@ import { LogoComponent } from '@/components/layout/logo.default';
 import { ToggleTheme } from '@/components/layout/toggle-theme';
 import { UserMenu } from '@/components/layout/user-menu.component';
 import { Button } from '@/components/ui/button';
+import { Link } from '@/components/ui/link';
 import Routes from '@/config/routes.setup';
 import { cn } from '@/helpers/css.helper';
 import { UserRoleEnum } from '@/models/user.model';
@@ -130,17 +131,17 @@ export function Header({
 		<header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
 			<div className="container-default">
 				<div className="flex h-16 items-center justify-between">
-					<Link
+					<NextLink
 						href={Routes.get('home')}
 						className="flex items-center gap-2"
 					>
 						<LogoComponent />
-					</Link>
+					</NextLink>
 
 					{/* Desktop Navigation */}
 					<nav className="hidden md:flex items-center gap-1">
 						{navLinks.map((link) => (
-							<Link
+							<NextLink
 								key={link.href}
 								href={link.href}
 								className={cn(
@@ -151,7 +152,7 @@ export function Header({
 								)}
 							>
 								{link.label}
-							</Link>
+							</NextLink>
 						))}
 					</nav>
 
@@ -184,7 +185,7 @@ export function Header({
 					<div className="md:hidden py-4 border-t border-border animate-fade-in">
 						<nav className="flex flex-col gap-1">
 							{navLinks.map((link) => (
-								<Link
+								<NextLink
 									key={link.href}
 									href={link.href}
 									onClick={() => setMobileMenuOpen(false)}
@@ -196,29 +197,25 @@ export function Header({
 									)}
 								>
 									{link.label}
-								</Link>
+								</NextLink>
 							))}
 							{authStatus === 'unauthenticated' && (
 								<div className="sm:hidden border-t border-border mt-2 pt-3 px-4 space-y-2">
-									<Button
+									<Link
 										variant="outline"
 										className="w-full"
+										href={Routes.get('login')}
+										title="Sign in"
 									>
-										<Link
-											href={Routes.get('login')}
-											title="Sign in"
-										>
-											Login
-										</Link>
-									</Button>
-									<Button className="w-full" asChild>
-										<Link
-											href={Routes.get('register')}
-											title="Create an account"
-										>
-											Sign Up
-										</Link>
-									</Button>
+										Login
+									</Link>
+									<Link
+										className="w-full"
+										href={Routes.get('register')}
+										title="Create an account"
+									>
+										Sign Up
+									</Link>
 								</div>
 							)}
 						</nav>

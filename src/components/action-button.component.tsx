@@ -1,10 +1,10 @@
 import type { LucideProps } from 'lucide-react';
-import Link from 'next/link';
 import type { JSX } from 'react';
 import React from 'react';
 import { getActionIcon } from '@/components/icon.component';
 import { LoadingIcon } from '@/components/status.component';
 import { Button } from '@/components/ui/button';
+import { Link } from '@/components/ui/link';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
 import type { ButtonAppearanceType } from '@/types/html.type';
 
@@ -77,6 +77,39 @@ export function ActionButton({
 			? buttonAppearance.label
 			: capitalizeFirstLetter(action);
 
+	const content = disabled ? (
+		<>
+			<LoadingIcon />
+			{buttonAppearance?.loadingLabel ?? 'Please wait...'}
+		</>
+	) : (
+		<ActionButtonContent
+			icon={buttonAppearance?.icon}
+			action={action}
+			label={label}
+		/>
+	);
+
+	// A link command renders an anchor that shares the button styling (`ui/link`
+	// applies the same `buttonVariants`). While disabled we fall back to a real
+	// <button> instead — an anchor has no disabled state, so a styled-but-live
+	// link would still navigate mid-action.
+	if (command.type === 'link' && !disabled) {
+		return (
+			<Link
+				variant={buttonAppearance?.variant}
+				hover={buttonAppearance?.hover}
+				size={buttonAppearance?.size}
+				className={buttonAppearance?.className}
+				title={title}
+				href={command.href}
+				target={command.target ?? '_self'}
+			>
+				{content}
+			</Link>
+		);
+	}
+
 	return (
 		<Button
 			variant={buttonAppearance?.variant}
@@ -86,28 +119,8 @@ export function ActionButton({
 			title={title}
 			onClick={command.type === 'action' ? command.onClick : undefined}
 			disabled={disabled}
-			asChild={command.type === 'link'}
 		>
-			{disabled ? (
-				<>
-					<LoadingIcon />
-					{buttonAppearance?.loadingLabel ?? 'Please wait...'}
-				</>
-			) : command.type === 'link' ? (
-				<Link href={command.href} target={command.target ?? '_self'}>
-					<ActionButtonContent
-						icon={buttonAppearance?.icon}
-						action={action}
-						label={label}
-					/>
-				</Link>
-			) : (
-				<ActionButtonContent
-					icon={buttonAppearance?.icon}
-					action={action}
-					label={label}
-				/>
-			)}
+			{content}
 		</Button>
 	);
 }

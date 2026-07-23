@@ -1,62 +1,63 @@
-import * as TabsPrimitive from '@radix-ui/react-tabs';
-import * as React from 'react';
-import { cn } from '@/helpers/css.helper';
+import { Tabs as HeroTabs } from '@heroui/react';
+import type * as React from 'react';
+import type { ReactNode } from 'react';
 
-const Tabs = TabsPrimitive.Root;
+/**
+ * Root — react-aria `Tabs`, keyed rather than valued: `defaultSelectedKey` /
+ * `selectedKey` + `onSelectionChange`, with each tab and panel matched by `id`.
+ */
+const Tabs = HeroTabs;
 
-const TabsList = React.forwardRef<
-	React.ComponentRef<typeof TabsPrimitive.List>,
-	React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>
->(({ className, ...props }, ref) => (
-	<TabsPrimitive.List
-		ref={ref}
-		className={cn(
-			'inline-flex gap-2 items-center justify-center p-2',
-			className,
-		)}
-		{...props}
-	/>
-));
+type TabsListProps = React.ComponentProps<typeof HeroTabs.List> & {
+	/**
+	 * Applied to the container rather than the list. The segmented background and its
+	 * rounding live there (`.tabs__list-container` sets `bg-default` and a raw
+	 * `border-radius`), so shape and background overrides belong here — `rounded-*` on
+	 * the list itself has nothing to override.
+	 */
+	containerClassName?: string;
+};
 
-TabsList.displayName = TabsPrimitive.List.displayName;
+/**
+ * HeroUI splits the list into a container (the segmented background, plus overflow
+ * chevrons that appear only when the tabs actually scroll) and the list itself.
+ * `className` targets the list — padding, grid layout — and `containerClassName` the
+ * container.
+ */
+const TabsList = ({
+	children,
+	className,
+	containerClassName,
+	...props
+}: TabsListProps) => (
+	<HeroTabs.ListContainer className={containerClassName}>
+		<HeroTabs.List className={className} {...props}>
+			{children}
+		</HeroTabs.List>
+	</HeroTabs.ListContainer>
+);
 
-const TabsTrigger = React.forwardRef<
-	React.ComponentRef<typeof TabsPrimitive.Trigger>,
-	React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>
->(({ className, ...props }, ref) => (
-	<TabsPrimitive.Trigger
-		ref={ref}
-		className={cn(
-			'inline-flex items-center justify-center whitespace-nowrap rounded-sm p-2 transition-all',
-			// Active state styles
-			'data-[state=active]:bg-accent-soft data-[state=active]:text-accent-soft-foreground data-[state=active]:shadow-sm',
-			'data-[state=active]:before:content-["↓"] data-[state=active]:before:mr-2 data-[state=active]:before:opacity-50 data-[state=active]:before:inline-block',
-			// Inactive state hover styles
-			'data-[state=inactive]:hover:bg-surface-secondary data-[state=inactive]:hover:text-foreground data-[state=inactive]:shadow-sm data-[state=inactive]:hover:cursor-pointer',
-			// Common styles
-			'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
-			className,
-		)}
-		{...props}
-	/>
-));
+// `children` is narrowed from HeroUI's render-prop union so the indicator can be
+// appended; no call site uses the function form.
+type TabsTriggerProps = Omit<
+	React.ComponentProps<typeof HeroTabs.Tab>,
+	'children'
+> & {
+	children?: ReactNode;
+};
 
-TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
+/**
+ * The selection indicator is a react-aria `SelectionIndicator`: it renders inside
+ * every tab and animates between them as a shared element, so it belongs here rather
+ * than at the call sites (the parent toggles its visibility).
+ */
+const TabsTrigger = ({ children, ...props }: TabsTriggerProps) => (
+	<HeroTabs.Tab {...props}>
+		{children}
+		<HeroTabs.Indicator />
+	</HeroTabs.Tab>
+);
 
-const TabsContent = React.forwardRef<
-	React.ComponentRef<typeof TabsPrimitive.Content>,
-	React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content>
->(({ className, ...props }, ref) => (
-	<TabsPrimitive.Content
-		ref={ref}
-		className={cn(
-			'ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2',
-			className,
-		)}
-		{...props}
-	/>
-));
-
-TabsContent.displayName = TabsPrimitive.Content.displayName;
+const TabsContent = HeroTabs.Panel;
 
 export { Tabs, TabsList, TabsTrigger, TabsContent };

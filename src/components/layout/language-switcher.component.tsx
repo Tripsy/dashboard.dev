@@ -52,7 +52,7 @@ export function LanguageSwitcher({
 			onChange={(selected) => switchLanguage(selected ? langOn : langOff)}
 			aria-label="Switch language"
 			thumbIcon={
-				<span className="text-[10px] font-bold uppercase">
+				<span className="text-xs font-bold uppercase">
 					{isOn ? langOn : langOff}
 				</span>
 			}

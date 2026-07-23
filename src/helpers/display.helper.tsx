@@ -8,11 +8,7 @@ import {
 	type BadgeVariant,
 } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from '@/components/ui/popover';
+import { Popover, PopoverContent } from '@/components/ui/popover';
 import { cn } from '@/helpers/css.helper';
 import { formatAmount } from '@/helpers/string.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
@@ -259,55 +255,27 @@ export function displayImage({
 	const [isOpen, setIsOpen] = useState(false);
 
 	return (
-		<Popover
-			open={isOpen}
-			onOpenChange={(open) => {
-				// Only allow closing via our close button
-				// Keep it open if trying to close by clicking outside
-				if (!open) {
-					// Don't close - only close via button
-					return;
-				}
-				setIsOpen(open);
-			}}
-		>
-			<PopoverTrigger asChild>
-				<button
-					type="button"
-					className="cursor-pointer relative group"
-					tabIndex={0}
-					aria-label={`View larger version of ${alt}`}
-				>
-					<Image
-						src={src}
-						alt={alt}
-						className={cn(
-							'h-full w-full object-contain',
-							className,
-						)}
-						width={width}
-						height={height}
-					/>
-				</button>
-			</PopoverTrigger>
+		<Popover isOpen={isOpen} onOpenChange={setIsOpen}>
+			<Popover.Trigger
+				className="cursor-pointer relative group"
+				aria-label={`View larger version of ${alt}`}
+			>
+				<Image
+					src={src}
+					alt={alt}
+					className={cn('h-full w-full object-contain', className)}
+					width={width}
+					height={height}
+				/>
+			</Popover.Trigger>
 			<PopoverContent
-				className="shadow-xl overflow-hidden"
-				align="center"
-				side="right"
-				style={{
-					width: 'auto',
-					height: 'auto',
-					maxWidth: '80vw',
-					maxHeight: '80vh',
-				}}
-				// Prevent closing by clicking outside
-				onInteractOutside={(e) => {
-					e.preventDefault();
-				}}
-				// Prevent closing by pressing Escape
-				onEscapeKeyDown={(e) => {
-					e.preventDefault();
-				}}
+				className="shadow-xl overflow-hidden w-auto h-auto max-w-[80vw] max-h-[80vh]"
+				placement="right"
+				// The overlay stays open until the close button is pressed: react-aria
+				// never requests a close for outside interaction or Escape, so
+				// `onOpenChange` can be wired straight to state.
+				shouldCloseOnInteractOutside={() => false}
+				isKeyboardDismissDisabled
 			>
 				<div className="relative w-auto h-auto max-w-[80vw] max-h-[80vh]">
 					<Image

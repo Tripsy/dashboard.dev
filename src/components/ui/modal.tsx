@@ -121,26 +121,26 @@ export function Modal({
 				)}
 
 				{/* Control buttons - Fixed */}
-				<div className="absolute right-4 top-4 z-10">
+				<div className="absolute right-4 top-4 z-10 flex gap-2">
 					<Button
 						variant="ghost"
 						size="xs"
-						className="rounded-full"
+						className="rounded-full p-1"
 						hover="warning"
 						onClick={onMinimize}
 						aria-label="Minimize modal"
 					>
-						<Icons.Minimize size={12} />
+						<Icons.Minimize />
 					</Button>
 					<Button
 						variant="ghost"
 						size="xs"
-						className="rounded-full"
+						className="rounded-full p-1"
 						hover="error"
 						onClick={onClose}
 						aria-label="Close modal"
 					>
-						<Icons.Close size={12} />
+						<Icons.Close />
 					</Button>
 				</div>
 

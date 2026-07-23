@@ -8,7 +8,6 @@ import {
 	useQuery,
 	useQueryClient,
 } from '@tanstack/react-query';
-import Link from 'next/link';
 import type React from 'react';
 import { type JSX, useEffect, useMemo, useState } from 'react';
 import { useStore } from 'zustand/react';
@@ -24,6 +23,7 @@ import {
 	LoadingComponent,
 } from '@/components/status.component';
 import { Button } from '@/components/ui/button';
+import { Link } from '@/components/ui/link';
 import Routes from '@/config/routes.setup';
 import { getLanguageClient } from '@/config/translate.setup';
 import { requestFind } from '@/helpers/services.helper';
@@ -215,12 +215,14 @@ const DataTableBrandOrderContent = (): JSX.Element => {
 			/>
 
 			<div className="flex gap-3 mt-4">
-				<Button variant="outline" title="Back to list" asChild={true}>
-					<Link href={Routes.get('brand')}>
-						<Icons.Brand />
-						Back to list
-					</Link>
-				</Button>
+				<Link
+					variant="outline"
+					title="Back to list"
+					href={Routes.get('brand')}
+				>
+					<Icons.Brand />
+					Back to list
+				</Link>
 				<Button
 					variant="outline"
 					hover="default"

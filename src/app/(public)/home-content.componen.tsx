@@ -1,9 +1,8 @@
 'use client';
 
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { Button } from '@/components/ui/button';
+import { Link } from '@/components/ui/link';
 import Routes from '@/config/routes.setup';
 import { UserRoleEnum } from '@/models/user.model';
 import { useAuth } from '@/providers/auth.provider';
@@ -32,11 +31,13 @@ export default function HomeContent() {
 						Join our team as a driver.
 					</p>
 					<div className="flex flex-col sm:flex-row gap-4 justify-center">
-						<Button size="lg" className="h-12 px-8" asChild>
-							<Link href={Routes.get('register')}>
-								Create Free Account
-							</Link>
-						</Button>
+						<Link
+							size="lg"
+							className="h-12 px-8"
+							href={Routes.get('register')}
+						>
+							Create Free Account
+						</Link>
 					</div>
 				</div>
 			</div>

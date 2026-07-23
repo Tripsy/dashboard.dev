@@ -24,7 +24,6 @@ import {
 	ErrorComponent,
 	SuccessComponent,
 } from '@/components/status.component';
-import { Label } from '@/components/ui/label';
 import Routes from '@/config/routes.setup';
 import { createHandleChange, toOptionsFromEnum } from '@/helpers/form.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
@@ -217,10 +216,7 @@ export default function Register() {
 					error={errors.terms}
 				>
 					<div>
-						<Label
-							htmlFor={elementIds.terms}
-							className="cursor-pointer text-sm text-muted"
-						>
+						<span className="cursor-pointer text-sm text-muted">
 							I agree to the{' '}
 							<Link
 								href={Routes.get('page', {
@@ -244,7 +240,7 @@ export default function Register() {
 								Privacy Policy
 							</Link>
 							.
-						</Label>
+						</span>
 					</div>
 				</FormComponentCheckbox>
 

@@ -70,7 +70,7 @@ export function WindowMinimizedInstance({
 			<div>
 				<Button
 					variant="ghost"
-					className="rounded-full"
+					className="rounded-full p-1"
 					hover="error"
 					size="xs"
 					onClick={handleClose}

@@ -6,7 +6,6 @@ import {
 	Hourglass,
 } from 'lucide-react';
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { ActiveWorkSessions } from '@/app/(dashboard)/_components/stats/active-work-sessions';
 import { CountCMRs } from '@/app/(dashboard)/_components/stats/count-cmrs';
 import { CountWorkingHours } from '@/app/(dashboard)/_components/stats/count-working-hours';
@@ -14,8 +13,8 @@ import { LatestCMRs } from '@/app/(dashboard)/_components/stats/latest-cmrs';
 import { RecentActivity } from '@/app/(dashboard)/_components/stats/recent-activity';
 import { SumExpenses } from '@/app/(dashboard)/_components/stats/sum-expenses';
 import { SumRevenues } from '@/app/(dashboard)/_components/stats/sum-revenues';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Link } from '@/components/ui/link';
 // import {
 // 	DropdownMenu,
 // 	DropdownMenuContent,
@@ -155,17 +154,14 @@ export default async function Page() {
 					<Card>
 						<CardHeader className="flex flex-row items-center justify-between">
 							<CardTitle>Work Sessions</CardTitle>
-							<Button
+							<Link
 								variant="ghost"
 								size="sm"
 								className="gap-1"
-								asChild
+								href={Routes.get('work-session')}
 							>
-								<Link href={Routes.get('work-session')}>
-									View more{' '}
-									<ArrowUpRight className="h-4 w-4" />
-								</Link>
-							</Button>
+								View more <ArrowUpRight className="h-4 w-4" />
+							</Link>
 						</CardHeader>
 						<CardContent>
 							<ActiveWorkSessions />
@@ -176,17 +172,14 @@ export default async function Page() {
 					<Card>
 						<CardHeader className="flex flex-row items-center justify-between">
 							<CardTitle>Latest CMRs</CardTitle>
-							<Button
+							<Link
 								variant="ghost"
 								size="sm"
 								className="gap-1"
-								asChild
+								href={Routes.get('cmr')}
 							>
-								<Link href={Routes.get('cmr')}>
-									View more{' '}
-									<ArrowUpRight className="h-4 w-4" />
-								</Link>
-							</Button>
+								View more <ArrowUpRight className="h-4 w-4" />
+							</Link>
 						</CardHeader>
 						<CardContent>
 							<LatestCMRs />
@@ -228,16 +221,14 @@ export default async function Page() {
 				<Card>
 					<CardHeader className="flex flex-row items-center justify-between">
 						<CardTitle>Recent Activity</CardTitle>
-						<Button
+						<Link
 							variant="ghost"
 							size="sm"
 							className="gap-1"
-							asChild
+							href={Routes.get('log-history')}
 						>
-							<Link href={Routes.get('log-history')}>
-								View more <ArrowUpRight className="h-4 w-4" />
-							</Link>
-						</Button>
+							View more <ArrowUpRight className="h-4 w-4" />
+						</Link>
 					</CardHeader>
 					<CardContent>
 						<RecentActivity />

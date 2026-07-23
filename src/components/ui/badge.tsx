@@ -12,7 +12,7 @@ const badgeVariants = cva(
 				secondary: 'bg-default text-default-foreground',
 				success: 'bg-success text-accent-foreground',
 				error: 'bg-danger text-danger-foreground',
-				warning: 'bg-warning text-warning-foreground',
+				warning: 'bg-warning text-accent-foreground',
 			},
 			size: {
 				md: 'px-4 py-2',

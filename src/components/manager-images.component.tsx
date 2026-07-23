@@ -371,7 +371,7 @@ function ImageCard({
 				</div>
 
 				{mode === 'edit' && (
-					<div className="flex">
+					<div className="flex gap-4">
 						{entry.status !== undefined && (
 							<Button
 								variant="ghost"

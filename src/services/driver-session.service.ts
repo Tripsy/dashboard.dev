@@ -59,6 +59,25 @@ export async function requestSessionCashFlowEntries(params: {
 	return response.data ?? null;
 }
 
+export async function requestWsTicket(): Promise<string> {
+	// Routes through the proxy (default `use-proxy` mode), which attaches the
+	// httpOnly session token as a Bearer server-side — so the JWT never reaches
+	// client JS. The returned single-use ticket is the only credential safe to put
+	// on the ws:// URL.
+	const response: ApiResponseFetch<{ ticket: string }> =
+		await new ApiRequest().doFetch('/driver-session/ws-ticket', {
+			method: 'POST',
+		});
+
+	if (!response?.success || !response.data?.ticket) {
+		throw new Error(
+			response?.message ?? 'Failed to obtain WebSocket ticket',
+		);
+	}
+
+	return response.data.ticket;
+}
+
 type DriverCashBalanceType = {
 	currency: string;
 	balance: number;

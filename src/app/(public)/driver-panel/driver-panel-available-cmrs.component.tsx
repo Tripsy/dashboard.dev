@@ -16,9 +16,31 @@ import { formatDate } from '@/helpers/date.helper';
 import { DisplayStatus } from '@/helpers/display.helper';
 import { arrayHasValue } from '@/helpers/objects.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
+import { useTranslation } from '@/hooks/use-translation.hook';
 import { displayAddressLabel } from '@/models/address.model';
 import { displayClientLabel } from '@/models/client.model';
 import { type CmrModel, CmrStatusEnum } from '@/models/cmr.model';
+
+const TRANSLATION_KEYS = [
+	'driver-panel.cmr.prefix',
+	'driver-panel.empty.no_available_cmrs',
+	'driver-panel.field.notes',
+	'driver-panel.field.transport',
+	'driver-panel.field.client',
+	'driver-panel.field.contact',
+	'driver-panel.field.ordered_at',
+	'driver-panel.field.pick_scheduled_at',
+	'driver-panel.field.estimated_delivery_at',
+	'driver-panel.field.pickup_address',
+	'driver-panel.field.delivery_address',
+	'driver-panel.value.na',
+	'driver-panel.button.assign_to_me',
+	'driver-panel.button.reconnect',
+	'driver-panel.tooltip.assign_cmr',
+	'driver-panel.tooltip.reconnect',
+	'driver-panel.ws.connection_aborted',
+	'driver-panel.ws.connection_lost',
+] as const;
 
 export function DriverPanelAvailableCmrs() {
 	const {
@@ -27,6 +49,7 @@ export function DriverPanelAvailableCmrs() {
 		errorMessage,
 		reconnect,
 	} = useAvailableCmr();
+	const { translations } = useTranslation(TRANSLATION_KEYS);
 
 	if (wsStatus === 'connecting') {
 		return <LoadingComponent className="min-h-[calc(40vh-4rem)]" />;
@@ -36,10 +59,17 @@ export function DriverPanelAvailableCmrs() {
 		return (
 			<div className="min-h-[calc(40vh-4rem)] flex flex-col items-center justify-center gap-4">
 				<ErrorComponent
-					description={errorMessage ?? 'Connection aborted'}
+					description={
+						errorMessage ??
+						translations['driver-panel.ws.connection_aborted']
+					}
 				/>
-				<Button onClick={reconnect} title="Reconnect">
-					<Icons.Action.Return className="h-4 w-4" /> Reconnect
+				<Button
+					onClick={reconnect}
+					title={translations['driver-panel.tooltip.reconnect']}
+				>
+					<Icons.Action.Return className="h-4 w-4" />{' '}
+					{translations['driver-panel.button.reconnect']}
 				</Button>
 			</div>
 		);
@@ -48,7 +78,7 @@ export function DriverPanelAvailableCmrs() {
 	if (wsStatus === 'error' || wsStatus === 'disconnected') {
 		return (
 			<LoadingComponent
-				description="Connection lost — reconnecting…"
+				description={translations['driver-panel.ws.connection_lost']}
 				className="min-h-[calc(40vh-4rem)]"
 			/>
 		);
@@ -59,7 +89,7 @@ export function DriverPanelAvailableCmrs() {
 			{cmrs.length === 0 ? (
 				<div className="text-center py-8 px-4 bg-surface-secondary rounded-lg border border-border">
 					<p className="text-sm text-muted">
-						No CMRs for this session yet
+						{translations['driver-panel.empty.no_available_cmrs']}
 					</p>
 				</div>
 			) : (
@@ -79,6 +109,7 @@ export function DriverPanelAvailableCmrs() {
 function DriverPanelAvailableCmrEntry({ cmr }: { cmr: CmrModel }) {
 	const { activeSession, activeSessionVehicleAuto } = useWorkSession();
 	const attachCmrToSession = useAttachCmrToSession();
+	const { translations } = useTranslation(TRANSLATION_KEYS);
 
 	const language = getLanguageClient();
 
@@ -94,7 +125,8 @@ function DriverPanelAvailableCmrEntry({ cmr }: { cmr: CmrModel }) {
 			<div className="flex flex-col justify-between items-start self-stretch gap-2">
 				<h3 className="flex items-center gap-4">
 					<div className="font-semibold text-surface-foreground ">
-						CMR#{cmr.id}
+						{translations['driver-panel.cmr.prefix']}
+						{cmr.id}
 					</div>
 					<DisplayStatus status={cmr.status} dataSource="cmr" />
 
@@ -102,35 +134,47 @@ function DriverPanelAvailableCmrEntry({ cmr }: { cmr: CmrModel }) {
 						<Button
 							variant="default"
 							onClick={() => attachCmrToSession(cmr.id)}
-							title="Assign CMR to my work session"
+							title={
+								translations['driver-panel.tooltip.assign_cmr']
+							}
 							className="text-sm px-2 py-1.5"
 						>
-							<Icons.Action.Add /> Assign to me
+							<Icons.Action.Add />{' '}
+							{translations['driver-panel.button.assign_to_me']}
 						</Button>
 					)}
 				</h3>
 				<div className="flex items-center">
-					<span className="text-muted">Notes:</span>
+					<span className="text-muted">
+						{translations['driver-panel.field.notes']}:
+					</span>
 					<span className="ml-2 font-mono">{cmr.notes}</span>
 				</div>
 				<div className="flex">
-					<div className="text-muted">Transport:</div>
+					<div className="text-muted">
+						{translations['driver-panel.field.transport']}:
+					</div>
 					<div className="ml-4 font-mono">
 						{formatEnumLabel(cmr.transport_type)}
 					</div>
 				</div>
 				<div>
-					<span className="text-muted">Client:</span>
+					<span className="text-muted">
+						{translations['driver-panel.field.client']}:
+					</span>
 					<span className="ml-2 font-mono">
 						{displayClientLabel(cmr.client)}
 					</span>
 				</div>
 				<CmrContactRow
+					label={translations['driver-panel.field.contact']}
 					name={cmr.contact_name}
 					phone={cmr.contact_phone}
 				/>
 				<div className="flex items-center">
-					<span className="text-muted">Ordered at:</span>
+					<span className="text-muted">
+						{translations['driver-panel.field.ordered_at']}:
+					</span>
 					<span className="ml-2 font-mono">
 						{formatDate(cmr.ordered_at, undefined, {
 							customFormat: 'D MMMM, HH:mm',
@@ -139,17 +183,26 @@ function DriverPanelAvailableCmrEntry({ cmr }: { cmr: CmrModel }) {
 				</div>
 				{cmr.status === CmrStatusEnum.ORDERED && (
 					<div className="flex items-center">
-						<span className="text-muted">Pick scheduled at:</span>
+						<span className="text-muted">
+							{
+								translations[
+									'driver-panel.field.pick_scheduled_at'
+								]
+							}
+							:
+						</span>
 						<span className="ml-2 font-mono">
 							{formatDate(cmr.pick_scheduled_at, undefined, {
 								customFormat: 'D MMMM, HH:mm',
-							}) ?? 'n/a'}
+							}) ?? translations['driver-panel.value.na']}
 						</span>
 					</div>
 				)}
 				{cmr.status === CmrStatusEnum.ORDERED && (
 					<CmrAddressRow
-						label="Pickup address"
+						label={
+							translations['driver-panel.field.pickup_address']
+						}
 						address={pickupAddress}
 					/>
 				)}
@@ -161,17 +214,22 @@ function DriverPanelAvailableCmrEntry({ cmr }: { cmr: CmrModel }) {
 				]) && (
 					<div className="flex items-center">
 						<span className="text-muted">
-							Estimated delivery at:
+							{
+								translations[
+									'driver-panel.field.estimated_delivery_at'
+								]
+							}
+							:
 						</span>
 						<span className="ml-2 font-mono">
 							{formatDate(cmr.estimated_delivery_at, undefined, {
 								customFormat: 'D MMMM, HH:mm',
-							}) ?? 'n/a'}
+							}) ?? translations['driver-panel.value.na']}
 						</span>
 					</div>
 				)}
 				<CmrAddressRow
-					label="Delivery address"
+					label={translations['driver-panel.field.delivery_address']}
 					address={deliveryAddress}
 				/>
 			</div>

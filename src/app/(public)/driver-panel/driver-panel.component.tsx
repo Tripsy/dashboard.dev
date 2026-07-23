@@ -22,10 +22,24 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { createCurrentDate } from '@/helpers/date.helper';
 import { requestCreate } from '@/helpers/services.helper';
+import { useTranslation } from '@/hooks/use-translation.hook';
 import type { WorkSessionModel } from '@/models/work-session.model';
 import { useAuth } from '@/providers/auth.provider';
 import { useModalStore } from '@/stores/window.store';
 import { DataSourceSectionEnum } from '@/types/data-source.type';
+
+const TRANSLATION_KEYS = [
+	'driver-panel.tab.session_vehicles',
+	'driver-panel.tab.session_cmrs',
+	'driver-panel.tab.cash_flow',
+	'driver-panel.tab.available_cmrs',
+	'driver-panel.empty.no_session_vehicles',
+	'driver-panel.empty.no_session_cmrs',
+	'driver-panel.empty.no_active_session',
+	'driver-panel.heading.available_vehicles',
+	'driver-panel.button.start_session',
+	'driver-panel.tooltip.start_session',
+] as const;
 
 export function DriverPanel() {
 	const {
@@ -41,6 +55,8 @@ export function DriverPanel() {
 	} = useWorkSession();
 	const { auth } = useAuth();
 	const open = useModalStore((s) => s.open);
+
+	const { translations } = useTranslation(TRANSLATION_KEYS);
 
 	const handleStartSession = useCallback(() => {
 		// The panel only renders behind an authenticated route, so `auth` is
@@ -112,25 +128,41 @@ export function DriverPanel() {
 											id="sessionVehicles"
 											className="font-semibold"
 										>
-											Session Vehicles
+											{
+												translations[
+													'driver-panel.tab.session_vehicles'
+												]
+											}
 										</TabsTrigger>
 										<TabsTrigger
 											id="sessionCmrs"
 											className="font-semibold"
 										>
-											Session CMRs
+											{
+												translations[
+													'driver-panel.tab.session_cmrs'
+												]
+											}
 										</TabsTrigger>
 										<TabsTrigger
 											id="sessionCashFlowEntries"
 											className="font-semibold"
 										>
-											Cash Flow
+											{
+												translations[
+													'driver-panel.tab.cash_flow'
+												]
+											}
 										</TabsTrigger>
 										<TabsTrigger
 											id="availableCmrs"
 											className="font-semibold"
 										>
-											Available CMRs
+											{
+												translations[
+													'driver-panel.tab.available_cmrs'
+												]
+											}
 										</TabsTrigger>
 									</TabsList>
 
@@ -148,8 +180,11 @@ export function DriverPanel() {
 											<div className="text-center py-8 px-4 bg-surface-secondary rounded-lg border border-border">
 												<Icons.Vehicle className="mx-auto h-12 w-12 text-muted" />
 												<p className="mt-2 text-sm text-muted">
-													There are no vehicles
-													assigned to current session
+													{
+														translations[
+															'driver-panel.empty.no_session_vehicles'
+														]
+													}
 												</p>
 											</div>
 										)}
@@ -157,7 +192,11 @@ export function DriverPanel() {
 											0 && (
 											<div>
 												<div className="mb-4 inline-flex whitespace-nowrap rounded-sm p-2 transition-all shadow-sm">
-													Available Vehicles
+													{
+														translations[
+															'driver-panel.heading.available_vehicles'
+														]
+													}
 												</div>
 												<DriverPanelAvailableCompanyVehicles
 													activeSession={
@@ -183,8 +222,11 @@ export function DriverPanel() {
 											<div className="text-center py-8 px-4 bg-surface-secondary rounded-lg border border-border">
 												<Icons.Cmr className="mx-auto h-12 w-12 text-muted" />
 												<p className="mt-2 text-sm text-muted">
-													There are no CMRs assigned
-													to current session
+													{
+														translations[
+															'driver-panel.empty.no_session_cmrs'
+														]
+													}
 												</p>
 											</div>
 										)}
@@ -213,16 +255,27 @@ export function DriverPanel() {
 							<div className="text-center py-8 px-4 bg-surface-secondary rounded-lg border border-border">
 								<Icons.WorkSession className="mx-auto h-12 w-12 text-muted" />
 								<p className="mt-2 text-sm text-muted">
-									There is no work session active at the
-									moment!
+									{
+										translations[
+											'driver-panel.empty.no_active_session'
+										]
+									}
 								</p>
 							</div>
 							<Button
 								className="mt-4 max-w-48"
 								onClick={handleStartSession}
-								title="Start session"
+								title={
+									translations[
+										'driver-panel.tooltip.start_session'
+									]
+								}
 							>
-								Start session
+								{
+									translations[
+										'driver-panel.button.start_session'
+									]
+								}
 								<Icons.Clock className="ml-2 h-5 w-5" />
 							</Button>
 						</div>

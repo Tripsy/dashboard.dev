@@ -13,6 +13,7 @@ import { formatDate } from '@/helpers/date.helper';
 import { DisplayStatus } from '@/helpers/display.helper';
 import { arrayHasValue } from '@/helpers/objects.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
+import { useTranslation } from '@/hooks/use-translation.hook';
 import { displayAddressLabel } from '@/models/address.model';
 import {
 	CashFlowCategoryEnum,
@@ -27,6 +28,35 @@ import {
 import type { CmrSessionModel } from '@/models/cmr-session.model';
 import { useModalStore } from '@/stores/window.store';
 import { DataSourceSectionEnum } from '@/types/data-source.type';
+
+const TRANSLATION_KEYS = [
+	'driver-panel.cmr.prefix',
+	'driver-panel.cmr.whatsapp_message',
+	'driver-panel.field.last_update_at',
+	'driver-panel.field.notes',
+	'driver-panel.field.tracking',
+	'driver-panel.field.transport',
+	'driver-panel.field.client',
+	'driver-panel.field.contact',
+	'driver-panel.field.ordered_at',
+	'driver-panel.field.pick_scheduled_at',
+	'driver-panel.field.estimated_delivery_at',
+	'driver-panel.field.pickup_address',
+	'driver-panel.field.delivery_address',
+	'driver-panel.field.delivered_at',
+	'driver-panel.field.signed',
+	'driver-panel.value.na',
+	'driver-panel.tooltip.show_more_details',
+	'driver-panel.tooltip.show_less_details',
+	'driver-panel.tooltip.update_cmr_status',
+	'driver-panel.tooltip.setup_cmr_vehicles',
+	'driver-panel.tooltip.view_cmr_images',
+	'driver-panel.tooltip.create_payment',
+	'driver-panel.tooltip.update_cmr',
+	'driver-panel.tooltip.delete_cmr',
+	'driver-panel.tooltip.drop_cmr',
+	'driver-panel.tooltip.view_cmr',
+] as const;
 
 // Full map over CmrStatus: adding a status to the enum breaks this until it's
 // ranked here, rather than silently sorting it last.
@@ -84,6 +114,7 @@ function DriverPanelSessionCmrEntry({
 
 	const [withDetails, setWithDetails] = useState(false);
 	const language = getLanguageClient();
+	const { translations } = useTranslation(TRANSLATION_KEYS);
 
 	const handleStatusTransition = useCallback(
 		(entry: CmrModel) => {
@@ -240,7 +271,11 @@ function DriverPanelSessionCmrEntry({
 						<Button
 							variant="outline"
 							onClick={() => setWithDetails(false)}
-							title="Show less details"
+							title={
+								translations[
+									'driver-panel.tooltip.show_less_details'
+								]
+							}
 							className="py-1.5 px-2"
 						>
 							<Icons.Direction.ArrowCurvedBottom className="h-4 w-4" />
@@ -249,14 +284,19 @@ function DriverPanelSessionCmrEntry({
 						<Button
 							variant="outline"
 							onClick={() => setWithDetails(true)}
-							title="Show more details"
+							title={
+								translations[
+									'driver-panel.tooltip.show_more_details'
+								]
+							}
 							className="py-1.5 px-2"
 						>
 							<Icons.Direction.ArrowRight className="h-4 w-4" />
 						</Button>
 					)}
 					<div className="font-semibold text-surface-foreground ">
-						CMR#{cmr.id}
+						{translations['driver-panel.cmr.prefix']}
+						{cmr.id}
 					</div>
 					{arrayHasValue(cmr.status, [
 						CmrStatusEnum.DELIVERED,
@@ -267,7 +307,11 @@ function DriverPanelSessionCmrEntry({
 						<Button
 							variant="ghost"
 							onClick={() => handleStatusTransition(cmr)}
-							title="Update CMR status"
+							title={
+								translations[
+									'driver-panel.tooltip.update_cmr_status'
+								]
+							}
 						>
 							<DisplayStatus
 								status={cmr.status}
@@ -278,7 +322,9 @@ function DriverPanelSessionCmrEntry({
 				</h3>
 				{withDetails && (
 					<div className="flex items-center">
-						<span className="text-muted">Last update at:</span>
+						<span className="text-muted">
+							{translations['driver-panel.field.last_update_at']}:
+						</span>
 						<span className="ml-2 font-mono">
 							{formatDate(cmr.updated_at, undefined, {
 								customFormat: 'D MMMM, HH:mm',
@@ -288,13 +334,17 @@ function DriverPanelSessionCmrEntry({
 				)}
 				{withDetails && cmr.notes && (
 					<div className="flex items-center">
-						<span className="text-muted">Notes:</span>
+						<span className="text-muted">
+							{translations['driver-panel.field.notes']}:
+						</span>
 						<span className="ml-2 font-mono">{cmr.notes}</span>
 					</div>
 				)}
 				{withDetails && (
 					<div>
-						<span className="text-muted">Tracking:</span>
+						<span className="text-muted">
+							{translations['driver-panel.field.tracking']}:
+						</span>
 						<span className="ml-2 font-mono">
 							{cmr.tracking_number}
 						</span>
@@ -302,26 +352,35 @@ function DriverPanelSessionCmrEntry({
 				)}
 				{withDetails && (
 					<div className="flex">
-						<div className="text-muted">Transport:</div>
+						<div className="text-muted">
+							{translations['driver-panel.field.transport']}:
+						</div>
 						<div className="ml-4 font-mono">
 							{formatEnumLabel(cmr.transport_type)}
 						</div>
 					</div>
 				)}
 				<div>
-					<span className="text-muted">Client:</span>
+					<span className="text-muted">
+						{translations['driver-panel.field.client']}:
+					</span>
 					<span className="ml-2 font-mono">
 						{displayClientLabel(cmr.client)}
 					</span>
 				</div>
 				<CmrContactRow
+					label={translations['driver-panel.field.contact']}
 					name={cmr.contact_name}
 					phone={cmr.contact_phone}
-					whatsAppMessage="Here is the CMR"
+					whatsAppMessage={
+						translations['driver-panel.cmr.whatsapp_message']
+					}
 				/>
 				{withDetails && (
 					<div className="flex items-center">
-						<span className="text-muted">Ordered at:</span>
+						<span className="text-muted">
+							{translations['driver-panel.field.ordered_at']}:
+						</span>
 						<span className="ml-2 font-mono">
 							{formatDate(cmr.ordered_at, undefined, {
 								customFormat: 'D MMMM, HH:mm',
@@ -331,17 +390,26 @@ function DriverPanelSessionCmrEntry({
 				)}
 				{withDetails && (
 					<div className="flex items-center">
-						<span className="text-muted">Pick scheduled at:</span>
+						<span className="text-muted">
+							{
+								translations[
+									'driver-panel.field.pick_scheduled_at'
+								]
+							}
+							:
+						</span>
 						<span className="ml-2 font-mono">
 							{formatDate(cmr.pick_scheduled_at, undefined, {
 								customFormat: 'D MMMM, HH:mm',
-							}) ?? 'n/a'}
+							}) ?? translations['driver-panel.value.na']}
 						</span>
 					</div>
 				)}
 				{(withDetails || cmr.status === CmrStatusEnum.ORDERED) && (
 					<CmrAddressRow
-						label="Pickup address"
+						label={
+							translations['driver-panel.field.pickup_address']
+						}
 						address={pickupAddress}
 					/>
 				)}
@@ -353,22 +421,29 @@ function DriverPanelSessionCmrEntry({
 				]) && (
 					<div className="flex items-center">
 						<span className="text-muted">
-							Estimated delivery at:
+							{
+								translations[
+									'driver-panel.field.estimated_delivery_at'
+								]
+							}
+							:
 						</span>
 						<span className="ml-2 font-mono">
 							{formatDate(cmr.estimated_delivery_at, undefined, {
 								customFormat: 'D MMMM, HH:mm',
-							}) ?? 'n/a'}
+							}) ?? translations['driver-panel.value.na']}
 						</span>
 					</div>
 				)}
 				<CmrAddressRow
-					label="Delivery address"
+					label={translations['driver-panel.field.delivery_address']}
 					address={deliveryAddress}
 				/>
 				{cmr.status === CmrStatusEnum.DELIVERED && (
 					<div className="flex items-center">
-						<span className="text-muted">Delivered at:</span>
+						<span className="text-muted">
+							{translations['driver-panel.field.delivered_at']}:
+						</span>
 						<span className="ml-2 font-mono">
 							{formatDate(cmr.delivered_at, undefined, {
 								customFormat: 'D MMMM, HH:mm',
@@ -378,9 +453,12 @@ function DriverPanelSessionCmrEntry({
 				)}
 				{cmr.status === CmrStatusEnum.DELIVERED && (
 					<div className="flex items-center">
-						<span className="text-muted">Signed:</span>
+						<span className="text-muted">
+							{translations['driver-panel.field.signed']}:
+						</span>
 						<span className="ml-2 font-mono">
-							{cmr.signed_by ?? 'n/a'}
+							{cmr.signed_by ??
+								translations['driver-panel.value.na']}
 							{formatDate(cmr.signed_at, undefined, {
 								customFormat: 'D MMMM, HH:mm',
 							})}
@@ -398,7 +476,11 @@ function DriverPanelSessionCmrEntry({
 						variant="secondary"
 						hover="default"
 						onClick={() => handleSetupCmrVehicles(cmr)}
-						title="Setup CMR vehicles"
+						title={
+							translations[
+								'driver-panel.tooltip.setup_cmr_vehicles'
+							]
+						}
 					>
 						<Icons.Vehicle className="h-4 w-4" />
 					</Button>
@@ -407,7 +489,7 @@ function DriverPanelSessionCmrEntry({
 					variant="secondary"
 					hover="default"
 					onClick={() => handleViewCmrImages(cmr)}
-					title="View CMR images"
+					title={translations['driver-panel.tooltip.view_cmr_images']}
 				>
 					<Icons.Image className="h-4 w-4" />
 				</Button>
@@ -415,7 +497,7 @@ function DriverPanelSessionCmrEntry({
 					variant="secondary"
 					hover="default"
 					onClick={() => handleCreatePaymentCustomer(cmr)}
-					title="Create payment"
+					title={translations['driver-panel.tooltip.create_payment']}
 				>
 					<Icons.Payment className="h-4 w-4" />
 				</Button>
@@ -427,7 +509,7 @@ function DriverPanelSessionCmrEntry({
 						variant="secondary"
 						hover="default"
 						onClick={() => handleUpdateCmr(cmr)}
-						title="Update CMR"
+						title={translations['driver-panel.tooltip.update_cmr']}
 					>
 						<Icons.Action.Update className="h-4 w-4" />
 					</Button>
@@ -440,7 +522,7 @@ function DriverPanelSessionCmrEntry({
 						variant="secondary"
 						hover="error"
 						onClick={() => handleDeleteCmr(cmr)}
-						title="Delete CMR"
+						title={translations['driver-panel.tooltip.delete_cmr']}
 					>
 						<Icons.Action.Delete className="h-4 w-4" />
 					</Button>
@@ -453,7 +535,7 @@ function DriverPanelSessionCmrEntry({
 						variant="secondary"
 						hover="error"
 						onClick={() => handleDropCmr(cmrSession)}
-						title="Drop CMR"
+						title={translations['driver-panel.tooltip.drop_cmr']}
 					>
 						<Icons.Action.Drop className="h-4 w-4" />
 					</Button>
@@ -465,7 +547,7 @@ function DriverPanelSessionCmrEntry({
 						})}
 						variant="secondary"
 						hover="success"
-						title="View CMR"
+						title={translations['driver-panel.tooltip.view_cmr']}
 						target="_blank"
 						rel="noopener noreferrer"
 					>

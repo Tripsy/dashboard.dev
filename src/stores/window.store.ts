@@ -13,6 +13,7 @@ import type {
 
 type WindowStore = {
 	stack: WindowConfig[];
+	isHydrated: boolean; // False until `hydrateWindowStore()` has restored the persisted stack
 	open: (
 		config: WindowCreateConfig,
 		replacedUid?: string, // If argument `replacedUid` is provided and a window exists it will be closed
@@ -136,6 +137,7 @@ export const useModalStore = create<WindowStore>()(
 
 				return {
 					stack: [],
+					isHydrated: false,
 
 					open: (config, replacedUid) => {
 						if (replacedUid) {
@@ -219,7 +221,10 @@ export const useModalStore = create<WindowStore>()(
 			{
 				name: 'window-store',
 
-				skipHydration: true, // hydration is handled via data-source-registrar.component
+				// Hydration is driven explicitly by `hydrateWindowStore()` below:
+				// definitions are lazy-loaded, so restoring the stack is async and
+				// cannot happen during the initial (SSR-matched) render.
+				skipHydration: true,
 
 				partialize: (state) => ({
 					stack: state.stack.map((window) => ({
@@ -234,33 +239,84 @@ export const useModalStore = create<WindowStore>()(
 					})),
 				}),
 
-				// Re-derive complete WindowConfig after rehydration
-				onRehydrateStorage: () => async (state) => {
-					if (!state) {
-						return;
-					}
-
-					const serializedStack = state.stack;
-
-					const results = await Promise.allSettled(
-						serializedStack.map((window) =>
-							prepareConfigOnCreate(window),
-						),
-					);
-
-					state.stack = results
-						.map((result, i) => {
-							if (result.status === 'fulfilled')
-								return result.value;
-							console.warn(
-								`[window-store] Failed to rehydrate window "${serializedStack[i].uid}":`,
-								result.reason,
-							);
-							return null;
-						})
-						.filter((w): w is WindowConfig => w !== null);
-				},
+				// No `onRehydrateStorage`: its callback is not awaited by zustand, so
+				// re-deriving there would mutate the state object without notifying
+				// subscribers. `hydrateWindowStore()` does it with a real `setState`.
 			},
 		),
 	),
 );
+
+let hydrationPromise: Promise<void> | null = null;
+
+/**
+ * Restores the persisted window stack. `persist.rehydrate()` only brings back the
+ * serialized shells (see `partialize` — no `definition`, no `events`), so each one
+ * is re-derived through `prepareConfigOnCreate` and the result is published in a
+ * single `setState`. Until that lands, `isHydrated` stays false and consumers must
+ * not render the stack: the intermediate entries have no `definition`.
+ *
+ * Safe to call from several components — the first call wins, the rest await it.
+ */
+export const hydrateWindowStore = (): Promise<void> => {
+	hydrationPromise ??= (async () => {
+		await useModalStore.persist.rehydrate();
+
+		const storedStack = useModalStore.getState().stack;
+
+		const results = await Promise.allSettled(
+			storedStack.map((window) => prepareConfigOnCreate(window)),
+		);
+
+		const restoredStack = results
+			.map((result, index) => {
+				if (result.status === 'fulfilled') {
+					return result.value;
+				}
+
+				console.warn(
+					`[window-store] Failed to rehydrate window "${storedStack[index].uid}":`,
+					result.reason,
+				);
+
+				return null;
+			})
+			.filter((window): window is WindowConfig => window !== null);
+
+		useModalStore.setState((state) => {
+			// A window opened while hydration was in flight already carries a
+			// `definition` — it is fresher than the stored copy, so it wins.
+			const openedStack = state.stack.filter(
+				(window) => window.definition,
+			);
+			const openedUids = new Set(openedStack.map((window) => window.uid));
+
+			return {
+				stack: [
+					...restoredStack.filter(
+						(window) => !openedUids.has(window.uid),
+					),
+					...openedStack,
+				],
+				isHydrated: true,
+			};
+		});
+	})();
+
+	return hydrationPromise;
+};
+
+/**
+ * Drops every window and its persisted copy. Called on logout: the stack carries
+ * entry data belonging to the session being ended, so it must not survive into the
+ * next login on the same browser.
+ *
+ * Hydration is awaited first — a restore still in flight would otherwise repopulate
+ * the stack right after it was cleared.
+ */
+export const clearWindowStore = async (): Promise<void> => {
+	await hydrateWindowStore();
+
+	useModalStore.getState().closeAll();
+	useModalStore.persist.clearStorage();
+};

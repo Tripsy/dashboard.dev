@@ -54,17 +54,22 @@ export function Modal({
 		[onClose, closeOnEscape],
 	);
 
+	// A minimized window stays mounted to preserve its form state, so the lock
+	// has to follow `isHidden` too — otherwise a window parked in the dock keeps
+	// the page behind it unscrollable
 	useEffect(() => {
-		if (isOpen) {
-			document.addEventListener('keydown', handleEscape);
-			document.body.style.overflow = 'hidden';
+		if (!isOpen || isHidden) {
+			return;
 		}
+
+		document.addEventListener('keydown', handleEscape);
+		document.body.style.overflow = 'hidden';
 
 		return () => {
 			document.removeEventListener('keydown', handleEscape);
 			document.body.style.overflow = '';
 		};
-	}, [isOpen, handleEscape]);
+	}, [isOpen, isHidden, handleEscape]);
 
 	if (!isOpen) {
 		return null;

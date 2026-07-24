@@ -1,8 +1,9 @@
 'use client';
 
+import { useEffect } from 'react';
 import { WindowDock } from '@/components/window/window-dock.component';
 import { WindowInstance } from '@/components/window/window-instance.component';
-import { useModalStore } from '@/stores/window.store';
+import { hydrateWindowStore, useModalStore } from '@/stores/window.store';
 import type { WindowConfig } from '@/types/window.type';
 
 export function WindowContainer({
@@ -10,7 +11,16 @@ export function WindowContainer({
 }: {
 	section: WindowConfig['section'];
 }) {
-	const { stack } = useModalStore();
+	const { stack, isHydrated } = useModalStore();
+
+	useEffect(() => {
+		hydrateWindowStore().catch(console.error);
+	}, []);
+
+	// Windows restored from storage have no `definition` until hydration completes
+	if (!isHydrated) {
+		return null;
+	}
 
 	const modals = stack.filter((m) => m.section === section);
 	const minimizedModals = modals.filter((m) => m.minimized);

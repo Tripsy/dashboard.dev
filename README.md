@@ -208,8 +208,10 @@ pnpm run build    # Production build
 
 1. dashboard stats - drivers stats to do
 2. monthly driver report
-3. order page ..glitch when moving to order without type (brand)
+3. Consider unifying the two form-submission patterns (dashboard `WindowForm`/`<entity>.definition.ts` vs public account `<flow>.action.ts` + `FormCsrf`) — currently split because they grew out of separate sections (dashboard CRUD vs public auth), not by design
 4. deploy
+5. Loading effect when clicking on a link 
+6. use window for account operations
 
 ---------- 
 
@@ -225,9 +227,6 @@ pnpm run build    # Production build
 6. For template section
     - would be a nice idea to keep track of the last changes (maybe add a new column - prev version id and a button to restore to that version)
     - view presentation could be enhanced
-7. https://nextjs.org/docs/app/getting-started/partial-prerendering
-8. https://react.dev/learn/react-compiler/introduction
-9. Consider unifying the two form-submission patterns (dashboard `WindowForm`/`<entity>.definition.ts` vs public account `<flow>.action.ts` + `FormCsrf`) — currently split because they grew out of separate sections (dashboard CRUD vs public auth), not by design
 
 # 🔗 Dependencies
 

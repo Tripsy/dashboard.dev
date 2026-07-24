@@ -93,6 +93,37 @@ export async function requestStatsCountWorkingHours(): Promise<ResponseStatsTren
 	return response.data ?? null;
 }
 
+export async function requestStatsDriverCountCMRs(): Promise<ResponseStatsTrending | null> {
+	const response: ApiResponseFetch<ResponseStatsTrending> =
+		await new ApiRequest().doFetch('/stats/driver-count-cmrs', {
+			method: 'GET',
+		});
+
+	if (!response?.success) {
+		throw new Error(
+			response?.message ?? 'Failed to retrieve driver CMR trending data',
+		);
+	}
+
+	return response.data ?? null;
+}
+
+export async function requestStatsDriverCountWorkingHours(): Promise<ResponseStatsTrending | null> {
+	const response: ApiResponseFetch<ResponseStatsTrending> =
+		await new ApiRequest().doFetch('/stats/driver-count-working-hours', {
+			method: 'GET',
+		});
+
+	if (!response?.success) {
+		throw new Error(
+			response?.message ??
+				'Failed to retrieve driver working hours trending data',
+		);
+	}
+
+	return response.data ?? null;
+}
+
 export async function requestStatsSumExpenses(): Promise<ResponseStatsTrending | null> {
 	const response: ApiResponseFetch<ResponseStatsTrending> =
 		await new ApiRequest().doFetch('/stats/sum-expenses', {

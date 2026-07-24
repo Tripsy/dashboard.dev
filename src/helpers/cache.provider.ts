@@ -2,29 +2,28 @@ import type Redis from 'ioredis';
 import { getRedisClient } from '@/config/init-redis.config';
 import { Configuration } from '@/config/settings.config';
 
-type CacheData = string | string[] | number | boolean | null;
+/**
+ * Port of `star-backend`'s `src/providers/cache.provider.ts` — keep the two in sync when
+ * either side changes. Deliberate differences, all environment-driven:
+ *   - logs through `console.error`; this project has no logger provider
+ *   - no `MockCacheProvider`; this project has no test suite to swap it into
+ *   - exported through a lazy accessor rather than an eagerly-built singleton, so merely
+ *     importing the module does not open a Redis connection
+ *   - adds `read()` (see its own note)
+ */
 
-class CacheProvider {
-	private static instance: CacheProvider;
+type CacheData = unknown;
 
-	public isCached: boolean = false;
+type CacheGetResults = {
+	isCached: boolean;
+	data: CacheData | null;
+};
 
-	private constructor() {}
-
-	public static getInstance(): CacheProvider {
-		if (!CacheProvider.instance) {
-			CacheProvider.instance = new CacheProvider();
-		}
-
-		return CacheProvider.instance;
-	}
-
-	private get cache(): Redis {
-		return getRedisClient();
-	}
+export class CacheProvider {
+	constructor(private readonly cache: Redis) {}
 
 	buildKey(...args: string[]) {
-		return args.join(':');
+		return args.filter((arg) => arg !== '').join(':');
 	}
 
 	determineTtl(ttl?: number): number {
@@ -80,9 +79,11 @@ class CacheProvider {
 	async exists(key: string): Promise<boolean> {
 		try {
 			const exists = await this.cache.exists(key);
-			return exists === 1; // Redis returns 1 if key exists, 0 otherwise
+
+			return exists === 1;
 		} catch (error) {
 			console.error(error, `Error checking existence for key: ${key}`);
+
 			return false;
 		}
 	}
@@ -91,29 +92,59 @@ class CacheProvider {
 		key: string,
 		fetchFunction: () => Promise<CacheData>,
 		ttl?: number,
-	): Promise<CacheData> {
+	): Promise<CacheGetResults> {
+		const results: CacheGetResults = {
+			isCached: false,
+			data: null,
+		};
+
+		const resolvedTtl = this.determineTtl(ttl);
+
+		if (resolvedTtl === 0) {
+			results.data = await fetchFunction();
+
+			return results;
+		}
+
+		let cachedData: string | null = null;
+
 		try {
-			ttl = this.determineTtl(ttl);
-
-			if (ttl === 0) {
-				return await fetchFunction();
-			}
-
-			const cachedData = await this.cache.get(key);
-
-			if (cachedData) {
-				this.isCached = true;
-				return this.formatOutputData(cachedData);
-			}
-
-			const freshData = await fetchFunction();
-			await this.set(key, freshData, ttl);
-
-			return freshData;
+			cachedData = await this.cache.get(key);
 		} catch (error) {
 			console.error(error, `Error fetching cache for key: ${key}`);
+		}
 
-			return await fetchFunction(); // Fallback to fetching fresh data
+		if (cachedData) {
+			results.isCached = true;
+			results.data = this.formatOutputData(cachedData);
+
+			return results;
+		}
+
+		results.data = await fetchFunction();
+
+		await this.set(key, results.data, resolvedTtl);
+
+		return results;
+	}
+
+	/**
+	 * Raw read with no fetch-on-miss.
+	 *
+	 * The read-through `get()` always stores whatever the fetch function returned, so it
+	 * cannot express "only some outcomes may be cached" — auth is the case in point: a
+	 * backend outage has to stay a live decision instead of being persisted for the TTL.
+	 * Callers with that constraint drive the cache themselves via `read()`/`set()`.
+	 *
+	 * Worth backporting to `star-backend`, which has the same gap.
+	 */
+	async read(key: string): Promise<CacheData> {
+		try {
+			return this.formatOutputData(await this.cache.get(key));
+		} catch (error) {
+			console.error(error, `Error reading cache for key: ${key}`);
+
+			return null;
 		}
 	}
 
@@ -137,6 +168,27 @@ class CacheProvider {
 			await this.cache.del(key);
 		} catch (error) {
 			console.error(error, `Error deleting cache for key: ${key}`);
+		}
+	}
+
+	/**
+	 * Atomically read a key and delete it in the same round-trip, returning the
+	 * previous value (or null). Used for single-use tokens where a read must not
+	 * be replayable. A MULTI is used rather than GETDEL so it works regardless of
+	 * the Redis server version.
+	 */
+	async readAndDrop(key: string): Promise<CacheData> {
+		try {
+			const results = await this.cache.multi().get(key).del(key).exec();
+
+			// results: [[err, value], [err, delCount]]
+			const value = (results?.[0]?.[1] ?? null) as string | null;
+
+			return this.formatOutputData(value);
+		} catch (error) {
+			console.error(error, `Error get-deleting cache for key: ${key}`);
+
+			return null;
 		}
 	}
 
@@ -180,5 +232,10 @@ class CacheProvider {
 	}
 }
 
-export const getCacheProvider = (): CacheProvider =>
-	CacheProvider.getInstance();
+let cacheProviderInstance: CacheProvider | null = null;
+
+export const getCacheProvider = (): CacheProvider => {
+	cacheProviderInstance ??= new CacheProvider(getRedisClient());
+
+	return cacheProviderInstance;
+};

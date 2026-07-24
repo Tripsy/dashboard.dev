@@ -4,6 +4,10 @@ import Routes, { RouteAuthEnum, type RouteMatch } from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
 import { ApiError } from '@/exceptions/api.error';
 import { ApiRequest, getResponseData } from '@/helpers/api.helper';
+import {
+	getCachedAuthModel,
+	setCachedAuthModel,
+} from '@/helpers/auth-cache.helper';
 import { getTrackedCookie } from '@/helpers/session.helper';
 import { apiHeaders } from '@/helpers/system.helper';
 import {
@@ -186,7 +190,7 @@ class MiddlewareContext {
 			}
 		}
 
-		const authResult = await fetchAuthModel(sessionToken.value); // null = invalid token, false = server error
+		const authResult = await resolveAuthModel(sessionToken.value); // null = invalid token, false = server error
 
 		if (authResult === null) {
 			switch (routeAuth) {
@@ -306,6 +310,34 @@ async function fetchAuthModel(
 
 		return null; // 401/403/invalid token or anything else
 	}
+}
+
+/**
+ * Cache-backed wrapper around {@link fetchAuthModel}.
+ *
+ * This runs on every matched request, so the uncached path puts a backend round-trip in
+ * front of each navigation. Only successful lookups are stored: an invalid token (`null`)
+ * and a backend outage (`false`) must stay live decisions, since caching either would turn a
+ * transient failure into a sticky one.
+ *
+ * @param token
+ */
+async function resolveAuthModel(
+	token: string,
+): Promise<AuthModel | null | false> {
+	const cachedAuthModel = await getCachedAuthModel(token);
+
+	if (cachedAuthModel) {
+		return cachedAuthModel;
+	}
+
+	const authModel = await fetchAuthModel(token);
+
+	if (authModel) {
+		await setCachedAuthModel(token, authModel);
+	}
+
+	return authModel;
 }
 
 export async function proxy(req: NextRequest) {

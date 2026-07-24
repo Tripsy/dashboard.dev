@@ -68,7 +68,15 @@ function loadSettings(): Settings {
 			password: process.env.REDIS_PASSWORD || undefined,
 		},
 		cache: {
-			ttl: process.env.CACHE_TTL || 60,
+			// `Number(x ?? default)` — `CACHE_TTL=0` must survive as the number 0, which is
+			// CacheProvider's "skip the cache" signal. `||` would have yielded the string
+			// '0' (truthy), and `Number(x) ?? default` would have yielded NaN when unset.
+			ttl: Number(process.env.CACHE_TTL ?? 60),
+			// Lifetime of a cached `/account/me` result, in seconds. Kept short because it
+			// bounds how long a backend permission/role change stays invisible to the proxy.
+			// Set to 0 to disable the cache entirely (no Redis connection is opened).
+			// `??` rather than `||` so an explicit 0 is honoured.
+			authTtl: Number(process.env.CACHE_AUTH_TTL ?? 30),
 		},
 		mail: {
 			provider: process.env.MAIL_PROVIDER || 'smtp', // 'smtp' or 'ses'

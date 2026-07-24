@@ -1,23 +1,26 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AuthTokenList } from '@/app/(public)/_components/auth-token-list.component';
 import { Icons } from '@/components/icon.component';
 import { LoadingComponent } from '@/components/status.component';
 import { Badge } from '@/components/ui/badge';
-import { Link } from '@/components/ui/link';
+import { Button } from '@/components/ui/button';
 import Routes from '@/config/routes.setup';
 import { formatDate } from '@/helpers/date.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { useAuth } from '@/providers/auth.provider';
 import { useToast } from '@/providers/toast.provider';
 import { requestGetSessions } from '@/services/account.service';
+import { useModalStore } from '@/stores/window.store';
 import type { AuthTokenType } from '@/types/auth.type';
+import { DataSourceSectionEnum } from '@/types/data-source.type';
 
 export default function AccountMe() {
-	const { auth, authStatus } = useAuth();
+	const { auth, authStatus, refreshAuth } = useAuth();
 	const { showToast } = useToast();
+	const open = useModalStore((s) => s.open);
 	const [sessions, setSessions] = useState<AuthTokenType[]>([]);
 
 	const translationsKeys = useMemo(
@@ -25,15 +28,11 @@ export default function AccountMe() {
 			[
 				'account-me.message.session_destroy_success',
 				'account-me.message.session_destroy_error',
-				'account-edit.message.success',
-				'account-email-update.message.success',
-				'account-password-update.message.success',
 			] as const,
 		[],
 	);
 
-	const { translations, isTranslationLoading } =
-		useTranslation(translationsKeys);
+	const { translations } = useTranslation(translationsKeys);
 
 	useEffect(() => {
 		if (authStatus === 'authenticated') {
@@ -44,44 +43,68 @@ export default function AccountMe() {
 	}, [authStatus]);
 
 	const router = useRouter();
-	const searchParams = useSearchParams();
 
-	useEffect(() => {
-		const fromParam = searchParams.get('from');
-
-		if (fromParam && !isTranslationLoading) {
-			switch (fromParam) {
-				case 'edit':
-					showToast({
-						severity: 'success',
-						summary: 'Success',
-						detail: translations['account-edit.message.success'],
-					});
-					break;
-				case 'emailUpdate':
-					showToast({
-						severity: 'success',
-						summary: 'Success',
-						detail: translations[
-							'account-email-update.message.success'
-						],
-					});
-					break;
-				case 'passwordUpdate':
-					showToast({
-						severity: 'success',
-						summary: 'Success',
-						detail: translations[
-							'account-password-update.message.success'
-						],
-					});
-					break;
-			}
-
-			const newUrl = Routes.get('account-me');
-			router.replace(newUrl, { scroll: false });
+	// Account self-service flows open as windows (WindowForm handles the submit,
+	// success toast and close). Post-submit side effects go through events.success.
+	const openAccountEdit = useCallback(() => {
+		if (!auth) {
+			return;
 		}
-	}, [searchParams, showToast, isTranslationLoading, translations, router]);
+
+		open({
+			minimized: false,
+			section: DataSourceSectionEnum.PUBLIC,
+			dataSource: 'account',
+			action: 'edit',
+			data: { entries: [auth] },
+			events: {
+				success: async () => {
+					await refreshAuth();
+				},
+			},
+		});
+	}, [open, auth, refreshAuth]);
+
+	const openEmailUpdate = useCallback(() => {
+		open({
+			minimized: false,
+			section: DataSourceSectionEnum.PUBLIC,
+			dataSource: 'account',
+			action: 'emailUpdate',
+		});
+	}, [open]);
+
+	const openPasswordUpdate = useCallback(() => {
+		open({
+			minimized: false,
+			section: DataSourceSectionEnum.PUBLIC,
+			dataSource: 'account',
+			action: 'passwordUpdate',
+			events: {
+				// Refresh so the "password last updated" timestamp reflects the change.
+				success: async () => {
+					await refreshAuth();
+				},
+			},
+		});
+	}, [open, refreshAuth]);
+
+	const openAccountDelete = useCallback(() => {
+		open({
+			minimized: false,
+			section: DataSourceSectionEnum.PUBLIC,
+			dataSource: 'account',
+			action: 'deleteAccount',
+			events: {
+				// Access is revoked immediately — send the user to the status page.
+				success: () => {
+					router.replace(
+						`${Routes.get('status', { type: 'error' })}?r=account-delete`,
+					);
+				},
+			},
+		});
+	}, [open, router]);
 
 	if (authStatus === 'loading') {
 		return <LoadingComponent />;
@@ -106,15 +129,16 @@ export default function AccountMe() {
 							<Icons.User />
 							Personal Information
 						</h2>
-						<Link
-							href={Routes.get('account-edit')}
-							prefetch={false}
+						<Button
+							type="button"
+							onClick={openAccountEdit}
 							title="Edit my account"
 							variant="outline"
 							size="sm"
+							className="cursor-pointer"
 						>
 							<Icons.Action.Update /> Edit
-						</Link>
+						</Button>
 					</div>
 
 					<div className="border-b pb-4">
@@ -151,15 +175,16 @@ export default function AccountMe() {
 									</Badge>
 								)}
 							</div>
-							<Link
-								href={Routes.get('email-update')}
-								prefetch={false}
+							<Button
+								type="button"
+								onClick={openEmailUpdate}
 								title="Update email address"
 								variant="outline"
 								size="sm"
+								className="cursor-pointer"
 							>
 								<Icons.Action.Update /> Change
-							</Link>
+							</Button>
 						</div>
 					</div>
 
@@ -206,28 +231,30 @@ export default function AccountMe() {
 									)}
 								</p>
 							</div>
-							<Link
-								href={Routes.get('password-update')}
-								prefetch={false}
+							<Button
+								type="button"
+								onClick={openPasswordUpdate}
 								title="Update password"
 								variant="outline"
 								size="sm"
+								className="cursor-pointer"
 							>
 								<Icons.Password /> Change
-							</Link>
+							</Button>
 						</div>
 					</div>
 
 					<div className="flex justify-end mt-6">
-						<Link
-							href={Routes.get('account-delete')}
-							prefetch={false}
+						<Button
+							type="button"
+							onClick={openAccountDelete}
 							title="Delete my account"
 							variant="error"
 							size="sm"
+							className="cursor-pointer"
 						>
 							<Icons.Action.Delete /> Delete Account
-						</Link>
+						</Button>
 					</div>
 				</div>
 

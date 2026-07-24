@@ -27,15 +27,20 @@ match the shape the backend actually accepts — see §3 below and `../star-back
 
 ### Two form patterns — don't mix them
 
-| | Dashboard entity forms | Public account/auth forms |
-|---|---|---|
-| Location | `src/app/(dashboard)/dashboard/<entity>/form-manage-<entity>.component.tsx` | `src/app/(public)/account/<flow>/` |
-| Submit driven by | Generic `WindowForm`, calling `processForm()` (`helpers/form.helper.ts`) inline | A dedicated per-flow `<flow>.action.ts` (e.g. `account-edit.action.ts`) |
-| Reaches backend via | `operationFunction` in `<entity>.definition.ts` → `requestCreate`/`requestUpdate` → `/api/proxy` | A `src/services/account.service.ts` function → `/api/proxy` |
-| CSRF | Not used — these submit through `/api/proxy`, protected instead by the origin/referer check in `src/proxy.ts` (`isValidOrigin()`) | **Required** — see §7 |
+The split is by **authentication context**, not by route group: authenticated account self-service uses the
+generic `WindowForm`; only the unauthenticated auth-entry flows keep the dedicated per-flow action.
 
-Follow the dashboard pattern (§2–§6 below) for anything under `dashboard/<entity>/`. Follow the account
-pattern only when adding a new public account/auth flow, and see §7 for its CSRF requirement.
+| | `WindowForm` forms | Auth-entry forms |
+|---|---|---|
+| Examples | dashboard `<entity>`; authenticated account self-service (edit, email-update, password-update, delete) | login, register, password-recover(+change), email-confirm(+send) |
+| Location | `(dashboard)/dashboard/<entity>/form-manage-<entity>.component.tsx`; account: `(public)/_components/account/` (window components + `account.definition.ts`) | `src/app/(public)/account/<flow>/` |
+| Submit driven by | Generic `WindowForm`, calling `processForm()` (`helpers/form.helper.ts`) inline | A dedicated per-flow `<flow>.action.ts` (e.g. `login.action.ts`) wired to `useActionState` |
+| Reaches backend via | `operationFunction` in the definition → `requestCreate`/`requestUpdate` (or an `account.service.ts` fn) → `/api/proxy` | A `src/services/account.service.ts` function → `/api/proxy` |
+| CSRF | Not used — protected instead by the `Sec-Fetch-Site` / origin check in `src/proxy.ts` (`isValidRequestSource()`) | **Required** — see §7 |
+
+Follow the `WindowForm` pattern (§2–§6 below) for anything under `dashboard/<entity>/` and for authenticated
+account self-service windows (`_components/account/`). Follow the auth-entry pattern (§7) only when adding a
+new **unauthenticated** login/register/recover/confirm flow.
 
 ## 2. Validator Class
 
@@ -70,6 +75,9 @@ class CashFlowValidator extends BaseValidator<typeof validatorMessages> {
 - Never hardcode a validation message string. Resolve every key in `validatorMessages` through
   `translateBatch(validatorMessages, '<entity>.validation')` inside an async `validateForm()`, then pass the
   translations into the validator's constructor.
+- The namespace passed to `translateBatch` must **exactly match the key the locale file is registered under**
+  in `src/locales/<lang>/index.ts` (e.g. `account-email-update.validation`, not `email-update.validation`).
+  A mismatched namespace resolves to nothing and silently surfaces raw keys instead of messages.
 - Before writing or changing a Zod schema here, check the authoritative shape in
   `../star-backend/src/features/<entity>/<entity>.validator.ts` (field list, required/optional, formats,
   enum values) — client and backend validation must agree on what "valid" means. The backend's own
@@ -111,17 +119,33 @@ form from showing every required-field error before the user has typed anything.
 - `handleChange` supports dotted/nested paths (e.g. `handleChange('operational_records', {...})` for a
   nested object) — use this instead of manually merging nested state.
 
-## 7. Public Account/Auth Forms (the other pattern)
+## 7. Auth-entry Forms (the other pattern)
 
-Login, register, password recover/update, email confirm/update, and account edit/delete each have their own
-`<flow>.action.ts` + `<flow>.definition.ts` + `<flow>.component.tsx` — they do not go through `WindowForm`.
-For this pattern only:
+The **unauthenticated** auth-entry flows — login, register, password-recover (+ `[token]` change),
+email-confirm (+ email-confirm-send) — each have their own `<flow>.action.ts` + `<flow>.definition.ts` +
+`<flow>.component.tsx` and do **not** go through `WindowForm`. For this pattern only:
 
 - The component wires `useActionState` directly to the exported action function (e.g.
-  `useActionState(accountEditAction, initState)`), not to `processForm`.
+  `useActionState(loginAction, initState)`), not to `processForm`.
 - The action function must call `isValidCsrfToken(formData)` (`src/helpers/session.helper.ts`) as its first
   check, before parsing/validating form values, and return a `csrfError` situation if it fails.
 - The component must render `<FormCsrf />` (`src/components/form/form-csrf.tsx`), which fetches a token from
   `/csrf` and injects it as a hidden field — omitting it makes every submission fail CSRF validation.
 - Everything else (validator class, `getFormValues`, debounced `useFormValidation`, shared field components)
   follows the same conventions as §2–§6.
+
+### Authenticated account self-service uses `WindowForm`, not this pattern
+
+Account edit / email-update / password-update / delete are **windows** opened from `/account/me`, driven by
+`src/app/(public)/_components/account/account.definition.ts` (one `account` virtual data source, actions
+`edit` / `emailUpdate` / `passwordUpdate` / `deleteAccount`). They follow §2–§6 like any dashboard entity.
+Notes specific to them:
+
+- They reuse the validators + `FormValuesType` still living in `(public)/account/<flow>/<flow>.definition.ts`;
+  only the old `page.tsx` / `<flow>.component.tsx` / `<flow>.action.ts` were removed.
+- `getFormValues` must be **synchronous** (`processForm` calls it without `await`) — the legacy
+  `getAccountEditFormValues` is async, so `account.definition.ts` defines its own sync version.
+- No permission gating: the actions omit `permission` (optional on the config), and `account` is registered in
+  `PermissionEntitiesSuggestions` only as a virtual key (`// NOT an entity`, like `dashboard`) so it satisfies
+  `DataSourceKey ⊆ PermissionEntityType`.
+- Post-submit side effects (refreshAuth, redirect after delete) go through the window's `events.success`.

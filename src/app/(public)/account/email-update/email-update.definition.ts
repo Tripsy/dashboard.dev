@@ -39,7 +39,7 @@ export async function validateFormEmailUpdate(
 ) {
 	const translations = await translateBatch(
 		validatorMessages,
-		'email-update.validation',
+		'account-email-update.validation',
 	);
 
 	const validator = new EmailUpdateValidator(translations);

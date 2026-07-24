@@ -107,7 +107,7 @@ type ActionConfigBase<Entry, FormValues extends FormValuesType> = {
 	windowTarget?: string; // Used for `link` windowType
 	windowConfigProps?: WindowConfigPropsType;
 
-	permission: ActionConfigPermission;
+	permission?: ActionConfigPermission; // Optional: dashboard data-table button gating. Omit for actions not permission-gated (e.g. account self-service, guarded by authentication only).
 	customEntryCheck?: (entry: Entry) => boolean; // Additional function to check if the action is available (hint: active user cannot have `active` action)
 	buttonPosition: 'left' | 'right' | 'hidden'; // Describe where the action button should be placed in data-table
 	button?: ButtonAppearanceType; // Action button configuration

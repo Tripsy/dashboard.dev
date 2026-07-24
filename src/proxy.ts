@@ -100,7 +100,22 @@ class MiddlewareContext {
 		}
 	}
 
-	isValidOrigin() {
+	isValidRequestSource() {
+		// Primary defense: Sec-Fetch-Site is a browser-set *forbidden* header —
+		// JavaScript cannot forge it — so it's a stronger CSRF signal than
+		// Origin/Referer. Present on all evergreen browsers. A state-changing
+		// request from our own SPA is always `same-origin`; `cross-site` (and the
+		// direct-navigation `none`) have no legitimate mutating caller here.
+		const secFetchSite = this.req.headers.get('sec-fetch-site');
+
+		if (secFetchSite) {
+			return (
+				secFetchSite === 'same-origin' || secFetchSite === 'same-site'
+			);
+		}
+
+		// Fallback for non-browser / legacy clients that omit Sec-Fetch-Site:
+		// the original Origin/Referer allowlist check.
 		const origin = this.req.headers.get('origin');
 		const referer = this.req.headers.get('referer');
 
@@ -309,7 +324,7 @@ export async function proxy(req: NextRequest) {
 	// Only enforce origin checks on state-changing requests
 	const isMutating = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method);
 
-	if (isMutating && !ctx.isValidOrigin()) {
+	if (isMutating && !ctx.isValidRequestSource()) {
 		return new NextResponse('Forbidden', { status: 403 });
 	}
 

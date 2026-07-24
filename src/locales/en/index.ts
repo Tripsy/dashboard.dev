@@ -1,3 +1,4 @@
+import account from '@/locales/en/account.json';
 import account_delete from '@/locales/en/account-delete.json';
 import account_edit from '@/locales/en/account-edit.json';
 import account_email_update from '@/locales/en/account-email-update.json';
@@ -42,6 +43,7 @@ import work_session_vehicle from '@/locales/en/work-session-vehicle.json';
 
 const en = {
 	// BE
+	account,
 	'account-delete': account_delete,
 	'account-edit': account_edit,
 	'account-email-update': account_email_update,

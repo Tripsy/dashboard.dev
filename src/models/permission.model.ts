@@ -1,5 +1,6 @@
 export const PermissionEntitiesSuggestions = [
 	'dashboard', // NOT an entity
+	'account', // NOT an entity — virtual key for the public account self-service data source (no backend permission gating)
 	'address',
 	'brand',
 	'cash-flow',

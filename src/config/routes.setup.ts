@@ -185,17 +185,10 @@ Routes.group('account')
 		auth: RouteAuthEnum.PUBLIC,
 	})
 	.add('email-confirm-send', '/account/email-confirm-send')
-	.add('account-me', '/account/me', { auth: RouteAuthEnum.AUTHENTICATED })
-	.add('account-edit', '/account/edit', { auth: RouteAuthEnum.AUTHENTICATED })
-	.add('password-update', '/account/password-update', {
-		auth: RouteAuthEnum.AUTHENTICATED,
-	})
-	.add('email-update', '/account/email-update', {
-		auth: RouteAuthEnum.AUTHENTICATED,
-	})
-	.add('account-delete', '/account/delete', {
-		auth: RouteAuthEnum.AUTHENTICATED,
-	});
+	// account edit / email-update / password-update / delete are no longer
+	// standalone routes — they open as windows from /account/me (see
+	// _components/account/account.definition.ts).
+	.add('account-me', '/account/me', { auth: RouteAuthEnum.AUTHENTICATED });
 
 // Dashboard
 Routes.group('dashboard')

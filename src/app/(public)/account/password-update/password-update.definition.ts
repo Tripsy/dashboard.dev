@@ -92,7 +92,7 @@ export async function validateFormPasswordUpdate(
 ) {
 	const translations = await translateBatch(
 		validatorMessages,
-		'password-update.validation',
+		'account-password-update.validation',
 	);
 
 	const validator = new PasswordUpdateValidator(translations);

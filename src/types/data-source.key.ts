@@ -21,6 +21,9 @@ import type { WorkSessionModel } from '@/models/work-session.model';
 import type { WorkSessionVehicleModel } from '@/models/work-session-vehicle.model';
 
 export type DatasourceModels = {
+	// `account` is a virtual data source (no list endpoint) — its entry is the
+	// current authenticated user; used only for the account self-service windows.
+	account: UserModel;
 	address: AddressModel;
 	brand: BrandModel;
 	'cash-flow': CashFlowModel;

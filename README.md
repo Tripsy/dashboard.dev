@@ -206,13 +206,13 @@ pnpm run build    # Production build
 
 # 📌 TODO
 
-1. dashboard stats - drivers stats to do
-2. monthly driver report
 3. Consider unifying the two form-submission patterns (dashboard `WindowForm`/`<entity>.definition.ts` vs public account `<flow>.action.ts` + `FormCsrf`) — currently split because they grew out of separate sections (dashboard CRUD vs public auth), not by design
-4. deploy
 5. Loading effect when clicking on a link 
-6. use window for account operations
+7. make form changes survive the minimize, when restored form docker, the changes should be there 
 
+1. monthly driver report
+2. deploy
+3. 
 ---------- 
 
 1. Hero UI -> theme

@@ -1,0 +1,24 @@
+{
+	"action": {
+		"edit": {
+			"title": "Edit account details",
+			"label": "Edit",
+			"success": "Account details updated with success"
+		},
+		"emailUpdate": {
+			"title": "Update email address",
+			"label": "Update email",
+			"success": "Email update request processed with success. Check your email for confirmation."
+		},
+		"passwordUpdate": {
+			"title": "Update password",
+			"label": "Update password",
+			"success": "Password updated with success"
+		},
+		"deleteAccount": {
+			"title": "Delete account",
+			"label": "Delete account",
+			"success": "Account deletion request processed with success"
+		}
+	}
+}

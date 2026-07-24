@@ -34,7 +34,7 @@ type HandleActionType<K extends DataSourceKey> = (
 
 type AllowActionType<K extends DataSourceKey> = (
 	entries: DatasourceModels[K][],
-	permission: ActionConfigPermission,
+	permission: ActionConfigPermission | undefined,
 	entriesSelection: EntriesSelectionType,
 	customEntryCheck?: (entry: DatasourceModels[K]) => boolean,
 ) => boolean;
@@ -194,7 +194,7 @@ export function DataTableActions<K extends DataSourceKey>() {
 	const allowAction: AllowActionType<K> = useCallback(
 		(
 			entries: Entry[],
-			permission: ActionConfigPermission,
+			permission: ActionConfigPermission | undefined,
 			entriesSelection: EntriesSelectionType,
 			customEntryCheck?: (entry: Entry) => boolean,
 		) => {
@@ -210,6 +210,11 @@ export function DataTableActions<K extends DataSourceKey>() {
 
 			if (entriesSelection === 'multiple' && entries.length === 0) {
 				return false;
+			}
+
+			// No declared permission → the action isn't permission-gated.
+			if (!permission) {
+				return true;
 			}
 
 			const [permissionEntity, permissionOperation] = permission;

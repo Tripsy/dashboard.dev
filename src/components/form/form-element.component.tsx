@@ -750,7 +750,7 @@ export const FormComponentCalendarWithoutFormElement = <Fields,>({
 				<DatePicker.Trigger
 					id={id}
 					className={cn(
-						'justify-start gap-2 rounded-md border border-border px-3 text-left text-sm',
+						'min-h-9 justify-start gap-2 rounded-md border border-border px-3 py-2 text-left text-base sm:text-sm',
 						!fieldValue && 'text-muted',
 						className,
 					)}

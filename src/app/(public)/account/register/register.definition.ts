@@ -19,10 +19,7 @@ export type RegisterFormValuesType = {
 	terms: boolean;
 };
 
-export type RegisterSituationType =
-	| FormSituationType
-	| 'csrfError'
-	| 'pendingAccount';
+export type RegisterSituationType = FormSituationType | 'pendingAccount';
 
 export type RegisterStateType = {
 	values: RegisterFormValuesType;

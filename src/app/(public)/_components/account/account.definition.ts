@@ -50,9 +50,8 @@ const asUserResult = <T>(
 // directly (never through the dashboard data-table that reads `permission`), so
 // `permission` is intentionally omitted from every action below.
 
-// `edit` needs a sync getFormValues: processForm calls it synchronously, and
-// the shared getAccountEditFormValues is async (its language fallback awaits
-// getLanguage()). Here the language always comes from the form's radio.
+// processForm calls getFormValues synchronously, so the language fallback can't
+// await getLanguage() — here it always comes from the form's radio anyway.
 function getAccountEditFormValues(
 	formData: FormData,
 ): AccountEditFormValuesType {

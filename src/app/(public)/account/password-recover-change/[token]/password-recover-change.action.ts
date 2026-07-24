@@ -1,72 +1,24 @@
 import {
 	getPasswordRecoverChangeFormValues,
 	type PasswordRecoverChangeFormValuesType,
-	type PasswordRecoverChangeSituationType,
 	type PasswordRecoverChangeStateType,
 	validateFormPasswordRecoverChange,
 } from '@/app/(public)/account/password-recover-change/[token]/password-recover-change.definition';
-import { translate } from '@/config/translate.setup';
-import { ApiError } from '@/exceptions/api.error';
-import { accumulateZodErrors } from '@/helpers/form.helper';
-import { isValidCsrfToken } from '@/helpers/session.helper';
+import { processForm } from '@/helpers/form-process.helper';
 import { requestPasswordRecoverChange } from '@/services/account.service';
 
 export async function passwordRecoverChangeAction(
 	formState: PasswordRecoverChangeStateType,
 	formData: FormData,
 ): Promise<PasswordRecoverChangeStateType> {
-	if (!(await isValidCsrfToken(formData))) {
-		return {
-			...formState,
-			message: await translate('app.error.csrf'),
-			situation: 'csrfError',
-		};
-	}
-
-	const formValues = getPasswordRecoverChangeFormValues(formData);
-	const validated = await validateFormPasswordRecoverChange(formValues);
-
-	if (!validated.success) {
-		const errors = accumulateZodErrors<PasswordRecoverChangeFormValuesType>(
-			validated.error,
-		);
-
-		return {
-			...formState,
-			values: formValues,
-			situation: 'failedValidation',
-			message: await translate('app.error.validation'),
-			errors,
-		};
-	}
-
-	try {
-		const requestResponse = await requestPasswordRecoverChange(
-			validated.data,
-			formState.token,
-		);
-
-		return {
-			...formState,
-			values: validated.data,
-			message: requestResponse?.message || null,
-			situation: requestResponse?.success ? 'success' : 'serverError',
-		};
-	} catch (error: unknown) {
-		let message: string = '';
-		const situation: PasswordRecoverChangeSituationType = 'serverError';
-
-		if (error instanceof ApiError) {
-			message = error.message;
-		}
-
-		return {
-			...formState,
-			values: validated.data,
-			message:
-				message ||
-				(await translate('password-recover-change.message.failed')),
-			situation: situation,
-		};
-	}
+	return processForm(formState, formData, {
+		getFormValues: getPasswordRecoverChangeFormValues,
+		validateForm: validateFormPasswordRecoverChange,
+		// The recovery token is carried on the form state, not the form values.
+		operationFunction: (values: PasswordRecoverChangeFormValuesType) =>
+			requestPasswordRecoverChange(values, formState.token),
+		requireCsrf: true,
+		fallbackErrorKey: 'password-recover-change.message.failed',
+		mapApiError: async (error) => ({ message: error.message }),
+	});
 }

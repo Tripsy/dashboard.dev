@@ -5,7 +5,8 @@ import { useActionState, useMemo } from 'react';
 import { ActionButton } from '@/components/action-button.component';
 import { FormComponentSubmit } from '@/components/form/form-element.component';
 import { FormError } from '@/components/form/form-error.component';
-import { createHandleChange, processForm } from '@/helpers/form.helper';
+import { createHandleChange } from '@/helpers/form.helper';
+import { processForm } from '@/helpers/form-process.helper';
 import { useWindowFormProcessed } from '@/hooks/use-form-processed.hook';
 import { useFormSituation } from '@/hooks/use-form-situation.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
@@ -79,14 +80,14 @@ export function WindowForm<
 		FormData
 	>(
 		async (state, formData) =>
-			processForm(
-				state,
-				formData,
+			processForm(state, formData, {
 				getFormValues,
 				validateForm,
 				operationFunction,
 				entryId,
-			),
+				// No CSRF token here: these forms are authenticated and covered by
+				// the `Sec-Fetch-Site` / origin check in `src/proxy.ts`.
+			}),
 		initState,
 	);
 

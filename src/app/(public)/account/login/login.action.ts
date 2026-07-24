@@ -1,110 +1,75 @@
 import {
 	getLoginFormValues,
-	type LoginApiResponseType,
 	type LoginFormValuesType,
-	type LoginSituationType,
 	type LoginStateType,
 	validateFormLogin,
 } from '@/app/(public)/account/login/login.definition';
 import { translate } from '@/config/translate.setup';
-import { ApiError } from '@/exceptions/api.error';
-import { accumulateZodErrors } from '@/helpers/form.helper';
-import { isValidCsrfToken } from '@/helpers/session.helper';
+import { processForm } from '@/helpers/form-process.helper';
 import { requestLogin } from '@/services/account.service';
 import { createAuth } from '@/services/auth.service';
+
+/**
+ * Login is a two-step operation: the backend returns a token, which only becomes
+ * a session once `createAuth` has written the cookie. Both steps live here so the
+ * form only reports success after the session actually exists.
+ */
+async function loginOperation(values: LoginFormValuesType) {
+	const requestResponse = await requestLogin(values);
+
+	if (
+		requestResponse?.success &&
+		requestResponse.data &&
+		'token' in requestResponse.data
+	) {
+		return createAuth(requestResponse.data.token);
+	}
+
+	// A response without a token is a failure even if the backend flagged success.
+	return {
+		...requestResponse,
+		message: requestResponse?.message ?? '',
+		success: false,
+	};
+}
 
 export async function loginAction(
 	formState: LoginStateType,
 	formData: FormData,
 ): Promise<LoginStateType> {
-	if (!(await isValidCsrfToken(formData))) {
-		return {
-			...formState,
-			message: await translate('app.error.csrf'),
-			situation: 'csrfError',
-		};
-	}
-
-	const formValues = getLoginFormValues(formData);
-	const validated = await validateFormLogin(formValues);
-
-	if (!validated.success) {
-		const errors = accumulateZodErrors<LoginFormValuesType>(
-			validated.error,
-		);
-
-		return {
-			...formState,
-			values: formValues,
-			situation: 'failedValidation',
-			message: await translate('app.error.validation'),
-			errors,
-		};
-	}
-
-	try {
-		const requestResponse = await requestLogin(validated.data);
-
-		if (
-			requestResponse?.success &&
-			requestResponse.data &&
-			'token' in requestResponse.data
-		) {
-			const authResponse = await createAuth(requestResponse.data.token);
-
-			return {
-				...formState,
-				values: validated.data,
-				message: authResponse?.message || null,
-				situation: authResponse?.success ? 'success' : 'serverError',
-			};
-		} else {
-			return {
-				...formState,
-				values: validated.data,
-				message: requestResponse?.message || null,
-				situation: 'serverError',
-			};
-		}
-	} catch (error: unknown) {
-		let message: string = '';
-		let situation: LoginSituationType = 'serverError';
-		let resultData: LoginApiResponseType | undefined;
-
-		if (error instanceof ApiError) {
+	return processForm(formState, formData, {
+		getFormValues: getLoginFormValues,
+		validateForm: validateFormLogin,
+		operationFunction: loginOperation,
+		requireCsrf: true,
+		fallbackErrorKey: 'login.message.could_not_login',
+		mapApiError: async (error) => {
 			switch (error.status) {
 				case 400:
-					message = await translate('login.message.not_active');
-					break;
+					return {
+						message: await translate('login.message.not_active'),
+					};
 				case 403:
-					message = await translate(
-						'login.message.max_active_sessions',
-					);
-					situation = 'maxActiveSession';
-					resultData = error.body?.data;
-					break;
+					return {
+						message: await translate(
+							'login.message.max_active_sessions',
+						),
+						situation: 'maxActiveSession' as const,
+						resultData: error.body?.data,
+					};
 				case 406:
-					situation = 'success'; // Already logged in
-					break;
+					// Already logged in — treat as a successful sign-in.
+					return { situation: 'success' as const };
 				case 409:
-					message = await translate('login.message.pending_account');
-					situation = 'pendingAccount';
-					break;
-				case 429:
-					message = await translate(
-						'login.message.too_many_login_attempts',
-					);
-					break;
+					return {
+						message: await translate(
+							'login.message.pending_account',
+						),
+						situation: 'pendingAccount' as const,
+					};
+				default:
+					return {};
 			}
-		}
-
-		return {
-			...formState,
-			values: validated.data,
-			message:
-				message || (await translate('login.message.could_not_login')),
-			situation: situation,
-			resultData: resultData,
-		};
-	}
+		},
+	});
 }

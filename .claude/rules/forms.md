@@ -6,6 +6,7 @@ paths:
   - "src/hooks/use-form-*.ts"
   - "src/hooks/use-form-*.hook.ts"
   - "src/helpers/form.helper.ts"
+  - "src/helpers/form-process.helper.ts"
   - "src/helpers/validator.helper.ts"
   - "src/app/**/*.definition.ts"
 ---
@@ -20,27 +21,34 @@ match the shape the backend actually accepts — see §3 below and `../star-back
 - A dashboard entity's form is **declared, not hand-wired**: `<entity>.definition.ts` exports the Zod
   validator, `getFormValues`, `getFormState`, and the `create`/`update` `operationFunction`s. The generic
   `WindowForm` component (`src/components/window/window-form.component.tsx`) drives every entity through the
-  same React 19 `useActionState` + `processForm` pipeline — don't hand-roll a one-off submit handler for a
-  new entity form.
+  same React 19 `useActionState` + `processForm` pipeline (`src/helpers/form-process.helper.ts`) — don't
+  hand-roll a one-off submit handler for a new entity form.
 - `useMutation` is not used for the primary entity submit (see `data-fetching.md` §1); it's fine for a
   secondary, inline action inside a form (e.g. quick-creating a related record).
 
-### Two form patterns — don't mix them
+### One pipeline, two hosts
 
-The split is by **authentication context**, not by route group: authenticated account self-service uses the
-generic `WindowForm`; only the unauthenticated auth-entry flows keep the dedicated per-flow action.
+Every form in the app submits through the same function — `processForm()`
+(`src/helpers/form-process.helper.ts`): optional CSRF gate → `getFormValues` → `validateForm` →
+`operationFunction` → error mapping. What differs is only *who calls it* and what wraps the result.
 
 | | `WindowForm` forms | Auth-entry forms |
 |---|---|---|
-| Examples | dashboard `<entity>`; authenticated account self-service (edit, email-update, password-update, delete) | login, register, password-recover(+change), email-confirm(+send) |
+| Examples | dashboard `<entity>`; authenticated account self-service (edit, email-update, password-update, delete) | login, register, password-recover(+change), email-confirm-send |
 | Location | `(dashboard)/dashboard/<entity>/form-manage-<entity>.component.tsx`; account: `(public)/_components/account/` (window components + `account.definition.ts`) | `src/app/(public)/account/<flow>/` |
-| Submit driven by | Generic `WindowForm`, calling `processForm()` (`helpers/form.helper.ts`) inline | A dedicated per-flow `<flow>.action.ts` (e.g. `login.action.ts`) wired to `useActionState` |
-| Reaches backend via | `operationFunction` in the definition → `requestCreate`/`requestUpdate` (or an `account.service.ts` fn) → `/api/proxy` | A `src/services/account.service.ts` function → `/api/proxy` |
-| CSRF | Not used — protected instead by the `Sec-Fetch-Site` / origin check in `src/proxy.ts` (`isValidRequestSource()`) | **Required** — see §7 |
+| Calls `processForm` from | The generic `WindowForm`, reading the options off the window definition | A thin per-flow `<flow>.action.ts` (e.g. `login.action.ts`) wired to `useActionState` |
+| Reaches backend via | `operationFunction` in the definition → `requestCreate`/`requestUpdate` (or an `account.service.ts` fn) → `/api/proxy` | `operationFunction` → a `src/services/account.service.ts` function → `/api/proxy` |
+| CSRF | Off — protected instead by the `Sec-Fetch-Site` / origin check in `src/proxy.ts` (`isValidRequestSource()`) | `requireCsrf: true` — see §7 |
 
 Follow the `WindowForm` pattern (§2–§6 below) for anything under `dashboard/<entity>/` and for authenticated
 account self-service windows (`_components/account/`). Follow the auth-entry pattern (§7) only when adding a
 new **unauthenticated** login/register/recover/confirm flow.
+
+`src/helpers/form.helper.ts` deliberately holds only the pure, client-safe utilities
+(`accumulateZodErrors`, `filterErrorsByTouched`, `createHandleChange`, `getFormDataAs*`, `safeHtml`).
+The pipeline lives in its own module because it imports `session.helper.ts` — which is `'use server'` and
+itself imports `form.helper.ts`. Adding that import to `form.helper.ts` would create a circular dependency
+*and* drag server actions into every client component that only wanted `createHandleChange`.
 
 ## 2. Validator Class
 
@@ -119,18 +127,27 @@ form from showing every required-field error before the user has typed anything.
 - `handleChange` supports dotted/nested paths (e.g. `handleChange('operational_records', {...})` for a
   nested object) — use this instead of manually merging nested state.
 
-## 7. Auth-entry Forms (the other pattern)
+## 7. Auth-entry Forms (the other host)
 
 The **unauthenticated** auth-entry flows — login, register, password-recover (+ `[token]` change),
-email-confirm (+ email-confirm-send) — each have their own `<flow>.action.ts` + `<flow>.definition.ts` +
-`<flow>.component.tsx` and do **not** go through `WindowForm`. For this pattern only:
+email-confirm-send — each have their own `<flow>.action.ts` + `<flow>.definition.ts` + `<flow>.component.tsx`
+and are routed pages, not windows, because each renders its own success/failure screen (`SuccessComponent`,
+login's `AuthTokenList` + post-login redirect). For this pattern only:
 
 - The component wires `useActionState` directly to the exported action function (e.g.
-  `useActionState(loginAction, initState)`), not to `processForm`.
-- The action function must call `isValidCsrfToken(formData)` (`src/helpers/session.helper.ts`) as its first
-  check, before parsing/validating form values, and return a `csrfError` situation if it fails.
+  `useActionState(loginAction, initState)`); that action is a thin wrapper that returns `processForm(...)`.
+- The action **must** pass `requireCsrf: true`. Don't call `isValidCsrfToken` by hand — the pipeline runs it
+  before parsing anything and returns the `csrfError` situation itself.
 - The component must render `<FormCsrf />` (`src/components/form/form-csrf.tsx`), which fetches a token from
   `/csrf` and injects it as a hidden field — omitting it makes every submission fail CSRF validation.
+- Per-flow backend failures go in `mapApiError(error)`, which maps an `ApiError` status onto
+  `{ message?, situation?, resultData? }`; anything it leaves out falls back to `fallbackErrorKey`
+  (default `app.error.form`) and `serverError`. Don't hand-roll a `try`/`catch` around the request.
+- A flow that needs an outcome beyond `FormSituationType` (login's `maxActiveSession`, register's
+  `pendingAccount`) widens its own `<Flow>SituationType`; `processForm` picks it up via `State['situation']`.
+  `csrfError` is already part of `FormSituationType` — don't re-add it per flow.
+- Multi-step submits belong in the `operationFunction`, not around it: `login.action.ts` chains
+  `requestLogin` → `createAuth` there so the form only reports success once the session cookie exists.
 - Everything else (validator class, `getFormValues`, debounced `useFormValidation`, shared field components)
   follows the same conventions as §2–§6.
 
@@ -142,9 +159,10 @@ Account edit / email-update / password-update / delete are **windows** opened fr
 Notes specific to them:
 
 - They reuse the validators + `FormValuesType` still living in `(public)/account/<flow>/<flow>.definition.ts`;
-  only the old `page.tsx` / `<flow>.component.tsx` / `<flow>.action.ts` were removed.
-- `getFormValues` must be **synchronous** (`processForm` calls it without `await`) — the legacy
-  `getAccountEditFormValues` is async, so `account.definition.ts` defines its own sync version.
+  those files now hold **only** the validator and the form-values contract — the old `page.tsx` /
+  `<flow>.component.tsx` / `<flow>.action.ts` and the per-flow state types are gone.
+- `getFormValues` must be **synchronous** (`processForm` calls it without `await`), which is why
+  `account.definition.ts` owns the `edit` flow's version rather than the definition file.
 - No permission gating: the actions omit `permission` (optional on the config), and `account` is registered in
   `PermissionEntitiesSuggestions` only as a virtual key (`// NOT an entity`, like `dashboard`) so it satisfies
   `DataSourceKey ⊆ PermissionEntityType`.

@@ -1,33 +1,14 @@
 import { z } from 'zod';
 import { Configuration } from '@/config/settings.config';
-import { getLanguage, translateBatch } from '@/config/translate.setup';
-import { getFormDataAsEnum, getFormDataAsString } from '@/helpers/form.helper';
+import { translateBatch } from '@/config/translate.setup';
 import { BaseValidator } from '@/helpers/validator.helper';
-import { type Language, LanguageEnum } from '@/types/common.type';
-import type { FormSituationType } from '@/types/form.type';
+import type { Language } from '@/types/common.type';
 
+// The flow itself is a `WindowForm` (see `_components/account/account.definition.ts`),
+// which also owns `getFormValues`; only the validator contract still lives here.
 export type AccountEditFormValuesType = {
 	name: string | null;
 	language: Language;
-};
-
-export type AccountEditSituationType = FormSituationType | 'csrfError';
-
-export type AccountEditStateType = {
-	values: AccountEditFormValuesType;
-	errors: Partial<Record<keyof AccountEditFormValuesType, string[]>>;
-	message: string | null;
-	situation: AccountEditSituationType;
-};
-
-export const AccountEditState: AccountEditStateType = {
-	values: {
-		name: '',
-		language: Configuration.defaultLanguage(),
-	},
-	errors: {},
-	message: null,
-	situation: null,
 };
 
 const validatorMessages = [
@@ -64,15 +45,4 @@ export async function validateFormAccountEdit(
 	const validator = new AccountEditValidator(translations);
 
 	return validator.accountEdit.safeParse(values);
-}
-
-export async function getAccountEditFormValues(
-	formData: FormData,
-): Promise<AccountEditFormValuesType> {
-	return {
-		name: getFormDataAsString(formData, 'name'),
-		language:
-			getFormDataAsEnum(formData, 'language', LanguageEnum) ||
-			(await getLanguage()),
-	};
 }

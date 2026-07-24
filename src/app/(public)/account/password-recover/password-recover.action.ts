@@ -1,81 +1,39 @@
 import {
 	getPasswordRecoverFormValues,
-	type PasswordRecoverFormValuesType,
-	type PasswordRecoverSituationType,
 	type PasswordRecoverStateType,
 	validateFormPasswordRecover,
 } from '@/app/(public)/account/password-recover/password-recover.definition';
 import { translate } from '@/config/translate.setup';
-import { ApiError } from '@/exceptions/api.error';
-import { accumulateZodErrors } from '@/helpers/form.helper';
-import { isValidCsrfToken } from '@/helpers/session.helper';
+import { processForm } from '@/helpers/form-process.helper';
 import { requestPasswordRecover } from '@/services/account.service';
 
 export async function passwordRecoverAction(
 	formState: PasswordRecoverStateType,
 	formData: FormData,
 ): Promise<PasswordRecoverStateType> {
-	if (!(await isValidCsrfToken(formData))) {
-		return {
-			...formState,
-			message: await translate('app.error.csrf'),
-			situation: 'csrfError',
-		};
-	}
-
-	const formValues = getPasswordRecoverFormValues(formData);
-	const validated = await validateFormPasswordRecover(formValues);
-
-	if (!validated.success) {
-		const errors = accumulateZodErrors<PasswordRecoverFormValuesType>(
-			validated.error,
-		);
-
-		return {
-			...formState,
-			values: formValues,
-			situation: 'failedValidation',
-			message: await translate('app.error.validation'),
-			errors,
-		};
-	}
-
-	try {
-		const requestResponse = await requestPasswordRecover(validated.data);
-
-		return {
-			...formState,
-			values: validated.data,
-			message: requestResponse?.message || null,
-			situation: requestResponse?.success ? 'success' : 'serverError',
-		};
-	} catch (error: unknown) {
-		let message: string = '';
-		const situation: PasswordRecoverSituationType = 'serverError';
-
-		if (error instanceof ApiError) {
+	return processForm(formState, formData, {
+		getFormValues: getPasswordRecoverFormValues,
+		validateForm: validateFormPasswordRecover,
+		operationFunction: requestPasswordRecover,
+		requireCsrf: true,
+		fallbackErrorKey: 'password-recover.message.failed',
+		mapApiError: async (error) => {
 			switch (error.status) {
 				case 425:
-					message = await translate(
-						'password-recover.message.recovery_attempts_exceeded',
-					);
-					break;
+					return {
+						message: await translate(
+							'password-recover.message.recovery_attempts_exceeded',
+						),
+					};
 				case 404:
-					message = await translate(
-						'password-recover.message.not_active',
-					);
-					break;
+					return {
+						message: await translate(
+							'password-recover.message.not_active',
+						),
+					};
 				default:
-					message = error.message;
+					return { message: error.message };
 			}
-		}
-
-		return {
-			...formState,
-			values: validated.data,
-			message:
-				message || (await translate('password-recover.message.failed')),
-			situation: situation,
-		};
-	}
+		},
+	});
 }

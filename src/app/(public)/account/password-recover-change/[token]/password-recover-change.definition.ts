@@ -10,9 +10,7 @@ export type PasswordRecoverChangeFormValuesType = {
 	password_confirm: string | null;
 };
 
-export type PasswordRecoverChangeSituationType =
-	| FormSituationType
-	| 'csrfError';
+export type PasswordRecoverChangeSituationType = FormSituationType;
 
 export type PasswordRecoverChangeStateType = {
 	token: string;

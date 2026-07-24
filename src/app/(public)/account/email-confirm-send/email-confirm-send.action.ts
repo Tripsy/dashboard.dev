@@ -1,82 +1,39 @@
 import {
-	type EmailConfirmSendFormValuesType,
-	type EmailConfirmSendSituationType,
 	type EmailConfirmSendStateType,
 	getEmailConfirmSendFormValues,
 	validateFormEmailConfirmSend,
 } from '@/app/(public)/account/email-confirm-send/email-confirm-send.definition';
 import { translate } from '@/config/translate.setup';
-import { ApiError } from '@/exceptions/api.error';
-import { accumulateZodErrors } from '@/helpers/form.helper';
-import { isValidCsrfToken } from '@/helpers/session.helper';
+import { processForm } from '@/helpers/form-process.helper';
 import { requestEmailConfirmSend } from '@/services/account.service';
 
 export async function emailConfirmSendAction(
 	formState: EmailConfirmSendStateType,
 	formData: FormData,
 ): Promise<EmailConfirmSendStateType> {
-	if (!(await isValidCsrfToken(formData))) {
-		return {
-			...formState,
-			message: await translate('app.error.csrf'),
-			situation: 'csrfError',
-		};
-	}
-
-	const formValues = getEmailConfirmSendFormValues(formData);
-	const validated = await validateFormEmailConfirmSend(formValues);
-
-	if (!validated.success) {
-		const errors = accumulateZodErrors<EmailConfirmSendFormValuesType>(
-			validated.error,
-		);
-
-		return {
-			...formState,
-			values: formValues,
-			situation: 'failedValidation',
-			message: await translate('app.error.validation'),
-			errors,
-		};
-	}
-
-	try {
-		const requestResponse = await requestEmailConfirmSend(validated.data);
-
-		return {
-			...formState,
-			values: validated.data,
-			message: requestResponse?.message || null,
-			situation: requestResponse?.success ? 'success' : 'serverError',
-		};
-	} catch (error: unknown) {
-		let message: string = '';
-		const situation: EmailConfirmSendSituationType = 'serverError';
-
-		if (error instanceof ApiError) {
+	return processForm(formState, formData, {
+		getFormValues: getEmailConfirmSendFormValues,
+		validateForm: validateFormEmailConfirmSend,
+		operationFunction: requestEmailConfirmSend,
+		requireCsrf: true,
+		fallbackErrorKey: 'email-confirm-send.message.failed',
+		mapApiError: async (error) => {
 			switch (error.status) {
 				case 403:
-					message = await translate(
-						'email-confirm-send.message.not_allowed',
-					);
-					break;
+					return {
+						message: await translate(
+							'email-confirm-send.message.not_allowed',
+						),
+					};
 				case 404:
-					message = await translate(
-						'email-confirm-send.message.not_active',
-					);
-					break;
+					return {
+						message: await translate(
+							'email-confirm-send.message.not_active',
+						),
+					};
 				default:
-					message = error.message;
+					return { message: error.message };
 			}
-		}
-
-		return {
-			...formState,
-			values: validated.data,
-			message:
-				message ||
-				(await translate('email-confirm-send.message.failed')),
-			situation: situation,
-		};
-	}
+		},
+	});
 }

@@ -1,75 +1,33 @@
 import {
 	getRegisterFormValues,
-	type RegisterFormValuesType,
-	type RegisterSituationType,
 	type RegisterStateType,
 	validateFormRegister,
 } from '@/app/(public)/account/register/register.definition';
 import { translate } from '@/config/translate.setup';
-import { ApiError } from '@/exceptions/api.error';
-import { accumulateZodErrors } from '@/helpers/form.helper';
-import { isValidCsrfToken } from '@/helpers/session.helper';
+import { processForm } from '@/helpers/form-process.helper';
 import { requestRegister } from '@/services/account.service';
 
 export async function registerAction(
 	formState: RegisterStateType,
 	formData: FormData,
 ): Promise<RegisterStateType> {
-	if (!(await isValidCsrfToken(formData))) {
-		return {
-			...formState,
-			message: await translate('app.error.csrf'),
-			situation: 'csrfError',
-		};
-	}
-
-	const formValues = getRegisterFormValues(formData);
-	const validated = await validateFormRegister(formValues);
-
-	if (!validated.success) {
-		const errors = accumulateZodErrors<RegisterFormValuesType>(
-			validated.error,
-		);
-
-		return {
-			...formState,
-			values: formValues,
-			situation: 'failedValidation',
-			message: await translate('app.error.validation'),
-			errors,
-		};
-	}
-
-	try {
-		const requestResponse = await requestRegister(validated.data);
-
-		return {
-			...formState,
-			values: validated.data,
-			message: requestResponse?.message || null,
-			situation: requestResponse?.success ? 'success' : 'serverError',
-		};
-	} catch (error: unknown) {
-		let message: string = '';
-		let situation: RegisterSituationType = 'serverError';
-
-		if (error instanceof ApiError) {
+	return processForm(formState, formData, {
+		getFormValues: getRegisterFormValues,
+		validateForm: validateFormRegister,
+		operationFunction: requestRegister,
+		requireCsrf: true,
+		mapApiError: async (error) => {
 			switch (error.status) {
 				case 409:
-					situation = 'pendingAccount';
-					message = await translate(
-						'register.message.pending_account',
-					);
-					break;
+					return {
+						message: await translate(
+							'register.message.pending_account',
+						),
+						situation: 'pendingAccount' as const,
+					};
+				default:
+					return {};
 			}
-		}
-
-		return {
-			...formState,
-			values: validated.data,
-			errors: {},
-			message: message || (await translate('app.error.form')),
-			situation: situation,
-		};
-	}
+		},
+	});
 }

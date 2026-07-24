@@ -1,87 +1,11 @@
 import type { Dispatch, SetStateAction } from 'react';
 import sanitizeHtml from 'sanitize-html';
 import type { z } from 'zod';
-import { translate } from '@/config/translate.setup';
-import { ApiError } from '@/exceptions/api.error';
-import { ExecutionError } from '@/exceptions/execution.error';
-import type {
-	CreateFunctionType,
-	FormOperationFunctionType,
-	UpdateFunctionType,
-} from '@/types/action.type';
 import type {
 	FormErrorsType,
-	FormStateType,
 	FormValuesType,
-	GetFormValuesFnType,
 	TouchedFieldsType,
-	ValidateFormFnType,
 } from '@/types/form.type';
-
-export async function processForm<Entry, FormValues extends FormValuesType>(
-	formState: FormStateType<FormValues>,
-	formData: FormData,
-	getFormValues: GetFormValuesFnType<FormValues>,
-	validateForm: ValidateFormFnType<FormValues>,
-	operationFunction: FormOperationFunctionType<Entry, FormValues>,
-	entryId?: number, // Only provided for update operations
-): Promise<FormStateType<FormValues>> {
-	try {
-		const formValues = getFormValues(formData);
-		const validated = await validateForm(formValues);
-
-		if (!validated.success) {
-			const errors = accumulateZodErrors<FormValues>(validated.error);
-
-			return {
-				...formState,
-				values: formValues,
-				situation: 'failedValidation',
-				message: await translate('app.error.validation'),
-				errors,
-			};
-		}
-
-		// If entryId is provided, it's an update operation — pass id as second argument.
-		const fetchResponse =
-			entryId !== undefined
-				? await (
-						operationFunction as UpdateFunctionType<
-							Entry,
-							FormValues
-						>
-					)(validated.data, entryId)
-				: await (
-						operationFunction as CreateFunctionType<
-							Entry,
-							FormValues
-						>
-					)(validated.data);
-
-		return {
-			...formState,
-			values: validated.data,
-			message: fetchResponse?.message || null,
-			situation: fetchResponse?.success ? 'success' : 'serverError',
-			resultData: fetchResponse?.data,
-		};
-	} catch (error) {
-		let message: string = await translate('app.error.form');
-
-		if (error instanceof ApiError && error.status === 409) {
-			message = error.message;
-		} else if (error instanceof ExecutionError) {
-			message = error.message;
-		}
-
-		return {
-			...formState,
-			message,
-			situation: 'serverError',
-			errors: {},
-		};
-	}
-}
 
 export function accumulateZodErrors<T extends FormValuesType>(
 	zodError: z.ZodError,

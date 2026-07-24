@@ -12,7 +12,6 @@ export type LoginFormValuesType = {
 
 export type LoginSituationType =
 	| FormSituationType
-	| 'csrfError'
 	| 'maxActiveSession'
 	| 'pendingAccount';
 

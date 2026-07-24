@@ -3,32 +3,13 @@ import { Configuration } from '@/config/settings.config';
 import { translateBatch } from '@/config/translate.setup';
 import { getFormDataAsString } from '@/helpers/form.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
-import type { FormErrorsType, FormSituationType } from '@/types/form.type';
 
+// The flow itself is a `WindowForm` (see `_components/account/account.definition.ts`);
+// only the validator and form-values contract still live here.
 export type PasswordUpdateFormValuesType = {
 	password_current: string | null;
 	password_new: string | null;
 	password_confirm: string | null;
-};
-
-export type PasswordUpdateSituationType = FormSituationType | 'csrfError';
-
-export type PasswordUpdateStateType = {
-	values: PasswordUpdateFormValuesType;
-	errors: FormErrorsType<PasswordUpdateFormValuesType>;
-	message: string | null;
-	situation: PasswordUpdateSituationType;
-};
-
-export const PasswordUpdateState: PasswordUpdateStateType = {
-	values: {
-		password_current: '',
-		password_new: '',
-		password_confirm: '',
-	},
-	errors: {},
-	message: null,
-	situation: null,
 };
 
 const validatorMessages = [

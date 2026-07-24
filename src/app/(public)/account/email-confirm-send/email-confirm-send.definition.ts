@@ -8,7 +8,7 @@ export type EmailConfirmSendFormValuesType = {
 	email: string | null;
 };
 
-export type EmailConfirmSendSituationType = FormSituationType | 'csrfError';
+export type EmailConfirmSendSituationType = FormSituationType;
 
 export type EmailConfirmSendStateType = {
 	values: EmailConfirmSendFormValuesType;

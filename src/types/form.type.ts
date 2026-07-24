@@ -2,10 +2,14 @@ import type { ZodSafeParseError, ZodSafeParseSuccess, z } from 'zod';
 import type { ImagePropertiesType } from '@/types/image.type';
 import type { PageMeta } from '@/types/page-meta.type';
 
+// `csrfError` is only ever produced by forms that opt into `requireCsrf`
+// (the unauthenticated auth-entry flows); it lives here rather than in each
+// flow's own union so the shared pipeline can emit it for any form.
 export type FormSituationType =
 	| 'success'
 	| 'failedValidation'
 	| 'serverError'
+	| 'csrfError'
 	| null;
 
 type FormValueType =
@@ -61,11 +65,16 @@ export type TouchedFieldsType<T> = {
 		: boolean;
 };
 
-export type FormStateType<FormValues extends FormValuesType> = {
+// `Situation` is a parameter so a flow can widen it with its own outcomes
+// (e.g. login's `maxActiveSession`) while still being driven by `processForm`.
+export type FormStateType<
+	FormValues extends FormValuesType,
+	Situation extends string | null = FormSituationType,
+> = {
 	values: FormValues;
 	errors: FormErrorsType<FormValues>;
 	message: string | null;
-	situation: FormSituationType;
+	situation: Situation;
 	resultData?: unknown;
 };
 

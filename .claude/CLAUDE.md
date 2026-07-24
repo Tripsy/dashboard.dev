@@ -57,7 +57,14 @@ pnpm run build    # Production build
 pnpm run start    # Start production server (port 80)
 pnpm run biome    # Biome check --write (lint + format)
 pnpm run madge    # Check for circular dependencies in src
+pnpm run clean    # Delete .next — Turbopack's dev cache grows until the container OOMs
 ```
+
+The container is capped at 4g (`mem_limit` in `docker-compose.yml`) and Turbopack fills it.
+If the dev server exits with nothing in the log it was SIGKILLed, not crashed — check
+`docker inspect dashboard.test --format '{{.State.OOMKilled}}'`, then `pnpm run clean` and
+restart. There is not enough headroom for the dev server and a `build`/`tsc` at the same
+time: stop the dev server before running either, or it is the one that gets killed.
 
 ## Context
 
@@ -153,6 +160,7 @@ entities/operations, DB schema, business rules read the code in `../star-backend
 
 - This project has no tests at the moment.
 - Do not run biome or madge after applying change. Run them only on demand or before git push commands.
+- Stop the dev server before running `build` or `tsc` — the container cannot hold both (see Commands).
 - Do not offer to do push commands, will be asked explicitly.
 - Delegate noisy operations to subagents.
 

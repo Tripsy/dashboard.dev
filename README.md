@@ -109,7 +109,26 @@ pnpm run biome    # Lint and format
 pnpm run madge    # Check for circular dependencies
 pnpm run dev      # Start development server
 pnpm run build    # Production build
+pnpm run clean    # Delete .next (see below)
 ```
+
+### When the dev server dies with nothing in the log
+
+That is the container's OOM killer, not a crash. Turbopack's persistent cache in
+`.next/dev/cache` grows across sessions — left alone it reached 4.0G, which put startup memory
+at 2.5G before a single request and pushed the process into the 4g `mem_limit` set in
+`docker-compose.yml`. Because `tty: true` keeps the container up, it just looks like the dev
+server quitting silently. Confirm with:
+
+```bash
+docker inspect dashboard.test --format '{{.State.OOMKilled}}'
+```
+
+Run `pnpm run clean` and restart. `experimental.turbopackMemoryLimit` in `next.config.ts` caps
+Turbopack's own memory, but not what the cache grows to on disk.
+
+Also avoid running `pnpm run build` or `tsc` while the dev server is up — there is not enough
+room in the container for both, and it is usually the dev server that gets killed.
 
 # 📁 Structure
 

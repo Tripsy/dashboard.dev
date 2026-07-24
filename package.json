@@ -8,7 +8,8 @@
 		"start": "next start -p 80",
 		"lint": "next lint",
 		"biome": "pnpm exec biome check --write",
-		"madge": "madge --circular src"
+		"madge": "madge --circular src",
+		"clean": "rm -rf .next"
 	},
 	"dependencies": {
 		"@aws-sdk/client-s3": "^3.1080.0",

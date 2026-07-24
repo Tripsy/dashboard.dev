@@ -226,6 +226,12 @@ export function FormFiltersDateRange<Fields>({
 					placeholderText={
 						translations['dashboard.text.placeholder_start_date']
 					}
+					// Falls back to the group label for the tick before the async
+					// translations resolve, so the picker is never left unnamed.
+					ariaLabel={
+						translations['dashboard.text.placeholder_start_date'] ??
+						labelText
+					}
 					disabled={false}
 					onSelect={start.onSelect}
 					maxDate={maxDate}
@@ -236,6 +242,10 @@ export function FormFiltersDateRange<Fields>({
 					fieldValue={end.fieldValue}
 					placeholderText={
 						translations['dashboard.text.placeholder_end_date']
+					}
+					ariaLabel={
+						translations['dashboard.text.placeholder_end_date'] ??
+						labelText
 					}
 					disabled={false}
 					onSelect={end.onSelect}

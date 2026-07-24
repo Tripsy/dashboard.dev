@@ -26,8 +26,8 @@ export default function AccountMe() {
 	const translationsKeys = useMemo(
 		() =>
 			[
-				'account-me.message.session_destroy_success',
-				'account-me.message.session_destroy_error',
+				'account.message.session_destroy_success',
+				'account.message.session_destroy_error',
 			] as const,
 		[],
 	);
@@ -96,10 +96,12 @@ export default function AccountMe() {
 			dataSource: 'account',
 			action: 'deleteAccount',
 			events: {
-				// Access is revoked immediately — send the user to the status page.
+				// Access is revoked immediately — send the user to the status
+				// page. `info` (not `error`): deletion succeeded, and the copy
+				// already lives at `app.info.account_delete`.
 				success: () => {
 					router.replace(
-						`${Routes.get('status', { type: 'error' })}?r=account-delete`,
+						`${Routes.get('status', { type: 'info' })}?r=account_delete`,
 					);
 				},
 			},
@@ -275,10 +277,10 @@ export default function AccountMe() {
 									detail:
 										message === 'session_destroy_success'
 											? translations[
-													'account-me.message.session_destroy_success'
+													'account.message.session_destroy_success'
 												]
 											: translations[
-													'account-me.message.session_destroy_error'
+													'account.message.session_destroy_error'
 												],
 								});
 							}}

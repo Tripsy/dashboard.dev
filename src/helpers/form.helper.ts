@@ -173,40 +173,6 @@ export function getFormDataAsEnum<T extends Record<string, string>>(
 	return null;
 }
 
-// export function getFormDataAsArray(
-// 	formData: FormData,
-// 	schemaKey: string,
-// ): Record<number, Record<string, FormDataEntryValue>> {
-// 	const schema: Record<number, Record<string, FormDataEntryValue>> = {};
-//
-// 	for (const [key, value] of formData.entries()) {
-// 		const match = key.match(new RegExp(`^${schemaKey}[(d+)][(w+)]$`));
-//
-// 		if (!match) {
-// 			continue;
-// 		}
-//
-// 		const index = Number(match[1]);
-// 		const field = match[2];
-//
-// 		if (!schema[index]) {
-// 			schema[index] = {};
-// 		}
-//
-// 		schema[index][field] = value;
-// 	}
-//
-// 	return schema;
-// }
-
-// export function getFormDataAsDate(formData: FormData, key: string): Date {
-// 	return new Date(formData.get(key) as string);
-// }
-//
-// export function getFormDataAsArray(formData: FormData, key: string): string[] {
-// 	return (formData.get(key) as string).split(',');
-// }
-
 export function toOptionsFromEnum(
 	enumObj: Record<string, string>,
 	options?: {

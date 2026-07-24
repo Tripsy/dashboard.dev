@@ -1,9 +1,0 @@
-{
-	"meta": {
-		"title": "My account | {{app_name}}"
-	},
-	"message": {
-		"session_destroy_success": "Session destroyed with success",
-		"session_destroy_error": "Error destroying session"
-	}
-}

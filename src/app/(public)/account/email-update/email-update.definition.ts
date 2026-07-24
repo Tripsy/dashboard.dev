@@ -22,7 +22,7 @@ export async function validateFormEmailUpdate(
 ) {
 	const translations = await translateBatch(
 		validatorMessages,
-		'account-email-update.validation',
+		'account.validation',
 	);
 
 	const validator = new EmailUpdateValidator(translations);

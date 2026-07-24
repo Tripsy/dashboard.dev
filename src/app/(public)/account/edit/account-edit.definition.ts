@@ -39,7 +39,7 @@ export async function validateFormAccountEdit(
 ) {
 	const translations = await translateBatch(
 		validatorMessages,
-		'account-edit.validation',
+		'account.validation',
 	);
 
 	const validator = new AccountEditValidator(translations);

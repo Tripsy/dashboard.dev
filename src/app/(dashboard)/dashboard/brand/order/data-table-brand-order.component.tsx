@@ -104,7 +104,7 @@ const DataTableBrandOrderContent = (): JSX.Element => {
 				'app.error.title',
 				'app.success.title',
 				'brand-order.success.order_updated',
-				'brand-order.error.order_updated',
+				'brand-order.error.order_failed',
 			] as const,
 		[],
 	);
@@ -184,7 +184,7 @@ const DataTableBrandOrderContent = (): JSX.Element => {
 			showToast({
 				severity: 'error',
 				summary: translations['app.error.title'],
-				detail: translations['brand-order.error.order_updated'],
+				detail: translations['brand-order.error.order_failed'],
 			});
 		},
 	});

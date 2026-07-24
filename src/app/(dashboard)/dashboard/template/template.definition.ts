@@ -236,7 +236,6 @@ export default async function dataSourceConfig(): Promise<
 			'view.title',
 			'delete.title',
 			'restore.title',
-			'permission.title',
 		] as const,
 		'template.action',
 	);

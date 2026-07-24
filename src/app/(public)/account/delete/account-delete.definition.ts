@@ -24,7 +24,7 @@ export async function validateFormAccountDelete(
 ) {
 	const translations = await translateBatch(
 		validatorMessages,
-		'account-delete.validation',
+		'account.validation',
 	);
 
 	const validator = new AccountDeleteValidator(translations);

@@ -1,9 +1,4 @@
 import account from '@/locales/en/account.json';
-import account_delete from '@/locales/en/account-delete.json';
-import account_edit from '@/locales/en/account-edit.json';
-import account_email_update from '@/locales/en/account-email-update.json';
-import account_me from '@/locales/en/account-me.json';
-import account_password_update from '@/locales/en/account-password-update.json';
 import address from '@/locales/en/address.json';
 import app from '@/locales/en/app.json';
 import auth from '@/locales/en/auth.json';
@@ -44,11 +39,6 @@ import work_session_vehicle from '@/locales/en/work-session-vehicle.json';
 const en = {
 	// BE
 	account,
-	'account-delete': account_delete,
-	'account-edit': account_edit,
-	'account-email-update': account_email_update,
-	'account-me': account_me,
-	'account-password-update': account_password_update,
 	address: address,
 	app,
 	auth,

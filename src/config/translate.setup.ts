@@ -74,6 +74,39 @@ export const getTranslatedString = (
 };
 
 /**
+ * Synchronous lookup for a key whose locale resource is already in the module cache.
+ *
+ * `translate` is async purely because the locale bundle is a dynamic import — once that
+ * import has resolved the lookup itself is pure. Client components use this to paint the
+ * right text on their first frame instead of flashing empty for a tick.
+ *
+ * Returns `null` when the resource has not been loaded yet (or on the server), so callers
+ * fall back to the async path.
+ */
+export const translateLoaded = (
+	key: string,
+	replacements: Record<string, string> = {},
+): string | null => {
+	if (typeof document === 'undefined') {
+		return null;
+	}
+
+	const languageResource = languageResources[getLanguageClient()];
+
+	if (!languageResource) {
+		return null;
+	}
+
+	const value = getTranslatedString(languageResource, key);
+
+	if (value !== key && replacements) {
+		return replaceVars(value, replacements);
+	}
+
+	return value;
+};
+
+/**
  * Translate a key with optional replacements.
  * The key should be in the format `namespace.key`.
  */

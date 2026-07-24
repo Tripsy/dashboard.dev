@@ -40,12 +40,12 @@ async function handler(request: NextRequest, path: string[]) {
 	});
 }
 
-type Params = { params: { path: string[] } };
+// Route params are async since Next.js 15 — https://nextjs.org/docs/messages/sync-dynamic-apis
+type Params = { params: Promise<{ path: string[] }> };
 
 // Generic handler for all methods
 async function handleRequest(req: NextRequest, { params }: Params) {
-	// Type assertion to satisfy TypeScript while following Next.js convention https://nextjs.org/docs/messages/sync-dynamic-apis
-	const { path } = await (params as unknown as Promise<{ path: string[] }>);
+	const { path } = await params;
 
 	return handler(req, path);
 }

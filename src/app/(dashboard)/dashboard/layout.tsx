@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import type { JSX } from 'react';
+import type { ReactNode } from 'react';
 import { Breadcrumb } from '@/app/(dashboard)/_components/breadcrumb.component';
 import DashboardMain from '@/app/(dashboard)/_components/dashboard-main.component';
 import { SideMenu } from '@/app/(dashboard)/_components/side-menu.component';
@@ -39,7 +39,7 @@ function Header() {
 	);
 }
 
-export default async function Layout({ children }: { children: JSX.Element }) {
+export default async function Layout({ children }: { children: ReactNode }) {
 	return (
 		<DashboardProvider>
 			<div className="dashboard-layout min-h-screen bg-background">

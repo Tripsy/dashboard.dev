@@ -1,12 +1,19 @@
 'use client';
 
+import isEqual from 'fast-deep-equal';
 import type React from 'react';
-import { useActionState, useMemo } from 'react';
+import { useActionState, useMemo, useState } from 'react';
 import { ActionButton } from '@/components/action-button.component';
 import { FormComponentSubmit } from '@/components/form/form-element.component';
 import { FormError } from '@/components/form/form-error.component';
 import { createHandleChange } from '@/helpers/form.helper';
 import { processForm } from '@/helpers/form-process.helper';
+import {
+	clearWindowDraft,
+	readWindowDraft,
+	saveWindowDraft,
+} from '@/helpers/window-draft.helper';
+import { useDebouncedEffect } from '@/hooks/use-debounced-effect.hook';
 import { useWindowFormProcessed } from '@/hooks/use-form-processed.hook';
 import { useFormSituation } from '@/hooks/use-form-situation.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
@@ -72,7 +79,27 @@ export function WindowForm<
 	const operationFunction =
 		formOperationFunction as FormOperationFunctionType<Entry, FormValues>;
 
-	const initState = getFormState(entry);
+	// Resolved once per mount: `useActionState` reads its initial state only on
+	// mount, and `pristineValues` has to stay draft-free so an untouched form can
+	// still be told apart from a restored one.
+	const [{ initState, pristineValues }] = useState(() => {
+		const formState = getFormState(entry);
+		const draft = readWindowDraft(uid);
+
+		return {
+			pristineValues: formState.values,
+			initState: draft
+				? {
+						...formState,
+						values: {
+							...formState.values,
+							...draft,
+						} as FormValues,
+					}
+				: formState,
+		};
+	});
+
 	const entryId = entry && 'id' in entry ? (entry.id as number) : undefined; // Undefined for create
 
 	const [state, action, pending] = useActionState<
@@ -92,6 +119,23 @@ export function WindowForm<
 	);
 
 	const [formValues, setFormValues] = useFormValues<FormValues>(state.values);
+
+	// Keeps edits across a page reload. Passwords are stripped by the helper, and a
+	// form edited back to its original values drops the draft instead of storing a
+	// no-op copy.
+	useDebouncedEffect(
+		() => {
+			if (isEqual(formValues, pristineValues)) {
+				clearWindowDraft(uid);
+
+				return;
+			}
+
+			saveWindowDraft(uid, formValues);
+		},
+		[uid, formValues, pristineValues],
+		500,
+	);
 
 	const { formSituation, formMessage, handleValidation } =
 		useFormSituation<FormValues>(state);

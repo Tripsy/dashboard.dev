@@ -3,6 +3,10 @@ import { devtools, persist } from 'zustand/middleware';
 import { getDataSourceConfig } from '@/config/data-source.config';
 import ValueError from '@/exceptions/value.error';
 import { generateWindowUid } from '@/helpers/window.helper';
+import {
+	clearWindowDraft,
+	clearWindowDrafts,
+} from '@/helpers/window-draft.helper';
 import type { DataSourceKey } from '@/types/data-source.key';
 import { DataSourceSectionEnum } from '@/types/data-source.type';
 import type {
@@ -126,14 +130,24 @@ export const useModalStore = create<WindowStore>()(
 				const stackBehind = (
 					stack: WindowConfig[],
 					activeUid: string,
-				): WindowConfig[] =>
-					stack
-						.filter((m) => m.uid === activeUid || canMinimize(m))
-						.map((m) =>
-							m.minimized || m.uid === activeUid
-								? m
-								: { ...m, minimized: true },
-						);
+				): WindowConfig[] => {
+					const keptStack = stack.filter(
+						(m) => m.uid === activeUid || canMinimize(m),
+					);
+
+					// A dropped window is gone for good, so its draft goes with it
+					for (const window of stack) {
+						if (!keptStack.includes(window)) {
+							clearWindowDraft(window.uid);
+						}
+					}
+
+					return keptStack.map((m) =>
+						m.minimized || m.uid === activeUid
+							? m
+							: { ...m, minimized: true },
+					);
+				};
 
 				return {
 					stack: [],
@@ -178,14 +192,29 @@ export const useModalStore = create<WindowStore>()(
 						});
 					},
 
-					close: (uid) =>
-						set((state) => ({
-							stack: uid
-								? state.stack.filter((m) => m.uid !== uid)
-								: state.stack.filter((m) => m.minimized), // Close the visible one
-						})),
+					close: (uid) => {
+						const stack = get().stack;
+						const closedStack = uid
+							? stack.filter((m) => m.uid === uid)
+							: stack.filter((m) => !m.minimized); // Close the visible one
 
-					closeAll: () => set({ stack: [] }),
+						// Closing is the user discarding the form — the draft goes too
+						for (const window of closedStack) {
+							clearWindowDraft(window.uid);
+						}
+
+						set({
+							stack: stack.filter(
+								(m) => !closedStack.includes(m),
+							),
+						});
+					},
+
+					closeAll: () => {
+						clearWindowDrafts();
+
+						set({ stack: [] });
+					},
 
 					// A window flagged `allowMinimize: false` can only be submitted
 					// or closed — never parked in the dock.
@@ -317,6 +346,6 @@ export const hydrateWindowStore = (): Promise<void> => {
 export const clearWindowStore = async (): Promise<void> => {
 	await hydrateWindowStore();
 
-	useModalStore.getState().closeAll();
+	useModalStore.getState().closeAll(); // Also drops every draft
 	useModalStore.persist.clearStorage();
 };

@@ -13,7 +13,7 @@ export function WindowContainer({
 	const { stack } = useModalStore();
 
 	const modals = stack.filter((m) => m.section === section);
-	const activeWindow = modals.find((m) => !m.minimized);
+	const minimizedModals = modals.filter((m) => m.minimized);
 
 	return (
 		<>
@@ -35,8 +35,10 @@ export function WindowContainer({
 				);
 			})}
 
-			{modals.length > 0 && (
-				<WindowDock modals={modals} active={activeWindow?.uid} />
+			{/* The dock is the way back to a minimized window — the visible one
+			    is already on screen, so it gets no chip */}
+			{minimizedModals.length > 0 && (
+				<WindowDock modals={minimizedModals} />
 			)}
 		</>
 	);

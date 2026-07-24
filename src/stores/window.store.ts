@@ -115,10 +115,24 @@ export const useModalStore = create<WindowStore>()(
 					return get().stack.some((window) => window.uid === uid);
 				};
 
-				const minimizeAll = (stack: WindowConfig[]): WindowConfig[] =>
-					stack.map((m) =>
-						m.minimized ? m : { ...m, minimized: true },
-					);
+				const canMinimize = (window: WindowConfig): boolean =>
+					window.props?.allowMinimize ?? true;
+
+				// Makes room for the window identified by `activeUid`: every other
+				// window is minimized, except the ones flagged `allowMinimize: false`
+				// which are dropped from the stack — they have no dock representation
+				// to return from, so parking them would strand them.
+				const stackBehind = (
+					stack: WindowConfig[],
+					activeUid: string,
+				): WindowConfig[] =>
+					stack
+						.filter((m) => m.uid === activeUid || canMinimize(m))
+						.map((m) =>
+							m.minimized || m.uid === activeUid
+								? m
+								: { ...m, minimized: true },
+						);
 
 				return {
 					stack: [],
@@ -134,7 +148,10 @@ export const useModalStore = create<WindowStore>()(
 							);
 
 							set((state) => {
-								const minimizedStack = minimizeAll(state.stack);
+								const minimizedStack = stackBehind(
+									state.stack,
+									preparedConfig.uid,
+								);
 
 								if (!alreadyExists) {
 									return {
@@ -168,16 +185,20 @@ export const useModalStore = create<WindowStore>()(
 
 					closeAll: () => set({ stack: [] }),
 
+					// A window flagged `allowMinimize: false` can only be submitted
+					// or closed — never parked in the dock.
 					minimize: (uid) =>
 						set((state) => ({
 							stack: state.stack.map((m) =>
-								m.uid === uid ? { ...m, minimized: true } : m,
+								m.uid === uid && canMinimize(m)
+									? { ...m, minimized: true }
+									: m,
 							),
 						})),
 
 					focus: (uid) =>
 						set((state) => ({
-							stack: minimizeAll(state.stack).map((m) =>
+							stack: stackBehind(state.stack, uid).map((m) =>
 								m.uid === uid ? { ...m, minimized: false } : m,
 							),
 						})),

@@ -2,7 +2,6 @@
 
 import { Icons } from '@/components/icon.component';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/helpers/css.helper';
 import {
 	displayWindowTitle,
 	resolveWindowEntries,
@@ -13,10 +12,8 @@ import type { WindowConfig, WindowType } from '@/types/window.type';
 
 export function WindowMinimizedInstance({
 	current,
-	isActive,
 }: {
 	current: WindowConfig;
-	isActive: boolean;
 }) {
 	const { close, focus } = useModalStore();
 
@@ -44,25 +41,12 @@ export function WindowMinimizedInstance({
 			windowTitle: definition.windowTitle,
 		});
 
-	const handleClick = () => {
-		if (!isActive) {
-			handleRestore();
-		}
-	};
-
 	return (
-		<div
-			className={cn(
-				'flex items-center gap-x-2 border  shadow-xl px-2 py-1 rounded',
-				isActive
-					? 'bg-accent-soft text-accent-soft-foreground'
-					: 'bg-background/95 hover:bg-accent-soft hover:text-accent-soft-foreground',
-			)}
-		>
+		<div className="flex items-center gap-x-2 border shadow-xl px-2 py-1 rounded bg-background/95 hover:bg-accent-soft hover:text-accent-soft-foreground">
 			<button
 				type="button"
 				className="flex-1 cursor-row-resize text-sm text-ellipsis overflow-hidden max-w-36 whitespace-nowrap"
-				onClick={handleClick}
+				onClick={handleRestore}
 				title={modalTitle}
 			>
 				{modalTitle}

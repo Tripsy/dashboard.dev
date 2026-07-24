@@ -128,6 +128,8 @@ export default async function dataSourceConfig(): Promise<
 				windowType: 'form',
 				windowTitle: translations['edit.title'],
 				windowComponent: FormManageAccountEdit,
+				// Account forms are short, single-purpose flows — submit or cancel, no parking them in the dock
+				windowConfigProps: { allowMinimize: false },
 				// `single`: the current user is passed as the entry so the form
 				// can prefill name/language; the id argument is unused (the
 				// backend resolves the account from the session).
@@ -144,6 +146,8 @@ export default async function dataSourceConfig(): Promise<
 				windowType: 'form',
 				windowTitle: translations['emailUpdate.title'],
 				windowComponent: FormManageEmailUpdate,
+				// Account forms are short, single-purpose flows — submit or cancel, no parking them in the dock
+				windowConfigProps: { allowMinimize: false },
 				entriesSelection: 'free',
 				operationFunction: (values: EmailUpdateFormValuesType) =>
 					asUserResult(requestEmailUpdate(values)),
@@ -157,6 +161,8 @@ export default async function dataSourceConfig(): Promise<
 				windowType: 'form',
 				windowTitle: translations['passwordUpdate.title'],
 				windowComponent: FormManagePasswordUpdate,
+				// Account forms are short, single-purpose flows — submit or cancel, no parking them in the dock
+				windowConfigProps: { allowMinimize: false },
 				entriesSelection: 'free',
 				operationFunction: (values: PasswordUpdateFormValuesType) =>
 					asUserResult(requestPasswordUpdate(values)),
@@ -172,6 +178,8 @@ export default async function dataSourceConfig(): Promise<
 				windowType: 'form',
 				windowTitle: translations['deleteAccount.title'],
 				windowComponent: FormManageAccountDelete,
+				// Account forms are short, single-purpose flows — submit or cancel, no parking them in the dock
+				windowConfigProps: { allowMinimize: false },
 				entriesSelection: 'free',
 				operationFunction: (values: AccountDeleteFormValuesType) =>
 					asUserResult(requestDeleteAccount(values)),

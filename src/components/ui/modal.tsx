@@ -122,16 +122,20 @@ export function Modal({
 
 				{/* Control buttons - Fixed */}
 				<div className="absolute right-4 top-4 z-10 flex gap-2">
-					<Button
-						variant="ghost"
-						size="xs"
-						className="rounded-full p-1"
-						hover="warning"
-						onClick={onMinimize}
-						aria-label="Minimize modal"
-					>
-						<Icons.Minimize />
-					</Button>
+					{/* Rendered only when a handler is given — a modal without
+					    `onMinimize` has nowhere to minimize to */}
+					{onMinimize && (
+						<Button
+							variant="ghost"
+							size="xs"
+							className="rounded-full p-1"
+							hover="warning"
+							onClick={onMinimize}
+							aria-label="Minimize modal"
+						>
+							<Icons.Minimize />
+						</Button>
+					)}
 					<Button
 						variant="ghost"
 						size="xs"

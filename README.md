@@ -206,9 +206,8 @@ pnpm run build    # Production build
 
 # 📌 TODO
 
-1. Loading effect when clicking on a link 
-3. monthly driver report
-4. deploy
+1. monthly driver report
+2. deploy
 
 ---------- 
 

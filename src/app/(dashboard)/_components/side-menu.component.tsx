@@ -17,6 +17,7 @@ import {
 } from '@/app/(dashboard)/_providers/breadcrumb.provider';
 import { useSideMenu } from '@/app/(dashboard)/_providers/side-menu.provider';
 import { Icons } from '@/components/icon.component';
+import { LinkPendingIcon } from '@/components/link-pending-icon.component';
 import { Link } from '@/components/ui/link';
 import Routes from '@/config/routes.setup';
 import { cn } from '@/helpers/css.helper';
@@ -468,7 +469,10 @@ function SideMenuOpenSection({
 										: 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground',
 								)}
 							>
-								<item.icon className="h-4 w-4 shrink-0" />{' '}
+								<LinkPendingIcon
+									icon={item.icon}
+									className="h-4 w-4 shrink-0"
+								/>{' '}
 								{item.text}
 							</NextLink>
 						</li>
@@ -537,7 +541,11 @@ function SideMenuClosedSection({
 						: 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground',
 				)}
 			>
-				<item.icon className="h-4 w-4 shrink-0" /> {item.text}
+				<LinkPendingIcon
+					icon={item.icon}
+					className="h-4 w-4 shrink-0"
+				/>{' '}
+				{item.text}
 			</NextLink>
 		</li>
 	));

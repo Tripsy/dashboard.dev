@@ -7,9 +7,7 @@ import { getCookie } from '@/helpers/session.helper';
 import { apiHeaders } from '@/helpers/system.helper';
 
 async function handler(request: NextRequest, path: string[]) {
-	const token = await getCookie(
-		Configuration.get('user.sessionToken') as string,
-	);
+	const token = await getCookie(Configuration.get('user.sessionToken'));
 	const baseUrl = getRemoteApiUrl(path.join('/'));
 	const url = `${baseUrl}${request.nextUrl.search || ''}`;
 

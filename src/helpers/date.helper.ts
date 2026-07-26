@@ -320,7 +320,7 @@ export function toUTCISOString(
 	endOfDay: boolean = false,
 	timezone?: string,
 ): string {
-	const tz = timezone ?? Configuration.get<string>('app.timezone');
+	const tz = timezone ?? Configuration.get('app.timezone');
 	let parsed = dayjs.tz(value, tz);
 
 	if (!parsed.isValid()) {

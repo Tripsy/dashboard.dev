@@ -24,7 +24,7 @@ import type { ApiResponseFetch } from '@/types/api.type';
  * @param sessionToken - the current token when the caller already has it; re-read otherwise
  */
 async function destroySession(sessionToken?: string): Promise<void> {
-	const cookieName = Configuration.get('user.sessionToken') as string;
+	const cookieName = Configuration.get('user.sessionToken');
 	const token = sessionToken ?? (await getCookie(cookieName));
 
 	if (token) {
@@ -47,12 +47,12 @@ export async function createAuth(
 	await setupTrackedCookie(
 		{
 			action: 'set',
-			name: Configuration.get('user.sessionToken') as string,
+			name: Configuration.get('user.sessionToken'),
 			value: sessionToken,
 		},
 		{
 			httpOnly: true,
-			maxAge: Configuration.get('user.sessionMaxAge') as number,
+			maxAge: Configuration.get('user.sessionMaxAge'),
 		},
 	);
 
@@ -65,7 +65,7 @@ export async function createAuth(
 export async function getAuth(): Promise<ApiResponseFetch<AuthModel | null>> {
 	try {
 		const sessionToken = await getTrackedCookie(
-			Configuration.get('user.sessionToken') as string,
+			Configuration.get('user.sessionToken'),
 		);
 
 		if (!sessionToken.value) {
@@ -95,7 +95,7 @@ export async function getAuth(): Promise<ApiResponseFetch<AuthModel | null>> {
 
 				await setupTrackedCookie(sessionToken, {
 					httpOnly: true,
-					maxAge: Configuration.get('user.sessionMaxAge') as number,
+					maxAge: Configuration.get('user.sessionMaxAge'),
 				});
 
 				return {

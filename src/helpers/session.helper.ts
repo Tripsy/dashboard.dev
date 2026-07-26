@@ -109,12 +109,10 @@ export async function setupTrackedCookie(
 export async function isValidCsrfToken(formData: FormData) {
 	const inputValue = getFormDataAsString(
 		formData,
-		Configuration.get('csrf.inputName') as string,
+		Configuration.get('csrf.inputName'),
 	);
 
-	const cookieValue = await getCookie(
-		Configuration.get('csrf.cookieName') as string,
-	);
+	const cookieValue = await getCookie(Configuration.get('csrf.cookieName'));
 
 	return cookieValue === inputValue;
 }

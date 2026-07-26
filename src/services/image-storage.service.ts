@@ -20,10 +20,7 @@ export interface ImageStorageService {
 }
 
 function getBaseStoragePath() {
-	return path.join(
-		process.cwd(),
-		Configuration.get('images.local.save') as string,
-	);
+	return path.join(process.cwd(), Configuration.get('images.local.save'));
 }
 
 class S3StorageService implements ImageStorageService {
@@ -32,8 +29,8 @@ class S3StorageService implements ImageStorageService {
 	private readonly region: string;
 
 	constructor() {
-		this.bucket = Configuration.get('images.s3.bucket') as string;
-		this.region = Configuration.get('images.s3.region') as string;
+		this.bucket = Configuration.get('images.s3.bucket');
+		this.region = Configuration.get('aws.region');
 
 		if (!this.bucket) {
 			throw new Error('AWS_S3_BUCKET is not configured');
@@ -42,12 +39,8 @@ class S3StorageService implements ImageStorageService {
 		this.client = new S3Client({
 			region: this.region,
 			credentials: {
-				accessKeyId: Configuration.get(
-					'images.s3.accessKeyId',
-				) as string,
-				secretAccessKey: Configuration.get(
-					'images.s3.secretAccessKey',
-				) as string,
+				accessKeyId: Configuration.get('aws.accessKeyId'),
+				secretAccessKey: Configuration.get('aws.secretAccessKey'),
 			},
 		});
 	}
@@ -207,6 +200,9 @@ export class ImageStorageFactory {
 	}
 
 	getDefaultService(): ImageStorageService {
+		// Cast rather than typing `images.storage` in the config: `ImageStorage` lives in
+		// image.model.ts, which itself reads Configuration — importing it there would close
+		// a cycle (madge).
 		const storageType = Configuration.get('images.storage') as ImageStorage;
 
 		return this.getService(storageType);

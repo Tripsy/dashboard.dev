@@ -1,32 +1,30 @@
-import {
-	getObjectValue,
-	type ObjectValue,
-	setObjectValue,
-} from '@/helpers/objects.helper';
+import { getObjectValue, type ObjectValue } from '@/helpers/objects.helper';
 import type { Currency, Language } from '@/types/common.type';
+import type { EmailProvider } from '@/types/email.type';
 
-type Settings = { [key: string]: ObjectValue };
-
-function loadSettings(): Settings {
+function loadSettings() {
 	return {
 		app: {
 			debug: process.env.NEXT_PUBLIC_APP_DEBUG === 'true',
 			environment: process.env.NEXT_PUBLIC_NODE_ENV || 'production',
-			url: process.env.NEXT_PUBLIC_APP_URL,
-			name: process.env.NEXT_PUBLIC_APP_NAME,
+			url: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost',
+			name: process.env.NEXT_PUBLIC_APP_NAME || 'NReady',
+			email: process.env.NEXT_PUBLIC_APP_EMAIL || 'hello@example.com',
 			timezone: process.env.NEXT_PUBLIC_TIMEZONE || 'UTC',
-
-			currency: process.env.NEXT_PUBLIC_APP_CURRENCY || 'RON',
-			vat_rate: process.env.NEXT_PUBLIC_APP_VAT_RATE || 24,
+			currency: (process.env.NEXT_PUBLIC_APP_CURRENCY ||
+				'RON') as Currency,
+			vatRate: Number(process.env.NEXT_PUBLIC_APP_VAT_RATE || 24),
 		},
 		language: {
-			default: process.env.NEXT_PUBLIC_LANGUAGE_DEFAULT || 'ro',
+			default: (process.env.NEXT_PUBLIC_LANGUAGE_DEFAULT ||
+				'ro') as Language,
 			supported: (process.env.NEXT_PUBLIC_LANGUAGE_SUPPORTED || 'ro,en')
 				.trim()
 				.split(','),
-			cookie_name:
+			cookieName:
 				process.env.NEXT_PUBLIC_LANGUAGE_COOKIE || 'app-language',
-			cookie_max_age:
+			// Env value is in days, the cookie wants seconds.
+			cookieMaxAge:
 				Number(process.env.NEXT_PUBLIC_LANGUAGE_COOKIE_MAX_AGE || 365) *
 				60 *
 				60 *
@@ -45,9 +43,6 @@ function loadSettings(): Settings {
 		user: {
 			nameMinChars: 3,
 			passwordMinChars: 8,
-			// loginMaxFailedAttemptsForIp: 5,
-			// loginMaxFailedAttemptsForEmail: 3,
-			// LoginFailedAttemptsLockTime: 900, // block logins for 15 minutes when too many failed attempts
 			sessionToken: process.env.SESSION_TOKEN || 'session',
 			sessionMaxAge: 60 * Number(process.env.SESSION_MAX_AGE || 10800),
 		},
@@ -59,27 +54,23 @@ function loadSettings(): Settings {
 				3000,
 		},
 		middleware: {
-			rate_limit_window: Number(process.env.RATE_LIMIT_WINDOW) || 60, // seconds
-			max_requests: Number(process.env.MAX_REQUESTS) || 100, // Max requests per window
+			rateLimitWindow: Number(process.env.RATE_LIMIT_WINDOW) || 60, // seconds
+			maxRequests: Number(process.env.MAX_REQUESTS) || 100, // Max requests per window
 		},
 		redis: {
 			host: process.env.REDIS_HOST || 'localhost',
-			port: process.env.REDIS_PORT || '6379',
+			port: parseInt(process.env.REDIS_PORT || '6379', 10),
 			password: process.env.REDIS_PASSWORD || undefined,
 		},
 		cache: {
-			// `Number(x ?? default)` — `CACHE_TTL=0` must survive as the number 0, which is
-			// CacheProvider's "skip the cache" signal. `||` would have yielded the string
-			// '0' (truthy), and `Number(x) ?? default` would have yielded NaN when unset.
 			ttl: Number(process.env.CACHE_TTL ?? 60),
 			// Lifetime of a cached `/account/me` result, in seconds. Kept short because it
 			// bounds how long a backend permission/role change stays invisible to the proxy.
 			// Set to 0 to disable the cache entirely (no Redis connection is opened).
-			// `??` rather than `||` so an explicit 0 is honoured.
 			authTtl: Number(process.env.CACHE_AUTH_TTL ?? 30),
 		},
 		mail: {
-			provider: process.env.MAIL_PROVIDER || 'smtp', // 'smtp' or 'ses'
+			provider: (process.env.MAIL_PROVIDER || 'smtp') as EmailProvider,
 			from: {
 				name: process.env.MAIL_FROM_NAME || 'NReady',
 				address: process.env.MAIL_FROM_ADDRESS || 'engine@play-zone.ro',
@@ -90,6 +81,11 @@ function loadSettings(): Settings {
 			username: process.env.MAIL_USERNAME || '',
 			password: process.env.MAIL_PASSWORD || '',
 		},
+		aws: {
+			region: process.env.AWS_REGION || 'eu-central-1',
+			accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
+			secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
+		},
 		images: {
 			storage: process.env.IMAGE_STORAGE || 'local',
 			local: {
@@ -98,54 +94,96 @@ function loadSettings(): Settings {
 			},
 			s3: {
 				bucket: process.env.AWS_S3_BUCKET ?? '',
-				region: process.env.AWS_REGION ?? 'eu-central-1',
-				accessKeyId: process.env.AWS_ACCESS_KEY_ID ?? '',
-				secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? '',
-				baseUrl: process.env.AWS_S3_BASE_URL ?? '',
 			},
 			maxSizeBytes: 10 * 1024 * 1024,
 		},
 	};
 }
 
+type Settings = ReturnType<typeof loadSettings>;
+
+/**
+ * Every valid dotted path into `Settings`, as a union of string literals.
+ *
+ * Arrays stop the recursion — `language.supported` is a leaf, there is no
+ * `language.supported.0`. `NonNullable` lets an optional branch (`mail.host` is
+ * `string | undefined`) still be classified by its non-undefined type.
+ */
+export type SettingsKey<T = Settings> = {
+	[K in keyof T & string]: T[K] extends readonly unknown[]
+		? K
+		: NonNullable<T[K]> extends object
+			? K | `${K}.${SettingsKey<NonNullable<T[K]>>}`
+			: K;
+}[keyof T & string];
+
+/** The type stored at a given dotted path. */
+export type SettingsValue<
+	K extends string,
+	T = Settings,
+> = K extends `${infer Head}.${infer Rest}`
+	? Head extends keyof T
+		? SettingsValue<Rest, NonNullable<T[Head]>>
+		: never
+	: K extends keyof T
+		? T[K]
+		: never;
+
+/**
+ * Settings are derived once, on first read, and reused.
+ *
+ * The cache is per bundle (server, client, middleware each hold their own), which is
+ * fine: each one is populated from values fixed at build or boot time.
+ */
+let settings: Settings | undefined;
+
+function getSettings(): Settings {
+	settings ??= loadSettings();
+
+	return settings;
+}
+
 export const Configuration = {
-	get: <T = ObjectValue>(key: string): T | undefined => {
-		const value = getObjectValue(loadSettings(), key);
+	/**
+	 * Reads a setting by dotted path. The path is checked against the shape of
+	 * `loadSettings()`, so a typo is a compile error rather than an `undefined` at runtime,
+	 * and the return type is inferred.
+	 */
+	get: <K extends SettingsKey>(key: K): SettingsValue<K> => {
+		const value = getObjectValue(
+			getSettings() as Record<string, ObjectValue>,
+			key,
+		);
 
 		if (value === undefined) {
+			// Unreachable for a well-typed key unless the value is genuinely optional
+			// (eg: `mail.host`); kept as a guard for dynamic paths.
 			console.warn(`Configuration key not found: ${key}`);
 		}
 
-		return value as T;
+		return value as SettingsValue<K>;
 	},
 
-	set: (key: string, value: ObjectValue): void => {
-		const success = setObjectValue(loadSettings(), key, value);
-
-		if (!success) {
-			console.warn(`Failed to set configuration key: ${key}`);
-		}
-	},
-
-	isSupportedLanguage: (language: string): boolean => {
-		const languages = Configuration.get<string[]>('language.supported');
-
-		return Array.isArray(languages) && languages.includes(language);
-	},
-
+	// These read the cached object directly rather than going through `get()`, skipping the
+	// path split and lookup. They are the hot paths — `isEnvironment` runs on every request
+	// in the proxy, `defaultLanguage` on every translated render.
 	environment: () => {
-		return Configuration.get('app.environment') as string;
+		return getSettings().app.environment;
 	},
 
 	isEnvironment: (value: string) => {
-		return Configuration.environment() === value;
+		return getSettings().app.environment === value;
 	},
 
-	defaultLanguage: () => {
-		return Configuration.get('language.default') as Language;
+	defaultLanguage: (): Language => {
+		return getSettings().language.default;
 	},
 
-	currency: () => {
-		return Configuration.get('app.currency') as Currency;
+	isSupportedLanguage: (language: string): boolean => {
+		return getSettings().language.supported.includes(language);
+	},
+
+	currency: (): Currency => {
+		return getSettings().app.currency;
 	},
 };

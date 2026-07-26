@@ -100,7 +100,7 @@ const GALLERY_MAX = 5;
 const ACCEPTED_MIME_TYPES = Object.values(ImageMimeEnum);
 const ACCEPTED_EXTENSIONS = ACCEPTED_MIME_TYPES.join(',');
 const ACCEPTED_EXTENSIONS_DESC = 'JPEG, PNG, WebP, SVG, GIF';
-const DEFAULT_LANGUAGE = Configuration.get('language.default') as Language;
+const DEFAULT_LANGUAGE = Configuration.get('language.default');
 
 // Fixed display order — independent of key order in whatever config object gets passed in
 const ATTRIBUTE_FIELD_ORDER: AttributeFieldName[] = ['title', 'description'];

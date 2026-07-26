@@ -231,8 +231,7 @@ function getFormState(
 			category: data?.category ?? CashFlowCategoryEnum.CUSTOMER,
 			method: data?.method ?? CashFlowMethodEnum.CASH,
 			amount: data?.amount ?? null,
-			vat_rate:
-				data?.vat_rate ?? (Configuration.get('app.vat_rate') as number),
+			vat_rate: data?.vat_rate ?? Configuration.get('app.vatRate'),
 			currency: data?.currency ?? Configuration.currency(),
 			external_reference: data?.external_reference ?? null,
 			parent_id: data?.parent_id ?? null,

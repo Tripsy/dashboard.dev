@@ -72,7 +72,7 @@ class MiddlewareContext {
 
 		// 2. Check existing cookie
 		const cookieLang = this.req.cookies.get(
-			Configuration.get('language.cookie_name') as string,
+			Configuration.get('language.cookieName'),
 		)?.value;
 
 		// 3. Check Accept-Language header
@@ -83,12 +83,10 @@ class MiddlewareContext {
 		const language = queryLang || cookieLang || headerLang;
 
 		if (language && Configuration.isSupportedLanguage(language)) {
-			const languageCookie = Configuration.get(
-				'language.cookie_name',
-			) as string;
+			const languageCookie = Configuration.get('language.cookieName');
 			const languageCookieMaxAge = Configuration.get(
-				'language.cookie_max_age',
-			) as number;
+				'language.cookieMaxAge',
+			);
 
 			if (language !== cookieLang) {
 				this.res.cookies.set(languageCookie, language, {
@@ -123,9 +121,7 @@ class MiddlewareContext {
 		const origin = this.req.headers.get('origin');
 		const referer = this.req.headers.get('referer');
 
-		const allowedOrigins = Configuration.get(
-			'security.allowedOrigins',
-		) as string[];
+		const allowedOrigins = Configuration.get('security.allowedOrigins');
 
 		// Probably a same-origin browser request — allow it
 		if (!origin && !referer) {
@@ -154,9 +150,7 @@ class MiddlewareContext {
 
 	destroySession() {
 		if (Configuration.isEnvironment('production')) {
-			this.res.cookies.delete(
-				Configuration.get('user.sessionToken') as string,
-			);
+			this.res.cookies.delete(Configuration.get('user.sessionToken'));
 		}
 	}
 
@@ -164,7 +158,7 @@ class MiddlewareContext {
 		routeMatch: RouteMatch | undefined,
 	): Promise<NextResponse> {
 		const sessionToken = await getTrackedCookie(
-			Configuration.get('user.sessionToken') as string,
+			Configuration.get('user.sessionToken'),
 		);
 
 		const {
@@ -239,10 +233,8 @@ class MiddlewareContext {
 		this.res.headers.set('x-auth-data', JSON.stringify(authResult));
 
 		if (sessionToken.action === 'set' && sessionToken.value) {
-			const cookieName = Configuration.get('user.sessionToken') as string;
-			const cookieMaxAge = Configuration.get(
-				'user.sessionMaxAge',
-			) as number;
+			const cookieName = Configuration.get('user.sessionToken');
+			const cookieMaxAge = Configuration.get('user.sessionMaxAge');
 
 			this.res.cookies.set(cookieName, sessionToken.value, {
 				httpOnly: true,

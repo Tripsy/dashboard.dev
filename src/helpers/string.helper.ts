@@ -128,15 +128,17 @@ export function toCamelCase(
  * Ex variables: {{key}}, {{Key}}, {{sub_key}}, {{key1}}
  *
  * @param {string} content - The string to replace template variables in
- * @param {Record<string, string>} vars - The template variables to replace
+ * @param {Record<string, string | number>} vars - The template variables to replace
  * @returns {string} - The string with template variables replaced
  */
 export function replaceVars(
 	content: string,
-	vars: Record<string, string> = {},
+	vars: Record<string, string | number> = {},
 ): string {
+	// Numbers are accepted because most interpolated values are numeric config
+	// (character minimums, counts) — stringifying at every call site was noise.
 	return content.replace(/{{\s*(\w+)\s*}}/g, (_, key) =>
-		key in vars ? vars[key] : `{{${key}}}`,
+		key in vars ? String(vars[key]) : `{{${key}}}`,
 	);
 }
 

@@ -69,7 +69,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 	if (!pageData) {
 		return {
 			title: await translate('app.page.not_found', {
-				app_name: Configuration.get('app.name') as string,
+				app_name: Configuration.get('app.name'),
 			}),
 		};
 	}

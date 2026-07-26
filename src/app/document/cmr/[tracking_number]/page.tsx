@@ -53,14 +53,14 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 	if (!data) {
 		return {
 			title: await translate('app.page.not_found', {
-				app_name: Configuration.get('app.name') as string,
+				app_name: Configuration.get('app.name'),
 			}),
 		};
 	}
 
 	return {
 		title: await translate('document.cmr.meta.title', {
-			app_name: Configuration.get('app.name') as string,
+			app_name: Configuration.get('app.name'),
 			cmr: displayCmrLabel(data),
 		}),
 	};

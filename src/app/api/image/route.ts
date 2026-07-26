@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
 		);
 	}
 
-	const maxSize = Configuration.get('images.maxSizeBytes') as number;
+	const maxSize = Configuration.get('images.maxSizeBytes');
 
 	if (file.size > maxSize) {
 		return NextResponse.json({ error: 'File too large' }, { status: 413 });

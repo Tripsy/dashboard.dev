@@ -33,9 +33,7 @@ class PasswordUpdateValidator extends BaseValidator<typeof validatorMessages> {
 				{
 					invalid_password: this.getMessage('invalid_password_new'),
 					password_min: this.getMessage('password_min', {
-						min: Configuration.get(
-							'user.passwordMinChars',
-						) as string,
+						min: Configuration.get('user.passwordMinChars'),
 					}),
 					password_condition_capital_letter: this.getMessage(
 						'password_condition_capital_letter',
@@ -48,9 +46,7 @@ class PasswordUpdateValidator extends BaseValidator<typeof validatorMessages> {
 					),
 				},
 				{
-					minLength: Configuration.get(
-						'user.passwordMinChars',
-					) as number,
+					minLength: Configuration.get('user.passwordMinChars'),
 				},
 			),
 			password_confirm: this.validateString(

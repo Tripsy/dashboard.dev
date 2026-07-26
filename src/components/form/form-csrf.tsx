@@ -37,7 +37,7 @@ export function FormCsrf({ inputName }: { inputName?: string }) {
 	return (
 		<input
 			type="hidden"
-			name={inputName ?? (Configuration.get('csrf.inputName') as string)}
+			name={inputName ?? Configuration.get('csrf.inputName')}
 			value={csrfToken}
 		/>
 	);

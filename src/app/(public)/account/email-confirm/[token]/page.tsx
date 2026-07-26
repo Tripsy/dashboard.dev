@@ -19,7 +19,7 @@ interface Props {
 export async function generateMetadata(): Promise<Metadata> {
 	return {
 		title: await translate('email-confirm.meta.title', {
-			app_name: Configuration.get('app.name') as string,
+			app_name: Configuration.get('app.name'),
 		}),
 		robots: 'noindex, nofollow',
 	};

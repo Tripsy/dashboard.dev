@@ -85,7 +85,7 @@ export const getTranslatedString = (
  */
 export const translateLoaded = (
 	key: string,
-	replacements: Record<string, string> = {},
+	replacements: Record<string, string | number> = {},
 ): string | null => {
 	if (typeof document === 'undefined') {
 		return null;
@@ -112,7 +112,7 @@ export const translateLoaded = (
  */
 export const translate = async (
 	key: string,
-	replacements: Record<string, string> = {},
+	replacements: Record<string, string | number> = {},
 ): Promise<string> => {
 	const languageSelected = await getLanguage();
 	const languageResource = await loadLanguageResource(languageSelected);
@@ -146,7 +146,7 @@ export type TranslateKey<T> = T extends string
 export const translateBatch = async <
 	const T extends readonly (
 		| string
-		| { key: string; vars?: Record<string, string> }
+		| { key: string; vars?: Record<string, string | number> }
 	)[],
 >(
 	requests: T,

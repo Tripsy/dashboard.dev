@@ -90,7 +90,7 @@ export abstract class BaseValidator<
 
 	protected getMessage<K extends TMessage[number]>(
 		key: K,
-		vars?: Record<string, string>,
+		vars?: Record<string, string | number>,
 	): string {
 		const message = this.message[key];
 		return vars ? replaceVars(message, vars) : message;

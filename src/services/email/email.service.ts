@@ -4,7 +4,6 @@ import { SesEmailService } from '@/services/email/email-ses.service';
 import { SmtpEmailService } from '@/services/email/email-smtp.service';
 import {
 	type EmailContent,
-	type EmailProvider,
 	EmailProviderEnum,
 	type EmailService,
 	type EmailTemplate,
@@ -47,9 +46,7 @@ export function prepareEmailContent(template: EmailTemplate): EmailContent {
 let currentServiceInstance: EmailService | null = null;
 
 export function getEmailService(): EmailService {
-	const provider =
-		(Configuration.get('mail.provider') as EmailProvider) ||
-		EmailProviderEnum.SES;
+	const provider = Configuration.get('mail.provider');
 
 	if (currentServiceInstance) {
 		return currentServiceInstance;

@@ -9,7 +9,7 @@ const templates = new nunjucks.Environment(
 		autoescape: true,
 		throwOnUndefined: true,
 		trimBlocks: true,
-		noCache: Configuration.get('app.debug') === 'true',
+		noCache: Configuration.get('app.debug'),
 		watch: true,
 	},
 );
@@ -17,7 +17,7 @@ const templates = new nunjucks.Environment(
 // Add global variables
 templates.addGlobal('siteName', Configuration.get('app.name'));
 templates.addGlobal('siteUrl', Configuration.get('app.url'));
-templates.addGlobal('supportEmail', Configuration.get('contact.email'));
+templates.addGlobal('supportEmail', Configuration.get('app.email'));
 templates.addGlobal('currentYear', new Date().getFullYear().toString());
 
 // // Add custom filter

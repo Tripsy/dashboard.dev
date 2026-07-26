@@ -58,11 +58,11 @@ class UserValidator extends BaseValidator<typeof validatorMessages> {
 			{
 				invalid: this.getMessage('invalid_name'),
 				min_chars: this.getMessage('name_min', {
-					min: Configuration.get('user.nameMinChars') as string,
+					min: Configuration.get('user.nameMinChars'),
 				}),
 			},
 			{
-				minChars: Configuration.get('user.nameMinChars') as number,
+				minChars: Configuration.get('user.nameMinChars'),
 			},
 		),
 		email: this.validateEmail(this.getMessage('invalid_email')),
@@ -81,9 +81,7 @@ class UserValidator extends BaseValidator<typeof validatorMessages> {
 				{
 					invalid_password: this.getMessage('invalid_password'),
 					password_min: this.getMessage('password_min', {
-						min: Configuration.get(
-							'user.passwordMinChars',
-						) as string,
+						min: Configuration.get('user.passwordMinChars'),
 					}),
 					password_condition_capital_letter: this.getMessage(
 						'password_condition_capital_letter',
@@ -96,9 +94,7 @@ class UserValidator extends BaseValidator<typeof validatorMessages> {
 					),
 				},
 				{
-					minLength: Configuration.get(
-						'user.passwordMinChars',
-					) as number,
+					minLength: Configuration.get('user.passwordMinChars'),
 				},
 			),
 			password_confirm: this.validateString(
@@ -130,9 +126,7 @@ class UserValidator extends BaseValidator<typeof validatorMessages> {
 				{
 					invalid_password: this.getMessage('invalid_password'),
 					password_min: this.getMessage('password_min', {
-						min: Configuration.get(
-							'user.passwordMinChars',
-						) as string,
+						min: Configuration.get('user.passwordMinChars'),
 					}),
 					password_condition_capital_letter: this.getMessage(
 						'password_condition_capital_letter',
@@ -146,9 +140,7 @@ class UserValidator extends BaseValidator<typeof validatorMessages> {
 				},
 				{
 					required: false,
-					minLength: Configuration.get(
-						'user.passwordMinChars',
-					) as number,
+					minLength: Configuration.get('user.passwordMinChars'),
 				},
 			),
 			password_confirm: this.validateString(

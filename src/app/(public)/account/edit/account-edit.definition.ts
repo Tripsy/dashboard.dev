@@ -23,11 +23,11 @@ class AccountEditValidator extends BaseValidator<typeof validatorMessages> {
 			{
 				invalid: this.getMessage('invalid_name'),
 				min_chars: this.getMessage('name_min', {
-					min: Configuration.get('user.nameMinChars') as string,
+					min: Configuration.get('user.nameMinChars'),
 				}),
 			},
 			{
-				minChars: Configuration.get('user.nameMinChars') as number,
+				minChars: Configuration.get('user.nameMinChars'),
 			},
 		),
 		language: this.validateLanguage(this.getMessage('invalid_language')),

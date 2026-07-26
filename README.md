@@ -225,15 +225,18 @@ room in the container for both, and it is usually the dev server that gets kille
 
 # 📌 TODO
 
-1. monthly driver report
-2. deploy
+1. Ask do I deal with console.error in FE app - some of them are BE actually
+2. Replace all console.error with logging
+3. cmr signature wrap up
+4. monthly driver report
+5. deploy
 
 ---------- 
 
-1. Hero UI -> theme
-2. Add section "documentation"
-3. login with google / facebook
-4. Replace all console.error with logging
+1. Implement Sentry on FE /
+2. Hero UI -> theme
+3. Add section "documentation"
+4. login with google / facebook
 5. Implement kill all sessions except current
       // // This will actually remove all sessions - keep it for further implementation
       // await AccountTokenRepository.createQuery()

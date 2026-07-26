@@ -9,7 +9,7 @@ const MAX_RETRIES = 5;
 const WS_PATH = '/cmr-available';
 
 function getWebSocketUrl(ticket: string): string {
-	const base = Configuration.get('remoteApi.wsUrl') as string;
+	const base = Configuration.get('remoteApi.wsUrl');
 
 	// The browser can't send an Authorization header on a WebSocket, so the
 	// single-use ticket (obtained server-side via the proxy) rides on the URL.
@@ -17,8 +17,7 @@ function getWebSocketUrl(ticket: string): string {
 }
 
 function getReconnectDelay(retry: number): number {
-	const baseDelay =
-		(Configuration.get('remoteApi.wsReconnectDelay') as number) ?? 1000;
+	const baseDelay = Configuration.get('remoteApi.wsReconnectDelay');
 
 	return Math.min(baseDelay * 2 ** (retry - 1), 30000);
 }

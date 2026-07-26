@@ -1,6 +1,6 @@
 import { getObjectValue, type ObjectValue } from '@/helpers/objects.helper';
 import type { Currency, Language } from '@/types/common.type';
-import type { EmailProvider } from '@/types/email.type';
+import type { EmailProvider, MailEncryption } from '@/types/email.type';
 
 function loadSettings() {
 	return {
@@ -93,7 +93,11 @@ function loadSettings() {
 			},
 			host: process.env.MAIL_HOST,
 			port: parseInt(process.env.MAIL_PORT || '2525', 10),
-			encryption: process.env.MAIL_ENCRYPTION === 'true',
+			// 'ssl' | 'tls' | 'none' — the transport maps these onto nodemailer's flags.
+			// This was `=== 'true'`, which no valid value ever matched, so an `ssl` setup
+			// would have connected in the clear and `tls` was never enforced.
+			encryption: (process.env.MAIL_ENCRYPTION ||
+				'none') as MailEncryption,
 			username: process.env.MAIL_USERNAME || '',
 			password: process.env.MAIL_PASSWORD || '',
 		},

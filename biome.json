@@ -37,5 +37,13 @@
 		"parser": {
 			"tailwindDirectives": true
 		}
+	},
+	"html": {
+		"formatter": {
+			"enabled": true
+		},
+		"parser": {
+			"interpolation": true
+		}
 	}
 }

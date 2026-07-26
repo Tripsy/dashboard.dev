@@ -2,10 +2,11 @@ import nodemailer, { type Transporter } from 'nodemailer';
 import type SMTPTransport from 'nodemailer/lib/smtp-transport';
 import { Configuration } from '@/config/settings.config';
 import { translate } from '@/config/translate.setup';
-import type {
-	EmailAddressType,
-	EmailContent,
-	EmailService,
+import {
+	type EmailAddressType,
+	type EmailContent,
+	type EmailService,
+	MailEncryptionEnum,
 } from '@/types/email.type';
 
 export class SmtpEmailService implements EmailService {
@@ -20,10 +21,17 @@ export class SmtpEmailService implements EmailService {
 				throw new Error('MAIL_HOST is not defined');
 			}
 
+			const encryption = Configuration.get('mail.encryption');
+
 			this.transporter = nodemailer.createTransport({
-				host: Configuration.get('mail.host'),
+				host: host,
 				port: Configuration.get('mail.port'),
-				secure: Configuration.get('mail.encryption'),
+				// `secure` means implicit TLS from the first byte, which only the SSL
+				// ports (465) speak. STARTTLS ports connect in the clear and upgrade,
+				// so they need `requireTLS` instead — without it nodemailer upgrades
+				// only opportunistically and silently accepts a plaintext session.
+				secure: encryption === MailEncryptionEnum.SSL,
+				requireTLS: encryption === MailEncryptionEnum.TLS,
 				auth: {
 					user: Configuration.get('mail.username'),
 					pass: Configuration.get('mail.password'),

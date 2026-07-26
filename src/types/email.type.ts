@@ -29,6 +29,21 @@ export const EmailProviderEnum = {
 export type EmailProvider =
 	(typeof EmailProviderEnum)[keyof typeof EmailProviderEnum];
 
+/**
+ * How the SMTP connection is encrypted:
+ * - `ssl` — implicit TLS, encrypted from the first byte (usually port 465)
+ * - `tls` — plain connection upgraded via STARTTLS (usually port 587 or 2525)
+ * - `none` — no encryption
+ */
+export const MailEncryptionEnum = {
+	NONE: 'none',
+	TLS: 'tls',
+	SSL: 'ssl',
+} as const;
+
+export type MailEncryption =
+	(typeof MailEncryptionEnum)[keyof typeof MailEncryptionEnum];
+
 export interface EmailService {
 	sendEmail(
 		content: EmailContent,

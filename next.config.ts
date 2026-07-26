@@ -4,6 +4,15 @@ const nextConfig: NextConfig = {
 	trailingSlash: false,
 	output: 'standalone', // Recommended for Amplify
 	allowedDevOrigins: ['dashboard.test'],
+	/*
+	 * Nunjucks reads the email layouts through a runtime path
+	 * (`buildSrcPath('templates')`), which file tracing cannot follow — nothing
+	 * statically imports them. Without this they are left out of the standalone
+	 * bundle and `templates.render()` throws in production but not in dev.
+	 */
+	outputFileTracingIncludes: {
+		'/**': ['./src/templates/**/*'],
+	},
 	// reactStrictMode: false,
 	experimental: {
 		// nodeMiddleware: true,

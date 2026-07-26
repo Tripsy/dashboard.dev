@@ -1,6 +1,5 @@
 import { getObjectValue, type ObjectValue } from '@/helpers/objects.helper';
 import type { Currency, Language } from '@/types/common.type';
-import type { EmailProvider, MailEncryption } from '@/types/email.type';
 
 function loadSettings() {
 	return {
@@ -85,22 +84,7 @@ function loadSettings() {
 			// Set to 0 to disable the cache entirely (no Redis connection is opened).
 			authTtl: Number(process.env.CACHE_AUTH_TTL ?? 30),
 		},
-		mail: {
-			provider: (process.env.MAIL_PROVIDER || 'smtp') as EmailProvider,
-			from: {
-				name: process.env.MAIL_FROM_NAME || 'NReady',
-				address: process.env.MAIL_FROM_ADDRESS || 'engine@play-zone.ro',
-			},
-			host: process.env.MAIL_HOST,
-			port: parseInt(process.env.MAIL_PORT || '2525', 10),
-			// 'ssl' | 'tls' | 'none' — the transport maps these onto nodemailer's flags.
-			// This was `=== 'true'`, which no valid value ever matched, so an `ssl` setup
-			// would have connected in the clear and `tls` was never enforced.
-			encryption: (process.env.MAIL_ENCRYPTION ||
-				'none') as MailEncryption,
-			username: process.env.MAIL_USERNAME || '',
-			password: process.env.MAIL_PASSWORD || '',
-		},
+		// Only S3 image storage reads these; the app does not send mail (the backend does).
 		aws: {
 			region: process.env.AWS_REGION || 'eu-central-1',
 			accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',

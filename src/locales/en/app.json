@@ -27,10 +27,6 @@
 		"generic": "Nothing to report here.",
 		"account_delete": "Hey ..I don't know your name anymore! Thank you for being with us for a while. Your account has been marked for deletion. All data associated with your account will be removed from our database within 5–30 days. You’re always welcome to create a new account anytime."
 	},
-	"email": {
-		"sent_success": "Email \"{{subject}}\" sent to {{to}}",
-		"sent_error": "Email \"{{subject}}\" could not be sent to {{to}}: {{error}}"
-	},
 	"status": {
 		"active": "Active",
 		"pending": "Pending",

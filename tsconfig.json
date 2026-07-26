@@ -1,9 +1,10 @@
 {
 	"compilerOptions": {
 		"jsx": "react-jsx",
-		"baseUrl": "src",
+		// TypeScript 7 removed `baseUrl`. Paths now resolve relative to this file, so the
+		// old `baseUrl: "src"` + `"@/*": ["./*"]` pair becomes a single `./src/*` entry.
 		"paths": {
-			"@/*": ["./*"]
+			"@/*": ["./src/*"]
 		},
 		"target": "ESNext",
 		"module": "ESNext",

@@ -202,7 +202,7 @@ export class ImageStorageFactory {
 	getDefaultService(): ImageStorageService {
 		// Cast rather than typing `images.storage` in the config: `ImageStorage` lives in
 		// image.model.ts, which itself reads Configuration — importing it there would close
-		// a cycle (madge).
+		// a cycle (Biome's noImportCycles).
 		const storageType = Configuration.get('images.storage') as ImageStorage;
 
 		return this.getService(storageType);

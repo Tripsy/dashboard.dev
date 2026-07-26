@@ -60,4 +60,4 @@ const TabsTrigger = ({ children, ...props }: TabsTriggerProps) => (
 
 const TabsContent = HeroTabs.Panel;
 
-export { Tabs, TabsList, TabsTrigger, TabsContent };
+export { Tabs, TabsContent, TabsList, TabsTrigger };

@@ -239,19 +239,27 @@ export function displayColumnSession(cmr_sessions: CmrSessionModel[]) {
 	);
 }
 
-export function displayImage({
-	src,
-	alt,
-	className,
-	width = 64,
-	height = 64,
-}: {
+type ImagePreviewProps = {
 	src: string;
 	alt: string;
 	className?: string;
 	width?: number;
 	height?: number;
-}) {
+};
+
+/**
+ * The popover's open state has to live in a real component rather than in `displayImage`
+ * itself. `displayImage` is invoked as a plain function — the `.definition.ts` files that
+ * call it cannot hold JSX — so a `useState` inside it would run in the *caller's* hook
+ * slot, once per row in a data table body, and any conditional row would shift hook order.
+ */
+function ImagePreview({
+	src,
+	alt,
+	className,
+	width = 64,
+	height = 64,
+}: ImagePreviewProps) {
 	const [isOpen, setIsOpen] = useState(false);
 
 	return (
@@ -307,4 +315,8 @@ export function displayImage({
 			</PopoverContent>
 		</Popover>
 	);
+}
+
+export function displayImage(props: ImagePreviewProps) {
+	return <ImagePreview {...props} />;
 }

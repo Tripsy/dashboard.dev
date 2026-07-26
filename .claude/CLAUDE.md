@@ -3,7 +3,7 @@ Next.js app with codename `dashboard` consuming `star-backend` API. Public site 
 
 ## Tech Stack
 
-- Runtime: Node.js v22
+- Runtime: Node.js v24 (Active LTS)
 - Framework: Next.js v16.2
 - Language: TypeScript v5.9.3
 - Containerization: Docker
@@ -55,8 +55,7 @@ Run inside the Docker container (`docker exec $DOCKER_CONTAINER`):
 pnpm run dev      # Start dev server
 pnpm run build    # Production build
 pnpm run start    # Start production server (port 80)
-pnpm run biome    # Biome check --write (lint + format)
-pnpm run madge    # Check for circular dependencies in src
+pnpm run biome    # Biome check --write (lint + format + circular dependencies)
 pnpm run clean    # Delete .next — Turbopack's dev cache grows until the container OOMs
 ```
 
@@ -149,7 +148,6 @@ entities/operations, DB schema, business rules read the code in `../star-backend
 │   ├── types/            
 │   └── proxy.ts           
 ├── .env
-├── .madgerc
 ├── biome.json
 ├── docker-compose.yml
 ├── next.config.ts
@@ -159,7 +157,7 @@ entities/operations, DB schema, business rules read the code in `../star-backend
 ## Restrictions
 
 - This project has no tests at the moment.
-- Do not run biome or madge after applying change. Run them only on demand or before git push commands.
+- Do not run biome after applying change. Run it only on demand or before git push commands.
 - Stop the dev server before running `build` or `tsc` — the container cannot hold both (see Commands).
 - Do not offer to do push commands, will be asked explicitly.
 - Delegate noisy operations to subagents.

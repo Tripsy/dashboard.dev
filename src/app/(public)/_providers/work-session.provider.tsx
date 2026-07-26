@@ -262,4 +262,4 @@ function useWorkSession() {
 	return context;
 }
 
-export { WorkSessionContext, WorkSessionProvider, useWorkSession };
+export { useWorkSession, WorkSessionContext, WorkSessionProvider };

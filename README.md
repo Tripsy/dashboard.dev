@@ -28,8 +28,7 @@ Meanwhile, we're open to suggestions / feedback, and if you find this project us
 - Framework: Next.js 16.2
 
 ## Code Quality
-- Linting & Formatting: Biome
-- Circular Dependency Check: Madge
+- Linting & Formatting: Biome (also checks circular dependencies)
 - Validation: Zod 4.3
 
 ## Infrastructure
@@ -105,8 +104,7 @@ $ pnpm run dev
 # 🖥️ Commands
 
 ```bash
-pnpm run biome    # Lint and format
-pnpm run madge    # Check for circular dependencies
+pnpm run biome    # Lint, format and check for circular dependencies
 pnpm run dev      # Start development server
 pnpm run build    # Production build
 pnpm run clean    # Delete .next (see below)
@@ -197,7 +195,6 @@ room in the container for both, and it is usually the dev server that gets kille
 │   ├── types/            
 │   └── proxy.ts           
 ├── .env
-├── .madgerc
 ├── biome.json
 ├── docker-compose.yml
 ├── next.config.ts
@@ -263,5 +260,4 @@ Dev only:
 
 - [typescript](https://www.typescriptlang.org/)
 - [tailwindcss](https://tailwindcss.com/)
-- [madge](https://github.com/pahen/madge) — Helps finding circular dependencies
-- [biome](https://biomejs.dev/) — Biome is a fast formatter for JavaScript, TypeScript, JSX, TSX, JSON, HTML, CSS and GraphQL
+- [biome](https://biomejs.dev/) — Biome is a fast formatter for JavaScript, TypeScript, JSX, TSX, JSON, HTML, CSS and GraphQL — its `noImportCycles` rule also covers circular dependencies

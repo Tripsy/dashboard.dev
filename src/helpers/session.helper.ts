@@ -53,6 +53,14 @@ export type TrackedCookie = {
 	action: 'set' | 'none';
 };
 
+/**
+ * Reads a cookie and reports whether it is close enough to expiry to be rewritten.
+ *
+ * @param name - cookie name; its expiry is tracked in a sibling `<name>-expiration` cookie
+ * @param expireIn - seconds of remaining life below which `action` comes back as 'set'.
+ *   The 20 minute default suits short-lived cookies (CSRF); the session cookie passes
+ *   `user.sessionRefreshThreshold` so it slides in step with the backend token.
+ */
 export async function getTrackedCookie(
 	name: string,
 	expireIn: number = 1200,

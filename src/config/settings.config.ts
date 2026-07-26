@@ -44,7 +44,23 @@ function loadSettings() {
 			nameMinChars: 3,
 			passwordMinChars: 8,
 			sessionToken: process.env.SESSION_TOKEN || 'session',
-			sessionMaxAge: 60 * Number(process.env.SESSION_MAX_AGE || 10800),
+			// Seconds, and it has to track the backend's AUTH_JWT_EXPIRES_IN (86400).
+			// The backend signs its JWT without an `exp` claim — a token's lifetime lives in
+			// `account_token.expire_at` (`now + authExpiresIn`), which auth.middleware slides
+			// forward on use. A cookie outliving that leaves the browser holding a session it
+			// believes is valid while every request behind it fails auth. The previous
+			// `60 *` treated the env value as minutes, giving a ~60 day cookie against a
+			// 24 hour token.
+			sessionMaxAge: Number(process.env.SESSION_MAX_AGE || 86400),
+			// Seconds of remaining life below which the session cookie is rewritten with a
+			// full `sessionMaxAge` again. Mirrors the backend's AUTH_JWT_REFRESH_EXPIRES_IN
+			// (28800), which is the same threshold auth.middleware uses to slide `expire_at`
+			// forward — so the cookie and the token it stands for extend together. Lower
+			// values are safe but log the user out while their backend session is still
+			// alive; higher ones rewrite the cookie on almost every request.
+			sessionRefreshThreshold: Number(
+				process.env.SESSION_REFRESH_THRESHOLD || 28800,
+			),
 		},
 		remoteApi: {
 			url: process.env.REMOTE_API_URL,

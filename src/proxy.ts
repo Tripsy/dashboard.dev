@@ -159,6 +159,7 @@ class MiddlewareContext {
 	): Promise<NextResponse> {
 		const sessionToken = await getTrackedCookie(
 			Configuration.get('user.sessionToken'),
+			Configuration.get('user.sessionRefreshThreshold'),
 		);
 
 		const {

@@ -66,6 +66,7 @@ export async function getAuth(): Promise<ApiResponseFetch<AuthModel | null>> {
 	try {
 		const sessionToken = await getTrackedCookie(
 			Configuration.get('user.sessionToken'),
+			Configuration.get('user.sessionRefreshThreshold'),
 		);
 
 		if (!sessionToken.value) {

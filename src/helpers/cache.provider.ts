@@ -22,8 +22,15 @@ type CacheGetResults = {
 export class CacheProvider {
 	constructor(private readonly cache: Redis) {}
 
+	/**
+	 * Every key is built here, so prefixing at this point covers reads, writes and the
+	 * patterns handed to `deleteByPattern` alike. An empty `redis.keyPrefix` drops out via
+	 * the same filter that removes empty segments, leaving keys unprefixed.
+	 */
 	buildKey(...args: string[]) {
-		return args.filter((arg) => arg !== '').join(':');
+		return [Configuration.get('redis.keyPrefix'), ...args]
+			.filter((arg) => arg !== '')
+			.join(':');
 	}
 
 	determineTtl(ttl?: number): number {

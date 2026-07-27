@@ -285,13 +285,18 @@ export abstract class BaseValidator<
 		}
 
 		if (options.required) {
-			if (!options?.minChars && !options?.maxChars) {
-				return this.coerceEmpty(
-					baseSchema.min(1, { message: message.invalid }),
-				) as z.ZodType<string>;
-			} else {
-				return this.coerceEmpty(baseSchema) as z.ZodType<string>;
-			}
+			/*
+			 * A required field has to reject the empty string. `minChars` already does that,
+			 * but `maxChars` does not — and the guard used to be skipped whenever *either*
+			 * bound was set, so `{ required: true, maxChars: n }` quietly accepted ''. No
+			 * caller combines them that way today; this stops the next one from getting an
+			 * optional field that claims to be required.
+			 */
+			const requiredSchema = options.minChars
+				? baseSchema
+				: baseSchema.min(1, { message: message.invalid });
+
+			return this.coerceEmpty(requiredSchema) as z.ZodType<string>;
 		}
 
 		return this.preprocessOptional(baseSchema) as z.ZodType<
@@ -861,13 +866,6 @@ export abstract class BaseValidator<
 			return hours * 60 + minutes;
 		};
 
-		const formatMinutesToTime = (minutes: number): string => {
-			const hours = Math.floor(minutes / 60);
-			const mins = minutes % 60;
-
-			return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
-		};
-
 		let baseSchema = z.string({ message: message.invalid });
 
 		// Validate format (HH:MM)
@@ -926,36 +924,23 @@ export abstract class BaseValidator<
 			);
 		}
 
-		// Optional step to round to nearest interval if needed
-		const timeSchema =
-			options.minuteInterval && options.minuteInterval > 1
-				? baseSchema.transform((val) => {
-						const minutes = parseTimeToMinutes(val);
-
-						if (minutes === null) {
-							return val;
-						}
-
-						// Round to nearest interval
-						const remainder = minutes % options.minuteInterval;
-
-						if (remainder === 0) {
-							return val;
-						}
-
-						const roundedMinutes = minutes - remainder;
-
-						return formatMinutesToTime(roundedMinutes);
-					})
-				: baseSchema;
+		/*
+		 * There was a transform here that rounded a time down onto the nearest interval. It
+		 * could never run: the `minuteInterval` refinement above rejects any time that is not
+		 * already on the interval, so nothing reaching the transform needed rounding. Its
+		 * comment also claimed "nearest" while it floored. Rejecting is the behaviour the app
+		 * has always had — reinstate rounding only by removing that refinement, deliberately.
+		 */
+		const timeSchema = baseSchema;
 
 		if (options.required) {
 			return this.coerceEmpty(timeSchema) as z.ZodType<string>;
 		}
 
-		const optionalSchema = timeSchema
-			.transform((val) => (val === '' ? undefined : val))
-			.optional();
+		// No '' -> undefined transform: the refinements above reject the empty string
+		// before it could reach one, and form values arrive as null (getFormDataAsString),
+		// which coerceEmpty already maps to the empty value.
+		const optionalSchema = timeSchema.optional();
 
 		return this.coerceEmpty(optionalSchema) as z.ZodType<string | TEmpty>;
 	}
@@ -1141,9 +1126,10 @@ export abstract class BaseValidator<
 			return this.coerceEmpty(baseSchema) as z.ZodType<string>;
 		}
 
-		const optionalSchema = baseSchema
-			.transform((val) => (val === '' ? undefined : val))
-			.optional();
+		// No '' -> undefined transform: the refinements above reject the empty string
+		// before it could reach one, and form values arrive as null (getFormDataAsString),
+		// which coerceEmpty already maps to the empty value.
+		const optionalSchema = baseSchema.optional();
 
 		return this.coerceEmpty(optionalSchema) as z.ZodType<string | TEmpty>;
 	}
@@ -1180,9 +1166,10 @@ export abstract class BaseValidator<
 			return this.coerceEmpty(baseSchema) as z.ZodType<string>;
 		}
 
-		const optionalSchema = baseSchema
-			.transform((val) => (val === '' ? undefined : val))
-			.optional();
+		// No '' -> undefined transform: the refinements above reject the empty string
+		// before it could reach one, and form values arrive as null (getFormDataAsString),
+		// which coerceEmpty already maps to the empty value.
+		const optionalSchema = baseSchema.optional();
 
 		return this.coerceEmpty(optionalSchema) as z.ZodType<string | TEmpty>;
 	}
@@ -1219,9 +1206,10 @@ export abstract class BaseValidator<
 			return this.coerceEmpty(baseSchema) as z.ZodType<string>;
 		}
 
-		const optionalSchema = baseSchema
-			.transform((val) => (val === '' ? undefined : val))
-			.optional();
+		// No '' -> undefined transform: the refinements above reject the empty string
+		// before it could reach one, and form values arrive as null (getFormDataAsString),
+		// which coerceEmpty already maps to the empty value.
+		const optionalSchema = baseSchema.optional();
 
 		return this.coerceEmpty(optionalSchema) as z.ZodType<string | TEmpty>;
 	}
@@ -1258,9 +1246,10 @@ export abstract class BaseValidator<
 			return this.coerceEmpty(baseSchema) as z.ZodType<string>;
 		}
 
-		const optionalSchema = baseSchema
-			.transform((val) => (val === '' ? undefined : val))
-			.optional();
+		// No '' -> undefined transform: the refinements above reject the empty string
+		// before it could reach one, and form values arrive as null (getFormDataAsString),
+		// which coerceEmpty already maps to the empty value.
+		const optionalSchema = baseSchema.optional();
 
 		return this.coerceEmpty(optionalSchema) as z.ZodType<string | TEmpty>;
 	}
@@ -1297,9 +1286,10 @@ export abstract class BaseValidator<
 			return this.coerceEmpty(baseSchema) as z.ZodType<string>;
 		}
 
-		const optionalSchema = baseSchema
-			.transform((val) => (val === '' ? undefined : val))
-			.optional();
+		// No '' -> undefined transform: the refinements above reject the empty string
+		// before it could reach one, and form values arrive as null (getFormDataAsString),
+		// which coerceEmpty already maps to the empty value.
+		const optionalSchema = baseSchema.optional();
 
 		return this.coerceEmpty(optionalSchema) as z.ZodType<string | TEmpty>;
 	}

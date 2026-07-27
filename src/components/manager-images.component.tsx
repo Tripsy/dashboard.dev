@@ -18,6 +18,7 @@ import { Configuration } from '@/config/settings.config';
 import { getLanguageClient } from '@/config/translate.setup';
 import { ApiError } from '@/exceptions/api.error';
 import ValueError from '@/exceptions/value.error';
+import { CSRF_HEADER, getCsrfToken } from '@/helpers/csrf.helper';
 import { cn } from '@/helpers/css.helper';
 import { displayImage } from '@/helpers/display.helper';
 import { getErrorMessage } from '@/helpers/objects.helper';
@@ -1138,8 +1139,11 @@ export function ManagerImages({
 		formData.append('section', section);
 		formData.append('entity_id', String(entity_id));
 
+		// Raw fetch rather than ApiRequest (multipart upload), so the CSRF header the
+		// middleware requires on mutating /api/* requests has to be set by hand.
 		const response = await fetch(Routes.get('api-image'), {
 			method: 'POST',
+			headers: { [CSRF_HEADER]: await getCsrfToken() },
 			body: formData,
 		});
 

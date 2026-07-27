@@ -12,7 +12,6 @@ import {
 	LoginState,
 	validateFormLogin,
 } from '@/app/(public)/account/login/login.definition';
-import { FormCsrf } from '@/components/form/form-csrf';
 import {
 	FormComponentEmail,
 	FormComponentPassword,
@@ -137,8 +136,6 @@ export default function Login() {
 				onSubmit={markSubmit}
 				className="form-section"
 			>
-				<FormCsrf />
-
 				<FormComponentEmail<LoginFormValuesType>
 					labelText="Email Address"
 					id={elementIds.email}

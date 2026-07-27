@@ -15,7 +15,6 @@ export async function emailConfirmSendAction(
 		getFormValues: getEmailConfirmSendFormValues,
 		validateForm: validateFormEmailConfirmSend,
 		operationFunction: requestEmailConfirmSend,
-		requireCsrf: true,
 		fallbackErrorKey: 'email-confirm-send.message.failed',
 		mapApiError: async (error) => {
 			switch (error.status) {

@@ -8,6 +8,7 @@ import {
 	getCachedAuthModel,
 	setCachedAuthModel,
 } from '@/helpers/auth-cache.helper';
+import { CSRF_REJECTION_CODE } from '@/helpers/csrf.helper';
 import { getTrackedCookie } from '@/helpers/session.helper';
 import { apiHeaders } from '@/helpers/system.helper';
 import {
@@ -100,6 +101,27 @@ class MiddlewareContext {
 
 			this.res.headers.set('x-language', language);
 		}
+	}
+
+	/**
+	 * Double-submit check: the token sent in the header must match the httpOnly cookie that
+	 * `/api/csrf` issued. Only same-origin script can read the token (it is handed back in the
+	 * response body, never readable from the cookie), and only same-origin script can set a
+	 * custom header without a preflight — so a forged cross-site request fails both halves.
+	 *
+	 * This sits alongside `isValidRequestSource()` rather than replacing it: that check reads
+	 * headers the browser controls, this one requires a secret the attacker cannot obtain.
+	 */
+	isValidCsrfToken() {
+		const submitted = this.req.headers.get(
+			Configuration.get('csrf.inputName'),
+		);
+
+		const secret = this.req.cookies.get(
+			Configuration.get('csrf.cookieName'),
+		)?.value;
+
+		return Boolean(submitted) && Boolean(secret) && submitted === secret;
 	}
 
 	isValidRequestSource() {
@@ -351,6 +373,26 @@ export async function proxy(req: NextRequest) {
 
 	if (isMutating && !ctx.isValidRequestSource()) {
 		return new NextResponse('Forbidden', { status: 403 });
+	}
+
+	/*
+	 * CSRF is enforced here, in front of every mutating API request, rather than inside the
+	 * form pipeline: `processForm` runs in the browser, so a check there was only ever a
+	 * suggestion the client could skip. This single gate covers `/api/proxy/*` — every
+	 * backend mutation — plus `/api/image` and `/api/language`, which bypass the proxy.
+	 *
+	 * Scoped to `/api/`: page routes are navigations, and server actions returned above
+	 * carry their own origin verification from Next.
+	 */
+	if (isMutating && req.nextUrl.pathname.startsWith('/api/')) {
+		if (!ctx.isValidCsrfToken()) {
+			// A recognisable body lets ApiRequest tell an expired token — refresh and retry
+			// once — from a genuine refusal.
+			return NextResponse.json(
+				{ code: CSRF_REJECTION_CODE, message: 'Invalid CSRF token' },
+				{ status: 403 },
+			);
+		}
 	}
 
 	ctx.setupLanguage();

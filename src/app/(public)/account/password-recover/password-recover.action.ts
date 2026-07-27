@@ -15,7 +15,6 @@ export async function passwordRecoverAction(
 		getFormValues: getPasswordRecoverFormValues,
 		validateForm: validateFormPasswordRecover,
 		operationFunction: requestPasswordRecover,
-		requireCsrf: true,
 		fallbackErrorKey: 'password-recover.message.failed',
 		mapApiError: async (error) => {
 			switch (error.status) {

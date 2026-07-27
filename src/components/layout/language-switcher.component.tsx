@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 import { Switch } from '@/components/ui/switch';
 import Routes from '@/config/routes.setup';
+import { CSRF_HEADER, getCsrfToken } from '@/helpers/csrf.helper';
 
 type LanguageSwitcherProps = {
 	currentLanguage: string;
@@ -25,7 +26,12 @@ export function LanguageSwitcher({
 		startTransition(async () => {
 			const response = await fetch(Routes.get('language'), {
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
+				headers: {
+					'Content-Type': 'application/json',
+					// Raw fetch rather than ApiRequest, so the CSRF header the middleware
+					// requires on mutating /api/* requests has to be set by hand.
+					[CSRF_HEADER]: await getCsrfToken(),
+				},
 				body: JSON.stringify({ language }),
 				credentials: 'include',
 			});

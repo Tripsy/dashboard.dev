@@ -1,6 +1,12 @@
 import Routes from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
 import { ApiError } from '@/exceptions/api.error';
+import {
+	CSRF_HEADER,
+	CSRF_REJECTION_CODE,
+	getCsrfToken,
+	resetCsrfToken,
+} from '@/helpers/csrf.helper';
 import type {
 	ApiRequestMode,
 	ApiResponseFetch,
@@ -178,6 +184,32 @@ export class ApiRequest {
 		return Configuration.get('app.url') + proxyRoute;
 	}
 
+	/**
+	 * The middleware gates mutating `/api/*` requests on the CSRF header, so only requests
+	 * that actually go through it need a token — `remote-api` calls leave the app entirely.
+	 */
+	private needsCsrfToken(requestOptions: RequestInit): boolean {
+		const method = (requestOptions.method || 'GET').toUpperCase();
+
+		if (['GET', 'HEAD', 'OPTIONS'].includes(method)) {
+			return false;
+		}
+
+		return (
+			this.requestMode === 'use-proxy' || this.requestMode === 'same-site'
+		);
+	}
+
+	private static isStaleCsrfRejection(
+		res: Response,
+		payload: unknown,
+	): boolean {
+		return (
+			res.status === 403 &&
+			(payload as { code?: string } | null)?.code === CSRF_REJECTION_CODE
+		);
+	}
+
 	private buildRequestUrl(path: string) {
 		switch (this.requestMode) {
 			case 'use-proxy':
@@ -212,27 +244,58 @@ export class ApiRequest {
 				(requestOptions.headers as Headers).delete('Content-Type');
 			}
 
-			const res = await fetch(requestUrl, {
-				...requestOptions,
-				/*
-				 * One signal covering the whole exchange. The previous timer was cleared
-				 * the moment `fetch` resolved — which is when the *headers* arrive — so
-				 * reading the body below was left unbounded and a server that stalled
-				 * mid-response hung the request indefinitely. A signal also cannot be
-				 * leaked the way a timer could when something threw before `clearTimeout`.
-				 */
-				signal: AbortSignal.timeout(ApiRequest.ABORT_TIMEOUT),
-			});
+			const withCsrf = this.needsCsrfToken(requestOptions);
 
-			// Handle non-JSON responses (like 204 No Content)
-			if (res.status === 204) {
-				return undefined;
-			}
+			/*
+			 * Two attempts at most. The CSRF cookie lives an hour, so a tab left open past
+			 * that submits a stale token and earns one 403 — refreshing and retrying turns
+			 * it into a save the user never notices, where a bare failure would look
+			 * arbitrary. Only a rejection the middleware explicitly marked as stale is
+			 * retried; every other 403 is a real refusal.
+			 */
+			for (let attempt = 0; attempt < 2; attempt++) {
+				if (withCsrf) {
+					(requestOptions.headers as Headers).set(
+						CSRF_HEADER,
+						await getCsrfToken(),
+					);
+				}
 
-			const jsonResponse: ApiResponseFetch<T> =
-				await this.handleJsonResponse(res);
+				const res = await fetch(requestUrl, {
+					...requestOptions,
+					/*
+					 * One signal covering the whole exchange. The previous timer was
+					 * cleared the moment `fetch` resolved — which is when the *headers*
+					 * arrive — so reading the body below was left unbounded and a server
+					 * that stalled mid-response hung the request indefinitely. A signal
+					 * also cannot be leaked the way a timer could when something threw
+					 * before `clearTimeout`.
+					 */
+					signal: AbortSignal.timeout(ApiRequest.ABORT_TIMEOUT),
+				});
 
-			if (!res.ok) {
+				// Handle non-JSON responses (like 204 No Content)
+				if (res.status === 204) {
+					return undefined;
+				}
+
+				const jsonResponse: ApiResponseFetch<T> =
+					await this.handleJsonResponse(res);
+
+				if (res.ok) {
+					return jsonResponse;
+				}
+
+				if (
+					withCsrf &&
+					attempt === 0 &&
+					ApiRequest.isStaleCsrfRejection(res, jsonResponse)
+				) {
+					resetCsrfToken();
+
+					continue;
+				}
+
 				throw new ApiError(
 					`HTTP ${res.status} Error`,
 					res.status,
@@ -240,7 +303,7 @@ export class ApiRequest {
 				);
 			}
 
-			return jsonResponse;
+			return undefined;
 		} catch (error) {
 			this.handleError(error);
 		}

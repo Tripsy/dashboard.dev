@@ -1,8 +1,8 @@
 import { translate } from '@/config/translate.setup';
 import { ApiError } from '@/exceptions/api.error';
 import { ExecutionError } from '@/exceptions/execution.error';
+import { CSRF_REJECTION_CODE } from '@/helpers/csrf.helper';
 import { accumulateZodErrors } from '@/helpers/form.helper';
-import { isValidCsrfToken } from '@/helpers/session.helper';
 import type { ApiResponseFetch } from '@/types/api.type';
 import type {
 	FormErrorsType,
@@ -49,21 +49,21 @@ type ProcessFormOptionsType<
 	operationFunction: FormOperationFnType<FormValues>;
 	/** Only set for update operations — passed as the second argument to `operationFunction`. */
 	entryId?: number;
-	/**
-	 * Required for unauthenticated (auth-entry) forms. Authenticated forms are
-	 * covered by the `Sec-Fetch-Site` / origin check in `src/proxy.ts` instead,
-	 * so they leave this off.
-	 */
-	requireCsrf?: boolean;
 	mapApiError?: MapApiErrorFnType<Situation>;
 	/** Translation key for the generic failure message. */
 	fallbackErrorKey?: string;
 };
 
 /**
- * The single submit pipeline: optional CSRF gate → parse → validate → request →
- * error mapping. Used by `WindowForm` for every dashboard/account entity form and
- * by each `<flow>.action.ts` for the unauthenticated auth-entry flows.
+ * The single submit pipeline: parse → validate → request → error mapping. Used by
+ * `WindowForm` for every dashboard/account entity form and by each `<flow>.action.ts` for the
+ * unauthenticated auth-entry flows.
+ *
+ * CSRF is deliberately absent here. This function runs in the browser — the auth actions have
+ * no `'use server'` directive and `WindowForm` calls it straight from a client component — so
+ * a check at this point was a decision the caller could simply skip. It is enforced in
+ * `src/proxy.ts` instead, in front of every mutating `/api/*` request, where a forged
+ * submission actually has to pass it.
  */
 export async function processForm<
 	FormValues extends FormValuesType,
@@ -81,7 +81,6 @@ export async function processForm<
 		validateForm,
 		operationFunction,
 		entryId,
-		requireCsrf = false,
 		mapApiError,
 		fallbackErrorKey = 'app.error.form',
 	} = options;
@@ -96,13 +95,6 @@ export async function processForm<
 		situation?: State['situation'] | FormSituationType;
 		resultData?: unknown;
 	}): State => ({ ...formState, ...patch }) as State;
-
-	if (requireCsrf && !(await isValidCsrfToken(formData))) {
-		return buildState({
-			message: await translate('app.error.csrf'),
-			situation: 'csrfError',
-		});
-	}
 
 	// Held outside the try so a failed request echoes the user's input back
 	// instead of reverting the form to the previously submitted values.
@@ -146,6 +138,22 @@ export async function processForm<
 			resultData: fetchResponse?.data,
 		});
 	} catch (error) {
+		// A CSRF rejection from the middleware outranks any per-flow mapping: it says nothing
+		// about the submitted data, and `ApiRequest` has already refreshed the token and
+		// retried once, so reaching here means the session genuinely cannot submit.
+		if (
+			error instanceof ApiError &&
+			error.status === 403 &&
+			(error.body as { code?: string } | undefined)?.code ===
+				CSRF_REJECTION_CODE
+		) {
+			return buildState({
+				values,
+				message: await translate('app.error.csrf'),
+				situation: 'csrfError',
+			});
+		}
+
 		const mapped =
 			mapApiError && error instanceof ApiError
 				? await mapApiError(error)

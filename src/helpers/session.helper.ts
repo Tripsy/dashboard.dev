@@ -1,8 +1,15 @@
-'use server';
+/*
+ * Deliberately not `'use server'`. That directive turns every export into a callable RPC
+ * endpoint, and these are generic cookie accessors taking a caller-supplied name — as server
+ * actions, `getCookie` would hand any cookie (session token included) to whoever invoked it,
+ * defeating httpOnly. Nothing client-side imports this module: the middleware, the two route
+ * handlers and `auth.service.ts` are all server-side, and a client component that imported it
+ * by mistake would now fail to build on `next/headers` rather than quietly minting an
+ * endpoint.
+ */
 
 import { cookies } from 'next/headers';
 import { Configuration } from '@/config/settings.config';
-import { getFormDataAsString } from '@/helpers/form.helper';
 
 export type CookieOptions = {
 	httpOnly?: boolean;
@@ -124,15 +131,4 @@ export async function setupTrackedCookie(
 		expirationTime.toString(),
 		options,
 	);
-}
-
-export async function isValidCsrfToken(formData: FormData) {
-	const inputValue = getFormDataAsString(
-		formData,
-		Configuration.get('csrf.inputName'),
-	);
-
-	const cookieValue = await getCookie(Configuration.get('csrf.cookieName'));
-
-	return cookieValue === inputValue;
 }

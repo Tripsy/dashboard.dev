@@ -17,7 +17,6 @@ export async function passwordRecoverChangeAction(
 		// The recovery token is carried on the form state, not the form values.
 		operationFunction: (values: PasswordRecoverChangeFormValuesType) =>
 			requestPasswordRecoverChange(values, formState.token),
-		requireCsrf: true,
 		fallbackErrorKey: 'password-recover-change.message.failed',
 		mapApiError: async (error) => ({ message: error.message }),
 	});

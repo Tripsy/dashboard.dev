@@ -1,5 +1,6 @@
 import Routes from '@/config/routes.setup';
 import { ApiRequest, resolveRequestPath } from '@/helpers/api.helper';
+import { CSRF_HEADER, getCsrfToken } from '@/helpers/csrf.helper';
 import type {
 	ImageModel,
 	ImageSection,
@@ -53,6 +54,9 @@ export async function removeImageFile(
 		method: 'DELETE',
 		headers: {
 			'Content-Type': 'application/json',
+			// Raw fetch rather than ApiRequest, so the CSRF header the middleware requires
+			// on mutating /api/* requests has to be set by hand.
+			[CSRF_HEADER]: await getCsrfToken(),
 		},
 		body: JSON.stringify({
 			path,

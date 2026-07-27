@@ -9,7 +9,6 @@ import {
 	PasswordRecoverState,
 	validateFormPasswordRecover,
 } from '@/app/(public)/account/password-recover/password-recover.definition';
-import { FormCsrf } from '@/components/form/form-csrf';
 import {
 	FormComponentEmail,
 	FormComponentSubmit,
@@ -93,8 +92,6 @@ export default function PasswordRecover() {
 				onSubmit={markSubmit}
 				className="form-section"
 			>
-				<FormCsrf />
-
 				<FormComponentEmail<PasswordRecoverFormValuesType>
 					labelText="Email Address"
 					id={elementIds.email}

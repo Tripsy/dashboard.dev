@@ -94,13 +94,6 @@ export class ApiRequest {
 		return this;
 	}
 
-	/**
-	 * Merges `override` onto `base` without touching either, headers included.
-	 *
-	 * `doFetch` needs this to be pure: folding a call's options into the instance would
-	 * leave the method, body and headers of one request set on the next one made through
-	 * the same instance.
-	 */
 	private static mergeRequestInit(
 		base: RequestInit,
 		override: RequestInit,
@@ -148,7 +141,7 @@ export class ApiRequest {
 	}
 
 	/**
-	 * Always throws — declared `never` so callers are known to be unreachable afterwards.
+	 * Always throws — declared `never` so callers are known to be unreachable afterward.
 	 */
 	private handleError(error: unknown): never {
 		if (error instanceof ApiError) {

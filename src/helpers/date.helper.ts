@@ -153,7 +153,7 @@ export function formatDate(
  *
  * `setHours` resolves against the runtime's zone, which is the driver's own device zone —
  * these run client-side. That is the intended reading: "20:00" means 20:00 where the driver
- * is, and serialising the resulting Date yields the correct UTC instant for the backend. Do
+ * is, and serializing the resulting Date yields the correct UTC instant for the backend. Do
  * not reach for `app.timezone` here; company time applies to filter day-boundaries only
  * (see `toUTCISOString`).
  *
@@ -236,12 +236,6 @@ export function dateDiff(
 
 /**
  * Relative description of a past date, e.g. "2 hours ago".
- *
- * This used to take a `TimeAgoOptions` bag — `useJustNow`, `suffix`, `useYesterday` and a
- * `maxPrecision` cascade — none of whichever ran: `maxPrecision` defaulted to 'year', which
- * matched no branch, so every call fell through to `fromNow()` regardless. The cascade was
- * also inverted relative to its name (passing 'second' enabled every level; passing 'day'
- * enabled only the day branch), so it was removed rather than repaired.
  */
 export function timeAgo(date: string | Date): string {
 	const target = dayjs(date);

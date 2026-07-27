@@ -18,8 +18,12 @@ export abstract class IsValidator {
 	protected isValidIBAN(iban: string): boolean {
 		const clean = iban.replace(/\s+/g, '').toUpperCase();
 
-		// Must be exactly 24 chars
-		if (!/^RO\d{2}[A-Z]{4}\d{16}$/.test(clean)) {
+		// ISO 13616 registers Romania as RO2!n4!a16!c — two check digits, a four-letter bank
+		// code, then sixteen *alphanumeric* characters. This demanded `\d{16}`, so every IBAN
+		// whose account part contains a letter was rejected outright, including the ECBS
+		// reference value RO49AAAA1B31007593840000. Accounts that happen to be all digits
+		// still validated, which is why it went unnoticed.
+		if (!/^RO\d{2}[A-Z]{4}[A-Z0-9]{16}$/.test(clean)) {
 			return false;
 		}
 
@@ -331,7 +335,11 @@ export abstract class BaseValidator<
 		};
 
 		if (options.onlyPositive) {
-			defaultMessages.onlyPositive = 'Must be a positive number';
+			// Key must match how it is read below (`message.only_positive`). It was
+			// `onlyPositive` here, so the default never resolved and Zod fell back to its own
+			// untranslated text — "Too small: expected number to be >0" — on every numeric
+			// field, since `onlyPositive` defaults to true and no caller passes the message.
+			defaultMessages.only_positive = 'Must be a positive number';
 		}
 
 		if (options.allowDecimals < 1) {

@@ -55,21 +55,65 @@ export abstract class IsValidator {
 	/**
 	 * Checks if the provided phone number is valid.
 	 *
-	 * @param {string} _phoneNumber
+	 * Deliberately an E.164 *shape* check rather than a per-country rule: these numbers
+	 * belong to clients, carriers and CMR contacts who are routinely outside Romania, so
+	 * anything narrower would reject legitimate counterparties. Optional leading `+` then
+	 * 7 to 15 digits — E.164 caps a number at 15, and 7 is the shortest plausible national
+	 * one. A leading trunk zero (0722…) is accepted because that is how numbers are written
+	 * locally.
+	 *
+	 * @param {string} phoneNumber
 	 * @returns {boolean}
 	 */
-	protected isValidPhoneNumber(_phoneNumber: string): boolean {
-		return true;
+	protected isValidPhoneNumber(phoneNumber: string): boolean {
+		// Separators are a presentation choice — numbers get pasted with spaces, dots,
+		// dashes or parentheses — so strip them before looking at the digits.
+		const clean = phoneNumber.replace(/[\s.\-()]/g, '');
+
+		return /^\+?\d{7,15}$/.test(clean);
 	}
 
 	/**
 	 * Checks if the provided CNP is valid.
 	 *
+	 * Verifies the structure that is safe to assume for every CNP — 13 digits, a sex/century
+	 * digit of 1-9, and a real month — plus the control digit, which is what actually catches
+	 * a mistyped number. The birth day and county code are deliberately *not* checked: those
+	 * follow different conventions for CNPs issued to foreign residents, so enforcing them
+	 * risks rejecting valid numbers.
+	 *
 	 * @param {string} cnp
 	 * @returns {boolean}
 	 */
 	protected isValidCNP(cnp: string): boolean {
-		return /^[0-9]{13}$/.test(cnp);
+		if (!/^[0-9]{13}$/.test(cnp)) {
+			return false;
+		}
+
+		// First digit encodes sex and century; 0 is never issued.
+		if (cnp[0] === '0') {
+			return false;
+		}
+
+		const month = Number(cnp.slice(3, 5));
+
+		if (month < 1 || month > 12) {
+			return false;
+		}
+
+		// Control digit: weight the first twelve digits by the national constant, sum, then
+		// take mod 11 — a remainder of 10 stands for a control digit of 1.
+		const controlKey = '279146358279';
+
+		let sum = 0;
+
+		for (let i = 0; i < 12; i++) {
+			sum += Number(cnp[i]) * Number(controlKey[i]);
+		}
+
+		const remainder = sum % 11;
+
+		return (remainder === 10 ? 1 : remainder) === Number(cnp[12]);
 	}
 }
 

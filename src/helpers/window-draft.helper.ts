@@ -68,7 +68,16 @@ export function readWindowDraft(uid: string): FormValuesType | null {
 	}
 
 	try {
-		return JSON.parse(storedDraft) as FormValuesType;
+		/*
+		 * Stripped on the way out as well as in. Writes have been filtered since drafts were
+		 * introduced, so nothing in storage should carry a credential — but `sessionStorage`
+		 * is caller-editable and a draft could equally predate the filter, and either way the
+		 * cost of re-running it is a walk over an object that is about to be spread into form
+		 * state anyway.
+		 */
+		return stripSensitiveFields(
+			JSON.parse(storedDraft) as Record<string, unknown>,
+		) as FormValuesType;
 	} catch (error: unknown) {
 		console.warn(
 			`[window-draft] Discarding unreadable draft "${uid}":`,

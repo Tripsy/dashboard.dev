@@ -1004,8 +1004,12 @@ export function ManagerImages({
 
 			const fetchResponse = await requestUpdateStatus(
 				'image',
+				// Only an id is needed to address the record, but `status` is what types the
+				// third argument — `ImageEntry.status` is optional, so passing the entry
+				// itself would not pin the union.
 				{
 					id: entry.id,
+					status,
 				},
 				status,
 			);

@@ -44,10 +44,9 @@ const NON_DECOMPOSING_LETTERS: Record<string, string> = {
 };
 
 /**
- * Derived from the map rather than written out again — a hand-maintained second copy of the
- * same character set is one edit away from disagreeing with it, which is exactly how `Ħ`
- * ended up in the map but still being dropped. Every key is a single character with no
- * meaning inside a character class, so joining them is safe.
+ * Derived from the map so the two cannot disagree: a letter added above is matched here
+ * automatically. Every key is a single character with no meaning inside a character class,
+ * so joining them is safe.
  */
 const NON_DECOMPOSING_PATTERN = new RegExp(
 	`[${Object.keys(NON_DECOMPOSING_LETTERS).join('')}]`,
@@ -57,12 +56,15 @@ const NON_DECOMPOSING_PATTERN = new RegExp(
 /**
  * Folds accented letters onto their ASCII base: `Brăila` → `Braila`.
  *
- * `NFD` splits a precomposed letter into base + combining mark, so removing the marks leaves
- * the base behind. Without this the alphanumeric filter in `toKebabCase` deleted the accented
- * letter outright — Romanian names came out mangled (`Ursus Brăila` → `rsus-brila`), which
- * matters because slugs here are generated from user-entered names in a Romanian-first app.
+ * `NFD` splits a precomposed letter into base + combining mark, so stripping the marks
+ * leaves the base behind for the alphanumeric filter in `toKebabCase` to keep. Slugs are
+ * generated from user-entered names in a Romanian-first app, so this is the difference
+ * between `braila` and a mangled `brila`.
  *
- * Runs before the camelCase split so an accented capital still reads as a word boundary.
+ * Both Romanian encodings fold the same way — comma-below (`ș`, U+0219) and cedilla (`ş`,
+ * U+015F) — which they need to, since real data mixes them.
+ *
+ * Call it before the camelCase split so an accented capital still reads as a word boundary.
  */
 function foldDiacritics(str: string): string {
 	return str
@@ -107,9 +109,8 @@ export function toKebabCase(
 	const { preserveCase = false, preserveUnderscores = true } = options;
 
 	/*
-	 * Split camelCase/PascalCase *before* lowercasing. The other order erased the case
-	 * boundary the split depends on, so under the default `preserveCase: false` the split
-	 * matched nothing and `HelloWorld` came out as `helloworld`.
+	 * Split camelCase/PascalCase *before* the lowercase below, which destroys the case
+	 * boundary the split reads.
 	 *
 	 * Two patterns rather than one: the first breaks a lower→upper transition
 	 * (`myVariable` → `my-Variable`), the second breaks a run of capitals off the word it
@@ -131,12 +132,8 @@ export function toKebabCase(
 		result = result.replace(/[\s_]+/g, '-');
 	}
 
-	/*
-	 * Remove special characters but keep hyphens and alphanumeric — and underscores when
-	 * they are being preserved. This strip used to run unconditionally, which deleted the
-	 * underscores the branch above had just gone out of its way to keep, making
-	 * `preserveUnderscores: true` (the default) a no-op.
-	 */
+	// Remove special characters but keep hyphens and alphanumeric — and underscores when
+	// they are being preserved, otherwise this strip would undo the branch above.
 	result = result.replace(
 		preserveUnderscores ? /[^a-zA-Z0-9\-_]/g : /[^a-zA-Z0-9-]/g,
 		'',
@@ -218,10 +215,6 @@ export function replaceVars(
 ): string {
 	// Numbers are accepted because most interpolated values are numeric config
 	// (character minimums, counts) — stringifying at every call site was noise.
-	//
-	// `Object.hasOwn` rather than `key in vars`: `in` walks the prototype chain, so
-	// `{{constructor}}` resolved to `Object` and rendered as "function Object() { [native
-	// code] }" instead of being left alone as an unknown placeholder.
 	return content.replace(/{{\s*(\w+)\s*}}/g, (_, key) =>
 		Object.hasOwn(vars, key) ? String(vars[key]) : `{{${key}}}`,
 	);
@@ -261,8 +254,8 @@ const AMOUNT_DECIMALS = 4;
  *
  * `toFixed` rather than `Math.round(value * 10 ** AMOUNT_DECIMALS) / 10 ** AMOUNT_DECIMALS`:
  * it rounds the decimal representation, so it does not inherit the error of a binary
- * multiply. This is the rounding `calcNetAmount` has always used; the other two are being
- * brought onto it rather than the reverse.
+ * multiply. All three VAT helpers go through it, so a value is the same number whichever
+ * one produced it.
  */
 function roundAmount(value: number): number {
 	return parseFloat(value.toFixed(AMOUNT_DECIMALS));

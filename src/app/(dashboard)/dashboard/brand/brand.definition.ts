@@ -129,7 +129,11 @@ function getFormValues(formData: FormData): BrandFormValuesType {
 
 	return {
 		...values,
-		slug: values.name ? toKebabCase(values.name) : null,
+		// `toKebabCase` strips anything outside the latin alphabet, so a wholly non-latin name
+		// (`Москва`) reduces to an empty string. Send `null` rather than `''` — the id that
+		// would make a usable fallback does not exist yet at create time, so this stays an
+		// open case rather than being papered over with a meaningless slug.
+		slug: values.name ? toKebabCase(values.name) || null : null,
 	};
 }
 

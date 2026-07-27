@@ -142,17 +142,37 @@ export function getFormDataAsString(
 	return formValue ? String(formValue) : null;
 }
 
+/** Anything unparseable is `null`, not `NaN` — a missing number and a broken one read alike. */
 export function getFormDataAsNumber(
 	formData: FormData,
 	key: string,
 ): number | null {
 	const formValue = formData.get(key);
 
-	return formValue ? Number(formValue) : null;
+	if (formValue === null || String(formValue).trim() === '') {
+		return null;
+	}
+
+	const parsed = Number(formValue);
+
+	return Number.isNaN(parsed) ? null : parsed;
 }
 
+/**
+ * Values a form can submit for false. An unchecked checkbox sends nothing at all, but a hidden
+ * input or a select carries a literal string — and every non-empty string is truthy, so
+ * `"false"` would otherwise read as true.
+ */
+const FALSE_FORM_VALUES = new Set(['', '0', 'false', 'off', 'no']);
+
 export function getFormDataAsBoolean(formData: FormData, key: string): boolean {
-	return Boolean(formData.get(key));
+	const formValue = formData.get(key);
+
+	if (formValue === null) {
+		return false;
+	}
+
+	return !FALSE_FORM_VALUES.has(String(formValue).trim().toLowerCase());
 }
 
 export function getFormDataAsEnum<T extends Record<string, string>>(

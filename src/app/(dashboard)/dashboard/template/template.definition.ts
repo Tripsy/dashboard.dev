@@ -119,7 +119,9 @@ export function getFormValues(formData: FormData): TemplateFormValuesType {
 	const label = getFormDataAsString(formData, 'label');
 
 	const base = {
-		label: label ? toKebabCase(label) : null,
+		// An all-non-latin label kebab-cases to an empty string; `null` says "no label"
+		// rather than passing `''` off as one.
+		label: label ? toKebabCase(label) || null : null,
 		language:
 			getFormDataAsEnum(formData, 'language', LanguageEnum) ||
 			Configuration.defaultLanguage(),

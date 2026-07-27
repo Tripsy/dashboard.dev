@@ -7,7 +7,7 @@ import {
 import { ViewCashFlow } from '@/app/(dashboard)/dashboard/cash-flow/view-cash-flow.component';
 import { Configuration } from '@/config/settings.config';
 import { translateBatch } from '@/config/translate.setup';
-import { DisplayAmount } from '@/helpers/display.helper';
+import { DisplayAmount, formatAmount } from '@/helpers/display.helper';
 import {
 	getFormDataAsEnum,
 	getFormDataAsNumber,
@@ -22,11 +22,7 @@ import {
 	requestUpdate,
 	requestUpdateStatus,
 } from '@/helpers/services.helper';
-import {
-	formatAmount,
-	formatEnumLabel,
-	replaceVars,
-} from '@/helpers/string.helper';
+import { formatEnumLabel, replaceVars } from '@/helpers/string.helper';
 import {
 	BaseValidator,
 	resolveValidatorMessages,

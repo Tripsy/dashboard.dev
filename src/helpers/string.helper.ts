@@ -306,34 +306,6 @@ export function extractVAT(grossAmount: number, vatRate: number): number {
 	return roundAmount(grossAmount - grossAmount / (1 + vatRate / 100));
 }
 
-/**
- * Formats an amount
- *
- * @param amount
- * @param currencyCode
- */
-export function formatAmount(amount: number, currencyCode: string) {
-	const numberFormatter = new Intl.NumberFormat(undefined, {
-		minimumFractionDigits: 2,
-		maximumFractionDigits: 2,
-	});
-
-	const symbolFormatter = new Intl.NumberFormat(undefined, {
-		style: 'currency',
-		currency: currencyCode,
-		currencyDisplay: 'narrowSymbol',
-	});
-
-	const parts = symbolFormatter.formatToParts(0);
-	const currency =
-		parts.find((part) => part.type === 'currency')?.value ?? currencyCode;
-
-	return {
-		value: numberFormatter.format(amount),
-		currency,
-	};
-}
-
 export function normalizePhoneNumber(
 	number: string,
 	defaultCountryCode: string = '40',

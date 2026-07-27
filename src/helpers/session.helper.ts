@@ -22,7 +22,10 @@ export async function setCookie(
 	const cookieStore = await cookies();
 
 	cookieStore.set(name, value, {
-		httpOnly: options?.httpOnly ?? false,
+		// Defaults to httpOnly: everything this module writes is a session or CSRF cookie,
+		// so a forgotten flag should fail closed rather than silently produce a cookie any
+		// script on the page can read. Pass `httpOnly: false` to opt out deliberately.
+		httpOnly: options?.httpOnly ?? true,
 		secure: options?.secure ?? Configuration.isEnvironment('production'),
 		path: options?.path ?? '/',
 		sameSite: options?.sameSite ?? 'lax',
@@ -43,6 +46,15 @@ export async function deleteCookie(name: string, path?: string): Promise<void> {
 
 	cookieStore.delete({
 		name,
+		path: path ?? '/',
+	});
+
+	// `setupTrackedCookie` always writes the two together, so they have to come down
+	// together — otherwise logging out leaves `<name>-expiration` behind, still carrying a
+	// future timestamp, until its own maxAge runs out. Deleting a cookie that was never
+	// tracked is a no-op.
+	cookieStore.delete({
+		name: `${name}-expiration`,
 		path: path ?? '/',
 	});
 }

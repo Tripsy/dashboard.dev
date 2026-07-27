@@ -124,9 +124,11 @@ form from showing every required-field error before the user has typed anything.
 
 ## 6. Field Rendering
 
-- Use the shared components in `src/components/form/form-element.component.tsx`
-  (`FormComponentInput` / `Select` / `Radio` / `Textarea` / `AutoComplete` / `Submit`) rather than raw
-  `<input>`/PrimeReact elements — they wire up error display and element ids consistently.
+- Use the shared components in `src/components/form/form-element.component.tsx` rather than raw
+  `<input>`/PrimeReact elements — they wire up error display and element ids consistently. The full
+  set is `FormComponent` + `Input` / `Select` / `Radio` / `Checkbox` / `Textarea` / `Time` /
+  `Calendar` / `AutoComplete` / `Submit`, plus the pre-configured `Name` / `Email` / `Password`
+  wrappers. Check the file before hand-rolling a field — a checkbox and a date picker already exist.
 - Inside a form, read and write field state through `useWindowForm()` (`window-form.provider.tsx`), which
   exposes `{ formValues, errors, handleChange, pending }` — don't keep a form field's value in local
   `useState` instead (a search box feeding an autocomplete is fine in local state; the field it ultimately

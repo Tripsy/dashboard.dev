@@ -63,12 +63,6 @@ export function createPastDate(seconds: number): Date {
  * @returns {boolean} - True if the date is valid, false otherwise
  */
 export function isValidDate(date: string): boolean {
-	/*
-	 * dayjs parses leniently and rolls overflow forward, so a bare `isValid()` accepts
-	 * impossible dates and silently changes them: '2024-02-30' becomes 2024-03-01 and
-	 * '2024-13-45' becomes 2025-02-14. Validating the calendar part in strict mode rejects
-	 * them instead of storing a different day than the user typed.
-	 */
 	if (!dayjs(date.trim().slice(0, 10), DEFAULT_DATE_FORMAT, true).isValid()) {
 		return false;
 	}
@@ -157,7 +151,13 @@ export function formatDate(
 }
 
 /**
- * Combine a date with specified time
+ * Combine a date with a specified wall-clock time.
+ *
+ * `setHours` resolves against the runtime's zone, which is the driver's own device zone —
+ * these run client-side. That is the intended reading: "20:00" means 20:00 where the driver
+ * is, and serialising the resulting Date yields the correct UTC instant for the backend. Do
+ * not reach for `app.timezone` here; company time applies to filter day-boundaries only
+ * (see `toUTCISOString`).
  *
  * @param date
  * @param time
@@ -219,13 +219,6 @@ export function dateDiff(
 		case 'display': {
 			const diffInMinutes = end.diff(start, 'minute');
 
-			/*
-			 * Formatted from the magnitude, with the sign applied once. Using the raw
-			 * value put it on both parts — JavaScript's `%` keeps the sign of the
-			 * dividend, so -90 gave "-2h -30'" and even -1 gave "-1h -1'", which is what
-			 * a viewer whose clock trails the server's by a minute saw on a session that
-			 * had only just started.
-			 */
 			const magnitude = Math.abs(diffInMinutes);
 			const sign = diffInMinutes < 0 ? '-' : '';
 
@@ -238,7 +231,7 @@ export function dateDiff(
  * Relative description of a past date, e.g. "2 hours ago".
  *
  * This used to take a `TimeAgoOptions` bag — `useJustNow`, `suffix`, `useYesterday` and a
- * `maxPrecision` cascade — none of which ever ran: `maxPrecision` defaulted to 'year', which
+ * `maxPrecision` cascade — none of whichever ran: `maxPrecision` defaulted to 'year', which
  * matched no branch, so every call fell through to `fromNow()` regardless. The cascade was
  * also inverted relative to its name (passing 'second' enabled every level; passing 'day'
  * enabled only the day branch), so it was removed rather than repaired.
@@ -254,9 +247,15 @@ export function timeAgo(date: string | Date): string {
 }
 
 /**
- * Convert a local datetime string to UTC ISO string for sending to BE
+ * Convert a datetime string to a UTC ISO string for sending to the backend, reading it as
+ * **company time** (`app.timezone`) rather than the viewer's.
  *
- * @param value - Date string in local timezone (e.g. "2024-01-15" or "2024-01-15T20:00")
+ * That is deliberate, and the one place the app departs from device-local input: this backs
+ * the dashboard's date-range filters, where a picked day has to mean the company's day so
+ * two managers in different countries filtering "27-07" get the same rows. Instants typed
+ * into forms take the opposite convention — see `combineDateAndTime`.
+ *
+ * @param value - Date string in company time (e.g. "2024-01-15" or "2024-01-15T20:00")
  * @param endOfDay
  * @param timezone - IANA timezone (e.g. "Europe/Bucharest"), falls back to app config
  * @returns UTC ISO string (e.g. "2024-01-15T18:00:00.000Z")

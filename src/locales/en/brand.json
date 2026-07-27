@@ -6,8 +6,6 @@
 		"invalid_brand_type": "Select a valid brand type",
 		"invalid_name": "Enter a brand name",
 		"invalid_slug": "Enter a valid slug",
-		"invalid_contents": "At least one content entry is required",
-		"duplicate_contents": "Contents data cannot contain duplicate language",
 		"invalid_language": "Invalid language",
 		"invalid_description": "Invalid description",
 		"invalid_meta_title": "Invalid meta title",

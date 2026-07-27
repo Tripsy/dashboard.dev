@@ -1,8 +1,11 @@
 import { z } from 'zod';
 import { Configuration } from '@/config/settings.config';
-import { translateBatch } from '@/config/translate.setup';
 import { getFormDataAsString } from '@/helpers/form.helper';
-import { BaseValidator } from '@/helpers/validator.helper';
+import {
+	BaseValidator,
+	resolveValidatorMessages,
+	sharedValidatorMessages,
+} from '@/helpers/validator.helper';
 
 // The flow itself is a `WindowForm` (see `_components/account/account.definition.ts`);
 // only the validator and form-values contract still live here.
@@ -13,14 +16,10 @@ export type PasswordUpdateFormValuesType = {
 };
 
 const validatorMessages = [
+	...sharedValidatorMessages,
 	'invalid_password_current',
 	'invalid_password_new',
-	'password_min',
-	'password_condition_capital_letter',
-	'password_condition_number',
-	'password_condition_special_character',
 	'password_confirm_required',
-	'password_confirm_mismatch',
 ] as const;
 
 class PasswordUpdateValidator extends BaseValidator<typeof validatorMessages> {
@@ -67,9 +66,9 @@ class PasswordUpdateValidator extends BaseValidator<typeof validatorMessages> {
 export async function validateFormPasswordUpdate(
 	values: PasswordUpdateFormValuesType,
 ) {
-	const translations = await translateBatch(
+	const translations = await resolveValidatorMessages(
 		validatorMessages,
-		'account.validation',
+		'account',
 	);
 
 	const validator = new PasswordUpdateValidator(translations);

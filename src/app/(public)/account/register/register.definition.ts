@@ -1,12 +1,16 @@
 import { z } from 'zod';
 import { Configuration } from '@/config/settings.config';
-import { getLanguageClient, translateBatch } from '@/config/translate.setup';
+import { getLanguageClient } from '@/config/translate.setup';
 import {
 	getFormDataAsBoolean,
 	getFormDataAsEnum,
 	getFormDataAsString,
 } from '@/helpers/form.helper';
-import { BaseValidator } from '@/helpers/validator.helper';
+import {
+	BaseValidator,
+	resolveValidatorMessages,
+	sharedValidatorMessages,
+} from '@/helpers/validator.helper';
 import { type Language, LanguageEnum } from '@/types/common.type';
 import type { FormErrorsType, FormSituationType } from '@/types/form.type';
 
@@ -43,16 +47,11 @@ export const RegisterState: RegisterStateType = {
 };
 
 const validatorMessages = [
+	...sharedValidatorMessages,
 	'invalid_name',
-	'name_min',
 	'invalid_email',
 	'invalid_password',
-	'password_min',
-	'password_condition_capital_letter',
-	'password_condition_number',
-	'password_condition_special_character',
 	'password_confirm_required',
-	'password_confirm_mismatch',
 	'invalid_language',
 	'terms_required',
 ] as const;
@@ -112,9 +111,9 @@ class RegisterValidator extends BaseValidator<typeof validatorMessages> {
 }
 
 export async function validateFormRegister(values: RegisterFormValuesType) {
-	const translations = await translateBatch(
+	const translations = await resolveValidatorMessages(
 		validatorMessages,
-		'register.validation',
+		'register',
 	);
 
 	const validator = new RegisterValidator(translations);

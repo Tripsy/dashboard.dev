@@ -4,15 +4,9 @@
 	},
 	"validation": {
 		"invalid_name": "Please enter your name",
-		"name_min": "Name must be at least {{min}} characters long",
 		"invalid_email": "Please enter a valid email address",
 		"invalid_password": "Please create a password",
-		"password_min": "Password must be at least {{min}} characters long",
-		"password_condition_capital_letter": "Password must contain at least one capital letter",
-		"password_condition_number": "Password must contain at least one number",
-		"password_condition_special_character": "Password must contain at least one special character",
 		"password_confirm_required": "Please confirm your password",
-		"password_confirm_mismatch": "Passwords do not match",
 		"invalid_language": "Please select a valid language",
 		"terms_required": "You must accept the terms and conditions to continue",
 		"email_already_used": "This email address is already registered"

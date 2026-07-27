@@ -18,7 +18,11 @@ import {
 	requestUpdate,
 	requestUpdateStatus,
 } from '@/helpers/services.helper';
-import { BaseValidator } from '@/helpers/validator.helper';
+import {
+	BaseValidator,
+	resolveValidatorMessages,
+	sharedValidatorMessages,
+} from '@/helpers/validator.helper';
 import { type AuthModel, hasPermission } from '@/models/auth.model';
 import {
 	type UserModel,
@@ -37,18 +41,13 @@ import type {
 import type { FormStateType } from '@/types/form.type';
 
 const validatorMessages = [
+	...sharedValidatorMessages,
 	'invalid_name',
-	'name_min',
 	'invalid_email',
 	'invalid_language',
 	'invalid_role',
 	'invalid_password',
-	'password_min',
-	'password_condition_capital_letter',
-	'password_condition_number',
-	'password_condition_special_character',
 	'password_confirm_required',
-	'password_confirm_mismatch',
 	'invalid_operator_type',
 ] as const;
 
@@ -177,9 +176,9 @@ class UserValidator extends BaseValidator<typeof validatorMessages> {
 }
 
 async function validateFormCreate(values: UserFormValuesType) {
-	const translations = await translateBatch(
+	const translations = await resolveValidatorMessages(
 		validatorMessages,
-		'user.validation',
+		'user',
 	);
 
 	const validator = new UserValidator(translations);
@@ -188,9 +187,9 @@ async function validateFormCreate(values: UserFormValuesType) {
 }
 
 async function validateFormUpdate(values: UserFormValuesType) {
-	const translations = await translateBatch(
+	const translations = await resolveValidatorMessages(
 		validatorMessages,
-		'user.validation',
+		'user',
 	);
 
 	const validator = new UserValidator(translations);

@@ -19,7 +19,11 @@ import {
 	requestUpdate,
 	requestView,
 } from '@/helpers/services.helper';
-import { BaseValidator } from '@/helpers/validator.helper';
+import {
+	BaseValidator,
+	resolveValidatorMessages,
+	sharedValidatorMessages,
+} from '@/helpers/validator.helper';
 import { type AuthModel, hasPermission } from '@/models/auth.model';
 import {
 	displayPlaceLabel,
@@ -38,12 +42,11 @@ import type {
 import type { FormStateType } from '@/types/form.type';
 
 const validatorMessages = [
+	...sharedValidatorMessages,
 	'invalid_place_type',
 	'invalid_code',
 	'invalid_parent',
 	'invalid_parent_id',
-	'invalid_contents',
-	'duplicate_contents',
 	'invalid_language',
 	'invalid_name',
 	'invalid_type_label',
@@ -107,9 +110,9 @@ async function validateForm(
 	values: PlaceFormValuesType,
 	isSubmit: boolean = true,
 ) {
-	const translations = await translateBatch(
+	const translations = await resolveValidatorMessages(
 		validatorMessages,
-		'place.validation',
+		'place',
 	);
 
 	const validator = new PlaceValidator(translations);

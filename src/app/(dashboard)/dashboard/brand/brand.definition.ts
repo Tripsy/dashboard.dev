@@ -18,7 +18,11 @@ import {
 	requestView,
 } from '@/helpers/services.helper';
 import { toKebabCase } from '@/helpers/string.helper';
-import { BaseValidator } from '@/helpers/validator.helper';
+import {
+	BaseValidator,
+	resolveValidatorMessages,
+	sharedValidatorMessages,
+} from '@/helpers/validator.helper';
 import { type AuthModel, hasPermission } from '@/models/auth.model';
 import {
 	BRAND_DEFAULT_TYPE,
@@ -39,11 +43,10 @@ import type {
 import type { FormStateType } from '@/types/form.type';
 
 const validatorMessages = [
+	...sharedValidatorMessages,
 	'invalid_brand_type',
 	'invalid_name',
 	'invalid_slug',
-	'invalid_contents',
-	'duplicate_contents',
 	'invalid_language',
 	'invalid_description',
 	'invalid_meta_title',
@@ -86,9 +89,9 @@ class BrandValidator extends BaseValidator<typeof validatorMessages> {
 }
 
 async function validateForm(values: BrandFormValuesType) {
-	const translations = await translateBatch(
+	const translations = await resolveValidatorMessages(
 		validatorMessages,
-		'brand.validation',
+		'brand',
 	);
 
 	const validator = new BrandValidator(translations);

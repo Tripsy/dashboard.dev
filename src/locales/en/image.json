@@ -6,8 +6,6 @@
 		"invalid_section": "Invalid section",
 		"invalid_entity_id": "Invalid entity ID",
 		"invalid_image_type": "Invalid image type",
-		"invalid_contents": "At least one content entry is required",
-		"duplicate_contents": "Contents data cannot contain duplicate language",
 		"invalid_language": "Invalid language",
 		"invalid_storage": "Invalid storage",
 		"invalid_path": "Invalid path provided",

@@ -14,13 +14,19 @@ import { type Language, LanguageEnum } from '@/types/common.type';
  * every entity's locale file — constraint messages the helpers below produce themselves,
  * as opposed to the per-field `invalid_<field>` messages an entity owns.
  *
- * Mirrors `sharedValidatorMessages` in star-backend's validator.abstract.ts. An entity opts
- * in by spreading this into its own tuple, which is what makes the key available to
- * `getMessage` at the type level:
- *
  *   const validatorMessages = [...sharedValidatorMessages, 'invalid_amount'] as const;
  */
-export const sharedValidatorMessages = ['only_positive'] as const;
+export const sharedValidatorMessages = [
+	'only_positive',
+	'name_min',
+	'password_min',
+	'password_condition_capital_letter',
+	'password_condition_number',
+	'password_condition_special_character',
+	'password_confirm_mismatch',
+	'invalid_contents',
+	'duplicate_contents',
+] as const;
 
 /**
  * Resolves a validator's message record, taking shared keys from the `shared.validation`
@@ -65,8 +71,7 @@ export abstract class IsValidator {
 		// ISO 13616 registers Romania as RO2!n4!a16!c — two check digits, a four-letter bank
 		// code, then sixteen *alphanumeric* characters. This demanded `\d{16}`, so every IBAN
 		// whose account part contains a letter was rejected outright, including the ECBS
-		// reference value RO49AAAA1B31007593840000. Accounts that happen to be all digits
-		// still validated, which is why it went unnoticed.
+		// reference value RO49AAAA1B31007593840000.
 		if (!/^RO\d{2}[A-Z]{4}[A-Z0-9]{16}$/.test(clean)) {
 			return false;
 		}
@@ -122,9 +127,7 @@ export abstract class IsValidator {
 	 *
 	 * Verifies the structure that is safe to assume for every CNP — 13 digits, a sex/century
 	 * digit of 1-9, and a real month — plus the control digit, which is what actually catches
-	 * a mistyped number. The birth day and county code are deliberately *not* checked: those
-	 * follow different conventions for CNPs issued to foreign residents, so enforcing them
-	 * risks rejecting valid numbers.
+	 * a mistyped number.
 	 *
 	 * @param {string} cnp
 	 * @returns {boolean}
@@ -329,13 +332,6 @@ export abstract class BaseValidator<
 		}
 
 		if (options.required) {
-			/*
-			 * A required field has to reject the empty string. `minChars` already does that,
-			 * but `maxChars` does not — and the guard used to be skipped whenever *either*
-			 * bound was set, so `{ required: true, maxChars: n }` quietly accepted ''. No
-			 * caller combines them that way today; this stops the next one from getting an
-			 * optional field that claims to be required.
-			 */
 			const requiredSchema = options.minChars
 				? baseSchema
 				: baseSchema.min(1, { message: message.invalid });
@@ -428,10 +424,6 @@ export abstract class BaseValidator<
 		};
 
 		if (options.onlyPositive) {
-			// Key must match how it is read below (`message.only_positive`). It was
-			// `onlyPositive` here, so the default never resolved and Zod fell back to its own
-			// untranslated text — "Too small: expected number to be >0" — on every numeric
-			// field, since `onlyPositive` defaults to true and no caller passes the message.
 			defaultMessages.only_positive = 'Must be a positive number';
 		}
 
@@ -968,13 +960,6 @@ export abstract class BaseValidator<
 			);
 		}
 
-		/*
-		 * There was a transform here that rounded a time down onto the nearest interval. It
-		 * could never run: the `minuteInterval` refinement above rejects any time that is not
-		 * already on the interval, so nothing reaching the transform needed rounding. Its
-		 * comment also claimed "nearest" while it floored. Rejecting is the behaviour the app
-		 * has always had — reinstate rounding only by removing that refinement, deliberately.
-		 */
 		const timeSchema = baseSchema;
 
 		if (options.required) {

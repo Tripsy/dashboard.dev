@@ -7,8 +7,6 @@
 		"invalid_code": "Invalid code",
 		"invalid_parent_id": "Invalid parent place; Use entry from select",
 		"invalid_parent": "Invalid parent place",
-		"invalid_contents": "At least one content entry is required",
-		"duplicate_contents": "Contents data cannot contain duplicate language",
 		"invalid_language": "Invalid language",
 		"invalid_name": "Invalid name",
 		"invalid_type_label": "Invalid type label"

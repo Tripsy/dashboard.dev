@@ -19,7 +19,12 @@
 		"invalid_pick_scheduled_at": "Invalid pick scheduled date",
 		"invalid_estimated_delivery_at": "Invalid estimated delivery date",
 		"invalid_delivered_at": "Invalid delivery date",
-		"delivery_same_as_pickup_address": "Delivery address cannot be the same as pickup address"
+		"delivery_same_as_pickup_address": "Delivery address cannot be the same as pickup address",
+		"invalid_ordered_at_time": "Invalid order time",
+		"invalid_pick_scheduled_at_time": "Invalid pick scheduled time",
+		"invalid_estimated_delivery_at_time": "Invalid estimated delivery time",
+		"invalid_delivered_at_time": "Invalid delivery time",
+		"invalid_notes": "Invalid notes"
 	},
 	"error": {
 		"cannot_update_status": "Cannot update status"

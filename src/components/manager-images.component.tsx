@@ -21,7 +21,7 @@ import ValueError from '@/exceptions/value.error';
 import { CSRF_HEADER, getCsrfToken } from '@/helpers/csrf.helper';
 import { cn } from '@/helpers/css.helper';
 import { displayImage } from '@/helpers/display.helper';
-import { getErrorMessage } from '@/helpers/objects.helper';
+import { getErrorMessage } from '@/helpers/error.helper';
 import {
 	requestDelete,
 	requestFind,

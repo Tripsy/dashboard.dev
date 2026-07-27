@@ -186,12 +186,10 @@ export const DisplayDeleted = ({
  * Grouping and decimal separators follow **the language the UI is rendered in**, not the
  * viewer's browser: `1,234.50` under `en`, `1.234,50` under `ro`. Two people reading the same
  * screen in the same language therefore see the same figures, and a screenshot in a bug report
- * matches what the reporter saw. Reading the browser locale instead would format numbers in a
- * way that can disagree with the text around them.
+ * matches what the reporter saw.
  *
- * This is why the function lives here rather than in `string.helper`: it needs
- * `getLanguageClient()`, and `translate.setup` imports `string.helper`, so the reverse import
- * would close a cycle.
+ * The function lives here rather than in `string.helper` because it needs
+ * `getLanguageClient()`, and `translate.setup` imports `string.helper`
  *
  * Client-only — `getLanguageClient()` reads `html[lang]`. Every amount in the app is rendered
  * client-side, which is what keeps this consistent (a server render would fall back to the

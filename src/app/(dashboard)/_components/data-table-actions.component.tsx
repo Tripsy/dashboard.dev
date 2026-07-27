@@ -9,7 +9,7 @@ import {
 	type ButtonCommand,
 } from '@/components/action-button.component';
 import { getDataSourceConfig } from '@/config/data-source.config';
-import { getErrorMessage } from '@/helpers/objects.helper';
+import { getErrorMessage } from '@/helpers/error.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { hasPermission } from '@/models/auth.model';
 import { UserRoleEnum } from '@/models/user.model';

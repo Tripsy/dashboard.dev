@@ -8,7 +8,7 @@ import {
 	DisplayStatus,
 	type statusList,
 } from '@/helpers/display.helper';
-import { getErrorMessage } from '@/helpers/objects.helper';
+import { getErrorMessage } from '@/helpers/error.helper';
 import { requestView } from '@/helpers/services.helper';
 import { capitalizeFirstLetter } from '@/helpers/string.helper';
 import { useToast } from '@/providers/toast.provider';

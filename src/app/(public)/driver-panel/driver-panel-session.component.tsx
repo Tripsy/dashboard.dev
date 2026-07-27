@@ -7,7 +7,7 @@ import { Icons } from '@/components/icon.component';
 import { Button } from '@/components/ui/button';
 import { formatDate } from '@/helpers/date.helper';
 import { DisplayAmount } from '@/helpers/display.helper';
-import { getErrorMessage } from '@/helpers/objects.helper';
+import { getErrorMessage } from '@/helpers/error.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import type { CmrModel } from '@/models/cmr.model';
 import { displayWorkSessionDuration } from '@/models/work-session.model';

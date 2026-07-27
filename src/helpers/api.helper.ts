@@ -32,6 +32,17 @@ export const buildQueryString = (params: QueryFiltersType): string => {
 		if (typeof value === 'object') {
 			if (key === 'filter') {
 				Object.entries(value).forEach(([filterKey, filterValue]) => {
+					// Prune exactly as the top-level branch above does. Without this an
+					// unset filter is sent as the literal string "undefined", which the
+					// backend then matches against.
+					if (
+						filterValue === undefined ||
+						filterValue === null ||
+						filterValue === ''
+					) {
+						return;
+					}
+
 					query.append(`filter[${filterKey}]`, String(filterValue));
 				});
 			} else {
@@ -56,7 +67,7 @@ export function getRemoteApiUrl(path: string): string {
 export function getResponseData<T>(
 	response: ApiResponseFetch<T>,
 ): T | undefined {
-	return response?.data as T;
+	return response?.data;
 }
 
 export class ApiRequest {
@@ -77,22 +88,37 @@ export class ApiRequest {
 		return this;
 	}
 
-	public setRequestInit(options: RequestInit): this {
-		const mergedHeaders = new Headers(this.requestInit.headers || {});
+	/**
+	 * Merges `override` onto `base` without touching either, headers included.
+	 *
+	 * `doFetch` needs this to be pure: folding a call's options into the instance would
+	 * leave the method, body and headers of one request set on the next one made through
+	 * the same instance.
+	 */
+	private static mergeRequestInit(
+		base: RequestInit,
+		override: RequestInit,
+	): RequestInit {
+		const mergedHeaders = new Headers(base.headers || {});
 
-		if (options.headers) {
-			const incomingHeaders = new Headers(options.headers);
-
-			incomingHeaders.forEach((value, key) => {
+		if (override.headers) {
+			new Headers(override.headers).forEach((value, key) => {
 				mergedHeaders.set(key, value);
 			});
 		}
 
-		this.requestInit = {
-			...this.requestInit,
-			...options,
+		return {
+			...base,
+			...override,
 			headers: mergedHeaders,
 		};
+	}
+
+	public setRequestInit(options: RequestInit): this {
+		this.requestInit = ApiRequest.mergeRequestInit(
+			this.requestInit,
+			options,
+		);
 
 		return this;
 	}
@@ -115,13 +141,20 @@ export class ApiRequest {
 		}
 	}
 
-	private handleError(error: unknown) {
+	/**
+	 * Always throws — declared `never` so callers are known to be unreachable afterwards.
+	 */
+	private handleError(error: unknown): never {
 		if (error instanceof ApiError) {
 			throw error;
 		}
 
-		// Handle network errors or aborted requests
-		if (error instanceof Error && error.name === 'AbortError') {
+		// `AbortSignal.timeout` rejects with a TimeoutError; a manual `controller.abort()`
+		// rejects with an AbortError. Both mean the request ran out of time.
+		if (
+			error instanceof Error &&
+			(error.name === 'TimeoutError' || error.name === 'AbortError')
+		) {
 			throw new ApiError('Request timeout', 408);
 		}
 
@@ -162,25 +195,34 @@ export class ApiRequest {
 		path: string,
 		requestInit: RequestInit = {},
 	): Promise<ApiResponseFetch<T>> {
-		const controller = new AbortController();
-		const timeout = setTimeout(
-			() => controller.abort(),
-			ApiRequest.ABORT_TIMEOUT,
-		);
-
-		const requestUrl = this.buildRequestUrl(path);
-
-		if (requestInit) {
-			this.setRequestInit(requestInit);
-		}
-
 		try {
-			const res = await fetch(requestUrl, {
-				...this.requestInit,
-				signal: controller.signal,
-			});
+			// Inside the try on purpose: `buildRequestUrl` reaches `Routes.get`, which
+			// throws for an unknown route name, and that has to surface as an ApiError like
+			// every other failure rather than escaping raw.
+			const requestUrl = this.buildRequestUrl(path);
 
-			clearTimeout(timeout);
+			const requestOptions = ApiRequest.mergeRequestInit(
+				this.requestInit,
+				requestInit,
+			);
+
+			// The platform has to set Content-Type for FormData because only it knows the
+			// multipart boundary; the default JSON header would make the body unreadable.
+			if (requestOptions.body instanceof FormData) {
+				(requestOptions.headers as Headers).delete('Content-Type');
+			}
+
+			const res = await fetch(requestUrl, {
+				...requestOptions,
+				/*
+				 * One signal covering the whole exchange. The previous timer was cleared
+				 * the moment `fetch` resolved — which is when the *headers* arrive — so
+				 * reading the body below was left unbounded and a server that stalled
+				 * mid-response hung the request indefinitely. A signal also cannot be
+				 * leaked the way a timer could when something threw before `clearTimeout`.
+				 */
+				signal: AbortSignal.timeout(ApiRequest.ABORT_TIMEOUT),
+			});
 
 			// Handle non-JSON responses (like 204 No Content)
 			if (res.status === 204) {
@@ -191,43 +233,40 @@ export class ApiRequest {
 				await this.handleJsonResponse(res);
 
 			if (!res.ok) {
-				const error = new ApiError(
+				throw new ApiError(
 					`HTTP ${res.status} Error`,
 					res.status,
 					jsonResponse,
 				);
-
-				this.handleError(error);
 			}
 
 			return jsonResponse;
 		} catch (error) {
-			clearTimeout(timeout);
-
 			this.handleError(error);
 		}
 	}
 }
 
-export function resolveRequestPath(key: DataSourceKey) {
-	const withSuffixList: DataSourceKey[] = [
-		'brand',
-		'client',
-		'image',
-		'permission',
-		'place',
-		'template',
-		'user',
-		'vehicle',
-		'vendor',
-		'company-vehicle',
-		'cmr-session',
-		'cmr-vehicle',
-		'work-session',
-		'work-session-vehicle',
-	];
+/** Data sources whose backend endpoint is the plural of the key. */
+const PLURAL_ENDPOINT_KEYS: ReadonlySet<DataSourceKey> = new Set([
+	'brand',
+	'client',
+	'image',
+	'permission',
+	'place',
+	'template',
+	'user',
+	'vehicle',
+	'vendor',
+	'company-vehicle',
+	'cmr-session',
+	'cmr-vehicle',
+	'work-session',
+	'work-session-vehicle',
+]);
 
-	if (withSuffixList.includes(key)) {
+export function resolveRequestPath(key: DataSourceKey) {
+	if (PLURAL_ENDPOINT_KEYS.has(key)) {
 		return `${key}s`;
 	}
 

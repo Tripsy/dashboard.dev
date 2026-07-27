@@ -21,7 +21,11 @@ import {
 	requestUpdateStatus,
 } from '@/helpers/services.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
-import { BaseValidator } from '@/helpers/validator.helper';
+import {
+	BaseValidator,
+	resolveValidatorMessages,
+	sharedValidatorMessages,
+} from '@/helpers/validator.helper';
 import { type AuthModel, hasPermission } from '@/models/auth.model';
 import {
 	displayVehicleLabel,
@@ -39,7 +43,7 @@ import type {
 import type { FormStateType } from '@/types/form.type';
 
 const validatorMessages = [
-	'only_positive',
+	...sharedValidatorMessages,
 	'invalid_brand_id',
 	'invalid_brand',
 	'invalid_vehicle_type',
@@ -115,9 +119,9 @@ async function validateForm(
 	values: VehicleFormValuesType,
 	isSubmit: boolean = true,
 ) {
-	const translations = await translateBatch(
+	const translations = await resolveValidatorMessages(
 		validatorMessages,
-		'vehicle.validation',
+		'vehicle',
 	);
 
 	const validator = new VehicleValidator(translations);

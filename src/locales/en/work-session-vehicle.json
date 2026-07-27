@@ -10,8 +10,7 @@
 		"invalid_vehicle_type": "Invalid vehicle type",
 		"invalid_vehicle_km_start": "Invalid start km",
 		"invalid_vehicle_km_end": "Invalid end km",
-		"invalid_notes": "Invalid notes",
-		"only_positive": "Enter a positive number"
+		"invalid_notes": "Invalid notes"
 	},
 	"error": {
 		"cannot_update_status": "Cannot update status"

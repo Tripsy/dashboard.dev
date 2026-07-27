@@ -1,0 +1,5 @@
+{
+	"validation": {
+		"only_positive": "Enter a positive number"
+	}
+}

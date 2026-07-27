@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { translateBatch } from '@/config/translate.setup';
 import {
 	createCurrentDate,
 	dateDiff,
@@ -7,6 +8,49 @@ import {
 } from '@/helpers/date.helper';
 import { replaceVars } from '@/helpers/string.helper';
 import { type Language, LanguageEnum } from '@/types/common.type';
+
+/**
+ * Validation messages that are generic enough to be written once rather than copied into
+ * every entity's locale file — constraint messages the helpers below produce themselves,
+ * as opposed to the per-field `invalid_<field>` messages an entity owns.
+ *
+ * Mirrors `sharedValidatorMessages` in star-backend's validator.abstract.ts. An entity opts
+ * in by spreading this into its own tuple, which is what makes the key available to
+ * `getMessage` at the type level:
+ *
+ *   const validatorMessages = [...sharedValidatorMessages, 'invalid_amount'] as const;
+ */
+export const sharedValidatorMessages = ['only_positive'] as const;
+
+/**
+ * Resolves a validator's message record, taking shared keys from the `shared.validation`
+ * namespace and everything else from the entity's own.
+ *
+ * Use this in an entity's `validateForm` in place of a bare
+ * `translateBatch(validatorMessages, '<entity>.validation')` whenever the tuple spreads
+ * `sharedValidatorMessages`.
+ */
+export async function resolveValidatorMessages<
+	const T extends readonly string[],
+>(validatorMessages: T, entity: string): Promise<Record<T[number], string>> {
+	/*
+	 * Shared keys are kept out of the entity batch deliberately: asking for
+	 * `<entity>.validation.only_positive` resolves to the raw key — and, with app.debug on,
+	 * logs a missing-translation warning for a key that was never meant to live there.
+	 */
+	const entityMessages = validatorMessages.filter(
+		(key) => !(sharedValidatorMessages as readonly string[]).includes(key),
+	);
+
+	const [shared, entitySpecific] = await Promise.all([
+		translateBatch(sharedValidatorMessages, 'shared.validation'),
+		translateBatch(entityMessages, `${entity}.validation`),
+	]);
+
+	// Shared spread last so a shared key always resolves from the shared namespace, matching
+	// the backend, where membership of the shared list decides the namespace outright.
+	return { ...entitySpecific, ...shared } as Record<T[number], string>;
+}
 
 export abstract class IsValidator {
 	/**

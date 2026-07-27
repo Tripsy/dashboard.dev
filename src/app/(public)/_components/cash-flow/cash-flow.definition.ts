@@ -23,7 +23,11 @@ import {
 	formatEnumLabel,
 	replaceVars,
 } from '@/helpers/string.helper';
-import { BaseValidator } from '@/helpers/validator.helper';
+import {
+	BaseValidator,
+	resolveValidatorMessages,
+	sharedValidatorMessages,
+} from '@/helpers/validator.helper';
 import {
 	CashFlowCategoryEnum,
 	CashFlowCategoryTypeEnum,
@@ -44,7 +48,7 @@ import type { DataSourceConfigType } from '@/types/data-source.type';
 import type { FormStateType, ValidatorOutput } from '@/types/form.type';
 
 const validatorMessages = [
-	'only_positive',
+	...sharedValidatorMessages,
 	'invalid_category',
 	'invalid_method',
 	'invalid_amount',
@@ -156,9 +160,9 @@ class CashFlowValidator extends BaseValidator<typeof validatorMessages> {
 }
 
 async function validateForm(values: CashFlowFormValuesType) {
-	const translations = await translateBatch(
+	const translations = await resolveValidatorMessages(
 		validatorMessages,
-		'cash-flow.validation',
+		'cash-flow',
 	);
 
 	const validator = new CashFlowValidator(translations);

@@ -133,6 +133,11 @@ export async function processForm<
 
 		return buildState({
 			values,
+			// Cleared because `buildState` spreads the previous state: reaching this point
+			// means validation passed, so any field errors it left behind describe input the
+			// user has since corrected. Without this they stay on screen next to a server
+			// message that has nothing to do with them.
+			errors: {},
 			message: fetchResponse?.message || null,
 			situation: fetchResponse?.success ? 'success' : 'serverError',
 			resultData: fetchResponse?.data,

@@ -1,5 +1,27 @@
 import { headers } from 'next/headers';
 
+/**
+ * Removes a trailing `:port` without damaging the address itself.
+ *
+ * An IPv6 address is built out of colons, so splitting on the first one keeps a single hextet
+ * (`2001:db8::1` becomes `2001`). Only two forms actually carry a port: the bracketed IPv6
+ * form, and `host:port` where the host holds no colon of its own.
+ */
+function stripPort(value: string): string {
+	const bracketed = value.match(/^\[(.+)\]/);
+
+	if (bracketed) {
+		return bracketed[1];
+	}
+
+	// More than one colon means a bare IPv6 address, which cannot carry a port unbracketed.
+	if (value.indexOf(':') !== value.lastIndexOf(':')) {
+		return value;
+	}
+
+	return value.split(':')[0];
+}
+
 export async function getClientIp(
 	headersProvided?: Headers,
 ): Promise<string | undefined> {
@@ -18,16 +40,12 @@ export async function getClientIp(
 		return undefined;
 	}
 
-	// Remove IPv6 prefix
+	// Unwrap an IPv4-mapped IPv6 address (`::ffff:203.0.113.7`) to its IPv4 form first, so
+	// what follows sees a plain address.
 	ip = ip.replace(/^::ffff:/, '');
 
-	// Remove port number if exists
-	ip = ip.split(':')[0];
-
-	// Remove brackets from IPv6 addresses
-	ip = ip.replace(/^\[|\]$/g, '');
-
-	return ip;
+	// Remove port number if exists; brackets around an IPv6 address go with it
+	return stripPort(ip);
 }
 
 type ApiHeaders = {

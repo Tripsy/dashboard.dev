@@ -6,7 +6,19 @@ import type { Language } from '@/types/common.type';
 type TranslationValue = string | { [key: string]: TranslationValue };
 type TranslationResource = Record<string, TranslationValue>;
 
+/** Resolved resources, readable synchronously by `translateLoaded`. */
 const languageResources: Record<string, TranslationResource> = {};
+
+/**
+ * In-flight imports, so concurrent first callers share one `import()` rather than each
+ * starting their own — `languageResources` is only populated once the import resolves.
+ */
+const languageResourcesPending: Record<
+	string,
+	Promise<TranslationResource>
+> = {};
+
+const isDebug = Configuration.get('app.debug');
 
 async function fetchLanguage(): Promise<Language> {
 	const fallback = Configuration.defaultLanguage();
@@ -21,7 +33,9 @@ async function fetchLanguage(): Promise<Language> {
 			return fromHeader as Language;
 		}
 	} catch (error) {
-		console.error('Failed to read language header:', error);
+		// Not an error worth shouting about: `headers()` throws whenever it is called
+		// outside a request scope, and falling back to the default language is correct.
+		console.debug('Could not read the language header:', error);
 	}
 
 	return fallback;
@@ -46,18 +60,22 @@ export async function getLanguage(): Promise<Language> {
 	return fetchLanguage();
 }
 
-async function loadLanguageResource(
-	language: string,
-): Promise<TranslationResource> {
-	if (languageResources[language]) {
-		return languageResources[language];
+function loadLanguageResource(language: string): Promise<TranslationResource> {
+	const loaded = languageResources[language];
+
+	if (loaded) {
+		return Promise.resolve(loaded);
 	}
 
-	languageResources[language] = (
-		await import(`@/locales/${language}`)
-	).default;
+	languageResourcesPending[language] ??= import(`@/locales/${language}`).then(
+		(module) => {
+			languageResources[language] = module.default;
 
-	return languageResources[language];
+			return module.default;
+		},
+	);
+
+	return languageResourcesPending[language];
 }
 
 /**
@@ -70,7 +88,18 @@ export const getTranslatedString = (
 ) => {
 	const objectValue = getObjectValue(resource, key);
 
-	return typeof objectValue === 'string' ? objectValue : key;
+	if (typeof objectValue === 'string') {
+		return objectValue;
+	}
+
+	// A miss is silent in production — the key is a serviceable placeholder and warning on
+	// every render would be noise — but while developing it is almost always a typo or a
+	// key that was never added to the locale file.
+	if (isDebug) {
+		console.warn(`Missing translation: ${key}`);
+	}
+
+	return key;
 };
 
 /**

@@ -75,9 +75,6 @@ function loadSettings() {
 		redis: {
 			host: process.env.REDIS_HOST || 'localhost',
 			port: parseInt(process.env.REDIS_PORT || '6379', 10),
-			// Empty rather than undefined: ioredis treats '' as "no auth" exactly like
-			// undefined, and `Configuration.get` warns on every undefined lookup — which
-			// fired on each connect because REDIS_PASSWORD is blank locally.
 			password: process.env.REDIS_PASSWORD || '',
 		},
 		cache: {

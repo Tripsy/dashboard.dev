@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import Image from 'next/image';
-import { type ComponentType, type JSX, useMemo, useState } from 'react';
+import { type ComponentType, type JSX, useState } from 'react';
 import { Icons } from '@/components/icon.component';
 import {
 	Badge,
@@ -147,10 +147,7 @@ export const DisplayStatus = ({
 	size?: BadgeSize;
 	icon?: ComponentType<{ className?: string }>;
 }) => {
-	const translationsKeys = useMemo(
-		() => [`${dataSource}.status.${status}`] as const,
-		[dataSource, status],
-	);
+	const translationsKeys = [`${dataSource}.status.${status}`] as const;
 
 	const { translations } = useTranslation(translationsKeys);
 	const { variant: statusVariant, icon: StatusIcon } =

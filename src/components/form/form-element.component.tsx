@@ -8,7 +8,7 @@ import {
 	Select,
 } from '@heroui/react';
 import { CalendarDate, parseDate } from '@internationalized/date';
-import React, { type JSX, useEffect, useMemo, useRef, useState } from 'react';
+import React, { type JSX, useEffect, useRef, useState } from 'react';
 import { ActionButtonContent } from '@/components/action-button.component';
 import { FormElementError } from '@/components/form/form-element-error.component';
 import { Icons } from '@/components/icon.component';
@@ -1112,10 +1112,10 @@ export const FormComponentSubmit = ({
 	error: boolean;
 	button?: ButtonAppearanceType;
 }) => {
-	const translationsKeys = useMemo(
-		() => ['app.action.loading.label', 'app.action.submit.label'] as const,
-		[],
-	);
+	const translationsKeys = [
+		'app.action.loading.label',
+		'app.action.submit.label',
+	] as const;
 
 	const { translations } = useTranslation(translationsKeys);
 

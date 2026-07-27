@@ -1,5 +1,4 @@
 import { Modal } from '@heroui/react';
-import { useMemo } from 'react';
 import { ActionButton } from '@/components/action-button.component';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import type { ButtonAppearanceType } from '@/types/html.type';
@@ -25,16 +24,12 @@ export function ConfirmationDialog({
 	buttonConfirm,
 	disabled = false,
 }: ConfirmationDialogProps) {
-	const translationsKeys = useMemo(
-		() =>
-			[
-				'app.action.abort.title',
-				'app.action.abort.label',
-				'app.action.confirm.title',
-				'app.action.confirm.label',
-			] as const,
-		[],
-	);
+	const translationsKeys = [
+		'app.action.abort.title',
+		'app.action.abort.label',
+		'app.action.confirm.title',
+		'app.action.confirm.label',
+	] as const;
 
 	const { translations } = useTranslation(translationsKeys);
 

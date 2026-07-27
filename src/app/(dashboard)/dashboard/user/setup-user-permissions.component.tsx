@@ -21,15 +21,11 @@ import {
 export function SetupUserPermissions({ entries }: { entries: UserModel[] }) {
 	const entry = entries[0];
 
-	const translationsKeys = useMemo(
-		() =>
-			[
-				'app.error.title',
-				'app.success.title',
-				'user.error.no_permissions_defined',
-			] as const,
-		[],
-	);
+	const translationsKeys = [
+		'app.error.title',
+		'app.success.title',
+		'user.error.no_permissions_defined',
+	] as const;
 
 	const { isTranslationLoading, translations } =
 		useTranslation(translationsKeys);

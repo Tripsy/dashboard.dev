@@ -159,10 +159,10 @@ export function WindowForm<
 		entryId,
 	});
 
-	const translationsKeys = useMemo(
-		() => ['app.action.cancel.title', 'app.action.cancel.label'] as const,
-		[],
-	);
+	const translationsKeys = [
+		'app.action.cancel.title',
+		'app.action.cancel.label',
+	] as const;
 
 	const { translations } = useTranslation(translationsKeys);
 

@@ -74,45 +74,41 @@ export function SideMenu() {
 	const { menuState } = useSideMenu();
 	const { selectedPage } = useBreadcrumb();
 
-	const translationsKeys = useMemo(
-		() =>
-			[
-				'dashboard.labels.financial',
-				'dashboard.labels.client',
-				'dashboard.labels.cash-flow',
+	const translationsKeys = [
+		'dashboard.labels.financial',
+		'dashboard.labels.client',
+		'dashboard.labels.cash-flow',
 
-				'dashboard.labels.activity',
-				'dashboard.labels.cmr',
-				'dashboard.labels.cmr-session',
-				'dashboard.labels.cmr-vehicle',
-				'dashboard.labels.work-session',
-				'dashboard.labels.work-session-vehicle',
+		'dashboard.labels.activity',
+		'dashboard.labels.cmr',
+		'dashboard.labels.cmr-session',
+		'dashboard.labels.cmr-vehicle',
+		'dashboard.labels.work-session',
+		'dashboard.labels.work-session-vehicle',
 
-				'dashboard.labels.assets',
-				'dashboard.labels.company-vehicle',
+		'dashboard.labels.assets',
+		'dashboard.labels.company-vehicle',
 
-				'dashboard.labels.content',
-				'dashboard.labels.address',
-				'dashboard.labels.place',
-				'dashboard.labels.brand',
-				'dashboard.labels.image',
-				'dashboard.labels.vehicle',
-				'dashboard.labels.vendor',
+		'dashboard.labels.content',
+		'dashboard.labels.address',
+		'dashboard.labels.place',
+		'dashboard.labels.brand',
+		'dashboard.labels.image',
+		'dashboard.labels.vehicle',
+		'dashboard.labels.vendor',
 
-				'dashboard.labels.settings',
-				'dashboard.labels.template',
+		'dashboard.labels.settings',
+		'dashboard.labels.template',
 
-				'dashboard.labels.logs',
-				'dashboard.labels.log-data',
-				'dashboard.labels.log-history',
-				'dashboard.labels.cron-history',
-				'dashboard.labels.mail-queue',
+		'dashboard.labels.logs',
+		'dashboard.labels.log-data',
+		'dashboard.labels.log-history',
+		'dashboard.labels.cron-history',
+		'dashboard.labels.mail-queue',
 
-				'dashboard.labels.user',
-				'dashboard.labels.permission',
-			] as const,
-		[],
-	);
+		'dashboard.labels.user',
+		'dashboard.labels.permission',
+	] as const;
 
 	const { translations, isTranslationLoading } =
 		useTranslation(translationsKeys);

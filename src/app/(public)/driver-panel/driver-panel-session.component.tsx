@@ -28,16 +28,12 @@ export function DriverPanelSession() {
 		refreshSession,
 	} = useWorkSession();
 
-	const translationsKeys = useMemo(
-		() =>
-			[
-				'app.error.title',
-				'driver-panel.tooltip.add_session_vehicle',
-				'driver-panel.tooltip.create_cmr',
-				'driver-panel.tooltip.close_session',
-			] as const,
-		[],
-	);
+	const translationsKeys = [
+		'app.error.title',
+		'driver-panel.tooltip.add_session_vehicle',
+		'driver-panel.tooltip.create_cmr',
+		'driver-panel.tooltip.close_session',
+	] as const;
 	const { translations } = useTranslation(translationsKeys);
 
 	const { data: ronData } = useDriverCashBalance(CurrencyEnum.RON);

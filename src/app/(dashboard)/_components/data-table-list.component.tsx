@@ -77,14 +77,10 @@ export default function DataTableList(props: {
 		(s) => s.clearSelectedEntries,
 	);
 
-	const translationsKeys = useMemo(
-		() =>
-			[
-				'dashboard.text.no_entries',
-				'dashboard.text.showing_entries',
-			] as const,
-		[],
-	);
+	const translationsKeys = [
+		'dashboard.text.no_entries',
+		'dashboard.text.showing_entries',
+	] as const;
 
 	const { isTranslationLoading, translations } =
 		useTranslation(translationsKeys);

@@ -61,16 +61,12 @@ export default function ProtectedRoute({
 		}
 	}, [authStatus, pathname, routeAuth, router]);
 
-	const translationsKeys = useMemo(
-		() =>
-			[
-				'app.action.loading.title',
-				'app.action.loading.label',
-				'auth.message.already_logged_in',
-				'auth.message.unauthorized',
-			] as const,
-		[],
-	);
+	const translationsKeys = [
+		'app.action.loading.title',
+		'app.action.loading.label',
+		'auth.message.already_logged_in',
+		'auth.message.unauthorized',
+	] as const;
 
 	const { translations, isTranslationLoading } =
 		useTranslation(translationsKeys);

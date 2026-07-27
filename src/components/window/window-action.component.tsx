@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { dispatchFilterReset } from '@/app/(dashboard)/_events/data-table-filter-reset.event';
 import { ActionButton } from '@/components/action-button.component';
 import { LoadingComponent } from '@/components/status.component';
@@ -71,23 +71,19 @@ export function WindowAction<WindowEntry extends WindowEntryType>({
 	const actionLabelKey = `${windowConfig.dataSource}.action.${windowConfig.action}.label`;
 	const actionConfirmKey = `${windowConfig.dataSource}.action.${windowConfig.action}.confirm`;
 
-	const translationsKeys = useMemo(
-		() =>
-			[
-				actionTitleKey,
-				actionLabelKey,
-				actionConfirmKey,
-				'app.error.description',
-				'app.success.title',
-				'app.error.title',
-				'app.action.loading.label',
-				'app.action.abort.title',
-				'app.action.abort.label',
-				'dashboard.text.selected_entries_one',
-				'dashboard.text.selected_entries_many',
-			] as const,
-		[actionTitleKey, actionLabelKey, actionConfirmKey],
-	);
+	const translationsKeys = [
+		actionTitleKey,
+		actionLabelKey,
+		actionConfirmKey,
+		'app.error.description',
+		'app.success.title',
+		'app.error.title',
+		'app.action.loading.label',
+		'app.action.abort.title',
+		'app.action.abort.label',
+		'dashboard.text.selected_entries_one',
+		'dashboard.text.selected_entries_many',
+	] as const;
 
 	const { translations, isTranslationLoading } =
 		useTranslation(translationsKeys);

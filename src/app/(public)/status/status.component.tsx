@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { useParams, useSearchParams } from 'next/navigation';
-import { useMemo } from 'react';
 import type { ParamsType } from '@/app/(public)/status/[type]/page';
 import {
 	ErrorComponent,
@@ -45,7 +44,7 @@ export default function StatusComponent() {
 	const r = searchParams.get('r') || 'generic';
 	const messageKey = `app.${type}.${r}`;
 
-	const translationKeys = useMemo(() => [messageKey] as const, [messageKey]);
+	const translationKeys = [messageKey] as const;
 	const { translations, isTranslationLoading } =
 		useTranslation(translationKeys);
 

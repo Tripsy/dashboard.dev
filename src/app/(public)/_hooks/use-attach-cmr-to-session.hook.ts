@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { useWorkSession } from '@/app/(public)/_providers/work-session.provider';
 import { getErrorMessage } from '@/helpers/objects.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
@@ -29,7 +29,7 @@ export function useAttachCmrToSession(): (cmrId: number) => Promise<void> {
 	} = useWorkSession();
 	const { showToast } = useToast();
 
-	const translationsKeys = useMemo(() => ['app.error.title'] as const, []);
+	const translationsKeys = ['app.error.title'] as const;
 	const { translations } = useTranslation(translationsKeys);
 
 	return useCallback(

@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect } from 'react';
 import { dispatchFilterReset } from '@/app/(dashboard)/_events/data-table-filter-reset.event';
 import { WINDOW_CACHE_LABEL } from '@/helpers/window.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
@@ -34,10 +34,11 @@ export function useWindowFormProcessed<
 	const actionLabelKey = `${windowConfig.dataSource}.action.${windowConfig.action}.label`;
 	const successMessageKey = `${windowConfig.dataSource}.action.${windowConfig.action}.success`;
 
-	const translationsKeys = useMemo(
-		() => [successMessageKey, actionLabelKey, 'app.success.title'] as const,
-		[actionLabelKey, successMessageKey],
-	);
+	const translationsKeys = [
+		successMessageKey,
+		actionLabelKey,
+		'app.success.title',
+	] as const;
 
 	const { translations } = useTranslation(translationsKeys);
 

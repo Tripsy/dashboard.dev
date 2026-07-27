@@ -629,28 +629,24 @@ export function ManagerImages({
 	const { showToast } = useToast();
 	const languages = attributeLanguages ?? [DEFAULT_LANGUAGE];
 
-	const translationsKeys = useMemo(
-		() =>
-			[
-				'app.error.title',
-				'app.error.description',
-				'app.success.title',
-				'image.action.add.success',
-				'image.validation.invalid_attribute',
-				'image.error.save_failed',
-				'image.success.save',
-				'image.action.delete.title',
-				'image.action.delete.success',
-				'image.action.delete.confirm',
-				'image.action.enable.title',
-				'image.action.enable.confirm',
-				'image.action.enable.success',
-				'image.action.disable.title',
-				'image.action.disable.confirm',
-				'image.action.disable.success',
-			] as const,
-		[],
-	);
+	const translationsKeys = [
+		'app.error.title',
+		'app.error.description',
+		'app.success.title',
+		'image.action.add.success',
+		'image.validation.invalid_attribute',
+		'image.error.save_failed',
+		'image.success.save',
+		'image.action.delete.title',
+		'image.action.delete.success',
+		'image.action.delete.confirm',
+		'image.action.enable.title',
+		'image.action.enable.confirm',
+		'image.action.enable.success',
+		'image.action.disable.title',
+		'image.action.disable.confirm',
+		'image.action.disable.success',
+	] as const;
 
 	const { translations } = useTranslation(translationsKeys);
 

@@ -1,5 +1,5 @@
 import { Label } from '@heroui/react';
-import { type JSX, useMemo } from 'react';
+import type { JSX } from 'react';
 import { dispatchFilterReset } from '@/app/(dashboard)/_events/data-table-filter-reset.event';
 import {
 	FormComponentAutoComplete,
@@ -199,14 +199,10 @@ export function FormFiltersDateRange<Fields>({
 	const elementKeyEnd = `search-${String(end.fieldName)}`;
 	const elementIds = useElementIds([elementKeyStart, elementKeyEnd]);
 
-	const translationsKeys = useMemo(
-		() =>
-			[
-				'dashboard.text.placeholder_start_date',
-				'dashboard.text.placeholder_end_date',
-			] as const,
-		[],
-	);
+	const translationsKeys = [
+		'dashboard.text.placeholder_start_date',
+		'dashboard.text.placeholder_end_date',
+	] as const;
 
 	const { translations } = useTranslation(translationsKeys);
 
@@ -269,10 +265,9 @@ export function FormFiltersShowDeleted({
 
 	const elementIds = useElementIds(['search-is-deleted'] as const);
 
-	const translationsKeys = useMemo(
-		() => ['dashboard.text.label_checkbox_show_deleted'] as const,
-		[],
-	);
+	const translationsKeys = [
+		'dashboard.text.label_checkbox_show_deleted',
+	] as const;
 
 	const { translations } = useTranslation(translationsKeys);
 
@@ -300,10 +295,7 @@ export function FormFiltersReset({
 }: {
 	dataSource: DataSourceKey;
 }) {
-	const translationsKeys = useMemo(
-		() => ['dashboard.text.label_reset'] as const,
-		[],
-	);
+	const translationsKeys = ['dashboard.text.label_reset'] as const;
 
 	const { translations } = useTranslation(translationsKeys);
 

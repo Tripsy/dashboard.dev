@@ -28,8 +28,6 @@ export async function requestFind<Entry>(
 ) {
 	const query = buildQueryString(params as QueryFiltersType);
 
-	// `buildQueryString` returns '' once every param has been pruned, which used to leave a
-	// bare trailing '?' on the URL.
 	const path = `/${resolveRequestPath(dataSource)}${query ? `?${query}` : ''}`;
 
 	const response: ApiResponseFetch<FindFunctionResponseType<Entry>> =
@@ -104,14 +102,6 @@ export async function requestRestore<Entry extends { id: number }>(
 	);
 }
 
-/**
- * The status is constrained to the ones the entry itself allows, so a value belonging to a
- * different entity is a compile error rather than a rejected request — `('vehicle', vehicle,
- * 'completed')` used to type-check happily against `status: string`.
- *
- * This is also why the whole entry is taken rather than an id: `Entry['status']` is what
- * carries the union.
- */
 export async function requestUpdateStatus<
 	Entry extends { id: number; status: string },
 >(

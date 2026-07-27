@@ -16,7 +16,8 @@
 		"invalid_employee": "Select a valid employee",
 		"invalid_company_vehicle": "Select a valid company vehicle",
 		"invalid_cmr": "Select a valid CMR",
-		"required_operational_record_type": "For selected category operational record is required (e.g.: {{type}})"
+		"required_operational_record_type": "For selected category operational record is required (e.g.: {{type}})",
+		"only_positive": "Enter a positive number"
 	},
 	"status": {
 		"pending": "Pending",

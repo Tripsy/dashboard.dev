@@ -26,6 +26,7 @@ import type { DataSourceConfigType } from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
 const validatorMessages = [
+	'only_positive',
 	'invalid_company_vehicle_id',
 	'invalid_company_vehicle',
 	'invalid_vehicle_km_start',
@@ -57,13 +58,19 @@ class WorkSessionVehicleValidator extends BaseValidator<
 					},
 				),
 				vehicle_km_start: this.validateNumber(
-					this.getMessage('invalid_vehicle_km_start'),
+					{
+						invalid: this.getMessage('invalid_vehicle_km_start'),
+						only_positive: this.getMessage('only_positive'),
+					},
 					{
 						required: false,
 					},
 				),
 				vehicle_km_end: this.validateNumber(
-					this.getMessage('invalid_vehicle_km_end'),
+					{
+						invalid: this.getMessage('invalid_vehicle_km_end'),
+						only_positive: this.getMessage('only_positive'),
+					},
 					{
 						required: false,
 					},
@@ -109,7 +116,10 @@ class WorkSessionVehicleValidator extends BaseValidator<
 					},
 				),
 				vehicle_km_end: this.validateNumber(
-					this.getMessage('invalid_vehicle_km_end'),
+					{
+						invalid: this.getMessage('invalid_vehicle_km_end'),
+						only_positive: this.getMessage('only_positive'),
+					},
 					{
 						required: false,
 					},

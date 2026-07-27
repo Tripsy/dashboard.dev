@@ -56,6 +56,7 @@ import type {
 import type { FormStateType, ValidatorOutput } from '@/types/form.type';
 
 const validatorMessages = [
+	'only_positive',
 	'invalid_category',
 	'invalid_method',
 	'invalid_amount',
@@ -113,11 +114,17 @@ class CashFlowValidator extends BaseValidator<typeof validatorMessages> {
 				onlyPositive: false,
 				allowDecimals: 2,
 			}),
-			vat_rate: this.validateNumber(this.getMessage('invalid_vat_rate'), {
-				required: true,
-				onlyPositive: true,
-				allowDecimals: 2,
-			}),
+			vat_rate: this.validateNumber(
+				{
+					invalid: this.getMessage('invalid_vat_rate'),
+					only_positive: this.getMessage('only_positive'),
+				},
+				{
+					required: true,
+					onlyPositive: true,
+					allowDecimals: 2,
+				},
+			),
 			currency: this.validateEnum(
 				CurrencyEnum,
 				this.getMessage('invalid_currency'),

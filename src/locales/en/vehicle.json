@@ -10,7 +10,8 @@
 		"invalid_length": "Invalid length",
 		"invalid_width": "Invalid width",
 		"invalid_height": "Invalid height",
-		"invalid_weight": "Invalid weight"
+		"invalid_weight": "Invalid weight",
+		"only_positive": "Enter a positive number"
 	},
 	"status": {
 		"verified": "Verified",

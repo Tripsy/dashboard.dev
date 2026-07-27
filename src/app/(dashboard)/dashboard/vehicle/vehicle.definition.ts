@@ -39,6 +39,7 @@ import type {
 import type { FormStateType } from '@/types/form.type';
 
 const validatorMessages = [
+	'only_positive',
 	'invalid_brand_id',
 	'invalid_brand',
 	'invalid_vehicle_type',
@@ -62,18 +63,42 @@ class VehicleValidator extends BaseValidator<typeof validatorMessages> {
 					this.getMessage('invalid_vehicle_type'),
 				),
 				model: this.validateString(this.getMessage('invalid_model')),
-				length: this.validateNumber(this.getMessage('invalid_length'), {
-					required: false,
-				}),
-				width: this.validateNumber(this.getMessage('invalid_width'), {
-					required: false,
-				}),
-				height: this.validateNumber(this.getMessage('invalid_height'), {
-					required: false,
-				}),
-				weight: this.validateNumber(this.getMessage('invalid_weight'), {
-					required: false,
-				}),
+				length: this.validateNumber(
+					{
+						invalid: this.getMessage('invalid_length'),
+						only_positive: this.getMessage('only_positive'),
+					},
+					{
+						required: false,
+					},
+				),
+				width: this.validateNumber(
+					{
+						invalid: this.getMessage('invalid_width'),
+						only_positive: this.getMessage('only_positive'),
+					},
+					{
+						required: false,
+					},
+				),
+				height: this.validateNumber(
+					{
+						invalid: this.getMessage('invalid_height'),
+						only_positive: this.getMessage('only_positive'),
+					},
+					{
+						required: false,
+					},
+				),
+				weight: this.validateNumber(
+					{
+						invalid: this.getMessage('invalid_weight'),
+						only_positive: this.getMessage('only_positive'),
+					},
+					{
+						required: false,
+					},
+				),
 			})
 			.superRefine((data, ctx) => {
 				if (isSubmit && data.brand && !data.brand_id) {

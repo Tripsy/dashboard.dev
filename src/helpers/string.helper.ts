@@ -12,6 +12,69 @@ export function formatEnumLabel(value: string): string {
 }
 
 /**
+ * Latin letters that carry no combining mark to strip, so `NFD` leaves them intact and the
+ * alphanumeric filter would drop them entirely. Spelled out rather than reached for a
+ * transliteration library: this is the set that realistically turns up in European company
+ * and place names, and a dependency for twenty characters is a poor trade.
+ *
+ * Multi-letter expansions of a capital are title-cased (`Æ` → `Ae`, not `AE`): the
+ * capital-run split in `toKebabCase` would read `AE` as an acronym ending a word and cut
+ * `Ærø` into `a-ero`.
+ */
+const NON_DECOMPOSING_LETTERS: Record<string, string> = {
+	ß: 'ss',
+	æ: 'ae',
+	œ: 'oe',
+	ø: 'o',
+	đ: 'd',
+	ð: 'd',
+	ł: 'l',
+	þ: 'th',
+	ħ: 'h',
+	ı: 'i',
+	ẞ: 'Ss',
+	Æ: 'Ae',
+	Œ: 'Oe',
+	Þ: 'Th',
+	Ø: 'O',
+	Đ: 'D',
+	Ð: 'D',
+	Ł: 'L',
+	Ħ: 'H',
+};
+
+/**
+ * Derived from the map rather than written out again — a hand-maintained second copy of the
+ * same character set is one edit away from disagreeing with it, which is exactly how `Ħ`
+ * ended up in the map but still being dropped. Every key is a single character with no
+ * meaning inside a character class, so joining them is safe.
+ */
+const NON_DECOMPOSING_PATTERN = new RegExp(
+	`[${Object.keys(NON_DECOMPOSING_LETTERS).join('')}]`,
+	'g',
+);
+
+/**
+ * Folds accented letters onto their ASCII base: `Brăila` → `Braila`.
+ *
+ * `NFD` splits a precomposed letter into base + combining mark, so removing the marks leaves
+ * the base behind. Without this the alphanumeric filter in `toKebabCase` deleted the accented
+ * letter outright — Romanian names came out mangled (`Ursus Brăila` → `rsus-brila`), which
+ * matters because slugs here are generated from user-entered names in a Romanian-first app.
+ *
+ * Runs before the camelCase split so an accented capital still reads as a word boundary.
+ */
+function foldDiacritics(str: string): string {
+	return str
+		.replace(
+			NON_DECOMPOSING_PATTERN,
+			(letter) => NON_DECOMPOSING_LETTERS[letter] ?? letter,
+		)
+		.normalize('NFD')
+		.replace(/\p{M}/gu, '');
+}
+
+/**
  * Convert a string to kebab-case
  *
  * toKebabCase("hello world")           // "hello-world"
@@ -23,6 +86,8 @@ export function formatEnumLabel(value: string): string {
  * toKebabCase("myVariableName")         // "my-variable-name"
  * toKebabCase("This is a test")         // "this-is-a-test"
  * toKebabCase("  leading trailing  ")   // "leading-trailing"
+ * toKebabCase("Ursus Brăila")           // "ursus-braila" (accents folded, not dropped)
+ * toKebabCase("Groß Straße")            // "gross-strasse"
  *
  * toKebabCase("hello_world", { preserveUnderscores: false })   // "hello-world"
  * toKebabCase("hello__world", { preserveUnderscores: false })  // "hello-world"
@@ -41,15 +106,23 @@ export function toKebabCase(
 ): string {
 	const { preserveCase = false, preserveUnderscores = true } = options;
 
-	let result = str;
+	/*
+	 * Split camelCase/PascalCase *before* lowercasing. The other order erased the case
+	 * boundary the split depends on, so under the default `preserveCase: false` the split
+	 * matched nothing and `HelloWorld` came out as `helloworld`.
+	 *
+	 * Two patterns rather than one: the first breaks a lower→upper transition
+	 * (`myVariable` → `my-Variable`), the second breaks a run of capitals off the word it
+	 * starts (`XMLParser` → `XML-Parser`), which a single pattern cannot do.
+	 */
+	let result = foldDiacritics(str)
+		.replace(/([a-z0-9])([A-Z])/g, '$1-$2')
+		.replace(/([A-Z]+)([A-Z][a-z])/g, '$1-$2');
 
 	// Convert to lowercase unless preserveCase is true
 	if (!preserveCase) {
 		result = result.toLowerCase();
 	}
-
-	// Handle camelCase/PascalCase
-	result = result.replace(/([a-z])([A-Z])/g, '$1-$2');
 
 	// Replace spaces and (optionally) underscores with hyphens
 	if (preserveUnderscores) {
@@ -58,8 +131,16 @@ export function toKebabCase(
 		result = result.replace(/[\s_]+/g, '-');
 	}
 
-	// Remove special characters but keep hyphens and alphanumeric
-	result = result.replace(/[^a-zA-Z0-9-]/g, '');
+	/*
+	 * Remove special characters but keep hyphens and alphanumeric — and underscores when
+	 * they are being preserved. This strip used to run unconditionally, which deleted the
+	 * underscores the branch above had just gone out of its way to keep, making
+	 * `preserveUnderscores: true` (the default) a no-op.
+	 */
+	result = result.replace(
+		preserveUnderscores ? /[^a-zA-Z0-9\-_]/g : /[^a-zA-Z0-9-]/g,
+		'',
+	);
 
 	// Clean up multiple hyphens
 	result = result.replace(/-+/g, '-');
@@ -137,8 +218,12 @@ export function replaceVars(
 ): string {
 	// Numbers are accepted because most interpolated values are numeric config
 	// (character minimums, counts) — stringifying at every call site was noise.
+	//
+	// `Object.hasOwn` rather than `key in vars`: `in` walks the prototype chain, so
+	// `{{constructor}}` resolved to `Object` and rendered as "function Object() { [native
+	// code] }" instead of being left alone as an unknown placeholder.
 	return content.replace(/{{\s*(\w+)\s*}}/g, (_, key) =>
-		key in vars ? String(vars[key]) : `{{${key}}}`,
+		Object.hasOwn(vars, key) ? String(vars[key]) : `{{${key}}}`,
 	);
 }
 
@@ -159,6 +244,31 @@ export function parseJson(val: unknown) {
 }
 
 /**
+ * Decimal places an amount is meaningful to.
+ *
+ * Mirrors `AMOUNT_DECIMALS` in the backend's `cash-flow.entity.ts`. Amounts are not stored
+ * with a separator there: `cash-flow.service.ts` persists `Math.round(abs(amount) * 10 ** 4)`
+ * as an integer and divides by the same factor on read, so 80.6452 is stored as 806452.
+ * Anything past the fourth decimal is discarded by that round-trip regardless — rounding here
+ * means the value the app shows and the value the database holds are the same number.
+ *
+ * Keep in sync with the backend if its precision ever changes.
+ */
+const AMOUNT_DECIMALS = 4;
+
+/**
+ * Rounds to the precision the backend stores.
+ *
+ * `toFixed` rather than `Math.round(value * 10 ** AMOUNT_DECIMALS) / 10 ** AMOUNT_DECIMALS`:
+ * it rounds the decimal representation, so it does not inherit the error of a binary
+ * multiply. This is the rounding `calcNetAmount` has always used; the other two are being
+ * brought onto it rather than the reverse.
+ */
+function roundAmount(value: number): number {
+	return parseFloat(value.toFixed(AMOUNT_DECIMALS));
+}
+
+/**
  * Add VAT to a net amount
  *
  * @param {number} netAmount - Amount excluding VAT
@@ -170,7 +280,7 @@ export function calcGrossAmount(netAmount: number, vatRate: number): number {
 		throw new Error('VAT rate must be greater or equal to 0');
 	}
 
-	return netAmount * (1 + vatRate / 100);
+	return roundAmount(netAmount * (1 + vatRate / 100));
 }
 
 /**
@@ -185,9 +295,7 @@ export function calcNetAmount(grossAmount: number, vatRate: number): number {
 		throw new Error('VAT rate must be greater or equal to 0');
 	}
 
-	const netAmount = grossAmount / (1 + vatRate / 100);
-
-	return parseFloat(netAmount.toFixed(4));
+	return roundAmount(grossAmount / (1 + vatRate / 100));
 }
 
 /**
@@ -202,7 +310,7 @@ export function extractVAT(grossAmount: number, vatRate: number): number {
 		throw new Error('VAT rate must be greater or equal to 0');
 	}
 
-	return grossAmount - grossAmount / (1 + vatRate / 100);
+	return roundAmount(grossAmount - grossAmount / (1 + vatRate / 100));
 }
 
 /**

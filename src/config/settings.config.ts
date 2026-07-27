@@ -75,13 +75,6 @@ function loadSettings() {
 		redis: {
 			host: process.env.REDIS_HOST || 'localhost',
 			port: parseInt(process.env.REDIS_PORT || '6379', 10),
-			/*
-			 * This app and star-backend share one Redis instance and database, so every key
-			 * is namespaced by app. Applied in `CacheProvider.buildKey` rather than through
-			 * ioredis's own `keyPrefix` option: that one does not reach the MATCH argument of
-			 * SCAN, so `deleteByPattern` would scan the *other* app's keys and then delete
-			 * against them — leaving the collision risk in place while appearing to solve it.
-			 */
 			keyPrefix: process.env.REDIS_KEY_PREFIX || 'dashboard',
 			password: process.env.REDIS_PASSWORD || '',
 		},

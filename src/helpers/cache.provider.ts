@@ -2,16 +2,6 @@ import type Redis from 'ioredis';
 import { getRedisClient } from '@/config/init-redis.config';
 import { Configuration } from '@/config/settings.config';
 
-/**
- * Port of `star-backend`'s `src/providers/cache.provider.ts` — keep the two in sync when
- * either side changes. Deliberate differences, all environment-driven:
- *   - logs through `console.error`; this project has no logger provider
- *   - no `MockCacheProvider`; this project has no test suite to swap it into
- *   - exported through a lazy accessor rather than an eagerly-built singleton, so merely
- *     importing the module does not open a Redis connection
- *   - adds `read()` (see its own note)
- */
-
 type CacheData = unknown;
 
 type CacheGetResults = {
@@ -22,11 +12,6 @@ type CacheGetResults = {
 export class CacheProvider {
 	constructor(private readonly cache: Redis) {}
 
-	/**
-	 * Every key is built here, so prefixing at this point covers reads, writes and the
-	 * patterns handed to `deleteByPattern` alike. An empty `redis.keyPrefix` drops out via
-	 * the same filter that removes empty segments, leaving keys unprefixed.
-	 */
 	buildKey(...args: string[]) {
 		return [Configuration.get('redis.keyPrefix'), ...args]
 			.filter((arg) => arg !== '')
@@ -63,12 +48,6 @@ export class CacheProvider {
 		}
 
 		try {
-			/*
-			 * Objects, arrays and quoted strings are parsed back; a bare number is left as the
-			 * string Redis returned. That is deliberate — "42" cannot be told apart from a
-			 * numeric string a caller stored on purpose, so coercing it here would corrupt
-			 * one to serve the other. Callers that need a number convert it themselves.
-			 */
 			const trimmed = data.trim();
 
 			if (

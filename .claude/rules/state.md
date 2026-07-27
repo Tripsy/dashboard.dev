@@ -45,6 +45,8 @@ factory-plus-Context shape, not a single global `create()`.
 
 ## 3. Slice Pattern
 
+This applies to the data-table store; the window store is a single flat definition and doesn't need it.
+
 Split a store's state into composable slice factories instead of one flat state object:
 
 ```typescript
@@ -62,15 +64,36 @@ a new piece of per-table UI state) as a new slice, not by bloating `DataTableSli
 
 ## 4. Middleware Stack
 
-Every store here uses `immer` + `devtools` + `persist`:
+The two stores do **not** share a middleware stack — check which one you are in before writing an update:
 
-- **immer** — mutate `state.x = y` directly inside `set((state: Draft<...>) => { ... })`; don't hand-write
-  spread-based immutable updates.
-- **devtools** — store name is passed for Redux DevTools visibility.
-- **persist** — data-table stores persist to `localStorage` under `datatable-store-<section>-<dataSource>`,
-  via a `partialize` function that **only** persists `tableState` and `selectedEntries` (not `isLoading`).
-  If you add a new top-level field to the data-table store, decide explicitly whether it belongs in
-  `partialize` — don't assume everything in the store state is persisted.
+| | `data-table.store.ts` | `window.store.ts` |
+|---|---|---|
+| Middleware | `devtools` + `persist` + `immer` | `devtools` + `persist` — **no immer** |
+| Write style | mutate `state.x = y` inside `set((state: Draft<...>) => { ... })` | return a new object: `set((state) => ({ stack: state.stack.map(...) }))` |
+
+Writing an immer-style mutation in the window store fails silently — no error, no type complaint, the
+update simply never lands. Match the store you are editing.
+
+**devtools** — store name is passed for Redux DevTools visibility.
+
+**persist**, data-table stores — `localStorage` under `datatable-store-<section>-<dataSource>`, via a
+`partialize` that **only** persists `tableState` and `selectedEntries` (not `isLoading`). If you add a new
+top-level field, decide explicitly whether it belongs in `partialize` — don't assume store state is
+persisted. The store is versioned (`version: 1`); bump it when you change the shape of
+`DataTableStateType` or the filters, so stale persisted state is dropped rather than rehydrated into code
+that can no longer read it.
+
+**persist**, window store — different in ways that matter:
+
+- `partialize` keeps only the serializable shell of each window (`uid`, `section`, `dataSource`, `action`,
+  `minimized`, `data`, `props`). `definition` and `events` are deliberately dropped — they hold functions.
+  A restored window is therefore incomplete until its definition is re-attached.
+- `skipHydration: true`, because definitions are lazy-loaded and restoring the stack is async, so it cannot
+  happen during the SSR-matched first render. `hydrateWindowStore()` performs it explicitly with a real
+  `setState`; there is no `onRehydrateStorage` callback, since zustand does not await it.
+- `clearWindowStore()` is the logout path: it awaits hydration first (so an in-flight restore cannot
+  repopulate the stack behind it), then `closeAll()` — which also clears form drafts — then
+  `persist.clearStorage()`. If you add anything persisted and user-specific, clear it here too.
 
 ## 5. Access Pattern
 

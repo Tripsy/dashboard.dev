@@ -23,7 +23,7 @@ export function createCurrentDate(startOfDay: boolean = false): Date {
  * Create a future date by adding seconds to the current date
  *
  * @param {number} seconds - The number of seconds to add
- * @throws {Error} - If seconds is a negative number
+ * @throws {Error} - If seconds is zero or negative
  * @returns {Date} - The future date
  */
 export function createFutureDate(seconds: number): Date {
@@ -40,7 +40,7 @@ export function createFutureDate(seconds: number): Date {
  * Create a past date by subtracting seconds from the current date
  *
  * @param {number} seconds - The number of seconds to subtract
- * @throws {Error} - If seconds is a negative number
+ * @throws {Error} - If seconds is zero or negative
  * @returns {Date} - The past date
  */
 export function createPastDate(seconds: number): Date {
@@ -138,10 +138,8 @@ export function formatDate(
 		case 'time':
 			return date.format('HH:mm');
 		default:
-			if (format) {
-				return date.format(format);
-			}
-
+			// No `if (format)` fallback here: the cases above cover every member of the
+			// union, so this branch is only reached when `format` is undefined.
 			if (options?.customFormat) {
 				return date.format(options.customFormat);
 			}
@@ -209,13 +207,22 @@ export function dateDiff(
 		throw new Error('Invalid date arguments provided for dateDiff');
 	}
 
+	/*
+	 * Rounds the magnitude up and restores the sign. A bare `Math.ceil` on a signed value
+	 * rounds positives away from zero (90.2 -> 91) but negatives toward it (-90.2 -> -90),
+	 * so the same interval measured backwards came back a unit short of the one measured
+	 * forwards.
+	 */
+	const roundAwayFromZero = (value: number) =>
+		Math.sign(value) * Math.ceil(Math.abs(value));
+
 	switch (unit) {
 		case 'seconds':
-			return Math.ceil(end.diff(start, 'second', true));
+			return roundAwayFromZero(end.diff(start, 'second', true));
 		case 'minutes':
-			return Math.ceil(end.diff(start, 'minute', true));
+			return roundAwayFromZero(end.diff(start, 'minute', true));
 		case 'hours':
-			return Math.ceil(end.diff(start, 'hour', true));
+			return roundAwayFromZero(end.diff(start, 'hour', true));
 		case 'display': {
 			const diffInMinutes = end.diff(start, 'minute');
 

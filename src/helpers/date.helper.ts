@@ -54,12 +54,25 @@ export function createPastDate(seconds: number): Date {
 }
 
 /**
- * Check if a string is a valid date
+ * Check if a string is a valid date.
+ *
+ * Expects the calendar part to lead in `YYYY-MM-DD` form; anything after it (a time, an
+ * offset) is parsed leniently.
  *
  * @param {string} date - The date string to check
  * @returns {boolean} - True if the date is valid, false otherwise
  */
 export function isValidDate(date: string): boolean {
+	/*
+	 * dayjs parses leniently and rolls overflow forward, so a bare `isValid()` accepts
+	 * impossible dates and silently changes them: '2024-02-30' becomes 2024-03-01 and
+	 * '2024-13-45' becomes 2025-02-14. Validating the calendar part in strict mode rejects
+	 * them instead of storing a different day than the user typed.
+	 */
+	if (!dayjs(date.trim().slice(0, 10), DEFAULT_DATE_FORMAT, true).isValid()) {
+		return false;
+	}
+
 	return dayjs(date).isValid();
 }
 
@@ -205,105 +218,38 @@ export function dateDiff(
 			return Math.ceil(end.diff(start, 'hour', true));
 		case 'display': {
 			const diffInMinutes = end.diff(start, 'minute');
-			const hours = Math.floor(diffInMinutes / 60);
-			const minutes = diffInMinutes % 60;
 
-			return `${hours}h ${minutes}'`;
+			/*
+			 * Formatted from the magnitude, with the sign applied once. Using the raw
+			 * value put it on both parts — JavaScript's `%` keeps the sign of the
+			 * dividend, so -90 gave "-2h -30'" and even -1 gave "-1h -1'", which is what
+			 * a viewer whose clock trails the server's by a minute saw on a session that
+			 * had only just started.
+			 */
+			const magnitude = Math.abs(diffInMinutes);
+			const sign = diffInMinutes < 0 ? '-' : '';
+
+			return `${sign}${Math.floor(magnitude / 60)}h ${magnitude % 60}'`;
 		}
 	}
 }
 
-interface TimeAgoOptions {
-	/**
-	 * Use "just now" for very recent times
-	 * @default true
-	 */
-	useJustNow?: boolean;
-
-	/**
-	 * Maximum precision level (e.g., 'minute' will show "2 minutes ago" but not "2 hours ago")
-	 */
-	maxPrecision?:
-		| 'second'
-		| 'minute'
-		| 'hour'
-		| 'day'
-		| 'week'
-		| 'month'
-		| 'year';
-
-	/**
-	 * Add suffix like "ago" or "from now"
-	 * @default 'ago'
-	 */
-	suffix?: string;
-
-	/**
-	 * Use "yesterday" for 1 day ago
-	 * @default false
-	 */
-	useYesterday?: boolean;
-}
-
-export function timeAgo(
-	date: string | Date,
-	options: TimeAgoOptions = {},
-): string {
-	const {
-		useJustNow = true,
-		maxPrecision = 'year',
-		suffix = 'ago',
-		useYesterday = false,
-	} = options;
-
+/**
+ * Relative description of a past date, e.g. "2 hours ago".
+ *
+ * This used to take a `TimeAgoOptions` bag — `useJustNow`, `suffix`, `useYesterday` and a
+ * `maxPrecision` cascade — none of which ever ran: `maxPrecision` defaulted to 'year', which
+ * matched no branch, so every call fell through to `fromNow()` regardless. The cascade was
+ * also inverted relative to its name (passing 'second' enabled every level; passing 'day'
+ * enabled only the day branch), so it was removed rather than repaired.
+ */
+export function timeAgo(date: string | Date): string {
 	const target = dayjs(date);
 
 	if (!target.isValid()) {
 		throw new Error('Invalid date argument provided for timeAgo');
 	}
 
-	const now = dayjs();
-	const diffInSeconds = now.diff(target, 'second');
-	const diffInMinutes = now.diff(target, 'minute');
-	const diffInHours = now.diff(target, 'hour');
-	const diffInDays = now.diff(target, 'day');
-
-	// Check for yesterday
-	if (useYesterday && diffInDays === 1) {
-		return 'yesterday';
-	}
-
-	// Check max precision
-	if (maxPrecision === 'second') {
-		if (diffInSeconds < 60) {
-			return useJustNow
-				? 'just now'
-				: `${diffInSeconds} second${diffInSeconds !== 1 ? 's' : ''} ${suffix}`;
-		}
-	}
-
-	if (maxPrecision === 'minute' || maxPrecision === 'second') {
-		if (diffInMinutes < 60) {
-			const value = Math.max(1, diffInMinutes);
-			return `${value} minute${value > 1 ? 's' : ''} ${suffix}`;
-		}
-	}
-
-	if (maxPrecision === 'hour' || maxPrecision === 'minute') {
-		if (diffInHours < 24) {
-			const value = Math.max(1, diffInHours);
-			return `${value} hour${value > 1 ? 's' : ''} ${suffix}`;
-		}
-	}
-
-	if (maxPrecision === 'day' || maxPrecision === 'hour') {
-		if (diffInDays < 7) {
-			const value = Math.max(1, diffInDays);
-			return `${value} day${value > 1 ? 's' : ''} ${suffix}`;
-		}
-	}
-
-	// For all other cases, use the simple version
 	return target.fromNow();
 }
 

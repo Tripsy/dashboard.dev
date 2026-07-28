@@ -221,10 +221,8 @@ room in the container for both, and it is usually the dev server that gets kille
 
 # 📌 TODO
 
-1. api.helper throw of exception caught locally
-2. Discuss about dropping Prime
-3. Seeders
-4. deploy
+1. Seeders
+2. deploy
     - dotenvx
     - command 
     - CI/CD  

@@ -116,15 +116,6 @@ export class ApiRequest {
 		};
 	}
 
-	public setRequestInit(options: RequestInit): this {
-		this.requestInit = ApiRequest.mergeRequestInit(
-			this.requestInit,
-			options,
-		);
-
-		return this;
-	}
-
 	private async handleJsonResponse(res: Response) {
 		const text = await res.text();
 
@@ -219,90 +210,101 @@ export class ApiRequest {
 		}
 	}
 
+	/**
+	 * Single funnel for every failure mode: whatever `performFetch` throws — a bad route
+	 * name from `Routes.get`, a network or timeout rejection, an unparsable body, or the
+	 * `ApiError` it raises for a non-2xx response — leaves this method as an `ApiError`.
+	 */
 	public async doFetch<T>(
 		path: string,
 		requestInit: RequestInit = {},
 	): Promise<ApiResponseFetch<T>> {
 		try {
-			// Inside the try on purpose: `buildRequestUrl` reaches `Routes.get`, which
-			// throws for an unknown route name, and that has to surface as an ApiError like
-			// every other failure rather than escaping raw.
-			const requestUrl = this.buildRequestUrl(path);
-
-			const requestOptions = ApiRequest.mergeRequestInit(
-				this.requestInit,
-				requestInit,
-			);
-
-			// The platform has to set Content-Type for FormData because only it knows the
-			// multipart boundary; the default JSON header would make the body unreadable.
-			if (requestOptions.body instanceof FormData) {
-				(requestOptions.headers as Headers).delete('Content-Type');
-			}
-
-			const withCsrf = this.needsCsrfToken(requestOptions);
-
-			/*
-			 * Two attempts at most. The CSRF cookie lives an hour, so a tab left open past
-			 * that submits a stale token and earns one 403 — refreshing and retrying turns
-			 * it into a save the user never notices, where a bare failure would look
-			 * arbitrary. Only a rejection the middleware explicitly marked as stale is
-			 * retried; every other 403 is a real refusal.
-			 */
-			for (let attempt = 0; attempt < 2; attempt++) {
-				if (withCsrf) {
-					(requestOptions.headers as Headers).set(
-						CSRF_HEADER,
-						await getCsrfToken(),
-					);
-				}
-
-				const res = await fetch(requestUrl, {
-					...requestOptions,
-					/*
-					 * One signal covering the whole exchange. The previous timer was
-					 * cleared the moment `fetch` resolved — which is when the *headers*
-					 * arrive — so reading the body below was left unbounded and a server
-					 * that stalled mid-response hung the request indefinitely. A signal
-					 * also cannot be leaked the way a timer could when something threw
-					 * before `clearTimeout`.
-					 */
-					signal: AbortSignal.timeout(ApiRequest.ABORT_TIMEOUT),
-				});
-
-				// Handle non-JSON responses (like 204 No Content)
-				if (res.status === 204) {
-					return undefined;
-				}
-
-				const jsonResponse: ApiResponseFetch<T> =
-					await this.handleJsonResponse(res);
-
-				if (res.ok) {
-					return jsonResponse;
-				}
-
-				if (
-					withCsrf &&
-					attempt === 0 &&
-					ApiRequest.isStaleCsrfRejection(res, jsonResponse)
-				) {
-					resetCsrfToken();
-
-					continue;
-				}
-
-				throw new ApiError(
-					`HTTP ${res.status} Error`,
-					res.status,
-					jsonResponse,
-				);
-			}
-
-			return undefined;
+			// Awaited rather than returned directly, so a rejection reaches the catch below
+			// instead of escaping to the caller raw.
+			return await this.performFetch<T>(path, requestInit);
 		} catch (error) {
 			this.handleError(error);
 		}
+	}
+
+	private async performFetch<T>(
+		path: string,
+		requestInit: RequestInit,
+	): Promise<ApiResponseFetch<T>> {
+		const requestUrl = this.buildRequestUrl(path);
+
+		const requestOptions = ApiRequest.mergeRequestInit(
+			this.requestInit,
+			requestInit,
+		);
+
+		// The platform has to set Content-Type for FormData because only it knows the
+		// multipart boundary; the default JSON header would make the body unreadable.
+		if (requestOptions.body instanceof FormData) {
+			(requestOptions.headers as Headers).delete('Content-Type');
+		}
+
+		const withCsrf = this.needsCsrfToken(requestOptions);
+
+		/*
+		 * Two attempts at most. The CSRF cookie lives an hour, so a tab left open past
+		 * that submits a stale token and earns one 403 — refreshing and retrying turns
+		 * it into a save the user never notices, where a bare failure would look
+		 * arbitrary. Only a rejection the middleware explicitly marked as stale is
+		 * retried; every other 403 is a real refusal.
+		 */
+		for (let attempt = 0; attempt < 2; attempt++) {
+			if (withCsrf) {
+				(requestOptions.headers as Headers).set(
+					CSRF_HEADER,
+					await getCsrfToken(),
+				);
+			}
+
+			const res = await fetch(requestUrl, {
+				...requestOptions,
+				/*
+				 * One signal covering the whole exchange, headers and body alike.
+				 * `fetch` resolves as soon as the headers arrive, so a deadline that
+				 * ended there would leave the body read below unbounded and a server
+				 * stalling mid-response would hang the request indefinitely. A signal
+				 * also cannot be leaked the way a manually cleared timer can when
+				 * something throws before the clear.
+				 */
+				signal: AbortSignal.timeout(ApiRequest.ABORT_TIMEOUT),
+			});
+
+			// Handle non-JSON responses (like 204 No Content)
+			if (res.status === 204) {
+				return undefined;
+			}
+
+			const jsonResponse: ApiResponseFetch<T> =
+				await this.handleJsonResponse(res);
+
+			if (res.ok) {
+				return jsonResponse;
+			}
+
+			if (
+				withCsrf &&
+				attempt === 0 &&
+				ApiRequest.isStaleCsrfRejection(res, jsonResponse)
+			) {
+				resetCsrfToken();
+
+				continue;
+			}
+
+			throw new ApiError(
+				`HTTP ${res.status} Error`,
+				res.status,
+				jsonResponse,
+			);
+		}
+
+		return undefined;
 	}
 }
 

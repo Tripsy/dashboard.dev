@@ -12,7 +12,7 @@ export const DataTableMailQueue = (): JSX.Element => {
 			<div className="table-container">
 				<DataTableFiltersMailQueue />
 				<DataTableActions />
-				<DataTableList dataKey="id" scrollHeight="420px" />
+				<DataTableList dataKey="id" />
 			</div>
 		</DataTableProvider>
 	);

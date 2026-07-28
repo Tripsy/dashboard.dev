@@ -181,7 +181,6 @@ room in the container for both, and it is usually the dev server that gets kille
 │   ├── models/            # Models (entities)
 │   ├── providers/           
 │   │   ├── auth.provider.tsx 
-│   │   ├── prime.provider.tsx 
 │   │   ├── query-client.provider.tsx 
 │   │   ├── theme.provider.tsx 
 │   │   ├── toast.provider.tsx 
@@ -223,10 +222,9 @@ room in the container for both, and it is usually the dev server that gets kille
 # 📌 TODO
 
 1. cmr signature wrap up
-2. Discuss about dropping Prime
-3. SENTRY needs account
-4. monthly driver report
-5. deploy
+2. SENTRY needs account
+3. monthly driver report
+4. deploy
 
 ---------- 
 
@@ -247,13 +245,12 @@ room in the container for both, and it is usually the dev server that gets kille
 - [next](https://nextjs.org/)
 - [react](https://reactjs.org/)
 - [zustand](https://zustand.docs.pmnd.rs/)
-- [primereact](https://primereact.org/)
+- [@heroui/react](https://www.heroui.com/) — component library (React Aria based); the dashboard data table is built on its `Table` + `Pagination`
 - [immer](https://immerjs.github.io/immer/)
 - [zod](https://zod.dev) — TypeScript-first schema validation with static type inference
 - [ioredis](https://github.com/luin/ioredis) — Robust Redis client for Node.js
 - [dayjs](https://day.js.org/) — Parses, validates, manipulates, and displays dates and times
 - [TanStack  Query](https://tanstack.com/query/latest) — Powerful asynchronous state management, server-state utilities and data fetching
-- [primereact](https://primereact.org/datatable/)
 
 Dev only:
 

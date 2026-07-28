@@ -125,7 +125,7 @@ form from showing every required-field error before the user has typed anything.
 ## 6. Field Rendering
 
 - Use the shared components in `src/components/form/form-element.component.tsx` rather than raw
-  `<input>`/PrimeReact elements — they wire up error display and element ids consistently. The full
+  `<input>`/HeroUI elements — they wire up error display and element ids consistently. The full
   set is `FormComponent` + `Input` / `Select` / `Radio` / `Checkbox` / `Textarea` / `Time` /
   `Calendar` / `AutoComplete` / `Submit`, plus the pre-configured `Name` / `Email` / `Password`
   wrappers. Check the file before hand-rolling a field — a checkbox and a date picker already exist.

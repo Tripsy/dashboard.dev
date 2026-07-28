@@ -380,6 +380,7 @@ export default async function dataSourceConfig(): Promise<
 				{
 					field: 'id',
 					header: 'ID',
+					defaultWidth: 88,
 					sortable: true,
 					body: (entry, column, auth) =>
 						DataTableValue(entry, column, {
@@ -438,10 +439,8 @@ export default async function dataSourceConfig(): Promise<
 							markDeleted: true,
 							displayButton: displayButtonStatus(auth),
 						}),
-					style: {
-						minWidth: '10rem',
-						maxWidth: '10rem',
-					},
+					minWidth: 160,
+					maxWidth: 160,
 				},
 				{
 					field: 'created_at',

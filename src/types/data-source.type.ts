@@ -72,7 +72,20 @@ export type DataTableColumnType<Entry> = {
 		column: DataTableColumnType<Entry>,
 		auth: AuthModel | null,
 	) => JSX.Element | string;
-	style?: React.CSSProperties;
+	/**
+	 * Width bounds in pixels. The data table is resizable, and react-aria's resize state
+	 * takes plain numbers (or a `%` string) rather than CSS lengths — it has to compute
+	 * with them, so a `rem` value has nothing to resolve against.
+	 */
+	minWidth?: number;
+	maxWidth?: number;
+	/**
+	 * Starting width in pixels for a column whose content does not deserve an equal share
+	 * of the table. Columns default to `1fr`, so a short one (an id) ends up as wide as a
+	 * long one (an email). This is the initial width only — the column stays resizable,
+	 * which a controlled `width` would not.
+	 */
+	defaultWidth?: number;
 };
 
 export type DataTableValueOptionsType<Entry> = {

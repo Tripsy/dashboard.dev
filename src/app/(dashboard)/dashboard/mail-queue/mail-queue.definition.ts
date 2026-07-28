@@ -78,6 +78,7 @@ export default async function dataSourceConfig(): Promise<
 				{
 					field: 'id',
 					header: 'ID',
+					defaultWidth: 88,
 					sortable: true,
 					body: (entry, column, auth) =>
 						DataTableValue(entry, column, {
@@ -113,10 +114,8 @@ export default async function dataSourceConfig(): Promise<
 							isStatus: true,
 							dataSource: 'mail-queue',
 						}),
-					style: {
-						minWidth: '6rem',
-						maxWidth: '6rem',
-					},
+					minWidth: 144,
+					maxWidth: 144,
 				},
 				{
 					field: 'sent_at',

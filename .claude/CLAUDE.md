@@ -164,7 +164,6 @@ entities/operations, DB schema, business rules read the code in `../star-backend
 │   │   ├── data-source.config.ts
 │   │   ├── dayjs.config.ts 
 │   │   ├── init-redis.config.ts 
-│   │   ├── prime-pt.preset.ts
 │   │   ├── routes.setup.ts
 │   │   ├── settings.config.ts 
 │   │   ├── translate.setup.ts 
@@ -175,7 +174,6 @@ entities/operations, DB schema, business rules read the code in `../star-backend
 │   ├── models/            # Models (entities)
 │   ├── providers/           
 │   │   ├── auth.provider.tsx 
-│   │   ├── prime.provider.tsx 
 │   │   ├── query-client.provider.tsx 
 │   │   ├── theme.provider.tsx 
 │   │   ├── toast.provider.tsx 

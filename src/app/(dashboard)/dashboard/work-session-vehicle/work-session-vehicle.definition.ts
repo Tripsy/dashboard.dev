@@ -247,6 +247,7 @@ export default async function dataSourceConfig(): Promise<
 				{
 					field: 'id',
 					header: 'ID',
+					defaultWidth: 88,
 					sortable: true,
 					body: (entry, column, auth) =>
 						DataTableValue(entry, column, {
@@ -283,7 +284,8 @@ export default async function dataSourceConfig(): Promise<
 								isStatus: true,
 							},
 						),
-					style: { minWidth: '8rem', maxWidth: '8rem' },
+					minWidth: 128,
+					maxWidth: 128,
 				},
 				{
 					field: 'company_vehicle',
@@ -305,10 +307,8 @@ export default async function dataSourceConfig(): Promise<
 							markDeleted: true,
 							displayButton: displayButtonReturn(auth, entry),
 						}),
-					style: {
-						minWidth: '8rem',
-						maxWidth: '8rem',
-					},
+					minWidth: 128,
+					maxWidth: 128,
 				},
 				{
 					field: 'assigned_at',

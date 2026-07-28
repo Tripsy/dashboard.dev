@@ -69,6 +69,16 @@ function loadSettings() {
 				Number(process.env.NEXT_PUBLIC_REMOTE_API_WS_RECONNECT_DELAY) ||
 				3000,
 		},
+		sentry: {
+			// Empty disables Sentry entirely — `init` is skipped rather than run against a
+			// blank DSN, so a machine without one carries none of the SDK's instrumentation.
+			dsn: process.env.NEXT_PUBLIC_SENTRY_DSN || '',
+			// Fraction of transactions sampled for performance data. Errors are never
+			// sampled — this only bounds span volume against the plan's quota.
+			tracesSampleRate: Number(
+				process.env.NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE || 0.1,
+			),
+		},
 		middleware: {
 			rateLimitWindow: Number(process.env.RATE_LIMIT_WINDOW) || 60, // seconds
 			maxRequests: Number(process.env.MAX_REQUESTS) || 100, // Max requests per window

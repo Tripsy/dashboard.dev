@@ -222,24 +222,23 @@ room in the container for both, and it is usually the dev server that gets kille
 
 # 📌 TODO
 
-1. Ask do I deal with console.error in FE app - some of them are BE actually
-2. Replace all console.error with logging
-3. cmr signature wrap up
+1. cmr signature wrap up
+2. Discuss about dropping Prime
+3. SENTRY needs account
 4. monthly driver report
 5. deploy
 
 ---------- 
 
-1. Implement Sentry on FE /
-2. Hero UI -> theme
-3. Add section "documentation"
-4. login with google / facebook
-5. Implement kill all sessions except current
+1. Hero UI -> theme
+2. Add section "documentation"
+3. login with google / facebook
+4. Implement kill all sessions except current
       // // This will actually remove all sessions - keep it for further implementation
       // await AccountTokenRepository.createQuery()
       //     .filterBy('user_id', policy.getUserId())
       //     .delete(false, true);
-6. For template section
+5. For template section
     - would be a nice idea to keep track of the last changes (maybe add a new column - prev version id and a button to restore to that version)
     - view presentation could be enhanced
 

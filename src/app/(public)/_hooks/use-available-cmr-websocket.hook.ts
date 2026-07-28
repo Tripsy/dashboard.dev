@@ -117,8 +117,19 @@ export function useAvailableCmrWebSocket() {
 						setEntries(data);
 					}
 				} catch (err) {
+					/*
+					 * The message body is deliberately not attached. It carries CMR and
+					 * client records, and log context leaves the browser once a Sentry DSN
+					 * is set. The length plus the parse error — which names the offending
+					 * position — is enough to tell truncation from malformed JSON from an
+					 * HTML error page, and `star-backend` owns the message if the content
+					 * itself is ever needed.
+					 */
 					logger.error('Failed to parse a WebSocket message', err, {
-						payload: event.data,
+						payloadLength:
+							typeof event.data === 'string'
+								? event.data.length
+								: null,
 					});
 				}
 			};

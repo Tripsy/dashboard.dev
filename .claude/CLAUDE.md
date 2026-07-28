@@ -72,12 +72,33 @@ pnpm run biome    # Biome check --write (lint + format + circular dependencies)
 pnpm run clean    # Delete .next — Turbopack's dev cache grows until the container OOMs
 ```
 
+**pnpm 11 no longer reads the `pnpm` field in `package.json`** — settings live in
+`pnpm-workspace.yaml`. A dependency whose install scripts are blocked reports
+`ERR_PNPM_IGNORED_BUILDS` and pnpm writes a placeholder into `allowBuilds` there for you to
+resolve; setting it in `package.json` is silently ignored with a warning. This matters for
+anything whose postinstall fetches a binary (`@sentry/cli` downloads the uploader that
+`next build` uses for source maps), because the build still succeeds without it and only the
+downstream artefact is missing.
+
+**`next build` rewrites `next-env.d.ts`** to reference `./.next/types/routes.d.ts`, where the
+dev server writes `./.next/dev/types/routes.d.ts`. It therefore shows up as a modified file
+after any build — a generated artefact, not a change to commit. `git checkout next-env.d.ts`
+after building, or leave it for the dev server to flip back.
+
 To spot-check a helper without a test suite, Node 24 runs TypeScript directly via type
 stripping — `docker exec dashboard.test sh -c "cd /var/www/html && node probe.ts"`, importing
 the real module (`./src/helpers/x.helper.ts`). Type-only imports are erased, so a file whose
 only `@/*` imports are `import type` resolves fine outside the path alias. This tests the
 shipped source rather than a copy of it, which is the whole point — a hand-copied
 reimplementation proves nothing about the code you are fixing.
+
+To probe a file that imports `@/*` for *values*, Node needs a resolver hook — it does not read
+`tsconfig` paths. Write a hook module exporting `resolve(specifier, context, next)` that maps
+`@/x` to `/var/www/html/src/x` (trying `.ts`/`.tsx`/`/index.ts`, since the alias leaves the
+extension implicit), register it from a second file via `register('./hook.mjs', pathToFileURL('/var/www/html/'))`,
+and run `node --import ./register.mjs probe.ts`. Delete all three afterwards — probes live in
+the scratchpad, not the repo. Prefer asserting through the module's public surface (call the
+exported factory and exercise what it returns) over reaching for internals.
 
 The container is capped at 4g (`mem_limit` in `docker-compose.yml`) and Turbopack fills it.
 If the dev server exits with nothing in the log it was SIGKILLed, not crashed — check
@@ -257,10 +278,26 @@ entities/operations, DB schema, business rules read the code in `../star-backend
   console, because server-side that console *is* the sink (Docker captures stdout).
   `logger.helper.ts` reads `process.env` rather than `Configuration` on purpose: settings
   resolution logs through it, so importing it would close an import cycle.
-  Client-side errors go nowhere durable until a transport is registered via `setLogReporter()`
-  — that is the seam Sentry plugs into, and the reason the helper imports no SDK. The backend's
-  `log_data` is for business/audit events (`history`/`cron`/`system`); the dashboard reads it and
-  must never write to it, and it has no create route.
+  The transport is attached via `setLogReporter()` — the reason the helper imports no SDK. The
+  backend's `log_data` is for business/audit events (`history`/`cron`/`system`); the dashboard
+  reads it and must never write to it, and it has no create route.
+- **Sentry** (`@sentry/nextjs`) — `src/config/sentry.setup.ts` owns the shared init options and the
+  `LogEntry` → Sentry mapping (`debug`/`info` become breadcrumbs, `warn`/`error` become events);
+  the three runtime entry points (`src/sentry.server.config.ts`, `src/sentry.edge.config.ts`,
+  `src/instrumentation-client.ts`) only call it. Edge is what covers `src/proxy.ts`.
+  `src/instrumentation.ts` loads the server/edge config per `NEXT_RUNTIME` and exports
+  `onRequestError`, which catches server-component and middleware errors that never reach a
+  `catch` and so are invisible to `logger`. Everything is gated on `NEXT_PUBLIC_SENTRY_DSN` — empty
+  means no `init` at all. Client events tunnel through `/sentry-tunnel` on this origin (set in
+  `next.config.ts`) to survive ad blockers; that path deliberately sits outside `/api/`, so the
+  CSRF gate in `proxy.ts` does not apply and it matches no entry in `routes.setup.ts`.
+  Session replay is off on purpose — bundle weight, and it records driver/client input.
+- **What may go in a log context** — the third argument of a `logger` call is shipped to Sentry as
+  `extra` (or as breadcrumb `data`), so it leaves the browser. Pass identifiers and shapes, never
+  records or secrets: `{ key }`, `{ uid }`, `{ payloadLength }` — not the payload, not a user row.
+  `sendDefaultPii` is off, and `beforeSend`/`beforeBreadcrumb` in `sentry.setup.ts` redact keys
+  matching `/password|token|secret|authorization|cookie|credential/i`, but that is a backstop for
+  the call site that slips through, not permission to rely on it.
 - **Error boundaries**: `src/app/error.tsx` catches route errors, `src/app/global-error.tsx`
   catches failures in the root layout itself. The latter replaces that layout, so it gets no
   `globals.css` — it is inline-styled and dependency-free by design and must stay that way.

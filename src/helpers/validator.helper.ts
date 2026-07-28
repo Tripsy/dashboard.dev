@@ -549,7 +549,7 @@ export abstract class BaseValidator<
 		}, z.boolean({ message }));
 
 		if (options.required) {
-			return baseSchema.refine((val) => val === true, { message });
+			return baseSchema.refine((val) => val, { message });
 		}
 
 		return baseSchema;

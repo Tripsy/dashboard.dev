@@ -9,7 +9,6 @@ function loadSettings() {
 			environment: process.env.NEXT_PUBLIC_NODE_ENV || 'production',
 			url: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost',
 			name: process.env.NEXT_PUBLIC_APP_NAME || 'NReady',
-			email: process.env.NEXT_PUBLIC_APP_EMAIL || 'hello@example.com',
 			timezone: process.env.NEXT_PUBLIC_TIMEZONE || 'UTC',
 			currency: (process.env.NEXT_PUBLIC_APP_CURRENCY ||
 				'RON') as Currency,
@@ -50,7 +49,7 @@ function loadSettings() {
 			// forward on use. A cookie outliving that leaves the browser holding a session it
 			// believes is valid while every request behind it fails auth. The previous
 			// `60 *` treated the env value as minutes, giving a ~60 day cookie against a
-			// 24 hour token.
+			// 24-hour token.
 			sessionMaxAge: Number(process.env.SESSION_MAX_AGE || 86400),
 			// Seconds of remaining life below which the session cookie is rewritten with a
 			// full `sessionMaxAge` again. Mirrors the backend's AUTH_JWT_REFRESH_EXPIRES_IN

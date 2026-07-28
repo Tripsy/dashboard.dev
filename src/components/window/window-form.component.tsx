@@ -27,7 +27,7 @@ import type { FormStateType, FormValuesType } from '@/types/form.type';
 type WindowFormType<Entry> = {
 	uid: string;
 	entry?: Entry;
-	children: React.ReactElement<unknown>;
+	children: React.ReactElement;
 };
 
 export function WindowForm<

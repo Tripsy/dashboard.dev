@@ -105,7 +105,7 @@ class S3StorageService implements ImageStorageService {
 }
 
 class LocalStorageService implements ImageStorageService {
-	private baseStoragePath: string;
+	private readonly baseStoragePath: string;
 
 	constructor() {
 		this.baseStoragePath = getBaseStoragePath();

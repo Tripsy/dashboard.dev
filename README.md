@@ -221,17 +221,13 @@ room in the container for both, and it is usually the dev server that gets kille
 
 # 📌 TODO
 
-1. Seeders
-2. deploy
+1. deploy
     - dotenvx
     - command 
     - CI/CD  
-    
-For 30.07 when I will be out of tokens 
-
-1. SENTRY needs account > add config to .env
-2. cmr signature wrap up
-3. monthly driver report
+2. SENTRY needs account > add config to .env
+3. cmr signature wrap up
+4. monthly driver report
 
 ---------- 
 

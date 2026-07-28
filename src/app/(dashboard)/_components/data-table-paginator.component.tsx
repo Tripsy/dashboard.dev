@@ -1,5 +1,3 @@
-'use client';
-
 import { ListBox, Pagination, Select } from '@heroui/react';
 import { useCallback, useMemo } from 'react';
 import { replaceVars } from '@/helpers/string.helper';

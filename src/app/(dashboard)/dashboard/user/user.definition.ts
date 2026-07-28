@@ -381,8 +381,6 @@ export default async function dataSourceConfig(): Promise<
 			],
 			find: (params: FindFunctionParamsType) =>
 				requestFind<UserModel>('user', params),
-			// onRowSelect: (entry: UserModel) => console.log('selected', entry),
-			// onRowUnselect: (entry: UserModel) => console.log('unselected', entry),
 		},
 		displayEntryLabel: (entry: UserModel) => {
 			return entry.name;
@@ -406,11 +404,6 @@ export default async function dataSourceConfig(): Promise<
 				getFormValues: getFormValues,
 				validateForm: validateFormCreate,
 				getFormState: getFormState,
-				// events: {
-				// 	success: (resultData: UserModel) => {
-				// 		console.log('onCreateSuccess', resultData);
-				// 	},
-				// },
 			},
 			update: {
 				windowType: 'form',

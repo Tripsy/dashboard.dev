@@ -1,5 +1,6 @@
 import Routes from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
+import { logger } from '@/helpers/logger.helper';
 
 /**
  * Header carrying the token on every mutating request. `/api/csrf` hands the same value to
@@ -34,7 +35,7 @@ async function fetchCsrfToken(): Promise<string> {
 
 		return payload?.data?.csrfToken || '';
 	} catch (error) {
-		console.error('Failed to fetch CSRF token:', error);
+		logger.error('Failed to fetch CSRF token', error);
 
 		return '';
 	}

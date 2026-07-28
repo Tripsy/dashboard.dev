@@ -250,6 +250,20 @@ entities/operations, DB schema, business rules read the code in `../star-backend
   `redis.keyPrefix` (`dashboard` here, `backend` there) inside `CacheProvider.buildKey`. Not via
   ioredis's own `keyPrefix` option: that one does not reach the MATCH argument of SCAN, so
   `deleteByPattern` would scan the other app's keys. Build every key through `buildKey`.
+- **Logging** — never call `console.*` directly; use `logger` / `logRejection` from
+  `src/helpers/logger.helper.ts` (the only file allowed to touch `console`). Signature is
+  `(message, error?, context?)` — message first at every level, so a grouping backend can key on
+  it. `debug` is dropped unless `NEXT_PUBLIC_APP_DEBUG=true`; the other levels always reach the
+  console, because server-side that console *is* the sink (Docker captures stdout).
+  `logger.helper.ts` reads `process.env` rather than `Configuration` on purpose: settings
+  resolution logs through it, so importing it would close an import cycle.
+  Client-side errors go nowhere durable until a transport is registered via `setLogReporter()`
+  — that is the seam Sentry plugs into, and the reason the helper imports no SDK. The backend's
+  `log_data` is for business/audit events (`history`/`cron`/`system`); the dashboard reads it and
+  must never write to it, and it has no create route.
+- **Error boundaries**: `src/app/error.tsx` catches route errors, `src/app/global-error.tsx`
+  catches failures in the root layout itself. The latter replaces that layout, so it gets no
+  `globals.css` — it is inline-styled and dependency-free by design and must stay that way.
 
 ## Adding new feature for `dashboard` (ex: `cars`)
 

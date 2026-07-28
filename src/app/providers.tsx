@@ -1,5 +1,6 @@
 import { headers } from 'next/headers';
 import type React from 'react';
+import { logger } from '@/helpers/logger.helper';
 import type { AuthModel } from '@/models/auth.model';
 import { AriaRouterProvider } from '@/providers/aria-router.provider';
 import { AuthProvider } from '@/providers/auth.provider';
@@ -17,7 +18,7 @@ export async function Providers({ children }: { children: React.ReactNode }) {
 	try {
 		initAuth = authHeader ? JSON.parse(authHeader) : null;
 	} catch (error: unknown) {
-		console.error('Failed to parse auth header', error);
+		logger.error('Failed to parse the x-auth-data header', error);
 	}
 
 	return (

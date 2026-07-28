@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { Configuration } from '@/config/settings.config';
+import { logger } from '@/helpers/logger.helper';
 import { hasPermission } from '@/models/auth.model';
 import { type ImageStorage, ImageStorageEnum } from '@/models/image.model';
 import {
@@ -86,7 +87,7 @@ export async function POST(request: NextRequest) {
 
 		return NextResponse.json(result);
 	} catch (error) {
-		console.error('Image upload failed', error);
+		logger.error('Image upload failed', error, { section, entity_id });
 
 		return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
 	}
@@ -123,7 +124,7 @@ export async function DELETE(request: NextRequest) {
 
 		return NextResponse.json({ success: true });
 	} catch (error) {
-		console.error('Image delete failed', error);
+		logger.error('Image delete failed', error, { filePath, storage });
 
 		return NextResponse.json({ error: 'Delete failed' }, { status: 500 });
 	}

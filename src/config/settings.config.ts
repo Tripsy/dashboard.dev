@@ -1,3 +1,4 @@
+import { logger } from '@/helpers/logger.helper';
 import { getObjectValue, type ObjectValue } from '@/helpers/objects.helper';
 import type { Currency, Language } from '@/types/common.type';
 
@@ -163,7 +164,7 @@ export const Configuration = {
 		if (value === undefined) {
 			// Unreachable for a well-typed key unless the value is genuinely optional
 			// (eg: `mail.host`); kept as a guard for dynamic paths.
-			console.warn(`Configuration key not found: ${key}`);
+			logger.warn('Configuration key not found', undefined, { key });
 		}
 
 		return value as SettingsValue<K>;

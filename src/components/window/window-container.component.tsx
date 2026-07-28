@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { WindowDock } from '@/components/window/window-dock.component';
 import { WindowInstance } from '@/components/window/window-instance.component';
+import { logRejection } from '@/helpers/logger.helper';
 import { hydrateWindowStore, useModalStore } from '@/stores/window.store';
 import type { WindowConfig } from '@/types/window.type';
 
@@ -13,8 +14,12 @@ export function WindowContainer({
 }) {
 	const { stack, isHydrated } = useModalStore();
 
+	// Hydration restores the whole stack, not this container's section, so it runs once —
+	// no `section` in the log context either, which would drag it into the dependencies.
 	useEffect(() => {
-		hydrateWindowStore().catch(console.error);
+		hydrateWindowStore().catch(
+			logRejection('Window store hydration failed'),
+		);
 	}, []);
 
 	// Windows restored from storage have no `definition` until hydration completes

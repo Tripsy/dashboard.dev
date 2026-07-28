@@ -1,5 +1,6 @@
 import type { Dispatch, SetStateAction } from 'react';
 import type { z } from 'zod';
+import { logger } from '@/helpers/logger.helper';
 import type {
 	FormErrorsType,
 	FormValuesType,
@@ -22,9 +23,10 @@ export function accumulateZodErrors<T extends FormValuesType>(
 	const fieldErrors: FormErrorsType<T> = {};
 
 	const warnUnrepresentable = (path: string[], message: string): void => {
-		console.warn(
-			`[form] Group-level message on "${path.join('.')}" cannot be shown ` +
-				`alongside errors for its own fields, and was discarded: "${message}"`,
+		logger.warn(
+			'Group-level validation message cannot be shown alongside errors for its own fields, and was discarded',
+			undefined,
+			{ path: path.join('.'), message },
 		);
 	};
 

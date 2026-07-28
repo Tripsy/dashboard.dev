@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { getDataSourceConfig } from '@/config/data-source.config';
 import ValueError from '@/exceptions/value.error';
+import { logger } from '@/helpers/logger.helper';
 import { generateWindowUid } from '@/helpers/window.helper';
 import {
 	clearWindowDraft,
@@ -303,10 +304,9 @@ export const hydrateWindowStore = (): Promise<void> => {
 					return result.value;
 				}
 
-				console.warn(
-					`[window-store] Failed to rehydrate window "${storedStack[index].uid}":`,
-					result.reason,
-				);
+				logger.warn('Failed to rehydrate window', result.reason, {
+					uid: storedStack[index].uid,
+				});
 
 				return null;
 			})

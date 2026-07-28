@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Configuration } from '@/config/settings.config';
+import { logger } from '@/helpers/logger.helper';
 import type { CmrModel } from '@/models/cmr.model';
 import { requestWsTicket } from '@/services/driver-session.service';
 import type { WsStatus } from '@/types/web-socket.type';
@@ -36,9 +37,11 @@ export function useAvailableCmrWebSocket() {
 		retryCount.current += 1;
 		const delay = getReconnectDelay(retryCount.current);
 
-		console.debug(
-			`Reconnecting in ${delay}ms (attempt ${retryCount.current}/${MAX_RETRIES})`,
-		);
+		logger.debug('Scheduling WebSocket reconnect', undefined, {
+			delay,
+			attempt: retryCount.current,
+			maxRetries: MAX_RETRIES,
+		});
 
 		reconnectTimer.current = setTimeout(() => {
 			void connectRef.current();
@@ -56,7 +59,9 @@ export function useAvailableCmrWebSocket() {
 				'Unable to connect to real-time updates. Please refresh the page.',
 			);
 
-			console.error(`WebSocket gave up after ${MAX_RETRIES} retries`);
+			logger.error('WebSocket gave up reconnecting', undefined, {
+				maxRetries: MAX_RETRIES,
+			});
 			return;
 		}
 
@@ -74,7 +79,7 @@ export function useAvailableCmrWebSocket() {
 				return;
 			}
 
-			console.error('Failed to obtain WebSocket ticket:', err);
+			logger.error('Failed to obtain a WebSocket ticket', err);
 
 			setWsStatus('error');
 			setErrorMessage('Connection error. Retrying...');
@@ -112,7 +117,9 @@ export function useAvailableCmrWebSocket() {
 						setEntries(data);
 					}
 				} catch (err) {
-					console.error('WS parse error', event.data, err);
+					logger.error('Failed to parse a WebSocket message', err, {
+						payload: event.data,
+					});
 				}
 			};
 
@@ -121,9 +128,10 @@ export function useAvailableCmrWebSocket() {
 					return;
 				}
 
-				console.debug(
-					`WebSocket closed: ${event.code} - ${event.reason}`,
-				);
+				logger.debug('WebSocket closed', undefined, {
+					code: event.code,
+					reason: event.reason,
+				});
 
 				setWsStatus('disconnected');
 
@@ -139,7 +147,7 @@ export function useAvailableCmrWebSocket() {
 
 				// Browser intentionally provides no error details in onerror (security policy)
 				// The onclose handler will fire next and handle reconnect
-				console.debug(
+				logger.debug(
 					'WebSocket connection error — waiting for close event',
 				);
 
@@ -150,7 +158,7 @@ export function useAvailableCmrWebSocket() {
 				}
 			};
 		} catch (err) {
-			console.error('Failed to create WebSocket:', err);
+			logger.error('Failed to create the WebSocket', err);
 
 			setWsStatus('error');
 			setErrorMessage('Failed to establish connection');

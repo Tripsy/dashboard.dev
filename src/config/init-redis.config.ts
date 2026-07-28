@@ -1,5 +1,6 @@
 import Redis from 'ioredis';
 import { Configuration } from '@/config/settings.config';
+import { logger } from '@/helpers/logger.helper';
 
 let redisInstance: Redis | null = null;
 
@@ -12,11 +13,11 @@ export const getRedisClient = (): Redis => {
 		});
 
 		redisInstance.on('error', (error) => {
-			console.error('Redis connection error', error);
+			logger.error('Redis connection error', error);
 		});
 
 		redisInstance.on('connect', () => {
-			console.debug('Connected to Redis');
+			logger.debug('Connected to Redis');
 		});
 	}
 
@@ -27,9 +28,9 @@ export const redisClose = async (): Promise<void> => {
 	if (redisInstance) {
 		try {
 			await redisInstance.quit();
-			console.debug('Redis connection closed gracefully');
+			logger.debug('Redis connection closed gracefully');
 		} catch (error) {
-			console.error('Error closing Redis connection', error);
+			logger.error('Failed to close the Redis connection', error);
 			throw error;
 		} finally {
 			redisInstance = null;

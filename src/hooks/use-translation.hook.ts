@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { translateBatch, translateLoaded } from '@/config/translate.setup';
+import { logger } from '@/helpers/logger.helper';
 
 /**
  * NUL is used to join the keys because it cannot occur in a translation key, so the joined
@@ -93,7 +94,7 @@ export function useTranslation<const T extends readonly string[]>(keys: T) {
 					isLoading: false,
 				});
 			} catch (error) {
-				console.error('Failed to load translations:', error);
+				logger.error('Failed to load translations', error);
 
 				if (isMounted) {
 					setState((prev) => ({ ...prev, isLoading: false }));

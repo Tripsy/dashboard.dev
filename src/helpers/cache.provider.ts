@@ -1,6 +1,7 @@
 import type Redis from 'ioredis';
 import { getRedisClient } from '@/config/init-redis.config';
 import { Configuration } from '@/config/settings.config';
+import { logger } from '@/helpers/logger.helper';
 
 type CacheData = unknown;
 
@@ -71,7 +72,7 @@ export class CacheProvider {
 
 			return exists === 1;
 		} catch (error) {
-			console.error(error, `Error checking existence for key: ${key}`);
+			logger.error('Cache exists check failed', error, { key });
 
 			return false;
 		}
@@ -100,7 +101,7 @@ export class CacheProvider {
 		try {
 			cachedData = await this.cache.get(key);
 		} catch (error) {
-			console.error(error, `Error fetching cache for key: ${key}`);
+			logger.error('Cache read failed', error, { key });
 		}
 
 		if (cachedData) {
@@ -131,7 +132,7 @@ export class CacheProvider {
 		try {
 			return this.formatOutputData(await this.cache.get(key));
 		} catch (error) {
-			console.error(error, `Error reading cache for key: ${key}`);
+			logger.error('Cache raw read failed', error, { key });
 
 			return null;
 		}
@@ -161,7 +162,7 @@ export class CacheProvider {
 				);
 			}
 		} catch (error) {
-			console.error(error, `Error setting cache for key: ${key}`);
+			logger.error('Cache write failed', error, { key });
 		}
 	}
 
@@ -169,7 +170,7 @@ export class CacheProvider {
 		try {
 			await this.cache.del(key);
 		} catch (error) {
-			console.error(error, `Error deleting cache for key: ${key}`);
+			logger.error('Cache delete failed', error, { key });
 		}
 	}
 
@@ -188,7 +189,7 @@ export class CacheProvider {
 
 			return this.formatOutputData(value);
 		} catch (error) {
-			console.error(error, `Error get-deleting cache for key: ${key}`);
+			logger.error('Cache read-and-drop failed', error, { key });
 
 			return null;
 		}
@@ -226,10 +227,7 @@ export class CacheProvider {
 				}
 			} while (cursor !== '0'); // Continue until all keys are scanned
 		} catch (error) {
-			console.error(
-				error,
-				`Error deleting cache with pattern: ${pattern}`,
-			);
+			logger.error('Cache pattern delete failed', error, { pattern });
 		}
 	}
 }

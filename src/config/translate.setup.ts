@@ -1,4 +1,5 @@
 import { Configuration } from '@/config/settings.config';
+import { logger } from '@/helpers/logger.helper';
 import { getObjectValue } from '@/helpers/objects.helper';
 import { replaceVars } from '@/helpers/string.helper';
 import type { Language } from '@/types/common.type';
@@ -35,7 +36,7 @@ async function fetchLanguage(): Promise<Language> {
 	} catch (error) {
 		// Not an error worth shouting about: `headers()` throws whenever it is called
 		// outside a request scope, and falling back to the default language is correct.
-		console.debug('Could not read the language header:', error);
+		logger.debug('Could not read the language header', error);
 	}
 
 	return fallback;
@@ -96,7 +97,7 @@ export const getTranslatedString = (
 	// every render would be noise — but while developing it is almost always a typo or a
 	// key that was never added to the locale file.
 	if (isDebug) {
-		console.warn(`Missing translation: ${key}`);
+		logger.warn('Missing translation', undefined, { key });
 	}
 
 	return key;

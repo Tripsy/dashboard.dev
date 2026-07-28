@@ -1,3 +1,4 @@
+import { logger } from '@/helpers/logger.helper';
 import type { FormValuesType } from '@/types/form.type';
 
 const DRAFT_KEY_PREFIX = 'window-draft:';
@@ -53,7 +54,7 @@ const getStorage = (): Storage | null => {
 		return window.sessionStorage;
 	} catch (error: unknown) {
 		// Disabled storage (private mode, blocked cookies) — drafts are optional
-		console.warn('[window-draft] Session storage unavailable:', error);
+		logger.warn('Session storage unavailable, drafts disabled', error);
 
 		return null;
 	}
@@ -79,10 +80,7 @@ export function readWindowDraft(uid: string): FormValuesType | null {
 			JSON.parse(storedDraft) as Record<string, unknown>,
 		) as FormValuesType;
 	} catch (error: unknown) {
-		console.warn(
-			`[window-draft] Discarding unreadable draft "${uid}":`,
-			error,
-		);
+		logger.warn('Discarding unreadable window draft', error, { uid });
 		storage?.removeItem(draftKey(uid));
 
 		return null;
@@ -110,7 +108,7 @@ export function saveWindowDraft(uid: string, values: FormValuesType): void {
 		storage.setItem(draftKey(uid), JSON.stringify(safeValues));
 	} catch (error: unknown) {
 		// Quota exceeded or serialization failure — never break the form over a draft
-		console.warn(`[window-draft] Could not store draft "${uid}":`, error);
+		logger.warn('Could not store window draft', error, { uid });
 	}
 }
 

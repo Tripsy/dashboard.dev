@@ -12,6 +12,7 @@ import {
 	useState,
 } from 'react';
 import { stringToDate } from '@/helpers/date.helper';
+import { logRejection } from '@/helpers/logger.helper';
 import { isDriver } from '@/models/auth.model';
 import type { CashFlowModel } from '@/models/cash-flow.model';
 import type { CmrSessionModel } from '@/models/cmr-session.model';
@@ -172,7 +173,9 @@ const WorkSessionProvider = ({
 	useEffect(() => {
 		// Interval-based refresh — runs regardless of visibility
 		const intervalId = setInterval(() => {
-			refreshSession().catch(console.error);
+			refreshSession().catch(
+				logRejection('Background work-session refresh failed'),
+			);
 		}, REFRESH_INTERVAL_SESSION);
 
 		// Tab visibility refresh — only refresh if tab was hidden long enough
@@ -186,7 +189,9 @@ const WorkSessionProvider = ({
 			}
 
 			if (hiddenAt && Date.now() - hiddenAt > HIDDEN_THRESHOLD) {
-				refreshSession().catch(console.error);
+				refreshSession().catch(
+					logRejection('Background work-session refresh failed'),
+				);
 			}
 
 			hiddenAt = null;

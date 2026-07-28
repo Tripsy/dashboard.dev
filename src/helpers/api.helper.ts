@@ -7,6 +7,7 @@ import {
 	getCsrfToken,
 	resetCsrfToken,
 } from '@/helpers/csrf.helper';
+import { logger } from '@/helpers/logger.helper';
 import type {
 	ApiRequestMode,
 	ApiResponseFetch,
@@ -52,7 +53,9 @@ export const buildQueryString = (params: QueryFiltersType): string => {
 					query.append(`filter[${filterKey}]`, String(filterValue));
 				});
 			} else {
-				console.warn(`Skipping object param "${key}" in query`);
+				logger.warn('Skipping object param in query', undefined, {
+					key,
+				});
 			}
 
 			return;

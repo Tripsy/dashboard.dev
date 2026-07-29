@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { DocumentCmrPrint } from '@/app/document/cmr/[tracking_number]/document-cmr-print.component';
 import { Configuration } from '@/config/settings.config';
-import { getLanguageClient, translate } from '@/config/translate.setup';
+import { getLanguage, translate } from '@/config/translate.setup';
 import { ApiRequest, getResponseData } from '@/helpers/api.helper';
 import { displayAddressLabel } from '@/models/address.model';
 import { type CmrModel, displayCmrLabel } from '@/models/cmr.model';
@@ -78,7 +78,7 @@ export default async function Page(props: Props) {
 		notFound();
 	}
 
-	const language = getLanguageClient();
+	const language = await getLanguage();
 
 	return (
 		<DocumentCmrPrint

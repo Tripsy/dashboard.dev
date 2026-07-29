@@ -1,6 +1,7 @@
 'use client';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ViewField, ViewSection } from '@/app/(dashboard)/_components/view-detail';
 import { formatDate } from '@/helpers/date.helper';
 import { DisplayStatus } from '@/helpers/display.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
@@ -12,51 +13,43 @@ export function ViewBrand({ entry }: { entry: BrandModel }) {
 
 	return (
 		<div className="space-y-6">
-			<div className="space-y-1">
-				<div>
-					<span className="font-semibold">ID</span> {entry.id}
-				</div>
-				<div>
-					<span className="font-semibold">Type</span>{' '}
-					{formatEnumLabel(entry.brand_type)}
-				</div>
-				<div className="flex items-center gap-2">
-					<span className="font-semibold">Status</span>{' '}
-					<div className="max-w-60">
-						<DisplayStatus
-							status={entry.status}
-							dataSource="brand"
-						/>
-					</div>
+			<div className="flex items-center gap-2 border-b border-line pb-4">
+				<span className="font-semibold">ID</span> {entry.id}
+				<div className="max-w-60 ml-2">
+					<DisplayStatus status={entry.status} dataSource="brand" />
 				</div>
 			</div>
 
-			<div>
-				<h3 className="font-bold border-b border-line pb-2 mb-3">
-					Timestamps
-				</h3>
-				<div className="ml-4 space-y-1 text-sm">
-					<div>
-						<span className="font-semibold">Created At</span>{' '}
-						{formatDate(entry.created_at, 'date-time')}
-					</div>
-					<div>
-						<span className="font-semibold">Updated At</span>{' '}
-						{formatDate(entry.updated_at, 'date-time') || '-'}
-					</div>
-					{entry.deleted_at && (
-						<div>
-							<span className="font-semibold">Deleted At</span>{' '}
+			<ViewSection title="Info">
+				<ViewField
+					label="Type"
+					value={formatEnumLabel(entry.brand_type)}
+				/>
+			</ViewSection>
+
+			<ViewSection title="Timestamps">
+				<ViewField
+					label="Created At"
+					value={formatDate(entry.created_at, 'date-time')}
+				/>
+				<ViewField
+					label="Updated At"
+					value={formatDate(entry.updated_at, 'date-time')}
+				/>
+				{entry.deleted_at && (
+					<ViewField
+						label="Deleted At"
+						value={
 							<span className="text-danger">
 								{formatDate(entry.deleted_at, 'date-time')}
 							</span>
-						</div>
-					)}
-				</div>
-			</div>
+						}
+					/>
+				)}
+			</ViewSection>
 
 			{languageContents.length > 0 && (
-				<div className="mb-4">
+				<div>
 					<Tabs
 						defaultSelectedKey={contentTabDefault}
 						className="w-full"
@@ -82,31 +75,23 @@ export function ViewBrand({ entry }: { entry: BrandModel }) {
 									key={`content-${value.language}`}
 									id={value.language}
 								>
-									<div className="space-y-1 text-sm">
-										<div>
-											<span className="font-semibold">
-												Description
-											</span>{' '}
-											{value.description}
-										</div>
-										<div>
-											<span className="font-semibold">
-												Meta - Title
-											</span>{' '}
-											{value.meta?.title || 'n/a'}
-										</div>
-										<div>
-											<span className="font-semibold">
-												Meta - Description
-											</span>{' '}
-											{value.meta?.description || 'n/a'}
-										</div>
-										<div>
-											<span className="font-semibold">
-												Meta - Keywords
-											</span>{' '}
-											{value.meta?.keywords || 'n/a'}
-										</div>
+									<div className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
+										<ViewField
+											label="Description"
+											value={value.description}
+										/>
+										<ViewField
+											label="Meta - Title"
+											value={value.meta?.title}
+										/>
+										<ViewField
+											label="Meta - Description"
+											value={value.meta?.description}
+										/>
+										<ViewField
+											label="Meta - Keywords"
+											value={value.meta?.keywords}
+										/>
 									</div>
 								</TabsContent>
 							);

@@ -1,3 +1,4 @@
+import { ViewField, ViewSection } from '@/app/(dashboard)/_components/view-detail';
 import { formatDate } from '@/helpers/date.helper';
 import { parseJson } from '@/helpers/string.helper';
 import type { LogDataModel } from '@/models/log-data.model';
@@ -8,92 +9,71 @@ export function ViewLogData({ entry }: { entry: LogDataModel }) {
 
 	return (
 		<div className="space-y-6">
-			<div className="space-y-1">
-				<div>
-					<span className="font-semibold">ID</span> {entry.id}
-				</div>
-				<div>
-					<span className="font-semibold">PID</span> {entry.pid}
-				</div>
-				<div>
-					<span className="font-semibold">Request ID</span>{' '}
-					{entry.request_id ?? 'n/a'}
-				</div>
-				<div>
-					<span className="font-semibold">Category</span>{' '}
-					{entry.category}
-				</div>
-				<div>
-					<span className="font-semibold">Level</span> {entry.level}
-				</div>
-				<div>
-					<span className="font-semibold">Message</span>{' '}
-					{entry.message}
-				</div>
-				<div>
-					<span className="font-semibold">Created At</span>{' '}
-					{formatDate(entry.created_at, 'date-time')}
-				</div>
+			<div className="flex items-center gap-2 border-b border-line pb-4">
+				<span className="font-semibold">ID</span> {entry.id}
 			</div>
 
+			<ViewSection title="Info">
+				<ViewField label="PID" value={entry.pid} />
+				<ViewField label="Request ID" value={entry.request_id} />
+				<ViewField label="Category" value={entry.category} />
+				<ViewField label="Level" value={entry.level} />
+				<ViewField label="Message" value={entry.message} full />
+				<ViewField
+					label="Created At"
+					value={formatDate(entry.created_at, 'date-time')}
+				/>
+			</ViewSection>
+
 			{parsedContext?.request && (
-				<div>
-					<h3 className="font-bold border-b border-line pb-2 mb-3">
-						Request Context
-					</h3>
-					<div className="ml-4 space-y-1">
-						<div>
-							<span className="font-semibold">Method</span>{' '}
-							{parsedContext.request.method}
-						</div>
-						<div>
-							<span className="font-semibold">URL</span>{' '}
-							{decodeURI(parsedContext.request.url)}
-						</div>
-						<div>
-							<span className="font-semibold">Body</span>{' '}
-							{JSON.stringify(parsedContext.request.body)}
-						</div>
-						<div>
-							<span className="font-semibold">Params</span>{' '}
-							{JSON.stringify(parsedContext.request.params)}
-						</div>
-						<div>
-							<span className="font-semibold">Query</span>{' '}
-							{JSON.stringify(parsedContext.request.query)}
-						</div>
-					</div>
-				</div>
+				<ViewSection title="Request Context">
+					<ViewField
+						label="Method"
+						value={parsedContext.request.method}
+					/>
+					<ViewField
+						label="URL"
+						value={decodeURI(parsedContext.request.url)}
+						full
+					/>
+					<ViewField
+						label="Body"
+						value={JSON.stringify(parsedContext.request.body)}
+						full
+					/>
+					<ViewField
+						label="Params"
+						value={JSON.stringify(parsedContext.request.params)}
+						full
+					/>
+					<ViewField
+						label="Query"
+						value={JSON.stringify(parsedContext.request.query)}
+						full
+					/>
+				</ViewSection>
 			)}
 
 			{parsedDebugStack && (
-				<div>
-					<h3 className="font-bold border-b border-line pb-2 mb-3">
-						Debug Stack
-					</h3>
-					<div className="ml-4 space-y-1">
-						<div>
-							<span className="font-semibold">File</span>{' '}
-							{parsedDebugStack.file}
-						</div>
-						<div>
-							<span className="font-semibold">Line</span>{' '}
-							{parsedDebugStack.line}
-						</div>
-						<div>
-							<span className="font-semibold">Function</span>{' '}
-							{parsedDebugStack.function}
-						</div>
-						{parsedDebugStack.trace && (
-							<div>
-								<span className="font-semibold">Trace</span>
+				<ViewSection title="Debug Stack">
+					<ViewField label="File" value={parsedDebugStack.file} />
+					<ViewField label="Line" value={parsedDebugStack.line} />
+					<ViewField
+						label="Function"
+						value={parsedDebugStack.function}
+					/>
+					{parsedDebugStack.trace && (
+						<ViewField
+							label="Trace"
+							full
+							value={
 								<pre className="bg-gray-50 border rounded p-2 text-xs mt-1 overflow-x-auto">
 									{parsedDebugStack.trace.join('\n')}
 								</pre>
-							</div>
-						)}
-					</div>
-				</div>
+							}
+						/>
+					)}
+				</ViewSection>
 			)}
 		</div>
 	);

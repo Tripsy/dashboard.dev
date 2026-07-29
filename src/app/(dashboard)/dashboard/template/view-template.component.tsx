@@ -1,5 +1,6 @@
 'use client';
 
+import { ViewField, ViewSection } from '@/app/(dashboard)/_components/view-detail';
 import { formatDate } from '@/helpers/date.helper';
 import { parseJson } from '@/helpers/string.helper';
 import type { TemplateModel } from '@/models/template.model';
@@ -9,66 +10,52 @@ export function ViewTemplate({ entry }: { entry: TemplateModel }) {
 
 	return (
 		<div className="space-y-6">
-			<div className="space-y-1">
-				<div>
-					<span className="font-semibold">ID</span> {entry.id}
-				</div>
-				<div>
-					<span className="font-semibold">Label</span> {entry.label}
-				</div>
-				<div>
-					<span className="font-semibold">Language</span>{' '}
-					{entry.language}
-				</div>
-				<div>
-					<span className="font-semibold">Type</span> {entry.type}
-				</div>
+			<div className="flex items-center gap-2 border-b border-line pb-4">
+				<span className="font-semibold">ID</span> {entry.id}
 			</div>
 
-			<div>
-				<h3 className="font-bold border-b border-line pb-2 mb-3">
-					Timestamps
-				</h3>
-				<div className="ml-4 space-y-1 text-sm">
-					<div>
-						<span className="font-semibold">Created At</span>{' '}
-						{formatDate(entry.created_at, 'date-time')}
-					</div>
-					<div>
-						<span className="font-semibold">Updated At</span>{' '}
-						{formatDate(entry.updated_at, 'date-time')}
-					</div>
-					{entry.deleted_at && (
-						<div>
-							<span className="font-semibold">Deleted At</span>{' '}
+			<ViewSection title="Info">
+				<ViewField label="Label" value={entry.label} />
+				<ViewField label="Language" value={entry.language} />
+				<ViewField label="Type" value={entry.type} />
+			</ViewSection>
+
+			<ViewSection title="Timestamps">
+				<ViewField
+					label="Created At"
+					value={formatDate(entry.created_at, 'date-time')}
+				/>
+				<ViewField
+					label="Updated At"
+					value={formatDate(entry.updated_at, 'date-time')}
+				/>
+				{entry.deleted_at && (
+					<ViewField
+						label="Deleted At"
+						value={
 							<span className="text-danger">
 								{formatDate(entry.deleted_at, 'date-time')}
 							</span>
-						</div>
-					)}
-				</div>
-			</div>
+						}
+					/>
+				)}
+			</ViewSection>
 
 			{parsedContent && (
-				<div>
-					<h3 className="font-bold border-b border-line pb-2 mb-3">
-						Content
-					</h3>
-					<div className="ml-4 space-y-1">
-						{Object.entries(parsedContent).map(([key, value]) => (
-							<div key={key}>
-								<span className="font-semibold capitalize">
-									{key}
-								</span>{' '}
-								<span>
-									{typeof value === 'object'
-										? JSON.stringify(value, null, 2)
-										: String(value)}
-								</span>
-							</div>
-						))}
-					</div>
-				</div>
+				<ViewSection title="Content">
+					{Object.entries(parsedContent).map(([key, value]) => (
+						<ViewField
+							key={key}
+							label={key}
+							value={
+								typeof value === 'object'
+									? JSON.stringify(value, null, 2)
+									: String(value)
+							}
+							full
+						/>
+					))}
+				</ViewSection>
 			)}
 		</div>
 	);

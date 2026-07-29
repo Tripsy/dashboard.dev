@@ -3,6 +3,10 @@
     "DOCKER_CONTAINER": "dashboard.test",
     "USER_NAME": "David Gabriel"
   },
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
   "permissions": {
     "additionalDirectories": [
       "../star-backend",

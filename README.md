@@ -221,16 +221,6 @@ room in the container for both, and it is usually the dev server that gets kille
 
 # 📌 TODO
 
-1. deploy
-    - dotenvx
-    - command 
-    - CI/CD  
-2. SENTRY needs account > add config to .env
-3. cmr signature wrap up
-4. monthly driver report
-
----------- 
-
 1. Hero UI -> theme
 2. Add section "documentation"
 3. login with google / facebook

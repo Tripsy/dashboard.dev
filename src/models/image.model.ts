@@ -103,10 +103,23 @@ export const displayImageLabel = (m: ImageModel) => {
 	return `${m.path}`;
 };
 
+/**
+ * The `src` to render a stored image from.
+ *
+ * Local files are served statically by Next straight off `/public`. S3 objects live in a
+ * private bucket and are only reachable through a presigned URL, which cannot be minted
+ * here — this function is synchronous and runs inside client components. So S3 paths point
+ * at `/api/image/view`, which authorizes the request and redirects to a signed URL.
+ */
 export function showImage(path: string, storage?: ImageStorage) {
 	if (storage === ImageStorageEnum.LOCAL) {
 		return `${Configuration.get('images.local.view')}/${path}`;
 	}
 
-	return path;
+	const params = new URLSearchParams({
+		path,
+		storage: storage ?? ImageStorageEnum.S3,
+	});
+
+	return `/api/image/view?${params.toString()}`;
 }

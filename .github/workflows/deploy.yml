@@ -92,12 +92,17 @@ jobs:
                   set -euo pipefail
 
                   # No migrate step: the dashboard owns no schema.
+                  #
+                  # `set -eu`, not `set -euo pipefail`: AWS-RunShellScript executes the
+                  # script with /bin/sh, which is dash on Ubuntu and has no `pipefail` —
+                  # it aborts on line 1 with "Illegal option -o pipefail". None of these
+                  # commands pipe, so -e and -u give the same protection here.
                   COMMAND_ID="$(aws ssm send-command \
                     --document-name AWS-RunShellScript \
                     --targets "Key=tag:Name,Values=${INSTANCE_TAG_NAME}" \
                     --comment "Deploy dashboard ${IMAGE_TAG}" \
                     --parameters commands="[
-                      \"set -euo pipefail\",
+                      \"set -eu\",
                       \"cd ${APP_DIR}\",
                       \"sed -i 's|^IMAGE_TAG=.*|IMAGE_TAG=${IMAGE_TAG}|' .env\",
                       \"docker compose pull --quiet\",

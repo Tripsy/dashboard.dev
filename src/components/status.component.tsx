@@ -13,7 +13,7 @@ type StatusProps = {
 export function LoadingIcon({ className }: { className?: string }) {
 	return (
 		<Icons.Status.Loading
-			className={cn('animate-spin h-6 w-6', className)}
+			className={cn('animate-spin', className)}
 			aria-label="Loading"
 		/>
 	);

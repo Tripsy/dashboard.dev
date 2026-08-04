@@ -40,11 +40,16 @@ export const START_AT_MAX_PAST_SECONDS = 1800;
 export const END_AT_MAX_FUTURE_SECONDS = 1800;
 
 export function displayWorkSessionDuration(entry: WorkSessionModel) {
-	return dateDiff(
-		entry.start_at,
-		entry.end_at ?? createCurrentDate(),
-		'display',
-	);
+	const start = new Date(entry.start_at);
+	const end = entry.end_at ? new Date(entry.end_at) : createCurrentDate();
+
+	/*
+	 * An open session is measured against the viewer's clock while `start_at` came from the
+	 * server's, so the two can disagree by a minute; `start_at` may also sit slightly in the
+	 * future by design (see END_AT_MAX_FUTURE_SECONDS). Neither means the session has run
+	 * for negative time — it has run for none yet.
+	 */
+	return dateDiff(start, end < start ? start : end, 'display');
 }
 
 export function displayWorkSessionLabel(entry: WorkSessionModel) {

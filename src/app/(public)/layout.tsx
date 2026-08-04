@@ -11,9 +11,7 @@ export default async function Layout({
 	children: ReactNode;
 }>) {
 	const currentLanguage = await getLanguage();
-	const supportedLanguages = Configuration.get(
-		'language.supported',
-	) as string[];
+	const supportedLanguages = Configuration.get('language.supported');
 
 	return (
 		<div className="min-h-screen flex flex-col bg-background">

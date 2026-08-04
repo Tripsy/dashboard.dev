@@ -99,6 +99,7 @@ export function WindowInstance({
 	const windowProps = current.props;
 	const modalSize = windowProps?.size || 'md';
 	const modalClassName = windowProps?.className;
+	const allowMinimize = windowProps?.allowMinimize ?? true;
 
 	const type = definition.windowType as WindowType<EntriesSelectionType>;
 	const WindowComponent = definition?.windowComponent;
@@ -168,7 +169,7 @@ export function WindowInstance({
 			isHidden={isHidden}
 			title={modalTitle}
 			onClose={handleClose}
-			onMinimize={handleMinimize}
+			onMinimize={allowMinimize ? handleMinimize : undefined}
 			closeOnBackdrop={windowProps?.closeOnBackdrop ?? false}
 			closeOnEscape={windowProps?.closeOnEscape ?? false}
 		>

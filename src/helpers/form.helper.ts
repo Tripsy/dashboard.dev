@@ -1,36 +1,82 @@
 import type { Dispatch, SetStateAction } from 'react';
-import sanitizeHtml from 'sanitize-html';
 import type { z } from 'zod';
+import { logger } from '@/helpers/logger.helper';
 import type {
 	FormErrorsType,
 	FormValuesType,
 	TouchedFieldsType,
 } from '@/types/form.type';
 
+/**
+ * Flattens a `ZodError` into the shape `FormErrorsType` describes: `string[]` at a leaf, a
+ * nested object at any field that has children.
+ *
+ * A key holds one or the other, never both. So when a validator raises an issue on an object
+ * field *and* on a path beneath it, only one can be represented: the nested messages win,
+ * because they name the individual field the user has to fix. The displaced parent-level
+ * message is reported rather than dropped in silence — seeing it means the validator needs a
+ * leaf path (a dedicated sentinel field) for its group-level rule.
+ */
 export function accumulateZodErrors<T extends FormValuesType>(
 	zodError: z.ZodError,
 ): FormErrorsType<T> {
 	const fieldErrors: FormErrorsType<T> = {};
 
+	const warnUnrepresentable = (path: string[], message: string): void => {
+		logger.warn(
+			'Group-level validation message cannot be shown alongside errors for its own fields, and was discarded',
+			undefined,
+			{ path: path.join('.'), message },
+		);
+	};
+
 	for (const issue of zodError.issues) {
 		if (issue.path.length === 0) continue;
+
+		// Array indices arrive as numbers; object keys are always strings.
+		const path = issue.path.map((segment) => String(segment));
 
 		// Walk the path and build nested objects as needed
 		let current = fieldErrors as Record<string, unknown>;
 
-		for (let i = 0; i < issue.path.length - 1; i++) {
-			const segment = issue.path[i] as string;
+		for (let index = 0; index < path.length - 1; index++) {
+			const segment = path[index];
+			const existing = current[segment];
 
-			if (!current[segment] || typeof current[segment] !== 'object') {
+			if (Array.isArray(existing)) {
+				// A group-level message got here first — nested fields take the key.
+				warnUnrepresentable(
+					path.slice(0, index + 1),
+					(existing as string[]).join('; '),
+				);
+			}
+
+			if (
+				!existing ||
+				typeof existing !== 'object' ||
+				Array.isArray(existing)
+			) {
 				current[segment] = {};
 			}
 
 			current = current[segment] as Record<string, unknown>;
 		}
 
-		const lastSegment = issue.path[issue.path.length - 1] as string;
+		const lastSegment = path[path.length - 1];
+		const existing = current[lastSegment];
 
-		if (!Array.isArray(current[lastSegment])) {
+		if (
+			existing &&
+			typeof existing === 'object' &&
+			!Array.isArray(existing)
+		) {
+			// Nested fields already own this key, so this group-level message has no slot.
+			warnUnrepresentable(path, issue.message);
+
+			continue;
+		}
+
+		if (!Array.isArray(existing)) {
 			current[lastSegment] = [];
 		}
 
@@ -75,49 +121,6 @@ export function filterErrorsByTouched<FormValues extends FormValuesType>(
 	return visible;
 }
 
-export function safeHtml(dirtyHtml: string): string {
-	return sanitizeHtml(dirtyHtml, {
-		allowedTags: [
-			'p',
-			'br',
-			'strong',
-			'em',
-			'i',
-			'b',
-			'u',
-			'span',
-			'div',
-			'h1',
-			'h2',
-			'h3',
-			'h4',
-			'h5',
-			'h6',
-			'ul',
-			'ol',
-			'li',
-			'blockquote',
-			'code',
-			'pre',
-			'a',
-			'img',
-			'table',
-			'thead',
-			'tbody',
-			'tr',
-			'th',
-			'td',
-		],
-		allowedAttributes: {
-			a: ['href', 'title', 'target'],
-			img: ['src', 'alt', 'width', 'height'],
-		},
-		disallowedTagsMode: 'discard',
-		allowedSchemes: ['http', 'https', 'mailto'],
-		allowProtocolRelative: false,
-	});
-}
-
 export function createHandleChange<FormValues extends FormValuesType>(
 	setFormValues: Dispatch<SetStateAction<FormValues>>,
 	markFieldAsTouched: (path: string) => void, // now a string path, not keyof FormValues
@@ -141,17 +144,37 @@ export function getFormDataAsString(
 	return formValue ? String(formValue) : null;
 }
 
+/** Anything unparseable is `null`, not `NaN` — a missing number and a broken one read alike. */
 export function getFormDataAsNumber(
 	formData: FormData,
 	key: string,
 ): number | null {
 	const formValue = formData.get(key);
 
-	return formValue ? Number(formValue) : null;
+	if (formValue === null || String(formValue).trim() === '') {
+		return null;
+	}
+
+	const parsed = Number(formValue);
+
+	return Number.isNaN(parsed) ? null : parsed;
 }
 
+/**
+ * Values a form can submit for false. An unchecked checkbox sends nothing at all, but a hidden
+ * input or a select carries a literal string — and every non-empty string is truthy, so
+ * `"false"` would otherwise read as true.
+ */
+const FALSE_FORM_VALUES = new Set(['', '0', 'false', 'off', 'no']);
+
 export function getFormDataAsBoolean(formData: FormData, key: string): boolean {
-	return Boolean(formData.get(key));
+	const formValue = formData.get(key);
+
+	if (formValue === null) {
+		return false;
+	}
+
+	return !FALSE_FORM_VALUES.has(String(formValue).trim().toLowerCase());
 }
 
 export function getFormDataAsEnum<T extends Record<string, string>>(

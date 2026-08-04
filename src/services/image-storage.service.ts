@@ -3,9 +3,11 @@ import { mkdir, unlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import {
 	DeleteObjectCommand,
+	GetObjectCommand,
 	PutObjectCommand,
 	S3Client,
 } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Configuration } from '@/config/settings.config';
 import { type ImageStorage, ImageStorageEnum } from '@/models/image.model';
 
@@ -17,13 +19,25 @@ export interface ImageStorageService {
 	): Promise<{ path: string; storage: ImageStorage }>;
 	delete(filePath: string): Promise<void>;
 	getStorageType(): ImageStorage;
+
+	/**
+	 * A URL the browser can fetch the object from.
+	 *
+	 * For local storage this is the static path Next already serves. For S3 the bucket is
+	 * private, so this mints a short-lived presigned URL — which is why the method is async
+	 * even though one implementation has nothing to await.
+	 */
+	resolveUrl(filePath: string): Promise<string>;
 }
 
+// Long enough to survive a slow page load and an image retry, short enough that a URL
+// leaking through a referrer header or a screenshot is worthless by the time anyone tries
+// it. The browser caches the fetched bytes, not the signature, so this is not a per-render
+// cost for the user.
+const SIGNED_URL_TTL_SECONDS = 300;
+
 function getBaseStoragePath() {
-	return path.join(
-		process.cwd(),
-		Configuration.get('images.local.save') as string,
-	);
+	return path.join(process.cwd(), Configuration.get('images.local.save'));
 }
 
 class S3StorageService implements ImageStorageService {
@@ -32,23 +46,30 @@ class S3StorageService implements ImageStorageService {
 	private readonly region: string;
 
 	constructor() {
-		this.bucket = Configuration.get('images.s3.bucket') as string;
-		this.region = Configuration.get('images.s3.region') as string;
+		this.bucket = Configuration.get('images.s3.bucket');
+		this.region = Configuration.get('aws.region');
 
 		if (!this.bucket) {
 			throw new Error('AWS_S3_BUCKET is not configured');
 		}
 
+		const accessKeyId = Configuration.get('aws.accessKeyId');
+		const secretAccessKey = Configuration.get('aws.secretAccessKey');
+
+		/*
+		 * Credentials are passed only when both are actually configured. Omitting the key
+		 * lets the SDK fall back to its default provider chain, which on EC2 resolves the
+		 * instance role from IMDS — so production needs no long-lived access keys on disk.
+		 *
+		 * The config defaults both to '', and passing those through would not fall back:
+		 * an explicit `credentials` object short-circuits the chain and every request would
+		 * fail to sign. Hence the check rather than passing the values straight down.
+		 */
 		this.client = new S3Client({
 			region: this.region,
-			credentials: {
-				accessKeyId: Configuration.get(
-					'images.s3.accessKeyId',
-				) as string,
-				secretAccessKey: Configuration.get(
-					'images.s3.secretAccessKey',
-				) as string,
-			},
+			...(accessKeyId && secretAccessKey
+				? { credentials: { accessKeyId, secretAccessKey } }
+				: {}),
 		});
 	}
 
@@ -88,6 +109,20 @@ class S3StorageService implements ImageStorageService {
 		);
 	}
 
+	async resolveUrl(filePath: string): Promise<string> {
+		const key = this.resolveS3Key(filePath);
+
+		if (!key) {
+			throw new Error('Invalid S3 path');
+		}
+
+		return getSignedUrl(
+			this.client,
+			new GetObjectCommand({ Bucket: this.bucket, Key: key }),
+			{ expiresIn: SIGNED_URL_TTL_SECONDS },
+		);
+	}
+
 	getStorageType(): ImageStorage {
 		return ImageStorageEnum.S3;
 	}
@@ -112,7 +147,7 @@ class S3StorageService implements ImageStorageService {
 }
 
 class LocalStorageService implements ImageStorageService {
-	private baseStoragePath: string;
+	private readonly baseStoragePath: string;
 
 	constructor() {
 		this.baseStoragePath = getBaseStoragePath();
@@ -164,6 +199,10 @@ class LocalStorageService implements ImageStorageService {
 		});
 	}
 
+	async resolveUrl(filePath: string): Promise<string> {
+		return `${Configuration.get('images.local.view')}/${filePath}`;
+	}
+
 	getStorageType(): ImageStorage {
 		return ImageStorageEnum.LOCAL;
 	}
@@ -207,6 +246,9 @@ export class ImageStorageFactory {
 	}
 
 	getDefaultService(): ImageStorageService {
+		// Cast rather than typing `images.storage` in the config: `ImageStorage` lives in
+		// image.model.ts, which itself reads Configuration — importing it there would close
+		// a cycle (Biome's noImportCycles).
 		const storageType = Configuration.get('images.storage') as ImageStorage;
 
 		return this.getService(storageType);
@@ -227,5 +269,13 @@ export const imageStorage = {
 		const service = ImageStorageFactory.getInstance().getService(storage);
 
 		return service.delete(filePath);
+	},
+	resolveUrl: async (
+		filePath: string,
+		storage: ImageStorage,
+	): Promise<string> => {
+		const service = ImageStorageFactory.getInstance().getService(storage);
+
+		return service.resolveUrl(filePath);
 	},
 };

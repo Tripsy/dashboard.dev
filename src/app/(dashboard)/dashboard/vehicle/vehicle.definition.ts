@@ -21,7 +21,11 @@ import {
 	requestUpdateStatus,
 } from '@/helpers/services.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
-import { BaseValidator } from '@/helpers/validator.helper';
+import {
+	BaseValidator,
+	resolveValidatorMessages,
+	sharedValidatorMessages,
+} from '@/helpers/validator.helper';
 import { type AuthModel, hasPermission } from '@/models/auth.model';
 import {
 	displayVehicleLabel,
@@ -39,6 +43,7 @@ import type {
 import type { FormStateType } from '@/types/form.type';
 
 const validatorMessages = [
+	...sharedValidatorMessages,
 	'invalid_brand_id',
 	'invalid_brand',
 	'invalid_vehicle_type',
@@ -62,18 +67,42 @@ class VehicleValidator extends BaseValidator<typeof validatorMessages> {
 					this.getMessage('invalid_vehicle_type'),
 				),
 				model: this.validateString(this.getMessage('invalid_model')),
-				length: this.validateNumber(this.getMessage('invalid_length'), {
-					required: false,
-				}),
-				width: this.validateNumber(this.getMessage('invalid_width'), {
-					required: false,
-				}),
-				height: this.validateNumber(this.getMessage('invalid_height'), {
-					required: false,
-				}),
-				weight: this.validateNumber(this.getMessage('invalid_weight'), {
-					required: false,
-				}),
+				length: this.validateNumber(
+					{
+						invalid: this.getMessage('invalid_length'),
+						only_positive: this.getMessage('only_positive'),
+					},
+					{
+						required: false,
+					},
+				),
+				width: this.validateNumber(
+					{
+						invalid: this.getMessage('invalid_width'),
+						only_positive: this.getMessage('only_positive'),
+					},
+					{
+						required: false,
+					},
+				),
+				height: this.validateNumber(
+					{
+						invalid: this.getMessage('invalid_height'),
+						only_positive: this.getMessage('only_positive'),
+					},
+					{
+						required: false,
+					},
+				),
+				weight: this.validateNumber(
+					{
+						invalid: this.getMessage('invalid_weight'),
+						only_positive: this.getMessage('only_positive'),
+					},
+					{
+						required: false,
+					},
+				),
 			})
 			.superRefine((data, ctx) => {
 				if (isSubmit && data.brand && !data.brand_id) {
@@ -90,9 +119,9 @@ async function validateForm(
 	values: VehicleFormValuesType,
 	isSubmit: boolean = true,
 ) {
-	const translations = await translateBatch(
+	const translations = await resolveValidatorMessages(
 		validatorMessages,
-		'vehicle.validation',
+		'vehicle',
 	);
 
 	const validator = new VehicleValidator(translations);
@@ -212,6 +241,7 @@ export default async function dataSourceConfig(): Promise<
 				{
 					field: 'id',
 					header: 'ID',
+					defaultWidth: 88,
 					sortable: true,
 					body: (entry, column, auth) =>
 						DataTableValue(entry, column, {
@@ -250,10 +280,8 @@ export default async function dataSourceConfig(): Promise<
 							markDeleted: true,
 							displayButton: displayButtonStatus(auth),
 						}),
-					style: {
-						minWidth: '8rem',
-						maxWidth: '8rem',
-					},
+					minWidth: 128,
+					maxWidth: 128,
 				},
 				{
 					field: 'created_at',

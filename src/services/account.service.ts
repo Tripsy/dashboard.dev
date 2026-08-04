@@ -11,6 +11,7 @@ import type { PasswordRecoverChangeFormValuesType } from '@/app/(public)/account
 import type { PasswordUpdateFormValuesType } from '@/app/(public)/account/password-update/password-update.definition';
 import type { RegisterFormValuesType } from '@/app/(public)/account/register/register.definition';
 import { ApiRequest } from '@/helpers/api.helper';
+import { logger } from '@/helpers/logger.helper';
 import type { UserModel } from '@/models/user.model';
 import type { ApiResponseFetch } from '@/types/api.type';
 import type { AuthTokenType } from '@/types/auth.type';
@@ -103,7 +104,10 @@ export async function requestGetSessions(): Promise<AuthTokenType[]> {
 			return fetchResponse.data || [];
 		}
 	} catch (error: unknown) {
-		console.error(error);
+		// The caller renders a list, so a failure degrades to "no sessions" rather than an
+		// error state — which is indistinguishable from a genuinely empty list on screen.
+		// The log is the only trace that the request failed at all.
+		logger.error('Failed to load account sessions', error);
 	}
 
 	return [];

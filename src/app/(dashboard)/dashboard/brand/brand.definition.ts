@@ -18,7 +18,11 @@ import {
 	requestView,
 } from '@/helpers/services.helper';
 import { toKebabCase } from '@/helpers/string.helper';
-import { BaseValidator } from '@/helpers/validator.helper';
+import {
+	BaseValidator,
+	resolveValidatorMessages,
+	sharedValidatorMessages,
+} from '@/helpers/validator.helper';
 import { type AuthModel, hasPermission } from '@/models/auth.model';
 import {
 	BRAND_DEFAULT_TYPE,
@@ -39,11 +43,10 @@ import type {
 import type { FormStateType } from '@/types/form.type';
 
 const validatorMessages = [
+	...sharedValidatorMessages,
 	'invalid_brand_type',
 	'invalid_name',
 	'invalid_slug',
-	'invalid_contents',
-	'duplicate_contents',
 	'invalid_language',
 	'invalid_description',
 	'invalid_meta_title',
@@ -86,9 +89,9 @@ class BrandValidator extends BaseValidator<typeof validatorMessages> {
 }
 
 async function validateForm(values: BrandFormValuesType) {
-	const translations = await translateBatch(
+	const translations = await resolveValidatorMessages(
 		validatorMessages,
-		'brand.validation',
+		'brand',
 	);
 
 	const validator = new BrandValidator(translations);
@@ -126,7 +129,11 @@ function getFormValues(formData: FormData): BrandFormValuesType {
 
 	return {
 		...values,
-		slug: values.name ? toKebabCase(values.name) : null,
+		// `toKebabCase` strips anything outside the latin alphabet, so a wholly non-latin name
+		// (`Москва`) reduces to an empty string. Send `null` rather than `''` — the id that
+		// would make a usable fallback does not exist yet at create time, so this stays an
+		// open case rather than being papered over with a meaningless slug.
+		slug: values.name ? toKebabCase(values.name) || null : null,
 	};
 }
 
@@ -221,6 +228,7 @@ export default async function dataSourceConfig(): Promise<
 				{
 					field: 'id',
 					header: 'ID',
+					defaultWidth: 88,
 					sortable: true,
 					body: (entry, column, auth) =>
 						DataTableValue(entry, column, {
@@ -251,10 +259,8 @@ export default async function dataSourceConfig(): Promise<
 							markDeleted: true,
 							displayButton: displayButtonStatus(auth),
 						}),
-					style: {
-						minWidth: '8rem',
-						maxWidth: '8rem',
-					},
+					minWidth: 128,
+					maxWidth: 128,
 				},
 			],
 			find: (params: FindFunctionParamsType) =>

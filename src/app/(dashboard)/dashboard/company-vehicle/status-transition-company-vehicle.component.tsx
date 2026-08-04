@@ -27,16 +27,12 @@ export function StatusTransitionCompanyVehicle({
 
 	const { showToast } = useToast();
 
-	const translationsKeys = useMemo(
-		() =>
-			[
-				'app.error.title',
-				'app.success.title',
-				'company-vehicle.error.cannot_update_status',
-				'company-vehicle.action.statusTransition.success',
-			] as const,
-		[],
-	);
+	const translationsKeys = [
+		'app.error.title',
+		'app.success.title',
+		'company-vehicle.error.cannot_update_status',
+		'company-vehicle.action.statusTransition.success',
+	] as const;
 
 	const { isTranslationLoading, translations } =
 		useTranslation(translationsKeys);

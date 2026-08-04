@@ -14,6 +14,7 @@ import { CountCMRs } from '@/app/(dashboard)/_components/stats/count-cmrs';
 import { CountDriverCMRs } from '@/app/(dashboard)/_components/stats/count-driver-cmrs';
 import { CountDriverWorkingHours } from '@/app/(dashboard)/_components/stats/count-driver-working-hours';
 import { CountWorkingHours } from '@/app/(dashboard)/_components/stats/count-working-hours';
+import { DriverMonthlyReport } from '@/app/(dashboard)/_components/stats/driver-monthly-report.component';
 import { LatestCMRs } from '@/app/(dashboard)/_components/stats/latest-cmrs';
 import { RecentActivity } from '@/app/(dashboard)/_components/stats/recent-activity';
 import { SumExpenses } from '@/app/(dashboard)/_components/stats/sum-expenses';
@@ -79,6 +80,15 @@ function AdminDashboard(): JSX.Element {
 					<SumRevenues />
 				</StatCard>
 			</div>
+
+			<Card className="my-6">
+				<CardHeader>
+					<CardTitle>Reports</CardTitle>
+				</CardHeader>
+				<CardContent>
+					<DriverMonthlyReport />
+				</CardContent>
+			</Card>
 
 			<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 				<div className="space-y-6">

@@ -8,7 +8,7 @@ import {
 	Select,
 } from '@heroui/react';
 import { CalendarDate, parseDate } from '@internationalized/date';
-import React, { type JSX, useEffect, useMemo, useRef, useState } from 'react';
+import React, { type JSX, useEffect, useRef, useState } from 'react';
 import { ActionButtonContent } from '@/components/action-button.component';
 import { FormElementError } from '@/components/form/form-element-error.component';
 import { Icons } from '@/components/icon.component';
@@ -705,6 +705,7 @@ export const FormComponentCalendarWithoutFormElement = <Fields,>({
 	fieldValue,
 	className = 'min-w-40',
 	placeholderText,
+	ariaLabel,
 	disabled,
 	onSelect,
 	minDate,
@@ -721,6 +722,12 @@ export const FormComponentCalendarWithoutFormElement = <Fields,>({
 	onSelect: (value: string) => void;
 	minDate?: Date;
 	maxDate?: Date;
+	/**
+	 * Accessible name for the picker. Needed because `placeholderText` is optional and,
+	 * for filters, arrives a tick late from `useTranslation` — react-aria's DatePicker
+	 * warns when it renders with neither a visible label nor an aria-label.
+	 */
+	ariaLabel?: string;
 }) => {
 	// The project stores dates as `YYYY-MM-DD`, which is exactly what `parseDate`
 	// reads and `CalendarDate.toString()` emits — no timezone conversion is involved
@@ -745,10 +752,14 @@ export const FormComponentCalendarWithoutFormElement = <Fields,>({
 				minValue={minDate ? toCalendarDate(minDate) : undefined}
 				maxValue={maxDate ? toCalendarDate(maxDate) : undefined}
 				isDisabled={disabled}
-				aria-label={placeholderText}
+				aria-label={ariaLabel ?? placeholderText}
 			>
 				<DatePicker.Trigger
 					id={id}
+					// Also on the trigger, not just the root: react-aria defaults this
+					// button's name to "Calendar", so without it every picker in a form
+					// reads identically and none says which field it belongs to.
+					aria-label={ariaLabel ?? placeholderText}
 					className={cn(
 						'min-h-9 justify-start gap-2 rounded-md border border-border px-3 py-2 text-left text-base sm:text-sm',
 						!fieldValue && 'text-muted',
@@ -800,6 +811,9 @@ export const FormComponentCalendar = <Fields,>({
 				fieldValue={fieldValue}
 				className={className}
 				placeholderText={placeholderText}
+				// The visible <label> is wired via `for`, but react-aria reads props, not
+				// the DOM — so the field's label doubles as the picker's accessible name.
+				ariaLabel={labelText}
 				disabled={disabled}
 				onSelect={onSelect}
 				minDate={minDate}
@@ -1098,10 +1112,10 @@ export const FormComponentSubmit = ({
 	error: boolean;
 	button?: ButtonAppearanceType;
 }) => {
-	const translationsKeys = useMemo(
-		() => ['app.action.loading.label', 'app.action.submit.label'] as const,
-		[],
-	);
+	const translationsKeys = [
+		'app.action.loading.label',
+		'app.action.submit.label',
+	] as const;
 
 	const { translations } = useTranslation(translationsKeys);
 

@@ -9,7 +9,6 @@ import {
 	EmailConfirmSendState,
 	validateFormEmailConfirmSend,
 } from '@/app/(public)/account/email-confirm-send/email-confirm-send.definition';
-import { FormCsrf } from '@/components/form/form-csrf';
 import {
 	FormComponentEmail,
 	FormComponentSubmit,
@@ -93,8 +92,6 @@ export default function EmailConfirmSend() {
 				onSubmit={markSubmit}
 				className="form-section"
 			>
-				<FormCsrf />
-
 				<FormComponentEmail<EmailConfirmSendFormValuesType>
 					labelText="Email Address"
 					id={elementIds.email}

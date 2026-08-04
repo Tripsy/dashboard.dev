@@ -18,7 +18,11 @@ import {
 	requestUpdate,
 	requestUpdateStatus,
 } from '@/helpers/services.helper';
-import { BaseValidator } from '@/helpers/validator.helper';
+import {
+	BaseValidator,
+	resolveValidatorMessages,
+	sharedValidatorMessages,
+} from '@/helpers/validator.helper';
 import { type AuthModel, hasPermission } from '@/models/auth.model';
 import {
 	type UserModel,
@@ -37,18 +41,13 @@ import type {
 import type { FormStateType } from '@/types/form.type';
 
 const validatorMessages = [
+	...sharedValidatorMessages,
 	'invalid_name',
-	'name_min',
 	'invalid_email',
 	'invalid_language',
 	'invalid_role',
 	'invalid_password',
-	'password_min',
-	'password_condition_capital_letter',
-	'password_condition_number',
-	'password_condition_special_character',
 	'password_confirm_required',
-	'password_confirm_mismatch',
 	'invalid_operator_type',
 ] as const;
 
@@ -58,11 +57,11 @@ class UserValidator extends BaseValidator<typeof validatorMessages> {
 			{
 				invalid: this.getMessage('invalid_name'),
 				min_chars: this.getMessage('name_min', {
-					min: Configuration.get('user.nameMinChars') as string,
+					min: Configuration.get('user.nameMinChars'),
 				}),
 			},
 			{
-				minChars: Configuration.get('user.nameMinChars') as number,
+				minChars: Configuration.get('user.nameMinChars'),
 			},
 		),
 		email: this.validateEmail(this.getMessage('invalid_email')),
@@ -81,9 +80,7 @@ class UserValidator extends BaseValidator<typeof validatorMessages> {
 				{
 					invalid_password: this.getMessage('invalid_password'),
 					password_min: this.getMessage('password_min', {
-						min: Configuration.get(
-							'user.passwordMinChars',
-						) as string,
+						min: Configuration.get('user.passwordMinChars'),
 					}),
 					password_condition_capital_letter: this.getMessage(
 						'password_condition_capital_letter',
@@ -96,9 +93,7 @@ class UserValidator extends BaseValidator<typeof validatorMessages> {
 					),
 				},
 				{
-					minLength: Configuration.get(
-						'user.passwordMinChars',
-					) as number,
+					minLength: Configuration.get('user.passwordMinChars'),
 				},
 			),
 			password_confirm: this.validateString(
@@ -130,9 +125,7 @@ class UserValidator extends BaseValidator<typeof validatorMessages> {
 				{
 					invalid_password: this.getMessage('invalid_password'),
 					password_min: this.getMessage('password_min', {
-						min: Configuration.get(
-							'user.passwordMinChars',
-						) as string,
+						min: Configuration.get('user.passwordMinChars'),
 					}),
 					password_condition_capital_letter: this.getMessage(
 						'password_condition_capital_letter',
@@ -146,9 +139,7 @@ class UserValidator extends BaseValidator<typeof validatorMessages> {
 				},
 				{
 					required: false,
-					minLength: Configuration.get(
-						'user.passwordMinChars',
-					) as number,
+					minLength: Configuration.get('user.passwordMinChars'),
 				},
 			),
 			password_confirm: this.validateString(
@@ -185,9 +176,9 @@ class UserValidator extends BaseValidator<typeof validatorMessages> {
 }
 
 async function validateFormCreate(values: UserFormValuesType) {
-	const translations = await translateBatch(
+	const translations = await resolveValidatorMessages(
 		validatorMessages,
-		'user.validation',
+		'user',
 	);
 
 	const validator = new UserValidator(translations);
@@ -196,9 +187,9 @@ async function validateFormCreate(values: UserFormValuesType) {
 }
 
 async function validateFormUpdate(values: UserFormValuesType) {
-	const translations = await translateBatch(
+	const translations = await resolveValidatorMessages(
 		validatorMessages,
-		'user.validation',
+		'user',
 	);
 
 	const validator = new UserValidator(translations);
@@ -335,6 +326,7 @@ export default async function dataSourceConfig(): Promise<
 				{
 					field: 'id',
 					header: 'ID',
+					defaultWidth: 88,
 					sortable: true,
 					body: (entry, column, auth) =>
 						DataTableValue(entry, column, {
@@ -373,10 +365,8 @@ export default async function dataSourceConfig(): Promise<
 							markDeleted: true,
 							displayButton: displayButtonStatus(auth),
 						}),
-					style: {
-						minWidth: '8rem',
-						maxWidth: '8rem',
-					},
+					minWidth: 128,
+					maxWidth: 128,
 				},
 				{
 					field: 'created_at',
@@ -390,8 +380,6 @@ export default async function dataSourceConfig(): Promise<
 			],
 			find: (params: FindFunctionParamsType) =>
 				requestFind<UserModel>('user', params),
-			// onRowSelect: (entry: UserModel) => console.log('selected', entry),
-			// onRowUnselect: (entry: UserModel) => console.log('unselected', entry),
 		},
 		displayEntryLabel: (entry: UserModel) => {
 			return entry.name;
@@ -415,11 +403,6 @@ export default async function dataSourceConfig(): Promise<
 				getFormValues: getFormValues,
 				validateForm: validateFormCreate,
 				getFormState: getFormState,
-				// events: {
-				// 	success: (resultData: UserModel) => {
-				// 		console.log('onCreateSuccess', resultData);
-				// 	},
-				// },
 			},
 			update: {
 				windowType: 'form',

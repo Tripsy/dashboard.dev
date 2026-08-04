@@ -4,6 +4,11 @@ import Routes, { RouteAuthEnum, type RouteMatch } from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
 import { ApiError } from '@/exceptions/api.error';
 import { ApiRequest, getResponseData } from '@/helpers/api.helper';
+import {
+	getCachedAuthModel,
+	setCachedAuthModel,
+} from '@/helpers/auth-cache.helper';
+import { CSRF_REJECTION_CODE } from '@/helpers/csrf.helper';
 import { getTrackedCookie } from '@/helpers/session.helper';
 import { apiHeaders } from '@/helpers/system.helper';
 import {
@@ -68,7 +73,7 @@ class MiddlewareContext {
 
 		// 2. Check existing cookie
 		const cookieLang = this.req.cookies.get(
-			Configuration.get('language.cookie_name') as string,
+			Configuration.get('language.cookieName'),
 		)?.value;
 
 		// 3. Check Accept-Language header
@@ -79,12 +84,10 @@ class MiddlewareContext {
 		const language = queryLang || cookieLang || headerLang;
 
 		if (language && Configuration.isSupportedLanguage(language)) {
-			const languageCookie = Configuration.get(
-				'language.cookie_name',
-			) as string;
+			const languageCookie = Configuration.get('language.cookieName');
 			const languageCookieMaxAge = Configuration.get(
-				'language.cookie_max_age',
-			) as number;
+				'language.cookieMaxAge',
+			);
 
 			if (language !== cookieLang) {
 				this.res.cookies.set(languageCookie, language, {
@@ -98,6 +101,27 @@ class MiddlewareContext {
 
 			this.res.headers.set('x-language', language);
 		}
+	}
+
+	/**
+	 * Double-submit check: the token sent in the header must match the httpOnly cookie that
+	 * `/api/csrf` issued. Only same-origin script can read the token (it is handed back in the
+	 * response body, never readable from the cookie), and only same-origin script can set a
+	 * custom header without a preflight — so a forged cross-site request fails both halves.
+	 *
+	 * This sits alongside `isValidRequestSource()` rather than replacing it: that check reads
+	 * headers the browser controls, this one requires a secret the attacker cannot obtain.
+	 */
+	isValidCsrfToken() {
+		const submitted = this.req.headers.get(
+			Configuration.get('csrf.inputName'),
+		);
+
+		const secret = this.req.cookies.get(
+			Configuration.get('csrf.cookieName'),
+		)?.value;
+
+		return Boolean(submitted) && Boolean(secret) && submitted === secret;
 	}
 
 	isValidRequestSource() {
@@ -119,9 +143,7 @@ class MiddlewareContext {
 		const origin = this.req.headers.get('origin');
 		const referer = this.req.headers.get('referer');
 
-		const allowedOrigins = Configuration.get(
-			'security.allowedOrigins',
-		) as string[];
+		const allowedOrigins = Configuration.get('security.allowedOrigins');
 
 		// Probably a same-origin browser request — allow it
 		if (!origin && !referer) {
@@ -150,9 +172,7 @@ class MiddlewareContext {
 
 	destroySession() {
 		if (Configuration.isEnvironment('production')) {
-			this.res.cookies.delete(
-				Configuration.get('user.sessionToken') as string,
-			);
+			this.res.cookies.delete(Configuration.get('user.sessionToken'));
 		}
 	}
 
@@ -160,7 +180,8 @@ class MiddlewareContext {
 		routeMatch: RouteMatch | undefined,
 	): Promise<NextResponse> {
 		const sessionToken = await getTrackedCookie(
-			Configuration.get('user.sessionToken') as string,
+			Configuration.get('user.sessionToken'),
+			Configuration.get('user.sessionRefreshThreshold'),
 		);
 
 		const {
@@ -186,7 +207,7 @@ class MiddlewareContext {
 			}
 		}
 
-		const authResult = await fetchAuthModel(sessionToken.value); // null = invalid token, false = server error
+		const authResult = await resolveAuthModel(sessionToken.value); // null = invalid token, false = server error
 
 		if (authResult === null) {
 			switch (routeAuth) {
@@ -235,10 +256,8 @@ class MiddlewareContext {
 		this.res.headers.set('x-auth-data', JSON.stringify(authResult));
 
 		if (sessionToken.action === 'set' && sessionToken.value) {
-			const cookieName = Configuration.get('user.sessionToken') as string;
-			const cookieMaxAge = Configuration.get(
-				'user.sessionMaxAge',
-			) as number;
+			const cookieName = Configuration.get('user.sessionToken');
+			const cookieMaxAge = Configuration.get('user.sessionMaxAge');
 
 			this.res.cookies.set(cookieName, sessionToken.value, {
 				httpOnly: true,
@@ -308,6 +327,34 @@ async function fetchAuthModel(
 	}
 }
 
+/**
+ * Cache-backed wrapper around {@link fetchAuthModel}.
+ *
+ * This runs on every matched request, so the uncached path puts a backend round-trip in
+ * front of each navigation. Only successful lookups are stored: an invalid token (`null`)
+ * and a backend outage (`false`) must stay live decisions, since caching either would turn a
+ * transient failure into a sticky one.
+ *
+ * @param token
+ */
+async function resolveAuthModel(
+	token: string,
+): Promise<AuthModel | null | false> {
+	const cachedAuthModel = await getCachedAuthModel(token);
+
+	if (cachedAuthModel) {
+		return cachedAuthModel;
+	}
+
+	const authModel = await fetchAuthModel(token);
+
+	if (authModel) {
+		await setCachedAuthModel(token, authModel);
+	}
+
+	return authModel;
+}
+
 export async function proxy(req: NextRequest) {
 	const ctx = new MiddlewareContext(req);
 
@@ -326,6 +373,26 @@ export async function proxy(req: NextRequest) {
 
 	if (isMutating && !ctx.isValidRequestSource()) {
 		return new NextResponse('Forbidden', { status: 403 });
+	}
+
+	/*
+	 * CSRF is enforced here, in front of every mutating API request, rather than inside the
+	 * form pipeline: `processForm` runs in the browser, so a check there was only ever a
+	 * suggestion the client could skip. This single gate covers `/api/proxy/*` — every
+	 * backend mutation — plus `/api/image` and `/api/language`, which bypass the proxy.
+	 *
+	 * Scoped to `/api/`: page routes are navigations, and server actions returned above
+	 * carry their own origin verification from Next.
+	 */
+	if (isMutating && req.nextUrl.pathname.startsWith('/api/')) {
+		if (!ctx.isValidCsrfToken()) {
+			// A recognisable body lets ApiRequest tell an expired token — refresh and retry
+			// once — from a genuine refusal.
+			return NextResponse.json(
+				{ code: CSRF_REJECTION_CODE, message: 'Invalid CSRF token' },
+				{ status: 403 },
+			);
+		}
 	}
 
 	ctx.setupLanguage();

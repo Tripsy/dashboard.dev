@@ -15,7 +15,6 @@ export async function registerAction(
 		getFormValues: getRegisterFormValues,
 		validateForm: validateFormRegister,
 		operationFunction: requestRegister,
-		requireCsrf: true,
 		mapApiError: async (error) => {
 			switch (error.status) {
 				case 409:

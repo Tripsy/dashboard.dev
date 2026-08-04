@@ -25,16 +25,12 @@ export function StatusTransitionCmr({ entries }: { entries: CmrModel[] }) {
 
 	const { showToast } = useToast();
 
-	const translationsKeys = useMemo(
-		() =>
-			[
-				'app.error.title',
-				'app.success.title',
-				'cmr.error.cannot_update_status',
-				'cmr.action.statusTransition.success',
-			] as const,
-		[],
-	);
+	const translationsKeys = [
+		'app.error.title',
+		'app.success.title',
+		'cmr.error.cannot_update_status',
+		'cmr.action.statusTransition.success',
+	] as const;
 
 	const { isTranslationLoading, translations } =
 		useTranslation(translationsKeys);

@@ -5,16 +5,19 @@ import { useEffect } from 'react';
 import { ErrorComponent } from '@/components/status.component';
 import { Button } from '@/components/ui/button';
 import Routes from '@/config/routes.setup';
+import { logger } from '@/helpers/logger.helper';
 
 export default function ErrorBoundary({
 	error,
 	reset,
 }: {
-	error: Error;
+	error: Error & { digest?: string };
 	reset: () => void;
 }) {
 	useEffect(() => {
-		console.error('Error:', error);
+		logger.error('Route boundary caught an error', error, {
+			digest: error.digest,
+		});
 	}, [error]);
 
 	return (

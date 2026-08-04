@@ -47,4 +47,4 @@ const PopoverContent = ({
 	</HeroPopover.Content>
 );
 
-export { Popover, PopoverTriggerButton, PopoverContent };
+export { Popover, PopoverContent, PopoverTriggerButton };

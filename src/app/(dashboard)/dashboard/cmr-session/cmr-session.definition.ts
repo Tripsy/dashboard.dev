@@ -202,6 +202,7 @@ export default async function dataSourceConfig(): Promise<
 				{
 					field: 'id',
 					header: 'ID',
+					defaultWidth: 88,
 					sortable: true,
 					body: (entry, column, auth) =>
 						DataTableValue(entry, column, {
@@ -225,10 +226,8 @@ export default async function dataSourceConfig(): Promise<
 							isStatus: true,
 							dataSource: 'cmr',
 						}),
-					style: {
-						minWidth: '8rem',
-						maxWidth: '8rem',
-					},
+					minWidth: 128,
+					maxWidth: 128,
 				},
 				{
 					field: 'work_session',
@@ -256,10 +255,8 @@ export default async function dataSourceConfig(): Promise<
 								dataSource: 'work-session',
 							},
 						),
-					style: {
-						minWidth: '8rem',
-						maxWidth: '8rem',
-					},
+					minWidth: 128,
+					maxWidth: 128,
 				},
 			],
 			find: (params: FindFunctionParamsType) =>

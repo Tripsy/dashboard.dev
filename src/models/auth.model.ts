@@ -57,5 +57,12 @@ export function hasPermission(
 }
 
 export function prepareAuthModel(data: AuthModel): AuthModel {
-	return normalizeDates(data) as unknown as AuthModel;
+	// `password_updated_at` is listed explicitly: it is a user-model field, so it is not in
+	// `normalizeDates`' default set, and `/account/me` sends it as a string like the rest.
+	return normalizeDates(data, [
+		'created_at',
+		'updated_at',
+		'deleted_at',
+		'password_updated_at',
+	]) as unknown as AuthModel;
 }

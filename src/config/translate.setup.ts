@@ -1,4 +1,5 @@
 import { Configuration } from '@/config/settings.config';
+import { logger } from '@/helpers/logger.helper';
 import { getObjectValue } from '@/helpers/objects.helper';
 import { replaceVars } from '@/helpers/string.helper';
 import type { Language } from '@/types/common.type';
@@ -6,7 +7,19 @@ import type { Language } from '@/types/common.type';
 type TranslationValue = string | { [key: string]: TranslationValue };
 type TranslationResource = Record<string, TranslationValue>;
 
+/** Resolved resources, readable synchronously by `translateLoaded`. */
 const languageResources: Record<string, TranslationResource> = {};
+
+/**
+ * In-flight imports, so concurrent first callers share one `import()` rather than each
+ * starting their own — `languageResources` is only populated once the import resolves.
+ */
+const languageResourcesPending: Record<
+	string,
+	Promise<TranslationResource>
+> = {};
+
+const isDebug = Configuration.get('app.debug');
 
 async function fetchLanguage(): Promise<Language> {
 	const fallback = Configuration.defaultLanguage();
@@ -21,7 +34,9 @@ async function fetchLanguage(): Promise<Language> {
 			return fromHeader as Language;
 		}
 	} catch (error) {
-		console.error('Failed to read language header:', error);
+		// Not an error worth shouting about: `headers()` throws whenever it is called
+		// outside a request scope, and falling back to the default language is correct.
+		logger.debug('Could not read the language header', error);
 	}
 
 	return fallback;
@@ -46,18 +61,22 @@ export async function getLanguage(): Promise<Language> {
 	return fetchLanguage();
 }
 
-async function loadLanguageResource(
-	language: string,
-): Promise<TranslationResource> {
-	if (languageResources[language]) {
-		return languageResources[language];
+function loadLanguageResource(language: string): Promise<TranslationResource> {
+	const loaded = languageResources[language];
+
+	if (loaded) {
+		return Promise.resolve(loaded);
 	}
 
-	languageResources[language] = (
-		await import(`@/locales/${language}`)
-	).default;
+	languageResourcesPending[language] ??= import(`@/locales/${language}`).then(
+		(module) => {
+			languageResources[language] = module.default;
 
-	return languageResources[language];
+			return module.default;
+		},
+	);
+
+	return languageResourcesPending[language];
 }
 
 /**
@@ -70,7 +89,51 @@ export const getTranslatedString = (
 ) => {
 	const objectValue = getObjectValue(resource, key);
 
-	return typeof objectValue === 'string' ? objectValue : key;
+	if (typeof objectValue === 'string') {
+		return objectValue;
+	}
+
+	// A miss is silent in production — the key is a serviceable placeholder and warning on
+	// every render would be noise — but while developing it is almost always a typo or a
+	// key that was never added to the locale file.
+	if (isDebug) {
+		logger.warn('Missing translation', undefined, { key });
+	}
+
+	return key;
+};
+
+/**
+ * Synchronous lookup for a key whose locale resource is already in the module cache.
+ *
+ * `translate` is async purely because the locale bundle is a dynamic import — once that
+ * import has resolved the lookup itself is pure. Client components use this to paint the
+ * right text on their first frame instead of flashing empty for a tick.
+ *
+ * Returns `null` when the resource has not been loaded yet (or on the server), so callers
+ * fall back to the async path.
+ */
+export const translateLoaded = (
+	key: string,
+	replacements: Record<string, string | number> = {},
+): string | null => {
+	if (typeof document === 'undefined') {
+		return null;
+	}
+
+	const languageResource = languageResources[getLanguageClient()];
+
+	if (!languageResource) {
+		return null;
+	}
+
+	const value = getTranslatedString(languageResource, key);
+
+	if (value !== key && replacements) {
+		return replaceVars(value, replacements);
+	}
+
+	return value;
 };
 
 /**
@@ -79,7 +142,7 @@ export const getTranslatedString = (
  */
 export const translate = async (
 	key: string,
-	replacements: Record<string, string> = {},
+	replacements: Record<string, string | number> = {},
 ): Promise<string> => {
 	const languageSelected = await getLanguage();
 	const languageResource = await loadLanguageResource(languageSelected);
@@ -113,7 +176,7 @@ export type TranslateKey<T> = T extends string
 export const translateBatch = async <
 	const T extends readonly (
 		| string
-		| { key: string; vars?: Record<string, string> }
+		| { key: string; vars?: Record<string, string | number> }
 	)[],
 >(
 	requests: T,

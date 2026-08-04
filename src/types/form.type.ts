@@ -2,9 +2,9 @@ import type { ZodSafeParseError, ZodSafeParseSuccess, z } from 'zod';
 import type { ImagePropertiesType } from '@/types/image.type';
 import type { PageMeta } from '@/types/page-meta.type';
 
-// `csrfError` is only ever produced by forms that opt into `requireCsrf`
-// (the unauthenticated auth-entry flows); it lives here rather than in each
-// flow's own union so the shared pipeline can emit it for any form.
+// `csrfError` is emitted by `processForm` when the middleware rejects a submit for a bad or
+// missing CSRF token — any form can hit it, which is why it lives here rather than in a
+// per-flow union.
 export type FormSituationType =
 	| 'success'
 	| 'failedValidation'

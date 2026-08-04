@@ -5,6 +5,7 @@ import {
 } from '@/app/(public)/_components/cash-flow/form-manage-cash-flow.component';
 import { Configuration } from '@/config/settings.config';
 import { translateBatch } from '@/config/translate.setup';
+import { formatAmount } from '@/helpers/display.helper';
 import {
 	getFormDataAsEnum,
 	getFormDataAsNumber,
@@ -19,11 +20,14 @@ import {
 } from '@/helpers/services.helper';
 import {
 	calcNetAmount,
-	formatAmount,
 	formatEnumLabel,
 	replaceVars,
 } from '@/helpers/string.helper';
-import { BaseValidator } from '@/helpers/validator.helper';
+import {
+	BaseValidator,
+	resolveValidatorMessages,
+	sharedValidatorMessages,
+} from '@/helpers/validator.helper';
 import {
 	CashFlowCategoryEnum,
 	CashFlowCategoryTypeEnum,
@@ -44,6 +48,7 @@ import type { DataSourceConfigType } from '@/types/data-source.type';
 import type { FormStateType, ValidatorOutput } from '@/types/form.type';
 
 const validatorMessages = [
+	...sharedValidatorMessages,
 	'invalid_category',
 	'invalid_method',
 	'invalid_amount',
@@ -103,11 +108,17 @@ class CashFlowValidator extends BaseValidator<typeof validatorMessages> {
 					allowDecimals: 2,
 				},
 			),
-			vat_rate: this.validateNumber(this.getMessage('invalid_vat_rate'), {
-				required: true,
-				onlyPositive: true,
-				allowDecimals: 2,
-			}),
+			vat_rate: this.validateNumber(
+				{
+					invalid: this.getMessage('invalid_vat_rate'),
+					only_positive: this.getMessage('only_positive'),
+				},
+				{
+					required: true,
+					onlyPositive: true,
+					allowDecimals: 2,
+				},
+			),
 			currency: this.validateEnum(
 				CurrencyEnum,
 				this.getMessage('invalid_currency'),
@@ -149,9 +160,9 @@ class CashFlowValidator extends BaseValidator<typeof validatorMessages> {
 }
 
 async function validateForm(values: CashFlowFormValuesType) {
-	const translations = await translateBatch(
+	const translations = await resolveValidatorMessages(
 		validatorMessages,
-		'cash-flow.validation',
+		'cash-flow',
 	);
 
 	const validator = new CashFlowValidator(translations);
@@ -213,8 +224,7 @@ function getFormState(
 			category: data?.category ?? CashFlowCategoryEnum.CUSTOMER,
 			method: data?.method ?? CashFlowMethodEnum.CASH,
 			grossAmount: data?.grossAmount ?? null,
-			vat_rate:
-				data?.vat_rate ?? (Configuration.get('app.vat_rate') as number),
+			vat_rate: data?.vat_rate ?? Configuration.get('app.vatRate'),
 			currency: data?.currency ?? Configuration.currency(),
 			external_reference: data?.external_reference ?? null,
 			notes: data?.notes ?? null,

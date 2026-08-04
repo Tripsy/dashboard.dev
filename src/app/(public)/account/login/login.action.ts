@@ -41,7 +41,6 @@ export async function loginAction(
 		getFormValues: getLoginFormValues,
 		validateForm: validateFormLogin,
 		operationFunction: loginOperation,
-		requireCsrf: true,
 		fallbackErrorKey: 'login.message.could_not_login',
 		mapApiError: async (error) => {
 			switch (error.status) {

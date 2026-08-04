@@ -17,6 +17,7 @@ import {
 } from '@/app/(dashboard)/_providers/breadcrumb.provider';
 import { useSideMenu } from '@/app/(dashboard)/_providers/side-menu.provider';
 import { Icons } from '@/components/icon.component';
+import { LinkPendingIcon } from '@/components/link-pending-icon.component';
 import { Link } from '@/components/ui/link';
 import Routes from '@/config/routes.setup';
 import { cn } from '@/helpers/css.helper';
@@ -73,45 +74,41 @@ export function SideMenu() {
 	const { menuState } = useSideMenu();
 	const { selectedPage } = useBreadcrumb();
 
-	const translationsKeys = useMemo(
-		() =>
-			[
-				'dashboard.labels.financial',
-				'dashboard.labels.client',
-				'dashboard.labels.cash-flow',
+	const translationsKeys = [
+		'dashboard.labels.financial',
+		'dashboard.labels.client',
+		'dashboard.labels.cash-flow',
 
-				'dashboard.labels.activity',
-				'dashboard.labels.cmr',
-				'dashboard.labels.cmr-session',
-				'dashboard.labels.cmr-vehicle',
-				'dashboard.labels.work-session',
-				'dashboard.labels.work-session-vehicle',
+		'dashboard.labels.activity',
+		'dashboard.labels.cmr',
+		'dashboard.labels.cmr-session',
+		'dashboard.labels.cmr-vehicle',
+		'dashboard.labels.work-session',
+		'dashboard.labels.work-session-vehicle',
 
-				'dashboard.labels.assets',
-				'dashboard.labels.company-vehicle',
+		'dashboard.labels.assets',
+		'dashboard.labels.company-vehicle',
 
-				'dashboard.labels.content',
-				'dashboard.labels.address',
-				'dashboard.labels.place',
-				'dashboard.labels.brand',
-				'dashboard.labels.image',
-				'dashboard.labels.vehicle',
-				'dashboard.labels.vendor',
+		'dashboard.labels.content',
+		'dashboard.labels.address',
+		'dashboard.labels.place',
+		'dashboard.labels.brand',
+		'dashboard.labels.image',
+		'dashboard.labels.vehicle',
+		'dashboard.labels.vendor',
 
-				'dashboard.labels.settings',
-				'dashboard.labels.template',
+		'dashboard.labels.settings',
+		'dashboard.labels.template',
 
-				'dashboard.labels.logs',
-				'dashboard.labels.log-data',
-				'dashboard.labels.log-history',
-				'dashboard.labels.cron-history',
-				'dashboard.labels.mail-queue',
+		'dashboard.labels.logs',
+		'dashboard.labels.log-data',
+		'dashboard.labels.log-history',
+		'dashboard.labels.cron-history',
+		'dashboard.labels.mail-queue',
 
-				'dashboard.labels.user',
-				'dashboard.labels.permission',
-			] as const,
-		[],
-	);
+		'dashboard.labels.user',
+		'dashboard.labels.permission',
+	] as const;
 
 	const { translations, isTranslationLoading } =
 		useTranslation(translationsKeys);
@@ -468,7 +465,10 @@ function SideMenuOpenSection({
 										: 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground',
 								)}
 							>
-								<item.icon className="h-4 w-4 shrink-0" />{' '}
+								<LinkPendingIcon
+									icon={item.icon}
+									className="h-4 w-4 shrink-0"
+								/>{' '}
 								{item.text}
 							</NextLink>
 						</li>
@@ -537,7 +537,11 @@ function SideMenuClosedSection({
 						: 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground',
 				)}
 			>
-				<item.icon className="h-4 w-4 shrink-0" /> {item.text}
+				<LinkPendingIcon
+					icon={item.icon}
+					className="h-4 w-4 shrink-0"
+				/>{' '}
+				{item.text}
 			</NextLink>
 		</li>
 	));

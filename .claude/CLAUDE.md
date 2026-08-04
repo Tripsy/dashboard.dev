@@ -3,13 +3,18 @@ Next.js app with codename `dashboard` consuming `star-backend` API. Public site 
 
 ## Tech Stack
 
-- Runtime: Node.js v22
+- Runtime: Node.js v24 (Active LTS)
 - Framework: Next.js v16.2
-- Language: TypeScript v5.9.3
+- Language: TypeScript v6.0.3
 - Containerization: Docker
 
 Versions above are current as of 2026-07. If a suggestion depends on version-specific
 behavior, check pnpm-lock.yaml for the resolved version before assuming it applies.
+
+**TypeScript stays on 6.x.** Next 16 rejects TS 7 at startup ("does not provide the compiler
+API required by Next.js") and the dev server never comes up — the failure looks like a
+hanging browser tab, not a version error. Do not bump the major without checking Next
+supports it first.
 
 ## Role
 
@@ -24,6 +29,10 @@ You are a concise assistant for a pragmatic senior full-stack developer.
 
 - Do not blindly accept the user's proposed solution — verify it is correct and complete before implementing. If the approach has gaps, edge cases, or a better alternative exists, flag it.
 - When the user describes a fix or approach, cross-check it against the actual codebase before writing code;
+- **Prove behavioural claims by running the code, not by reading it.** There are no tests, so
+  a runtime probe is the only evidence — and inspection routinely gets it wrong (a helper's
+  own doc examples can be wrong, a regex can be unreachable). This applies to your own fix
+  as much as to the bug: run it before saying it works.
 - Path alias `@/*` maps to `src/*` (see `tsconfig.json`).
 - Prefer named exports for components
 - Use TypeScript strict mode
@@ -46,6 +55,10 @@ You are a concise assistant for a pragmatic senior full-stack developer.
 - Explain your reasoning for non-obvious decisions in comments
 - If there are two valid approaches, document why you chose one over the other
 - Note any performance implications or trade-offs
+- **Write comments about the code as it is, never as a diff against what it was.** No "this
+  used to run unconditionally", no "the previous order broke X". State the constraint that
+  still applies ("split before the lowercase, which destroys the case boundary the split
+  reads") and leave the before/after for the commit message.
 
 ## Commands
 
@@ -55,13 +68,48 @@ Run inside the Docker container (`docker exec $DOCKER_CONTAINER`):
 pnpm run dev      # Start dev server
 pnpm run build    # Production build
 pnpm run start    # Start production server (port 80)
-pnpm run biome    # Biome check --write (lint + format)
-pnpm run madge    # Check for circular dependencies in src
+pnpm run biome    # Biome check --write (lint + format + circular dependencies)
+pnpm run clean    # Delete .next — Turbopack's dev cache grows until the container OOMs
 ```
+
+**pnpm 11 no longer reads the `pnpm` field in `package.json`** — settings live in
+`pnpm-workspace.yaml`. A dependency whose install scripts are blocked reports
+`ERR_PNPM_IGNORED_BUILDS` and pnpm writes a placeholder into `allowBuilds` there for you to
+resolve; setting it in `package.json` is silently ignored with a warning. This matters for
+anything whose postinstall fetches a binary (`@sentry/cli` downloads the uploader that
+`next build` uses for source maps), because the build still succeeds without it and only the
+downstream artefact is missing.
+
+**`next build` rewrites `next-env.d.ts`** to reference `./.next/types/routes.d.ts`, where the
+dev server writes `./.next/dev/types/routes.d.ts`. It therefore shows up as a modified file
+after any build — a generated artefact, not a change to commit. `git checkout next-env.d.ts`
+after building, or leave it for the dev server to flip back.
+
+To spot-check a helper without a test suite, Node 24 runs TypeScript directly via type
+stripping — `docker exec dashboard.test sh -c "cd /var/www/html && node probe.ts"`, importing
+the real module (`./src/helpers/x.helper.ts`). Type-only imports are erased, so a file whose
+only `@/*` imports are `import type` resolves fine outside the path alias. This tests the
+shipped source rather than a copy of it, which is the whole point — a hand-copied
+reimplementation proves nothing about the code you are fixing.
+
+To probe a file that imports `@/*` for *values*, Node needs a resolver hook — it does not read
+`tsconfig` paths. Write a hook module exporting `resolve(specifier, context, next)` that maps
+`@/x` to `/var/www/html/src/x` (trying `.ts`/`.tsx`/`/index.ts`, since the alias leaves the
+extension implicit), register it from a second file via `register('./hook.mjs', pathToFileURL('/var/www/html/'))`,
+and run `node --import ./register.mjs probe.ts`. Delete all three afterwards — probes live in
+the scratchpad, not the repo. Prefer asserting through the module's public surface (call the
+exported factory and exercise what it returns) over reaching for internals.
+
+The container is capped at 4g (`mem_limit` in `docker-compose.yml`) and Turbopack fills it.
+If the dev server exits with nothing in the log it was SIGKILLed, not crashed — check
+`docker inspect dashboard.test --format '{{.State.OOMKilled}}'`, then `pnpm run clean` and
+restart. There is not enough headroom for the dev server and a `build`/`tsc` at the same
+time: stop the dev server before running either, or it is the one that gets killed.
 
 ## Context
 
-- This FE project has **no database and holds no business logic of its own**  
+- This FE project has **no database and holds no business logic of its own**
+- It **sends no email** — the backend owns mail entirely. There is no nunjucks/templates stack here; don't reintroduce one.
 - Nearly everything under `src/services/*.service.ts` is a typed wrapper around `star-backend` REST endpoint.
 - The backend project is located in `../star-backend` on which you have access through permission / additionalDirectories
 - The two projects connect purely over HTTP
@@ -114,10 +162,8 @@ entities/operations, DB schema, business rules read the code in `../star-backend
 │   │   ├── status.component.tsx
 │   ├── config/            # Configuration files
 │   │   ├── data-source.config.ts
-│   │   ├── data-source.register.ts
-│   │   ├── daysjs.config.ts 
+│   │   ├── dayjs.config.ts 
 │   │   ├── init-redis.config.ts 
-│   │   ├── nunjucks.config.ts 
 │   │   ├── routes.setup.ts
 │   │   ├── settings.config.ts 
 │   │   ├── translate.setup.ts 
@@ -128,7 +174,6 @@ entities/operations, DB schema, business rules read the code in `../star-backend
 │   ├── models/            # Models (entities)
 │   ├── providers/           
 │   │   ├── auth.provider.tsx 
-│   │   ├── prime.provider.tsx 
 │   │   ├── query-client.provider.tsx 
 │   │   ├── theme.provider.tsx 
 │   │   ├── toast.provider.tsx 
@@ -142,7 +187,6 @@ entities/operations, DB schema, business rules read the code in `../star-backend
 │   ├── types/            
 │   └── proxy.ts           
 ├── .env
-├── .madgerc
 ├── biome.json
 ├── docker-compose.yml
 ├── next.config.ts
@@ -152,12 +196,25 @@ entities/operations, DB schema, business rules read the code in `../star-backend
 ## Restrictions
 
 - This project has no tests at the moment.
-- Do not run biome or madge after applying change. Run them only on demand or before git push commands.
+- Do not run biome after applying change. Run it only on demand or before git push commands.
+- Stop the dev server before running `build` or `tsc` — the container cannot hold both (see Commands).
 - Do not offer to do push commands, will be asked explicitly.
 - Delegate noisy operations to subagents.
 
 ## Architecture
 
+- **Dates and timezones** (`src/helpers/date.helper.ts`) — three deliberate conventions, don't
+  "unify" them:
+  1. *Typed times* (work-session start/end, CMR dates) mean the **driver's device clock**.
+     `combineDateAndTime` uses `setHours`, which resolves in the runtime zone, and these run
+     client-side; serialising the Date gives the backend the right UTC instant.
+  2. *Filter day-boundaries* mean **company time** — `toUTCISOString` reads its input as
+     `app.timezone` so two managers in different countries filtering the same day get the same
+     rows. This is the only place company time applies.
+  3. *Display* is always the driver's device zone, which happens for free: table and stats data
+     is fetched client-side, so no timestamp is ever server-rendered (verified — the SSR HTML
+     for `/dashboard` and `/dashboard/user` contains no formatted dates). Keep it that way; a
+     date formatted in a server component would render in the container's UTC.
 - **Route groups**: `src/app/(public)/*` is the public site (marketing/auth/account/driver-panel), and
   `src/app/(dashboard)/dashboard/*` is the admin panel — each has its own `layout.tsx`. Route access
   (`public` / `unauthenticated` / `authenticated` / `protected`, plus permission entity/operation) is
@@ -183,16 +240,65 @@ entities/operations, DB schema, business rules read the code in `../star-backend
   `Routes.group('dashboard')` (`src/config/routes.setup.ts`).
 - **Data tables**: list views use a shared `data-table` abstraction backed by `src/stores/data-table.store.ts`
   (Zustand); windows/dialogs are backed by `src/stores/window.store.ts` and `src/components/window`.
-- **Config layer** (`src/config`): `settings.config.ts` (`Configuration.get(...)` — env-driven app settings),
-  `routes.setup.ts` (route table + auth), `data-source.config.ts`/`data-source.register.ts` (maps
-  `DataSourceKey` values to backend list/filter endpoints for data tables), `nunjucks.config.ts` (email
-  templates), `translate.setup.ts` (i18n), `init-redis.config.ts`.
+- **Config layer** (`src/config`): `settings.config.ts` (`Configuration.get(...)` — env-driven app settings,
+  typed by dotted path so a typo is a compile error), `routes.setup.ts` (route table + auth),
+  `data-source.config.ts` (maps `DataSourceKey` values to backend list/filter endpoints for data tables),
+  `translate.setup.ts` (i18n), `init-redis.config.ts`.
 - **Images**: `src/services/image.service.ts` / `image-storage.service.ts` handle upload/list/delete against
   the backend's `image` feature; storage backend is `local` or `s3` (`IMAGE_STORAGE` env var, `@aws-sdk/client-s3`).
 - **CMR documents**: `src/app/document/cmr` renders CMR documents (uses `@siamf/react-signature-pad` for
   signatures, `react-to-print` for printing).
 - **Locales**: `src/locales/<lang>/*.json`, registered per-language in `src/locales/<lang>/index.ts`;
-  `NEXT_PUBLIC_LANGUAGE_SUPPORTED` in `.env` controls which languages are active.
+  `NEXT_PUBLIC_LANGUAGE_SUPPORTED` in `.env` controls which languages are active. Validation messages
+  common to several entities live in `shared.json` (`shared.validation`); an entity spreads
+  `sharedValidatorMessages` into its own key list and calls `resolveValidatorMessages()`
+  (`src/helpers/validator.helper.ts`), which pulls the shared keys from `shared.validation` and the
+  rest from `<entity>.validation`. Only genuinely entity-specific wording belongs in the latter.
+- **CSRF**: enforced in `src/proxy.ts` for every mutating request under `/api/*`, by comparing the
+  `x-csrf-token` header against the `x-csrf-secret` httpOnly cookie. `ApiRequest` attaches the header
+  automatically (`src/helpers/csrf.helper.ts` owns the token and retries once on a `403` carrying the
+  CSRF marker, since the cookie expires after an hour). A check inside a form handler cannot enforce
+  anything — the form pipeline runs client-side — so keep the gate in the middleware. Server actions
+  bypass it by design and rely on Next's own origin verification.
+- **Money**: the backend stores amounts as separator-less integers scaled by `10 ** AMOUNT_DECIMALS`
+  (4) — `cash-flow.service.ts` persists `Math.round(abs(amount) * 10000)` and divides back on read, so
+  80.6452 is row value 806452. Forms accept 2 decimals; anything past the 4th is discarded by that
+  round-trip. The VAT helpers in `src/helpers/string.helper.ts` round to the same precision — keep any
+  new amount maths on `roundAmount()` rather than returning raw float.
+- **Redis is shared with star-backend** (one instance, one database), so every key is namespaced by
+  `redis.keyPrefix` (`dashboard` here, `backend` there) inside `CacheProvider.buildKey`. Not via
+  ioredis's own `keyPrefix` option: that one does not reach the MATCH argument of SCAN, so
+  `deleteByPattern` would scan the other app's keys. Build every key through `buildKey`.
+- **Logging** — never call `console.*` directly; use `logger` / `logRejection` from
+  `src/helpers/logger.helper.ts` (the only file allowed to touch `console`). Signature is
+  `(message, error?, context?)` — message first at every level, so a grouping backend can key on
+  it. `debug` is dropped unless `NEXT_PUBLIC_APP_DEBUG=true`; the other levels always reach the
+  console, because server-side that console *is* the sink (Docker captures stdout).
+  `logger.helper.ts` reads `process.env` rather than `Configuration` on purpose: settings
+  resolution logs through it, so importing it would close an import cycle.
+  The transport is attached via `setLogReporter()` — the reason the helper imports no SDK. The
+  backend's `log_data` is for business/audit events (`history`/`cron`/`system`); the dashboard
+  reads it and must never write to it, and it has no create route.
+- **Sentry** (`@sentry/nextjs`) — `src/config/sentry.setup.ts` owns the shared init options and the
+  `LogEntry` → Sentry mapping (`debug`/`info` become breadcrumbs, `warn`/`error` become events);
+  the three runtime entry points (`src/sentry.server.config.ts`, `src/sentry.edge.config.ts`,
+  `src/instrumentation-client.ts`) only call it. Edge is what covers `src/proxy.ts`.
+  `src/instrumentation.ts` loads the server/edge config per `NEXT_RUNTIME` and exports
+  `onRequestError`, which catches server-component and middleware errors that never reach a
+  `catch` and so are invisible to `logger`. Everything is gated on `NEXT_PUBLIC_SENTRY_DSN` — empty
+  means no `init` at all. Client events tunnel through `/sentry-tunnel` on this origin (set in
+  `next.config.ts`) to survive ad blockers; that path deliberately sits outside `/api/`, so the
+  CSRF gate in `proxy.ts` does not apply and it matches no entry in `routes.setup.ts`.
+  Session replay is off on purpose — bundle weight, and it records driver/client input.
+- **What may go in a log context** — the third argument of a `logger` call is shipped to Sentry as
+  `extra` (or as breadcrumb `data`), so it leaves the browser. Pass identifiers and shapes, never
+  records or secrets: `{ key }`, `{ uid }`, `{ payloadLength }` — not the payload, not a user row.
+  `sendDefaultPii` is off, and `beforeSend`/`beforeBreadcrumb` in `sentry.setup.ts` redact keys
+  matching `/password|token|secret|authorization|cookie|credential/i`, but that is a backstop for
+  the call site that slips through, not permission to rely on it.
+- **Error boundaries**: `src/app/error.tsx` catches route errors, `src/app/global-error.tsx`
+  catches failures in the root layout itself. The latter replaces that layout, so it gets no
+  `globals.css` — it is inline-styled and dependency-free by design and must stay that way.
 
 ## Adding new feature for `dashboard` (ex: `cars`)
 

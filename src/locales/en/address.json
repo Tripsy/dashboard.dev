@@ -6,7 +6,8 @@
 		"invalid_city_id": "Invalid city; Pick city from select",
 		"invalid_city": "Invalid city",
 		"invalid_details": "Invalid address info",
-		"invalid_postal_code": "Invalid postal code"
+		"invalid_postal_code": "Invalid postal code",
+		"invalid_notes": "Invalid notes"
 	},
 	"action": {
 		"create": {

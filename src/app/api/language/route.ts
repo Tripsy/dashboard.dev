@@ -21,10 +21,8 @@ export async function POST(req: NextRequest) {
 		message: '',
 	});
 
-	const languageCookie = Configuration.get('language.cookie_name') as string;
-	const languageCookieMaxAge = Configuration.get(
-		'language.cookie_max_age',
-	) as number;
+	const languageCookie = Configuration.get('language.cookieName');
+	const languageCookieMaxAge = Configuration.get('language.cookieMaxAge');
 
 	response.cookies.set(languageCookie, language, {
 		maxAge: languageCookieMaxAge,

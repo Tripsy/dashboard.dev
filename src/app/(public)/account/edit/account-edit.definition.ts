@@ -1,7 +1,10 @@
 import { z } from 'zod';
 import { Configuration } from '@/config/settings.config';
-import { translateBatch } from '@/config/translate.setup';
-import { BaseValidator } from '@/helpers/validator.helper';
+import {
+	BaseValidator,
+	resolveValidatorMessages,
+	sharedValidatorMessages,
+} from '@/helpers/validator.helper';
 import type { Language } from '@/types/common.type';
 
 // The flow itself is a `WindowForm` (see `_components/account/account.definition.ts`),
@@ -12,8 +15,8 @@ export type AccountEditFormValuesType = {
 };
 
 const validatorMessages = [
+	...sharedValidatorMessages,
 	'invalid_name',
-	'name_min',
 	'invalid_language',
 ] as const;
 
@@ -23,11 +26,11 @@ class AccountEditValidator extends BaseValidator<typeof validatorMessages> {
 			{
 				invalid: this.getMessage('invalid_name'),
 				min_chars: this.getMessage('name_min', {
-					min: Configuration.get('user.nameMinChars') as string,
+					min: Configuration.get('user.nameMinChars'),
 				}),
 			},
 			{
-				minChars: Configuration.get('user.nameMinChars') as number,
+				minChars: Configuration.get('user.nameMinChars'),
 			},
 		),
 		language: this.validateLanguage(this.getMessage('invalid_language')),
@@ -37,9 +40,9 @@ class AccountEditValidator extends BaseValidator<typeof validatorMessages> {
 export async function validateFormAccountEdit(
 	values: AccountEditFormValuesType,
 ) {
-	const translations = await translateBatch(
+	const translations = await resolveValidatorMessages(
 		validatorMessages,
-		'account.validation',
+		'account',
 	);
 
 	const validator = new AccountEditValidator(translations);

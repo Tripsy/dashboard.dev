@@ -11,6 +11,7 @@ import {
 	useState,
 } from 'react';
 import { ApiError } from '@/exceptions/api.error';
+import { logRejection } from '@/helpers/logger.helper';
 import type { AuthModel } from '@/models/auth.model';
 import { getAuth } from '@/services/auth.service';
 
@@ -83,7 +84,9 @@ const AuthProvider = ({
 	useEffect(() => {
 		// Interval-based refresh — runs regardless of visibility
 		const intervalId = setInterval(() => {
-			refreshAuth({ silent: true }).catch(console.error);
+			refreshAuth({ silent: true }).catch(
+				logRejection('Background auth refresh failed'),
+			);
 		}, REFRESH_INTERVAL);
 
 		// Tab visibility refresh — only refresh if tab was hidden long enough
@@ -97,7 +100,9 @@ const AuthProvider = ({
 			}
 
 			if (hiddenAt && Date.now() - hiddenAt > HIDDEN_THRESHOLD) {
-				refreshAuth({ silent: true }).catch(console.error);
+				refreshAuth({ silent: true }).catch(
+					logRejection('Background auth refresh failed'),
+				);
 			}
 
 			hiddenAt = null;

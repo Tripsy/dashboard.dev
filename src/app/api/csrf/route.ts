@@ -11,7 +11,7 @@ type NextResponseCsrf = NextResponse<
 >;
 
 export async function GET(): Promise<NextResponseCsrf> {
-	const cookieName = Configuration.get('csrf.cookieName') as string;
+	const cookieName = Configuration.get('csrf.cookieName');
 
 	const csrfToken = await getTrackedCookie(cookieName);
 
@@ -43,7 +43,7 @@ export async function GET(): Promise<NextResponseCsrf> {
 	);
 
 	if (csrfToken.action === 'set') {
-		const cookieMaxAge = Configuration.get('csrf.cookieMaxAge') as number;
+		const cookieMaxAge = Configuration.get('csrf.cookieMaxAge');
 
 		response.cookies.set(cookieName, csrfToken.value, {
 			httpOnly: true,

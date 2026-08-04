@@ -1,6 +1,10 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import {
+	ViewField,
+	ViewSection,
+} from '@/app/(dashboard)/_components/view-detail';
 import { Configuration } from '@/config/settings.config';
 import { formatDate } from '@/helpers/date.helper';
 import { DisplayAmount, DisplayStatus } from '@/helpers/display.helper';
@@ -169,116 +173,106 @@ export function ViewCashFlow({ entry }: { entry: CashFlowModel }) {
 
 	return (
 		<div className="space-y-6">
-			<div className="space-y-1">
-				<div>
-					<span className="font-semibold">ID</span> {entry.id}
-				</div>
-				<div className="flex items-center gap-2">
-					<span className="font-semibold">Status</span>{' '}
-					<div className="max-w-60">
-						<DisplayStatus
-							status={entry.status}
-							dataSource="cash-flow"
-						/>
-					</div>
+			<div className="flex items-center gap-2 border-b border-line pb-4">
+				<span className="font-semibold">ID</span> {entry.id}
+				<div className="max-w-60 ml-2">
+					<DisplayStatus
+						status={entry.status}
+						dataSource="cash-flow"
+					/>
 				</div>
 			</div>
 
-			<div>
-				<h3 className="font-bold border-b border-line pb-2 mb-3">
-					Timestamps
-				</h3>
-				<div className="ml-4 space-y-1 text-sm">
-					<div>
-						<span className="font-semibold">Created At</span>{' '}
-						{formatDate(entry.created_at, 'date-time')}
-					</div>
-					<div>
-						<span className="font-semibold">Updated At</span>{' '}
-						{formatDate(entry.updated_at, 'date-time') || '-'}
-					</div>
-					{entry.deleted_at && (
-						<div>
-							<span className="font-semibold">Deleted At</span>{' '}
-							<span className="text-danger">
-								{formatDate(entry.deleted_at, 'date-time')}
-							</span>
-						</div>
-					)}
-				</div>
-			</div>
-
-			<div>
-				<h3 className="font-bold border-b border-line pb-2 mb-3">
-					Info
-				</h3>
-				<div className="ml-4 space-y-1 text-sm">
-					<div>
-						<span className="font-semibold">Direction</span>{' '}
-						{formatEnumLabel(entry.direction)}
-					</div>
-					<div>
-						<span className="font-semibold">Type</span>{' '}
-						{formatEnumLabel(entry.category_type)}
-					</div>
-					<div>
-						<span className="font-semibold">Category</span>{' '}
-						{formatEnumLabel(entry.category)}
-					</div>
-					<div>
-						<span className="font-semibold">Net Amount</span>{' '}
+			<ViewSection title="Info">
+				<ViewField
+					label="Direction"
+					value={formatEnumLabel(entry.direction)}
+				/>
+				<ViewField
+					label="Type"
+					value={formatEnumLabel(entry.category_type)}
+				/>
+				<ViewField
+					label="Category"
+					value={formatEnumLabel(entry.category)}
+				/>
+				<ViewField
+					label="Net Amount"
+					value={
 						<DisplayAmount
 							amount={entry.netAmount}
 							currencyCode={entry.currency}
 						/>
-					</div>
-					<div>
-						<span className="font-semibold">Gross Amount</span>{' '}
+					}
+				/>
+				<ViewField
+					label="Gross Amount"
+					value={
 						<DisplayAmount
 							amount={entry.grossAmount}
 							currencyCode={entry.currency}
 						/>
-					</div>
-					{entry.currency !== Configuration.currency() && (
-						<div>
-							<span className="font-semibold">Exchange Rate</span>{' '}
-							{entry.exchange_rate}
-						</div>
-					)}
-					{entry.external_reference && (
-						<div>
-							<span className="font-semibold">Reference</span>{' '}
-							{entry.external_reference}
-						</div>
-					)}
-					{entry.notes && (
-						<div>
-							<span className="font-semibold">Notes</span>{' '}
-							{entry.notes}
-						</div>
-					)}
-				</div>
-			</div>
+					}
+				/>
+				{entry.currency !== Configuration.currency() && (
+					<ViewField
+						label="Exchange Rate"
+						value={entry.exchange_rate}
+					/>
+				)}
+				{entry.external_reference && (
+					<ViewField
+						label="Reference"
+						value={entry.external_reference}
+					/>
+				)}
+				{entry.notes && (
+					<ViewField label="Notes" value={entry.notes} full />
+				)}
+			</ViewSection>
 
-			{!isRefundsLoading && refunds && (
+			<ViewSection title="Timestamps">
+				<ViewField
+					label="Created At"
+					value={formatDate(entry.created_at, 'date-time')}
+				/>
+				<ViewField
+					label="Updated At"
+					value={formatDate(entry.updated_at, 'date-time')}
+				/>
+				{entry.deleted_at && (
+					<ViewField
+						label="Deleted At"
+						value={
+							<span className="text-danger">
+								{formatDate(entry.deleted_at, 'date-time')}
+							</span>
+						}
+					/>
+				)}
+			</ViewSection>
+
+			{!isRefundsLoading && refunds && refunds.entries.length > 0 && (
 				<div>
 					<h3 className="font-bold border-b border-line pb-2 mb-3">
-						Operational Records
+						Refunds
 					</h3>
 					<ViewCashFlowRefunds refunds={refunds.entries} />
 				</div>
 			)}
 
-			{!isOperationalRecordsLoading && operationalRecords && (
-				<div>
-					<h3 className="font-bold border-b border-line pb-2 mb-3">
-						Operational Records
-					</h3>
-					<ViewCashFlowOperationalRecords
-						operationalRecords={operationalRecords}
-					/>
-				</div>
-			)}
+			{!isOperationalRecordsLoading &&
+				operationalRecords &&
+				operationalRecords.length > 0 && (
+					<div>
+						<h3 className="font-bold border-b border-line pb-2 mb-3">
+							Operational Records
+						</h3>
+						<ViewCashFlowOperationalRecords
+							operationalRecords={operationalRecords}
+						/>
+					</div>
+				)}
 		</div>
 	);
 }

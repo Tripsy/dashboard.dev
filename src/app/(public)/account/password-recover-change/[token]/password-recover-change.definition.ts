@@ -1,8 +1,11 @@
 import { z } from 'zod';
 import { Configuration } from '@/config/settings.config';
-import { translateBatch } from '@/config/translate.setup';
 import { getFormDataAsString } from '@/helpers/form.helper';
-import { BaseValidator } from '@/helpers/validator.helper';
+import {
+	BaseValidator,
+	resolveValidatorMessages,
+	sharedValidatorMessages,
+} from '@/helpers/validator.helper';
 import type { FormErrorsType, FormSituationType } from '@/types/form.type';
 
 export type PasswordRecoverChangeFormValuesType = {
@@ -32,13 +35,9 @@ export const PasswordRecoverChangeState: PasswordRecoverChangeStateType = {
 };
 
 const validatorMessages = [
+	...sharedValidatorMessages,
 	'invalid_password',
-	'password_min',
-	'password_condition_capital_letter',
-	'password_condition_number',
-	'password_condition_special_character',
 	'password_confirm_required',
-	'password_confirm_mismatch',
 ] as const;
 
 class PasswordRecoverChangeValidator extends BaseValidator<
@@ -50,9 +49,7 @@ class PasswordRecoverChangeValidator extends BaseValidator<
 				{
 					invalid_password: this.getMessage('invalid_password'),
 					password_min: this.getMessage('password_min', {
-						min: Configuration.get(
-							'user.passwordMinChars',
-						) as string,
+						min: Configuration.get('user.passwordMinChars'),
 					}),
 					password_condition_capital_letter: this.getMessage(
 						'password_condition_capital_letter',
@@ -65,9 +62,7 @@ class PasswordRecoverChangeValidator extends BaseValidator<
 					),
 				},
 				{
-					minLength: Configuration.get(
-						'user.passwordMinChars',
-					) as number,
+					minLength: Configuration.get('user.passwordMinChars'),
 				},
 			),
 			password_confirm: this.validateString(
@@ -88,9 +83,9 @@ class PasswordRecoverChangeValidator extends BaseValidator<
 export async function validateFormPasswordRecoverChange(
 	values: PasswordRecoverChangeFormValuesType,
 ) {
-	const translations = await translateBatch(
+	const translations = await resolveValidatorMessages(
 		validatorMessages,
-		'password-recover-change.validation',
+		'password-recover-change',
 	);
 
 	const validator = new PasswordRecoverChangeValidator(translations);

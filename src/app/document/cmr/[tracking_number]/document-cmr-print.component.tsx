@@ -40,7 +40,7 @@ export function DocumentCmrPrint({
 		setShowSignature(true);
 	};
 
-	const handleSaveSignature = async () => {
+	const handleSaveSignature = () => {
 		if (signatureRef.current) {
 			if (!signatureRef.current.hasContent()) {
 				showToast({
@@ -58,12 +58,10 @@ export function DocumentCmrPrint({
 				detail: 'CMR has been signed with success',
 			});
 
-			const { dataUrl } = await signatureRef.current.export();
-
+			// TODO: the drawn signature is not persisted — `signatureRef.export()`
+			// yields the data URL, but there is no backend call to store it against
+			// the CMR, so the toast above currently reports more than happened.
 			setShowSignature(false);
-
-			// You can also send this to your backend here
-			console.log('Signature saved:', dataUrl);
 		}
 	};
 

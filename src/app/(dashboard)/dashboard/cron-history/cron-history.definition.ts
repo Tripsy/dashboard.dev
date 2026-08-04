@@ -58,6 +58,7 @@ export default async function dataSourceConfig(): Promise<
 				{
 					field: 'id',
 					header: 'ID',
+					defaultWidth: 88,
 					sortable: true,
 					body: (entry, column, auth) =>
 						DataTableValue(entry, column, {
@@ -86,10 +87,8 @@ export default async function dataSourceConfig(): Promise<
 							isStatus: true,
 							dataSource: 'cron-history',
 						}),
-					style: {
-						minWidth: '6rem',
-						maxWidth: '6rem',
-					},
+					minWidth: 144,
+					maxWidth: 144,
 				},
 				{
 					field: 'run_time',

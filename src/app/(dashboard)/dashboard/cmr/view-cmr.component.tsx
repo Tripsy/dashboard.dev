@@ -1,5 +1,9 @@
 'use client';
 
+import {
+	ViewField,
+	ViewSection,
+} from '@/app/(dashboard)/_components/view-detail';
 import { getLanguageClient } from '@/config/translate.setup';
 import { formatDate } from '@/helpers/date.helper';
 import { DisplayStatus } from '@/helpers/display.helper';
@@ -13,116 +17,95 @@ export function ViewCmr({ entry }: { entry: CmrModel }) {
 
 	return (
 		<div className="space-y-6">
-			<div className="space-y-1">
-				<div>
-					<span className="font-semibold">ID</span> {entry.id}
-				</div>
-				<div>
-					<span className="font-semibold">Type</span>{' '}
-					{formatEnumLabel(entry.transport_type)}
-				</div>
-				<div className="flex items-center gap-2">
-					<span className="font-semibold">Status</span>{' '}
-					<div className="max-w-60">
-						<DisplayStatus status={entry.status} dataSource="cmr" />
-					</div>
-				</div>
-
-				<div>
-					<span className="font-semibold">Tracking Number</span>{' '}
-					{entry.tracking_number}
-				</div>
-				<div>
-					<span className="font-semibold">Pickup Address</span>{' '}
-					{displayAddressLabel(entry.pickup_address, language)}
-				</div>
-				<div>
-					<span className="font-semibold">Delivery Address</span>{' '}
-					{displayAddressLabel(entry.delivery_address, language)}
+			<div className="flex items-center gap-2 border-b border-line pb-4">
+				<span className="font-semibold">ID</span> {entry.id}
+				<div className="max-w-60 ml-2">
+					<DisplayStatus status={entry.status} dataSource="cmr" />
 				</div>
 			</div>
 
-			<div>
-				<h3 className="font-bold border-b border-line pb-2 mb-3">
-					Contact
-				</h3>
-				<div className="ml-4 space-y-1 text-sm">
-					<div>
-						<span className="font-semibold">Client</span>{' '}
-						{displayClientLabel(entry.client)}
-					</div>
-					<div>
-						<span className="font-semibold">Contact - Name</span>{' '}
-						{entry.contact_name}
-					</div>
-					<div>
-						<span className="font-semibold">Contact - Email</span>{' '}
-						{entry.contact_email}
-					</div>
-					<div>
-						<span className="font-semibold">Contact - Phone</span>{' '}
-						{entry.contact_phone}
-					</div>
-				</div>
-			</div>
+			<ViewSection title="Info">
+				<ViewField
+					label="Type"
+					value={formatEnumLabel(entry.transport_type)}
+				/>
+				<ViewField
+					label="Tracking Number"
+					value={entry.tracking_number}
+				/>
+				<ViewField
+					label="Pickup Address"
+					value={displayAddressLabel(entry.pickup_address, language)}
+				/>
+				<ViewField
+					label="Delivery Address"
+					value={displayAddressLabel(
+						entry.delivery_address,
+						language,
+					)}
+				/>
+			</ViewSection>
 
-			<div>
-				<h3 className="font-bold border-b border-line pb-2 mb-3">
-					Sign Details
-				</h3>
-				<div className="ml-4 space-y-1 text-sm">
-					<div>
-						<span className="font-semibold">Signed At</span>{' '}
-						{formatDate(entry.signed_at, 'date-time')}
-					</div>
-					<div>
-						<span className="font-semibold">Signed By</span>{' '}
-						{entry.signed_by}
-					</div>
-				</div>
-			</div>
+			<ViewSection title="Contact">
+				<ViewField
+					label="Client"
+					value={displayClientLabel(entry.client)}
+				/>
+				<ViewField label="Contact - Name" value={entry.contact_name} />
+				<ViewField
+					label="Contact - Email"
+					value={entry.contact_email}
+				/>
+				<ViewField
+					label="Contact - Phone"
+					value={entry.contact_phone}
+				/>
+			</ViewSection>
 
-			<div>
-				<h3 className="font-bold border-b border-line pb-2 mb-3">
-					Timestamps
-				</h3>
-				<div className="ml-4 space-y-1 text-sm">
-					<div>
-						<span className="font-semibold">Ordered At</span>{' '}
-						{formatDate(entry.ordered_at, 'date-time')}
-					</div>
-					<div>
-						<span className="font-semibold">Pick Scheduled At</span>{' '}
-						{formatDate(entry.pick_scheduled_at, 'date-time')}
-					</div>
-					<div>
-						<span className="font-semibold">
-							Estimated Delivery At
-						</span>{' '}
-						{formatDate(entry.estimated_delivery_at, 'date-time')}
-					</div>
-					<div>
-						<span className="font-semibold">Delivered At</span>{' '}
-						{formatDate(entry.delivered_at, 'date-time')}
-					</div>
-					<div>
-						<span className="font-semibold">Created At</span>{' '}
-						{formatDate(entry.created_at, 'date-time')}
-					</div>
-					<div>
-						<span className="font-semibold">Updated At</span>{' '}
-						{formatDate(entry.updated_at, 'date-time') || '-'}
-					</div>
-					{entry.deleted_at && (
-						<div>
-							<span className="font-semibold">Deleted At</span>{' '}
+			<ViewSection title="Sign Details">
+				<ViewField
+					label="Signed At"
+					value={formatDate(entry.signed_at, 'date-time')}
+				/>
+				<ViewField label="Signed By" value={entry.signed_by} />
+			</ViewSection>
+
+			<ViewSection title="Timestamps">
+				<ViewField
+					label="Ordered At"
+					value={formatDate(entry.ordered_at, 'date-time')}
+				/>
+				<ViewField
+					label="Pick Scheduled At"
+					value={formatDate(entry.pick_scheduled_at, 'date-time')}
+				/>
+				<ViewField
+					label="Estimated Delivery At"
+					value={formatDate(entry.estimated_delivery_at, 'date-time')}
+				/>
+				<ViewField
+					label="Delivered At"
+					value={formatDate(entry.delivered_at, 'date-time')}
+				/>
+				<ViewField
+					label="Created At"
+					value={formatDate(entry.created_at, 'date-time')}
+				/>
+				<ViewField
+					label="Updated At"
+					value={formatDate(entry.updated_at, 'date-time')}
+				/>
+				{entry.deleted_at && (
+					<ViewField
+						label="Deleted At"
+						value={
 							<span className="text-danger">
 								{formatDate(entry.deleted_at, 'date-time')}
 							</span>
-						</div>
-					)}
-				</div>
-			</div>
+						}
+					/>
+				)}
+			</ViewSection>
 		</div>
 	);
 }

@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import Image from 'next/image';
-import { type ComponentType, type JSX, useMemo, useState } from 'react';
+import { type ComponentType, type JSX, useState } from 'react';
 import { Icons } from '@/components/icon.component';
 import {
 	Badge,
@@ -9,8 +9,8 @@ import {
 } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent } from '@/components/ui/popover';
+import { getLanguageClient } from '@/config/translate.setup';
 import { cn } from '@/helpers/css.helper';
-import { formatAmount } from '@/helpers/string.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import type { CmrSessionModel } from '@/models/cmr-session.model';
 import { displayWorkSessionLabel } from '@/models/work-session.model';
@@ -147,10 +147,7 @@ export const DisplayStatus = ({
 	size?: BadgeSize;
 	icon?: ComponentType<{ className?: string }>;
 }) => {
-	const translationsKeys = useMemo(
-		() => [`${dataSource}.status.${status}`] as const,
-		[dataSource, status],
-	);
+	const translationsKeys = [`${dataSource}.status.${status}`] as const;
 
 	const { translations } = useTranslation(translationsKeys);
 	const { variant: statusVariant, icon: StatusIcon } =
@@ -183,20 +180,59 @@ export const DisplayDeleted = ({
 };
 
 /**
- * Displays a formatted amount with optional VAT calculation and conditional styling for negative values
+ * Formats an amount for display, returning the number and its currency symbol separately so a
+ * caller can style or place them independently.
+ *
+ * Grouping and decimal separators follow **the language the UI is rendered in**, not the
+ * viewer's browser: `1,234.50` under `en`, `1.234,50` under `ro`. Two people reading the same
+ * screen in the same language therefore see the same figures, and a screenshot in a bug report
+ * matches what the reporter saw.
+ *
+ * The function lives here rather than in `string.helper` because it needs
+ * `getLanguageClient()`, and `translate.setup` imports `string.helper`
+ *
+ * Client-only — `getLanguageClient()` reads `html[lang]`. Every amount in the app is rendered
+ * client-side, which is what keeps this consistent (a server render would fall back to the
+ * container's locale).
+ */
+export function formatAmount(amount: number, currencyCode: string) {
+	const language = getLanguageClient();
+
+	const numberFormatter = new Intl.NumberFormat(language, {
+		minimumFractionDigits: 2,
+		maximumFractionDigits: 2,
+	});
+
+	const symbolFormatter = new Intl.NumberFormat(language, {
+		style: 'currency',
+		currency: currencyCode,
+		currencyDisplay: 'narrowSymbol',
+	});
+
+	// `formatToParts(0)` is only a vehicle for extracting the symbol — the zero is discarded.
+	const parts = symbolFormatter.formatToParts(0);
+	const currency =
+		parts.find((part) => part.type === 'currency')?.value ?? currencyCode;
+
+	return {
+		value: numberFormatter.format(amount),
+		currency,
+	};
+}
+
+/**
+ * Displays a formatted amount, styling negative values distinctly.
  *
  * @param {Object} props - Component props
- * @param {number} props.amount
+ * @param {number} props.amount - Signed amount; negative values take `classNameNegative`
  * @param {string} props.currencyCode - Currency code (e.g., RON, USD, EUR)
  * @returns {JSX.Element} Formatted amount span with currency and conditional styling
  *
  * @example
- * // Display positive amount in RON
- * <DisplayAmount netAmount={100} currencyCode="RON" sign={1} />
+ * <DisplayAmount amount={100} currencyCode="RON" />
  *
  * @example
- * // Display negative amount with error styling
- * <DisplayAmount netAmount={50} currencyCode="EUR" sign={-1} vat_rate={20} />
+ * <DisplayAmount amount={-50} currencyCode="EUR" />
  */
 export function DisplayAmount({
 	amount,
@@ -239,19 +275,27 @@ export function displayColumnSession(cmr_sessions: CmrSessionModel[]) {
 	);
 }
 
-export function displayImage({
-	src,
-	alt,
-	className,
-	width = 64,
-	height = 64,
-}: {
+type ImagePreviewProps = {
 	src: string;
 	alt: string;
 	className?: string;
 	width?: number;
 	height?: number;
-}) {
+};
+
+/**
+ * The popover's open state has to live in a real component rather than in `displayImage`
+ * itself. `displayImage` is invoked as a plain function — the `.definition.ts` files that
+ * call it cannot hold JSX — so a `useState` inside it would run in the *caller's* hook
+ * slot, once per row in a data table body, and any conditional row would shift hook order.
+ */
+function ImagePreview({
+	src,
+	alt,
+	className,
+	width = 64,
+	height = 64,
+}: ImagePreviewProps) {
 	const [isOpen, setIsOpen] = useState(false);
 
 	return (
@@ -307,4 +351,8 @@ export function displayImage({
 			</PopoverContent>
 		</Popover>
 	);
+}
+
+export function displayImage(props: ImagePreviewProps) {
+	return <ImagePreview {...props} />;
 }

@@ -7,7 +7,7 @@ import {
 import { ViewCashFlow } from '@/app/(dashboard)/dashboard/cash-flow/view-cash-flow.component';
 import { Configuration } from '@/config/settings.config';
 import { translateBatch } from '@/config/translate.setup';
-import { DisplayAmount } from '@/helpers/display.helper';
+import { DisplayAmount, formatAmount } from '@/helpers/display.helper';
 import {
 	getFormDataAsEnum,
 	getFormDataAsNumber,
@@ -22,12 +22,12 @@ import {
 	requestUpdate,
 	requestUpdateStatus,
 } from '@/helpers/services.helper';
+import { formatEnumLabel, replaceVars } from '@/helpers/string.helper';
 import {
-	formatAmount,
-	formatEnumLabel,
-	replaceVars,
-} from '@/helpers/string.helper';
-import { BaseValidator } from '@/helpers/validator.helper';
+	BaseValidator,
+	resolveValidatorMessages,
+	sharedValidatorMessages,
+} from '@/helpers/validator.helper';
 import { type AuthModel, hasPermission } from '@/models/auth.model';
 import {
 	type CashFlowCategory,
@@ -56,6 +56,7 @@ import type {
 import type { FormStateType, ValidatorOutput } from '@/types/form.type';
 
 const validatorMessages = [
+	...sharedValidatorMessages,
 	'invalid_category',
 	'invalid_method',
 	'invalid_amount',
@@ -113,11 +114,17 @@ class CashFlowValidator extends BaseValidator<typeof validatorMessages> {
 				onlyPositive: false,
 				allowDecimals: 2,
 			}),
-			vat_rate: this.validateNumber(this.getMessage('invalid_vat_rate'), {
-				required: true,
-				onlyPositive: true,
-				allowDecimals: 2,
-			}),
+			vat_rate: this.validateNumber(
+				{
+					invalid: this.getMessage('invalid_vat_rate'),
+					only_positive: this.getMessage('only_positive'),
+				},
+				{
+					required: true,
+					onlyPositive: true,
+					allowDecimals: 2,
+				},
+			),
 			currency: this.validateEnum(
 				CurrencyEnum,
 				this.getMessage('invalid_currency'),
@@ -162,9 +169,9 @@ class CashFlowValidator extends BaseValidator<typeof validatorMessages> {
 }
 
 async function validateForm(values: CashFlowFormValuesType) {
-	const translations = await translateBatch(
+	const translations = await resolveValidatorMessages(
 		validatorMessages,
-		'cash-flow.validation',
+		'cash-flow',
 	);
 
 	const validator = new CashFlowValidator(translations);
@@ -231,8 +238,7 @@ function getFormState(
 			category: data?.category ?? CashFlowCategoryEnum.CUSTOMER,
 			method: data?.method ?? CashFlowMethodEnum.CASH,
 			amount: data?.amount ?? null,
-			vat_rate:
-				data?.vat_rate ?? (Configuration.get('app.vat_rate') as number),
+			vat_rate: data?.vat_rate ?? Configuration.get('app.vatRate'),
 			currency: data?.currency ?? Configuration.currency(),
 			external_reference: data?.external_reference ?? null,
 			parent_id: data?.parent_id ?? null,
@@ -374,6 +380,7 @@ export default async function dataSourceConfig(): Promise<
 				{
 					field: 'id',
 					header: 'ID',
+					defaultWidth: 88,
 					sortable: true,
 					body: (entry, column, auth) =>
 						DataTableValue(entry, column, {
@@ -432,10 +439,8 @@ export default async function dataSourceConfig(): Promise<
 							markDeleted: true,
 							displayButton: displayButtonStatus(auth),
 						}),
-					style: {
-						minWidth: '10rem',
-						maxWidth: '10rem',
-					},
+					minWidth: 160,
+					maxWidth: 160,
 				},
 				{
 					field: 'created_at',

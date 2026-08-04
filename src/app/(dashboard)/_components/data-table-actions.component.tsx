@@ -9,7 +9,7 @@ import {
 	type ButtonCommand,
 } from '@/components/action-button.component';
 import { getDataSourceConfig } from '@/config/data-source.config';
-import { getErrorMessage } from '@/helpers/objects.helper';
+import { getErrorMessage } from '@/helpers/error.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { hasPermission } from '@/models/auth.model';
 import { UserRoleEnum } from '@/models/user.model';
@@ -56,15 +56,11 @@ function DataTableActionButton({
 	const actionTitleKey = `${dataSource}.action.${action}.title`;
 	const actionLabelKey = `${dataSource}.action.${action}.label`;
 
-	const translationsKeys = useMemo(
-		() =>
-			[
-				actionTitleKey,
-				actionLabelKey,
-				'app.action.loading.label',
-			] as const,
-		[actionTitleKey, actionLabelKey],
-	);
+	const translationsKeys = [
+		actionTitleKey,
+		actionLabelKey,
+		'app.action.loading.label',
+	] as const;
 
 	const { translations, isTranslationLoading } =
 		useTranslation(translationsKeys);
@@ -184,10 +180,10 @@ export function DataTableActions<K extends DataSourceKey>() {
 		).then(setActions);
 	}, [dataSource]);
 
-	const translationsKeys = useMemo(
-		() => ['app.error.operation_not_allowed', 'app.error.title'] as const,
-		[],
-	);
+	const translationsKeys = [
+		'app.error.operation_not_allowed',
+		'app.error.title',
+	] as const;
 
 	const { translations } = useTranslation(translationsKeys);
 

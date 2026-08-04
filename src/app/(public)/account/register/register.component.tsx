@@ -9,7 +9,6 @@ import {
 	RegisterState,
 	validateFormRegister,
 } from '@/app/(public)/account/register/register.definition';
-import { FormCsrf } from '@/components/form/form-csrf';
 import {
 	FormComponentCheckbox,
 	FormComponentEmail,
@@ -146,8 +145,6 @@ export default function Register() {
 				onSubmit={markSubmit}
 				className="form-section"
 			>
-				<FormCsrf />
-
 				<FormComponentName<RegisterFormValuesType>
 					labelText="Name"
 					id={elementIds.name}

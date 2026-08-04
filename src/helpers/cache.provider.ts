@@ -1,36 +1,26 @@
 import type Redis from 'ioredis';
 import { getRedisClient } from '@/config/init-redis.config';
 import { Configuration } from '@/config/settings.config';
+import { logger } from '@/helpers/logger.helper';
 
-type CacheData = string | string[] | number | boolean | null;
+type CacheData = unknown;
 
-class CacheProvider {
-	private static instance: CacheProvider;
+type CacheGetResults = {
+	isCached: boolean;
+	data: CacheData | null;
+};
 
-	public isCached: boolean = false;
-
-	private constructor() {}
-
-	public static getInstance(): CacheProvider {
-		if (!CacheProvider.instance) {
-			CacheProvider.instance = new CacheProvider();
-		}
-
-		return CacheProvider.instance;
-	}
-
-	private get cache(): Redis {
-		return getRedisClient();
-	}
+export class CacheProvider {
+	constructor(private readonly cache: Redis) {}
 
 	buildKey(...args: string[]) {
-		return args.join(':');
+		return [Configuration.get('redis.keyPrefix'), ...args]
+			.filter((arg) => arg !== '')
+			.join(':');
 	}
 
 	determineTtl(ttl?: number): number {
-		return ttl === undefined
-			? (Configuration.get('cache.ttl') as number)
-			: ttl;
+		return ttl === undefined ? Configuration.get('cache.ttl') : ttl;
 	}
 
 	formatInputData(data: CacheData): string | number {
@@ -59,7 +49,6 @@ class CacheProvider {
 		}
 
 		try {
-			// Only parse if it looks like JSON (starts with {, [, ", or digit)
 			const trimmed = data.trim();
 
 			if (
@@ -80,9 +69,11 @@ class CacheProvider {
 	async exists(key: string): Promise<boolean> {
 		try {
 			const exists = await this.cache.exists(key);
-			return exists === 1; // Redis returns 1 if key exists, 0 otherwise
+
+			return exists === 1;
 		} catch (error) {
-			console.error(error, `Error checking existence for key: ${key}`);
+			logger.error('Cache exists check failed', error, { key });
+
 			return false;
 		}
 	}
@@ -91,44 +82,87 @@ class CacheProvider {
 		key: string,
 		fetchFunction: () => Promise<CacheData>,
 		ttl?: number,
-	): Promise<CacheData> {
+	): Promise<CacheGetResults> {
+		const results: CacheGetResults = {
+			isCached: false,
+			data: null,
+		};
+
+		const resolvedTtl = this.determineTtl(ttl);
+
+		if (resolvedTtl === 0) {
+			results.data = await fetchFunction();
+
+			return results;
+		}
+
+		let cachedData: string | null = null;
+
 		try {
-			ttl = this.determineTtl(ttl);
-
-			if (ttl === 0) {
-				return await fetchFunction();
-			}
-
-			const cachedData = await this.cache.get(key);
-
-			if (cachedData) {
-				this.isCached = true;
-				return this.formatOutputData(cachedData);
-			}
-
-			const freshData = await fetchFunction();
-			await this.set(key, freshData, ttl);
-
-			return freshData;
+			cachedData = await this.cache.get(key);
 		} catch (error) {
-			console.error(error, `Error fetching cache for key: ${key}`);
+			logger.error('Cache read failed', error, { key });
+		}
 
-			return await fetchFunction(); // Fallback to fetching fresh data
+		if (cachedData) {
+			results.isCached = true;
+			results.data = this.formatOutputData(cachedData);
+
+			return results;
+		}
+
+		results.data = await fetchFunction();
+
+		await this.set(key, results.data, resolvedTtl);
+
+		return results;
+	}
+
+	/**
+	 * Raw read with no fetch-on-miss.
+	 *
+	 * The read-through `get()` always stores whatever the fetch function returned, so it
+	 * cannot express "only some outcomes may be cached" — auth is the case in point: a
+	 * backend outage has to stay a live decision instead of being persisted for the TTL.
+	 * Callers with that constraint drive the cache themselves via `read()`/`set()`.
+	 *
+	 * Worth backporting to `star-backend`, which has the same gap.
+	 */
+	async read(key: string): Promise<CacheData> {
+		try {
+			return this.formatOutputData(await this.cache.get(key));
+		} catch (error) {
+			logger.error('Cache raw read failed', error, { key });
+
+			return null;
 		}
 	}
 
 	async set(key: string, data: CacheData, ttl?: number) {
+		const resolvedTtl = this.determineTtl(ttl);
+
+		/*
+		 * Redis rejects `EX 0` outright ("ERR invalid expire time in 'set' command"), and the
+		 * catch below would turn that into a silent no-op with only a log line. A resolved TTL
+		 * of 0 means caching is switched off — `get()` already reads it that way — so skip the
+		 * write rather than issue one that cannot succeed. This is reachable through the
+		 * default alone: `cache.ttl` is 0 in .env, so any caller omitting `ttl` lands here.
+		 */
+		if (resolvedTtl <= 0) {
+			return;
+		}
+
 		try {
 			if (data !== null) {
 				await this.cache.set(
 					key,
 					this.formatInputData(data),
 					'EX',
-					this.determineTtl(ttl),
+					resolvedTtl,
 				);
 			}
 		} catch (error) {
-			console.error(error, `Error setting cache for key: ${key}`);
+			logger.error('Cache write failed', error, { key });
 		}
 	}
 
@@ -136,7 +170,28 @@ class CacheProvider {
 		try {
 			await this.cache.del(key);
 		} catch (error) {
-			console.error(error, `Error deleting cache for key: ${key}`);
+			logger.error('Cache delete failed', error, { key });
+		}
+	}
+
+	/**
+	 * Atomically read a key and delete it in the same round-trip, returning the
+	 * previous value (or null). Used for single-use tokens where a read must not
+	 * be replayable. A MULTI is used rather than GETDEL so it works regardless of
+	 * the Redis server version.
+	 */
+	async readAndDrop(key: string): Promise<CacheData> {
+		try {
+			const results = await this.cache.multi().get(key).del(key).exec();
+
+			// results: [[err, value], [err, delCount]]
+			const value = (results?.[0]?.[1] ?? null) as string | null;
+
+			return this.formatOutputData(value);
+		} catch (error) {
+			logger.error('Cache read-and-drop failed', error, { key });
+
+			return null;
 		}
 	}
 
@@ -172,13 +227,15 @@ class CacheProvider {
 				}
 			} while (cursor !== '0'); // Continue until all keys are scanned
 		} catch (error) {
-			console.error(
-				error,
-				`Error deleting cache with pattern: ${pattern}`,
-			);
+			logger.error('Cache pattern delete failed', error, { pattern });
 		}
 	}
 }
 
-export const getCacheProvider = (): CacheProvider =>
-	CacheProvider.getInstance();
+let cacheProviderInstance: CacheProvider | null = null;
+
+export const getCacheProvider = (): CacheProvider => {
+	cacheProviderInstance ??= new CacheProvider(getRedisClient());
+
+	return cacheProviderInstance;
+};

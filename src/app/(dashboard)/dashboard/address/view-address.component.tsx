@@ -1,50 +1,37 @@
 'use client';
 
+import {
+	ViewField,
+	ViewSection,
+} from '@/app/(dashboard)/_components/view-detail';
 import { formatDate } from '@/helpers/date.helper';
 import type { AddressModel } from '@/models/address.model';
 
 export function ViewAddress({ entry }: { entry: AddressModel }) {
 	return (
 		<div className="space-y-6">
-			<div className="space-y-1">
-				<div>
-					<span className="font-semibold">ID</span> {entry.id}
-				</div>
+			<div className="flex items-center gap-2 border-b border-line pb-4">
+				<span className="font-semibold">ID</span> {entry.id}
 			</div>
 
-			<div>
-				<h3 className="font-bold border-b border-line pb-2 mb-3">
-					Details
-				</h3>
-				<div className="ml-4 space-y-1 text-sm">
-					<div>
-						<span className="font-semibold">Address - Info</span>{' '}
-						{entry.details}
-					</div>
-					<div>
-						<span className="font-semibold">
-							Address - Postal Code
-						</span>{' '}
-						{entry.postal_code}
-					</div>
-				</div>
-			</div>
+			<ViewSection title="Details">
+				<ViewField label="Address - Info" value={entry.details} />
+				<ViewField
+					label="Address - Postal Code"
+					value={entry.postal_code}
+				/>
+			</ViewSection>
 
-			<div>
-				<h3 className="font-bold border-b border-line pb-2 mb-3">
-					Timestamps
-				</h3>
-				<div className="ml-4 space-y-1 text-sm">
-					<div>
-						<span className="font-semibold">Created At</span>{' '}
-						{formatDate(entry.created_at, 'date-time')}
-					</div>
-					<div>
-						<span className="font-semibold">Updated At</span>{' '}
-						{formatDate(entry.updated_at, 'date-time') || '-'}
-					</div>
-				</div>
-			</div>
+			<ViewSection title="Timestamps">
+				<ViewField
+					label="Created At"
+					value={formatDate(entry.created_at, 'date-time')}
+				/>
+				<ViewField
+					label="Updated At"
+					value={formatDate(entry.updated_at, 'date-time')}
+				/>
+			</ViewSection>
 		</div>
 	);
 }

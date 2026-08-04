@@ -7,7 +7,7 @@ import { Icons } from '@/components/icon.component';
 import { Button } from '@/components/ui/button';
 import { formatDate } from '@/helpers/date.helper';
 import { DisplayAmount } from '@/helpers/display.helper';
-import { getErrorMessage } from '@/helpers/objects.helper';
+import { getErrorMessage } from '@/helpers/error.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import type { CmrModel } from '@/models/cmr.model';
 import { displayWorkSessionDuration } from '@/models/work-session.model';
@@ -28,16 +28,12 @@ export function DriverPanelSession() {
 		refreshSession,
 	} = useWorkSession();
 
-	const translationsKeys = useMemo(
-		() =>
-			[
-				'app.error.title',
-				'driver-panel.tooltip.add_session_vehicle',
-				'driver-panel.tooltip.create_cmr',
-				'driver-panel.tooltip.close_session',
-			] as const,
-		[],
-	);
+	const translationsKeys = [
+		'app.error.title',
+		'driver-panel.tooltip.add_session_vehicle',
+		'driver-panel.tooltip.create_cmr',
+		'driver-panel.tooltip.close_session',
+	] as const;
 	const { translations } = useTranslation(translationsKeys);
 
 	const { data: ronData } = useDriverCashBalance(CurrencyEnum.RON);

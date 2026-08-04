@@ -5,13 +5,7 @@ import { WindowMinimizedInstance } from '@/components/window/window-minimized-in
 import { useModalStore } from '@/stores/window.store';
 import type { WindowConfig } from '@/types/window.type';
 
-export function WindowDock({
-	modals,
-	active,
-}: {
-	modals: WindowConfig[];
-	active?: string;
-}) {
+export function WindowDock({ modals }: { modals: WindowConfig[] }) {
 	const [showAll, setShowAll] = useState(false);
 	const { closeAll } = useModalStore();
 
@@ -20,8 +14,10 @@ export function WindowDock({
 	const hasMore = modals.length > 5;
 	const hasWindows = modals.length > 1;
 
+	// `closeAll` clears the whole stack, including the window currently on
+	// screen — which is no longer listed here, hence the wording
 	const handleCloseAll = () => {
-		if (confirm(`Close all ${modals.length} windows?`)) {
+		if (confirm('Close all open windows?')) {
 			closeAll();
 		}
 	};
@@ -32,7 +28,6 @@ export function WindowDock({
 				<WindowMinimizedInstance
 					key={`minimized-${current.uid}`}
 					current={current}
-					isActive={current.uid === active}
 				/>
 			))}
 			{hasMore && (

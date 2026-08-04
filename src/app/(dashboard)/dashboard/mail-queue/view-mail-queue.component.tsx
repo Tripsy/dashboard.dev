@@ -1,3 +1,7 @@
+import {
+	ViewField,
+	ViewSection,
+} from '@/app/(dashboard)/_components/view-detail';
 import { formatDate } from '@/helpers/date.helper';
 import { DisplayStatus } from '@/helpers/display.helper';
 import type { MailQueueModel } from '@/models/mail-queue.model';
@@ -5,86 +9,62 @@ import type { MailQueueModel } from '@/models/mail-queue.model';
 export function ViewMailQueue({ entry }: { entry: MailQueueModel }) {
 	return (
 		<div className="space-y-6">
-			<div className="space-y-1">
-				<div>
-					<span className="font-semibold">ID</span> {entry.id}
-				</div>
-				<div>
-					<span className="font-semibold">Created At</span>{' '}
-					{formatDate(entry.created_at, 'date-time')}
-				</div>
-				<div>
-					<span className="font-semibold">Updated At</span>{' '}
-					{formatDate(entry.updated_at, 'date-time') || '-'}
-				</div>
+			<div className="flex items-center gap-2 border-b border-line pb-4">
+				<span className="font-semibold">ID</span> {entry.id}
 			</div>
 
-			<div>
-				<h3 className="font-bold border-b border-line pb-2 mb-3">
-					State
-				</h3>
-				<div className="ml-4 space-y-1">
-					<div className="flex items-center gap-2">
-						<span className="font-semibold">Status</span>{' '}
+			<ViewSection title="State">
+				<ViewField
+					label="Status"
+					value={
 						<div className="max-w-60">
 							<DisplayStatus
 								status={entry.status}
 								dataSource="mail-queue"
 							/>
 						</div>
-					</div>
-					<div>
-						<span className="font-semibold">Error</span>{' '}
-						{entry.error || '-'}
-					</div>
-					<div>
-						<span className="font-semibold">Sent At</span>{' '}
-						{formatDate(entry.sent_at, 'date-time') || '-'}
-					</div>
-					<div>
-						<span className="font-semibold">Email To</span>{' '}
-						{entry.to.name} &lt;{entry.to.address}&gt;
-					</div>
-					{entry.from && (
-						<div>
-							<span className="font-semibold">Email From</span>{' '}
-							{entry.from?.name} &lt;{entry.from?.address}&gt;
-						</div>
-					)}
-				</div>
-			</div>
+					}
+				/>
+				<ViewField label="Error" value={entry.error} />
+				<ViewField
+					label="Sent At"
+					value={formatDate(entry.sent_at, 'date-time')}
+				/>
+				<ViewField
+					label="Email To"
+					value={`${entry.to.name} <${entry.to.address}>`}
+				/>
+				{entry.from && (
+					<ViewField
+						label="Email From"
+						value={`${entry.from.name} <${entry.from.address}>`}
+					/>
+				)}
+			</ViewSection>
 
-			<div>
-				<h3 className="font-bold border-b border-line pb-2 mb-3">
-					Email Data
-				</h3>
-				<div className="ml-4 space-y-1">
-					<div>
-						<span className="font-semibold">Template</span>{' '}
-						{entry.template?.label || 'n/a'}
-					</div>
-					<div>
-						<span className="font-semibold">Language</span>{' '}
-						{entry.language}
-					</div>
-					<div>
-						<span className="font-semibold">Layout</span>{' '}
-						{entry.content.layout}
-					</div>
-					<div>
-						<span className="font-semibold">Subject</span>{' '}
-						{entry.content.subject}
-					</div>
-					<div>
-						<span className="font-semibold">Content</span>{' '}
-						{entry.content.html}
-					</div>
-					<div>
-						<span className="font-semibold">Vars</span>{' '}
-						{JSON.stringify(entry.content.vars, null, 2)}
-					</div>
-				</div>
-			</div>
+			<ViewSection title="Email Data">
+				<ViewField label="Template" value={entry.template?.label} />
+				<ViewField label="Language" value={entry.language} />
+				<ViewField label="Layout" value={entry.content.layout} />
+				<ViewField label="Subject" value={entry.content.subject} />
+				<ViewField label="Content" value={entry.content.html} full />
+				<ViewField
+					label="Vars"
+					value={JSON.stringify(entry.content.vars, null, 2)}
+					full
+				/>
+			</ViewSection>
+
+			<ViewSection title="Timestamps">
+				<ViewField
+					label="Created At"
+					value={formatDate(entry.created_at, 'date-time')}
+				/>
+				<ViewField
+					label="Updated At"
+					value={formatDate(entry.updated_at, 'date-time')}
+				/>
+			</ViewSection>
 		</div>
 	);
 }

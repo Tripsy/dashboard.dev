@@ -10,7 +10,6 @@ import {
 	PasswordRecoverChangeState,
 	validateFormPasswordRecoverChange,
 } from '@/app/(public)/account/password-recover-change/[token]/password-recover-change.definition';
-import { FormCsrf } from '@/components/form/form-csrf';
 import {
 	FormComponentPassword,
 	FormComponentSubmit,
@@ -102,8 +101,6 @@ export default function PasswordRecoverChange() {
 				onSubmit={markSubmit}
 				className="form-section"
 			>
-				<FormCsrf />
-
 				<FormComponentPassword<PasswordRecoverChangeFormValuesType>
 					labelText="New Password"
 					id={elementIds.password}

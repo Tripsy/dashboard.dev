@@ -10,11 +10,7 @@ export function isLargeScreen(): boolean {
 		return true;
 	} // SSR safety
 
-	try {
-		return window.matchMedia('(min-width: 1024px)').matches;
-	} catch (error) {
-		console.error('Error checking screen size:', error);
-
-		return false;
-	}
+	// `matchMedia` only throws on a malformed query, and this one is a literal — so there
+	// is no failure mode here to guard against.
+	return window.matchMedia('(min-width: 1024px)').matches;
 }

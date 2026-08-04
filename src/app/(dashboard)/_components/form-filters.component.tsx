@@ -1,5 +1,5 @@
 import { Label } from '@heroui/react';
-import { type JSX, useMemo } from 'react';
+import type { JSX } from 'react';
 import { dispatchFilterReset } from '@/app/(dashboard)/_events/data-table-filter-reset.event';
 import {
 	FormComponentAutoComplete,
@@ -199,14 +199,10 @@ export function FormFiltersDateRange<Fields>({
 	const elementKeyEnd = `search-${String(end.fieldName)}`;
 	const elementIds = useElementIds([elementKeyStart, elementKeyEnd]);
 
-	const translationsKeys = useMemo(
-		() =>
-			[
-				'dashboard.text.placeholder_start_date',
-				'dashboard.text.placeholder_end_date',
-			] as const,
-		[],
-	);
+	const translationsKeys = [
+		'dashboard.text.placeholder_start_date',
+		'dashboard.text.placeholder_end_date',
+	] as const;
 
 	const { translations } = useTranslation(translationsKeys);
 
@@ -226,6 +222,12 @@ export function FormFiltersDateRange<Fields>({
 					placeholderText={
 						translations['dashboard.text.placeholder_start_date']
 					}
+					// Falls back to the group label for the tick before the async
+					// translations resolve, so the picker is never left unnamed.
+					ariaLabel={
+						translations['dashboard.text.placeholder_start_date'] ??
+						labelText
+					}
 					disabled={false}
 					onSelect={start.onSelect}
 					maxDate={maxDate}
@@ -236,6 +238,10 @@ export function FormFiltersDateRange<Fields>({
 					fieldValue={end.fieldValue}
 					placeholderText={
 						translations['dashboard.text.placeholder_end_date']
+					}
+					ariaLabel={
+						translations['dashboard.text.placeholder_end_date'] ??
+						labelText
 					}
 					disabled={false}
 					onSelect={end.onSelect}
@@ -259,10 +265,9 @@ export function FormFiltersShowDeleted({
 
 	const elementIds = useElementIds(['search-is-deleted'] as const);
 
-	const translationsKeys = useMemo(
-		() => ['dashboard.text.label_checkbox_show_deleted'] as const,
-		[],
-	);
+	const translationsKeys = [
+		'dashboard.text.label_checkbox_show_deleted',
+	] as const;
 
 	const { translations } = useTranslation(translationsKeys);
 
@@ -290,10 +295,7 @@ export function FormFiltersReset({
 }: {
 	dataSource: DataSourceKey;
 }) {
-	const translationsKeys = useMemo(
-		() => ['dashboard.text.label_reset'] as const,
-		[],
-	);
+	const translationsKeys = ['dashboard.text.label_reset'] as const;
 
 	const { translations } = useTranslation(translationsKeys);
 

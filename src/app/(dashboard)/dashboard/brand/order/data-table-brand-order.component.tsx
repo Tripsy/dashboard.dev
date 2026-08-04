@@ -98,16 +98,12 @@ const SortableBrandItem = ({ brand }: SortableBrandItemProps): JSX.Element => {
 };
 
 const DataTableBrandOrderContent = (): JSX.Element => {
-	const translationsKeys = useMemo(
-		() =>
-			[
-				'app.error.title',
-				'app.success.title',
-				'brand-order.success.order_updated',
-				'brand-order.error.order_failed',
-			] as const,
-		[],
-	);
+	const translationsKeys = [
+		'app.error.title',
+		'app.success.title',
+		'brand-order.success.order_updated',
+		'brand-order.error.order_failed',
+	] as const;
 
 	const { translations } = useTranslation(translationsKeys);
 

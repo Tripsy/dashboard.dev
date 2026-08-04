@@ -22,6 +22,7 @@ export type WindowConfigPropsType = {
 	className?: string;
 	closeOnBackdrop?: boolean;
 	closeOnEscape?: boolean;
+	allowMinimize?: boolean; // Default true; false hides the minimize control and blocks `minimize()` (window must be submitted or closed)
 };
 export type WindowSectionType = 'dashboard' | 'public';
 export type WindowType<T extends EntriesSelectionType> = T extends 'free'

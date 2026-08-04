@@ -1,5 +1,9 @@
 'use client';
 
+import {
+	ViewField,
+	ViewSection,
+} from '@/app/(dashboard)/_components/view-detail';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatDate } from '@/helpers/date.helper';
 import {
@@ -14,45 +18,41 @@ export function ViewPlace({ entry }: { entry: PlaceModel }) {
 
 	return (
 		<div className="space-y-6">
-			<div className="space-y-1">
-				<div>
-					<span className="font-semibold">ID</span> {entry.id}
-				</div>
-				<div>
-					<span className="font-semibold">Type</span>{' '}
-					{formatEnumLabel(entry.place_type)}
-				</div>
-				<div>
-					<span className="font-semibold">Code</span> {entry.code}
-				</div>
+			<div className="flex items-center gap-2 border-b border-line pb-4">
+				<span className="font-semibold">ID</span> {entry.id}
 			</div>
 
-			<div>
-				<h3 className="font-bold border-b border-line pb-2 mb-3">
-					Timestamps
-				</h3>
-				<div className="ml-4 space-y-1 text-sm">
-					<div>
-						<span className="font-semibold">Created At</span>{' '}
-						{formatDate(entry.created_at, 'date-time')}
-					</div>
-					<div>
-						<span className="font-semibold">Updated At</span>{' '}
-						{formatDate(entry.updated_at, 'date-time') || '-'}
-					</div>
-					{entry.deleted_at && (
-						<div>
-							<span className="font-semibold">Deleted At</span>{' '}
+			<ViewSection title="Info">
+				<ViewField
+					label="Type"
+					value={formatEnumLabel(entry.place_type)}
+				/>
+				<ViewField label="Code" value={entry.code} />
+			</ViewSection>
+
+			<ViewSection title="Timestamps">
+				<ViewField
+					label="Created At"
+					value={formatDate(entry.created_at, 'date-time')}
+				/>
+				<ViewField
+					label="Updated At"
+					value={formatDate(entry.updated_at, 'date-time')}
+				/>
+				{entry.deleted_at && (
+					<ViewField
+						label="Deleted At"
+						value={
 							<span className="text-danger">
 								{formatDate(entry.deleted_at, 'date-time')}
 							</span>
-						</div>
-					)}
-				</div>
-			</div>
+						}
+					/>
+				)}
+			</ViewSection>
 
 			{languageContents.length > 0 && (
-				<div className="mb-4">
+				<div>
 					<Tabs
 						defaultSelectedKey={contentTabDefault}
 						className="w-full"
@@ -77,21 +77,17 @@ export function ViewPlace({ entry }: { entry: PlaceModel }) {
 								key={`content-${value.language}`}
 								id={value.language}
 							>
-								<div className="space-y-1 text-sm">
-									<div>
-										<span className="font-semibold">
-											Type - Label
-										</span>{' '}
-										{capitalizeFirstLetter(
+								<div className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
+									<ViewField
+										label="Type - Label"
+										value={capitalizeFirstLetter(
 											value.type_label,
 										)}
-									</div>
-									<div>
-										<span className="font-semibold">
-											Name
-										</span>{' '}
-										{value.name}
-									</div>
+									/>
+									<ViewField
+										label="Name"
+										value={value.name}
+									/>
 								</div>
 							</TabsContent>
 						))}

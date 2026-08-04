@@ -7,9 +7,7 @@ import { getCookie } from '@/helpers/session.helper';
 import { apiHeaders } from '@/helpers/system.helper';
 
 async function handler(request: NextRequest, path: string[]) {
-	const token = await getCookie(
-		Configuration.get('user.sessionToken') as string,
-	);
+	const token = await getCookie(Configuration.get('user.sessionToken'));
 	const baseUrl = getRemoteApiUrl(path.join('/'));
 	const url = `${baseUrl}${request.nextUrl.search || ''}`;
 
@@ -32,15 +30,35 @@ async function handler(request: NextRequest, path: string[]) {
 
 	const contentType = backendRes.headers.get('content-type') || '';
 	const isJson = contentType.includes('application/json');
-	const data = isJson ? await backendRes.json() : await backendRes.text();
 
-	return new NextResponse(isJson ? JSON.stringify(data) : data, {
+	const responseHeaders: Record<string, string> = {
+		'Content-Type': contentType,
+	};
+	const contentDisposition = backendRes.headers.get('content-disposition');
+
+	if (contentDisposition) {
+		responseHeaders['Content-Disposition'] = contentDisposition;
+	}
+
+	if (isJson) {
+		const data = await backendRes.json();
+
+		return new NextResponse(JSON.stringify(data), {
+			status: backendRes.status,
+			headers: responseHeaders,
+		});
+	}
+
+	// Non-JSON bodies (file downloads) are binary — reading them as text would
+	// corrupt anything that isn't valid UTF-8, e.g. an .xlsx's zip bytes.
+	const data = await backendRes.arrayBuffer();
+
+	return new NextResponse(data, {
 		status: backendRes.status,
-		headers: { 'Content-Type': contentType },
+		headers: responseHeaders,
 	});
 }
 
-// Route params are async since Next.js 15 — https://nextjs.org/docs/messages/sync-dynamic-apis
 type Params = { params: Promise<{ path: string[] }> };
 
 // Generic handler for all methods

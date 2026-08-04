@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { AuthTokenList } from '@/app/(public)/_components/auth-token-list.component';
 import { Icons } from '@/components/icon.component';
 import { LoadingComponent } from '@/components/status.component';
@@ -23,14 +23,10 @@ export default function AccountMe() {
 	const open = useModalStore((s) => s.open);
 	const [sessions, setSessions] = useState<AuthTokenType[]>([]);
 
-	const translationsKeys = useMemo(
-		() =>
-			[
-				'account.message.session_destroy_success',
-				'account.message.session_destroy_error',
-			] as const,
-		[],
-	);
+	const translationsKeys = [
+		'account.message.session_destroy_success',
+		'account.message.session_destroy_error',
+	] as const;
 
 	const { translations } = useTranslation(translationsKeys);
 

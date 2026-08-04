@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useActionState, useEffect, useMemo, useState } from 'react';
+import { useActionState, useEffect, useState } from 'react';
 import { AuthTokenList } from '@/app/(public)/_components/auth-token-list.component';
 import { loginAction } from '@/app/(public)/account/login/login.action';
 import {
@@ -12,7 +12,6 @@ import {
 	LoginState,
 	validateFormLogin,
 } from '@/app/(public)/account/login/login.definition';
-import { FormCsrf } from '@/components/form/form-csrf';
 import {
 	FormComponentEmail,
 	FormComponentPassword,
@@ -58,14 +57,10 @@ export default function Login() {
 			onValidation: handleValidation,
 		});
 
-	const translationsKeys = useMemo(
-		() =>
-			[
-				'login.message.session_destroy_success',
-				'login.message.session_destroy_error',
-			] as const,
-		[],
-	);
+	const translationsKeys = [
+		'login.message.session_destroy_success',
+		'login.message.session_destroy_error',
+	] as const;
 
 	const { translations } = useTranslation(translationsKeys);
 
@@ -141,8 +136,6 @@ export default function Login() {
 				onSubmit={markSubmit}
 				className="form-section"
 			>
-				<FormCsrf />
-
 				<FormComponentEmail<LoginFormValuesType>
 					labelText="Email Address"
 					id={elementIds.email}

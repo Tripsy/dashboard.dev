@@ -20,7 +20,7 @@ export async function generateMetadata({
 		? (type as ParamsType)
 		: 'info';
 
-	const appName = Configuration.get('app.name') as string;
+	const appName = Configuration.get('app.name');
 	const title = await translate(`status.${validType}.meta.title`, {
 		app_name: appName,
 	});

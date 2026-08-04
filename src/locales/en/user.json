@@ -4,15 +4,9 @@
 	},
 	"validation": {
 		"invalid_name": "Enter a name",
-		"name_min": "Name must be at least {{min}} characters long",
 		"invalid_email": "Enter a valid email address",
 		"invalid_password": "Set a password",
-		"password_min": "Password must be at least {{min}} characters long",
-		"password_condition_capital_letter": "Password must contain at least one capital letter",
-		"password_condition_number": "Password must contain at least one number",
-		"password_condition_special_character": "Password must contain at least one special character",
 		"password_confirm_required": "Password confirmation is required",
-		"password_confirm_mismatch": "Passwords do not match",
 		"invalid_language": "Select a valid language",
 		"invalid_role": "Select a valid role",
 		"invalid_operator_type": "Select a valid operator type"

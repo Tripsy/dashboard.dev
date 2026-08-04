@@ -4,14 +4,35 @@ import { Configuration } from '@/config/settings.config';
 import { translate } from '@/config/translate.setup';
 import { ApiError } from '@/exceptions/api.error';
 import { ApiRequest, getResponseData } from '@/helpers/api.helper';
+import { clearCachedAuthModel } from '@/helpers/auth-cache.helper';
 import {
 	deleteCookie,
+	getCookie,
 	getTrackedCookie,
 	setupTrackedCookie,
 } from '@/helpers/session.helper';
 import { apiHeaders } from '@/helpers/system.helper';
 import { type AuthModel, prepareAuthModel } from '@/models/auth.model';
 import type { ApiResponseFetch } from '@/types/api.type';
+
+/**
+ * Drops the session cookie *and* the proxy's cached `/account/me` entry.
+ *
+ * Clearing only the cookie would leave the cached auth model authorising the token for the
+ * rest of its TTL, so the two always have to be torn down together.
+ *
+ * @param sessionToken - the current token when the caller already has it; re-read otherwise
+ */
+async function destroySession(sessionToken?: string): Promise<void> {
+	const cookieName = Configuration.get('user.sessionToken');
+	const token = sessionToken ?? (await getCookie(cookieName));
+
+	if (token) {
+		await clearCachedAuthModel(token);
+	}
+
+	await deleteCookie(cookieName);
+}
 
 export async function createAuth(
 	sessionToken: string,
@@ -26,12 +47,12 @@ export async function createAuth(
 	await setupTrackedCookie(
 		{
 			action: 'set',
-			name: Configuration.get('user.sessionToken') as string,
+			name: Configuration.get('user.sessionToken'),
 			value: sessionToken,
 		},
 		{
 			httpOnly: true,
-			maxAge: Configuration.get('user.sessionMaxAge') as number,
+			maxAge: Configuration.get('user.sessionMaxAge'),
 		},
 	);
 
@@ -44,7 +65,8 @@ export async function createAuth(
 export async function getAuth(): Promise<ApiResponseFetch<AuthModel | null>> {
 	try {
 		const sessionToken = await getTrackedCookie(
-			Configuration.get('user.sessionToken') as string,
+			Configuration.get('user.sessionToken'),
+			Configuration.get('user.sessionRefreshThreshold'),
 		);
 
 		if (!sessionToken.value) {
@@ -74,7 +96,7 @@ export async function getAuth(): Promise<ApiResponseFetch<AuthModel | null>> {
 
 				await setupTrackedCookie(sessionToken, {
 					httpOnly: true,
-					maxAge: Configuration.get('user.sessionMaxAge') as number,
+					maxAge: Configuration.get('user.sessionMaxAge'),
 				});
 
 				return {
@@ -85,7 +107,7 @@ export async function getAuth(): Promise<ApiResponseFetch<AuthModel | null>> {
 			}
 		}
 
-		await deleteCookie(Configuration.get('user.sessionToken') as string);
+		await destroySession(sessionToken.value);
 
 		return {
 			data: null,
@@ -96,9 +118,7 @@ export async function getAuth(): Promise<ApiResponseFetch<AuthModel | null>> {
 		};
 	} catch (error: unknown) {
 		if (error instanceof ApiError && error.status === 401) {
-			await deleteCookie(
-				Configuration.get('user.sessionToken') as string,
-			);
+			await destroySession();
 		}
 
 		return {
@@ -113,7 +133,7 @@ export async function getAuth(): Promise<ApiResponseFetch<AuthModel | null>> {
 }
 
 export async function clearAuth(): Promise<ApiResponseFetch<null>> {
-	await deleteCookie(Configuration.get('user.sessionToken') as string);
+	await destroySession();
 
 	return {
 		message: await translate('logout.message.success'),

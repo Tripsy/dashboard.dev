@@ -3,6 +3,7 @@ import {
 	SortableContext,
 	verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
+import type * as React from 'react';
 import { useSortableDnd } from '@/hooks/use-sortable-dnd';
 import { SortablePositionProvider } from '@/providers/sortable-position.provider';
 

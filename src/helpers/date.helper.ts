@@ -23,7 +23,7 @@ export function createCurrentDate(startOfDay: boolean = false): Date {
  * Create a future date by adding seconds to the current date
  *
  * @param {number} seconds - The number of seconds to add
- * @throws {Error} - If seconds is a negative number
+ * @throws {Error} - If seconds is zero or negative
  * @returns {Date} - The future date
  */
 export function createFutureDate(seconds: number): Date {
@@ -40,7 +40,7 @@ export function createFutureDate(seconds: number): Date {
  * Create a past date by subtracting seconds from the current date
  *
  * @param {number} seconds - The number of seconds to subtract
- * @throws {Error} - If seconds is a negative number
+ * @throws {Error} - If seconds is zero or negative
  * @returns {Date} - The past date
  */
 export function createPastDate(seconds: number): Date {
@@ -54,12 +54,19 @@ export function createPastDate(seconds: number): Date {
 }
 
 /**
- * Check if a string is a valid date
+ * Check if a string is a valid date.
+ *
+ * Expects the calendar part to lead in `YYYY-MM-DD` form; anything after it (a time, an
+ * offset) is parsed leniently.
  *
  * @param {string} date - The date string to check
  * @returns {boolean} - True if the date is valid, false otherwise
  */
 export function isValidDate(date: string): boolean {
+	if (!dayjs(date.trim().slice(0, 10), DEFAULT_DATE_FORMAT, true).isValid()) {
+		return false;
+	}
+
 	return dayjs(date).isValid();
 }
 
@@ -131,10 +138,8 @@ export function formatDate(
 		case 'time':
 			return date.format('HH:mm');
 		default:
-			if (format) {
-				return date.format(format);
-			}
-
+			// No `if (format)` fallback here: the cases above cover every member of the
+			// union, so this branch is only reached when `format` is undefined.
 			if (options?.customFormat) {
 				return date.format(options.customFormat);
 			}
@@ -144,7 +149,13 @@ export function formatDate(
 }
 
 /**
- * Combine a date with specified time
+ * Combine a date with a specified wall-clock time.
+ *
+ * `setHours` resolves against the runtime's zone, which is the driver's own device zone —
+ * these run client-side. That is the intended reading: "20:00" means 20:00 where the driver
+ * is, and serializing the resulting Date yields the correct UTC instant for the backend. Do
+ * not reach for `app.timezone` here; company time applies to filter day-boundaries only
+ * (see `toUTCISOString`).
  *
  * @param date
  * @param time
@@ -196,121 +207,56 @@ export function dateDiff(
 		throw new Error('Invalid date arguments provided for dateDiff');
 	}
 
+	/*
+	 * Rounds the magnitude up and restores the sign. A bare `Math.ceil` on a signed value
+	 * rounds positives away from zero (90.2 -> 91) but negatives toward it (-90.2 -> -90),
+	 * so the same interval measured backwards came back a unit short of the one measured
+	 * forwards.
+	 */
+	const roundAwayFromZero = (value: number) =>
+		Math.sign(value) * Math.ceil(Math.abs(value));
+
 	switch (unit) {
 		case 'seconds':
-			return Math.ceil(end.diff(start, 'second', true));
+			return roundAwayFromZero(end.diff(start, 'second', true));
 		case 'minutes':
-			return Math.ceil(end.diff(start, 'minute', true));
+			return roundAwayFromZero(end.diff(start, 'minute', true));
 		case 'hours':
-			return Math.ceil(end.diff(start, 'hour', true));
+			return roundAwayFromZero(end.diff(start, 'hour', true));
 		case 'display': {
 			const diffInMinutes = end.diff(start, 'minute');
-			const hours = Math.floor(diffInMinutes / 60);
-			const minutes = diffInMinutes % 60;
 
-			return `${hours}h ${minutes}'`;
+			const magnitude = Math.abs(diffInMinutes);
+			const sign = diffInMinutes < 0 ? '-' : '';
+
+			return `${sign}${Math.floor(magnitude / 60)}h ${magnitude % 60}'`;
 		}
 	}
 }
 
-interface TimeAgoOptions {
-	/**
-	 * Use "just now" for very recent times
-	 * @default true
-	 */
-	useJustNow?: boolean;
-
-	/**
-	 * Maximum precision level (e.g., 'minute' will show "2 minutes ago" but not "2 hours ago")
-	 */
-	maxPrecision?:
-		| 'second'
-		| 'minute'
-		| 'hour'
-		| 'day'
-		| 'week'
-		| 'month'
-		| 'year';
-
-	/**
-	 * Add suffix like "ago" or "from now"
-	 * @default 'ago'
-	 */
-	suffix?: string;
-
-	/**
-	 * Use "yesterday" for 1 day ago
-	 * @default false
-	 */
-	useYesterday?: boolean;
-}
-
-export function timeAgo(
-	date: string | Date,
-	options: TimeAgoOptions = {},
-): string {
-	const {
-		useJustNow = true,
-		maxPrecision = 'year',
-		suffix = 'ago',
-		useYesterday = false,
-	} = options;
-
+/**
+ * Relative description of a past date, e.g. "2 hours ago".
+ */
+export function timeAgo(date: string | Date): string {
 	const target = dayjs(date);
 
 	if (!target.isValid()) {
 		throw new Error('Invalid date argument provided for timeAgo');
 	}
 
-	const now = dayjs();
-	const diffInSeconds = now.diff(target, 'second');
-	const diffInMinutes = now.diff(target, 'minute');
-	const diffInHours = now.diff(target, 'hour');
-	const diffInDays = now.diff(target, 'day');
-
-	// Check for yesterday
-	if (useYesterday && diffInDays === 1) {
-		return 'yesterday';
-	}
-
-	// Check max precision
-	if (maxPrecision === 'second') {
-		if (diffInSeconds < 60) {
-			return useJustNow
-				? 'just now'
-				: `${diffInSeconds} second${diffInSeconds !== 1 ? 's' : ''} ${suffix}`;
-		}
-	}
-
-	if (maxPrecision === 'minute' || maxPrecision === 'second') {
-		if (diffInMinutes < 60) {
-			const value = Math.max(1, diffInMinutes);
-			return `${value} minute${value > 1 ? 's' : ''} ${suffix}`;
-		}
-	}
-
-	if (maxPrecision === 'hour' || maxPrecision === 'minute') {
-		if (diffInHours < 24) {
-			const value = Math.max(1, diffInHours);
-			return `${value} hour${value > 1 ? 's' : ''} ${suffix}`;
-		}
-	}
-
-	if (maxPrecision === 'day' || maxPrecision === 'hour') {
-		if (diffInDays < 7) {
-			const value = Math.max(1, diffInDays);
-			return `${value} day${value > 1 ? 's' : ''} ${suffix}`;
-		}
-	}
-
-	// For all other cases, use the simple version
 	return target.fromNow();
 }
 
 /**
- * Convert a local datetime string to UTC ISO string for sending to BE
+ * Convert a datetime string to a UTC ISO string for sending to the backend, reading it as
+ * **company time** (`app.timezone`) rather than the viewer's.
  *
- * @param value - Date string in local timezone (e.g. "2024-01-15" or "2024-01-15T20:00")
+ * That is deliberate, and the one place the app departs from device-local input: this backs
+ * the dashboard's date-range filters, where a picked day has to mean the company's day so
+ * two managers in different countries filtering "27-07" get the same rows. Instants typed
+ * into forms take the opposite convention — see `combineDateAndTime`.
+ *
+ * @param value - Date string in company time (e.g. "2024-01-15" or "2024-01-15T20:00")
  * @param endOfDay
  * @param timezone - IANA timezone (e.g. "Europe/Bucharest"), falls back to app config
  * @returns UTC ISO string (e.g. "2024-01-15T18:00:00.000Z")
@@ -320,7 +266,7 @@ export function toUTCISOString(
 	endOfDay: boolean = false,
 	timezone?: string,
 ): string {
-	const tz = timezone ?? Configuration.get<string>('app.timezone');
+	const tz = timezone ?? Configuration.get('app.timezone');
 	let parsed = dayjs.tz(value, tz);
 
 	if (!parsed.isValid()) {

@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Icons } from '@/components/icon.component';
 import { Skeleton } from '@/components/ui/skeleton';
-import { createCurrentDate, dateDiff } from '@/helpers/date.helper';
+import { displayWorkSessionDuration } from '@/models/work-session.model';
 import { requestStatsActiveWorkSessions } from '@/services/stats.service';
 
 function ActiveWorkSessionsSkeleton() {
@@ -67,11 +67,7 @@ export function ActiveWorkSessions() {
 					</div>
 					<div className="flex items-center gap-2 text-sm text-muted">
 						<Icons.Clock className="h-4 w-4" />{' '}
-						{dateDiff(
-							entry.start_at,
-							entry.end_at ?? createCurrentDate(),
-							'display',
-						)}
+						{displayWorkSessionDuration(entry)}
 					</div>
 				</div>
 			))}

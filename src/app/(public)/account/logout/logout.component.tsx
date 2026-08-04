@@ -10,7 +10,9 @@ import {
 	SuccessComponent,
 } from '@/components/status.component';
 import Routes from '@/config/routes.setup';
+import { logRejection } from '@/helpers/logger.helper';
 import { useAuth } from '@/providers/auth.provider';
+import { clearWindowStore } from '@/stores/window.store';
 
 export default function Logout() {
 	const [state, setState] = useState(LogoutDefaultState);
@@ -36,6 +38,11 @@ export default function Logout() {
 		if (state.situation === 'success') {
 			setAuth(null); // Clear auth state immediately after successful logout
 			setAuthStatus('unauthenticated');
+
+			// Open windows hold entry data from the session just ended
+			clearWindowStore().catch(
+				logRejection('Clearing the window store on logout failed'),
+			);
 		}
 	}, [setAuth, setAuthStatus, state.situation]);
 

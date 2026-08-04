@@ -52,6 +52,15 @@
 		"placeholder_start_date": "Start Date",
 		"placeholder_end_date": "End Date",
 		"label_checkbox_show_deleted": "Show deleted",
-		"label_reset": "Reset"
+		"label_reset": "Reset",
+
+		"rows_per_page": "Rows per page",
+		"label_data_table": "Data table",
+		"label_pagination": "Table pagination",
+		"label_page": "Page {{page}}",
+		"label_page_previous": "Previous page",
+		"label_page_next": "Next page",
+		"label_select_row": "Select row",
+		"label_select_all_rows": "Select all rows"
 	}
 }

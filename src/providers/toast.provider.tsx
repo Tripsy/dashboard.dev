@@ -17,7 +17,7 @@ type ToastContextType = {
 
 const ToastContext = createContext<ToastContextType | null>(null);
 
-// Map the legacy (PrimeReact) severities onto HeroUI's imperative toast variants.
+// Map the app's severity vocabulary onto HeroUI's imperative toast variants.
 const TOAST_METHOD = {
 	success: 'success',
 	info: 'info',
@@ -26,7 +26,6 @@ const TOAST_METHOD = {
 } as const;
 
 function ToastProvider({ children }: { children: React.ReactNode }) {
-	// Kept identical to the previous PrimeReact-backed API so all callers stay unchanged:
 	// summary -> toast title (first arg), detail -> description, life -> timeout (ms).
 	const showToast = ({
 		severity,

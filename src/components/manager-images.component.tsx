@@ -18,9 +18,10 @@ import { Configuration } from '@/config/settings.config';
 import { getLanguageClient } from '@/config/translate.setup';
 import { ApiError } from '@/exceptions/api.error';
 import ValueError from '@/exceptions/value.error';
+import { CSRF_HEADER, getCsrfToken } from '@/helpers/csrf.helper';
 import { cn } from '@/helpers/css.helper';
 import { displayImage } from '@/helpers/display.helper';
-import { getErrorMessage } from '@/helpers/objects.helper';
+import { getErrorMessage } from '@/helpers/error.helper';
 import {
 	requestDelete,
 	requestFind,
@@ -100,7 +101,7 @@ const GALLERY_MAX = 5;
 const ACCEPTED_MIME_TYPES = Object.values(ImageMimeEnum);
 const ACCEPTED_EXTENSIONS = ACCEPTED_MIME_TYPES.join(',');
 const ACCEPTED_EXTENSIONS_DESC = 'JPEG, PNG, WebP, SVG, GIF';
-const DEFAULT_LANGUAGE = Configuration.get('language.default') as Language;
+const DEFAULT_LANGUAGE = Configuration.get('language.default');
 
 // Fixed display order — independent of key order in whatever config object gets passed in
 const ATTRIBUTE_FIELD_ORDER: AttributeFieldName[] = ['title', 'description'];
@@ -629,28 +630,24 @@ export function ManagerImages({
 	const { showToast } = useToast();
 	const languages = attributeLanguages ?? [DEFAULT_LANGUAGE];
 
-	const translationsKeys = useMemo(
-		() =>
-			[
-				'app.error.title',
-				'app.error.description',
-				'app.success.title',
-				'image.action.add.success',
-				'image.validation.invalid_attribute',
-				'image.error.save_failed',
-				'image.success.save',
-				'image.action.delete.title',
-				'image.action.delete.success',
-				'image.action.delete.confirm',
-				'image.action.enable.title',
-				'image.action.enable.confirm',
-				'image.action.enable.success',
-				'image.action.disable.title',
-				'image.action.disable.confirm',
-				'image.action.disable.success',
-			] as const,
-		[],
-	);
+	const translationsKeys = [
+		'app.error.title',
+		'app.error.description',
+		'app.success.title',
+		'image.action.add.success',
+		'image.validation.invalid_attribute',
+		'image.error.save_failed',
+		'image.success.save',
+		'image.action.delete.title',
+		'image.action.delete.success',
+		'image.action.delete.confirm',
+		'image.action.enable.title',
+		'image.action.enable.confirm',
+		'image.action.enable.success',
+		'image.action.disable.title',
+		'image.action.disable.confirm',
+		'image.action.disable.success',
+	] as const;
 
 	const { translations } = useTranslation(translationsKeys);
 
@@ -1009,6 +1006,7 @@ export function ManagerImages({
 				'image',
 				{
 					id: entry.id,
+					status,
 				},
 				status,
 			);
@@ -1142,8 +1140,11 @@ export function ManagerImages({
 		formData.append('section', section);
 		formData.append('entity_id', String(entity_id));
 
+		// Raw fetch rather than ApiRequest (multipart upload), so the CSRF header the
+		// middleware requires on mutating /api/* requests has to be set by hand.
 		const response = await fetch(Routes.get('api-image'), {
 			method: 'POST',
+			headers: { [CSRF_HEADER]: await getCsrfToken() },
 			body: formData,
 		});
 

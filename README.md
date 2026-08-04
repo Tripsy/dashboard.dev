@@ -28,8 +28,7 @@ Meanwhile, we're open to suggestions / feedback, and if you find this project us
 - Framework: Next.js 16.2
 
 ## Code Quality
-- Linting & Formatting: Biome
-- Circular Dependency Check: Madge
+- Linting & Formatting: Biome (also checks circular dependencies)
 - Validation: Zod 4.3
 
 ## Infrastructure
@@ -105,11 +104,29 @@ $ pnpm run dev
 # 🖥️ Commands
 
 ```bash
-pnpm run biome    # Lint and format
-pnpm run madge    # Check for circular dependencies
+pnpm run biome    # Lint, format and check for circular dependencies
 pnpm run dev      # Start development server
 pnpm run build    # Production build
+pnpm run clean    # Delete .next (see below)
 ```
+
+### When the dev server dies with nothing in the log
+
+That is the container's OOM killer, not a crash. Turbopack's persistent cache in
+`.next/dev/cache` grows across sessions — left alone it reached 4.0G, which put startup memory
+at 2.5G before a single request and pushed the process into the 4g `mem_limit` set in
+`docker-compose.yml`. Because `tty: true` keeps the container up, it just looks like the dev
+server quitting silently. Confirm with:
+
+```bash
+docker inspect dashboard.test --format '{{.State.OOMKilled}}'
+```
+
+Run `pnpm run clean` and restart. `experimental.turbopackMemoryLimit` in `next.config.ts` caps
+Turbopack's own memory, but not what the cache grows to on disk.
+
+Also avoid running `pnpm run build` or `tsc` while the dev server is up — there is not enough
+room in the container for both, and it is usually the dev server that gets killed.
 
 # 📁 Structure
 
@@ -164,7 +181,6 @@ pnpm run build    # Production build
 │   ├── models/            # Models (entities)
 │   ├── providers/           
 │   │   ├── auth.provider.tsx 
-│   │   ├── prime.provider.tsx 
 │   │   ├── query-client.provider.tsx 
 │   │   ├── theme.provider.tsx 
 │   │   ├── toast.provider.tsx 
@@ -178,7 +194,6 @@ pnpm run build    # Production build
 │   ├── types/            
 │   └── proxy.ts           
 ├── .env
-├── .madgerc
 ├── biome.json
 ├── docker-compose.yml
 ├── next.config.ts
@@ -206,25 +221,15 @@ pnpm run build    # Production build
 
 # 📌 TODO
 
-3. Consider unifying the two form-submission patterns (dashboard `WindowForm`/`<entity>.definition.ts` vs public account `<flow>.action.ts` + `FormCsrf`) — currently split because they grew out of separate sections (dashboard CRUD vs public auth), not by design
-5. Loading effect when clicking on a link 
-7. make form changes survive the minimize, when restored form docker, the changes should be there 
-
-1. monthly driver report
-2. deploy
-3. 
----------- 
-
 1. Hero UI -> theme
 2. Add section "documentation"
 3. login with google / facebook
-4. Replace all console.error with logging
-5. Implement kill all sessions except current
+4. Implement kill all sessions except current
       // // This will actually remove all sessions - keep it for further implementation
       // await AccountTokenRepository.createQuery()
       //     .filterBy('user_id', policy.getUserId())
       //     .delete(false, true);
-6. For template section
+5. For template section
     - would be a nice idea to keep track of the last changes (maybe add a new column - prev version id and a button to restore to that version)
     - view presentation could be enhanced
 
@@ -233,17 +238,15 @@ pnpm run build    # Production build
 - [next](https://nextjs.org/)
 - [react](https://reactjs.org/)
 - [zustand](https://zustand.docs.pmnd.rs/)
-- [primereact](https://primereact.org/)
+- [@heroui/react](https://www.heroui.com/) — component library (React Aria based); the dashboard data table is built on its `Table` + `Pagination`
 - [immer](https://immerjs.github.io/immer/)
 - [zod](https://zod.dev) — TypeScript-first schema validation with static type inference
 - [ioredis](https://github.com/luin/ioredis) — Robust Redis client for Node.js
 - [dayjs](https://day.js.org/) — Parses, validates, manipulates, and displays dates and times
 - [TanStack  Query](https://tanstack.com/query/latest) — Powerful asynchronous state management, server-state utilities and data fetching
-- [primereact](https://primereact.org/datatable/)
 
 Dev only:
 
 - [typescript](https://www.typescriptlang.org/)
 - [tailwindcss](https://tailwindcss.com/)
-- [madge](https://github.com/pahen/madge) — Helps finding circular dependencies
-- [biome](https://biomejs.dev/) — Biome is a fast formatter for JavaScript, TypeScript, JSX, TSX, JSON, HTML, CSS and GraphQL
+- [biome](https://biomejs.dev/) — Biome is a fast formatter for JavaScript, TypeScript, JSX, TSX, JSON, HTML, CSS and GraphQL — its `noImportCycles` rule also covers circular dependencies

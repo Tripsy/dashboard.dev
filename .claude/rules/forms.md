@@ -29,8 +29,8 @@ match the shape the backend actually accepts — see §3 below and `../star-back
 ### One pipeline, two hosts
 
 Every form in the app submits through the same function — `processForm()`
-(`src/helpers/form-process.helper.ts`): optional CSRF gate → `getFormValues` → `validateForm` →
-`operationFunction` → error mapping. What differs is only *who calls it* and what wraps the result.
+(`src/helpers/form-process.helper.ts`): `getFormValues` → `validateForm` → `operationFunction` →
+error mapping. What differs is only *who calls it* and what wraps the result.
 
 | | `WindowForm` forms | Auth-entry forms |
 |---|---|---|
@@ -38,14 +38,21 @@ Every form in the app submits through the same function — `processForm()`
 | Location | `(dashboard)/dashboard/<entity>/form-manage-<entity>.component.tsx`; account: `(public)/_components/account/` (window components + `account.definition.ts`) | `src/app/(public)/account/<flow>/` |
 | Calls `processForm` from | The generic `WindowForm`, reading the options off the window definition | A thin per-flow `<flow>.action.ts` (e.g. `login.action.ts`) wired to `useActionState` |
 | Reaches backend via | `operationFunction` in the definition → `requestCreate`/`requestUpdate` (or an `account.service.ts` fn) → `/api/proxy` | `operationFunction` → a `src/services/account.service.ts` function → `/api/proxy` |
-| CSRF | Off — protected instead by the `Sec-Fetch-Site` / origin check in `src/proxy.ts` (`isValidRequestSource()`) | `requireCsrf: true` — see §7 |
+| CSRF | Nothing to do — enforced for both by the middleware (see below) | Nothing to do — same gate |
 
 Follow the `WindowForm` pattern (§2–§6 below) for anything under `dashboard/<entity>/` and for authenticated
 account self-service windows (`_components/account/`). Follow the auth-entry pattern (§7) only when adding a
 new **unauthenticated** login/register/recover/confirm flow.
 
+**CSRF needs nothing at the form layer.** `src/proxy.ts` compares the `x-csrf-token` header against
+the `x-csrf-secret` cookie on every mutating `/api/*` request, and `ApiRequest` attaches that header
+automatically — so a form is covered whichever host it uses, including row actions, bulk delete and
+image upload, which are not forms at all. Don't add a per-form CSRF option or a hidden token field:
+a check inside `processForm` cannot enforce anything, because `processForm` runs in the browser.
+The `Sec-Fetch-Site` / origin check in `isValidRequestSource()` still runs alongside it.
+
 `src/helpers/form.helper.ts` deliberately holds only the pure, client-safe utilities
-(`accumulateZodErrors`, `filterErrorsByTouched`, `createHandleChange`, `getFormDataAs*`, `safeHtml`).
+(`accumulateZodErrors`, `filterErrorsByTouched`, `createHandleChange`, `getFormDataAs*`).
 The pipeline lives in its own module because it imports `session.helper.ts` — which is `'use server'` and
 itself imports `form.helper.ts`. Adding that import to `form.helper.ts` would create a circular dependency
 *and* drag server actions into every client component that only wanted `createHandleChange`.
@@ -117,9 +124,11 @@ form from showing every required-field error before the user has typed anything.
 
 ## 6. Field Rendering
 
-- Use the shared components in `src/components/form/form-element.component.tsx`
-  (`FormComponentInput` / `Select` / `Radio` / `Textarea` / `AutoComplete` / `Submit`) rather than raw
-  `<input>`/PrimeReact elements — they wire up error display and element ids consistently.
+- Use the shared components in `src/components/form/form-element.component.tsx` rather than raw
+  `<input>`/HeroUI elements — they wire up error display and element ids consistently. The full
+  set is `FormComponent` + `Input` / `Select` / `Radio` / `Checkbox` / `Textarea` / `Time` /
+  `Calendar` / `AutoComplete` / `Submit`, plus the pre-configured `Name` / `Email` / `Password`
+  wrappers. Check the file before hand-rolling a field — a checkbox and a date picker already exist.
 - Inside a form, read and write field state through `useWindowForm()` (`window-form.provider.tsx`), which
   exposes `{ formValues, errors, handleChange, pending }` — don't keep a form field's value in local
   `useState` instead (a search box feeding an autocomplete is fine in local state; the field it ultimately
@@ -136,16 +145,15 @@ login's `AuthTokenList` + post-login redirect). For this pattern only:
 
 - The component wires `useActionState` directly to the exported action function (e.g.
   `useActionState(loginAction, initState)`); that action is a thin wrapper that returns `processForm(...)`.
-- The action **must** pass `requireCsrf: true`. Don't call `isValidCsrfToken` by hand — the pipeline runs it
-  before parsing anything and returns the `csrfError` situation itself.
-- The component must render `<FormCsrf />` (`src/components/form/form-csrf.tsx`), which fetches a token from
-  `/csrf` and injects it as a hidden field — omitting it makes every submission fail CSRF validation.
+- These action files run **client-side on purpose** — they carry no `'use server'`, which is what keeps
+  them inside the middleware's CSRF gate. Don't add one.
 - Per-flow backend failures go in `mapApiError(error)`, which maps an `ApiError` status onto
   `{ message?, situation?, resultData? }`; anything it leaves out falls back to `fallbackErrorKey`
   (default `app.error.form`) and `serverError`. Don't hand-roll a `try`/`catch` around the request.
 - A flow that needs an outcome beyond `FormSituationType` (login's `maxActiveSession`, register's
   `pendingAccount`) widens its own `<Flow>SituationType`; `processForm` picks it up via `State['situation']`.
-  `csrfError` is already part of `FormSituationType` — don't re-add it per flow.
+  `csrfError` is already part of `FormSituationType` — `processForm` maps the middleware's 403 onto it —
+  so don't re-add it per flow.
 - Multi-step submits belong in the `operationFunction`, not around it: `login.action.ts` chains
   `requestLogin` → `createAuth` there so the form only reports success once the session cookie exists.
 - Everything else (validator class, `getFormValues`, debounced `useFormValidation`, shared field components)

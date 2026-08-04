@@ -14,7 +14,11 @@ import {
 	getFormDataAsNumber,
 	getFormDataAsString,
 } from '@/helpers/form.helper';
-import { BaseValidator } from '@/helpers/validator.helper';
+import {
+	BaseValidator,
+	resolveValidatorMessages,
+	sharedValidatorMessages,
+} from '@/helpers/validator.helper';
 import { displayCompanyVehicleLabel } from '@/models/company-vehicle.model';
 import { VehicleTypeEnum } from '@/models/vehicle.model';
 import {
@@ -26,6 +30,7 @@ import type { DataSourceConfigType } from '@/types/data-source.type';
 import type { FormStateType } from '@/types/form.type';
 
 const validatorMessages = [
+	...sharedValidatorMessages,
 	'invalid_company_vehicle_id',
 	'invalid_company_vehicle',
 	'invalid_vehicle_km_start',
@@ -57,13 +62,19 @@ class WorkSessionVehicleValidator extends BaseValidator<
 					},
 				),
 				vehicle_km_start: this.validateNumber(
-					this.getMessage('invalid_vehicle_km_start'),
+					{
+						invalid: this.getMessage('invalid_vehicle_km_start'),
+						only_positive: this.getMessage('only_positive'),
+					},
 					{
 						required: false,
 					},
 				),
 				vehicle_km_end: this.validateNumber(
-					this.getMessage('invalid_vehicle_km_end'),
+					{
+						invalid: this.getMessage('invalid_vehicle_km_end'),
+						only_positive: this.getMessage('only_positive'),
+					},
 					{
 						required: false,
 					},
@@ -109,7 +120,10 @@ class WorkSessionVehicleValidator extends BaseValidator<
 					},
 				),
 				vehicle_km_end: this.validateNumber(
-					this.getMessage('invalid_vehicle_km_end'),
+					{
+						invalid: this.getMessage('invalid_vehicle_km_end'),
+						only_positive: this.getMessage('only_positive'),
+					},
 					{
 						required: false,
 					},
@@ -137,9 +151,9 @@ async function validateForm(
 	values: WorkSessionVehicleFormValuesType,
 	isSubmit: boolean = true,
 ) {
-	const translations = await translateBatch(
+	const translations = await resolveValidatorMessages(
 		validatorMessages,
-		'work-session-vehicle.validation',
+		'work-session-vehicle',
 	);
 
 	const validator = new WorkSessionVehicleValidator(translations);
@@ -185,9 +199,9 @@ function getFormState(
 async function validateReturnForm(
 	values: WorkSessionVehicleFormReturnValuesType,
 ) {
-	const translations = await translateBatch(
+	const translations = await resolveValidatorMessages(
 		validatorMessages,
-		'work-session-vehicle.validation',
+		'work-session-vehicle',
 	);
 
 	const validator = new WorkSessionVehicleValidator(translations);

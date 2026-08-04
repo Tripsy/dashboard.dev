@@ -1,4 +1,7 @@
-import { ViewField, ViewSection } from '@/app/(dashboard)/_components/view-detail';
+import {
+	ViewField,
+	ViewSection,
+} from '@/app/(dashboard)/_components/view-detail';
 import { formatDate } from '@/helpers/date.helper';
 import { parseJson } from '@/helpers/string.helper';
 import type { LogDataModel } from '@/models/log-data.model';

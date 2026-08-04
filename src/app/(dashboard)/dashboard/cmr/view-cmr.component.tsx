@@ -1,6 +1,9 @@
 'use client';
 
-import { ViewField, ViewSection } from '@/app/(dashboard)/_components/view-detail';
+import {
+	ViewField,
+	ViewSection,
+} from '@/app/(dashboard)/_components/view-detail';
 import { getLanguageClient } from '@/config/translate.setup';
 import { formatDate } from '@/helpers/date.helper';
 import { DisplayStatus } from '@/helpers/display.helper';
@@ -78,10 +81,7 @@ export function ViewCmr({ entry }: { entry: CmrModel }) {
 				/>
 				<ViewField
 					label="Estimated Delivery At"
-					value={formatDate(
-						entry.estimated_delivery_at,
-						'date-time',
-					)}
+					value={formatDate(entry.estimated_delivery_at, 'date-time')}
 				/>
 				<ViewField
 					label="Delivered At"

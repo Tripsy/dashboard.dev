@@ -1,6 +1,9 @@
 'use client';
 
-import { ViewField, ViewSection } from '@/app/(dashboard)/_components/view-detail';
+import {
+	ViewField,
+	ViewSection,
+} from '@/app/(dashboard)/_components/view-detail';
 import { formatDate } from '@/helpers/date.helper';
 import { parseJson } from '@/helpers/string.helper';
 import type { TemplateModel } from '@/models/template.model';

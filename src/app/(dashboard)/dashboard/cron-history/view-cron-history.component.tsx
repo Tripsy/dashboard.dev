@@ -1,4 +1,7 @@
-import { ViewField, ViewSection } from '@/app/(dashboard)/_components/view-detail';
+import {
+	ViewField,
+	ViewSection,
+} from '@/app/(dashboard)/_components/view-detail';
 import { formatDate } from '@/helpers/date.helper';
 import { DisplayStatus } from '@/helpers/display.helper';
 import { parseJson } from '@/helpers/string.helper';
@@ -29,7 +32,10 @@ export function ViewCronHistory({ entry }: { entry: CronHistoryModel }) {
 					label="End At"
 					value={formatDate(entry.end_at, 'date-time')}
 				/>
-				<ViewField label="Run Time" value={`${entry.run_time} second(s)`} />
+				<ViewField
+					label="Run Time"
+					value={`${entry.run_time} second(s)`}
+				/>
 			</ViewSection>
 
 			{parsedContent && (

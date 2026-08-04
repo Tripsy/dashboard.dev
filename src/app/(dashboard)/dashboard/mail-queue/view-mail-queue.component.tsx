@@ -1,4 +1,7 @@
-import { ViewField, ViewSection } from '@/app/(dashboard)/_components/view-detail';
+import {
+	ViewField,
+	ViewSection,
+} from '@/app/(dashboard)/_components/view-detail';
 import { formatDate } from '@/helpers/date.helper';
 import { DisplayStatus } from '@/helpers/display.helper';
 import type { MailQueueModel } from '@/models/mail-queue.model';
@@ -40,18 +43,11 @@ export function ViewMailQueue({ entry }: { entry: MailQueueModel }) {
 			</ViewSection>
 
 			<ViewSection title="Email Data">
-				<ViewField
-					label="Template"
-					value={entry.template?.label}
-				/>
+				<ViewField label="Template" value={entry.template?.label} />
 				<ViewField label="Language" value={entry.language} />
 				<ViewField label="Layout" value={entry.content.layout} />
 				<ViewField label="Subject" value={entry.content.subject} />
-				<ViewField
-					label="Content"
-					value={entry.content.html}
-					full
-				/>
+				<ViewField label="Content" value={entry.content.html} full />
 				<ViewField
 					label="Vars"
 					value={JSON.stringify(entry.content.vars, null, 2)}

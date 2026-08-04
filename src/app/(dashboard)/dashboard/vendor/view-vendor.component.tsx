@@ -1,6 +1,9 @@
 'use client';
 
-import { ViewField, ViewSection } from '@/app/(dashboard)/_components/view-detail';
+import {
+	ViewField,
+	ViewSection,
+} from '@/app/(dashboard)/_components/view-detail';
 import { formatDate } from '@/helpers/date.helper';
 import { DisplayStatus } from '@/helpers/display.helper';
 import type { VendorModel } from '@/models/vendor.model';

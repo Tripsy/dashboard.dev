@@ -1,7 +1,10 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { ViewField, ViewSection } from '@/app/(dashboard)/_components/view-detail';
+import {
+	ViewField,
+	ViewSection,
+} from '@/app/(dashboard)/_components/view-detail';
 import { Configuration } from '@/config/settings.config';
 import { formatDate } from '@/helpers/date.helper';
 import { DisplayAmount, DisplayStatus } from '@/helpers/display.helper';
@@ -173,7 +176,10 @@ export function ViewCashFlow({ entry }: { entry: CashFlowModel }) {
 			<div className="flex items-center gap-2 border-b border-line pb-4">
 				<span className="font-semibold">ID</span> {entry.id}
 				<div className="max-w-60 ml-2">
-					<DisplayStatus status={entry.status} dataSource="cash-flow" />
+					<DisplayStatus
+						status={entry.status}
+						dataSource="cash-flow"
+					/>
 				</div>
 			</div>
 

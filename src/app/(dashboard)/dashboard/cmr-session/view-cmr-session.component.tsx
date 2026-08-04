@@ -1,10 +1,13 @@
 'use client';
 
-import { ViewField, ViewSection } from '@/app/(dashboard)/_components/view-detail';
+import {
+	ViewField,
+	ViewSection,
+} from '@/app/(dashboard)/_components/view-detail';
 import { formatDate } from '@/helpers/date.helper';
 import { DisplayStatus } from '@/helpers/display.helper';
-import type { CmrSessionModel } from '@/models/cmr-session.model';
 import { displayCmrLabel } from '@/models/cmr.model';
+import type { CmrSessionModel } from '@/models/cmr-session.model';
 
 export function ViewCmrSession({ entry }: { entry: CmrSessionModel }) {
 	return (

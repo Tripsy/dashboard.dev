@@ -1,7 +1,10 @@
 'use client';
 
+import {
+	ViewField,
+	ViewSection,
+} from '@/app/(dashboard)/_components/view-detail';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ViewField, ViewSection } from '@/app/(dashboard)/_components/view-detail';
 import { formatDate } from '@/helpers/date.helper';
 import {
 	capitalizeFirstLetter,
@@ -81,7 +84,10 @@ export function ViewPlace({ entry }: { entry: PlaceModel }) {
 											value.type_label,
 										)}
 									/>
-									<ViewField label="Name" value={value.name} />
+									<ViewField
+										label="Name"
+										value={value.name}
+									/>
 								</div>
 							</TabsContent>
 						))}

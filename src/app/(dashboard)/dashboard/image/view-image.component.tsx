@@ -1,7 +1,10 @@
 'use client';
 
+import {
+	ViewField,
+	ViewSection,
+} from '@/app/(dashboard)/_components/view-detail';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ViewField, ViewSection } from '@/app/(dashboard)/_components/view-detail';
 import { formatDate } from '@/helpers/date.helper';
 import { DisplayStatus, displayImage } from '@/helpers/display.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
@@ -53,7 +56,10 @@ export function ViewImage({ entry }: { entry: ImageModel }) {
 
 			{languageContents.length > 0 && (
 				<div>
-					<Tabs defaultSelectedKey={contentTabDefault} className="w-full">
+					<Tabs
+						defaultSelectedKey={contentTabDefault}
+						className="w-full"
+					>
 						<div className="flex items-center border-b border-line pb-2 gap-2">
 							<h3 className="font-bold whitespace-nowrap">
 								Language specific

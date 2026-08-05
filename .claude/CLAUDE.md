@@ -1,5 +1,5 @@
 ## Overview
-Next.js app with codename `dashboard` consuming `star-backend` API. Public site (auth, driver panel) + admin CRUD dashboard for all backend entities.
+Next.js app with codename `star-ui` consuming `star-api` API. Public site (auth, driver panel) + admin CRUD dashboard for all backend entities.
 
 ## Tech Stack
 
@@ -86,7 +86,7 @@ after any build — a generated artefact, not a change to commit. `git checkout 
 after building, or leave it for the dev server to flip back.
 
 To spot-check a helper without a test suite, Node 24 runs TypeScript directly via type
-stripping — `docker exec dashboard.test sh -c "cd /var/www/html && node probe.ts"`, importing
+stripping — `docker exec star-ui.test sh -c "cd /var/www/html && node probe.ts"`, importing
 the real module (`./src/helpers/x.helper.ts`). Type-only imports are erased, so a file whose
 only `@/*` imports are `import type` resolves fine outside the path alias. This tests the
 shipped source rather than a copy of it, which is the whole point — a hand-copied
@@ -102,7 +102,7 @@ exported factory and exercise what it returns) over reaching for internals.
 
 The container is capped at 4g (`mem_limit` in `docker-compose.yml`) and Turbopack fills it.
 If the dev server exits with nothing in the log it was SIGKILLed, not crashed — check
-`docker inspect dashboard.test --format '{{.State.OOMKilled}}'`, then `pnpm run clean` and
+`docker inspect star-ui.test --format '{{.State.OOMKilled}}'`, then `pnpm run clean` and
 restart. There is not enough headroom for the dev server and a `build`/`tsc` at the same
 time: stop the dev server before running either, or it is the one that gets killed.
 
@@ -110,12 +110,12 @@ time: stop the dev server before running either, or it is the one that gets kill
 
 - This FE project has **no database and holds no business logic of its own**
 - It **sends no email** — the backend owns mail entirely. There is no nunjucks/templates stack here; don't reintroduce one.
-- Nearly everything under `src/services/*.service.ts` is a typed wrapper around `star-backend` REST endpoint.
-- The backend project is located in `../star-backend` on which you have access through permission / additionalDirectories
+- Nearly everything under `src/services/*.service.ts` is a typed wrapper around `star-api` REST endpoint.
+- The backend project is located in `../star-api` on which you have access through permission / additionalDirectories
 - The two projects connect purely over HTTP
 - `REMOTE_API_URL` in `.env` is the backend base URL.
 - When a task requires understanding backend behavior — request/response shape, validation rules, permission
-entities/operations, DB schema, business rules read the code in `../star-backend`
+entities/operations, DB schema, business rules read the code in `../star-api`
 - `src/app/api/proxy/[...path]/route.ts` forwards dashboard requests to the backend, attaching the session
   cookie as a `Bearer` token.
 - `src/proxy.ts` (the Next.js middleware) resolves auth/permission on every route by
@@ -265,8 +265,8 @@ entities/operations, DB schema, business rules read the code in `../star-backend
   80.6452 is row value 806452. Forms accept 2 decimals; anything past the 4th is discarded by that
   round-trip. The VAT helpers in `src/helpers/string.helper.ts` round to the same precision — keep any
   new amount maths on `roundAmount()` rather than returning raw float.
-- **Redis is shared with star-backend** (one instance, one database), so every key is namespaced by
-  `redis.keyPrefix` (`dashboard` here, `backend` there) inside `CacheProvider.buildKey`. Not via
+- **Redis is shared with star-api** (one instance, one database), so every key is namespaced by
+  `redis.keyPrefix` (`star-ui` here, `star-api` there) inside `CacheProvider.buildKey`. Not via
   ioredis's own `keyPrefix` option: that one does not reach the MATCH argument of SCAN, so
   `deleteByPattern` would scan the other app's keys. Build every key through `buildKey`.
 - **Logging** — never call `console.*` directly; use `logger` / `logRejection` from

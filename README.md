@@ -75,7 +75,7 @@ docker compose up
 Once the container is running, connect to it with:
 
 ```
-docker exec -it dashboard.test /bin/bash
+docker exec -it star-ui.test /bin/bash
 ```
 
 ### 4. Install dependencies inside the container
@@ -119,7 +119,7 @@ at 2.5G before a single request and pushed the process into the 4g `mem_limit` s
 server quitting silently. Confirm with:
 
 ```bash
-docker inspect dashboard.test --format '{{.State.OOMKilled}}'
+docker inspect star-ui.test --format '{{.State.OOMKilled}}'
 ```
 
 Run `pnpm run clean` and restart. `experimental.turbopackMemoryLimit` in `next.config.ts` caps

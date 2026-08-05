@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import OAuthCallback from '@/app/(public)/account/oauth/[provider]/oauth-callback.component';
+import { OAUTH_CALLBACK_TRANSLATION_KEYS } from '@/app/(public)/account/oauth/[provider]/oauth-callback.definition';
 import { Configuration } from '@/config/settings.config';
-import { translate } from '@/config/translate.setup';
+import { translate, translateBatch } from '@/config/translate.setup';
 
 export async function generateMetadata(): Promise<Metadata> {
 	return {
@@ -27,6 +28,7 @@ export default async function Page({
 }) {
 	const { provider } = await params;
 	const query = await searchParams;
+	const translations = await translateBatch(OAUTH_CALLBACK_TRANSLATION_KEYS);
 
 	const readParam = (name: string): string | null => {
 		const value = query[name];
@@ -41,6 +43,7 @@ export default async function Page({
 				code={readParam('code')}
 				state={readParam('state')}
 				providerError={readParam('error')}
+				translations={translations}
 			/>
 		</div>
 	);

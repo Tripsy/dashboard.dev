@@ -9,6 +9,7 @@ import { getLanguageClient } from '@/config/translate.setup';
 import { requestCreate, requestFind } from '@/helpers/services.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useRemoteAutocomplete } from '@/hooks/use-remote-autocomplete';
+import { useTranslation } from '@/hooks/use-translation.hook';
 import {
 	CITY_DEFAULT,
 	displayPlaceLabel,
@@ -26,9 +27,17 @@ export type AddressFormValuesType = {
 	postal_code: string | null;
 };
 
+const TRANSLATION_KEYS = [
+	'address.field.city',
+	'address.field.details',
+	'address.field.postal_code',
+] as const;
+
 export function FormManageAddress() {
 	const { formValues, errors, handleChange, pending } =
 		useWindowForm<AddressFormValuesType>();
+
+	const { translations } = useTranslation(TRANSLATION_KEYS);
 
 	const queryClient = useQueryClient();
 
@@ -91,7 +100,7 @@ export function FormManageAddress() {
 				value={formValues.city_id ?? ''}
 			/>
 			<FormComponentAutoComplete<AddressFormValuesType, PlaceModel>
-				labelText="City"
+				labelText={translations['address.field.city']}
 				id={elementIds.city}
 				fieldName="city"
 				fieldValue={formValues.city ?? ''}
@@ -138,7 +147,7 @@ export function FormManageAddress() {
 			/>
 
 			<FormComponentInput<AddressFormValuesType>
-				labelText="Details"
+				labelText={translations['address.field.details']}
 				id={elementIds.details}
 				fieldName="details"
 				fieldValue={formValues.details ?? ''}
@@ -150,7 +159,7 @@ export function FormManageAddress() {
 			/>
 
 			<FormComponentInput<AddressFormValuesType>
-				labelText="Postal Code"
+				labelText={translations['address.field.postal_code']}
 				id={elementIds.postal_code}
 				fieldName="postal_code"
 				fieldValue={formValues.postal_code ?? ''}

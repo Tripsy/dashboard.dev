@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { AuthTokenList } from '@/app/(public)/_components/auth-token-list.component';
@@ -9,6 +8,7 @@ import { Icons } from '@/components/icon.component';
 import { LoadingComponent } from '@/components/status.component';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Link } from '@/components/ui/link';
 import Routes from '@/config/routes.setup';
 import { formatDate } from '@/helpers/date.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
@@ -30,6 +30,28 @@ export default function AccountMe() {
 	const [sessions, setSessions] = useState<AuthTokenType[]>([]);
 
 	const translationsKeys = [
+		'app.success.title',
+		'app.error.title',
+		'account.section.personal',
+		'account.section.security',
+		'account.section.sessions',
+		'account.label.full_name',
+		'account.label.email',
+		'account.label.language',
+		'account.label.member_since',
+		'account.label.password',
+		'account.label.verified',
+		'account.label.not_verified',
+		'account.label.last_updated',
+		'account.label.password_not_set',
+		'account.button.edit',
+		'account.button.edit_title',
+		'account.button.change',
+		'account.button.email_title',
+		'account.button.password_title',
+		'account.button.set_password',
+		'account.button.delete',
+		'account.button.delete_title',
 		'account.message.session_destroy_success',
 		'account.message.session_destroy_error',
 	] as const;
@@ -131,23 +153,24 @@ export default function AccountMe() {
 					<div className="flex justify-between items-center">
 						<h2 className="text-lg font-bold flex items-center gap-2">
 							<Icons.User />
-							Personal Information
+							{translations['account.section.personal']}
 						</h2>
 						<Button
 							type="button"
 							onClick={openAccountEdit}
-							title="Edit my account"
+							title={translations['account.button.edit_title']}
 							variant="outline"
 							size="sm"
 							className="cursor-pointer"
 						>
-							<Icons.Action.Update /> Edit
+							<Icons.Action.Update />{' '}
+							{translations['account.button.edit']}
 						</Button>
 					</div>
 
 					<div className="border-b pb-4">
 						<div className="text-sm text-muted font-semibold">
-							Full Name
+							{translations['account.label.full_name']}
 						</div>
 						<p>{auth.name}</p>
 					</div>
@@ -156,7 +179,7 @@ export default function AccountMe() {
 						<div className="flex justify-between">
 							<div>
 								<div className="text-sm text-muted font-semibold">
-									Email Address
+									{translations['account.label.email']}
 								</div>
 								<p>{auth.email}</p>
 								{auth.email_verified_at ? (
@@ -166,7 +189,7 @@ export default function AccountMe() {
 										className="rounded-lg mt-2"
 									>
 										<Icons.Status.Ok className="w-4 h-4" />
-										Verified
+										{translations['account.label.verified']}
 									</Badge>
 								) : (
 									<Badge
@@ -175,33 +198,40 @@ export default function AccountMe() {
 										className="rounded-lg mt-2"
 									>
 										<Icons.Status.Warning className="w-4 h-4" />
-										Not Verified
+										{
+											translations[
+												'account.label.not_verified'
+											]
+										}
 									</Badge>
 								)}
 							</div>
 							<Button
 								type="button"
 								onClick={openEmailUpdate}
-								title="Update email address"
+								title={
+									translations['account.button.email_title']
+								}
 								variant="outline"
 								size="sm"
 								className="cursor-pointer"
 							>
-								<Icons.Action.Update /> Change
+								<Icons.Action.Update />{' '}
+								{translations['account.button.change']}
 							</Button>
 						</div>
 					</div>
 
 					<div className="border-b pb-4">
 						<div className="text-sm text-muted font-semibold">
-							Language
+							{translations['account.label.language']}
 						</div>
 						<p>{auth.language}</p>
 					</div>
 
 					<div>
 						<div className="text-sm text-muted font-semibold">
-							Member Since
+							{translations['account.label.member_since']}
 						</div>
 						<p>
 							{formatDate(auth.created_at, undefined, {
@@ -215,14 +245,14 @@ export default function AccountMe() {
 				<div className="bg-surface border border-border rounded-xl p-6 shadow-xl space-y-4 w-full max-w-md">
 					<h2 className="text-lg font-bold flex items-center gap-2">
 						<Icons.Security />
-						Security & Account
+						{translations['account.section.security']}
 					</h2>
 
 					<div className="border-b pb-4">
 						<div className="flex justify-between">
 							<div>
 								<div className="text-sm text-muted font-semibold">
-									Password
+									{translations['account.label.password']}
 								</div>
 								{/*
 								 * A social sign-in account has no password, so there is
@@ -233,7 +263,11 @@ export default function AccountMe() {
 								 */}
 								{accountHasPassword ? (
 									<p className="text-xs italic">
-										Last updated:{' '}
+										{
+											translations[
+												'account.label.last_updated'
+											]
+										}{' '}
 										{formatDate(
 											auth.password_updated_at,
 											undefined,
@@ -245,8 +279,11 @@ export default function AccountMe() {
 									</p>
 								) : (
 									<p className="text-xs italic">
-										Not set — you sign in with a social
-										provider
+										{
+											translations[
+												'account.label.password_not_set'
+											]
+										}
 									</p>
 								)}
 							</div>
@@ -254,19 +291,37 @@ export default function AccountMe() {
 								<Button
 									type="button"
 									onClick={openPasswordUpdate}
-									title="Update password"
+									title={
+										translations[
+											'account.button.password_title'
+										]
+									}
 									variant="outline"
 									size="sm"
 									className="cursor-pointer"
 								>
-									<Icons.Password /> Change
+									<Icons.Password />{' '}
+									{translations['account.button.change']}
 								</Button>
 							) : (
+								/*
+								 * Styled as a button to match the sibling "Change"
+								 * action, but kept an anchor: it navigates to password
+								 * recovery, so middle-click and open-in-new-tab should
+								 * keep working.
+								 */
 								<Link
 									href={Routes.get('password-recover')}
-									className="text-accent text-sm font-medium hover:underline self-center"
+									variant="outline"
+									size="sm"
+									className="cursor-pointer self-center"
 								>
-									Set a password
+									<Icons.Password />{' '}
+									{
+										translations[
+											'account.button.set_password'
+										]
+									}
 								</Link>
 							)}
 						</div>
@@ -276,12 +331,13 @@ export default function AccountMe() {
 						<Button
 							type="button"
 							onClick={openAccountDelete}
-							title="Delete my account"
+							title={translations['account.button.delete_title']}
 							variant="error"
 							size="sm"
 							className="cursor-pointer"
 						>
-							<Icons.Action.Delete /> Delete Account
+							<Icons.Action.Delete />{' '}
+							{translations['account.button.delete']}
 						</Button>
 					</div>
 				</div>
@@ -292,7 +348,7 @@ export default function AccountMe() {
 				<div className="bg-surface border border-border rounded-xl p-6 shadow-xl space-y-4 w-full max-w-md">
 					<h2 className="text-lg font-bold flex items-center gap-2">
 						<Icons.Sessions />
-						Sessions
+						{translations['account.section.sessions']}
 					</h2>
 
 					<div className="py-2 space-y-4">
@@ -301,7 +357,9 @@ export default function AccountMe() {
 							onResult={(success, message) => {
 								showToast({
 									severity: success ? 'success' : 'error',
-									summary: success ? 'Success' : 'Error',
+									summary: success
+										? translations['app.success.title']
+										: translations['app.error.title'],
 									detail:
 										message === 'session_destroy_success'
 											? translations[

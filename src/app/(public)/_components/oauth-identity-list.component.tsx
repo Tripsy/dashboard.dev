@@ -5,6 +5,7 @@ import { Icons } from '@/components/icon.component';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { formatDate } from '@/helpers/date.helper';
+import { replaceVars } from '@/helpers/string.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
 import { useToast } from '@/providers/toast.provider';
 import {
@@ -18,6 +19,20 @@ import {
 	type OAuthProvider,
 } from '@/types/oauth.type';
 
+const TRANSLATION_KEYS = [
+	'app.success.title',
+	'app.error.title',
+	'account.section.social',
+	'account.label.last_used',
+	'account.label.linked',
+	'account.label.not_linked',
+	'account.button.unlink',
+	'account.button.unlink_title',
+	'account.message.no_password_hint',
+	'oauth.message.unlink_success',
+	'oauth.message.unlink_error',
+] as const;
+
 /**
  * Linked social sign-in providers, with the ability to link or unlink one.
  *
@@ -30,12 +45,7 @@ export function OAuthIdentityList({ hasPassword }: { hasPassword: boolean }) {
 	const [identities, setIdentities] = useState<OAuthIdentityType[]>([]);
 	const [pending, setPending] = useState<OAuthProvider | null>(null);
 
-	const translationsKeys = [
-		'oauth.message.unlink_success',
-		'oauth.message.unlink_error',
-	] as const;
-
-	const { translations } = useTranslation(translationsKeys);
+	const { translations } = useTranslation(TRANSLATION_KEYS);
 
 	const load = useCallback(async () => {
 		setIdentities(await requestGetOAuthIdentities());
@@ -54,7 +64,9 @@ export function OAuthIdentityList({ hasPassword }: { hasPassword: boolean }) {
 
 				showToast({
 					severity: response?.success ? 'success' : 'error',
-					summary: response?.success ? 'Success' : 'Error',
+					summary: response?.success
+						? translations['app.success.title']
+						: translations['app.error.title'],
 					detail: response?.success
 						? translations['oauth.message.unlink_success']
 						: (response?.message ??
@@ -67,7 +79,7 @@ export function OAuthIdentityList({ hasPassword }: { hasPassword: boolean }) {
 			} catch {
 				showToast({
 					severity: 'error',
-					summary: 'Error',
+					summary: translations['app.error.title'],
 					detail: translations['oauth.message.unlink_error'],
 				});
 			} finally {
@@ -92,7 +104,7 @@ export function OAuthIdentityList({ hasPassword }: { hasPassword: boolean }) {
 		<div className="bg-surface border border-border rounded-xl p-6 shadow-xl space-y-4 w-full max-w-md">
 			<h2 className="text-lg font-bold flex items-center gap-2">
 				<Icons.Security />
-				Social Sign-in
+				{translations['account.section.social']}
 			</h2>
 
 			<div className="space-y-4">
@@ -118,7 +130,11 @@ export function OAuthIdentityList({ hasPassword }: { hasPassword: boolean }) {
 										</p>
 										{identity.last_login_at && (
 											<p className="text-xs italic text-muted">
-												Last used:{' '}
+												{
+													translations[
+														'account.label.last_used'
+													]
+												}{' '}
 												{formatDate(
 													identity.last_login_at,
 													undefined,
@@ -135,7 +151,11 @@ export function OAuthIdentityList({ hasPassword }: { hasPassword: boolean }) {
 											className="rounded-lg mt-2"
 										>
 											<Icons.Status.Ok className="w-4 h-4" />
-											Linked
+											{
+												translations[
+													'account.label.linked'
+												]
+											}
 										</Badge>
 									</>
 								) : (
@@ -147,10 +167,17 @@ export function OAuthIdentityList({ hasPassword }: { hasPassword: boolean }) {
 									 * account attaches it. A button here would only ever 403.
 									 */
 									<p className="text-xs text-muted">
-										Not linked — sign in with{' '}
-										{OAUTH_PROVIDER_LABEL[provider]} using{' '}
-										this account&rsquo;s email address to
-										link it.
+										{replaceVars(
+											translations[
+												'account.label.not_linked'
+											],
+											{
+												provider:
+													OAUTH_PROVIDER_LABEL[
+														provider
+													],
+											},
+										)}
 									</p>
 								)}
 							</div>
@@ -159,13 +186,22 @@ export function OAuthIdentityList({ hasPassword }: { hasPassword: boolean }) {
 								<Button
 									type="button"
 									onClick={() => handleUnlink(provider)}
-									title={`Unlink ${OAUTH_PROVIDER_LABEL[provider]}`}
+									title={replaceVars(
+										translations[
+											'account.button.unlink_title'
+										],
+										{
+											provider:
+												OAUTH_PROVIDER_LABEL[provider],
+										},
+									)}
 									variant="outline"
 									size="sm"
 									disabled={pending === provider}
 									className="cursor-pointer"
 								>
-									<Icons.Action.Delete /> Unlink
+									<Icons.Action.Delete />{' '}
+									{translations['account.button.unlink']}
 								</Button>
 							)}
 						</div>
@@ -175,8 +211,7 @@ export function OAuthIdentityList({ hasPassword }: { hasPassword: boolean }) {
 
 			{!hasPassword && (
 				<p className="text-xs text-muted italic">
-					This account has no password. Use “Forgot your password” on
-					the login page to set one.
+					{translations['account.message.no_password_hint']}
 				</p>
 			)}
 		</div>

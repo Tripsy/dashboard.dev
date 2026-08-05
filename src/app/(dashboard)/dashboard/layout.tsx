@@ -11,8 +11,13 @@ import { UserMenu } from '@/components/layout/user-menu.component';
 import ProtectedRoute from '@/components/protected-route.component';
 import { WindowContainer } from '@/components/window/window-container.component';
 import Routes, { RouteAuthEnum } from '@/config/routes.setup';
+import { translateBatch } from '@/config/translate.setup';
+import {
+	LAYOUT_TRANSLATION_KEYS,
+	type LayoutTranslations,
+} from '@/types/layout.type';
 
-function Header() {
+function Header({ translations }: { translations: LayoutTranslations }) {
 	return (
 		<header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
 			<div className="container-dashboard mx-4">
@@ -30,8 +35,8 @@ function Header() {
 					</div>
 
 					<div className="flex items-center gap-2 ml-auto">
-						<ToggleTheme />
-						<UserMenu />
+						<ToggleTheme translations={translations} />
+						<UserMenu translations={translations} />
 					</div>
 				</div>
 			</div>
@@ -40,10 +45,12 @@ function Header() {
 }
 
 export default async function Layout({ children }: { children: ReactNode }) {
+	const translations = await translateBatch(LAYOUT_TRANSLATION_KEYS);
+
 	return (
 		<DashboardProvider>
 			<div className="dashboard-layout min-h-screen bg-background">
-				<Header />
+				<Header translations={translations} />
 				<ProtectedRoute routeAuth={RouteAuthEnum.PROTECTED}>
 					<DashboardMain>
 						<SideMenu />

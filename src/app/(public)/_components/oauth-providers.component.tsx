@@ -2,6 +2,7 @@
 
 import { useSearchParams } from 'next/navigation';
 import Routes from '@/config/routes.setup';
+import { replaceVars } from '@/helpers/string.helper';
 import {
 	getEnabledOAuthProviders,
 	OAUTH_PROVIDER_LABEL,
@@ -9,10 +10,6 @@ import {
 	OAuthProviderEnum,
 } from '@/types/oauth.type';
 
-/*
- * Inlined rather than pulled from the icon set: lucide carries no brand marks, and both
- * providers' brand guidelines require their own glyph on the sign-in button.
- */
 function GoogleMark() {
 	return (
 		<svg
@@ -72,7 +69,14 @@ const PROVIDER_MARK: Record<OAuthProvider, () => React.JSX.Element> = {
  * Renders nothing when no provider is configured, so a deployment without OAuth credentials
  * shows an unchanged login form rather than dead buttons.
  */
-export function OAuthProviders({ label }: { label?: string }) {
+type OAuthProvidersProps = {
+	/** Divider caption, e.g. "or continue with". */
+	label: string;
+	/** Button caption carrying a `{{provider}}` placeholder. */
+	continueWith: string;
+};
+
+export function OAuthProviders({ label, continueWith }: OAuthProvidersProps) {
 	const searchParams = useSearchParams();
 	const providers = getEnabledOAuthProviders();
 
@@ -88,7 +92,7 @@ export function OAuthProviders({ label }: { label?: string }) {
 			<div className="flex items-center gap-3">
 				<span className="h-px flex-1 bg-border" />
 				<span className="text-xs uppercase tracking-wide text-muted">
-					{label ?? 'or continue with'}
+					{label}
 				</span>
 				<span className="h-px flex-1 bg-border" />
 			</div>
@@ -107,7 +111,9 @@ export function OAuthProviders({ label }: { label?: string }) {
 							className="flex items-center justify-center gap-3 w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-medium hover:bg-surface/70 transition-colors"
 						>
 							<Mark />
-							Continue with {OAUTH_PROVIDER_LABEL[provider]}
+							{replaceVars(continueWith, {
+								provider: OAUTH_PROVIDER_LABEL[provider],
+							})}
 						</a>
 					);
 				})}

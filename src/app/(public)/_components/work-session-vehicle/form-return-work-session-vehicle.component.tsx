@@ -1,5 +1,6 @@
 import { FormComponentInput } from '@/components/form/form-element.component';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
+import { useTranslation } from '@/hooks/use-translation.hook';
 import { type VehicleType, VehicleTypeEnum } from '@/models/vehicle.model';
 import { useAuth } from '@/providers/auth.provider';
 import { useWindowForm } from '@/providers/window-form.provider';
@@ -13,6 +14,11 @@ export type WorkSessionVehicleFormReturnValuesType = {
 	notes: string | null;
 };
 
+const TRANSLATION_KEYS = [
+	'work-session-vehicle.field.km_end',
+	'work-session-vehicle.field.notes',
+] as const;
+
 export function FormReturnWorkSessionVehicle() {
 	const { auth } = useAuth();
 	const { getCurrentWindow, close } = useModalStore();
@@ -21,6 +27,8 @@ export function FormReturnWorkSessionVehicle() {
 
 	const { formValues, errors, handleChange, pending } =
 		useWindowForm<WorkSessionVehicleFormReturnValuesType>();
+
+	const { translations } = useTranslation(TRANSLATION_KEYS);
 
 	const elementIds = useElementIds(['vehicle_km_end', 'notes'] as const);
 
@@ -40,7 +48,9 @@ export function FormReturnWorkSessionVehicle() {
 
 			{formValues.vehicle_type !== VehicleTypeEnum.TRAILER && (
 				<FormComponentInput<WorkSessionVehicleFormReturnValuesType>
-					labelText="End Km"
+					labelText={
+						translations['work-session-vehicle.field.km_end']
+					}
 					id={elementIds.vehicle_km_end}
 					fieldName="vehicle_km_end"
 					fieldType="number"
@@ -59,7 +69,7 @@ export function FormReturnWorkSessionVehicle() {
 			)}
 
 			<FormComponentInput<WorkSessionVehicleFormReturnValuesType>
-				labelText="Notes"
+				labelText={translations['work-session-vehicle.field.notes']}
 				id={elementIds.notes}
 				fieldName="notes"
 				fieldValue={formValues.notes ?? ''}

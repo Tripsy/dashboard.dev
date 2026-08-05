@@ -13,7 +13,7 @@ import { redirect } from 'next/navigation';
 import { Link } from '@/components/ui/link';
 import Routes from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
-import { translate } from '@/config/translate.setup';
+import { translate, translateBatch } from '@/config/translate.setup';
 import { logger } from '@/helpers/logger.helper';
 import type { AuthModel } from '@/models/auth.model';
 import { UserRoleEnum } from '@/models/user.model';
@@ -27,43 +27,37 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 const features = [
-	{
-		icon: FileCheck2,
-		title: 'CMR & Transport Documents',
-		description:
-			'Digitize CMR consignment notes, attach vehicles and sessions, then sign and print from any device.',
-	},
-	{
-		icon: Truck,
-		title: 'Fleet & Work Sessions',
-		description:
-			'Track company vehicles and driver work sessions from dispatch to delivery, in real time.',
-	},
-	{
-		icon: Wallet,
-		title: 'Cash Flow',
-		description:
-			'Record income and expenses per client, vendor or driver, with a full operational history.',
-	},
-	{
-		icon: Users,
-		title: 'Clients & Vendors',
-		description:
-			'Keep a shared directory of clients, vendors, brands and addresses across the whole team.',
-	},
-	{
-		icon: ShieldCheck,
-		title: 'Roles & Permissions',
-		description:
-			'Grant per-entity, per-operation access so admins, operators and drivers only see what they need.',
-	},
-	{
-		icon: LayoutDashboard,
-		title: 'One Admin Dashboard',
-		description:
-			'Every entity — users, logs, mail queue, templates — managed from a single, consistent CRUD interface.',
-	},
-];
+	{ icon: FileCheck2, key: 'cmr' },
+	{ icon: Truck, key: 'fleet' },
+	{ icon: Wallet, key: 'cash_flow' },
+	{ icon: Users, key: 'directory' },
+	{ icon: ShieldCheck, key: 'permissions' },
+	{ icon: LayoutDashboard, key: 'dashboard' },
+] as const;
+
+const TRANSLATION_KEYS = [
+	'home.hero.title_prefix',
+	'home.hero.title_highlight',
+	'home.hero.title_suffix',
+	'home.hero.subtitle',
+	'home.feature.heading',
+	'home.feature.subheading',
+	...features.flatMap(
+		({ key }) =>
+			[
+				`home.feature.${key}_title`,
+				`home.feature.${key}_description`,
+			] as const,
+	),
+	'home.cta.go_dashboard',
+	'home.cta.create_account',
+	'home.cta.sign_in',
+	'home.cta.back_title',
+	'home.cta.back_description',
+	'home.cta.open_dashboard',
+	'home.cta.ready_title',
+	'home.cta.ready_description',
+] as const;
 
 async function getAuth(): Promise<AuthModel | null> {
 	const headersList = await headers();
@@ -81,29 +75,30 @@ async function getAuth(): Promise<AuthModel | null> {
 export default async function Page() {
 	const auth = await getAuth();
 
-	// Drivers get their own operational panel, not the marketing/admin home page.
+	// Driver get redirect to their own operational panel, not the marketing/admin home page.
 	if (auth?.role === UserRoleEnum.DRIVER) {
 		redirect(Routes.get('driver-panel'));
 	}
 
 	const isDashboardUser = auth !== null;
+	const t = await translateBatch(TRANSLATION_KEYS);
 
 	return (
 		<>
 			{/* Hero Section */}
 			<section className="relative overflow-hidden bg-gradient-hero">
-				<div className="container-default py-20 md:py-32">
+				<div className="container-default py-20">
 					<div className="max-w-3xl mx-auto text-center">
 						<h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
-							Run your{' '}
-							<span className="text-gradient">fleet</span>
-							<br className="hidden sm:block" /> from a single
-							dashboard
+							{t['home.hero.title_prefix']}{' '}
+							<span className="text-gradient">
+								{t['home.hero.title_highlight']}
+							</span>
+							<br className="hidden sm:block" />{' '}
+							{t['home.hero.title_suffix']}
 						</h1>
 						<p className="text-lg md:text-xl text-muted mb-8 max-w-2xl mx-auto">
-							CMR documents, work sessions, vehicles and cash flow
-							— all in one place, with the right access for every
-							role on your team.
+							{t['home.hero.subtitle']}
 						</p>
 						<div className="flex flex-col sm:flex-row gap-4 justify-center">
 							{isDashboardUser ? (
@@ -112,7 +107,7 @@ export default async function Page() {
 									className="h-12 px-8 text-base"
 									href={Routes.get('dashboard')}
 								>
-									Go to Dashboard
+									{t['home.cta.go_dashboard']}
 									<ArrowRight className="ml-2 h-5 w-5" />
 								</Link>
 							) : (
@@ -121,8 +116,9 @@ export default async function Page() {
 										size="lg"
 										className="h-12 px-8 text-base"
 										href={Routes.get('register')}
+										title={t['home.cta.create_account']}
 									>
-										Create Free Account
+										{t['home.cta.create_account']}
 										<ArrowRight className="ml-2 h-5 w-5" />
 									</Link>
 									<Link
@@ -130,8 +126,9 @@ export default async function Page() {
 										variant="outline"
 										className="h-12 px-8 text-base"
 										href={Routes.get('login')}
+										title={t['home.cta.sign_in']}
 									>
-										Sign In
+										{t['home.cta.sign_in']}
 									</Link>
 								</>
 							)}
@@ -145,32 +142,35 @@ export default async function Page() {
 			</section>
 
 			{/* Features Section */}
-			<section className="py-20 md:py-28">
+			<section className="py-20">
 				<div className="container-default">
 					<div className="text-center mb-16">
 						<h2 className="text-3xl md:text-4xl font-bold mb-4">
-							Everything Your Operation Needs
+							{t['home.feature.heading']}
 						</h2>
 						<p className="text-lg text-muted max-w-2xl mx-auto">
-							A complete toolkit for managing transport documents,
-							fleet activity and back-office operations.
+							{t['home.feature.subheading']}
 						</p>
 					</div>
 
 					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 						{features.map((feature) => (
 							<div
-								key={feature.title}
+								key={feature.key}
 								className="group p-6 rounded-xl border border-border bg-surface card-hover"
 							>
 								<div className="flex h-12 w-12 items-center justify-center rounded-lg bg-accent-soft mb-4">
 									<feature.icon className="h-6 w-6 text-accent-soft-foreground" />
 								</div>
 								<h3 className="text-lg font-semibold mb-2">
-									{feature.title}
+									{t[`home.feature.${feature.key}_title`]}
 								</h3>
 								<p className="text-sm text-muted">
-									{feature.description}
+									{
+										t[
+											`home.feature.${feature.key}_description`
+										]
+									}
 								</p>
 							</div>
 						))}
@@ -179,17 +179,16 @@ export default async function Page() {
 			</section>
 
 			{/* CTA Section */}
-			<section className="py-20 md:py-28 bg-surface-secondary/30">
+			<section className="pb-20 bg-surface-secondary/30">
 				<div className="container-default">
 					<div className="max-w-3xl mx-auto text-center">
 						{isDashboardUser ? (
 							<>
 								<h2 className="text-3xl md:text-4xl font-bold mb-4">
-									Back to work
+									{t['home.cta.back_title']}
 								</h2>
 								<p className="text-lg text-muted mb-8">
-									Jump into the admin dashboard to manage
-									users, fleet, documents and more.
+									{t['home.cta.back_description']}
 								</p>
 								<div className="flex flex-col sm:flex-row gap-4 justify-center">
 									<Link
@@ -197,18 +196,17 @@ export default async function Page() {
 										className="h-12 px-8"
 										href={Routes.get('dashboard')}
 									>
-										Open Dashboard
+										{t['home.cta.open_dashboard']}
 									</Link>
 								</div>
 							</>
 						) : (
 							<>
 								<h2 className="text-3xl md:text-4xl font-bold mb-4">
-									Ready to Get Started?
+									{t['home.cta.ready_title']}
 								</h2>
 								<p className="text-lg text-muted mb-8">
-									Create an account to manage your fleet,
-									documents and team in one dashboard.
+									{t['home.cta.ready_description']}
 								</p>
 								<div className="flex flex-col sm:flex-row gap-4 justify-center">
 									<Link
@@ -216,7 +214,7 @@ export default async function Page() {
 										className="h-12 px-8"
 										href={Routes.get('register')}
 									>
-										Create Free Account
+										{t['home.cta.create_account']}
 									</Link>
 									<Link
 										size="lg"
@@ -224,7 +222,7 @@ export default async function Page() {
 										className="h-12 px-8"
 										href={Routes.get('login')}
 									>
-										Sign In
+										{t['home.cta.sign_in']}
 									</Link>
 								</div>
 							</>

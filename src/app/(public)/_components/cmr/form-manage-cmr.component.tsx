@@ -16,6 +16,7 @@ import { requestFind } from '@/helpers/services.helper';
 import { formatEnumLabel } from '@/helpers/string.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useRemoteAutocomplete } from '@/hooks/use-remote-autocomplete';
+import { useTranslation } from '@/hooks/use-translation.hook';
 import { type AddressModel, displayAddressLabel } from '@/models/address.model';
 import {
 	type ClientModel,
@@ -56,9 +57,28 @@ const transportTypes = toOptionsFromEnum(CmrTransportTypeEnum, {
 	formatter: formatEnumLabel,
 });
 
+const TRANSLATION_KEYS = [
+	'cmr.field.type',
+	'cmr.field.client',
+	'cmr.field.pickup_address',
+	'cmr.field.delivery_address',
+	'cmr.field.contact_name',
+	'cmr.field.contact_email',
+	'cmr.field.contact_phone',
+	'cmr.field.pick_scheduled_date',
+	'cmr.field.pick_scheduled_time',
+	'cmr.field.estimated_delivery_date',
+	'cmr.field.estimated_delivery_time',
+	'cmr.field.delivered_date',
+	'cmr.field.delivered_time',
+	'cmr.field.notes',
+] as const;
+
 export function FormManageCmr() {
 	const { formValues, errors, handleChange, pending } =
 		useWindowForm<CmrFormValuesType>();
+
+	const { translations } = useTranslation(TRANSLATION_KEYS);
 
 	const queryClient = useQueryClient();
 
@@ -171,7 +191,7 @@ export function FormManageCmr() {
 	return (
 		<>
 			<FormComponentRadio<CmrFormValuesType>
-				labelText="Type"
+				labelText={translations['cmr.field.type']}
 				id={elementIds.transport_type}
 				fieldName="transport_type"
 				fieldValue={formValues.transport_type}
@@ -190,7 +210,7 @@ export function FormManageCmr() {
 			/>
 
 			<FormComponentAutoComplete<CmrFormValuesType, ClientModel>
-				labelText="Client"
+				labelText={translations['cmr.field.client']}
 				id={elementIds.client}
 				fieldName="client"
 				fieldValue={formValues.client ?? ''}
@@ -266,7 +286,7 @@ export function FormManageCmr() {
 			/>
 
 			<FormComponentAutoComplete<CmrFormValuesType, AddressModel>
-				labelText="Pickup Address"
+				labelText={translations['cmr.field.pickup_address']}
 				id={elementIds.pickup_address}
 				fieldName="pickup_address"
 				fieldValue={formValues.pickup_address ?? ''}
@@ -347,7 +367,7 @@ export function FormManageCmr() {
 			/>
 
 			<FormComponentAutoComplete<CmrFormValuesType, AddressModel>
-				labelText="Delivery Address"
+				labelText={translations['cmr.field.delivery_address']}
 				id={elementIds.delivery_address}
 				fieldName="delivery_address"
 				fieldValue={formValues.delivery_address ?? ''}
@@ -423,7 +443,7 @@ export function FormManageCmr() {
 
 			<div className="grid sm:grid-cols-3 gap-4">
 				<FormComponentInput<CmrFormValuesType>
-					labelText="Contact - Name"
+					labelText={translations['cmr.field.contact_name']}
 					id={elementIds.contact_name}
 					fieldName="contact_name"
 					fieldValue={formValues.contact_name ?? ''}
@@ -436,7 +456,7 @@ export function FormManageCmr() {
 				/>
 
 				<FormComponentInput<CmrFormValuesType>
-					labelText="Contact - Email"
+					labelText={translations['cmr.field.contact_email']}
 					id={elementIds.contact_email}
 					fieldName="contact_email"
 					fieldValue={formValues.contact_email ?? ''}
@@ -449,7 +469,7 @@ export function FormManageCmr() {
 				/>
 
 				<FormComponentInput<CmrFormValuesType>
-					labelText="Contact - Phone"
+					labelText={translations['cmr.field.contact_phone']}
 					id={elementIds.contact_phone}
 					fieldName="contact_phone"
 					fieldValue={formValues.contact_phone ?? ''}
@@ -465,7 +485,9 @@ export function FormManageCmr() {
 			<div className="flex flex-wrap gap-4">
 				<div className="flex flex-wrap gap-2">
 					<FormComponentCalendar<CmrFormValuesType>
-						labelText="Pick Scheduled Date"
+						labelText={
+							translations['cmr.field.pick_scheduled_date']
+						}
 						id={elementIds.pick_scheduled_at}
 						fieldName="pick_scheduled_at"
 						fieldValue={formValues.pick_scheduled_at ?? ''}
@@ -478,7 +500,9 @@ export function FormManageCmr() {
 					/>
 
 					<FormComponentTime<CmrFormValuesType>
-						labelText="Pick Scheduled Time"
+						labelText={
+							translations['cmr.field.pick_scheduled_time']
+						}
 						id={elementIds.pick_scheduled_at_time}
 						fieldName="pick_scheduled_at_time"
 						fieldValue={formValues.pick_scheduled_at_time ?? ''}
@@ -497,7 +521,9 @@ export function FormManageCmr() {
 
 				<div className="flex flex-wrap gap-2">
 					<FormComponentCalendar<CmrFormValuesType>
-						labelText="Estimated Delivery Date"
+						labelText={
+							translations['cmr.field.estimated_delivery_date']
+						}
 						id={elementIds.estimated_delivery_at}
 						fieldName="estimated_delivery_at"
 						fieldValue={formValues.estimated_delivery_at ?? ''}
@@ -510,7 +536,9 @@ export function FormManageCmr() {
 					/>
 
 					<FormComponentTime<CmrFormValuesType>
-						labelText="Estimated Delivery Time"
+						labelText={
+							translations['cmr.field.estimated_delivery_time']
+						}
 						id={elementIds.estimated_delivery_at_time}
 						fieldName="estimated_delivery_at_time"
 						fieldValue={formValues.estimated_delivery_at_time ?? ''}
@@ -529,7 +557,7 @@ export function FormManageCmr() {
 
 				<div className="flex flex-wrap gap-2">
 					<FormComponentCalendar<CmrFormValuesType>
-						labelText="Delivered Date"
+						labelText={translations['cmr.field.delivered_date']}
 						id={elementIds.delivered_at}
 						fieldName="delivered_at"
 						fieldValue={formValues.delivered_at ?? ''}
@@ -542,7 +570,7 @@ export function FormManageCmr() {
 					/>
 
 					<FormComponentTime<CmrFormValuesType>
-						labelText="Delivered Time"
+						labelText={translations['cmr.field.delivered_time']}
 						id={elementIds.delivered_at_time}
 						fieldName="delivered_at_time"
 						fieldValue={formValues.delivered_at_time ?? ''}
@@ -558,7 +586,7 @@ export function FormManageCmr() {
 			</div>
 
 			<FormComponentTextarea<CmrFormValuesType>
-				labelText="Notes"
+				labelText={translations['cmr.field.notes']}
 				id={elementIds.notes}
 				fieldName="notes"
 				fieldValue={formValues.notes ?? ''}

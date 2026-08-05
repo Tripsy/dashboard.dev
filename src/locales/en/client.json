@@ -61,5 +61,16 @@
 			"title": "Client details - {{entry}}",
 			"label": "View details"
 		}
+	},
+	"field": {
+		"company_name": "Company - Name",
+		"company_cui": "Company - CUI",
+		"company_reg_com": "Company - Reg. Com",
+		"person_name": "Person - Name",
+		"person_cnp": "Person - CNP",
+		"contact_name": "Contact - Name",
+		"contact_email": "Contact - Email",
+		"contact_phone": "Contact - Phone",
+		"notes": "Notes"
 	}
 }

@@ -2,6 +2,27 @@
 	"meta": {
 		"title": "Login | {{app_name}}"
 	},
+	"form": {
+		"title": "Welcome back",
+		"description": "Sign in to your account to continue",
+		"title_status": "Login"
+	},
+	"field": {
+		"email": "Email Address",
+		"password": "Password"
+	},
+	"action": {
+		"submit": "Login",
+		"oauth": "or continue with"
+	},
+	"link": {
+		"no_account": "Don't have an account?",
+		"create_account": "Create an account",
+		"forgot_password": "Forgot your password?",
+		"reset_password": "Reset it here",
+		"confirm_email_prompt": "Have you confirmed your email? If you’ve lost the instructions, you can resend the",
+		"confirm_email": "confirmation email"
+	},
 	"validation": {
 		"invalid_email": "Please enter a valid email address",
 		"invalid_password": "Please enter your password"

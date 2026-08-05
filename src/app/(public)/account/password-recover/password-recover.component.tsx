@@ -7,6 +7,7 @@ import {
 	type PasswordRecoverFormValuesType,
 	type PasswordRecoverSituationType,
 	PasswordRecoverState,
+	type PasswordRecoverTranslations,
 	validateFormPasswordRecover,
 } from '@/app/(public)/account/password-recover/password-recover.definition';
 import {
@@ -26,7 +27,13 @@ import { useFormSituation } from '@/hooks/use-form-situation.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
 
-export default function PasswordRecover() {
+type PasswordRecoverProps = {
+	translations: PasswordRecoverTranslations;
+};
+
+export default function PasswordRecover({
+	translations,
+}: PasswordRecoverProps) {
 	const [state, action, pending] = useActionState(
 		passwordRecoverAction,
 		PasswordRecoverState,
@@ -55,7 +62,7 @@ export default function PasswordRecover() {
 	if (formSituation === 'csrfError') {
 		return (
 			<ErrorComponent
-				title="Recover Password"
+				title={translations['password-recover.form.title']}
 				description={formMessage as string}
 			/>
 		);
@@ -64,18 +71,18 @@ export default function PasswordRecover() {
 	if (formSituation === 'success') {
 		return (
 			<SuccessComponent
-				title="Recover Password"
-				description="Please
-					check your email and follow instructions to complete
-					password recovery."
+				title={translations['password-recover.form.title']}
+				description={
+					translations['password-recover.form.success_description']
+				}
 			>
 				<div className="text-center mt-6">
-					Meanwhile you can go back to{' '}
+					{translations['password-recover.link.back_home_prompt']}{' '}
 					<Link
 						href={Routes.get('home')}
 						className="text-accent font-medium hover:underline"
 					>
-						home page
+						{translations['password-recover.link.back_home']}
 					</Link>
 				</div>
 			</SuccessComponent>
@@ -84,8 +91,8 @@ export default function PasswordRecover() {
 
 	return (
 		<FormWrapperComponent
-			title="Recover Password"
-			description="Restore your access and continue using your account securely."
+			title={translations['password-recover.form.title']}
+			description={translations['password-recover.form.description']}
 		>
 			<form
 				action={action}
@@ -93,7 +100,7 @@ export default function PasswordRecover() {
 				className="form-section"
 			>
 				<FormComponentEmail<PasswordRecoverFormValuesType>
-					labelText="Email Address"
+					labelText={translations['password-recover.field.email']}
 					id={elementIds.email}
 					fieldValue={formValues.email ?? ''}
 					disabled={pending}
@@ -106,7 +113,7 @@ export default function PasswordRecover() {
 					submitted={submitted}
 					error={formSituation === 'failedValidation'}
 					button={{
-						label: 'Recover password',
+						label: translations['password-recover.action.submit'],
 					}}
 				/>
 
@@ -117,12 +124,16 @@ export default function PasswordRecover() {
 
 				<div className="text-center space-y-2">
 					<p className="text-sm text-muted">
-						Not registered yet?{' '}
+						{translations['password-recover.link.not_registered']}{' '}
 						<Link
 							href={Routes.get('register')}
 							className="text-accent font-medium hover:underline"
 						>
-							Create an account
+							{
+								translations[
+									'password-recover.link.create_account'
+								]
+							}
 						</Link>
 					</p>
 				</div>

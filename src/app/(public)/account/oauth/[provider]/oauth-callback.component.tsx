@@ -8,13 +8,14 @@ import { oauthCallbackAction } from '@/app/(public)/account/oauth/[provider]/oau
 import {
 	OAuthCallbackState,
 	type OAuthCallbackStateType,
+	type OAuthCallbackTranslations,
 } from '@/app/(public)/account/oauth/[provider]/oauth-callback.definition';
 import {
 	ErrorComponent,
 	LoadingComponent,
 } from '@/components/status.component';
 import Routes, { isExcludedRoute } from '@/config/routes.setup';
-import { useTranslation } from '@/hooks/use-translation.hook';
+import { replaceVars } from '@/helpers/string.helper';
 import { useAuth } from '@/providers/auth.provider';
 import { useToast } from '@/providers/toast.provider';
 import { OAUTH_PROVIDER_LABEL, type OAuthProvider } from '@/types/oauth.type';
@@ -24,6 +25,7 @@ type OAuthCallbackProps = {
 	code: string | null;
 	state: string | null;
 	providerError: string | null;
+	translations: OAuthCallbackTranslations;
 };
 
 export default function OAuthCallback({
@@ -31,6 +33,7 @@ export default function OAuthCallback({
 	code,
 	state,
 	providerError,
+	translations,
 }: OAuthCallbackProps) {
 	const router = useRouter();
 	const { refreshAuth } = useAuth();
@@ -45,13 +48,6 @@ export default function OAuthCallback({
 	 * consumes the code and the second reports a failure over an already-successful sign-in.
 	 */
 	const redeemed = useRef(false);
-
-	const translationsKeys = [
-		'login.message.session_destroy_success',
-		'login.message.session_destroy_error',
-	] as const;
-
-	const { translations } = useTranslation(translationsKeys);
 
 	useEffect(() => {
 		if (redeemed.current) {
@@ -90,18 +86,26 @@ export default function OAuthCallback({
 	}, [result, router, refreshAuth]);
 
 	const providerLabel =
-		OAUTH_PROVIDER_LABEL[provider as OAuthProvider] ?? 'provider';
+		OAUTH_PROVIDER_LABEL[provider as OAuthProvider] ??
+		translations['oauth.value.provider_fallback'];
 
 	if (result.situation === 'pending' || result.situation === 'success') {
 		return (
-			<LoadingComponent title={`Signing you in with ${providerLabel}`} />
+			<LoadingComponent
+				title={replaceVars(
+					translations['oauth.form.title_signing_in'],
+					{
+						provider: providerLabel,
+					},
+				)}
+			/>
 		);
 	}
 
 	if (result.situation === 'maxActiveSession') {
 		return (
 			<ErrorComponent
-				title="Too many sessions"
+				title={translations['oauth.form.title_max_sessions']}
 				description={result.message as string}
 			>
 				<div className="mt-6">
@@ -110,7 +114,9 @@ export default function OAuthCallback({
 						onResult={(success, message) => {
 							showToast({
 								severity: success ? 'success' : 'error',
-								summary: success ? 'Success' : 'Error',
+								summary: success
+									? translations['app.success.title']
+									: translations['app.error.title'],
 								detail:
 									message === 'session_destroy_success'
 										? translations[
@@ -124,12 +130,12 @@ export default function OAuthCallback({
 					/>
 
 					<p className="text-sm text-muted text-center mt-6">
-						Once a session is freed,{' '}
+						{translations['oauth.link.session_freed_prompt']}{' '}
 						<Link
 							href={Routes.get('login')}
 							className="text-accent font-medium hover:underline"
 						>
-							sign in again
+							{translations['oauth.link.sign_in_again']}
 						</Link>
 					</p>
 				</div>
@@ -139,7 +145,7 @@ export default function OAuthCallback({
 
 	return (
 		<ErrorComponent
-			title="Sign-in failed"
+			title={translations['oauth.form.title_failed']}
 			description={result.message as string}
 		>
 			<p className="text-sm text-muted text-center mt-6">
@@ -147,7 +153,7 @@ export default function OAuthCallback({
 					href={Routes.get('login')}
 					className="text-accent font-medium hover:underline"
 				>
-					Back to login
+					{translations['oauth.link.back_to_login']}
 				</Link>
 			</p>
 		</ErrorComponent>

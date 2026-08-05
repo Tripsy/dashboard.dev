@@ -9,5 +9,22 @@
 		"provider_unreachable": "We couldn't reach the sign-in provider. Please try again in a moment.",
 		"unlink_success": "Provider unlinked successfully",
 		"unlink_error": "We couldn't unlink that provider"
+	},
+	"action": {
+		"continue_with": "Continue with {{provider}}",
+		"label": "or continue with"
+	},
+	"form": {
+		"title_signing_in": "Signing you in with {{provider}}",
+		"title_max_sessions": "Too many sessions",
+		"title_failed": "Sign-in failed"
+	},
+	"link": {
+		"session_freed_prompt": "Once a session is freed,",
+		"sign_in_again": "sign in again",
+		"back_to_login": "Back to login"
+	},
+	"value": {
+		"provider_fallback": "provider"
 	}
 }

@@ -8,6 +8,7 @@ import {
 	formatDate,
 } from '@/helpers/date.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
+import { useTranslation } from '@/hooks/use-translation.hook';
 import {
 	END_AT_MAX_FUTURE_SECONDS,
 	START_AT_MAX_PAST_SECONDS,
@@ -21,6 +22,11 @@ export type WorkSessionFormValuesType = {
 	start_at_time: string | null;
 };
 
+const TRANSLATION_KEYS = [
+	'work-session.field.start_date',
+	'work-session.field.start_time',
+] as const;
+
 export function FormManageWorkSession() {
 	const { auth } = useAuth();
 	const { getCurrentWindow, close } = useModalStore();
@@ -29,6 +35,8 @@ export function FormManageWorkSession() {
 
 	const { formValues, errors, handleChange, pending } =
 		useWindowForm<WorkSessionFormValuesType>();
+
+	const { translations } = useTranslation(TRANSLATION_KEYS);
 
 	const elementIds = useElementIds(['start_at', 'start_at_time'] as const);
 
@@ -46,7 +54,7 @@ export function FormManageWorkSession() {
 	return (
 		<div className="flex flex-wrap gap-2">
 			<FormComponentCalendar<WorkSessionFormValuesType>
-				labelText="Start Date"
+				labelText={translations['work-session.field.start_date']}
 				id={elementIds.start_at}
 				fieldName="start_at"
 				fieldValue={formValues.start_at ?? ''}
@@ -58,7 +66,7 @@ export function FormManageWorkSession() {
 				error={errors.start_at}
 			/>
 			<FormComponentTime<WorkSessionFormValuesType>
-				labelText="Start Time"
+				labelText={translations['work-session.field.start_time']}
 				id={elementIds.start_at_time}
 				fieldName="start_at_time"
 				fieldValue={formValues.start_at_time ?? ''}

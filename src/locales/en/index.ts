@@ -18,6 +18,7 @@ import email_confirm from '@/locales/en/email-confirm.json';
 import email_confirm_send from '@/locales/en/email-confirm-send.json';
 import home from '@/locales/en/home.json';
 import image from '@/locales/en/image.json';
+import layout from '@/locales/en/layout.json';
 import log_data from '@/locales/en/log-data.json';
 import log_history from '@/locales/en/log-history.json';
 import login from '@/locales/en/login.json';
@@ -81,6 +82,7 @@ const en = {
 	'cmr-session': cmr_session,
 
 	// FE
+	layout,
 	'driver-panel': driver_panel,
 };
 

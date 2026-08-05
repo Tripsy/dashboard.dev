@@ -14,13 +14,16 @@ import Routes from '@/config/routes.setup';
 import { cn } from '@/helpers/css.helper';
 import { UserRoleEnum } from '@/models/user.model';
 import { useAuth } from '@/providers/auth.provider';
+import type { LayoutTranslations } from '@/types/layout.type';
 
 export function Header({
 	currentLanguage,
 	supportedLanguages,
+	translations,
 }: {
 	currentLanguage: string;
 	supportedLanguages: string[];
+	translations: LayoutTranslations;
 }) {
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -40,26 +43,26 @@ export function Header({
 
 		result.push({
 			href: Routes.get('home'),
-			label: 'Home',
+			label: translations['layout.nav.home'],
 			hash: 'home',
 		});
 
 		result.push({
 			href: Routes.get('dashboard'),
-			label: 'Dashboard',
+			label: translations['layout.nav.dashboard'],
 			hash: 'dashboard',
 		});
 
 		if (auth?.role === UserRoleEnum.DRIVER) {
 			result.push({
 				href: Routes.get('driver-panel'),
-				label: 'Driver Panel',
+				label: translations['layout.nav.driver_panel'],
 				hash: 'driver-panel',
 			});
 		}
 
 		return result;
-	}, [authStatus, auth]);
+	}, [authStatus, auth, translations]);
 
 	useEffect(() => {
 		if (pathname !== homePath) {
@@ -163,7 +166,7 @@ export function Header({
 							variant="ghost"
 							className="md:hidden h-10 w-10"
 							onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-							aria-label="Toggle menu"
+							aria-label={translations['layout.aria.toggle_menu']}
 						>
 							{mobileMenuOpen ? (
 								<X className="h-5 w-5" />
@@ -174,9 +177,10 @@ export function Header({
 						<LanguageSwitcher
 							currentLanguage={currentLanguage}
 							supportedLanguages={supportedLanguages}
+							translations={translations}
 						/>
-						<ToggleTheme />
-						<UserMenu />
+						<ToggleTheme translations={translations} />
+						<UserMenu translations={translations} />
 					</div>
 				</div>
 
@@ -205,16 +209,24 @@ export function Header({
 										variant="outline"
 										className="w-full"
 										href={Routes.get('login')}
-										title="Sign in"
+										title={
+											translations[
+												'layout.menu.login_title'
+											]
+										}
 									>
-										Login
+										{translations['layout.menu.login']}
 									</Link>
 									<Link
 										className="w-full"
 										href={Routes.get('register')}
-										title="Create an account"
+										title={
+											translations[
+												'layout.menu.register_title'
+											]
+										}
 									>
-										Sign Up
+										{translations['layout.menu.register']}
 									</Link>
 								</div>
 							)}

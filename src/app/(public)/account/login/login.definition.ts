@@ -5,6 +5,40 @@ import { BaseValidator } from '@/helpers/validator.helper';
 import type { AuthTokenType } from '@/types/auth.type';
 import type { FormErrorsType, FormSituationType } from '@/types/form.type';
 
+/**
+ * Resolved by the server page and handed to the client component as props, rather than
+ * read there through `useTranslation`: that hook can only seed itself from an effect, so
+ * every key would render empty in the SSR HTML and pop in after hydration.
+ *
+ * The list lives here rather than in the `'use client'` component because a named export
+ * crossing the client boundary reaches the server as a client reference, not as the array.
+ */
+export const LOGIN_TRANSLATION_KEYS = [
+	'app.error.title',
+	'app.success.title',
+	'login.form.title',
+	'login.form.description',
+	'login.form.title_status',
+	'login.field.email',
+	'login.field.password',
+	'login.action.submit',
+	'login.action.oauth',
+	'oauth.action.continue_with',
+	'login.link.no_account',
+	'login.link.create_account',
+	'login.link.forgot_password',
+	'login.link.reset_password',
+	'login.link.confirm_email_prompt',
+	'login.link.confirm_email',
+	'login.message.session_destroy_success',
+	'login.message.session_destroy_error',
+] as const;
+
+export type LoginTranslations = Record<
+	(typeof LOGIN_TRANSLATION_KEYS)[number],
+	string
+>;
+
 export type LoginFormValuesType = {
 	email: string | null;
 	password: string | null;

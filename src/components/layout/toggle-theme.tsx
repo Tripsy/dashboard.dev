@@ -3,8 +3,13 @@
 import { Moon, Sun } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { useTheme } from '@/providers/theme.provider';
+import type { LayoutTranslations } from '@/types/layout.type';
 
-export function ToggleTheme() {
+type ToggleThemeProps = {
+	translations: LayoutTranslations;
+};
+
+export function ToggleTheme({ translations }: ToggleThemeProps) {
 	const { theme, toggleTheme } = useTheme();
 	const isDark = theme === 'dark';
 
@@ -13,7 +18,7 @@ export function ToggleTheme() {
 			size="lg"
 			isSelected={isDark}
 			onChange={toggleTheme}
-			aria-label="Toggle theme"
+			aria-label={translations['layout.aria.toggle_theme']}
 			thumbIcon={
 				isDark ? (
 					<Moon className="h-4 w-4" />

@@ -8,6 +8,24 @@ import {
 } from '@/helpers/validator.helper';
 import type { FormErrorsType, FormSituationType } from '@/types/form.type';
 
+export const PASSWORD_RECOVER_CHANGE_TRANSLATION_KEYS = [
+	'password-recover-change.form.title',
+	'password-recover-change.form.description',
+	'password-recover-change.form.success_description',
+	'password-recover-change.field.password',
+	'password-recover-change.field.password_confirm',
+	'password-recover-change.field.password_confirm_placeholder',
+	'password-recover-change.action.submit',
+	'password-recover-change.link.sign_in_prompt',
+	'password-recover-change.link.sign_in',
+	'password-recover-change.link.sign_in_suffix',
+] as const;
+
+export type PasswordRecoverChangeTranslations = Record<
+	(typeof PASSWORD_RECOVER_CHANGE_TRANSLATION_KEYS)[number],
+	string
+>;
+
 export type PasswordRecoverChangeFormValuesType = {
 	password: string | null;
 	password_confirm: string | null;

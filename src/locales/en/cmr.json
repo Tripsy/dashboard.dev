@@ -85,5 +85,21 @@
 			"title": "CMR images - {{entry}}",
 			"label": "Images"
 		}
+	},
+	"field": {
+		"type": "Type",
+		"client": "Client",
+		"pickup_address": "Pickup Address",
+		"delivery_address": "Delivery Address",
+		"contact_name": "Contact - Name",
+		"contact_email": "Contact - Email",
+		"contact_phone": "Contact - Phone",
+		"pick_scheduled_date": "Pick Scheduled Date",
+		"pick_scheduled_time": "Pick Scheduled Time",
+		"estimated_delivery_date": "Estimated Delivery Date",
+		"estimated_delivery_time": "Estimated Delivery Time",
+		"delivered_date": "Delivered Date",
+		"delivered_time": "Delivered Time",
+		"notes": "Notes"
 	}
 }

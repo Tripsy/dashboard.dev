@@ -15,12 +15,17 @@ import { LoadingIcon } from '@/components/status.component';
 import { Button } from '@/components/ui/button';
 import Routes from '@/config/routes.setup';
 import { useAuth } from '@/providers/auth.provider';
+import type { LayoutTranslations } from '@/types/layout.type';
 
 const triggerClass =
 	'flex items-center gap-2 h-10 px-2 rounded-md hover:bg-surface-secondary';
 const itemClass = 'flex items-center gap-2';
 
-export function UserMenu() {
+type UserMenuProps = {
+	translations: LayoutTranslations;
+};
+
+export function UserMenu({ translations }: UserMenuProps) {
 	const { auth, authStatus } = useAuth();
 
 	if (authStatus === 'loading') {
@@ -31,7 +36,7 @@ export function UserMenu() {
 		return (
 			<UserX
 				className="h-5 w-5 text-danger"
-				aria-label="An error occurred while loading your account"
+				aria-label={translations['layout.aria.account_error']}
 			/>
 		);
 	}
@@ -42,16 +47,19 @@ export function UserMenu() {
 				{/* Desktop version */}
 				<div className="hidden sm:block space-x-2">
 					<Button variant="ghost">
-						<Link href={Routes.get('login')} title="Sign in">
-							Login
+						<Link
+							href={Routes.get('login')}
+							title={translations['layout.menu.login_title']}
+						>
+							{translations['layout.menu.login']}
 						</Link>
 					</Button>
 					<Button>
 						<Link
 							href={Routes.get('register')}
-							title="Create an account"
+							title={translations['layout.menu.register_title']}
 						>
-							Sign Up
+							{translations['layout.menu.register']}
 						</Link>
 					</Button>
 				</div>
@@ -66,18 +74,20 @@ export function UserMenu() {
 							<Dropdown.Item
 								id={Routes.get('login')}
 								href={Routes.get('login')}
-								textValue="Login"
+								textValue={translations['layout.menu.login']}
 								className={itemClass}
 							>
-								<KeyRound className="h-4 w-4" /> Login
+								<KeyRound className="h-4 w-4" />{' '}
+								{translations['layout.menu.login']}
 							</Dropdown.Item>
 							<Dropdown.Item
 								id={Routes.get('register')}
 								href={Routes.get('register')}
-								textValue="Sign Up"
+								textValue={translations['layout.menu.register']}
 								className={itemClass}
 							>
-								<UserPlus className="h-4 w-4" /> Sign Up
+								<UserPlus className="h-4 w-4" />{' '}
+								{translations['layout.menu.register']}
 							</Dropdown.Item>
 						</Dropdown.Menu>
 					</Dropdown.Popover>
@@ -103,26 +113,29 @@ export function UserMenu() {
 						<Dropdown.Item
 							id={Routes.get('account-me')}
 							href={Routes.get('account-me')}
-							textValue="My account"
+							textValue={translations['layout.menu.account']}
 							className={itemClass}
 						>
-							<User className="h-4 w-4" /> My account
+							<User className="h-4 w-4" />{' '}
+							{translations['layout.menu.account']}
 						</Dropdown.Item>
 						<Dropdown.Item
 							id={Routes.get('dashboard')}
 							href={Routes.get('dashboard')}
-							textValue="Dashboard"
+							textValue={translations['layout.menu.dashboard']}
 							className={itemClass}
 						>
-							<LayoutDashboard className="h-4 w-4" /> Dashboard
+							<LayoutDashboard className="h-4 w-4" />{' '}
+							{translations['layout.menu.dashboard']}
 						</Dropdown.Item>
 						<Dropdown.Item
 							id={Routes.get('logout')}
 							href={Routes.get('logout')}
-							textValue="Logout"
+							textValue={translations['layout.menu.logout']}
 							className={`${itemClass} text-danger`}
 						>
-							<LogOut className="h-4 w-4" /> Logout
+							<LogOut className="h-4 w-4" />{' '}
+							{translations['layout.menu.logout']}
 						</Dropdown.Item>
 					</Dropdown.Menu>
 				</Dropdown.Popover>

@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import Logout from '@/app/(public)/account/logout/logout.component';
+import { LOGOUT_TRANSLATION_KEYS } from '@/app/(public)/account/logout/logout.definition';
 import { Configuration } from '@/config/settings.config';
-import { translate } from '@/config/translate.setup';
+import { translate, translateBatch } from '@/config/translate.setup';
 
 export async function generateMetadata(): Promise<Metadata> {
 	return {
@@ -11,6 +12,8 @@ export async function generateMetadata(): Promise<Metadata> {
 	};
 }
 
-export default function Page() {
-	return <Logout />;
+export default async function Page() {
+	const translations = await translateBatch(LOGOUT_TRANSLATION_KEYS);
+
+	return <Logout translations={translations} />;
 }

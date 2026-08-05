@@ -117,6 +117,56 @@
 		@apply transition-all duration-300 ease-out hover:-translate-y-1;
 	}
 
+	/*
+	 * Backend-supplied page content (`template` entity, `/page/[label]`) — plain
+	 * `<h1>`-`<h6>`/`<p>` HTML with no classes of its own, injected via
+	 * `dangerouslySetInnerHTML`. There's no typography plugin in this project, so the tags
+	 * need their own rules rather than a `prose` class.
+	 */
+	.content-page {
+		@apply text-foreground;
+
+		& :is(h1, h2, h3, h4, h5, h6) {
+			@apply font-semibold mt-6 mb-2 first:mt-0;
+		}
+
+		& h1 {
+			@apply text-xl md:text-2xl;
+		}
+
+		& h2 {
+			@apply text-lg md:text-xl;
+		}
+
+		& :is(h3, h4, h5, h6) {
+			@apply text-base;
+		}
+
+		& p {
+			@apply mb-4 leading-relaxed text-muted;
+		}
+
+		& :is(ul, ol) {
+			@apply mb-4 ms-6 space-y-1;
+		}
+
+		& ul {
+			@apply list-disc;
+		}
+
+		& ol {
+			@apply list-decimal;
+		}
+
+		& a {
+			@apply text-accent underline underline-offset-2 hover:no-underline;
+		}
+
+		& strong {
+			@apply font-semibold text-foreground;
+		}
+	}
+
 	/* Form section */
 
 	.form-section {
@@ -236,6 +286,19 @@
 	}
 
 	/*
+	 * HeroUI's default selected-row tint (`bg-surface/10`) is nearly the same shade as the
+	 * hover state, so a selected row disappears next to one the pointer happens to be over.
+	 * `!important` beats that rule's specificity (`.table__row[data-selected="true"]
+	 * .table__cell` also matches here, at equal specificity, so source order alone isn't
+	 * reliable once Tailwind's layers are combined).
+	 */
+	.dashboard-layout .data-table
+		.table__row[data-selected='true']
+		.table__cell {
+		@apply bg-warning-light!;
+	}
+
+	/*
 	 * HeroUI sizes column headers at `text-xs`, which reads as a caption rather than a
 	 * heading next to the `text-sm` body cells. `text-base` is Tailwind's medium step —
 	 * there is no `text-md` class, so naming one here would silently apply nothing.
@@ -260,6 +323,31 @@
 	.dashboard-layout .data-table .table-root,
 	.dashboard-layout .data-table .table__resizable-container {
 		@apply md:overflow-visible;
+	}
+
+	/*
+	 * HeroUI's `secondary` variant rounds the first/last header column to read as a
+	 * standalone card (table.styles.ts). This dashboard's tables sit flush against the
+	 * surrounding surface instead, so the header row should read as square.
+	 */
+	.dashboard-layout .data-table
+		:is(
+			th.table__column:first-child,
+			[role='row'] > [role='presentation']:first-of-type
+				> .table__column
+		) {
+		border-start-start-radius: 0;
+		border-end-start-radius: 0;
+	}
+
+	.dashboard-layout .data-table
+		:is(
+			th.table__column:last-child,
+			[role='row'] > [role='presentation']:last-of-type
+				> .table__column
+		) {
+		border-start-end-radius: 0;
+		border-end-end-radius: 0;
 	}
 }
 

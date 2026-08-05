@@ -8,7 +8,7 @@ import { DataTableFiltersPlace } from '@/app/(dashboard)/dashboard/place/data-ta
 
 export const DataTablePlace = (): JSX.Element => {
 	return (
-		<DataTableProvider dataSource="place" selectionMode="checkbox">
+		<DataTableProvider dataSource="place" selectionMode="single">
 			<div className="table-container">
 				<DataTableFiltersPlace />
 				<DataTableActions />

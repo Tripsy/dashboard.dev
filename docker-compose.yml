@@ -1,6 +1,6 @@
 services:
     node:
-        container_name: dashboard.test
+        container_name: star-ui.test
         ports:
             - "80:80"
         build:

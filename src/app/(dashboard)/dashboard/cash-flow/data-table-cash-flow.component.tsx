@@ -8,7 +8,7 @@ import { DataTableFiltersCashFlow } from '@/app/(dashboard)/dashboard/cash-flow/
 
 export const DataTableCashFlow = (): JSX.Element => {
 	return (
-		<DataTableProvider dataSource="cash-flow" selectionMode="checkbox">
+		<DataTableProvider dataSource="cash-flow" selectionMode="single">
 			<div className="table-container">
 				<DataTableFiltersCashFlow />
 				<DataTableActions />

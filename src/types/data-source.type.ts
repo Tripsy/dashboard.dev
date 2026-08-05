@@ -40,7 +40,7 @@ export type DataSourceSection =
 // Data Table Types
 // ============================================================================
 
-export type DataTableSelectionModeType = 'checkbox' | 'multiple' | null;
+export type DataTableSelectionModeType = 'single' | 'multiple' | null;
 
 export type DataTableFiltersType = {
 	[key: string]: {

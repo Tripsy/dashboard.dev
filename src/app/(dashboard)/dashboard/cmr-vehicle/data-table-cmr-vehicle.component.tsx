@@ -8,7 +8,7 @@ import { DataTableFiltersCmrVehicle } from '@/app/(dashboard)/dashboard/cmr-vehi
 
 export const DataTableCmrVehicle = (): JSX.Element => {
 	return (
-		<DataTableProvider dataSource="cmr-vehicle" selectionMode="checkbox">
+		<DataTableProvider dataSource="cmr-vehicle" selectionMode="single">
 			<div className="table-container">
 				<DataTableFiltersCmrVehicle />
 				<DataTableActions />

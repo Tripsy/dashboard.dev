@@ -8,7 +8,7 @@ import { DataTableFiltersWorkSession } from '@/app/(dashboard)/dashboard/work-se
 
 export const DataTableWorkSession = (): JSX.Element => {
 	return (
-		<DataTableProvider dataSource="work-session" selectionMode="checkbox">
+		<DataTableProvider dataSource="work-session" selectionMode="single">
 			<div className="table-container">
 				<DataTableFiltersWorkSession />
 				<DataTableActions />

@@ -8,7 +8,7 @@ import { DataTableFiltersAddress } from '@/app/(dashboard)/dashboard/address/dat
 
 export const DataTableAddress = (): JSX.Element => {
 	return (
-		<DataTableProvider dataSource="address" selectionMode="checkbox">
+		<DataTableProvider dataSource="address" selectionMode="single">
 			<div className="table-container">
 				<DataTableFiltersAddress />
 				<DataTableActions />

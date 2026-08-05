@@ -236,7 +236,7 @@ const DataTableBrandOrderContent = (): JSX.Element => {
 
 export const DataTableBrandOrder = (): JSX.Element => {
 	return (
-		<DataTableProvider dataSource="brand" selectionMode="checkbox">
+		<DataTableProvider dataSource="brand" selectionMode="single">
 			<div className="table-container">
 				<DataTableFiltersBrandOrder />
 				<DataTableBrandOrderContent />

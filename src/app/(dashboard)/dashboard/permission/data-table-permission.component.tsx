@@ -8,7 +8,7 @@ import { DataTableFiltersPermission } from '@/app/(dashboard)/dashboard/permissi
 
 export const DataTablePermission = (): JSX.Element => {
 	return (
-		<DataTableProvider dataSource="permission" selectionMode="checkbox">
+		<DataTableProvider dataSource="permission" selectionMode="single">
 			<div className="table-container">
 				<DataTableFiltersPermission />
 				<DataTableActions />

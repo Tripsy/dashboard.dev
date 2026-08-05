@@ -8,7 +8,7 @@ import { DataTableFiltersCmr } from '@/app/(dashboard)/dashboard/cmr/data-table-
 
 export const DataTableCmr = (): JSX.Element => {
 	return (
-		<DataTableProvider dataSource="cmr" selectionMode="checkbox">
+		<DataTableProvider dataSource="cmr" selectionMode="single">
 			<div className="table-container">
 				<DataTableFiltersCmr />
 				<DataTableActions />

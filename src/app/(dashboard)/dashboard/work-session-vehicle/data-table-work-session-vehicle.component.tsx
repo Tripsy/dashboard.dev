@@ -10,7 +10,7 @@ export const DataTableWorkSessionVehicle = (): JSX.Element => {
 	return (
 		<DataTableProvider
 			dataSource="work-session-vehicle"
-			selectionMode="checkbox"
+			selectionMode="single"
 		>
 			<div className="table-container">
 				<DataTableFiltersWorkSessionVehicle />

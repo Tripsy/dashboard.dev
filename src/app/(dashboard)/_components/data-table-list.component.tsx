@@ -162,11 +162,14 @@ export default function DataTableList(props: { dataKey: string }) {
 	const totalRecords = data?.pagination?.total ?? 0;
 
 	/*
-	 * Only `multiple` tables select rows. A `checkbox` table gets its per-row operations
-	 * from the action buttons the column bodies render, so it needs no selection column
-	 * and no row-click selection.
+	 * Both `single` and `multiple` tables select rows; only a `null` selectionMode opts a
+	 * table out of selection entirely. `multiple` additionally gets a checkbox column and
+	 * `toggle` selection behaviour so several rows can be picked at once — `single` selects
+	 * (and replaces) one row on click, with no checkbox column, matching react-aria's own
+	 * `single`/`multiple` distinction.
 	 */
-	const isSelectable = selectionMode === 'multiple';
+	const isSelectable = selectionMode !== null;
+	const isMultiSelectable = selectionMode === 'multiple';
 
 	const onPageChange = useCallback(
 		({ first, rows }: DataTablePageChangeType) => {
@@ -256,15 +259,23 @@ export default function DataTableList(props: { dataKey: string }) {
 							aria-label={
 								translations['dashboard.text.label_data_table']
 							}
-							selectionMode={isSelectable ? 'multiple' : 'none'}
-							selectionBehavior="toggle"
+							selectionMode={
+								isMultiSelectable
+									? 'multiple'
+									: isSelectable
+										? 'single'
+										: 'none'
+							}
+							selectionBehavior={
+								isMultiSelectable ? 'toggle' : 'replace'
+							}
 							selectedKeys={selectedKeys}
 							onSelectionChange={onSelectionChange}
 							sortDescriptor={sortDescriptor}
 							onSortChange={onSortChange}
 						>
 							<Table.Header>
-								{isSelectable && (
+								{isMultiSelectable && (
 									<Table.Column
 										id="selection"
 										width={48}
@@ -335,7 +346,7 @@ export default function DataTableList(props: { dataKey: string }) {
 							>
 								{(entry) => (
 									<Table.Row id={getRowKey(entry)}>
-										{isSelectable && (
+										{isMultiSelectable && (
 											<Table.Cell>
 												<Checkbox
 													slot="selection"

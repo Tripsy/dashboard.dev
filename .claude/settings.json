@@ -1,6 +1,6 @@
 {
   "env": {
-    "DOCKER_CONTAINER": "dashboard.test",
+    "DOCKER_CONTAINER": "star-ui.test",
     "USER_NAME": "David Gabriel"
   },
   "attribution": {
@@ -9,7 +9,7 @@
   },
   "permissions": {
     "additionalDirectories": [
-      "../star-backend",
+      "../star-api",
       "../shared",
       "../nready.dev"
     ],

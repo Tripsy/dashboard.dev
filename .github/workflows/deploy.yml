@@ -8,14 +8,14 @@ on:
     workflow_dispatch:
 
 concurrency:
-    group: deploy-dashboard
+    group: deploy-star-ui
     cancel-in-progress: false
 
 env:
     AWS_REGION: eu-central-1
-    ECR_REPOSITORY: dashboard
+    ECR_REPOSITORY: star-ui
     INSTANCE_TAG_NAME: playzone-apps
-    APP_DIR: /srv/apps/dashboard
+    APP_DIR: /srv/apps/star-ui
 
 permissions:
     # Required for OIDC. Without it configure-aws-credentials fails with a message that
@@ -91,7 +91,7 @@ jobs:
               run: |
                   set -euo pipefail
 
-                  # No migrate step: the dashboard owns no schema.
+                  # No migrate step: star-ui owns no schema.
                   #
                   # `set -eu`, not `set -euo pipefail`: AWS-RunShellScript executes the
                   # script with /bin/sh, which is dash on Ubuntu and has no `pipefail` —
@@ -100,7 +100,7 @@ jobs:
                   COMMAND_ID="$(aws ssm send-command \
                     --document-name AWS-RunShellScript \
                     --targets "Key=tag:Name,Values=${INSTANCE_TAG_NAME}" \
-                    --comment "Deploy dashboard ${IMAGE_TAG}" \
+                    --comment "Deploy star-ui ${IMAGE_TAG}" \
                     --parameters commands="[
                       \"set -eu\",
                       \"cd ${APP_DIR}\",

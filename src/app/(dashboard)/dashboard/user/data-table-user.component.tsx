@@ -8,7 +8,7 @@ import { DataTableFiltersUser } from '@/app/(dashboard)/dashboard/user/data-tabl
 
 export const DataTableUser = (): JSX.Element => {
 	return (
-		<DataTableProvider dataSource="user" selectionMode="checkbox">
+		<DataTableProvider dataSource="user" selectionMode="single">
 			<div className="table-container">
 				<DataTableFiltersUser />
 				<DataTableActions />

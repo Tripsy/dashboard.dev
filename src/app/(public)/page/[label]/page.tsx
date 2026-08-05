@@ -92,15 +92,19 @@ export default async function Page(props: Props) {
 	}
 
 	return (
-		<div className="default-container page-default">
-			<h1>{pageData.title}</h1>
-			<div
-				className="page-default-html"
-				/*biome-ignore lint/security/noDangerouslySetInnerHtml: It's fine*/
-				dangerouslySetInnerHTML={{ __html: pageData.html }}
-			/>
-			<div className="text-sm italic text-right">
-				Last update: {formatDate(pageData.updated_at, 'date-time')}
+		<div className="container-default py-12 md:py-16">
+			<div className="mx-auto max-w-3xl rounded-2xl border border-border bg-surface p-6 md:p-10">
+				<h1 className="text-2xl md:text-3xl font-semibold">
+					{pageData.title}
+				</h1>
+				<div
+					className="content-page mt-6"
+					/*biome-ignore lint/security/noDangerouslySetInnerHtml: It's fine*/
+					dangerouslySetInnerHTML={{ __html: pageData.html }}
+				/>
+				<div className="mt-8 text-sm italic text-right text-muted">
+					Last update: {formatDate(pageData.updated_at, 'date-time')}
+				</div>
 			</div>
 		</div>
 	);

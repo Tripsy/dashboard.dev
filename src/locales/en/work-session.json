@@ -54,5 +54,9 @@
 			"title": "Setup work session vehicles",
 			"label": "Setup vehicles"
 		}
+	},
+	"field": {
+		"start_date": "Start Date",
+		"start_time": "Start Time"
 	}
 }

@@ -12,9 +12,16 @@ export type AccountDeleteFormValuesType = {
 const validatorMessages = ['invalid_password_current'] as const;
 
 class AccountDeleteValidator extends BaseValidator<typeof validatorMessages> {
+	/*
+	 * Optional at the schema level because a social sign-in account has no password to
+	 * confirm with — the form hides the field entirely in that case. The backend still
+	 * requires it whenever the account does have one, and it is the only side that can
+	 * know, so this schema deliberately does not try to.
+	 */
 	accountDelete = z.object({
 		password_current: this.validateString(
 			this.getMessage('invalid_password_current'),
+			{ required: false },
 		),
 	});
 }

@@ -9,13 +9,23 @@ import {
 } from '@/components/status.component';
 import { Button } from '@/components/ui/button';
 import { requestFind } from '@/helpers/services.helper';
+import { useTranslation } from '@/hooks/use-translation.hook';
 import type { CmrModel } from '@/models/cmr.model';
 import type { CmrVehicleModel } from '@/models/cmr-vehicle.model';
 import { displayVehicleLabel } from '@/models/vehicle.model';
 import { useModalStore } from '@/stores/window.store';
 import { DataSourceSectionEnum } from '@/types/data-source.type';
 
+const TRANSLATION_KEYS = [
+	'cmr-vehicle.button.add',
+	'cmr-vehicle.button.update',
+	'cmr-vehicle.button.delete',
+] as const;
+
+type CmrVehicleLabels = Record<(typeof TRANSLATION_KEYS)[number], string>;
+
 export function SetupCmrVehicles({ entries }: { entries: CmrModel[] }) {
+	const { translations } = useTranslation(TRANSLATION_KEYS);
 	const { open, focus, getCurrentWindow } = useModalStore();
 
 	const windowConfig = getCurrentWindow();
@@ -172,6 +182,7 @@ export function SetupCmrVehicles({ entries }: { entries: CmrModel[] }) {
 						<tbody className="divide-y divide-border bg-surface">
 							{cmrVehicle?.entries.map((v) => (
 								<CmrVehicleEntry
+									labels={translations}
 									key={v.id}
 									m={v}
 									onUpdate={onUpdate}
@@ -193,10 +204,10 @@ export function SetupCmrVehicles({ entries }: { entries: CmrModel[] }) {
 					type="button"
 					variant="success"
 					onClick={openCreate}
-					title="Add vehicle"
+					title={translations['cmr-vehicle.button.add']}
 					className="inline-flex items-center gap-2"
 				>
-					<Icons.Vehicle /> Add vehicle
+					<Icons.Vehicle /> {translations['cmr-vehicle.button.add']}
 				</Button>
 			</div>
 		</div>
@@ -207,9 +218,15 @@ type CmrVehicleEntryProps = {
 	m: CmrVehicleModel;
 	onUpdate: (entry: CmrVehicleModel) => void;
 	onDelete: (entry: CmrVehicleModel) => void;
+	labels: CmrVehicleLabels;
 };
 
-function CmrVehicleEntry({ m, onUpdate, onDelete }: CmrVehicleEntryProps) {
+function CmrVehicleEntry({
+	m,
+	onUpdate,
+	onDelete,
+	labels,
+}: CmrVehicleEntryProps) {
 	return (
 		<tr className="hover:bg-surface-secondary/50 transition-colors duration-150">
 			<td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-surface-foreground">
@@ -227,7 +244,7 @@ function CmrVehicleEntry({ m, onUpdate, onDelete }: CmrVehicleEntryProps) {
 						type="button"
 						onClick={() => onUpdate(m)}
 						className="cursor-pointer text-accent hover:text-accent-hover transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-focus focus:ring-offset-2 rounded focus:ring-offset-background"
-						title="Update vehicle"
+						title={labels['cmr-vehicle.button.update']}
 					>
 						<Icons.Action.Update className="h-4 w-4" />
 					</button>
@@ -236,7 +253,7 @@ function CmrVehicleEntry({ m, onUpdate, onDelete }: CmrVehicleEntryProps) {
 						type="button"
 						onClick={() => onDelete(m)}
 						className="cursor-pointer text-danger hover:text-danger/80 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-danger focus:ring-offset-2 rounded focus:ring-offset-background"
-						title="Delete vehicle"
+						title={labels['cmr-vehicle.button.delete']}
 					>
 						<Icons.Action.Delete className="h-4 w-4" />
 					</button>

@@ -2,11 +2,13 @@
 
 import Link from 'next/link';
 import { useActionState, useState } from 'react';
+import { OAuthProviders } from '@/app/(public)/_components/oauth-providers.component';
 import { registerAction } from '@/app/(public)/account/register/register.action';
 import {
 	type RegisterFormValuesType,
 	type RegisterSituationType,
 	RegisterState,
+	type RegisterTranslations,
 	validateFormRegister,
 } from '@/app/(public)/account/register/register.definition';
 import {
@@ -36,7 +38,11 @@ const languages = toOptionsFromEnum(LanguageEnum, {
 	formatter: formatEnumLabel,
 });
 
-export default function Register() {
+type RegisterProps = {
+	translations: RegisterTranslations;
+};
+
+export default function Register({ translations }: RegisterProps) {
 	const [showPassword, setShowPassword] = useState(false);
 
 	const [state, action, pending] = useActionState(
@@ -75,7 +81,7 @@ export default function Register() {
 	if (formSituation === 'csrfError') {
 		return (
 			<ErrorComponent
-				title="Create Account"
+				title={translations['register.form.title_status']}
 				description={formMessage as string}
 			/>
 		);
@@ -84,19 +90,20 @@ export default function Register() {
 	if (formSituation === 'pendingAccount') {
 		return (
 			<ErrorComponent
-				title="Create Account"
+				title={translations['register.form.title_status']}
 				description={formMessage as string}
 			>
 				<div className="text-center mt-6">
 					<span className="text-muted">
-						Have you confirmed your email? If you’ve lost the
-						instructions, you can resend the{' '}
+						{
+							translations['register.link.confirm_email_prompt']
+						}{' '}
 					</span>
 					<Link
 						href={Routes.get('email-confirm-send')}
 						className="text-accent font-medium hover:underline"
 					>
-						confirmation email
+						{translations['register.link.confirm_email']}
 					</Link>
 				</div>
 			</ErrorComponent>
@@ -106,29 +113,26 @@ export default function Register() {
 	if (formSituation === 'success') {
 		return (
 			<SuccessComponent
-				title="Create Account"
-				description="Congratulations! Your account has been created successfully."
+				title={translations['register.form.title_status']}
+				description={translations['register.form.success_description']}
 			>
 				<div className="text-center mt-6">
 					<p>
-						We&apos;ve sent a verification email to{' '}
+						{translations['register.link.verification_sent']}{' '}
 						<span className="font-semibold">
 							{' '}
 							{formValues.email}
 						</span>
 					</p>
-					<p>
-						Please check your inbox and click the verification link
-						to activate your account.
-					</p>
+					<p>{translations['register.link.verification_check']}</p>
 				</div>
 				<div className="text-center mt-6">
-					Meanwhile you can go back to{' '}
+					{translations['register.link.back_home_prompt']}{' '}
 					<Link
 						href={Routes.get('home')}
 						className="text-accent font-medium hover:underline"
 					>
-						home page
+						{translations['register.link.back_home']}
 					</Link>
 				</div>
 			</SuccessComponent>
@@ -137,8 +141,8 @@ export default function Register() {
 
 	return (
 		<FormWrapperComponent
-			title="Create your account"
-			description="Quick access. Extra benefits. Your gateway to personalized experiences."
+			title={translations['register.form.title']}
+			description={translations['register.form.description']}
 		>
 			<form
 				action={action}
@@ -146,7 +150,7 @@ export default function Register() {
 				className="form-section"
 			>
 				<FormComponentName<RegisterFormValuesType>
-					labelText="Name"
+					labelText={translations['register.field.name']}
 					id={elementIds.name}
 					fieldValue={formValues.name ?? ''}
 					disabled={pending}
@@ -155,7 +159,7 @@ export default function Register() {
 				/>
 
 				<FormComponentEmail<RegisterFormValuesType>
-					labelText="Email Address"
+					labelText={translations['register.field.email']}
 					id={elementIds.email}
 					fieldValue={formValues.email ?? ''}
 					disabled={pending}
@@ -164,7 +168,7 @@ export default function Register() {
 				/>
 
 				<FormComponentPassword<RegisterFormValuesType>
-					labelText="Password"
+					labelText={translations['register.field.password']}
 					id={elementIds.password}
 					fieldName="password"
 					fieldValue={formValues.password ?? ''}
@@ -176,11 +180,15 @@ export default function Register() {
 				/>
 
 				<FormComponentPassword<RegisterFormValuesType>
-					labelText="Confirm Password"
+					labelText={translations['register.field.password_confirm']}
 					id={elementIds.passwordConfirm}
 					fieldName="password_confirm"
 					fieldValue={formValues.password_confirm ?? ''}
-					placeholderText="Password confirmation"
+					placeholderText={
+						translations[
+							'register.field.password_confirm_placeholder'
+						]
+					}
 					disabled={pending}
 					onChange={(e) =>
 						handleChange('password_confirm', e.target.value)
@@ -190,7 +198,7 @@ export default function Register() {
 				/>
 
 				<FormComponentRadio<RegisterFormValuesType>
-					labelText="Language"
+					labelText={translations['register.field.language']}
 					id={elementIds.language}
 					fieldName="language"
 					fieldValue={formValues.language}
@@ -214,27 +222,31 @@ export default function Register() {
 				>
 					<div>
 						<span className="cursor-pointer text-sm text-muted">
-							I agree to the{' '}
+							{translations['register.link.terms_prompt']}{' '}
 							<Link
 								href={Routes.get('page', {
 									label: 'terms-and-conditions',
 								})}
 								className="text-accent font-medium hover:underline"
 								target="_blank"
-								title="Terms & Conditions"
+								title={
+									translations['register.link.terms_title']
+								}
 							>
-								Terms of Service
+								{translations['register.link.terms_of_service']}
 							</Link>{' '}
-							and{' '}
+							{translations['register.link.terms_separator']}{' '}
 							<Link
 								href={Routes.get('page', {
 									label: 'privacy-policy',
 								})}
 								className="text-accent font-medium hover:underline"
 								target="_blank"
-								title="Privacy Policy"
+								title={
+									translations['register.link.privacy_title']
+								}
 							>
-								Privacy Policy
+								{translations['register.link.privacy_policy']}
 							</Link>
 							.
 						</span>
@@ -246,7 +258,7 @@ export default function Register() {
 					submitted={submitted}
 					error={formSituation === 'failedValidation'}
 					button={{
-						label: 'Create account',
+						label: translations['register.action.submit'],
 					}}
 				/>
 
@@ -255,14 +267,19 @@ export default function Register() {
 					formMessage={formMessage}
 				/>
 
+				<OAuthProviders
+					label={translations['register.action.oauth']}
+					continueWith={translations['oauth.action.continue_with']}
+				/>
+
 				<div className="text-center space-y-2">
 					<p className="text-sm text-muted">
-						Already registered?{' '}
+						{translations['register.link.already_registered']}{' '}
 						<Link
 							href={Routes.get('login')}
 							className="text-accent font-medium hover:underline"
 						>
-							Sign in here
+							{translations['register.link.sign_in']}
 						</Link>
 					</p>
 				</div>

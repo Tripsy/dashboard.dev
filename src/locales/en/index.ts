@@ -18,11 +18,13 @@ import email_confirm from '@/locales/en/email-confirm.json';
 import email_confirm_send from '@/locales/en/email-confirm-send.json';
 import home from '@/locales/en/home.json';
 import image from '@/locales/en/image.json';
+import layout from '@/locales/en/layout.json';
 import log_data from '@/locales/en/log-data.json';
 import log_history from '@/locales/en/log-history.json';
 import login from '@/locales/en/login.json';
 import logout from '@/locales/en/logout.json';
 import mail_queue from '@/locales/en/mail-queue.json';
+import oauth from '@/locales/en/oauth.json';
 import password_recover from '@/locales/en/password-recover.json';
 import password_recover_change from '@/locales/en/password-recover-change.json';
 import permission from '@/locales/en/permission.json';
@@ -59,6 +61,7 @@ const en = {
 	login,
 	logout,
 	'mail-queue': mail_queue,
+	oauth,
 	'password-recover': password_recover,
 	'password-recover-change': password_recover_change,
 	permission,
@@ -79,6 +82,7 @@ const en = {
 	'cmr-session': cmr_session,
 
 	// FE
+	layout,
 	'driver-panel': driver_panel,
 };
 

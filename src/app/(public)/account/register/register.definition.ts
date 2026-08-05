@@ -14,6 +14,41 @@ import {
 import { type Language, LanguageEnum } from '@/types/common.type';
 import type { FormErrorsType, FormSituationType } from '@/types/form.type';
 
+export const REGISTER_TRANSLATION_KEYS = [
+	'register.form.title',
+	'register.form.description',
+	'register.form.title_status',
+	'register.form.success_description',
+	'register.field.name',
+	'register.field.email',
+	'register.field.password',
+	'register.field.password_confirm',
+	'register.field.password_confirm_placeholder',
+	'register.field.language',
+	'register.action.submit',
+	'register.action.oauth',
+	'oauth.action.continue_with',
+	'register.link.confirm_email_prompt',
+	'register.link.confirm_email',
+	'register.link.verification_sent',
+	'register.link.verification_check',
+	'register.link.back_home_prompt',
+	'register.link.back_home',
+	'register.link.already_registered',
+	'register.link.sign_in',
+	'register.link.terms_prompt',
+	'register.link.terms_of_service',
+	'register.link.terms_separator',
+	'register.link.terms_title',
+	'register.link.privacy_policy',
+	'register.link.privacy_title',
+] as const;
+
+export type RegisterTranslations = Record<
+	(typeof REGISTER_TRANSLATION_KEYS)[number],
+	string
+>;
+
 export type RegisterFormValuesType = {
 	name: string | null;
 	email: string | null;

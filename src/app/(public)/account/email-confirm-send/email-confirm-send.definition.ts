@@ -4,6 +4,25 @@ import { getFormDataAsString } from '@/helpers/form.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import type { FormErrorsType, FormSituationType } from '@/types/form.type';
 
+export const EMAIL_CONFIRM_SEND_TRANSLATION_KEYS = [
+	'email-confirm-send.form.title',
+	'email-confirm-send.form.description',
+	'email-confirm-send.form.title_status',
+	'email-confirm-send.form.title_success',
+	'email-confirm-send.form.success_description',
+	'email-confirm-send.field.email',
+	'email-confirm-send.action.submit',
+	'email-confirm-send.link.back_home_prompt',
+	'email-confirm-send.link.back_home',
+	'email-confirm-send.link.not_registered',
+	'email-confirm-send.link.create_account',
+] as const;
+
+export type EmailConfirmSendTranslations = Record<
+	(typeof EMAIL_CONFIRM_SEND_TRANSLATION_KEYS)[number],
+	string
+>;
+
 export type EmailConfirmSendFormValuesType = {
 	email: string | null;
 };

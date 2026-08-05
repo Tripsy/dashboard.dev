@@ -36,5 +36,10 @@
 			"title": "Address details - {{entry}}",
 			"label": "View details"
 		}
+	},
+	"field": {
+		"city": "City",
+		"details": "Details",
+		"postal_code": "Postal Code"
 	}
 }

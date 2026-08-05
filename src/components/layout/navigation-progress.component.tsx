@@ -23,7 +23,15 @@ const MAX_VISIBLE_MS = 15_000;
  * The animation is deliberately indeterminate: we cannot know real progress, and faking a
  * percentage is worse than admitting it.
  */
-export function NavigationProgress() {
+type NavigationProgressProps = {
+	/**
+	 * Resolved in the root layout: this renders above the locale-aware public layout and
+	 * has no request scope of its own to `translate()` from.
+	 */
+	label: string;
+};
+
+export function NavigationProgress({ label }: NavigationProgressProps) {
 	const pathname = usePathname();
 	const [isNavigating, setIsNavigating] = useState(false);
 
@@ -108,7 +116,7 @@ export function NavigationProgress() {
 	return (
 		// `output` already means role="status" + aria-live="polite"; spelling them out on a
 		// div is what the semantic-elements rule flags.
-		<output className="navigation-progress" aria-label="Loading page">
+		<output className="navigation-progress" aria-label={label}>
 			<div className="navigation-progress-bar" />
 		</output>
 	);

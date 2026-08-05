@@ -4,6 +4,23 @@ import { getFormDataAsString } from '@/helpers/form.helper';
 import { BaseValidator } from '@/helpers/validator.helper';
 import type { FormErrorsType, FormSituationType } from '@/types/form.type';
 
+export const PASSWORD_RECOVER_TRANSLATION_KEYS = [
+	'password-recover.form.title',
+	'password-recover.form.description',
+	'password-recover.form.success_description',
+	'password-recover.field.email',
+	'password-recover.action.submit',
+	'password-recover.link.back_home_prompt',
+	'password-recover.link.back_home',
+	'password-recover.link.not_registered',
+	'password-recover.link.create_account',
+] as const;
+
+export type PasswordRecoverTranslations = Record<
+	(typeof PASSWORD_RECOVER_TRANSLATION_KEYS)[number],
+	string
+>;
+
 export type PasswordRecoverFormValuesType = {
 	email: string | null;
 };

@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import Register from '@/app/(public)/account/register/register.component';
+import { REGISTER_TRANSLATION_KEYS } from '@/app/(public)/account/register/register.definition';
 import ProtectedRoute from '@/components/protected-route.component';
 import { RouteAuthEnum } from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
-import { translate } from '@/config/translate.setup';
+import { translate, translateBatch } from '@/config/translate.setup';
 
 export async function generateMetadata(): Promise<Metadata> {
 	return {
@@ -14,10 +15,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
+	const translations = await translateBatch(REGISTER_TRANSLATION_KEYS);
+
 	return (
 		<ProtectedRoute routeAuth={RouteAuthEnum.UNAUTHENTICATED}>
 			<div className="bg-gradient-hero">
-				<Register />
+				<Register translations={translations} />
 			</div>
 		</ProtectedRoute>
 	);

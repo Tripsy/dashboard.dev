@@ -15,6 +15,7 @@ import { logger } from '@/helpers/logger.helper';
 import type { UserModel } from '@/models/user.model';
 import type { ApiResponseFetch } from '@/types/api.type';
 import type { AuthTokenType } from '@/types/auth.type';
+import type { OAuthIdentityType, OAuthProvider } from '@/types/oauth.type';
 
 export async function requestRegister(
 	params: RegisterFormValuesType,
@@ -31,6 +32,55 @@ export async function requestLogin(
 	return await new ApiRequest().doFetch('/account/login', {
 		method: 'POST',
 		body: JSON.stringify(params),
+	});
+}
+
+/**
+ * Redeems a provider authorization code for a session.
+ *
+ * The code is exchanged by the backend, not here — the client secret never reaches the
+ * browser. `redirect_uri` has to be the exact value used to obtain the code, which is why
+ * both legs build it from `getOAuthRedirectUri`.
+ *
+ * The response mirrors `/account/login`, max-active-sessions case included.
+ */
+export async function requestOAuthLogin(
+	provider: OAuthProvider,
+	code: string,
+	redirect_uri: string,
+): Promise<ApiResponseFetch<LoginApiResponseType>> {
+	return await new ApiRequest().doFetch(`/account/oauth/${provider}`, {
+		method: 'POST',
+		body: JSON.stringify({ code, redirect_uri }),
+	});
+}
+
+export async function requestGetOAuthIdentities(): Promise<
+	OAuthIdentityType[]
+> {
+	try {
+		const fetchResponse: ApiResponseFetch<OAuthIdentityType[]> =
+			await new ApiRequest().doFetch('/account/oauth', {
+				method: 'GET',
+			});
+
+		if (fetchResponse?.success) {
+			return fetchResponse.data || [];
+		}
+	} catch (error: unknown) {
+		// Same reasoning as `requestGetSessions`: the caller renders a list, so a failure
+		// degrades to "nothing linked" rather than an error state.
+		logger.error('Failed to load linked sign-in providers', error);
+	}
+
+	return [];
+}
+
+export async function requestUnlinkOAuth(
+	provider: OAuthProvider,
+): Promise<ApiResponseFetch<null>> {
+	return await new ApiRequest().doFetch(`/account/oauth/${provider}`, {
+		method: 'DELETE',
 	});
 }
 

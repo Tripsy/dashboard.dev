@@ -7,6 +7,7 @@ import { Icons } from '@/components/icon.component';
 import { requestFind } from '@/helpers/services.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useRemoteAutocomplete } from '@/hooks/use-remote-autocomplete';
+import { useTranslation } from '@/hooks/use-translation.hook';
 import {
 	type CompanyVehicleModel,
 	CompanyVehicleScopeEnum,
@@ -30,6 +31,13 @@ export type WorkSessionVehicleFormValuesType = {
 	notes: string | null;
 };
 
+const TRANSLATION_KEYS = [
+	'work-session-vehicle.field.vehicle',
+	'work-session-vehicle.field.km_start',
+	'work-session-vehicle.field.km_end',
+	'work-session-vehicle.field.notes',
+] as const;
+
 export function FormManageWorkSessionVehicle() {
 	const { auth } = useAuth();
 	const { getCurrentWindow, close } = useModalStore();
@@ -39,6 +47,8 @@ export function FormManageWorkSessionVehicle() {
 
 	const { formValues, errors, handleChange, pending } =
 		useWindowForm<WorkSessionVehicleFormValuesType>();
+
+	const { translations } = useTranslation(TRANSLATION_KEYS);
 
 	const elementIds = useElementIds([
 		'company_vehicle',
@@ -96,7 +106,7 @@ export function FormManageWorkSessionVehicle() {
 				WorkSessionVehicleFormValuesType,
 				CompanyVehicleModel
 			>
-				labelText="Vehicle"
+				labelText={translations['work-session-vehicle.field.vehicle']}
 				id={elementIds.company_vehicle}
 				fieldName="company_vehicle"
 				fieldValue={formValues.company_vehicle ?? ''}
@@ -134,7 +144,9 @@ export function FormManageWorkSessionVehicle() {
 			{formValues.vehicle_type !== VehicleTypeEnum.TRAILER && (
 				<div className="flex flex-wrap gap-2">
 					<FormComponentInput<WorkSessionVehicleFormValuesType>
-						labelText="Start Km"
+						labelText={
+							translations['work-session-vehicle.field.km_start']
+						}
 						id={elementIds.vehicle_km_start}
 						fieldName="vehicle_km_start"
 						fieldType="number"
@@ -152,7 +164,11 @@ export function FormManageWorkSessionVehicle() {
 					/>
 					{windowConfigAction === 'update' && (
 						<FormComponentInput<WorkSessionVehicleFormValuesType>
-							labelText="End Km"
+							labelText={
+								translations[
+									'work-session-vehicle.field.km_end'
+								]
+							}
 							id={elementIds.vehicle_km_end}
 							fieldName="vehicle_km_end"
 							fieldType="number"
@@ -173,7 +189,7 @@ export function FormManageWorkSessionVehicle() {
 			)}
 
 			<FormComponentInput<WorkSessionVehicleFormValuesType>
-				labelText="Notes"
+				labelText={translations['work-session-vehicle.field.notes']}
 				id={elementIds.notes}
 				fieldName="notes"
 				fieldValue={formValues.notes ?? ''}

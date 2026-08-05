@@ -37,5 +37,16 @@
 			"title": "CMR vehicle details - {{entry}}",
 			"label": "View details"
 		}
+	},
+	"field": {
+		"vehicle": "Vehicle",
+		"vin": "VIN",
+		"license_plate": "License Plate",
+		"notes": "Notes"
+	},
+	"button": {
+		"add": "Add vehicle",
+		"update": "Update vehicle",
+		"delete": "Delete vehicle"
 	}
 }

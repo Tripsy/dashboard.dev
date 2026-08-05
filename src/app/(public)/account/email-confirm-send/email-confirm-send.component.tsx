@@ -7,6 +7,7 @@ import {
 	type EmailConfirmSendFormValuesType,
 	type EmailConfirmSendSituationType,
 	EmailConfirmSendState,
+	type EmailConfirmSendTranslations,
 	validateFormEmailConfirmSend,
 } from '@/app/(public)/account/email-confirm-send/email-confirm-send.definition';
 import {
@@ -26,7 +27,13 @@ import { useFormSituation } from '@/hooks/use-form-situation.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
 
-export default function EmailConfirmSend() {
+type EmailConfirmSendProps = {
+	translations: EmailConfirmSendTranslations;
+};
+
+export default function EmailConfirmSend({
+	translations,
+}: EmailConfirmSendProps) {
 	const [state, action, pending] = useActionState(
 		emailConfirmSendAction,
 		EmailConfirmSendState,
@@ -55,7 +62,7 @@ export default function EmailConfirmSend() {
 	if (formSituation === 'csrfError') {
 		return (
 			<ErrorComponent
-				title="Email Confirmation"
+				title={translations['email-confirm-send.form.title_status']}
 				description={formMessage as string}
 			/>
 		);
@@ -64,18 +71,18 @@ export default function EmailConfirmSend() {
 	if (formSituation === 'success') {
 		return (
 			<SuccessComponent
-				title="Email Confirmation Sent"
-				description="Please
-					check your email and follow instructions to complete the
-					confirmation process."
+				title={translations['email-confirm-send.form.title_success']}
+				description={
+					translations['email-confirm-send.form.success_description']
+				}
 			>
 				<div className="text-center mt-6">
-					Meanwhile you can go back to{' '}
+					{translations['email-confirm-send.link.back_home_prompt']}{' '}
 					<Link
 						href={Routes.get('home')}
 						className="text-accent font-medium hover:underline"
 					>
-						home page
+						{translations['email-confirm-send.link.back_home']}
 					</Link>
 				</div>
 			</SuccessComponent>
@@ -84,8 +91,8 @@ export default function EmailConfirmSend() {
 
 	return (
 		<FormWrapperComponent
-			title="Get Your Email Confirmation"
-			description="Use the form below to re-send the confirmation email to the email address you used to register."
+			title={translations['email-confirm-send.form.title']}
+			description={translations['email-confirm-send.form.description']}
 		>
 			<form
 				action={action}
@@ -93,7 +100,7 @@ export default function EmailConfirmSend() {
 				className="form-section"
 			>
 				<FormComponentEmail<EmailConfirmSendFormValuesType>
-					labelText="Email Address"
+					labelText={translations['email-confirm-send.field.email']}
 					id={elementIds.email}
 					fieldValue={formValues.email ?? ''}
 					disabled={pending}
@@ -106,7 +113,7 @@ export default function EmailConfirmSend() {
 					submitted={submitted}
 					error={formSituation === 'failedValidation'}
 					button={{
-						label: 'Get confirmation',
+						label: translations['email-confirm-send.action.submit'],
 					}}
 				/>
 
@@ -117,12 +124,16 @@ export default function EmailConfirmSend() {
 
 				<div className="text-center space-y-2">
 					<p className="text-sm text-muted">
-						Not registered yet?{' '}
+						{translations['email-confirm-send.link.not_registered']}{' '}
 						<Link
 							href={Routes.get('register')}
 							className="text-accent font-medium hover:underline"
 						>
-							Create an account
+							{
+								translations[
+									'email-confirm-send.link.create_account'
+								]
+							}
 						</Link>
 					</p>
 				</div>

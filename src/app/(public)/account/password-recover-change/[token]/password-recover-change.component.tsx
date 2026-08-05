@@ -8,6 +8,7 @@ import {
 	type PasswordRecoverChangeFormValuesType,
 	type PasswordRecoverChangeSituationType,
 	PasswordRecoverChangeState,
+	type PasswordRecoverChangeTranslations,
 	validateFormPasswordRecoverChange,
 } from '@/app/(public)/account/password-recover-change/[token]/password-recover-change.definition';
 import {
@@ -27,7 +28,13 @@ import { useFormSituation } from '@/hooks/use-form-situation.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
 
-export default function PasswordRecoverChange() {
+type PasswordRecoverChangeProps = {
+	translations: PasswordRecoverChangeTranslations;
+};
+
+export default function PasswordRecoverChange({
+	translations,
+}: PasswordRecoverChangeProps) {
 	const [showPassword, setShowPassword] = useState(false);
 
 	const params = useParams<{ token: string }>();
@@ -65,7 +72,7 @@ export default function PasswordRecoverChange() {
 	if (formSituation === 'csrfError') {
 		return (
 			<ErrorComponent
-				title="Recover password"
+				title={translations['password-recover-change.form.title']}
 				description={formMessage as string}
 			/>
 		);
@@ -74,18 +81,30 @@ export default function PasswordRecoverChange() {
 	if (formSituation === 'success') {
 		return (
 			<SuccessComponent
-				title="Recover Password"
-				description="Your password has been updated successfully."
+				title={translations['password-recover-change.form.title']}
+				description={
+					translations[
+						'password-recover-change.form.success_description'
+					]
+				}
 			>
 				<div className="text-center mt-6">
-					You can now go to the{' '}
+					{
+						translations[
+							'password-recover-change.link.sign_in_prompt'
+						]
+					}{' '}
 					<Link
 						href={Routes.get('login')}
 						className="text-accent font-medium hover:underline"
 					>
-						login page
+						{translations['password-recover-change.link.sign_in']}
 					</Link>{' '}
-					and sign in with your new password.
+					{
+						translations[
+							'password-recover-change.link.sign_in_suffix'
+						]
+					}
 				</div>
 			</SuccessComponent>
 		);
@@ -93,8 +112,10 @@ export default function PasswordRecoverChange() {
 
 	return (
 		<FormWrapperComponent
-			title="Recover Password"
-			description="Set up a new password for your account."
+			title={translations['password-recover-change.form.title']}
+			description={
+				translations['password-recover-change.form.description']
+			}
 		>
 			<form
 				action={action}
@@ -102,7 +123,9 @@ export default function PasswordRecoverChange() {
 				className="form-section"
 			>
 				<FormComponentPassword<PasswordRecoverChangeFormValuesType>
-					labelText="New Password"
+					labelText={
+						translations['password-recover-change.field.password']
+					}
 					id={elementIds.password}
 					fieldName="password"
 					fieldValue={formValues.password ?? ''}
@@ -114,11 +137,19 @@ export default function PasswordRecoverChange() {
 				/>
 
 				<FormComponentPassword<PasswordRecoverChangeFormValuesType>
-					labelText="Confirm Password"
+					labelText={
+						translations[
+							'password-recover-change.field.password_confirm'
+						]
+					}
 					id={elementIds.passwordConfirm}
 					fieldName="password_confirm"
 					fieldValue={formValues.password_confirm ?? ''}
-					placeholderText="Password confirmation"
+					placeholderText={
+						translations[
+							'password-recover-change.field.password_confirm_placeholder'
+						]
+					}
 					disabled={pending}
 					onChange={(e) =>
 						handleChange('password_confirm', e.target.value)
@@ -132,7 +163,9 @@ export default function PasswordRecoverChange() {
 					submitted={submitted}
 					error={formSituation === 'failedValidation'}
 					button={{
-						label: 'Set password',
+						label: translations[
+							'password-recover-change.action.submit'
+						],
 					}}
 				/>
 

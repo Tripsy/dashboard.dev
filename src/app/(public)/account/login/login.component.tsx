@@ -4,12 +4,14 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useActionState, useEffect, useState } from 'react';
 import { AuthTokenList } from '@/app/(public)/_components/auth-token-list.component';
+import { OAuthProviders } from '@/app/(public)/_components/oauth-providers.component';
 import { loginAction } from '@/app/(public)/account/login/login.action';
 import {
 	isLoginResponseMaxActiveSessions,
 	type LoginFormValuesType,
 	type LoginSituationType,
 	LoginState,
+	type LoginTranslations,
 	validateFormLogin,
 } from '@/app/(public)/account/login/login.definition';
 import {
@@ -26,11 +28,14 @@ import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useFormSituation } from '@/hooks/use-form-situation.hook';
 import { useFormValidation } from '@/hooks/use-form-validation.hook';
 import { useFormValues } from '@/hooks/use-form-values.hook';
-import { useTranslation } from '@/hooks/use-translation.hook';
 import { useAuth } from '@/providers/auth.provider';
 import { useToast } from '@/providers/toast.provider';
 
-export default function Login() {
+type LoginProps = {
+	translations: LoginTranslations;
+};
+
+export default function Login({ translations }: LoginProps) {
 	const [showPassword, setShowPassword] = useState(false);
 	const { showToast } = useToast();
 
@@ -56,13 +61,6 @@ export default function Login() {
 			debounceDelay: 800,
 			onValidation: handleValidation,
 		});
-
-	const translationsKeys = [
-		'login.message.session_destroy_success',
-		'login.message.session_destroy_error',
-	] as const;
-
-	const { translations } = useTranslation(translationsKeys);
 
 	const handleChange = createHandleChange(setFormValues, markFieldAsTouched);
 
@@ -98,23 +96,28 @@ export default function Login() {
 
 	if (formSituation === 'csrfError') {
 		return (
-			<ErrorComponent title="Login" description={formMessage as string} />
+			<ErrorComponent
+				title={translations['login.form.title_status']}
+				description={formMessage as string}
+			/>
 		);
 	}
 
 	if (formSituation === 'pendingAccount') {
 		return (
-			<ErrorComponent title="Login" description={formMessage as string}>
+			<ErrorComponent
+				title={translations['login.form.title_status']}
+				description={formMessage as string}
+			>
 				<div className="text-center mt-6">
 					<span className="text-muted">
-						Have you confirmed your email? If you’ve lost the
-						instructions, you can resend the{' '}
+						{translations['login.link.confirm_email_prompt']}{' '}
 					</span>
 					<Link
 						href={Routes.get('email-confirm-send')}
 						className="text-accent font-medium hover:underline"
 					>
-						confirmation email
+						{translations['login.link.confirm_email']}
 					</Link>
 				</div>
 			</ErrorComponent>
@@ -128,8 +131,8 @@ export default function Login() {
 
 	return (
 		<FormWrapperComponent
-			title="Welcome back"
-			description="Sign in to your account to continue"
+			title={translations['login.form.title']}
+			description={translations['login.form.description']}
 		>
 			<form
 				action={action}
@@ -137,7 +140,7 @@ export default function Login() {
 				className="form-section"
 			>
 				<FormComponentEmail<LoginFormValuesType>
-					labelText="Email Address"
+					labelText={translations['login.field.email']}
 					id={elementIds.email}
 					fieldValue={formValues.email ?? ''}
 					disabled={pending}
@@ -146,7 +149,7 @@ export default function Login() {
 				/>
 
 				<FormComponentPassword<LoginFormValuesType>
-					labelText="Password"
+					labelText={translations['login.field.password']}
 					id={elementIds.password}
 					fieldName="password"
 					fieldValue={formValues.password ?? ''}
@@ -164,7 +167,7 @@ export default function Login() {
 					error={formSituation === 'failedValidation'}
 					button={{
 						icon: 'login',
-						label: 'Login',
+						label: translations['login.action.submit'],
 					}}
 				/>
 
@@ -185,7 +188,9 @@ export default function Login() {
 							onResult={(success, message) => {
 								showToast({
 									severity: success ? 'success' : 'error',
-									summary: success ? 'Success' : 'Error',
+									summary: success
+										? translations['app.success.title']
+										: translations['app.error.title'],
 									detail:
 										message === 'session_destroy_success'
 											? translations[
@@ -200,23 +205,28 @@ export default function Login() {
 					</div>
 				)}
 
+				<OAuthProviders
+					label={translations['login.action.oauth']}
+					continueWith={translations['oauth.action.continue_with']}
+				/>
+
 				<div className="text-center space-y-2">
 					<p className="text-sm text-muted">
-						Don't have an account?{' '}
+						{translations['login.link.no_account']}{' '}
 						<Link
 							href={Routes.get('register')}
 							className="text-accent font-medium hover:underline"
 						>
-							Create an account
+							{translations['login.link.create_account']}
 						</Link>
 					</p>
 					<p className="text-sm text-muted">
-						Forgot your password?{' '}
+						{translations['login.link.forgot_password']}{' '}
 						<Link
 							href={Routes.get('password-recover')}
 							className="text-accent font-medium hover:underline"
 						>
-							Reset it here
+							{translations['login.link.reset_password']}
 						</Link>
 					</p>
 				</div>

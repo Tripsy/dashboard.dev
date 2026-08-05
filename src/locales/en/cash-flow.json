@@ -72,5 +72,14 @@
 			"title": "Cash flow details - {{entry}}",
 			"label": "View details"
 		}
+	},
+	"field": {
+		"method": "Method",
+		"amount": "Amount",
+		"vat_rate": "Vat Rate",
+		"currency": "Currency",
+		"external_reference": "External Reference",
+		"vendor": "Vendor",
+		"notes": "Notes"
 	}
 }

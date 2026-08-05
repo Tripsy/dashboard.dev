@@ -5,15 +5,18 @@ import { useTransition } from 'react';
 import { Switch } from '@/components/ui/switch';
 import Routes from '@/config/routes.setup';
 import { CSRF_HEADER, getCsrfToken } from '@/helpers/csrf.helper';
+import type { LayoutTranslations } from '@/types/layout.type';
 
 type LanguageSwitcherProps = {
 	currentLanguage: string;
 	supportedLanguages: string[];
+	translations: LayoutTranslations;
 };
 
 export function LanguageSwitcher({
 	currentLanguage,
 	supportedLanguages,
+	translations,
 }: LanguageSwitcherProps) {
 	const router = useRouter();
 	const [isPending, startTransition] = useTransition();
@@ -56,7 +59,7 @@ export function LanguageSwitcher({
 			isSelected={isOn}
 			isDisabled={isPending}
 			onChange={(selected) => switchLanguage(selected ? langOn : langOff)}
-			aria-label="Switch language"
+			aria-label={translations['layout.aria.switch_language']}
 			thumbIcon={
 				<span className="text-xs font-bold uppercase">
 					{isOn ? langOn : langOff}

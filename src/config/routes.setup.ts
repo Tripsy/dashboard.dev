@@ -171,7 +171,10 @@ Routes.group('api')
 	.add('language', '/api/language')
 	.add('api-image', '/api/image', {
 		auth: RouteAuthEnum.PUBLIC,
-	});
+	})
+	// Mints the `state` cookie and bounces the browser to the provider. A route handler
+	// rather than a server action so the button is a plain link the browser can follow.
+	.add('oauth-start', '/api/oauth/:provider');
 
 // Account
 Routes.group('account')
@@ -185,6 +188,8 @@ Routes.group('account')
 		auth: RouteAuthEnum.PUBLIC,
 	})
 	.add('email-confirm-send', '/account/email-confirm-send')
+	// Where the provider returns the browser; must match `getOAuthRedirectUri`.
+	.add('oauth-callback', '/account/oauth/:provider')
 	// account edit / email-update / password-update / delete are no longer
 	// standalone routes — they open as windows from /account/me (see
 	// _components/account/account.definition.ts).
@@ -271,24 +276,36 @@ Routes.group('dashboard')
 	});
 
 /**
+ * Routes a signed-in user must never be sent back to.
+ *
+ * Held as route *names*, not paths: `Routes.get('email-confirm')` returns the pattern
+ * `/account/email-confirm/:token` verbatim, which no real pathname ever equals — so a
+ * path-based list silently failed to exclude every parameterised route in it.
+ */
+const EXCLUDED_ROUTE_NAMES: ReadonlySet<string> = new Set([
+	'login',
+	'logout',
+	'register',
+	'password-recover',
+	'password-recover-change',
+	'email-confirm',
+	'email-confirm-send',
+	'oauth-callback',
+]);
+
+/**
  * Check if the given path is an excluded route (usually auth related routes)
  * On successful login it doesn't redirect back to excluded routes
- * `auth` is not refreshed periodically while on excluded routes
  *
- * @param pathname
+ * Resolves the pathname to a route first, so `/account/email-confirm/abc123` is recognised
+ * as `email-confirm` rather than compared as a literal string.
+ *
+ * @param pathname - a pathname without its query string
  */
 export function isExcludedRoute(pathname: string) {
-	const excludeRoutes = [
-		Routes.get('login'),
-		Routes.get('logout'),
-		Routes.get('register'),
-		Routes.get('password-recover'),
-		Routes.get('password-recover-change'),
-		Routes.get('email-confirm'),
-		Routes.get('email-confirm-send'),
-	];
+	const route = Routes.match(pathname);
 
-	return excludeRoutes.includes(pathname);
+	return route !== null && EXCLUDED_ROUTE_NAMES.has(route.name);
 }
 
 /**

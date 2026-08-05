@@ -14,6 +14,7 @@ import { formatEnumLabel } from '@/helpers/string.helper';
 import { resolveWindowEntries } from '@/helpers/window.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useRemoteAutocomplete } from '@/hooks/use-remote-autocomplete';
+import { useTranslation } from '@/hooks/use-translation.hook';
 import {
 	type CashFlowCategory,
 	type CashFlowMethod,
@@ -62,6 +63,16 @@ const currencies = toOptionsFromEnum(CurrencyEnum, {
 	formatter: formatEnumLabel,
 });
 
+const TRANSLATION_KEYS = [
+	'cash-flow.field.method',
+	'cash-flow.field.amount',
+	'cash-flow.field.vat_rate',
+	'cash-flow.field.currency',
+	'cash-flow.field.external_reference',
+	'cash-flow.field.vendor',
+	'cash-flow.field.notes',
+] as const;
+
 export function FormManageCashFlow() {
 	const queryClient = useQueryClient();
 
@@ -84,6 +95,8 @@ export function FormManageCashFlow() {
 
 	const { formValues, errors, handleChange, pending } =
 		useWindowForm<CashFlowFormValuesType>();
+
+	const { translations } = useTranslation(TRANSLATION_KEYS);
 
 	const operationalRecordErrors = errors.operational_records as
 		| FormErrorsType<
@@ -224,7 +237,7 @@ export function FormManageCashFlow() {
 			<input type="hidden" name="category" value={formValues.category} />
 
 			<FormComponentSelect<CashFlowFormValuesType>
-				labelText="Method"
+				labelText={translations['cash-flow.field.method']}
 				id={elementIds.method}
 				fieldName="method"
 				fieldValue={formValues.method}
@@ -239,7 +252,7 @@ export function FormManageCashFlow() {
 
 			<div className="flex flex-wrap gap-2">
 				<FormComponentInput<CashFlowFormValuesType>
-					labelText="Amount"
+					labelText={translations['cash-flow.field.amount']}
 					id={elementIds.grossAmount}
 					fieldName="grossAmount"
 					fieldType="number"
@@ -258,7 +271,7 @@ export function FormManageCashFlow() {
 				/>
 
 				<FormComponentInput<CashFlowFormValuesType>
-					labelText="Vat Rate"
+					labelText={translations['cash-flow.field.vat_rate']}
 					id={elementIds.vatRate}
 					fieldName="vat_rate"
 					fieldType="number"
@@ -278,7 +291,7 @@ export function FormManageCashFlow() {
 			</div>
 
 			<FormComponentRadio<CashFlowFormValuesType>
-				labelText="Currency"
+				labelText={translations['cash-flow.field.currency']}
 				id={elementIds.currency}
 				fieldName="currency"
 				fieldValue={formValues.currency}
@@ -291,7 +304,7 @@ export function FormManageCashFlow() {
 			/>
 
 			<FormComponentInput<CashFlowFormValuesType>
-				labelText="External Reference"
+				labelText={translations['cash-flow.field.external_reference']}
 				id={elementIds.externalReference}
 				fieldName="external_reference"
 				fieldValue={formValues.external_reference ?? ''}
@@ -331,7 +344,7 @@ export function FormManageCashFlow() {
 						CashFlowFormValuesType,
 						VendorModel
 					>
-						labelText="Vendor"
+						labelText={translations['cash-flow.field.vendor']}
 						id={elementIds.vendor}
 						fieldName="vendor"
 						fieldValue={formValues.vendor ?? ''}
@@ -418,7 +431,7 @@ export function FormManageCashFlow() {
 			)}
 
 			<FormComponentTextarea<CashFlowFormValuesType>
-				labelText="Notes"
+				labelText={translations['cash-flow.field.notes']}
 				id={elementIds.notes}
 				fieldName="notes"
 				fieldValue={formValues.notes ?? ''}

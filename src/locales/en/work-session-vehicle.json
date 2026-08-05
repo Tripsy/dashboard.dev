@@ -2,7 +2,6 @@
 	"meta": {
 		"title": "Work session vehicles - Dashboard | {{app_name}}"
 	},
-
 	"validation": {
 		"invalid_work_session_id": "Invalid work session",
 		"invalid_company_vehicle_id": "Invalid company vehicle; Pick vehicle from select",
@@ -46,5 +45,11 @@
 			"title": "Work session vehicle details - {{entry}}",
 			"label": "View details"
 		}
+	},
+	"field": {
+		"vehicle": "Vehicle",
+		"km_start": "Start Km",
+		"km_end": "End Km",
+		"notes": "Notes"
 	}
 }

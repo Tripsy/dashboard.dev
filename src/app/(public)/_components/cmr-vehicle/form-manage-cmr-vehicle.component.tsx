@@ -8,6 +8,7 @@ import { Icons } from '@/components/icon.component';
 import { requestFind } from '@/helpers/services.helper';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
 import { useRemoteAutocomplete } from '@/hooks/use-remote-autocomplete';
+import { useTranslation } from '@/hooks/use-translation.hook';
 import {
 	displayVehicleLabel,
 	type VehicleModel,
@@ -27,9 +28,18 @@ export type CmrVehicleFormValuesType = {
 	notes: string | null;
 };
 
+const TRANSLATION_KEYS = [
+	'cmr-vehicle.field.vehicle',
+	'cmr-vehicle.field.vin',
+	'cmr-vehicle.field.license_plate',
+	'cmr-vehicle.field.notes',
+] as const;
+
 export function FormManageCmrVehicle() {
 	const { formValues, errors, handleChange, pending } =
 		useWindowForm<CmrVehicleFormValuesType>();
+
+	const { translations } = useTranslation(TRANSLATION_KEYS);
 
 	const queryClient = useQueryClient();
 
@@ -87,7 +97,7 @@ export function FormManageCmrVehicle() {
 			/>
 
 			<FormComponentAutoComplete<CmrVehicleFormValuesType, VehicleModel>
-				labelText="Vehicle"
+				labelText={translations['cmr-vehicle.field.vehicle']}
 				id={elementIds.vehicle}
 				fieldName="vehicle"
 				fieldValue={formValues.vehicle ?? ''}
@@ -154,7 +164,7 @@ export function FormManageCmrVehicle() {
 			/>
 
 			<FormComponentInput<CmrVehicleFormValuesType>
-				labelText="VIN"
+				labelText={translations['cmr-vehicle.field.vin']}
 				id={elementIds.vin}
 				fieldName="vin"
 				fieldValue={formValues.vin ?? ''}
@@ -166,7 +176,7 @@ export function FormManageCmrVehicle() {
 			/>
 
 			<FormComponentInput<CmrVehicleFormValuesType>
-				labelText="License Plate"
+				labelText={translations['cmr-vehicle.field.license_plate']}
 				id={elementIds.license_plate}
 				fieldName="license_plate"
 				fieldValue={formValues.license_plate ?? ''}
@@ -177,7 +187,7 @@ export function FormManageCmrVehicle() {
 			/>
 
 			<FormComponentInput<CmrVehicleFormValuesType>
-				labelText="Notes"
+				labelText={translations['cmr-vehicle.field.notes']}
 				id={elementIds.notes}
 				fieldName="notes"
 				fieldValue={formValues.notes ?? ''}

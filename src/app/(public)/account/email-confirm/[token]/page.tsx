@@ -6,9 +6,24 @@ import {
 } from '@/components/status.component';
 import Routes from '@/config/routes.setup';
 import { Configuration } from '@/config/settings.config';
-import { translate } from '@/config/translate.setup';
+import { translate, translateBatch } from '@/config/translate.setup';
 import { ApiError } from '@/exceptions/api.error';
 import { requestEmailConfirm } from '@/services/account.service';
+
+const EMAIL_CONFIRM_TRANSLATION_KEYS = [
+	'email-confirm.form.title',
+	'email-confirm.link.success_prompt',
+	'email-confirm.link.account',
+	'email-confirm.link.account_title',
+	'email-confirm.link.or_navigate',
+	'email-confirm.link.home',
+	'email-confirm.link.error_prompt',
+	'email-confirm.link.register',
+	'email-confirm.link.register_title',
+	'email-confirm.link.or_request',
+	'email-confirm.link.confirm_again',
+	'email-confirm.link.confirm_again_title',
+] as const;
 
 interface Props {
 	params: Promise<{
@@ -53,24 +68,29 @@ export default async function Page(props: Props) {
 		}
 	}
 
+	const t = await translateBatch(EMAIL_CONFIRM_TRANSLATION_KEYS);
+
 	if (success) {
 		return (
-			<SuccessComponent title="Email Confirmation" description={message}>
+			<SuccessComponent
+				title={t['email-confirm.form.title']}
+				description={message}
+			>
 				<div className="text-center mt-6">
-					What's next? Check{' '}
+					{t['email-confirm.link.success_prompt']}{' '}
 					<Link
 						href={Routes.get('account-me')}
 						className="text-accent font-medium hover:underline"
-						title="Go to your account"
+						title={t['email-confirm.link.account_title']}
 					>
-						your account
+						{t['email-confirm.link.account']}
 					</Link>{' '}
-					or navigate to{' '}
+					{t['email-confirm.link.or_navigate']}{' '}
 					<Link
 						href={Routes.get('home')}
 						className="text-accent font-medium hover:underline"
 					>
-						home page
+						{t['email-confirm.link.home']}
 					</Link>
 				</div>
 			</SuccessComponent>
@@ -78,23 +98,26 @@ export default async function Page(props: Props) {
 	}
 
 	return (
-		<ErrorComponent title="Email Confirmation" description={message}>
+		<ErrorComponent
+			title={t['email-confirm.form.title']}
+			description={message}
+		>
 			<div className="text-center mt-6">
-				What now? You can register for a{' '}
+				{t['email-confirm.link.error_prompt']}{' '}
 				<Link
 					href={Routes.get('register')}
 					className="text-accent font-medium hover:underline"
-					title="Create account"
+					title={t['email-confirm.link.register_title']}
 				>
-					new account
+					{t['email-confirm.link.register']}
 				</Link>{' '}
-				or request{' '}
+				{t['email-confirm.link.or_request']}{' '}
 				<Link
 					href={Routes.get('email-confirm-send')}
 					className="text-accent font-medium hover:underline"
-					title="Send confirmation link again"
+					title={t['email-confirm.link.confirm_again_title']}
 				>
-					another confirmation link
+					{t['email-confirm.link.confirm_again']}
 				</Link>
 			</div>
 		</ErrorComponent>

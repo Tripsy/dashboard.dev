@@ -3,7 +3,10 @@
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { logoutAction } from '@/app/(public)/account/logout/logout.action';
-import { LogoutDefaultState } from '@/app/(public)/account/logout/logout.definition';
+import {
+	LogoutDefaultState,
+	type LogoutTranslations,
+} from '@/app/(public)/account/logout/logout.definition';
 import {
 	ErrorComponent,
 	LoadingComponent,
@@ -14,7 +17,11 @@ import { logRejection } from '@/helpers/logger.helper';
 import { useAuth } from '@/providers/auth.provider';
 import { clearWindowStore } from '@/stores/window.store';
 
-export default function Logout() {
+type LogoutProps = {
+	translations: LogoutTranslations;
+};
+
+export default function Logout({ translations }: LogoutProps) {
 	const [state, setState] = useState(LogoutDefaultState);
 	const { setAuth, setAuthStatus } = useAuth();
 
@@ -49,8 +56,8 @@ export default function Logout() {
 	if (state.situation === null) {
 		return (
 			<LoadingComponent
-				title="Logout"
-				description="Your session will end. See you next time!"
+				title={translations['logout.form.title']}
+				description={translations['logout.message.loading_description']}
 			/>
 		);
 	}
@@ -58,10 +65,10 @@ export default function Logout() {
 	if (state.situation === 'error') {
 		return (
 			<ErrorComponent
-				title="Logout"
+				title={translations['logout.form.title']}
 				description={
 					state.message ||
-					'An error occurred while logging out. Please try again later. If the problem persists, contact support!'
+					translations['logout.message.error_description']
 				}
 			/>
 		);
@@ -70,27 +77,27 @@ export default function Logout() {
 	if (state.situation === 'success') {
 		return (
 			<SuccessComponent
-				title="Logout"
+				title={translations['logout.form.title']}
 				description={
 					state.message ||
-					'Your session has been ended. See you next time!'
+					translations['logout.message.success_description']
 				}
 			>
 				<div className="text-center mt-6">
-					What next? <br />
-					You can go back to{' '}
+					{translations['logout.link.what_next']} <br />
+					{translations['logout.link.go_back_prompt']}{' '}
 					<Link
 						href={Routes.get('login')}
 						className="text-accent font-medium hover:underline"
 					>
-						login
+						{translations['logout.link.login']}
 					</Link>{' '}
-					or navigate to{' '}
+					{translations['logout.link.or_navigate']}{' '}
 					<Link
 						href={Routes.get('home')}
 						className="text-accent font-medium hover:underline"
 					>
-						home page
+						{translations['logout.link.home']}
 					</Link>
 				</div>
 			</SuccessComponent>

@@ -1,8 +1,17 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Modal } from '@/components/ui/modal';
+import { useTranslation } from '@/hooks/use-translation.hook';
 import { requestRemoveAuthToken } from '@/services/account.service';
 import type { AuthTokenType } from '@/types/auth.type';
+
+const TRANSLATION_KEYS = [
+	'account.session.destroy_title',
+	'account.session.deleting',
+	'account.session.confirm_question',
+	'app.action.confirm.label',
+	'app.action.cancel.label',
+] as const;
 
 interface AuthTokenDestroyModalProps {
 	token: AuthTokenType;
@@ -18,6 +27,7 @@ export const AuthTokenDestroyModal = ({
 	onError,
 }: AuthTokenDestroyModalProps) => {
 	const [loading, setLoading] = useState(false);
+	const { translations } = useTranslation(TRANSLATION_KEYS);
 
 	const handleConfirm = async () => {
 		if (!token) {
@@ -42,7 +52,7 @@ export const AuthTokenDestroyModal = ({
 		<Modal
 			isOpen={true}
 			onClose={onClose}
-			title="Destroy session"
+			title={translations['account.session.destroy_title']}
 			footer={
 				<>
 					<Button
@@ -51,7 +61,9 @@ export const AuthTokenDestroyModal = ({
 						onClick={handleConfirm}
 						disabled={loading}
 					>
-						{loading ? 'Deleting...' : 'Confirm'}
+						{loading
+							? translations['account.session.deleting']
+							: translations['app.action.confirm.label']}
 					</Button>
 					<Button
 						variant="outline"
@@ -59,13 +71,13 @@ export const AuthTokenDestroyModal = ({
 						onClick={onClose}
 						disabled={loading}
 					>
-						Cancel
+						{translations['app.action.cancel.label']}
 					</Button>
 				</>
 			}
 		>
 			<p className="text-sm semi-bold">
-				Are you sure you want to destroy the session?
+				{translations['account.session.confirm_question']}
 			</p>
 			<p className="font-mono text-xs wrap-break-word mt-2">
 				{token.label}

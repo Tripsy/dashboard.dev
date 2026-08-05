@@ -117,6 +117,10 @@ export default async function dataSourceConfig(): Promise<
 			'emailUpdate.title',
 			'passwordUpdate.title',
 			'deleteAccount.title',
+			'edit.submit',
+			'emailUpdate.submit',
+			'passwordUpdate.submit',
+			'deleteAccount.submit',
 		] as const,
 		'account.action',
 	);
@@ -137,7 +141,7 @@ export default async function dataSourceConfig(): Promise<
 				operationFunction: (values: AccountEditFormValuesType) =>
 					asUserResult(requestEditAccount(values)),
 				buttonPosition: 'hidden',
-				button: { icon: 'save', label: 'Save' },
+				button: { icon: 'save', label: translations['edit.submit'] },
 				getFormValues: getAccountEditFormValues,
 				validateForm: validateFormAccountEdit,
 				getFormState: getAccountEditFormState,
@@ -152,7 +156,10 @@ export default async function dataSourceConfig(): Promise<
 				operationFunction: (values: EmailUpdateFormValuesType) =>
 					asUserResult(requestEmailUpdate(values)),
 				buttonPosition: 'hidden',
-				button: { icon: 'save', label: 'Update' },
+				button: {
+					icon: 'save',
+					label: translations['emailUpdate.submit'],
+				},
 				getFormValues: getEmailUpdateFormValues,
 				validateForm: validateFormEmailUpdate,
 				getFormState: getEmailUpdateFormState,
@@ -167,7 +174,10 @@ export default async function dataSourceConfig(): Promise<
 				operationFunction: (values: PasswordUpdateFormValuesType) =>
 					asUserResult(requestPasswordUpdate(values)),
 				buttonPosition: 'hidden',
-				button: { icon: 'save', label: 'Update password' },
+				button: {
+					icon: 'save',
+					label: translations['passwordUpdate.submit'],
+				},
 				getFormValues: getPasswordUpdateFormValues,
 				validateForm: validateFormPasswordUpdate,
 				getFormState: getPasswordUpdateFormState,
@@ -187,7 +197,7 @@ export default async function dataSourceConfig(): Promise<
 				button: {
 					variant: 'error',
 					icon: 'destroy',
-					label: 'Delete account',
+					label: translations['deleteAccount.submit'],
 				},
 				getFormValues: getAccountDeleteFormValues,
 				validateForm: validateFormAccountDelete,

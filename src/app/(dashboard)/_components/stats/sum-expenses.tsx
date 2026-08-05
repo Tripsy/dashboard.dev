@@ -41,7 +41,9 @@ export function SumExpenses() {
 			<div
 				className={cn(
 					'flex items-center text-xs mt-1',
-					data.trend === 'up' ? 'text-success' : 'text-danger',
+					// Inverted vs. the revenue tiles: for a cost metric, rising
+					// is the bad outcome.
+					data.trend === 'up' ? 'text-danger' : 'text-success',
 				)}
 			>
 				{data.trend === 'up' ? (

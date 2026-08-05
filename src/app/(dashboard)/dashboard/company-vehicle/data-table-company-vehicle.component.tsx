@@ -10,7 +10,7 @@ export const DataTableCompanyVehicle = (): JSX.Element => {
 	return (
 		<DataTableProvider
 			dataSource="company-vehicle"
-			selectionMode="checkbox"
+			selectionMode="single"
 		>
 			<div className="table-container">
 				<DataTableFiltersCompanyVehicle />

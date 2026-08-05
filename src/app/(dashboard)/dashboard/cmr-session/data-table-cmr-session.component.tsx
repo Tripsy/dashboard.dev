@@ -8,7 +8,7 @@ import { DataTableFiltersCmrSession } from '@/app/(dashboard)/dashboard/cmr-sess
 
 export const DataTableCmrSession = (): JSX.Element => {
 	return (
-		<DataTableProvider dataSource="cmr-session" selectionMode="checkbox">
+		<DataTableProvider dataSource="cmr-session" selectionMode="single">
 			<div className="table-container">
 				<DataTableFiltersCmrSession />
 				<DataTableActions />

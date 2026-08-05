@@ -8,7 +8,7 @@ import { DataTableFiltersVehicle } from '@/app/(dashboard)/dashboard/vehicle/dat
 
 export const DataTableVehicle = (): JSX.Element => {
 	return (
-		<DataTableProvider dataSource="vehicle" selectionMode="checkbox">
+		<DataTableProvider dataSource="vehicle" selectionMode="single">
 			<div className="table-container">
 				<DataTableFiltersVehicle />
 				<DataTableActions />

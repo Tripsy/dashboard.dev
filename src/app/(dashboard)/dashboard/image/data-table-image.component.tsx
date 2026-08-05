@@ -8,7 +8,7 @@ import { DataTableFiltersImage } from '@/app/(dashboard)/dashboard/image/data-ta
 
 export const DataTableImage = (): JSX.Element => {
 	return (
-		<DataTableProvider dataSource="image" selectionMode="checkbox">
+		<DataTableProvider dataSource="image" selectionMode="single">
 			<div className="table-container">
 				<DataTableFiltersImage />
 				<DataTableActions />

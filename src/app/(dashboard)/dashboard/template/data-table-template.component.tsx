@@ -8,7 +8,7 @@ import { DataTableFiltersTemplate } from '@/app/(dashboard)/dashboard/template/d
 
 export const DataTableTemplate = (): JSX.Element => {
 	return (
-		<DataTableProvider dataSource="template" selectionMode="checkbox">
+		<DataTableProvider dataSource="template" selectionMode="single">
 			<div className="table-container">
 				<DataTableFiltersTemplate />
 				<DataTableActions />

@@ -8,7 +8,7 @@ import { DataTableFiltersBrand } from '@/app/(dashboard)/dashboard/brand/data-ta
 
 export const DataTableBrand = (): JSX.Element => {
 	return (
-		<DataTableProvider dataSource="brand" selectionMode="checkbox">
+		<DataTableProvider dataSource="brand" selectionMode="single">
 			<div className="table-container">
 				<DataTableFiltersBrand />
 				<DataTableActions />

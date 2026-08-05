@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import Routes from '@/config/routes.setup';
 import { formatDate } from '@/helpers/date.helper';
 import { useTranslation } from '@/hooks/use-translation.hook';
+import { hasPassword } from '@/models/auth.model';
 import { useAuth } from '@/providers/auth.provider';
 import { useToast } from '@/providers/toast.provider';
 import { requestGetSessions } from '@/services/account.service';
@@ -21,6 +22,9 @@ import { DataSourceSectionEnum } from '@/types/data-source.type';
 
 export default function AccountMe() {
 	const { auth, authStatus, refreshAuth } = useAuth();
+	// Read through the helper: a backend that predates `has_password` omits it, and treating
+	// that as "social account" would mislabel every user during a version skew.
+	const accountHasPassword = hasPassword(auth);
 	const { showToast } = useToast();
 	const open = useModalStore((s) => s.open);
 	const [sessions, setSessions] = useState<AuthTokenType[]>([]);
@@ -227,7 +231,7 @@ export default function AccountMe() {
 								 * Setting a first one goes through password recovery, which
 								 * proves ownership by email instead of by current password.
 								 */}
-								{auth.has_password ? (
+								{accountHasPassword ? (
 									<p className="text-xs italic">
 										Last updated:{' '}
 										{formatDate(
@@ -246,7 +250,7 @@ export default function AccountMe() {
 									</p>
 								)}
 							</div>
-							{auth.has_password ? (
+							{accountHasPassword ? (
 								<Button
 									type="button"
 									onClick={openPasswordUpdate}
@@ -282,7 +286,7 @@ export default function AccountMe() {
 					</div>
 				</div>
 
-				<OAuthIdentityList hasPassword={auth.has_password} />
+				<OAuthIdentityList hasPassword={accountHasPassword} />
 
 				{/* Sessions Management */}
 				<div className="bg-surface border border-border rounded-xl p-6 shadow-xl space-y-4 w-full max-w-md">

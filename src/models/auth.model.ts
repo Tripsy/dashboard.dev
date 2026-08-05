@@ -12,6 +12,13 @@ export type AuthModelPermissions = Record<
 
 export type AuthModel = UserModel<Date> & {
 	permissions: AuthModelPermissions;
+	/*
+	 * False for a social sign-in account that has never set a password. Supplied by the
+	 * backend's auth context — the password hash itself is deliberately never sent, so this
+	 * boolean is the only signal the UI gets, and it is what decides whether the "change
+	 * password" and "confirm with password" affordances make sense at all.
+	 */
+	has_password: boolean;
 };
 
 export function isAdmin(data: AuthModel | null): boolean {

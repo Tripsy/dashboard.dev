@@ -1,8 +1,10 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { AuthTokenList } from '@/app/(public)/_components/auth-token-list.component';
+import { OAuthIdentityList } from '@/app/(public)/_components/oauth-identity-list.component';
 import { Icons } from '@/components/icon.component';
 import { LoadingComponent } from '@/components/status.component';
 import { Badge } from '@/components/ui/badge';
@@ -218,27 +220,51 @@ export default function AccountMe() {
 								<div className="text-sm text-muted font-semibold">
 									Password
 								</div>
-								<p className="text-xs italic">
-									Last updated:{' '}
-									{formatDate(
-										auth.password_updated_at,
-										undefined,
-										{
-											customFormat: 'D MMMM YYYY, h:mm A',
-										},
-									)}
-								</p>
+								{/*
+								 * A social sign-in account has no password, so there is
+								 * nothing to change and no meaningful "last updated" —
+								 * `password_updated_at` is stamped at creation regardless.
+								 * Setting a first one goes through password recovery, which
+								 * proves ownership by email instead of by current password.
+								 */}
+								{auth.has_password ? (
+									<p className="text-xs italic">
+										Last updated:{' '}
+										{formatDate(
+											auth.password_updated_at,
+											undefined,
+											{
+												customFormat:
+													'D MMMM YYYY, h:mm A',
+											},
+										)}
+									</p>
+								) : (
+									<p className="text-xs italic">
+										Not set — you sign in with a social
+										provider
+									</p>
+								)}
 							</div>
-							<Button
-								type="button"
-								onClick={openPasswordUpdate}
-								title="Update password"
-								variant="outline"
-								size="sm"
-								className="cursor-pointer"
-							>
-								<Icons.Password /> Change
-							</Button>
+							{auth.has_password ? (
+								<Button
+									type="button"
+									onClick={openPasswordUpdate}
+									title="Update password"
+									variant="outline"
+									size="sm"
+									className="cursor-pointer"
+								>
+									<Icons.Password /> Change
+								</Button>
+							) : (
+								<Link
+									href={Routes.get('password-recover')}
+									className="text-accent text-sm font-medium hover:underline self-center"
+								>
+									Set a password
+								</Link>
+							)}
 						</div>
 					</div>
 
@@ -255,6 +281,8 @@ export default function AccountMe() {
 						</Button>
 					</div>
 				</div>
+
+				<OAuthIdentityList hasPassword={auth.has_password} />
 
 				{/* Sessions Management */}
 				<div className="bg-surface border border-border rounded-xl p-6 shadow-xl space-y-4 w-full max-w-md">

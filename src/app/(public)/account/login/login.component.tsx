@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useActionState, useEffect, useState } from 'react';
 import { AuthTokenList } from '@/app/(public)/_components/auth-token-list.component';
+import { OAuthProviders } from '@/app/(public)/_components/oauth-providers.component';
 import { loginAction } from '@/app/(public)/account/login/login.action';
 import {
 	isLoginResponseMaxActiveSessions,
@@ -199,6 +200,8 @@ export default function Login() {
 						/>
 					</div>
 				)}
+
+				<OAuthProviders />
 
 				<div className="text-center space-y-2">
 					<p className="text-sm text-muted">

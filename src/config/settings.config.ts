@@ -61,6 +61,28 @@ function loadSettings() {
 				process.env.SESSION_REFRESH_THRESHOLD || 28800,
 			),
 		},
+		/*
+		 * Social sign-in. Only the client ids live here — they are public by design and the
+		 * browser needs them to build the provider's authorize URL. The client *secrets*
+		 * belong to the backend, which is what performs the code exchange.
+		 *
+		 * An empty client id disables that provider's button, so a deployment can offer
+		 * Google without Facebook. This has to agree with the backend's own OAUTH_* config:
+		 * a button shown here against an unconfigured backend answers 501.
+		 */
+		oauth: {
+			google: {
+				clientId: process.env.NEXT_PUBLIC_OAUTH_GOOGLE_CLIENT_ID || '',
+			},
+			facebook: {
+				clientId:
+					process.env.NEXT_PUBLIC_OAUTH_FACEBOOK_CLIENT_ID || '',
+			},
+			// Holds the CSRF `state` between leaving for the provider and coming back.
+			// Short-lived: it only has to survive one round trip through the provider.
+			stateCookieName: 'oauth-state',
+			stateCookieMaxAge: 15 * 60,
+		},
 		remoteApi: {
 			url: process.env.REMOTE_API_URL,
 			wsUrl: process.env.NEXT_PUBLIC_REMOTE_API_WS_URL,

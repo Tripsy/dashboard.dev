@@ -23,6 +23,7 @@ import log_history from '@/locales/en/log-history.json';
 import login from '@/locales/en/login.json';
 import logout from '@/locales/en/logout.json';
 import mail_queue from '@/locales/en/mail-queue.json';
+import oauth from '@/locales/en/oauth.json';
 import password_recover from '@/locales/en/password-recover.json';
 import password_recover_change from '@/locales/en/password-recover-change.json';
 import permission from '@/locales/en/permission.json';
@@ -59,6 +60,7 @@ const en = {
 	login,
 	logout,
 	'mail-queue': mail_queue,
+	oauth,
 	'password-recover': password_recover,
 	'password-recover-change': password_recover_change,
 	permission,

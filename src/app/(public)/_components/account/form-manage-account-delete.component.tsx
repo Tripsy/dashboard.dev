@@ -4,6 +4,7 @@ import { useState } from 'react';
 import type { AccountDeleteFormValuesType } from '@/app/(public)/account/delete/account-delete.definition';
 import { FormComponentPassword } from '@/components/form/form-element.component';
 import { useElementIds } from '@/hooks/use-element-ids.hook';
+import { useAuth } from '@/providers/auth.provider';
 import { useWindowForm } from '@/providers/window-form.provider';
 
 export function FormManageAccountDelete() {
@@ -11,8 +12,13 @@ export function FormManageAccountDelete() {
 
 	const { formValues, errors, handleChange, pending } =
 		useWindowForm<AccountDeleteFormValuesType>();
+	const { auth } = useAuth();
 
 	const elementIds = useElementIds(['passwordCurrent'] as const);
+
+	// A social sign-in account has no password to type. The session cookie is the only
+	// credential it has, and it is the same bar every other `/account/me` action clears.
+	const hasPassword = auth?.has_password !== false;
 
 	return (
 		<>
@@ -22,21 +28,23 @@ export function FormManageAccountDelete() {
 				immediately.
 			</p>
 
-			<FormComponentPassword<AccountDeleteFormValuesType>
-				labelText="Current Password"
-				id={elementIds.passwordCurrent}
-				fieldName="password_current"
-				fieldValue={formValues.password_current ?? ''}
-				placeholderText="Current password"
-				autoComplete="current-password"
-				disabled={pending}
-				onChange={(e) =>
-					handleChange('password_current', e.target.value)
-				}
-				error={errors.password_current}
-				showPassword={showPassword}
-				setShowPassword={setShowPassword}
-			/>
+			{hasPassword && (
+				<FormComponentPassword<AccountDeleteFormValuesType>
+					labelText="Current Password"
+					id={elementIds.passwordCurrent}
+					fieldName="password_current"
+					fieldValue={formValues.password_current ?? ''}
+					placeholderText="Current password"
+					autoComplete="current-password"
+					disabled={pending}
+					onChange={(e) =>
+						handleChange('password_current', e.target.value)
+					}
+					error={errors.password_current}
+					showPassword={showPassword}
+					setShowPassword={setShowPassword}
+				/>
+			)}
 		</>
 	);
 }

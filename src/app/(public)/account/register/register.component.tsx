@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useActionState, useState } from 'react';
+import { OAuthProviders } from '@/app/(public)/_components/oauth-providers.component';
 import { registerAction } from '@/app/(public)/account/register/register.action';
 import {
 	type RegisterFormValuesType,
@@ -254,6 +255,8 @@ export default function Register() {
 					formSituation={formSituation}
 					formMessage={formMessage}
 				/>
+
+				<OAuthProviders label="or sign up with" />
 
 				<div className="text-center space-y-2">
 					<p className="text-sm text-muted">

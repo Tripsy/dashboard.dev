@@ -103,8 +103,7 @@ export default async function Page(props: Props) {
 					dangerouslySetInnerHTML={{ __html: pageData.html }}
 				/>
 				<div className="mt-8 text-sm italic text-right text-muted">
-					Last update:{' '}
-					{formatDate(pageData.updated_at, 'date-time')}
+					Last update: {formatDate(pageData.updated_at, 'date-time')}
 				</div>
 			</div>
 		</div>

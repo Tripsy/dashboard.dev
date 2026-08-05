@@ -292,8 +292,9 @@
 	 * .table__cell` also matches here, at equal specificity, so source order alone isn't
 	 * reliable once Tailwind's layers are combined).
 	 */
-	.dashboard-layout .data-table
-		.table__row[data-selected='true']
+	.dashboard-layout
+		.data-table
+		.table__row[data-selected="true"]
 		.table__cell {
 		@apply bg-warning-light!;
 	}
@@ -330,21 +331,21 @@
 	 * standalone card (table.styles.ts). This dashboard's tables sit flush against the
 	 * surrounding surface instead, so the header row should read as square.
 	 */
-	.dashboard-layout .data-table
+	.dashboard-layout
+		.data-table
 		:is(
 			th.table__column:first-child,
-			[role='row'] > [role='presentation']:first-of-type
-				> .table__column
+			[role="row"] > [role="presentation"]:first-of-type > .table__column
 		) {
 		border-start-start-radius: 0;
 		border-end-start-radius: 0;
 	}
 
-	.dashboard-layout .data-table
+	.dashboard-layout
+		.data-table
 		:is(
 			th.table__column:last-child,
-			[role='row'] > [role='presentation']:last-of-type
-				> .table__column
+			[role="row"] > [role="presentation"]:last-of-type > .table__column
 		) {
 		border-start-end-radius: 0;
 		border-end-end-radius: 0;

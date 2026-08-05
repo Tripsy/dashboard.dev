@@ -11,8 +11,8 @@ import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { Link } from '@/components/ui/link';
-import { Configuration } from '@/config/settings.config';
 import Routes from '@/config/routes.setup';
+import { Configuration } from '@/config/settings.config';
 import { translate } from '@/config/translate.setup';
 import { logger } from '@/helpers/logger.helper';
 import type { AuthModel } from '@/models/auth.model';
@@ -101,9 +101,9 @@ export default async function Page() {
 							dashboard
 						</h1>
 						<p className="text-lg md:text-xl text-muted mb-8 max-w-2xl mx-auto">
-							CMR documents, work sessions, vehicles and cash
-							flow — all in one place, with the right access
-							for every role on your team.
+							CMR documents, work sessions, vehicles and cash flow
+							— all in one place, with the right access for every
+							role on your team.
 						</p>
 						<div className="flex flex-col sm:flex-row gap-4 justify-center">
 							{isDashboardUser ? (
@@ -152,9 +152,8 @@ export default async function Page() {
 							Everything Your Operation Needs
 						</h2>
 						<p className="text-lg text-muted max-w-2xl mx-auto">
-							A complete toolkit for managing transport
-							documents, fleet activity and back-office
-							operations.
+							A complete toolkit for managing transport documents,
+							fleet activity and back-office operations.
 						</p>
 					</div>
 

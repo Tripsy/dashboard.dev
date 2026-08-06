@@ -9,9 +9,7 @@
   },
   "permissions": {
     "additionalDirectories": [
-      "../star-api",
-      "../shared",
-      "../nready.dev"
+      "../star-api"
     ],
     "allow": [
       "Bash(git add:*)",

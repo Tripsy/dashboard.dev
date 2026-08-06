@@ -66,29 +66,34 @@ export default function Login({ translations }: LoginProps) {
 
 	useEffect(() => {
 		if (formSituation === 'success') {
+			/*
+			 * Sequenced, not parallel: `refreshAuth` calls the `getAuth` server action, which
+			 * Next posts to the *current* URL and answers with a re-rendered tree for it. Started
+			 * alongside the navigation, that response lands after it and puts the login page back
+			 * on screen — the session is already valid, so only a reload shows it. Awaiting the
+			 * action leaves nothing in flight to overwrite the redirect.
+			 */
 			(async () => {
 				await refreshAuth();
-			})();
 
-			// Get the original destination from query params
-			const fromParam = searchParams.get('from');
+				// Get the original destination from query params
+				const fromParam = searchParams.get('from');
 
-			let redirectUrl = Routes.get('home');
+				let redirectUrl = Routes.get('home');
 
-			if (fromParam) {
-				const decodedFrom = decodeURIComponent(fromParam);
+				if (fromParam) {
+					// `get` already percent-decodes, so `fromParam` is the plain path.
+					const url = new URL(fromParam, window.location.origin);
+					const pathname = url.pathname;
 
-				// Parse the decoded URL to extract just the pathname
-				const url = new URL(decodedFrom, window.location.origin);
-				const pathname = url.pathname;
-
-				// Check only the pathname against excluded routes
-				if (!isExcludedRoute(pathname)) {
-					redirectUrl = url.toString();
+					// Check only the pathname against excluded routes
+					if (!isExcludedRoute(pathname)) {
+						redirectUrl = url.toString();
+					}
 				}
-			}
 
-			router.replace(redirectUrl);
+				router.replace(redirectUrl);
+			})();
 		}
 	}, [formSituation, router, refreshAuth, searchParams]);
 

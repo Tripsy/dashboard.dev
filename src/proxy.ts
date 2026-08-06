@@ -49,8 +49,11 @@ class MiddlewareContext {
 		// Create the login URL
 		const loginUrl = new URL(Routes.get('login'), this.req.url);
 
-		// Set from query parameter as `destinationPath`
-		loginUrl.searchParams.set('from', encodeURIComponent(destinationPath));
+		// `set` percent-encodes on serialisation, so the raw path goes in: pre-encoding it
+		// here would encode the escapes themselves, and a reader doing one `get` would be
+		// handed `%2Fdashboard` — which `isSafeReturnPath` in the OAuth start route rejects
+		// for not beginning with a slash.
+		loginUrl.searchParams.set('from', destinationPath);
 
 		return this.redirect(loginUrl);
 	}

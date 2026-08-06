@@ -296,6 +296,11 @@ entities/operations, DB schema, business rules read the code in `../star-api`
   `sendDefaultPii` is off, and `beforeSend`/`beforeBreadcrumb` in `sentry.setup.ts` redact keys
   matching `/password|token|secret|authorization|cookie|credential/i`, but that is a backstop for
   the call site that slips through, not permission to rely on it.
+- **Server actions vs. navigation**: a server action is POSTed to the *current* URL and its
+  response carries a re-rendered tree for that page. Started alongside a `router.push`/`replace`,
+  it lands after the navigation and restores the page you just left — the state change succeeded,
+  so only a reload reveals it. Always `await` the action, then navigate (see
+  `login.component.tsx` and `oauth-callback.component.tsx`).
 - **Error boundaries**: `src/app/error.tsx` catches route errors, `src/app/global-error.tsx`
   catches failures in the root layout itself. The latter replaces that layout, so it gets no
   `globals.css` — it is inline-styled and dependency-free by design and must stay that way.

@@ -221,9 +221,9 @@ room in the container for both, and it is usually the dev server that gets kille
 
 # 📌 TODO
 
-1. Hero UI -> theme
-2. Add section "documentation"
-3. login with google / facebook
+1. login with google / facebook - done => test implementation
+2. Hero UI -> theme
+3. Add section "documentation"
 4. Implement kill all sessions except current
       // // This will actually remove all sessions - keep it for further implementation
       // await AccountTokenRepository.createQuery()

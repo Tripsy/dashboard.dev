@@ -9,7 +9,7 @@ import { requestStatsDriverCountCMRs } from '@/services/stats.service';
 
 export function CountDriverCMRs() {
 	const { data, isLoading, isError } = useQuery({
-		queryKey: ['stats-driver-count-cmrs'],
+		queryKey: ['stats', 'driver-count-cmrs'],
 		queryFn: () => requestStatsDriverCountCMRs(),
 		staleTime: 20 * 60 * 1000,
 	});

@@ -9,7 +9,7 @@ import { requestStatsDriverCountWorkingHours } from '@/services/stats.service';
 
 export function CountDriverWorkingHours() {
 	const { data, isLoading, isError } = useQuery({
-		queryKey: ['stats-driver-count-working-hours'],
+		queryKey: ['stats', 'driver-count-working-hours'],
 		queryFn: () => requestStatsDriverCountWorkingHours(),
 		staleTime: 10 * 60 * 1000,
 	});

@@ -35,7 +35,7 @@ function LatestCMRsSkeleton() {
 
 export function LatestCMRs() {
 	const { data, isLoading, isError } = useQuery({
-		queryKey: ['stats-latest-cmrs'],
+		queryKey: ['stats', 'latest-cmrs'],
 		queryFn: () => requestStatsLatestCMRs(),
 		// staleTime: 10 * 60 * 1000,
 		staleTime: 0,

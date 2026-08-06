@@ -32,7 +32,7 @@ function RecentActivitySkeleton() {
 
 export function RecentActivity() {
 	const { data, isLoading, isError } = useQuery({
-		queryKey: ['stats-recent-activity'],
+		queryKey: ['stats', 'recent-activity'],
 		queryFn: () => requestStatsRecentActivity(),
 		staleTime: 20 * 60 * 1000,
 	});

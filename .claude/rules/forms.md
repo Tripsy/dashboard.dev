@@ -4,11 +4,12 @@ paths:
   - "src/components/window/window-form.component.tsx"
   - "src/providers/window-form.provider.tsx"
   - "src/hooks/use-form-*.ts"
-  - "src/hooks/use-form-*.hook.ts"
   - "src/helpers/form.helper.ts"
   - "src/helpers/form-process.helper.ts"
   - "src/helpers/validator.helper.ts"
   - "src/app/**/*.definition.ts"
+  - "src/app/**/form-manage-*.component.tsx"
+  - "src/app/**/*.action.ts"
 ---
 
 # Forms Protocol
@@ -158,6 +159,17 @@ login's `AuthTokenList` + post-login redirect). For this pattern only:
   `requestLogin` → `createAuth` there so the form only reports success once the session cookie exists.
 - Everything else (validator class, `getFormValues`, debounced `useFormValidation`, shared field components)
   follows the same conventions as §2–§6.
+
+**`oauth-callback.action.ts` is not one of these**, despite the `.action.ts` name and living next to a
+`.definition.ts`. There is no form — no fields, no `FormData`, no `processForm`, no validator — only a
+provider redirect to redeem. It is therefore the one action file that *does* carry `'use server'` (the
+`state` cookie must be read and cleared server-side; there is no browser form for the CSRF header to
+ride on), and its `.definition.ts` holds only the state shape and translation keys.
+`OAuthCallbackSituationType` is its own standalone union (`pending` / `success` / `error` /
+`maxActiveSession`) — it deliberately does **not** extend `FormSituationType`, because most of that
+type describes form outcomes this flow cannot have. The overlap with login (`maxActiveSession`
+rendering the same `AuthTokenList`) is a shared failure, not a shared pipeline.
+See CLAUDE.md's "Social login (OAuth)" for the full flow.
 
 ### Authenticated account self-service uses `WindowForm`, not this pattern
 

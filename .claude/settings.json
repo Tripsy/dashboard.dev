@@ -57,7 +57,9 @@
     "deny": [
       "Bash(find * -delete*)",
       "Bash(find * -exec*)",
-      "Bash(find * -execdir*)"
+      "Bash(find * -execdir*)",
+      "Bash(git push:*)",
+      "Bash(rm:*)"
     ]
   }
 }

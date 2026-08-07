@@ -7,6 +7,21 @@
     "commit": "",
     "pr": ""
   },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Bash(git commit:*)",
+            "command": "b=$(git rev-parse --abbrev-ref HEAD 2>/dev/null); if [ \"$b\" = \"main\" ]; then printf '%s' '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"Refusing to commit on main: GitHub rejects a direct push, so the commit would have to be moved off. Run: git switch -c <type>/<short-name>\"}}'; fi",
+            "statusMessage": "Checking branch"
+          }
+        ]
+      }
+    ]
+  },
   "permissions": {
     "additionalDirectories": [
       "../star-api"

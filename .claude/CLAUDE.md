@@ -215,6 +215,10 @@ entities/operations, DB schema, business rules read the code in `../star-api`
 - This project has no tests at the moment.
 - Do not run biome after applying change. Run it only on demand or before git push commands.
 - Stop the dev server before running `build` or `tsc` — the container cannot hold both (see Commands).  
+- **Never commit onto `main`.** GitHub refuses a direct push to it, so a commit made there has to be
+  moved off before it can go anywhere. If the current branch is `main` when a commit is requested,
+  create the branch first (`git switch -c <type>/<short-name>`) and commit on that. The same applies
+  in `../star-api`.
 - When subagents are available and appropriate for the task, prefer delegating noisy operations
   (broad searches, log trawls, build output) to one — this is a preference for keeping the main
   context clean, not an instruction to spawn agents unprompted.

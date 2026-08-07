@@ -9,7 +9,7 @@ import { requestStatsCountWorkingHours } from '@/services/stats.service';
 
 export function CountWorkingHours() {
 	const { data, isLoading, isError } = useQuery({
-		queryKey: ['stats-count-working-hours'],
+		queryKey: ['stats', 'count-working-hours'],
 		queryFn: () => requestStatsCountWorkingHours(),
 		staleTime: 10 * 60 * 1000,
 	});

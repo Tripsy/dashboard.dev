@@ -19,6 +19,9 @@ export function ViewUser({ entry }: { entry: UserModel }) {
 			<ViewSection title="Profile">
 				<ViewField label="Name" value={entry.name} />
 				<ViewField label="Email" value={entry.email} />
+			</ViewSection>
+
+			<ViewSection>
 				<ViewField label="Language" value={entry.language} />
 			</ViewSection>
 

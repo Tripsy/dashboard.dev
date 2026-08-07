@@ -25,6 +25,23 @@ You are a concise assistant for a pragmatic senior full-stack developer.
 - Write production-ready code with clear intent and low complexity.
 - Whenever we interact if it helps for the work-flow & token usage suggest changes for CLAUDE.md
 
+## Detailed Protocols (`.claude/rules/`)
+
+These files carry the real conventions for their area. All are **path-scoped** via their `paths:`
+frontmatter — they load only once a matching file is opened, so during planning they are not in
+context yet. Read the relevant one *before* proposing an approach in that area, not after:
+
+| File | Covers | Loads for |
+|---|---|---|
+| `forms.md` | Validators, `<entity>.definition.ts`, the `processForm` pipeline, both form hosts | form/definition/action files, form helpers |
+| `data-fetching.md` | TanStack Query, service layer, query keys, cache invalidation | `src/services/**`, api helpers, data-table components |
+| `state.md` | Zustand stores, what belongs in a store vs. local state vs. server cache | `src/stores/**`, `src/components/window/**` |
+| `typescript.md` | TS/React conventions, linting rules, type-checking | every `.ts`/`.tsx` |
+
+Backend behaviour has its own set in `../star-api/.claude/rules/` (`api.md`, `auth.md`,
+`database.md`, `error-handling.md`, `validation.md`, ...) — consult those rather than inferring
+backend rules from this project.
+
 ## Rules & Conventions
 
 - Do not blindly accept the user's proposed solution — verify it is correct and complete before implementing. If the approach has gaps, edge cases, or a better alternative exists, flag it.
@@ -53,12 +70,12 @@ You are a concise assistant for a pragmatic senior full-stack developer.
 ## Decision Documentation
 
 - Explain your reasoning for non-obvious decisions in comments
-- If there are two valid approaches, document why you chose one over the other
-- Note any performance implications or trade-offs
 - **Write comments about the code as it is, never as a diff against what it was.** No "this
   used to run unconditionally", no "the previous order broke X". State the constraint that
   still applies ("split before the lowercase, which destroys the case boundary the split
-  reads") and leave the before/after for the commit message.
+  reads") and leave the before/after for the commit message
+- If there are two valid approaches, document why you chose one over the other
+- Note any performance implications or trade-offs
 
 ## Commands
 
@@ -129,63 +146,63 @@ entities/operations, DB schema, business rules read the code in `../star-api`
 ├── docker/
 ├── public/
 ├── src/
-│   ├── app/    
-│   │   ├── (dashboard)/   # Dashboard related routes  
-│   │   ├── (public)/      # Public routes
-│   │   │   ├── account/ 
-│   │   │   ├── docs/ 
-│   │   │   ├── page/ 
-│   │   │   ├── status/ 
-│   │   │   ├── layout.tsx # Public specific layout
+│   ├── app/
+│   │   ├── (dashboard)/       # Admin panel routes (see "Per-entity dashboard CRUD pattern")
+│   │   │   ├── _components/   # Dashboard-only components (side menu, data-table)
+│   │   │   ├── _events/       # Cross-component events (data-table action / filter reset)
+│   │   │   ├── _providers/    # data-table.provider.tsx (per-table store + Context)
+│   │   │   ├── dashboard/     # One folder per entity
+│   │   ├── (public)/          # Public site: marketing, auth, account, driver panel
+│   │   │   ├── _components/   # Public-only components (incl. account/ self-service windows)
+│   │   │   ├── _hooks/
+│   │   │   ├── _providers/
+│   │   │   ├── account/       # Auth-entry flows + oauth/[provider] + me/
+│   │   │   ├── driver-panel/
+│   │   │   ├── page/
+│   │   │   ├── status/
+│   │   │   ├── layout.tsx     # Public specific layout
+│   │   │   ├── loading.tsx
 │   │   │   ├── page.tsx
-│   │   ├── api/  
-│   │   │   ├── csrf/ 
-│   │   │   ├── language/ 
-│   │   │   ├── proxy/ 
-│   │   ├── error.tsx 
+│   │   ├── api/               # Route handlers
+│   │   │   ├── csrf/
+│   │   │   ├── health/
+│   │   │   ├── image/
+│   │   │   ├── language/
+│   │   │   ├── oauth/         # oauth/[provider] — social login redirect/callback
+│   │   │   ├── proxy/         # [...path] — forwards dashboard requests to star-api
+│   │   ├── document/          # cmr/ — printable CMR documents
+│   │   ├── error.tsx          # Route error boundary
 │   │   ├── favicon.ico
-│   │   ├── global.css
-│   │   ├── layout.css  # Base layout
-│   │   ├── providers.tsx # Base providers
-│   ├── components/        # Common components
-│   │   ├── form/          # Form related components
-│   │   ├── layout/        # Layout components
-│   │   │   ├── footer.default.tsx
-│   │   │   ├── header.default.tsx
-│   │   │   ├── logo.default.tsx
-│   │   │   ├── toggle-theme.tsx
-│   │   │   ├── user-menu.component.tsx
-│   │   ├── ui/
-│   │   ├── window/
-│   │   ├── icon.component.tsx
-│   │   ├── protected-route.component.tsx
-│   │   ├── status.component.tsx
-│   ├── config/            # Configuration files
+│   │   ├── global-error.tsx   # Root-layout error boundary (inline-styled, no globals.css)
+│   │   ├── globals.css
+│   │   ├── layout.tsx         # Base layout
+│   │   ├── providers.tsx      # Base providers
+│   ├── components/            # Common components
+│   │   ├── form/              # Form field components (form-element.component.tsx et al.)
+│   │   ├── layout/            # Header, footer, logo, user menu, theme/language switchers
+│   │   ├── ui/                # Thin wrappers over HeroUI primitives
+│   │   ├── window/            # Modal/window stack + WindowForm
+│   ├── config/                # Configuration files
 │   │   ├── data-source.config.ts
-│   │   ├── dayjs.config.ts 
-│   │   ├── init-redis.config.ts 
+│   │   ├── dayjs.config.ts
+│   │   ├── init-redis.config.ts
 │   │   ├── routes.setup.ts
-│   │   ├── settings.config.ts 
-│   │   ├── translate.setup.ts 
-│   ├── exceptions/        # Custom error classes
-│   ├── helpers/           # Utilities (date, string, object, etc.)
-│   ├── hooks/             # Custom hooks
-│   ├── locales/           # Language files
-│   ├── models/            # Models (entities)
-│   ├── providers/           
-│   │   ├── auth.provider.tsx 
-│   │   ├── query-client.provider.tsx 
-│   │   ├── theme.provider.tsx 
-│   │   ├── toast.provider.tsx 
-│   ├── services/          # Back-end (eg: NReady) services
-│   │   ├── account.service.ts
-│   │   ├── auth.service.ts
-│   │   ├── ...
+│   │   ├── sentry.setup.ts
+│   │   ├── settings.config.ts
+│   │   ├── translate.setup.ts
+│   ├── exceptions/            # Custom error classes
+│   ├── helpers/               # Utilities (api, date, string, form, window, logger, etc.)
+│   ├── hooks/                 # Custom hooks
+│   ├── locales/               # Language files (en, ro)
+│   ├── models/                # Models (entities)
+│   ├── providers/             # auth, query-client, theme, toast, window-form, ...
+│   ├── services/              # star-api service wrappers (account, auth, image, ...)
 │   ├── stores/
 │   │   ├── data-table.store.ts
 │   │   ├── window.store.ts
-│   ├── types/            
-│   └── proxy.ts           
+│   ├── types/
+│   ├── instrumentation.ts     # + instrumentation-client.ts, sentry.{server,edge}.config.ts
+│   └── proxy.ts               # Next.js middleware: auth, permissions, CSRF
 ├── .env
 ├── biome.json
 ├── docker-compose.yml
@@ -197,9 +214,14 @@ entities/operations, DB schema, business rules read the code in `../star-api`
 
 - This project has no tests at the moment.
 - Do not run biome after applying change. Run it only on demand or before git push commands.
-- Stop the dev server before running `build` or `tsc` — the container cannot hold both (see Commands).
-- Do not offer to do push commands, will be asked explicitly.
-- Delegate noisy operations to subagents.
+- Stop the dev server before running `build` or `tsc` — the container cannot hold both (see Commands).  
+- **Never commit onto `main`.** GitHub refuses a direct push to it, so a commit made there has to be
+  moved off before it can go anywhere. If the current branch is `main` when a commit is requested,
+  create the branch first (`git switch -c <type>/<short-name>`) and commit on that. The same applies
+  in `../star-api`.
+- When subagents are available and appropriate for the task, prefer delegating noisy operations
+  (broad searches, log trawls, build output) to one — this is a preference for keeping the main
+  context clean, not an instruction to spawn agents unprompted.
 
 ## Architecture
 
@@ -225,6 +247,33 @@ entities/operations, DB schema, business rules read the code in `../star-api`
   resulting `AuthModel` (user + `permissions` map) as the `x-auth-data` response header; `hasPermission()` in
   `src/models/auth.model.ts` gates `protected` routes. `src/providers/auth.provider.tsx` exposes this to
   client components.
+- **Social login (OAuth)** — authorization-code flow split across two legs, both on this origin:
+  1. *Start* — `src/app/api/oauth/[provider]/route.ts` (route `oauth-start`, `/api/oauth/:provider`).
+     A GET route handler, not a server action, because the browser has to **navigate** to the
+     provider; `OAuthProviders` (`(public)/_components/oauth-providers.component.tsx`) renders plain
+     `<a>` links for that reason. It mints a `state` uuid, stores `{ state, from }` in the httpOnly
+     `oauth-state` cookie (`sameSite: 'lax'` — a strict cookie would not survive the cross-site
+     return), and redirects to the provider.
+  2. *Callback* — `(public)/account/oauth/[provider]/` (route `oauth-callback`,
+     `/account/oauth/:provider`, must match `getOAuthRedirectUri`). `oauth-callback.action.ts`
+     consumes the cookie (single-use — deleted whether or not the check passes), compares `state`,
+     then `requestOAuthLogin` → `createAuth`. The component redeems once behind a `useRef` guard,
+     since Strict Mode would otherwise spend the single-use `code` twice.
+  - **`state` is the entire CSRF defence for this flow** and only this app can enforce it — the
+     backend never sees the browser leave. The middleware's `x-csrf-token` gate does not apply:
+     the start leg is a GET, and the callback is a server action. Don't "simplify" either leg into
+     the other's shape.
+  - The `from` return target rides in the cookie, never through the provider's `state`, and is
+     validated against `isSafeReturnPath` / `isExcludedRoute` — a target that round-trips through a
+     third party is one an attacker can rewrite.
+  - Providers are declared in `src/types/oauth.type.ts` (`OAuthProviderEnum`, label map, per-provider
+     authorize-URL builder). A provider is offered only when its `NEXT_PUBLIC_OAUTH_*_CLIENT_ID` is
+     set; the backend holds the secret and answers 501 if it is not configured there too, so the two
+     configs must agree. Adding a provider means a new enum entry, label, `buildOAuthAuthorizeUrl`
+     case, `settings.config.ts` client id, and the matching backend `OAUTH_*` config.
+  - Account-level linking/unlinking is separate from sign-in: `requestGetOAuthIdentities` /
+     `requestUnlinkOAuth` (`account.service.ts`) behind `oauth-identity-list.component.tsx` on
+     `/account/me`.
 - **Backend calls only go through the proxy** (`src/app/api/proxy/[...path]/route.ts`) or, server-side,
   through `ApiRequest` (`src/helpers/api.helper.ts`) with `.setRequestMode('remote-api')` — this is what
   attaches auth headers and builds the backend URL from `REMOTE_API_URL`. Don't call the backend directly
@@ -239,7 +288,8 @@ entities/operations, DB schema, business rules read the code in `../star-api`
   `src/app/(dashboard)/_components/side-menu.component.tsx`, and the route entry in
   `Routes.group('dashboard')` (`src/config/routes.setup.ts`).
 - **Data tables**: list views use a shared `data-table` abstraction backed by `src/stores/data-table.store.ts`
-  (Zustand); windows/dialogs are backed by `src/stores/window.store.ts` and `src/components/window`.
+  (Zustand); windows/dialogs are backed by `src/stores/window.store.ts` and `src/components/window`. The two
+  stores differ in middleware and write style — read `.claude/rules/state.md` before editing either.
 - **Config layer** (`src/config`): `settings.config.ts` (`Configuration.get(...)` — env-driven app settings,
   typed by dotted path so a typo is a compile error), `routes.setup.ts` (route table + auth),
   `data-source.config.ts` (maps `DataSourceKey` values to backend list/filter endpoints for data tables),
@@ -259,7 +309,8 @@ entities/operations, DB schema, business rules read the code in `../star-api`
   automatically (`src/helpers/csrf.helper.ts` owns the token and retries once on a `403` carrying the
   CSRF marker, since the cookie expires after an hour). A check inside a form handler cannot enforce
   anything — the form pipeline runs client-side — so keep the gate in the middleware. Server actions
-  bypass it by design and rely on Next's own origin verification.
+  bypass it by design and rely on Next's own origin verification. This is the mechanism; what it means
+  at the form layer (nothing to do, per-form CSRF options are wrong) is in `.claude/rules/forms.md` §1.
 - **Money**: the backend stores amounts as separator-less integers scaled by `10 ** AMOUNT_DECIMALS`
   (4) — `cash-flow.service.ts` persists `Math.round(abs(amount) * 10000)` and divides back on read, so
   80.6452 is row value 806452. Forms accept 2 decimals; anything past the 4th is discarded by that

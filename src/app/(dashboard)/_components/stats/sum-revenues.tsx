@@ -10,7 +10,7 @@ import { requestStatsSumRevenues } from '@/services/stats.service';
 
 export function SumRevenues() {
 	const { data, isLoading, isError } = useQuery({
-		queryKey: ['stats-sum-revenues'],
+		queryKey: ['stats', 'sum-revenues'],
 		queryFn: () => requestStatsSumRevenues(),
 		staleTime: 20 * 60 * 1000,
 	});

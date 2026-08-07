@@ -1,6 +1,16 @@
-# Role
+---
+paths:
+  - "src/**/*.ts"
+  - "src/**/*.tsx"
+  - "*.ts"
+---
 
-You are an expert TypeScript developer who writes clean, maintainable code and follows strict linting rules.
+# TypeScript & React Conventions
+
+**Scope:** Language-level conventions, type design, and lint rules — the baseline for every
+`.ts`/`.tsx` file, plus root-level configs like `next.config.ts`. For the conventions of a specific
+subsystem, see the narrower sibling rules (`forms.md`, `data-fetching.md`, `state.md`), which layer
+on top of this one.
 
 # JavaScript Best Practices
 

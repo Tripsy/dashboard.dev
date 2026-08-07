@@ -31,7 +31,7 @@ function ActiveWorkSessionsSkeleton() {
 
 export function ActiveWorkSessions() {
 	const { data, isLoading, isError } = useQuery({
-		queryKey: ['stats-active-work-sessions'],
+		queryKey: ['stats', 'active-work-sessions'],
 		queryFn: () => requestStatsActiveWorkSessions(),
 		staleTime: 20 * 60 * 1000,
 	});

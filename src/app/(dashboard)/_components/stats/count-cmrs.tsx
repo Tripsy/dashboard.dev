@@ -9,7 +9,7 @@ import { requestStatsCountCMRs } from '@/services/stats.service';
 
 export function CountCMRs() {
 	const { data, isLoading, isError } = useQuery({
-		queryKey: ['stats-count-cmrs'],
+		queryKey: ['stats', 'count-cmrs'],
 		queryFn: () => requestStatsCountCMRs(),
 		staleTime: 20 * 60 * 1000,
 	});
